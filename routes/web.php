@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\Tenant;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return view('landing', [
+        'tenants' => Tenant::all(),
+    ]);
 });
