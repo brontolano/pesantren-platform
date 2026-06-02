@@ -12,9 +12,9 @@ Route::middleware([
     InitializeTenancyBySubdomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-    Route::get('/', function () {
+    Route::get('/tenant', function () {
         return Inertia::render('Welcome', [
             'tenant' => tenant(),
         ]);
-    });
+    })->name('tenant.home');
 });

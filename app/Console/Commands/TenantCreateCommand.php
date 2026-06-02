@@ -23,10 +23,10 @@ class TenantCreateCommand extends Command
         ]);
 
         $tenant->domains()->create([
-            'domain' => $subdomain . '.localhost',
+            'domain' => $subdomain,
         ]);
 
-        $this->info("Tenant '{$name}' created with subdomain '{$subdomain}.localhost'");
+        $this->info("Tenant '{$name}' created with subdomain '{$subdomain}'");
 
         return self::SUCCESS;
     }
