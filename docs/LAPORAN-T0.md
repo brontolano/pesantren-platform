@@ -1,8 +1,13 @@
 # Laporan Eksekusi Tahap T0 — Fondasi Platform Pesantren
 
 > **Tanggal:** 2 Juni 2026
-> **Commit:** `fbeb293` — `T0: Fondasi platform pesantren multi-tenant SaaS`
 > **Status:** SELESAI
+>
+> **Commits:**
+> - `fbeb293` — T0: Fondasi platform pesantren multi-tenant SaaS
+> - `883a185` — docs: tambah laporan eksekusi T0
+> - `2bad2ef` — fix: tenant subdomain identification untuk development lokal
+> - `5a1c0ee` — feat: landing page central domain + link ke panel admin tenant
 
 ---
 
@@ -224,6 +229,51 @@ Tahap T0 membangun kerangka kosong multi-tenant yang bisa login, isolasi data, d
 
 ---
 
+## Perbaikan Pasca-Commit Awal
+
+### Fix: Tenant Subdomain Identification (`2bad2ef`)
+
+**Masalah:** `InitializeTenancyBySubdomain` mengekstrak subdomain dari hostname (misal `asy-syifaa` dari `asy-syifaa.localhost`), lalu mencocokkan ke tabel `domains`. Domain di DB tersimpan sebagai `asy-syifaa.localhost` (full) padahal stancl mencari `asy-syifaa` (subdomain saja) → tenant tidak ditemukan → error 500.
+
+**Solusi:**
+- Domain di tabel `domains` disimpan sebagai subdomain saja (`asy-syifaa`, bukan `asy-syifaa.localhost`)
+- Command `tenant:create` diupdate agar menyimpan format yang benar
+- Entry ditambahkan ke Windows hosts file: `127.0.0.1 asy-syifaa.localhost demo.localhost`
+
+**Pelajaran:** Selalu test di browser setelah setup middleware — automated test saja tidak menangkap issue routing/hostname.
+
+### Feat: Landing Page + Login Flow (`5a1c0ee`)
+
+**Yang dikerjakan:**
+- Landing page di central domain (`localhost:8000`) menampilkan daftar semua tenant
+- Setiap tenant ditampilkan sebagai card dengan link langsung ke panel admin
+- Klik card → redirect ke `{subdomain}.localhost:8000/admin`
+- Jika belum login → halaman login Filament muncul
+- Setelah login → langsung ke Dashboard dengan nama user yang benar
+
+**Akses lokal:**
+
+| URL | Fungsi |
+|---|---|
+| `localhost:8000` | Landing page — daftar tenant + link ke admin |
+| `asy-syifaa.localhost:8000/admin` | Panel admin Asy-Syifaa |
+| `demo.localhost:8000/admin` | Panel admin Demo |
+
+**Kredensial test:**
+
+| Tenant | Email | Password | Role |
+|---|---|---|---|
+| Asy-Syifaa | `admin@asy-syifaa.localhost` | `password` | super_admin |
+| Asy-Syifaa | `tu@asy-syifaa.localhost` | `password` | tu |
+| Demo | `admin@demo.localhost` | `password` | super_admin |
+| Demo | `tu@demo.localhost` | `password` | tu |
+
+**File utama:**
+- `resources/views/landing.blade.php` — landing page (Blade, tanpa Vite build)
+- `routes/web.php` — route central domain
+
+---
+
 ## Definition of Done — Status Akhir
 
 | # | Kriteria | Status |
@@ -262,10 +312,43 @@ pesantren-platform/
 │   └── seeders/ (RolesAndPermissionsSeeder, DatabaseSeeder)
 ├── docker-compose.yml, Dockerfile, Dockerfile.dev
 ├── Modules/Hello/ (modul contoh)
+├── resources/views/
+│   ├── landing.blade.php (landing page central domain)
+│   └── app.blade.php (root template Inertia/Vue)
 ├── routes/ (web.php, tenant.php, api.php)
 ├── tests/Feature/TenantIsolationTest.php
 ├── .github/workflows/test.yml
 └── docs/ (blueprint, PRD, rencana, laporan)
+```
+
+---
+
+## Cara Menjalankan Lokal
+
+**Prasyarat:** Docker Desktop terinstal.
+
+```bash
+# 1. Clone & masuk ke project
+cd pesantren-platform
+
+# 2. Jalankan semua service
+docker compose up -d
+
+# 3. Jalankan migrasi & seeder (pertama kali)
+docker compose exec app php artisan migrate
+docker compose exec app php artisan tenant:create "Asy-Syifaa" asy-syifaa
+docker compose exec app php artisan tenant:create "Demo" demo
+docker compose exec app php artisan db:seed
+
+# 4. Tambahkan ke hosts file (Windows, perlu Administrator)
+# Tambahkan baris berikut ke C:\Windows\System32\drivers\etc\hosts:
+# 127.0.0.1 asy-syifaa.localhost demo.localhost
+
+# 5. Buka di browser
+# Landing page: http://localhost:8000
+# Admin Asy-Syifaa: http://asy-syifaa.localhost:8000/admin
+# Admin Demo: http://demo.localhost:8000/admin
+# Login: admin@asy-syifaa.localhost / password
 ```
 
 ---
