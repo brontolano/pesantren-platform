@@ -1,0 +1,32 @@
+# Stage 1: Build frontend assets
+FROM node:22-alpine AS frontend
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY vite.config.js tailwind.config.js ./
+COPY resources/ resources/
+RUN npm run build
+
+# Stage 2: PHP application
+FROM php:8.3-cli
+
+RUN apt-get update && apt-get install -y \
+    git zip unzip libpq-dev libzip-dev libicu-dev \
+    && docker-php-ext-install pdo pdo_pgsql pgsql zip intl bcmath pcntl \
+    && pecl install redis && docker-php-ext-enable redis \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+COPY . .
+COPY --from=frontend /app/public/build public/build
+
+RUN composer install --no-dev --optimize-autoloader
+
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+EXPOSE 8000
+
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
