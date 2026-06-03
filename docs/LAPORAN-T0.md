@@ -1403,6 +1403,8 @@ tests/Feature/
 **Checklist yang sekarang bisa dianggap selesai:**
 - `T1.9.1` s/d `T1.9.13` **SELESAI**
 
+**Penutupan checklist:**
+- `T1.9.14 Commit: feat(notifikasi): complete module` sekarang **SELESAI** dengan hash `d911f59`
+
 **Checklist yang masih terbuka berurutan:**
-- `T1.9.14 Commit: feat(notifikasi): complete module`
-- setelah commit baru lanjut ke `T1.10.1 Buat tenant Asy-Syifaa`
+- `T1.10.1 Buat tenant Asy-Syifaa`
