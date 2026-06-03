@@ -1352,3 +1352,57 @@ tests/Feature/
 - `T1.8.6 Commit: feat(keuangan): complete module` sekarang **SELESAI** dengan hash `f0236fd`
 - Task berikutnya yang berurutan setelah commit keuangan adalah:
   - `T1.9.1 Buat module Notifikasi via nwidart`
+
+### Update 3 Juni 2026 — T1.9 Modul Notifikasi Distabilkan
+
+**Fokus sesi:**
+- Menyelesaikan blok `T1.9.1` s/d `T1.9.13` secara berurutan sebelum menyentuh fase go-live `T1.10`
+- Menjaga perubahan tetap minimal dan konsisten dengan arsitektur modular monolith yang sudah dipakai Core, Kesantrian, dan Keuangan
+- Memastikan jalur WA, email, queue, retry, dan logging benar-benar lolos QC lokal
+
+**Perubahan yang dilakukan:**
+- Modul baru [`Modules/Notifikasi`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Notifikasi) ditambahkan dan diaktifkan pada autoload + `modules_statuses.json`
+- Tiga tabel tenant-aware ditambahkan:
+  - `template_notifikasi`
+  - `broadcast_wa`
+  - `log_notifikasi`
+- Model tenant-aware ditambahkan:
+  - `TemplateNotifikasi`
+  - `BroadcastWa`
+  - `LogNotifikasi`
+- Stack gateway notifikasi ditambahkan:
+  - `WaGatewayService` untuk kirim WA via webhook `n8n` atau fallback endpoint `WAHA`
+  - `EmailNotificationService` untuk kirim email via mailer Laravel
+  - `BroadcastWaService` untuk draft, queue, execute, dan retry broadcast
+  - `BroadcastWaJob` dengan queue `notifikasi`, `tries=3`, dan `backoff` bertingkat
+  - `LogNotifikasiService` untuk jejak `sent` / `failed`
+  - `RecipientResolver` untuk target `wali`, `santri`, `staff`, dan `custom`
+- Integrasi operasi ditambahkan di [`docker-compose.yml`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\docker-compose.yml):
+  - service profile `notifikasi` untuk `n8n`
+  - service profile `notifikasi` untuk `waha`
+- Permission baru ditambahkan di seeder:
+  - `view_notifikasi`
+  - `manage_notifikasi`
+- Resource Filament baru ditambahkan:
+  - [`TemplateNotifikasiResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource.php)
+  - [`BroadcastWaResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\BroadcastWa\BroadcastWaResource.php)
+
+**Bug nyata yang ditemukan dan ditutup:**
+- Verifikasi email awal gagal karena implementasi `Mail::raw()` tidak tercatat sebagai `Mailable` pada fake mail Laravel 13
+- Perbaikan: service email diganti ke [`GenericNotificationMail`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Notifikasi\app\Mail\GenericNotificationMail.php) agar jalur SMTP Laravel dan test memakai kontrak yang sama
+
+**QC sesi ini:**
+- `composer dump-autoload --no-scripts` PASS
+- `php artisan about` PASS
+- `php -l app/Filament/Resources/BroadcastWa/BroadcastWaResource.php` PASS
+- `php -l app/Filament/Resources/TemplateNotifikasi/TemplateNotifikasiResource.php` PASS
+- `php -l Modules/Notifikasi/app/Services/BroadcastWaService.php` PASS
+- `php artisan test tests/Feature/NotifikasiServiceTest.php` PASS (`4` test, `14` assertion)
+- `php artisan test tests/Feature/RolesAndPermissionsSeederTest.php tests/Feature/NotifikasiServiceTest.php` PASS (`5` test, `18` assertion)
+
+**Checklist yang sekarang bisa dianggap selesai:**
+- `T1.9.1` s/d `T1.9.13` **SELESAI**
+
+**Checklist yang masih terbuka berurutan:**
+- `T1.9.14 Commit: feat(notifikasi): complete module`
+- setelah commit baru lanjut ke `T1.10.1 Buat tenant Asy-Syifaa`

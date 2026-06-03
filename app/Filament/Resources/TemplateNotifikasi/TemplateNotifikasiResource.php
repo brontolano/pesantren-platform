@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Filament\Resources\TemplateNotifikasi;
+
+use App\Filament\Resources\TemplateNotifikasi\Pages\CreateTemplateNotifikasi;
+use App\Filament\Resources\TemplateNotifikasi\Pages\EditTemplateNotifikasi;
+use App\Filament\Resources\TemplateNotifikasi\Pages\ListTemplateNotifikasi;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Modules\Notifikasi\Models\TemplateNotifikasi;
+
+class TemplateNotifikasiResource extends Resource
+{
+    protected static ?string $model = TemplateNotifikasi::class;
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
+
+    protected static ?string $navigationLabel = 'Template Notifikasi';
+
+    protected static ?string $modelLabel = 'Template Notifikasi';
+
+    protected static ?string $pluralModelLabel = 'Template Notifikasi';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Notifikasi';
+
+    protected static ?int $navigationSort = 1;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('manage_notifikasi') ?? false;
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return auth()->user()?->can('manage_notifikasi') ?? false;
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return auth()->user()?->can('manage_notifikasi') ?? false;
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Template')->schema([
+                TextInput::make('kode_template')
+                    ->label('Kode Template')
+                    ->required()
+                    ->maxLength(100),
+                TextInput::make('judul')
+                    ->label('Judul')
+                    ->required()
+                    ->maxLength(255),
+                Select::make('channel')
+                    ->label('Channel')
+                    ->options([
+                        'wa' => 'WhatsApp',
+                        'email' => 'Email',
+                    ])
+                    ->default('wa')
+                    ->required(),
+                Toggle::make('is_active')
+                    ->label('Aktif')
+                    ->default(true),
+                Textarea::make('isi')
+                    ->label('Isi Pesan')
+                    ->rows(8)
+                    ->required()
+                    ->helperText('Gunakan placeholder seperti {{nama_santri}} atau {{nama_wali}}.'),
+                KeyValue::make('variable_dinamis')
+                    ->label('Variabel Dinamis')
+                    ->keyLabel('Nama Variabel')
+                    ->valueLabel('Contoh Nilai')
+                    ->reorderable(),
+            ])->columns(2),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('kode_template')
+                    ->label('Kode')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('judul')
+                    ->label('Judul')
+                    ->searchable(),
+                TextColumn::make('channel')
+                    ->label('Channel')
+                    ->badge(),
+                IconColumn::make('is_active')
+                    ->label('Aktif')
+                    ->boolean(),
+                TextColumn::make('updated_at')
+                    ->label('Diubah')
+                    ->since(),
+            ])
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListTemplateNotifikasi::route('/'),
+            'create' => CreateTemplateNotifikasi::route('/create'),
+            'edit' => EditTemplateNotifikasi::route('/{record}/edit'),
+        ];
+    }
+}

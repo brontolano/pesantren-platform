@@ -1,0 +1,9 @@
+{
+    "name": "modules/notifikasi",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Notifikasi\\": "app/",
+            "Modules\\Notifikasi\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

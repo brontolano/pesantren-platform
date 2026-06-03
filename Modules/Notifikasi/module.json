@@ -1,0 +1,11 @@
+{
+    "name": "Notifikasi",
+    "alias": "notifikasi",
+    "description": "Modul Notifikasi — template, broadcast WA, email, dan log pengiriman",
+    "keywords": ["notifikasi", "broadcast", "waha", "n8n", "email"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Notifikasi\\Providers\\NotifikasiServiceProvider"
+    ],
+    "files": []
+}

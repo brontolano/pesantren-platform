@@ -91,10 +91,47 @@ services:
     networks:
       - pesantren
 
+  n8n:
+    image: n8nio/n8n:1.98.2
+    container_name: pesantren-n8n
+    restart: unless-stopped
+    profiles:
+      - notifikasi
+    ports:
+      - "5678:5678"
+    environment:
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://localhost:5678/
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - pesantren
+
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: pesantren-waha
+    restart: unless-stopped
+    profiles:
+      - notifikasi
+    ports:
+      - "3000:3000"
+    environment:
+      WHATSAPP_DEFAULT_ENGINE: NOWEB
+      WHATSAPP_HOOK_URL: http://n8n:5678/webhook/waha
+      WHATSAPP_HOOK_EVENTS: message,message.any,session.status
+    volumes:
+      - waha_data:/app/.sessions
+    networks:
+      - pesantren
+
 volumes:
   postgres_data:
   redis_data:
   uptime_kuma_data:
+  n8n_data:
+  waha_data:
 
 networks:
   pesantren:
