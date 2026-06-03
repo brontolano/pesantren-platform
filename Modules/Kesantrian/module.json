@@ -1,0 +1,11 @@
+{
+    "name": "Kesantrian",
+    "alias": "kesantrian",
+    "description": "Modul master santri, kelas, penempatan, status, alumni",
+    "keywords": ["santri", "kelas", "penempatan"],
+    "priority": 1,
+    "providers": [
+        "Modules\\Kesantrian\\Providers\\KesantrianServiceProvider"
+    ],
+    "files": []
+}

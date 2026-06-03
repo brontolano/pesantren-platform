@@ -1,58 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Pesantren Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Platform ERP pesantren white-label berbasis Laravel multi-tenant sesuai konstitusi di [`docs/BLUEPRINT-ARSITEKTUR.md`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\docs\BLUEPRINT-ARSITEKTUR.md).
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Laravel 13
+- Filament 5
+- stancl/tenancy
+- spatie/laravel-permission
+- nwidart/laravel-modules
+- Inertia.js + Vue 3
+- PostgreSQL 16
+- Redis 7
+- Docker Compose + Traefik
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Menjalankan Lokal
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+docker compose up -d
+docker compose exec app php artisan migrate
+docker compose exec app php artisan tenant:create "Asy-Syifaa" asy-syifaa
+docker compose exec app php artisan tenant:create "Demo" demo
+docker compose exec app php artisan db:seed
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Tambahkan host lokal berikut:
 
-## Contributing
+```text
+127.0.0.1 asy-syifaa.localhost demo.localhost
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+URL lokal:
 
-## Code of Conduct
+- `http://localhost:8000`
+- `http://asy-syifaa.localhost:8000/admin`
+- `http://demo.localhost:8000/admin`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Testing Lokal
 
-## Security Vulnerabilities
+Jalankan test dari host atau CI runner. `phpunit.xml` memakai `DB_HOST=127.0.0.1` agar cocok dengan service PostgreSQL yang diekspos oleh Docker/Actions.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan test
+```
 
-## License
+Prasyarat:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- container PostgreSQL dan Redis sudah hidup
+- port `5432` dan `6379` terbuka di host lokal
+
+Jika ingin menjalankan test dari dalam container `app`, override host database saat eksekusi:
+
+```bash
+docker compose exec -e DB_HOST=postgres app php artisan test
+```
+
+## CI/CD
+
+### CI
+
+Workflow [`/.github/workflows/test.yml`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\.github\workflows\test.yml) berjalan pada `push` dan `pull_request` ke `main` dan memblokir deploy jika test gagal.
+
+### CD
+
+Workflow [`/.github/workflows/deploy.yml`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\.github\workflows\deploy.yml) berjalan pada `push` ke `main`, namun job deploy hanya jalan setelah job test hijau.
+
+Secret GitHub yang wajib diisi:
+
+- `VPS_HOST`
+- `VPS_USER`
+- `VPS_PORT`
+- `VPS_SSH_KEY`
+- `VPS_PATH`
+
+Struktur target di VPS:
+
+- Repo diekstrak ke `${VPS_PATH}/current`
+- File `.env` production disimpan permanen di `${VPS_PATH}/shared/.env`
+- Direktori `storage` persisten disimpan di `${VPS_PATH}/shared/storage`
+
+Alur deploy:
+
+1. Runner membuat arsip source tanpa `.git`, `vendor`, dan `node_modules`.
+2. Arsip dikirim ke VPS via SCP.
+3. VPS mengekstrak source ke `${VPS_PATH}/current`.
+4. `.env` dan `storage` shared dipasang ulang.
+5. `docker compose up -d --build` dijalankan.
+6. Migrasi production dijalankan dengan `php artisan migrate --force`.
+7. Cache aplikasi di-refresh.
+
+## Monitoring
+
+Monitoring memakai tool siap pakai, bukan dibangun sendiri:
+
+- Lokal/opsional: service `uptime-kuma` dengan profile `monitoring`
+- Production ringan: Uptime Kuma self-hosted atau UptimeRobot
+
+Menjalankan Uptime Kuma lokal:
+
+```bash
+docker compose --profile monitoring up -d uptime-kuma
+```
+
+URL monitoring lokal:
+
+- `http://localhost:3001`
+
+Monitor minimum yang disarankan:
+
+- `http://localhost:8000`
+- `http://localhost:8000/admin`
+- health endpoint tenant/production yang nanti dipakai live
+
+## Catatan Operasional
+
+- Server production harus sudah memiliki Docker Engine + Docker Compose plugin.
+- Container `app` harus dapat menjalankan `php artisan` dan `composer install`.
+- Bila struktur production berbeda dari asumsi workflow ini, ubah nilai `VPS_PATH` atau perintah di workflow sebelum dipakai live.

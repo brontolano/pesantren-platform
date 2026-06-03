@@ -31,27 +31,74 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        Role::firstOrCreate(['name' => 'super_admin'])
-            ->givePermissionTo(Permission::all());
-
-        Role::firstOrCreate(['name' => 'tu'])
-            ->givePermissionTo([
-                'view_dashboard', 'manage_users', 'view_santri', 'manage_santri',
-            ]);
-
-        Role::firstOrCreate(['name' => 'keuangan'])
-            ->givePermissionTo([
-                'view_dashboard', 'view_keuangan', 'manage_keuangan', 'view_santri',
-            ]);
-
-        Role::firstOrCreate(['name' => 'guru'])
-            ->givePermissionTo([
-                'view_dashboard', 'view_santri', 'view_akademik', 'manage_akademik',
-            ]);
-
-        Role::firstOrCreate(['name' => 'wali'])
-            ->givePermissionTo([
+        $rolePermissions = [
+            'super_admin' => Permission::query()->pluck('name')->all(),
+            'admin_pesantren' => [
+                'view_dashboard',
+                'manage_users',
+                'manage_roles',
+                'manage_tenant_settings',
+                'manage_modules',
+                'view_santri',
+                'manage_santri',
+                'view_keuangan',
+                'manage_keuangan',
+                'view_akademik',
+                'manage_akademik',
+            ],
+            'tu' => [
+                'view_dashboard',
+                'manage_users',
+                'view_santri',
+                'manage_santri',
+                'view_akademik',
+            ],
+            'keuangan' => [
+                'view_dashboard',
+                'view_keuangan',
+                'manage_keuangan',
+                'view_santri',
+            ],
+            'guru' => [
+                'view_dashboard',
+                'view_santri',
+                'view_akademik',
+                'manage_akademik',
+            ],
+            'guru_tahfidz' => [
+                'view_dashboard',
+                'view_santri',
+                'view_akademik',
+                'manage_akademik',
+            ],
+            'konselor' => [
+                'view_dashboard',
+                'view_santri',
+            ],
+            'pengelola_uks' => [
+                'view_dashboard',
+                'view_santri',
+            ],
+            'pengelola_asrama' => [
+                'view_dashboard',
+                'view_santri',
+                'manage_santri',
+            ],
+            'kepala' => [
+                'view_dashboard',
+                'view_santri',
+                'view_keuangan',
+                'view_akademik',
+                'manage_tenant_settings',
+            ],
+            'wali' => [
                 'view_own_children',
-            ]);
+            ],
+        ];
+
+        foreach ($rolePermissions as $roleName => $grants) {
+            $role = Role::firstOrCreate(['name' => $roleName]);
+            $role->syncPermissions($grants);
+        }
     }
 }

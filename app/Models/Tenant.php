@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Tenant extends BaseTenant
 {
@@ -21,4 +22,9 @@ class Tenant extends BaseTenant
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    public function settings(): HasMany
+    {
+        return $this->hasMany(Setting::class);
+    }
 }

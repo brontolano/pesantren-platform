@@ -1,0 +1,6 @@
+{
+    "name": "modules/kesantrian",
+    "description": "Modul Kesantrian - Master santri, kelas, penempatan, status, alumni",
+    "type": "laravel-module",
+    "require": {}
+}
