@@ -1,0 +1,44 @@
+<?php
+
+namespace App\Filament\Pages;
+
+use Filament\Pages\Page;
+use Modules\PPDB\Models\CalonSantri;
+
+class PpdbReport extends Page
+{
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
+
+    protected static ?string $navigationLabel = 'Laporan PPDB';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
+
+    protected static ?string $slug = 'ppdb/report';
+
+    protected static ?int $navigationSort = 4;
+
+    protected string $view = 'filament.pages.ppdb-report';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canAccess();
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+    }
+
+    public function getViewData(): array
+    {
+        return [
+            'counts' => [
+                'total' => CalonSantri::count(),
+                'lulus' => CalonSantri::where('status_pendaftaran', 'lulus')->count(),
+                'cadangan' => CalonSantri::where('status_pendaftaran', 'cadangan')->count(),
+                'ditolak' => CalonSantri::where('status_pendaftaran', 'ditolak')->count(),
+                'belum_verifikasi' => CalonSantri::where('status_pendaftaran', 'pending')->count(),
+            ],
+        ];
+    }
+}

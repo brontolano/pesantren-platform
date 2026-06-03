@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('calon_santri', function (Blueprint $table) {
+            $table->string('program_diminati', 50)
+                ->nullable()
+                ->after('asal_sekolah');
+
+            $table->index(['tenant_id', 'program_diminati']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('calon_santri', function (Blueprint $table) {
+            $table->dropIndex(['tenant_id', 'program_diminati']);
+            $table->dropColumn('program_diminati');
+        });
+    }
+};
