@@ -1349,6 +1349,6 @@ tests/Feature/
 **Dampak ke checklist:**
 - `T1.4.6 Commit: feat(kesantrian): complete module` sekarang **SELESAI**
 - `T1.7.6 Export: laporan keuangan (PDF, Excel)` sekarang **SELESAI**
-- `T1.8.6 Commit: feat(keuangan): complete module` siap ditutup pada commit sesi ini
+- `T1.8.6 Commit: feat(keuangan): complete module` sekarang **SELESAI** dengan hash `f0236fd`
 - Task berikutnya yang berurutan setelah commit keuangan adalah:
   - `T1.9.1 Buat module Notifikasi via nwidart`
