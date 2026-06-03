@@ -1,0 +1,11 @@
+{
+    "name": "Keuangan",
+    "alias": "keuangan",
+    "description": "Modul Keuangan — tagihan, pembayaran, tabungan, laporan",
+    "keywords": ["keuangan", "tagihan", "pembayaran", "tabungan"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Keuangan\\Providers\\KeuanganServiceProvider"
+    ],
+    "files": []
+}

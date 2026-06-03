@@ -1317,3 +1317,38 @@ tests/Feature/
   - `T1.7.6 Export: laporan keuangan (PDF, Excel)`
   - `T1.8.6 Commit: feat(keuangan): complete module`
   - baru setelah itu `T1.9 Modul Notifikasi`
+
+### Update 3 Juni 2026 — T1.4.6, T1.7.6, dan T1.8.6 Ditutup
+
+**Fokus sesi:**
+- Menutup sisa task berurutan sebelum masuk `T1.9 Modul Notifikasi`
+- Merapikan commit yang tertinggal untuk `Kesantrian`
+- Menyelesaikan export laporan keuangan yang sebelumnya baru ada backend sebagian
+- Membuktikan jalur QC host-level tetap hijau setelah export ditambahkan
+
+**Perubahan yang dilakukan:**
+- Commit `feat(kesantrian): complete module` berhasil dibuat dengan hash `021211f`
+- Halaman Filament [`ListLaporanKeuangan.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\LaporanKeuangan\Pages\ListLaporanKeuangan.php) sekarang punya 4 action:
+  - Export Excel Tagihan
+  - Cetak PDF Tagihan
+  - Export Excel Pembayaran
+  - Cetak PDF Pembayaran
+- Action export memakai filter minimum yang relevan:
+  - tagihan: `status`, `jenis_tagihan`, `periode_akademik`, `dari`, `sampai`
+  - pembayaran: `metode`, `verified`, `dari`, `sampai`
+- Test baru [`KeuanganExportControllerTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\KeuanganExportControllerTest.php) menutup 3 jalur:
+  - CSV tagihan berisi data tenant aktif
+  - print pembayaran menampilkan ringkasan pembayaran terverifikasi
+  - export ditolak untuk user tanpa permission keuangan
+
+**QC sesi ini:**
+- `php -l app/Filament/Resources/LaporanKeuangan/Pages/ListLaporanKeuangan.php` PASS
+- `php -l tests/Feature/KeuanganExportControllerTest.php` PASS
+- `php artisan test tests/Feature/KeuanganExportControllerTest.php tests/Feature/KeuanganServiceTest.php tests/Feature/KesantrianTest.php` PASS (`24` test, `66` assertion)
+
+**Dampak ke checklist:**
+- `T1.4.6 Commit: feat(kesantrian): complete module` sekarang **SELESAI**
+- `T1.7.6 Export: laporan keuangan (PDF, Excel)` sekarang **SELESAI**
+- `T1.8.6 Commit: feat(keuangan): complete module` siap ditutup pada commit sesi ini
+- Task berikutnya yang berurutan setelah commit keuangan adalah:
+  - `T1.9.1 Buat module Notifikasi via nwidart`

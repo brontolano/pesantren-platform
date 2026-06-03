@@ -1,0 +1,11 @@
+{
+    "name": "modules/keuangan",
+    "description": "Modul Keuangan untuk Platform Pesantren",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Keuangan\\": "app/",
+            "Modules\\Keuangan\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}
