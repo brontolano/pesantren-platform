@@ -21,6 +21,7 @@ class RecipientResolver
     private function resolveCustomTargets(array $filters): Collection
     {
         $targets = $filters['targets'] ?? [];
+        $variables = is_array($filters['variables'] ?? null) ? $filters['variables'] : [];
 
         if (is_string($targets)) {
             $targets = collect(explode(',', $targets))
@@ -32,7 +33,10 @@ class RecipientResolver
 
         return collect($targets)
                 ->filter(fn ($target): bool => filled($target))
-                ->map(fn ($target) => ['target' => $target, 'variables' => ['target' => $target]]);
+                ->map(fn ($target) => [
+                    'target' => $target,
+                    'variables' => array_merge($variables, ['target' => $target]),
+                ]);
     }
 
     private function resolveSantri(array $filters): Collection

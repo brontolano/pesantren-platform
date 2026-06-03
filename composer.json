@@ -39,7 +39,9 @@
             "Modules\\Kesantrian\\": "Modules/Kesantrian/app/",
             "Modules\\Kesantrian\\Database\\Seeders\\": "Modules/Kesantrian/database/seeders/",
             "Modules\\Notifikasi\\": "Modules/Notifikasi/app/",
-            "Modules\\Notifikasi\\Database\\Seeders\\": "Modules/Notifikasi/database/seeders/"
+            "Modules\\Notifikasi\\Database\\Seeders\\": "Modules/Notifikasi/database/seeders/",
+            "Modules\\PPDB\\": "Modules/PPDB/app/",
+            "Modules\\PPDB\\Database\\Seeders\\": "Modules/PPDB/database/seeders/"
         }
     },
     "autoload-dev": {

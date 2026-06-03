@@ -23,6 +23,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=HostRegexp(`{subdomain:.+}.localhost`) || Host(`localhost`)"
       - "traefik.http.routers.app.entrypoints=web"
+      - "traefik.http.routers.app.middlewares=app-compress"
+      - "traefik.http.middlewares.app-compress.compress=true"
       - "traefik.http.services.app.loadbalancer.server.port=8000"
 
   postgres:

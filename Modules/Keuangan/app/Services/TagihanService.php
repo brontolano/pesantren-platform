@@ -23,11 +23,29 @@ class TagihanService
             ? $santri
             : Santri::query()->findOrFail($santri);
 
+        return $this->persistTagihan($santriModel, $payload);
+    }
+
+    public function sinkronkanTagihanUntukSantri(Santri|int $santri, array $payload, ?Tagihan $tagihan = null): Tagihan
+    {
+        $this->ensureTenantContext();
+
+        $santriModel = $santri instanceof Santri
+            ? $santri
+            : Santri::query()->findOrFail($santri);
+
+        return $this->persistTagihan($santriModel, $payload, $tagihan);
+    }
+
+    private function persistTagihan(Santri $santriModel, array $payload, ?Tagihan $tagihan = null): Tagihan
+    {
+        $this->ensureTenantContext();
+
         $periode = $this->resolvePeriodePayload($payload);
         $nominal = (float) ($payload['nominal'] ?? 0);
         $diskon = (float) ($payload['diskon'] ?? 0);
 
-        return Tagihan::create([
+        $attributes = [
             'santri_id' => $santriModel->id,
             'jenis_tagihan' => $payload['jenis_tagihan'],
             'keterangan' => $payload['keterangan'] ?? null,
@@ -40,7 +58,16 @@ class TagihanService
             'bulan_masehi' => $periode['bulan_masehi'],
             'bulan_hijriah' => $periode['bulan_hijriah'],
             'created_by' => $payload['created_by'] ?? null,
-        ]);
+        ];
+
+        if ($tagihan instanceof Tagihan) {
+            $tagihan->fill($attributes);
+            $tagihan->save();
+
+            return $tagihan->fresh();
+        }
+
+        return Tagihan::create($attributes);
     }
 
     public function setPeriodeKeuangan(string $mode): Setting

@@ -88,6 +88,7 @@ class PenempatanKelasService
 
             $santriDiKelas = Santri::where('kelas_id', $kelasLamaId)
                 ->where('status', 'aktif')
+                ->with('kelas')
                 ->get();
 
             foreach ($santriDiKelas as $santri) {

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\AuditLogger;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\PasswordReset;
@@ -24,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Model::preventLazyLoading(! app()->isProduction());
+
         Event::listen(Login::class, function (Login $event): void {
             app(AuditLogger::class)->log(
                 action: 'auth.login',

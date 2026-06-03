@@ -8,9 +8,11 @@ use App\Filament\Resources\Settings\Pages\ListSettings;
 use App\Models\Setting;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
@@ -81,6 +83,13 @@ class SettingResource extends Resource
                 ->imageEditor()
                 ->visible(fn (Get $get): bool => $get('key') === 'branding_logo')
                 ->required(fn (Get $get): bool => $get('key') === 'branding_logo'),
+            KeyValue::make('value.fields')
+                ->label('Konfigurasi Field PPDB')
+                ->helperText('Isi mode field dengan `required`, `optional`, atau `hidden`.')
+                ->required(fn (Get $get): bool => $get('key') === 'ppdb_form_fields')
+                ->visible(fn (Get $get): bool => $get('key') === 'ppdb_form_fields')
+                ->keyLabel('Field')
+                ->valueLabel('Mode'),
         ]);
     }
 
@@ -98,6 +107,12 @@ class SettingResource extends Resource
                     ->formatStateUsing(function (mixed $state): string {
                         if (! is_array($state)) {
                             return '-';
+                        }
+
+                        if (isset($state['fields']) && is_array($state['fields'])) {
+                            return collect($state['fields'])
+                                ->map(fn (mixed $mode, string $field): string => "{$field}: {$mode}")
+                                ->implode(', ');
                         }
 
                         return $state['text'] ?? $state['color'] ?? $state['logo_path'] ?? '-';
@@ -126,7 +141,7 @@ class SettingResource extends Resource
 
     protected static function userCanManageSettings(): bool
     {
-        return auth()->user()?->can('manage_tenant_settings') ?? false;
+        return Auth::user()?->can('manage_tenant_settings') ?? false;
     }
 
     protected static function settingOptions(): array
@@ -137,6 +152,7 @@ class SettingResource extends Resource
             'branding_primary_color' => 'Warna Primer',
             'branding_secondary_color' => 'Warna Sekunder',
             'branding_logo' => 'Logo Tenant',
+            'ppdb_form_fields' => 'Field Form PPDB',
         ];
     }
 }

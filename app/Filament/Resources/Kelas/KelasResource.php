@@ -11,11 +11,12 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Kesantrian\Models\Kelas;
 
 class KelasResource extends Resource
@@ -120,6 +121,13 @@ class KelasResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with('waliKelas')
+            ->withCount('santri');
     }
 
     public static function getPages(): array

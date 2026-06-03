@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
                 [EmailAuthentication::make()],
                 isRequired: fn (): bool => auth()->user()?->hasAnyRole(['super_admin', 'kepala']) ?? false,
             )
+            ->spa()
             ->colors([
                 'primary' => Color::Emerald,
             ])

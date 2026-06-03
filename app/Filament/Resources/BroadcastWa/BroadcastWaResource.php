@@ -7,14 +7,15 @@ use App\Filament\Resources\BroadcastWa\Pages\EditBroadcastWa;
 use App\Filament\Resources\BroadcastWa\Pages\ListBroadcastWa;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
 use Modules\Notifikasi\Services\BroadcastWaService;
@@ -136,6 +137,11 @@ class BroadcastWaResource extends Resource
                     }),
                 EditAction::make(),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('template');
     }
 
     public static function getPages(): array

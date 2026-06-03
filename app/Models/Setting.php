@@ -17,4 +17,32 @@ class Setting extends Model
             'value' => 'array',
         ];
     }
+
+    public static function getTenantValue(string $key, mixed $default = null): mixed
+    {
+        $tenant = tenant();
+
+        if (! $tenant) {
+            return $default;
+        }
+
+        $setting = $tenant->settings()->where('key', $key)->first();
+
+        if (! $setting) {
+            return $default;
+        }
+
+        return $setting->value;
+    }
+
+    public static function getTenantStringValue(string $key, ?string $default = null): ?string
+    {
+        $value = static::getTenantValue($key, null);
+
+        if (is_array($value) && isset($value['text'])) {
+            return $value['text'];
+        }
+
+        return is_string($value) ? $value : $default;
+    }
 }

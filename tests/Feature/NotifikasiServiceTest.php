@@ -3,7 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Tenant;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -17,13 +18,20 @@ use Tests\TestCase;
 
 class NotifikasiServiceTest extends TestCase
 {
-    use RefreshDatabase;
-
     private Tenant $tenant;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        Config::set('database.default', 'pgsql');
+        Config::set('database.connections.pgsql.host', '127.0.0.1');
+        Config::set('database.connections.pgsql.port', '5432');
+        Config::set('database.connections.pgsql.database', 'pesantren_platform_test');
+        Config::set('database.connections.pgsql.username', 'postgres');
+        Config::set('database.connections.pgsql.password', 'secret');
+
+        Artisan::call('migrate:fresh', ['--force' => true]);
 
         $this->tenant = Tenant::create(['id' => 'notif-a', 'name' => 'Pesantren Notif']);
         $this->tenant->domains()->create(['domain' => 'notif-a']);
