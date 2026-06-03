@@ -1408,3 +1408,12 @@ tests/Feature/
 
 **Checklist yang masih terbuka berurutan:**
 - `T1.10.1 Buat tenant Asy-Syifaa`
+
+**Percobaan lanjut ke T1.10.1:**
+- Sudah dicoba menjalankan `php artisan tenant:create "Asy-Syifaa" asy-syifaa` dari host dengan override `DB_HOST=127.0.0.1`
+- Blocker nyata yang ditemukan:
+  - PostgreSQL host menjawab `FATAL: database "pesantren_platform" does not exist`
+  - artinya jalur database aplikasi utama belum siap untuk task pilot tenant, walau database test tetap sehat untuk PHPUnit
+- Keputusan sesi:
+  - **jangan lanjut ke `T1.10.2` atau task pilot lain**
+  - selesaikan dulu provisioning / koneksi database aplikasi utama untuk environment lokal atau container aktif
