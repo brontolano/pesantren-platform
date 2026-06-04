@@ -1,0 +1,89 @@
+# docker-compose.production.yml
+# Dipakai di VPS Hostinger — JANGAN untuk development lokal
+# Usage: docker compose -f docker-compose.production.yml up -d
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pesantren-app
+    restart: unless-stopped
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - SERVER_NAME=:80
+    volumes:
+      - app_storage:/app/storage
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - traefik-net
+      - internal
+    labels:
+      - "traefik.enable=true"
+      # HTTP → HTTPS redirect
+      - "traefik.http.routers.app-http.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.app-http.entrypoints=web"
+      - "traefik.http.routers.app-http.middlewares=redirect-https"
+      - "traefik.http.middlewares.redirect-https.redirectscheme.scheme=https"
+      # HTTPS router — catch-all untuk semua domain tenant
+      - "traefik.http.routers.app.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls=true"
+      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
+      # Wildcard + specific domains
+      - "traefik.http.routers.app.tls.domains[0].main=pesantren.online"
+      - "traefik.http.routers.app.tls.domains[0].sans=*.pesantren.online"
+      - "traefik.http.services.app.loadbalancer.server.port=80"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: pesantren-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-pesantren_platform}
+      POSTGRES_USER: ${DB_USERNAME:-pesantren}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-pesantren}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+    # TIDAK expose port ke luar — hanya internal
+
+  redis:
+    image: redis:7-alpine
+    container_name: pesantren-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+    # TIDAK expose port ke luar — hanya internal
+
+volumes:
+  postgres_data:
+  redis_data:
+  app_storage:
+
+networks:
+  traefik-net:
+    external: true
+    name: traefik-net
+  internal:
+    driver: bridge
