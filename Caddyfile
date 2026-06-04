@@ -1,7 +1,5 @@
 {
 	frankenphp
-	auto_https off
-	http_port 80
 	order php_server before file_server
 }
 

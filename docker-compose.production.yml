@@ -15,7 +15,7 @@ services:
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
-      - SERVER_NAME=pesantren.online,*.pesantren.online
+      - SERVER_NAME=:80
     env_file:
       - .env
     volumes:
