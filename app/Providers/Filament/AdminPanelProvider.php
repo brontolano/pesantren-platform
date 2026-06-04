@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Resources\Billing\PlanResource;
 use App\Filament\Resources\Billing\PlatformInvoiceResource;
 use App\Filament\Resources\Billing\TenantSubscriptionResource;
+use App\Filament\Resources\Modules\ModuleResource;
 use App\Filament\Resources\Tenants\TenantResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\BillingOverviewWidget;
@@ -50,6 +51,7 @@ class AdminPanelProvider extends PanelProvider
                 TenantResource::class,
                 UserResource::class,
                 // Billing SaaS
+                ModuleResource::class,
                 PlanResource::class,
                 TenantSubscriptionResource::class,
                 PlatformInvoiceResource::class,
