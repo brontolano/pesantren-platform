@@ -131,7 +131,11 @@ class TenantPanelProvider extends PanelProvider
                 KeuanganOverviewWidget::class,
             ])
             ->middleware([
+                // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user
+                // di-resolve dari database tenant (bukan central). Mencegah redirect loop.
                 \App\Http\Middleware\RedirectCentralToPlatform::class,
+                PreventAccessFromCentralDomains::class,
+                InitializeTenancyByDomain::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
@@ -141,8 +145,6 @@ class TenantPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                InitializeTenancyByDomain::class,
-                PreventAccessFromCentralDomains::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
