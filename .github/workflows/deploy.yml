@@ -1,8 +1,13 @@
 name: Deploy to VPS
 
+# CATATAN: Hostinger memblokir koneksi masuk dari IP datacenter GitHub ke
+# port 22 VPS, sehingga deploy push-based dari runner tidak andal.
+# Deploy PRODUKSI memakai pull-based dari VPS: jalankan /opt/deploy.sh
+# (helper di VPS yang `git pull` + rebuild). Saat tenant sudah live,
+# deploy dijadwalkan di maintenance window, bukan tiap push.
+# Workflow ini disisakan sebagai trigger MANUAL (kalau IP GitHub kebetulan lolos).
+
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
 
 concurrency:
