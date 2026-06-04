@@ -174,6 +174,7 @@
         <div class="nav-links">
             <a href="#modul">Modul</a>
             <a href="#keunggulan">Keunggulan</a>
+            <a href="https://demo.pesantren.online" target="_blank" rel="noopener">Demo</a>
             <a href="{{ route('legal.contact') }}">Kontak</a>
             <a href="/platform" class="btn btn-primary">Masuk</a>
         </div>
@@ -186,8 +187,8 @@
         <h1>Kelola Pesantren Lebih <span>Mudah & Profesional</span></h1>
         <p>Sistem administrasi pesantren terpadu berbasis cloud. Dari data santri, keuangan, akademik, hingga komunikasi wali — semua dalam satu platform.</p>
         <div class="hero-actions">
-            <a href="https://wa.me/6285572711197?text=Assalamu'alaikum,%20saya%20tertarik%20dengan%20Pesantren%20Platform" class="btn btn-primary">Hubungi Kami</a>
-            <a href="#modul" class="btn btn-outline">Lihat Fitur</a>
+            <a href="https://demo.pesantren.online" target="_blank" rel="noopener" class="btn btn-primary">Coba Demo Gratis</a>
+            <a href="https://wa.me/6285572711197?text=Assalamu'alaikum,%20saya%20tertarik%20dengan%20Pesantren%20Platform" class="btn btn-outline">Hubungi Kami</a>
         </div>
     </div>
 </section>
@@ -311,8 +312,11 @@
 
 <section class="cta">
     <h2>Siap Mendigitalkan Pesantren Anda?</h2>
-    <p>Konsultasi gratis dan demo langsung. Hubungi kami sekarang.</p>
-    <a href="https://wa.me/6285572711197?text=Assalamu'alaikum,%20saya%20ingin%20demo%20Pesantren%20Platform" class="btn btn-primary">Chat via WhatsApp</a>
+    <p>Coba langsung demo sistemnya, atau konsultasi gratis dengan tim kami.</p>
+    <div class="hero-actions" style="justify-content:center;">
+        <a href="https://demo.pesantren.online" target="_blank" rel="noopener" class="btn btn-primary">Coba Demo Gratis</a>
+        <a href="https://wa.me/6285572711197?text=Assalamu'alaikum,%20saya%20ingin%20demo%20Pesantren%20Platform" class="btn btn-outline" style="border-color:rgba(255,255,255,0.3);color:#fff;">Chat via WhatsApp</a>
+    </div>
 </section>
 
 <footer>

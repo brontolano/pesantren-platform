@@ -60,6 +60,15 @@
         .hero p.desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 2.5rem; max-width: 580px; margin-left: auto; margin-right: auto; }
         .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
+        .demo-creds { max-width: 460px; margin: 2.5rem auto 0; background: #fff; border: 1.5px solid #bbf7d0; border-radius: 14px; padding: 1.5rem; box-shadow: 0 8px 30px rgba(21,128,61,0.10); text-align: left; }
+        .demo-creds-head { font-weight: 700; color: var(--primary-dark); margin-bottom: 1rem; font-size: 0.95rem; text-align: center; }
+        .demo-creds-grid { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.25rem; }
+        .demo-creds-grid > div { display: flex; align-items: center; justify-content: space-between; gap: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 0.9rem; }
+        .demo-creds-grid .lbl { font-size: 0.8rem; color: var(--text-muted); }
+        .demo-creds-grid .val { font-weight: 700; color: var(--primary); font-size: 0.9rem; user-select: all; }
+        .demo-creds .btn { width: 100%; justify-content: center; }
+        .demo-creds .hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 0.75rem; }
+
         .stats { display: flex; justify-content: center; gap: 3.5rem; flex-wrap: wrap; padding: 0 1.5rem 4rem; max-width: 900px; margin: 0 auto; }
         .stat { text-align: center; }
         .stat-num { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
@@ -127,6 +136,7 @@
             <a href="#program">Program</a>
             <a href="#keunggulan">Keunggulan</a>
             <a href="#kontak">Kontak</a>
+            <a href="/admin" class="btn btn-outline">Login</a>
             <a href="{{ route('tenant.ppdb.form') }}" class="btn btn-gold">Daftar PPDB</a>
         </div>
     </div>
@@ -143,6 +153,18 @@
             <a href="{{ route('tenant.ppdb.form') }}" class="btn btn-primary btn-lg">Daftar Sekarang</a>
             <a href="#program" class="btn btn-outline btn-lg">Lihat Program</a>
         </div>
+
+        @if($tenant->id === 'demo')
+        <div class="demo-creds">
+            <div class="demo-creds-head">🔑 Akun Demo — Silakan Coba Dashboard Admin</div>
+            <div class="demo-creds-grid">
+                <div><span class="lbl">Email</span><span class="val">admin@demo.pesantren.online</span></div>
+                <div><span class="lbl">Password</span><span class="val">demo1234</span></div>
+            </div>
+            <a href="/admin" class="btn btn-primary">Masuk ke Dashboard →</a>
+            <div class="hint">Login untuk menjelajah fitur: data santri, keuangan, akademik, PPDB, dan lainnya.</div>
+        </div>
+        @endif
     </div>
 </section>
 

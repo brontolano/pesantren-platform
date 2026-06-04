@@ -41,12 +41,12 @@ class User extends Authenticatable implements HasEmailAuthentication, FilamentUs
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // Super admin bisa akses dari central domain (tanpa tenant)
-        // User biasa harus punya tenant_id
-        if ($this->hasRole('super_admin')) {
-            return true;
+        if ($panel->getId() === 'admin') {
+            // Panel platform (central) — hanya pemilik platform (super_admin tanpa tenant)
+            return $this->hasRole('super_admin') && $this->tenant_id === null;
         }
 
+        // Panel tenant — user harus terhubung ke sebuah tenant
         return $this->tenant_id !== null;
     }
 
