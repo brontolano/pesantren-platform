@@ -6,7 +6,6 @@ use App\Filament\Resources\Billing\PlanResource;
 use App\Filament\Resources\Billing\PlatformInvoiceResource;
 use App\Filament\Resources\Billing\TenantSubscriptionResource;
 use App\Filament\Resources\Roles\RoleResource;
-use App\Filament\Resources\Settings\SettingResource;
 use App\Filament\Resources\Tenants\TenantResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\BillingOverviewWidget;
@@ -47,11 +46,10 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Emerald,
             ])
             ->resources([
-                // Central domain only — kelola platform
+                // Central domain only — kelola platform/SaaS (BUKAN data operasional tenant)
                 TenantResource::class,
                 UserResource::class,
                 RoleResource::class,
-                SettingResource::class,
                 // Billing SaaS
                 PlanResource::class,
                 TenantSubscriptionResource::class,

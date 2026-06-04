@@ -112,7 +112,16 @@ class UserResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('roles');
+        $query = parent::getEloquentQuery()->with('roles');
+
+        // Di domain central (tenancy tidak aktif) panel platform HANYA boleh
+        // melihat user platform (tenant_id NULL). Di panel tenant, TenantScope
+        // sudah memfilter ke tenant aktif.
+        if (! tenancy()->initialized) {
+            $query->whereNull('tenant_id');
+        }
+
+        return $query;
     }
 
     public static function getPages(): array
