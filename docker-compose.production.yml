@@ -13,8 +13,11 @@ services:
       - APP_ENV=production
       - APP_DEBUG=false
       - SERVER_NAME=:80
+    env_file:
+      - .env
     volumes:
       - app_storage:/app/storage
+      - ./.env:/app/.env:ro
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
     depends_on:
       postgres:
