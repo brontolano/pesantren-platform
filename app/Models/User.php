@@ -6,11 +6,14 @@ namespace App\Models;
 use App\Traits\BelongsToTenant;
 use Database\Factories\UserFactory;
 use Filament\Auth\MultiFactor\Email\Contracts\HasEmailAuthentication;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Modules\Kesantrian\Models\Santri;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'tenant_id', 'email_authentication_enabled'])]
@@ -44,5 +47,17 @@ class User extends Authenticatable implements HasEmailAuthentication
         $this->forceFill([
             'email_authentication_enabled' => $condition,
         ])->save();
+    }
+
+    public function accessWali(): HasMany
+    {
+        return $this->hasMany(AccessWali::class, 'wali_id');
+    }
+
+    public function accessibleSantri(): BelongsToMany
+    {
+        return $this->belongsToMany(Santri::class, 'access_wali', 'wali_id', 'santri_id')
+            ->withPivot(['tenant_id', 'relationship_type', 'is_primary'])
+            ->withTimestamps();
     }
 }

@@ -2,10 +2,12 @@
 
 namespace Modules\Kesantrian\Models;
 
+use App\Models\AccessWali;
 use App\Models\User;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -51,6 +53,18 @@ class Santri extends Model
     public function waliUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'wali_user_id');
+    }
+
+    public function accessWali(): HasMany
+    {
+        return $this->hasMany(AccessWali::class, 'santri_id');
+    }
+
+    public function waliPortal(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'access_wali', 'santri_id', 'wali_id')
+            ->withPivot(['tenant_id', 'relationship_type', 'is_primary'])
+            ->withTimestamps();
     }
 
     public function penempatanKelas(): HasMany

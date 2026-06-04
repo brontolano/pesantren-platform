@@ -4074,3 +4074,215 @@ tests/Feature/
 - `T3.1.1` s.d. `T3.1.9` sekarang **SELESAI**
 - Task berurutan berikutnya:
   - `T3.1.10 Commit: feat(akademik): complete module`
+
+### Update 4 Juni 2026 16:25 WIB — T3.1.10 Commit Akademik Complete Module
+
+**Hasil commit:**
+- Commit lokal berhasil dibuat:
+  - `6cca40e` — `feat(akademik): complete module`
+
+**Status checklist:**
+- `T3.1.10 Commit: feat(akademik): complete module` sekarang **SELESAI**
+- Slice `T3.1 Modul Akademik` sekarang **SELESAI TERKOMIT**
+- Task berurutan berikutnya:
+  - `T3.2.1 Migrasi: tabel access_wali (wali_id, santri_id)`
+
+### Update 4 Juni 2026 17:05 WIB — T3.2.1 Fondasi Access Wali
+
+**Fokus sesi:**
+- Memulai `T3.2 Portal Wali` dari fondasi data paling dasar:
+  - `T3.2.1 Migrasi: tabel access_wali (wali_id, santri_id)`
+- Menjaga kompatibilitas dengan seam lama:
+  - `santri.wali_user_id` tetap dibiarkan untuk link tunggal lama
+  - `access_wali` ditambahkan sebagai join table baru untuk Portal Wali multi-anak / multi-wali yang lebih fleksibel
+
+**Perubahan yang dibuat:**
+- Menambahkan migration baru [`database/migrations/2026_06_04_170000_create_access_wali_table.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\database\migrations\2026_06_04_170000_create_access_wali_table.php)
+  - tabel `access_wali`
+  - kolom inti:
+    - `tenant_id`
+    - `wali_id`
+    - `santri_id`
+  - kolom pendukung:
+    - `relationship_type`
+    - `is_primary`
+  - guardrail data:
+    - foreign key ke `tenants`, `users`, `santri`
+    - unique `(tenant_id, wali_id, santri_id)`
+    - index per tenant untuk `wali_id` dan `santri_id`
+- Menambahkan model [`app/Models/AccessWali.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Models\AccessWali.php)
+  - memakai `BelongsToTenant`
+  - relasi `wali()` ke `User`
+  - relasi `santri()` ke `Modules\Kesantrian\Models\Santri`
+- Menyambungkan relasi di [`app/Models/User.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Models\User.php)
+  - `accessWali()`
+  - `accessibleSantri()` via tabel `access_wali`
+- Menyambungkan relasi di [`Modules/Kesantrian/app/Models/Santri.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Kesantrian\app\Models\Santri.php)
+  - `accessWali()`
+  - `waliPortal()` via tabel `access_wali`
+- Menambahkan coverage dasar di [`tests/Feature/PortalWaliAccessTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PortalWaliAccessTest.php)
+  - memastikan wali tenant B hanya melihat anak tenant B sendiri
+  - memastikan relasi balik santri ke wali portal berjalan sesuai tenant aktif
+
+**QC yang HIJAU:**
+- `php -l database/migrations/2026_06_04_170000_create_access_wali_table.php` PASS
+- `php -l app/Models/AccessWali.php` PASS
+- `php -l app/Models/User.php` PASS
+- `php -l Modules/Kesantrian/app/Models/Santri.php` PASS
+- `php -l tests/Feature/PortalWaliAccessTest.php` PASS
+- Host-side env verifikasi:
+  - `APP_ENV=testing`
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+- `php artisan test tests/Feature/PortalWaliAccessTest.php` PASS
+  - `1` test
+  - `4` assertions
+
+**Status checklist:**
+- `T3.2.1 Migrasi: tabel access_wali (wali_id, santri_id)` sekarang **SELESAI**
+- Task berurutan berikutnya:
+  - `T3.2.2 Setup Vue 3 + Inertia layout: mobile-responsive (Tailwind CSS)`
+
+### Update 4 Juni 2026 17:35 WIB — T3.2.2 Layout Portal Wali Mobile-First
+
+**Fokus sesi:**
+- Melanjutkan `T3.2 Portal Wali` secara berurutan dari task berikutnya:
+  - `T3.2.2 Setup Vue 3 + Inertia layout: mobile-responsive (Tailwind CSS)`
+- Menjaga scope tetap sempit:
+  - baru membangun shell Portal Wali + route tenant Inertia
+  - belum mengklaim dashboard detail akademik/keuangan `T3.2.3+`
+
+**Perubahan yang dibuat:**
+- Menambahkan controller baru [`app/Http/Controllers/PortalWali/PortalWaliDashboardController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\PortalWaliDashboardController.php)
+  - route tenant `/wali` sekarang merender halaman Inertia untuk role yang punya permission `view_own_children`
+  - payload awal yang dikirim:
+    - profil wali login
+    - daftar santri terhubung dari `accessibleSantri()`
+    - ringkasan jumlah anak dan jumlah status aktif
+- Memperbarui route tenant di [`routes/tenant.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\routes\tenant.php)
+  - menambah route:
+    - `GET {tenant}.localhost/wali`
+    - name `tenant.portal-wali.dashboard`
+- Menambahkan layout baru [`resources/js/Layouts/PortalWaliLayout.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Layouts\PortalWaliLayout.vue)
+  - struktur mobile-first dengan header sticky, area konten sempit `max-w-md`, dan bottom navigation placeholder
+- Menambahkan halaman Inertia baru [`resources/js/Pages/PortalWali/Dashboard.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Pages\PortalWali\Dashboard.vue)
+  - memakai layout Portal Wali
+  - menampilkan greeting, ringkasan akses anak, dan kartu santri yang responsif di layar kecil
+- Menambahkan coverage baru di [`tests/Feature/PortalWaliLayoutTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PortalWaliLayoutTest.php)
+  - memastikan route tenant `/wali` merender komponen Inertia `PortalWali/Dashboard`
+  - memastikan payload summary dan data santri terhubung tampil benar
+
+**Temuan penting dari verifikasi:**
+- QC pertama gagal bukan karena route Portal Wali, tetapi karena harness test belum menonaktifkan Vite sehingga render Inertia mencari `public/build/manifest.json`
+- Blocker ditutup secara minimal dengan `withoutVite()` di suite `PortalWaliLayoutTest`, sama seperti suite CMS/PPDB yang sudah stabil
+
+**QC yang HIJAU:**
+- `php -l app/Http/Controllers/PortalWali/PortalWaliDashboardController.php` PASS
+- `php -l tests/Feature/PortalWaliLayoutTest.php` PASS
+- `php artisan route:list --path=wali` PASS
+  - route tenant tampil sebagai:
+    - `GET {tenant}.localhost/wali`
+- Host-side env verifikasi:
+  - `APP_ENV=testing`
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+- `php artisan test tests/Feature/PortalWaliAccessTest.php tests/Feature/PortalWaliLayoutTest.php` PASS
+  - `2` test
+  - `28` assertions
+
+**Status checklist:**
+- `T3.2.2 Setup Vue 3 + Inertia layout: mobile-responsive (Tailwind CSS)` sekarang **SELESAI**
+- Task berurutan berikutnya:
+  - `T3.2.3 Dashboard wali: info santri, calendar akademik`
+
+### Update 4 Juni 2026 14:27 WIB — T3.2.3 s.d. T3.2.11 Portal Wali Lengkap
+
+**Fokus sesi:**
+- Menutup sisa slice Portal Wali secara berurutan:
+  - `T3.2.3` dashboard wali
+  - `T3.2.4` profil santri
+  - `T3.2.5` laporan akademik
+  - `T3.2.6` laporan keuangan
+  - `T3.2.7` notifikasi personal
+  - `T3.2.8` pengajuan izin
+  - `T3.2.9` download rapor PDF
+  - `T3.2.10` isolasi ketat anak milik wali
+  - `T3.2.11` test Portal Wali
+- Menjaga scope tetap satu sistem Laravel + Inertia, tanpa app auth terpisah dan tanpa menambah modul presensi baru di luar urutan.
+
+**Perubahan yang dibuat:**
+- Menambahkan model izin wali [`app/Models/PortalWaliIzin.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Models\PortalWaliIzin.php) dan migration [`database/migrations/2026_06_04_173000_create_portal_wali_izin_table.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\database\migrations\2026_06_04_173000_create_portal_wali_izin_table.php)
+  - tabel tenant-aware untuk pengajuan izin `sakit`, `pulang`, dan `khusus`
+  - status `pending/approved/rejected` siap dipakai modul operasional berikutnya
+- Menambahkan validator submit izin [`app/Http/Requests/PortalWali/StorePortalWaliIzinRequest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Requests\PortalWali\StorePortalWaliIzinRequest.php)
+- Menambahkan service agregasi portal [`app/Services/PortalWali/PortalWaliService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Services\PortalWali\PortalWaliService.php)
+  - sumber akses anak menghormati dua seam sekaligus:
+    - `santri.wali_user_id`
+    - tabel baru `access_wali`
+  - payload yang dihimpun:
+    - dashboard anak
+    - profil & riwayat penempatan
+    - nilai, jadwal, rapor, dan ringkasan kehadiran dari histori izin
+    - tagihan, pembayaran, tabungan
+    - feed notifikasi wali dari `log_notifikasi`
+    - daftar pengajuan izin wali
+- Menambahkan guard context [`app/Http/Controllers/PortalWali/Concerns/ResolvesPortalWaliContext.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\Concerns\ResolvesPortalWaliContext.php)
+  - semua controller Portal Wali sekarang memaksa permission `view_own_children`
+  - semua akses child selalu diverifikasi via query tenant-aware `PortalWaliService`
+- Menyempurnakan controller Portal Wali:
+  - [`PortalWaliDashboardController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\PortalWaliDashboardController.php)
+  - [`PortalWaliProfileController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\PortalWaliProfileController.php)
+  - [`PortalWaliAcademicController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\PortalWaliAcademicController.php)
+  - [`PortalWaliFinancialController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\PortalWaliFinancialController.php)
+  - [`PortalWaliNotificationController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\PortalWaliNotificationController.php)
+  - [`PortalWaliIzinController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\PortalWaliIzinController.php)
+  - [`PortalWaliRaporDownloadController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\PortalWali\PortalWaliRaporDownloadController.php)
+- Menambahkan route tenant Portal Wali di [`routes/tenant.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\routes\tenant.php)
+  - `GET /wali`
+  - `GET /wali/santri/{santri}`
+  - `GET /wali/santri/{santri}/akademik`
+  - `GET /wali/santri/{santri}/keuangan`
+  - `GET /wali/notifikasi`
+  - `GET|POST /wali/izin`
+  - `GET /wali/santri/{santri}/rapor/{rapor}/download`
+- Menyempurnakan layout dan halaman Inertia mobile-first:
+  - [`resources/js/Layouts/PortalWaliLayout.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Layouts\PortalWaliLayout.vue)
+  - [`resources/js/Pages/PortalWali/Dashboard.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Pages\PortalWali\Dashboard.vue)
+  - [`resources/js/Pages/PortalWali/Profile.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Pages\PortalWali\Profile.vue)
+  - [`resources/js/Pages/PortalWali/Academic.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Pages\PortalWali\Academic.vue)
+  - [`resources/js/Pages/PortalWali/Financial.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Pages\PortalWali\Financial.vue)
+  - [`resources/js/Pages/PortalWali/Notifications.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Pages\PortalWali\Notifications.vue)
+  - [`resources/js/Pages/PortalWali/Izin.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Pages\PortalWali\Izin.vue)
+
+**Catatan desain penting:**
+- Keperluan `T3.2.5 kehadiran` belum punya tabel presensi khusus di codebase aktif. Agar tetap urut dan tidak overbuild, halaman akademik Portal Wali sementara menampilkan ringkasan kehadiran dari histori `portal_wali_izin` yang memang sudah ada pada slice ini.
+- Download rapor wali memakai guard akses anak sendiri, tidak memakai route admin akademik yang hanya untuk role guru/TU.
+- Beberapa bug nyata yang ditutup di sesi ini:
+  - query PostgreSQL `distinct on` yang bentrok dengan `order by`
+  - generator URL tenant pada navigasi dan redirect izin
+  - benturan parameter `{tenant}` domain dengan argumen `{santri}` / `{rapor}` di controller route Portal Wali
+
+**QC yang HIJAU:**
+- `php -l` PASS untuk:
+  - `app/Services/PortalWali/PortalWaliService.php`
+  - seluruh controller Portal Wali baru/yang diubah
+  - `app/Models/PortalWaliIzin.php`
+  - `app/Http/Requests/PortalWali/StorePortalWaliIzinRequest.php`
+  - `tests/Feature/PortalWaliFeatureTest.php`
+- `php artisan route:list --path=wali` PASS
+  - `8` route Portal Wali terdaftar
+- Host-side env verifikasi:
+  - `APP_ENV=testing`
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+- `php artisan test tests/Feature/PortalWaliAccessTest.php tests/Feature/PortalWaliLayoutTest.php tests/Feature/PortalWaliFeatureTest.php` PASS
+  - `5` test
+  - `130` assertions
+
+**Status checklist:**
+- `T3.2.3` s.d. `T3.2.11` sekarang **SELESAI**
+- Task berurutan berikutnya:
+  - `T3.2.12 Commit: feat(portal-wali): complete module`

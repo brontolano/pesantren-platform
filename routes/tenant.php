@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\AkademikExportController;
+use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
+use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
+use App\Http\Controllers\PortalWali\PortalWaliFinancialController;
+use App\Http\Controllers\PortalWali\PortalWaliIzinController;
+use App\Http\Controllers\PortalWali\PortalWaliNotificationController;
+use App\Http\Controllers\PortalWali\PortalWaliProfileController;
+use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
 use App\Http\Controllers\SantriExportController;
 use Illuminate\Support\Facades\Route;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
@@ -21,6 +28,17 @@ Route::domain('{tenant}.localhost')->middleware([
     Route::get('/tenant', TenantLandingPageController::class);
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
+
+    Route::middleware('auth')->prefix('wali')->name('tenant.portal-wali.')->group(function () {
+        Route::get('/', PortalWaliDashboardController::class)->name('dashboard');
+        Route::get('/santri/{santri}', PortalWaliProfileController::class)->name('profile');
+        Route::get('/santri/{santri}/akademik', PortalWaliAcademicController::class)->name('academic');
+        Route::get('/santri/{santri}/keuangan', PortalWaliFinancialController::class)->name('financial');
+        Route::get('/notifikasi', PortalWaliNotificationController::class)->name('notifications');
+        Route::get('/izin', [PortalWaliIzinController::class, 'index'])->name('izin');
+        Route::post('/izin', [PortalWaliIzinController::class, 'store'])->name('izin.store');
+        Route::get('/santri/{santri}/rapor/{rapor}/download', PortalWaliRaporDownloadController::class)->name('rapor.download');
+    });
 
     Route::middleware('auth')->prefix('admin/kesantrian/santri/export')->name('tenant.kesantrian.santri.export.')->group(function () {
         Route::get('/csv', [SantriExportController::class, 'csv'])->name('csv');
