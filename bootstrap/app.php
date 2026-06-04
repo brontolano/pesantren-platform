@@ -17,9 +17,15 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
-        ]);
+        $middleware->web(
+            prepend: [
+                // Tenancy init untuk request grup web (Livewire dll) di domain tenant
+                \App\Http\Middleware\InitializeTenancyForWebRequests::class,
+            ],
+            append: [
+                \App\Http\Middleware\HandleInertiaRequests::class,
+            ],
+        );
         $middleware->alias([
             'module' => \App\Http\Middleware\CheckModuleActive::class,
         ]);
