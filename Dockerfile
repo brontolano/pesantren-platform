@@ -21,9 +21,15 @@ RUN install-php-extensions \
     redis \
     opcache
 
-# postgresql-client (pg_dump/pg_restore/psql) untuk backup & restore DB tenant dari panel
+# postgresql-client 16 (cocok dgn server pg16) untuk backup/restore DB tenant dari panel.
+# Default Debian bookworm = pg15 → mismatch; pakai repo PGDG untuk v16.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends postgresql-client gzip \
+    && apt-get install -y --no-install-recommends gnupg lsb-release wget ca-certificates gzip \
+    && install -d /usr/share/postgresql-common/pgdg \
+    && wget --quiet -O /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client-16 \
     && rm -rf /var/lib/apt/lists/*
 
 # OPcache config for production (no revalidation)
