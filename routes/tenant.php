@@ -18,17 +18,20 @@ use App\Http\Controllers\SantriExportController;
 use Illuminate\Support\Facades\Route;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
 use Modules\CMS\Http\Controllers\SitemapController;
-use Modules\CMS\Http\Controllers\TenantLandingPageController;
-use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
-Route::domain('{tenant}.localhost')->middleware([
+/*
+ * Tenant routes — resolved by full domain (mis. demo.pesantren.online).
+ * PreventAccessFromCentralDomains dijalankan lebih dulu agar domain central
+ * (pesantren.online) di-abort 404 sebelum resolver tenant melempar exception.
+ * Halaman publik tenant ("/" + "/ppdb") ditangani oleh routes/web.php.
+ */
+Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
     PreventAccessFromCentralDomains::class,
+    InitializeTenancyByDomain::class,
 ])->group(function () {
-    Route::get('/', TenantLandingPageController::class)->name('tenant.home');
-    Route::get('/tenant', TenantLandingPageController::class);
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
 

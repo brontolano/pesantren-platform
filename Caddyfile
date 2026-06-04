@@ -1,9 +1,26 @@
 {
 	frankenphp
 	order php_server before file_server
+
+	# On-demand TLS: terbitkan sertifikat per-domain saat handshake pertama.
+	# Caddy bertanya ke endpoint Laravel apakah domain diizinkan (central / tenant terdaftar).
+	on_demand_tls {
+		ask http://localhost/caddy/ssl-check
+	}
 }
 
-pesantren.online, demo.pesantren.online {
+# HTTP — melayani app + tantangan ACME + endpoint ssl-check
+:80 {
+	root * /app/public
+	encode zstd br gzip
+	php_server
+}
+
+# HTTPS — sertifikat otomatis (on-demand) untuk pesantren.online & semua subdomain tenant
+:443 {
+	tls {
+		on_demand
+	}
 	root * /app/public
 	encode zstd br gzip
 	php_server

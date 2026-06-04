@@ -35,6 +35,9 @@ WORKDIR /app
 COPY . .
 COPY --from=frontend /app/public/build public/build
 
+# Override FrankenPHP default Caddyfile dengan konfigurasi on-demand TLS kita
+COPY Caddyfile /etc/caddy/Caddyfile
+
 RUN composer install --no-dev --optimize-autoloader
 
 RUN chown -R www-data:www-data storage bootstrap/cache
