@@ -6,6 +6,7 @@ use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\TenantSubscription;
 use App\Services\BillingService;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -51,9 +52,16 @@ class KalkulatorLangganan extends Page implements HasForms
 
     public int $santriCount = 0;
 
+    /** Fitur bisnis SaaS — HANYA panel platform (central 'admin'), bukan panel tenant. */
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasRole('super_admin') ?? false;
+        return Filament::getCurrentPanel()?->getId() === 'admin'
+            && (auth()->user()?->hasRole('super_admin') ?? false);
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canAccess();
     }
 
     public function mount(): void
