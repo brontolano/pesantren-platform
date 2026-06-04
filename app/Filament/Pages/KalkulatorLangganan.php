@@ -15,6 +15,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 use Illuminate\Support\Facades\DB;
 
 class KalkulatorLangganan extends Page implements HasForms
@@ -99,8 +100,9 @@ class KalkulatorLangganan extends Page implements HasForms
                         ->live(),
                     TextInput::make('price')
                         ->label('Tarif (Rp)')
-                        ->numeric()
                         ->prefix('Rp')
+                        ->mask(RawJs::make("\$money(\$input, ',', '.', 0)"))
+                        ->stripCharacters('.')
                         ->live(onBlur: true)
                         ->disabled(fn (callable $get) => $get('billing_type') === 'gratis'),
                     Select::make('billing_cycle')
@@ -167,11 +169,23 @@ class KalkulatorLangganan extends Page implements HasForms
         $this->data['modules'] = $plan->default_modules ?? [];
     }
 
+    /** Tenant yang sedang dipilih (untuk header). */
+    public function selectedTenant(): ?Tenant
+    {
+        return Tenant::with('domains')->find($this->data['tenant_id'] ?? null);
+    }
+
+    /** Bersihkan tarif dari pemisah ribuan ("5.000" => 5000). */
+    protected function cleanPrice(): float
+    {
+        return (float) preg_replace('/\D/', '', (string) ($this->data['price'] ?? '0'));
+    }
+
     /** Hitung pratinjau tagihan dari state sekarang. */
     public function previewData(): array
     {
         $type = $this->data['billing_type'] ?? 'per_santri';
-        $price = (float) ($this->data['price'] ?? 0);
+        $price = $this->cleanPrice();
         $discount = (float) ($this->data['discount'] ?? 0);
         $cycle = $this->data['billing_cycle'] ?? 'monthly';
 
@@ -230,7 +244,7 @@ class KalkulatorLangganan extends Page implements HasForms
 
         app(BillingService::class)->subscribe($tenant, $plan, [
             'billing_type' => $this->data['billing_type'] ?? 'per_santri',
-            'price' => (float) ($this->data['price'] ?? 0),
+            'price' => $this->cleanPrice(),
             'discount' => (float) ($this->data['discount'] ?? 0),
             'billing_cycle' => $this->data['billing_cycle'] ?? 'monthly',
             'modules' => $this->data['modules'] ?? [],

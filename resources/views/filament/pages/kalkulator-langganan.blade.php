@@ -1,4 +1,22 @@
 <x-filament-panels::page>
+    @php($tenant = $this->selectedTenant())
+    @if($tenant)
+        <div class="flex items-start justify-between rounded-xl border border-gray-200 bg-white p-5 dark:border-white/10 dark:bg-white/5">
+            <div>
+                <h2 class="text-lg font-bold text-gray-950 dark:text-white">{{ $tenant->name }}</h2>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Pengaturan langganan &middot; tenant: <span class="font-medium">{{ $tenant->id }}</span>
+                    &middot; {{ $tenant->domains->first()?->domain ?? '—' }}
+                </p>
+            </div>
+            @if($tenant->is_active)
+                <span class="inline-flex items-center rounded-full bg-green-500/10 px-3 py-1 text-sm font-medium text-green-600 dark:text-green-400">Aktif</span>
+            @else
+                <span class="inline-flex items-center rounded-full bg-red-500/10 px-3 py-1 text-sm font-medium text-red-600 dark:text-red-400">Nonaktif</span>
+            @endif
+        </div>
+    @endif
+
     <form wire:submit.prevent="save">
         {{ $this->form }}
     </form>
