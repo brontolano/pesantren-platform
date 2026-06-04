@@ -3148,6 +3148,6 @@ tests/Feature/
   - tanpa kegagalan
 
 **Status checklist:**
-- `T2.3.5 Commit: feat(ppdb): complete module` sekarang **SIAP DITUTUP**
-- Setelah commit ini dibuat, task berurutan berikutnya adalah:
+- `T2.3.5 Commit: feat(ppdb): complete module` sekarang **SELESAI** — commit `ed6d113`
+- Task berurutan berikutnya adalah:
   - `T2.4.1 Buat module CMS via nwidart`
