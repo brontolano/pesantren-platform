@@ -52,19 +52,14 @@ class ModuleResource extends Resource
                     ->boolean()
                     ->tooltip('Modul inti selalu aktif untuk semua tenant'),
                 SelectColumn::make('status')
-                    ->label('Mode')
+                    ->label('Mode (klik untuk ubah)')
                     ->options([
-                        'released' => 'Released (semua tenant)',
-                        'development' => 'Development (demo saja)',
+                        'released' => '🟢 Released — semua tenant',
+                        'development' => '🟠 Development — demo saja',
                     ])
                     ->selectablePlaceholder(false)
                     ->disabled(fn (ModuleRegistry $record): bool => $record->is_core)
                     ->rules(['in:released,development']),
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => $state === 'released' ? 'Released' : 'Development')
-                    ->color(fn (string $state): string => $state === 'released' ? 'success' : 'warning'),
             ])
             ->defaultSort('sort')
             ->paginated(false);
