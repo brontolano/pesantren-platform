@@ -25,22 +25,31 @@ jobs:
 
       - name: Rsync source to VPS
         run: |
-          rsync -az \
-            --exclude '.git' \
-            --exclude '.github' \
-            --exclude 'node_modules' \
-            --exclude 'vendor' \
-            --exclude '.env' \
-            --exclude 'storage/app' \
-            --exclude 'storage/logs' \
-            --exclude 'storage/framework' \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            ./ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/pesantren-platform/"
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=20 -o ServerAliveInterval=10"
+          ok=0
+          for i in 1 2 3 4 5; do
+            rsync -az \
+              --exclude '.git' \
+              --exclude '.github' \
+              --exclude 'node_modules' \
+              --exclude 'vendor' \
+              --exclude '.env' \
+              --exclude 'storage/app' \
+              --exclude 'storage/logs' \
+              --exclude 'storage/framework' \
+              -e "ssh $SSH_OPTS" \
+              ./ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/pesantren-platform/" && { ok=1; break; }
+            echo "Rsync percobaan $i gagal, ulang dalam 20s..."
+            sleep 20
+          done
+          [ "$ok" = 1 ]
 
       - name: Build, restart & migrate
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" '
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=20 -o ServerAliveInterval=10"
+          ok=0
+          for i in 1 2 3 4 5; do
+            ssh $SSH_OPTS "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" '
               set -e
               cd /opt/pesantren-platform
               docker compose -f docker-compose.production.yml build app
@@ -49,4 +58,8 @@ jobs:
               docker compose -f docker-compose.production.yml exec -T app php artisan migrate --force
               docker compose -f docker-compose.production.yml exec -T app php artisan optimize:clear
               echo "Deploy selesai."
-            '
+            ' && { ok=1; break; }
+            echo "SSH percobaan $i gagal, ulang dalam 20s..."
+            sleep 20
+          done
+          [ "$ok" = 1 ]
