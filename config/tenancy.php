@@ -186,7 +186,20 @@ return [
      */
     'migration_parameters' => [
         '--force' => true, // This needs to be true to run migrations in production.
-        '--path' => [database_path('migrations/tenant')],
+        '--path' => [
+            database_path('migrations/tenant'),
+            // Migrasi modul operasional dijalankan pada DB tiap tenant
+            base_path('Modules/Akademik/database/migrations'),
+            base_path('Modules/Asrama/database/migrations'),
+            base_path('Modules/CMS/database/migrations'),
+            base_path('Modules/Kegiatan/database/migrations'),
+            base_path('Modules/Kesantrian/database/migrations'),
+            base_path('Modules/Kesehatan/database/migrations'),
+            base_path('Modules/Keuangan/database/migrations'),
+            base_path('Modules/Notifikasi/database/migrations'),
+            base_path('Modules/PPDB/database/migrations'),
+            base_path('Modules/Tahfidz/database/migrations'),
+        ],
         '--realpath' => true,
     ],
 
