@@ -5,7 +5,6 @@ namespace App\Providers\Filament;
 use App\Filament\Resources\Billing\PlanResource;
 use App\Filament\Resources\Billing\PlatformInvoiceResource;
 use App\Filament\Resources\Billing\TenantSubscriptionResource;
-use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Tenants\TenantResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\BillingOverviewWidget;
@@ -46,10 +45,10 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Emerald,
             ])
             ->resources([
-                // Central domain only — kelola platform/SaaS (BUKAN data operasional tenant)
+                // Central domain only — kelola platform/SaaS (BUKAN data operasional tenant).
+                // Role/permission pesantren dikelola di panel tenant masing-masing.
                 TenantResource::class,
                 UserResource::class,
-                RoleResource::class,
                 // Billing SaaS
                 PlanResource::class,
                 TenantSubscriptionResource::class,
