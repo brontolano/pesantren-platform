@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Tahfidz;
 
-use Filament\Forms\Components\Card;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -33,7 +33,7 @@ class HafalanTahfidzResource extends Resource
     {
         return $schema
             ->schema([
-                Card::make()->schema([
+                Section::make()->schema([
                     Select::make('santri_id')
                         ->label('Santri')
                         ->options(Santri::query()->pluck('nama', 'id'))

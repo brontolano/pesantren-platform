@@ -61,8 +61,7 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
-use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+// Tenancy middleware tidak dipakai di admin panel (central domain only)
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -159,8 +158,9 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                InitializeTenancyBySubdomain::class,
-                PreventAccessFromCentralDomains::class,
+                // Tenancy middleware dihapus dari admin panel
+                // Admin panel diakses via central domain (pesantren.online)
+                // Tenant panel akan punya middleware sendiri
             ])
             ->authMiddleware([
                 Authenticate::class,

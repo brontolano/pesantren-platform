@@ -81,7 +81,8 @@ class RaporResource extends Resource
                     ->label('Cetak / Simpan PDF')
                     ->icon('heroicon-o-printer')
                     ->url(fn (Rapor $record): string => route('tenant.akademik.export.rapor.print', $record))
-                    ->openUrlInNewTab(false),
+                    ->openUrlInNewTab(false)
+                    ->visible(fn () => tenancy()->initialized),
             ])
             ->defaultSort('generated_at', 'desc');
     }

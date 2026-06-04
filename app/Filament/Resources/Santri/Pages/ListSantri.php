@@ -43,7 +43,8 @@ class ListSantri extends ListRecords
                         ])
                         ->default(''),
                 ])
-                ->action(fn (array $data) => redirect()->route('tenant.kesantrian.santri.export.csv', $data)),
+                ->action(fn (array $data) => redirect()->route('tenant.kesantrian.santri.export.csv', $data))
+                ->visible(fn () => tenancy()->initialized),
             Action::make('printPdfPerKelas')
                 ->label('Cetak / Simpan PDF')
                 ->icon('heroicon-o-printer')
@@ -66,7 +67,8 @@ class ListSantri extends ListRecords
                         ->default(''),
                 ])
                 ->action(fn (array $data) => redirect()->route('tenant.kesantrian.santri.export.print', $data))
-                ->openUrlInNewTab(false),
+                ->openUrlInNewTab(false)
+                ->visible(fn () => tenancy()->initialized),
             CreateAction::make(),
         ];
     }

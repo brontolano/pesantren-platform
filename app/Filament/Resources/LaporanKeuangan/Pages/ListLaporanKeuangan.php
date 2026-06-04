@@ -19,24 +19,28 @@ class ListLaporanKeuangan extends ListRecords
                 ->label('Export Excel Tagihan')
                 ->icon('heroicon-o-table-cells')
                 ->form($this->tagihanFilterForm())
-                ->action(fn (array $data) => redirect()->route('tenant.keuangan.export.tagihan.csv', $this->normalizeFilters($data))),
+                ->action(fn (array $data) => redirect()->route('tenant.keuangan.export.tagihan.csv', $this->normalizeFilters($data)))
+                ->visible(fn () => tenancy()->initialized),
             Action::make('printTagihanPdf')
                 ->label('Cetak PDF Tagihan')
                 ->icon('heroicon-o-printer')
                 ->form($this->tagihanFilterForm())
                 ->action(fn (array $data) => redirect()->route('tenant.keuangan.export.tagihan.print', $this->normalizeFilters($data)))
-                ->openUrlInNewTab(false),
+                ->openUrlInNewTab(false)
+                ->visible(fn () => tenancy()->initialized),
             Action::make('exportPembayaranCsv')
                 ->label('Export Excel Pembayaran')
                 ->icon('heroicon-o-banknotes')
                 ->form($this->pembayaranFilterForm())
-                ->action(fn (array $data) => redirect()->route('tenant.keuangan.export.pembayaran.csv', $this->normalizeFilters($data))),
+                ->action(fn (array $data) => redirect()->route('tenant.keuangan.export.pembayaran.csv', $this->normalizeFilters($data)))
+                ->visible(fn () => tenancy()->initialized),
             Action::make('printPembayaranPdf')
                 ->label('Cetak PDF Pembayaran')
                 ->icon('heroicon-o-document-arrow-down')
                 ->form($this->pembayaranFilterForm())
                 ->action(fn (array $data) => redirect()->route('tenant.keuangan.export.pembayaran.print', $this->normalizeFilters($data)))
-                ->openUrlInNewTab(false),
+                ->openUrlInNewTab(false)
+                ->visible(fn () => tenancy()->initialized),
         ];
     }
 

@@ -20,13 +20,15 @@ class ListPembayaran extends ListRecords
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->url(fn () => route('tenant.keuangan.export.pembayaran.csv', [], false))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->visible(fn () => tenancy()->initialized),
             Action::make('export_print')
                 ->label('Cetak / PDF')
                 ->icon('heroicon-o-printer')
                 ->color('gray')
                 ->url(fn () => route('tenant.keuangan.export.pembayaran.print', [], false))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->visible(fn () => tenancy()->initialized),
         ];
     }
 }

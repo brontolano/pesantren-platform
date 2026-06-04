@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Modules\Kesantrian\Models\Santri;
@@ -18,7 +20,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'tenant_id', 'email_authentication_enabled'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements HasEmailAuthentication
+class User extends Authenticatable implements HasEmailAuthentication, FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, BelongsToTenant, HasRoles;
@@ -35,6 +37,17 @@ class User extends Authenticatable implements HasEmailAuthentication
             'email_authentication_enabled' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Super admin bisa akses dari central domain (tanpa tenant)
+        // User biasa harus punya tenant_id
+        if ($this->hasRole('super_admin')) {
+            return true;
+        }
+
+        return $this->tenant_id !== null;
     }
 
     public function hasEmailAuthentication(): bool

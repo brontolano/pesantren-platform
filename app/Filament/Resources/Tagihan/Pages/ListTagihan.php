@@ -20,13 +20,15 @@ class ListTagihan extends ListRecords
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->url(fn () => route('tenant.keuangan.export.tagihan.csv', [], false))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->visible(fn () => tenancy()->initialized),
             Action::make('export_print')
                 ->label('Cetak / PDF')
                 ->icon('heroicon-o-printer')
                 ->color('gray')
                 ->url(fn () => route('tenant.keuangan.export.tagihan.print', [], false))
-                ->openUrlInNewTab(),
+                ->openUrlInNewTab()
+                ->visible(fn () => tenancy()->initialized),
         ];
     }
 }
