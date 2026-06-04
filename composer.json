@@ -43,7 +43,9 @@
             "Modules\\PPDB\\": "Modules/PPDB/app/",
             "Modules\\PPDB\\Database\\Seeders\\": "Modules/PPDB/database/seeders/",
             "Modules\\CMS\\": "Modules/CMS/app/",
-            "Modules\\CMS\\Database\\Seeders\\": "Modules/CMS/database/seeders/"
+            "Modules\\CMS\\Database\\Seeders\\": "Modules/CMS/database/seeders/",
+            "Modules\\Akademik\\": "Modules/Akademik/app/",
+            "Modules\\Akademik\\Database\\Seeders\\": "Modules/Akademik/database/seeders/"
         }
     },
     "autoload-dev": {

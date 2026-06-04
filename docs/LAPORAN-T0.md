@@ -3976,3 +3976,101 @@ tests/Feature/
 - `T2.4.17 Test: homepage load, artikel visible, section toggle benar, branding per tenant` sekarang **SELESAI**
 - Task berurutan berikutnya adalah:
   - `T2.4.18 Commit: feat(cms): complete module`
+
+### Update 4 Juni 2026 15:20 WIB — T2.4.18 Commit CMS Complete Module
+
+**Fokus sesi:**
+- Menutup task berurutan terakhir pada slice CMS:
+  - `T2.4.18 Commit: feat(cms): complete module`
+- Menjaga commit tetap bersih:
+  - hanya membawa file modul CMS, seam tenant route/branding, test CMS, dan laporan repo
+  - tidak membawa `storage/*`, `.env.example`, `Dockerfile*`, `docker-compose.yml`, atau `Caddyfile` yang masih di luar scope task CMS
+
+**Verifikasi final sebelum commit:**
+- Host-side env verifikasi:
+  - `APP_ENV=testing`
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+- `php artisan test tests/Feature/CmsWebsiteBuilderTest.php tests/Feature/CmsFilamentResourceTest.php tests/Feature/CmsLandingPageTest.php` PASS
+  - `24` test
+  - `157` assertions
+
+**Hasil commit:**
+- Commit lokal berhasil dibuat:
+  - `c314b48` — `feat(cms): complete module`
+
+**Status checklist:**
+- `T2.4.18 Commit: feat(cms): complete module` sekarang **SELESAI**
+- Slice `T2.4 CMS & Landing Page Pesantren` untuk task `T2.4.1` sampai `T2.4.18` sekarang **SELESAI TERKOMIT**
+
+### Update 4 Juni 2026 16:15 WIB — T3.1 Modul Akademik
+
+**Fokus sesi:**
+- Memulai `TAHAP T3` secara berurutan dari `T3.1 Modul Akademik`
+- Menutup satu slice penuh dulu sebelum lanjut ke `T3.2 Portal Wali`
+
+**Perubahan yang dibuat:**
+- Membuat module baru [`Modules/Akademik`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik) via nwidart
+  - generator sempat timeout di `composer dump-autoload`, tetapi scaffold modul tetap terbentuk lengkap
+  - root autoload diselaraskan di [`composer.json`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\composer.json)
+  - provider modul di [`Modules/Akademik/app/Providers/AkademikServiceProvider.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Providers\AkademikServiceProvider.php) kini memuat migration module
+- Menambahkan migration tenant-aware lengkap di [`Modules/Akademik/database/migrations/2026_06_04_160000_create_akademik_tables.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\database\migrations\2026_06_04_160000_create_akademik_tables.php)
+  - tabel `periode_akademik`
+  - tabel `pelajaran`
+  - tabel `jadwal_pelajaran`
+  - tabel `nilai`
+  - tabel `rapor`
+- Menambahkan model domain Akademik:
+  - [`PeriodeAkademik.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Models\PeriodeAkademik.php)
+  - [`Pelajaran.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Models\Pelajaran.php)
+  - [`JadwalPelajaran.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Models\JadwalPelajaran.php)
+  - [`Nilai.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Models\Nilai.php)
+  - [`Rapor.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Models\Rapor.php)
+- Menambahkan service layer Akademik:
+  - [`PeriodeAkademikService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Services\PeriodeAkademikService.php)
+    - create/update periode
+    - aktivasi satu periode aktif per tenant
+  - [`JadwalPelajaranService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Services\JadwalPelajaranService.php)
+    - validasi jam mulai/jam selesai
+    - simpan jadwal pelajaran per kelas
+  - [`NilaiService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Services\NilaiService.php)
+    - validasi rentang nilai `0-100`
+    - hitung `nilai_akhir` otomatis
+    - membaca bobot tenant dari setting `akademik_grade_weights`
+    - membatasi guru ke pelajaran dan kelas yang diampu
+  - [`RaporService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Akademik\app\Services\RaporService.php)
+    - generate rapor per kelas/periode
+    - hitung `total_sks`, `ipk`, dan `rank_kelas`
+    - simpan `ringkasan_nilai` untuk cetak/view
+- Menambahkan export rapor model browser-to-PDF:
+  - controller [`app/Http/Controllers/AkademikExportController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Http\Controllers\AkademikExportController.php)
+  - view cetak [`resources/views/exports/rapor-print.blade.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\views\exports\rapor-print.blade.php)
+  - route tenant print ditambahkan ke [`routes/tenant.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\routes\tenant.php)
+- Menambahkan resource Filament Akademik:
+  - [`PeriodeAkademikResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource.php)
+  - [`PelajaranResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Akademik\Pelajaran\PelajaranResource.php)
+  - [`JadwalPelajaranResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource.php)
+  - [`NilaiResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Akademik\Nilai\NilaiResource.php)
+  - [`RaporResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Akademik\Rapor\RaporResource.php)
+
+**QC yang HIJAU:**
+- `php -l` PASS untuk file provider, migration, model, service, controller, resource, dan `routes/tenant.php`
+- `composer dump-autoload` PASS
+- `php artisan module:list` PASS
+  - `Akademik` muncul dalam status enabled
+- `php artisan route:list --path=admin/akademik` PASS
+  - route resource admin Akademik dan export rapor terdaftar
+- Host-side env verifikasi:
+  - `APP_ENV=testing`
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+- `php artisan test tests/Feature/AkademikServiceTest.php` PASS
+  - `4` test
+  - `16` assertions
+
+**Status checklist:**
+- `T3.1.1` s.d. `T3.1.9` sekarang **SELESAI**
+- Task berurutan berikutnya:
+  - `T3.1.10 Commit: feat(akademik): complete module`

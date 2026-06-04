@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\KeuanganExportController;
+use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\SantriExportController;
 use Illuminate\Support\Facades\Route;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
@@ -24,6 +25,10 @@ Route::domain('{tenant}.localhost')->middleware([
     Route::middleware('auth')->prefix('admin/kesantrian/santri/export')->name('tenant.kesantrian.santri.export.')->group(function () {
         Route::get('/csv', [SantriExportController::class, 'csv'])->name('csv');
         Route::get('/print', [SantriExportController::class, 'print'])->name('print');
+    });
+
+    Route::middleware('auth')->prefix('admin/akademik/export')->name('tenant.akademik.export.')->group(function () {
+        Route::get('/rapor/{rapor}/print', [AkademikExportController::class, 'raporPrint'])->name('rapor.print');
     });
 
     Route::middleware('auth')->prefix('admin/keuangan/export')->name('tenant.keuangan.export.')->group(function () {
