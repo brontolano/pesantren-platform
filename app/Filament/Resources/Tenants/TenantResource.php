@@ -7,12 +7,16 @@ use App\Filament\Resources\Tenants\Pages\EditTenant;
 use App\Filament\Resources\Tenants\Pages\ListTenants;
 use App\Models\Tenant;
 use App\Services\BillingService;
+use App\Services\TenantRecoveryService;
 use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -123,6 +127,61 @@ class TenantResource extends Resource
                     ->color('success')
                     ->action(fn (Tenant $record) => $record->update(['is_active' => true]))
                     ->visible(fn (Tenant $record): bool => !$record->is_active),
+
+                // === Recovery database per tenant ===
+                ActionGroup::make([
+                    Action::make('db_info')
+                        ->label('Info Database')
+                        ->icon('heroicon-o-circle-stack')
+                        ->color('gray')
+                        ->action(function (Tenant $record) {
+                            $size = app(TenantRecoveryService::class)->size($record);
+                            Notification::make()
+                                ->title('Database tenant')
+                                ->body('DB: ' . $record->database()->getName() . ' — Ukuran: ' . ($size ?? 'tidak diketahui'))
+                                ->info()
+                                ->send();
+                        }),
+                    Action::make('backup_db')
+                        ->label('Backup / Export DB')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalDescription('Buat & unduh backup database tenant ini (.sql.gz).')
+                        ->action(function (Tenant $record) {
+                            $path = app(TenantRecoveryService::class)->backup($record);
+
+                            return response()->download($path)->deleteFileAfterSend();
+                        }),
+                    Action::make('restore_db')
+                        ->label('Restore / Import DB')
+                        ->icon('heroicon-o-arrow-up-tray')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalDescription('PERINGATAN: Restore akan menimpa data database tenant ini dengan isi file backup. Tidak bisa dibatalkan.')
+                        ->form([
+                            FileUpload::make('file')
+                                ->label('File backup (.sql.gz)')
+                                ->disk('local')
+                                ->directory('tenant-restore-uploads')
+                                ->acceptedFileTypes(['application/gzip', 'application/x-gzip', 'application/octet-stream'])
+                                ->required(),
+                        ])
+                        ->action(function (array $data, Tenant $record) {
+                            $path = storage_path('app/' . $data['file']);
+                            try {
+                                app(TenantRecoveryService::class)->restore($record, $path);
+                                Notification::make()->title('Restore berhasil')->success()->send();
+                            } catch (\Throwable $e) {
+                                Notification::make()->title('Restore gagal')->body($e->getMessage())->danger()->send();
+                            } finally {
+                                @unlink($path);
+                            }
+                        }),
+                ])
+                    ->label('Recovery')
+                    ->icon('heroicon-o-server-stack')
+                    ->button(),
             ]);
     }
 

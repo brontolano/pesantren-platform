@@ -21,6 +21,11 @@ RUN install-php-extensions \
     redis \
     opcache
 
+# postgresql-client (pg_dump/pg_restore/psql) untuk backup & restore DB tenant dari panel
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client gzip \
+    && rm -rf /var/lib/apt/lists/*
+
 # OPcache config for production (no revalidation)
 RUN echo "opcache.enable=1\n\
 opcache.memory_consumption=256\n\
