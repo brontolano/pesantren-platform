@@ -56,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->pages([
                 Dashboard::class,
+                \App\Filament\Pages\KalkulatorLangganan::class,
             ])
             ->widgets([
                 AccountWidget::class,
