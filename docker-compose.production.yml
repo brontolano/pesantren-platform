@@ -1,5 +1,5 @@
 # docker-compose.production.yml
-# Dipakai di VPS Hostinger — JANGAN untuk development lokal
+# FrankenPHP handles SSL directly via Caddy — no Traefik needed
 # Usage: docker compose -f docker-compose.production.yml up -d
 
 services:
@@ -9,40 +9,27 @@ services:
       dockerfile: Dockerfile
     container_name: pesantren-app
     restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
-      - SERVER_NAME=:80
+      - SERVER_NAME=pesantren.online,*.pesantren.online
     env_file:
       - .env
     volumes:
       - app_storage:/app/storage
       - ./.env:/app/.env:ro
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     networks:
-      - traefik-net
       - internal
-    labels:
-      - "traefik.enable=true"
-      # HTTP → HTTPS redirect
-      - "traefik.http.routers.app-http.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.app-http.entrypoints=web"
-      - "traefik.http.routers.app-http.middlewares=redirect-https"
-      - "traefik.http.middlewares.redirect-https.redirectscheme.scheme=https"
-      # HTTPS router — catch-all untuk semua domain tenant
-      - "traefik.http.routers.app.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls=true"
-      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
-      # Wildcard + specific domains
-      - "traefik.http.routers.app.tls.domains[0].main=pesantren.online"
-      - "traefik.http.routers.app.tls.domains[0].sans=*.pesantren.online"
-      - "traefik.http.services.app.loadbalancer.server.port=80"
 
   postgres:
     image: postgres:16-alpine
@@ -61,7 +48,6 @@ services:
       retries: 5
     networks:
       - internal
-    # TIDAK expose port ke luar — hanya internal
 
   redis:
     image: redis:7-alpine
@@ -77,16 +63,14 @@ services:
       retries: 5
     networks:
       - internal
-    # TIDAK expose port ke luar — hanya internal
 
 volumes:
   postgres_data:
   redis_data:
   app_storage:
+  caddy_data:
+  caddy_config:
 
 networks:
-  traefik-net:
-    external: true
-    name: traefik-net
   internal:
     driver: bridge
