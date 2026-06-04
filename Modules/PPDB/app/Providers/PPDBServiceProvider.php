@@ -2,8 +2,8 @@
 
 namespace Modules\PPDB\Providers;
 
-use Nwidart\Modules\Support\ModuleServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Nwidart\Modules\Support\ModuleServiceProvider;
 
 class PPDBServiceProvider extends ModuleServiceProvider
 {
@@ -33,6 +33,13 @@ class PPDBServiceProvider extends ModuleServiceProvider
         EventServiceProvider::class,
         RouteServiceProvider::class,
     ];
+
+    public function boot(): void
+    {
+        parent::boot();
+
+        $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+    }
 
     /**
      * Define module schedules.

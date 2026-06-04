@@ -5,20 +5,21 @@ declare(strict_types=1);
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\SantriExportController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use Modules\CMS\Http\Controllers\ArticleDetailController;
+use Modules\CMS\Http\Controllers\SitemapController;
+use Modules\CMS\Http\Controllers\TenantLandingPageController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
-Route::middleware([
+Route::domain('{tenant}.localhost')->middleware([
     'web',
     InitializeTenancyBySubdomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-    Route::get('/tenant', function () {
-        return Inertia::render('Welcome', [
-            'tenant' => tenant(),
-        ]);
-    })->name('tenant.home');
+    Route::get('/', TenantLandingPageController::class)->name('tenant.home');
+    Route::get('/tenant', TenantLandingPageController::class);
+    Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
+    Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
 
     Route::middleware('auth')->prefix('admin/kesantrian/santri/export')->name('tenant.kesantrian.santri.export.')->group(function () {
         Route::get('/csv', [SantriExportController::class, 'csv'])->name('csv');

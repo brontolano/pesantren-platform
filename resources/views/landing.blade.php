@@ -116,7 +116,7 @@
     </div>
 
     <footer>
-        &copy; {{ date('Y') }} Pesantren Platform &mdash; Multi-Tenant SaaS
+        &copy; {{ date('Y') }} {{ config('app.company', 'PT Rojo Bronto Lano') }}
     </footer>
 </body>
 </html>

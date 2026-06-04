@@ -6,7 +6,7 @@ use Modules\PPDB\Http\Controllers\PPDBController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
-Route::middleware([
+Route::domain('{tenant}.localhost')->middleware([
     'web',
     InitializeTenancyBySubdomain::class,
     PreventAccessFromCentralDomains::class,

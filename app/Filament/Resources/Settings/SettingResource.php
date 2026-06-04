@@ -83,6 +83,22 @@ class SettingResource extends Resource
                 ->imageEditor()
                 ->visible(fn (Get $get): bool => $get('key') === 'branding_logo')
                 ->required(fn (Get $get): bool => $get('key') === 'branding_logo'),
+            TextInput::make('value.text')
+                ->label('Favicon URL / Path')
+                ->helperText('Boleh URL absolut atau path file publik.')
+                ->visible(fn (Get $get): bool => $get('key') === 'branding_favicon')
+                ->required(fn (Get $get): bool => $get('key') === 'branding_favicon')
+                ->maxLength(255),
+            Select::make('value.text')
+                ->label('Font Branding')
+                ->options([
+                    'default' => 'Default Sans',
+                    'serif' => 'Serif Elegan',
+                    'modern' => 'Modern Sans',
+                    'mono' => 'Mono Editorial',
+                ])
+                ->visible(fn (Get $get): bool => $get('key') === 'branding_font')
+                ->required(fn (Get $get): bool => $get('key') === 'branding_font'),
             KeyValue::make('value.fields')
                 ->label('Konfigurasi Field PPDB')
                 ->helperText('Isi mode field dengan `required`, `optional`, atau `hidden`.')
@@ -115,7 +131,7 @@ class SettingResource extends Resource
                                 ->implode(', ');
                         }
 
-                        return $state['text'] ?? $state['color'] ?? $state['logo_path'] ?? '-';
+                        return $state['text'] ?? $state['color'] ?? $state['logo_path'] ?? $state['url'] ?? '-';
                     })
                     ->wrap(),
                 ImageColumn::make('value.logo_path')
@@ -152,6 +168,8 @@ class SettingResource extends Resource
             'branding_primary_color' => 'Warna Primer',
             'branding_secondary_color' => 'Warna Sekunder',
             'branding_logo' => 'Logo Tenant',
+            'branding_favicon' => 'Favicon Tenant',
+            'branding_font' => 'Font Branding',
             'ppdb_form_fields' => 'Field Form PPDB',
         ];
     }

@@ -15,6 +15,10 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'company' => env('APP_COMPANY', 'PT Rojo Bronto Lano'),
+
+    'domain' => env('APP_DOMAIN', 'localhost'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

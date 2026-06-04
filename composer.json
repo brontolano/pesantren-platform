@@ -41,7 +41,9 @@
             "Modules\\Notifikasi\\": "Modules/Notifikasi/app/",
             "Modules\\Notifikasi\\Database\\Seeders\\": "Modules/Notifikasi/database/seeders/",
             "Modules\\PPDB\\": "Modules/PPDB/app/",
-            "Modules\\PPDB\\Database\\Seeders\\": "Modules/PPDB/database/seeders/"
+            "Modules\\PPDB\\Database\\Seeders\\": "Modules/PPDB/database/seeders/",
+            "Modules\\CMS\\": "Modules/CMS/app/",
+            "Modules\\CMS\\Database\\Seeders\\": "Modules/CMS/database/seeders/"
         }
     },
     "autoload-dev": {
