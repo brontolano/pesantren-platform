@@ -131,6 +131,7 @@ class TenantPanelProvider extends PanelProvider
                 KeuanganOverviewWidget::class,
             ])
             ->middleware([
+                \App\Http\Middleware\RedirectCentralToPlatform::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
