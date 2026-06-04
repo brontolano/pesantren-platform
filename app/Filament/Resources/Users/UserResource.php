@@ -129,3 +129,4 @@ class UserResource extends Resource
         return auth()->user()?->can('manage_users') ?? false;
     }
 }
+

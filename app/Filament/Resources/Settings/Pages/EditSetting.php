@@ -17,3 +17,4 @@ class EditSetting extends EditRecord
         ];
     }
 }
+

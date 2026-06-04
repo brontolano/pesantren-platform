@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/tahfidz",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Tahfidz\\": "app/",
+            "Modules\\Tahfidz\\Database\\Factories\\": "database/factories/",
+            "Modules\\Tahfidz\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Tahfidz\\Tests\\": "tests/"
+        }
+    }
+}

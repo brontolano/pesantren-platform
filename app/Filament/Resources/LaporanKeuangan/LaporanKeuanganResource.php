@@ -84,3 +84,4 @@ class LaporanKeuanganResource extends Resource
         ];
     }
 }
+

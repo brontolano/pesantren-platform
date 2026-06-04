@@ -17,3 +17,4 @@ class ListNilai extends ListRecords
         ];
     }
 }
+

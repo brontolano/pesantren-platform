@@ -9,3 +9,4 @@ class EditBroadcastWa extends EditRecord
 {
     protected static string $resource = BroadcastWaResource::class;
 }
+

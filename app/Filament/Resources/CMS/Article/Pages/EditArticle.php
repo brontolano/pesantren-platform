@@ -24,3 +24,4 @@ class EditArticle extends EditRecord
         return $data;
     }
 }
+

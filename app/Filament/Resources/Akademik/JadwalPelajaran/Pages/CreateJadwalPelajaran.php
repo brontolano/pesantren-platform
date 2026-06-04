@@ -15,3 +15,4 @@ class CreateJadwalPelajaran extends CreateRecord
         return app(JadwalPelajaranService::class)->simpan($data);
     }
 }
+

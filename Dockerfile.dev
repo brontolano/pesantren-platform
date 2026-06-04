@@ -1,15 +1,45 @@
-FROM php:8.3-cli
+FROM dunglas/frankenphp:latest-php8.3
 
-RUN apt-get update && apt-get install -y \
-    git zip unzip libpq-dev libzip-dev libicu-dev \
-    && docker-php-ext-install pdo pdo_pgsql pgsql zip intl bcmath pcntl \
-    && pecl install redis && docker-php-ext-enable redis \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install PHP extensions needed by Laravel + PostgreSQL + Redis
+RUN install-php-extensions \
+    pdo_pgsql \
+    pgsql \
+    zip \
+    intl \
+    bcmath \
+    pcntl \
+    redis \
+    opcache \
+    exif \
+    gd
+
+# OPcache config for development
+# validate_timestamps=1 + revalidate_freq=0 = deteksi perubahan file otomatis
+# max_accelerated_files cukup besar untuk 12 modul + vendor
+RUN echo "opcache.enable=1" > /usr/local/etc/php/conf.d/opcache-dev.ini && \
+    echo "opcache.enable_cli=1" >> /usr/local/etc/php/conf.d/opcache-dev.ini && \
+    echo "opcache.memory_consumption=256" >> /usr/local/etc/php/conf.d/opcache-dev.ini && \
+    echo "opcache.max_accelerated_files=30000" >> /usr/local/etc/php/conf.d/opcache-dev.ini && \
+    echo "opcache.validate_timestamps=1" >> /usr/local/etc/php/conf.d/opcache-dev.ini && \
+    echo "opcache.revalidate_freq=0" >> /usr/local/etc/php/conf.d/opcache-dev.ini && \
+    echo "opcache.interned_strings_buffer=32" >> /usr/local/etc/php/conf.d/opcache-dev.ini && \
+    echo "opcache.fast_shutdown=1" >> /usr/local/etc/php/conf.d/opcache-dev.ini
+
+# PHP runtime — limits untuk 40+ Filament resources + worker mode
+RUN echo "max_execution_time=120" > /usr/local/etc/php/conf.d/php-dev.ini && \
+    echo "max_input_time=120" >> /usr/local/etc/php/conf.d/php-dev.ini && \
+    echo "memory_limit=512M" >> /usr/local/etc/php/conf.d/php-dev.ini && \
+    echo "upload_max_filesize=32M" >> /usr/local/etc/php/conf.d/php-dev.ini && \
+    echo "post_max_size=32M" >> /usr/local/etc/php/conf.d/php-dev.ini && \
+    echo "realpath_cache_size=4096K" >> /usr/local/etc/php/conf.d/php-dev.ini && \
+    echo "realpath_cache_ttl=600" >> /usr/local/etc/php/conf.d/php-dev.ini
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+WORKDIR /app
 
-EXPOSE 8000
+EXPOSE 80 443
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# FrankenPHP dengan worker mode — PHP persistent process
+# Request ke-2 dst tidak perlu boot Laravel dari awal
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

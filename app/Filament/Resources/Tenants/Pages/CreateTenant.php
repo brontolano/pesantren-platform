@@ -23,3 +23,4 @@ class CreateTenant extends CreateRecord
         return $tenant;
     }
 }
+

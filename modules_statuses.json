@@ -6,5 +6,9 @@
     "Notifikasi": true,
     "PPDB": true,
     "CMS": true,
-    "Akademik": true
+    "Akademik": true,
+    "Asrama": true,
+    "Tahfidz": true,
+    "Kesehatan": true,
+    "Kegiatan": true
 }

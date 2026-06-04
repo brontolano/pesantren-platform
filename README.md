@@ -16,25 +16,60 @@ Platform ERP pesantren white-label berbasis Laravel multi-tenant sesuai konstitu
 
 ## Menjalankan Lokal
 
-```bash
-docker compose up -d
-docker compose exec app php artisan migrate
-docker compose exec app php artisan tenant:create "Asy-Syifaa" asy-syifaa
-docker compose exec app php artisan tenant:create "Demo" demo
-docker compose exec app php artisan db:seed
-```
+### Langkah 1 — Hosts file (sekali saja)
 
-Tambahkan host lokal berikut:
+Tambahkan ke `C:\Windows\System32\drivers\etc\hosts` (sebagai Administrator):
 
 ```text
 127.0.0.1 asy-syifaa.localhost demo.localhost
 ```
 
-URL lokal:
+### Langkah 2 — Build & jalankan container
 
-- `http://localhost:8000`
-- `http://asy-syifaa.localhost:8000/admin`
-- `http://demo.localhost:8000/admin`
+```bash
+docker compose up -d --build
+```
+
+### Langkah 3 — Setup (WAJIB setelah build pertama)
+
+```bash
+bash scripts/dev-setup.sh
+```
+
+Script ini otomatis: install vendor, migrasi, seeder, cache Filament, cache Laravel.
+
+**Mengapa wajib?** Platform ini punya 40+ Filament resources dari 12 modul. Tanpa cache, panel admin timeout 30 detik saat loading. `filament:cache-components` menyelesaikan masalah ini.
+
+### Langkah 4 — Buat tenant
+
+```bash
+docker compose exec app php artisan tenant:create "Asy-Syifaa" asy-syifaa
+docker compose exec app php artisan tenant:create "Demo" demo
+```
+
+### URL Lokal
+
+- `http://localhost:8000` — Landing page
+- `http://asy-syifaa.localhost:8000/admin` — Panel admin Asy-Syifaa
+- `http://demo.localhost:8000/admin` — Panel admin Demo
+
+Login: `admin@asy-syifaa.localhost` / `password`
+
+### Setelah update kode
+
+```bash
+# Jika mengubah resource/page Filament baru:
+docker compose exec app php artisan filament:cache-components
+
+# Jika mengubah route:
+docker compose exec app php artisan route:cache
+
+# Jika mengubah config:
+docker compose exec app php artisan config:cache
+
+# Jika ada masalah aneh — clear semua cache:
+docker compose exec app php artisan optimize:clear && bash scripts/dev-setup.sh
+```
 
 ## Testing Lokal
 

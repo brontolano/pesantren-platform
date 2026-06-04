@@ -18,3 +18,4 @@ class ListProfiles extends ListRecords
         ];
     }
 }
+

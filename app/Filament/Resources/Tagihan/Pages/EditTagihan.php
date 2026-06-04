@@ -26,3 +26,4 @@ class EditTagihan extends EditRecord
         ];
     }
 }
+

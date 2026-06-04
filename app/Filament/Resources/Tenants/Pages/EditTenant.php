@@ -30,3 +30,4 @@ class EditTenant extends EditRecord
         return $record;
     }
 }
+

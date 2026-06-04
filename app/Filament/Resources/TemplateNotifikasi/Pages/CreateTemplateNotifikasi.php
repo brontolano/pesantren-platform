@@ -9,3 +9,4 @@ class CreateTemplateNotifikasi extends CreateRecord
 {
     protected static string $resource = TemplateNotifikasiResource::class;
 }
+

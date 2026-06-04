@@ -7,18 +7,30 @@ COPY vite.config.js tailwind.config.js ./
 COPY resources/ resources/
 RUN npm run build
 
-# Stage 2: PHP application
-FROM php:8.3-cli
+# Stage 2: PHP application with FrankenPHP
+FROM dunglas/frankenphp:latest-php8.3
 
-RUN apt-get update && apt-get install -y \
-    git zip unzip libpq-dev libzip-dev libicu-dev \
-    && docker-php-ext-install pdo pdo_pgsql pgsql zip intl bcmath pcntl \
-    && pecl install redis && docker-php-ext-enable redis \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install PHP extensions
+RUN install-php-extensions \
+    pdo_pgsql \
+    pgsql \
+    zip \
+    intl \
+    bcmath \
+    pcntl \
+    redis \
+    opcache
+
+# OPcache config for production (no revalidation)
+RUN echo "opcache.enable=1\n\
+opcache.memory_consumption=256\n\
+opcache.max_accelerated_files=20000\n\
+opcache.validate_timestamps=0\n\
+opcache.interned_strings_buffer=16" > /usr/local/etc/php/conf.d/opcache-prod.ini
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+WORKDIR /app
 
 COPY . .
 COPY --from=frontend /app/public/build public/build
@@ -27,6 +39,6 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-EXPOSE 8000
+EXPOSE 80 443
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]

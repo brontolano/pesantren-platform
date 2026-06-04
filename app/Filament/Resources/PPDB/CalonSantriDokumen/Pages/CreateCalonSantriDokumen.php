@@ -9,3 +9,4 @@ class CreateCalonSantriDokumen extends CreateRecord
 {
     protected static string $resource = CalonSantriDokumenResource::class;
 }
+

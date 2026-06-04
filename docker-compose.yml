@@ -5,13 +5,17 @@ services:
       dockerfile: Dockerfile.dev
     container_name: pesantren-app
     restart: unless-stopped
+    # Port 8000 untuk akses langsung (localhost:8000)
+    # Port 80 di-handle Traefik untuk subdomain routing (asy-syifaa.localhost:80)
     ports:
-      - "8000:8000"
+      - "8000:80"
     volumes:
-      - .:/var/www/html
+      - .:/app
+      - ./Caddyfile:/etc/caddy/Caddyfile
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
+      - SERVER_NAME=:80
     depends_on:
       postgres:
         condition: service_healthy
@@ -21,11 +25,9 @@ services:
       - pesantren
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=HostRegexp(`{subdomain:.+}.localhost`) || Host(`localhost`)"
+      - "traefik.http.routers.app.rule=HostRegexp(`{subdomain:[a-z0-9-]+}.localhost`) || Host(`localhost`)"
       - "traefik.http.routers.app.entrypoints=web"
-      - "traefik.http.routers.app.middlewares=app-compress"
-      - "traefik.http.middlewares.app-compress.compress=true"
-      - "traefik.http.services.app.loadbalancer.server.port=8000"
+      - "traefik.http.services.app.loadbalancer.server.port=80"
 
   postgres:
     image: postgres:16-alpine

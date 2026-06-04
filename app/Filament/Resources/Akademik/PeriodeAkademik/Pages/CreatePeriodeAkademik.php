@@ -15,3 +15,4 @@ class CreatePeriodeAkademik extends CreateRecord
         return app(PeriodeAkademikService::class)->simpan($data);
     }
 }
+

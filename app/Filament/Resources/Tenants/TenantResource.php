@@ -6,10 +6,14 @@ use App\Filament\Resources\Tenants\Pages\CreateTenant;
 use App\Filament\Resources\Tenants\Pages\EditTenant;
 use App\Filament\Resources\Tenants\Pages\ListTenants;
 use App\Models\Tenant;
+use App\Services\BillingService;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -57,24 +61,39 @@ class TenantResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('id')
-                ->label('Tenant ID')
-                ->required()
-                ->alphaDash()
-                ->maxLength(255),
-            TextInput::make('name')
-                ->label('Nama Tenant')
-                ->required()
-                ->maxLength(255),
-            TextInput::make('primary_domain')
-                ->label('Subdomain')
-                ->helperText('Simpan subdomain saja, misalnya asy-syifaa atau demo.')
-                ->required()
-                ->maxLength(255),
-            Toggle::make('is_active')
-                ->label('Aktif')
-                ->default(true)
-                ->inline(false),
+            Section::make('Identitas Tenant')->schema([
+                TextInput::make('id')
+                    ->label('Tenant ID')
+                    ->required()
+                    ->alphaDash()
+                    ->maxLength(255)
+                    ->disabledOn('edit'),
+                TextInput::make('name')
+                    ->label('Nama Pesantren')
+                    ->required()
+                    ->maxLength(255),
+                Toggle::make('is_active')
+                    ->label('Aktif')
+                    ->default(true)
+                    ->inline(false),
+            ]),
+            Section::make('Domain Mapping')->schema([
+                TextInput::make('primary_domain')
+                    ->label('Subdomain (fallback)')
+                    ->helperText('Misal: asy-syifaa → asy-syifaa.pesantren-platform.com')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('website_domain')
+                    ->label('Domain Website Publik (custom)')
+                    ->helperText('Misal: asy-syifaa.sch.id — kosongkan jika pakai subdomain')
+                    ->nullable()
+                    ->maxLength(255),
+                TextInput::make('sistem_domain')
+                    ->label('Domain Sistem (panel admin)')
+                    ->helperText('Otomatis: sistem.{website_domain}. Isi manual jika berbeda.')
+                    ->nullable()
+                    ->maxLength(255),
+            ]),
         ]);
     }
 
@@ -82,27 +101,29 @@ class TenantResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label('Tenant ID')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('name')
-                    ->label('Nama Tenant')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('domains.domain')
-                    ->label('Subdomain')
-                    ->badge()
-                    ->separator(','),
-                IconColumn::make('is_active')
-                    ->label('Aktif')
-                    ->boolean(),
-                TextColumn::make('created_at')
-                    ->label('Dibuat')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
+                TextColumn::make('id')->label('Tenant ID')->searchable()->sortable(),
+                TextColumn::make('name')->label('Nama Pesantren')->searchable()->sortable(),
+                TextColumn::make('domains.domain')->label('Domain')->badge()->separator(','),
+                IconColumn::make('is_active')->label('Aktif')->boolean(),
+                TextColumn::make('created_at')->label('Dibuat')->dateTime('d M Y H:i')->sortable(),
             ])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->actions([
+                EditAction::make(),
+                Action::make('suspend')
+                    ->label('Suspend')
+                    ->icon('heroicon-o-pause-circle')
+                    ->color('danger')
+                    ->action(fn (Tenant $record) => $record->update(['is_active' => false]))
+                    ->requiresConfirmation()
+                    ->visible(fn (Tenant $record): bool => $record->is_active),
+                Action::make('activate')
+                    ->label('Aktifkan')
+                    ->icon('heroicon-o-play-circle')
+                    ->color('success')
+                    ->action(fn (Tenant $record) => $record->update(['is_active' => true]))
+                    ->visible(fn (Tenant $record): bool => !$record->is_active),
+            ]);
     }
 
     public static function getEloquentQuery(): Builder
@@ -124,3 +145,4 @@ class TenantResource extends Resource
         return auth()->user()?->hasRole('super_admin') ?? false;
     }
 }
+

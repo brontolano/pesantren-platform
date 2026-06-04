@@ -30,3 +30,4 @@ class ListTagihan extends ListRecords
         ];
     }
 }
+

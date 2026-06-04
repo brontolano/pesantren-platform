@@ -9,3 +9,4 @@ class EditCalonSantriDokumen extends EditRecord
 {
     protected static string $resource = CalonSantriDokumenResource::class;
 }
+

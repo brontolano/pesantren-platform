@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Asrama\Models\BiayaAsrama;
+use Modules\Asrama\Models\PenempatanAsrama;
 
 class Santri extends Model
 {
@@ -70,6 +72,23 @@ class Santri extends Model
     public function penempatanKelas(): HasMany
     {
         return $this->hasMany(PenempatanKelas::class, 'santri_id');
+    }
+
+    public function penempatanAsrama(): HasMany
+    {
+        return $this->hasMany(PenempatanAsrama::class, 'santri_id');
+    }
+
+    public function penempatanAsramaAktif(): HasOne
+    {
+        return $this->hasOne(PenempatanAsrama::class, 'santri_id')
+            ->where('is_current', true)
+            ->latestOfMany('tanggal_masuk');
+    }
+
+    public function biayaAsrama(): HasMany
+    {
+        return $this->hasMany(BiayaAsrama::class, 'santri_id');
     }
 
     public function penempatanAktif(): HasOne

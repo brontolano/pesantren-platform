@@ -24,3 +24,4 @@ class EditGallery extends EditRecord
         return $data;
     }
 }
+

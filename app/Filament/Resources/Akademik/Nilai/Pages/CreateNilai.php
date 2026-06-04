@@ -15,3 +15,4 @@ class CreateNilai extends CreateRecord
         return app(NilaiService::class)->simpan($data, auth()->user());
     }
 }
+

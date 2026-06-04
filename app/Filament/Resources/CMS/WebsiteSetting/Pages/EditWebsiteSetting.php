@@ -95,3 +95,4 @@ class EditWebsiteSetting extends EditRecord
         return [];
     }
 }
+

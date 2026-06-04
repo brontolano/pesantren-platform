@@ -23,3 +23,4 @@ class EditNilai extends EditRecord
         return app(NilaiService::class)->simpan($data, auth()->user(), $record);
     }
 }
+

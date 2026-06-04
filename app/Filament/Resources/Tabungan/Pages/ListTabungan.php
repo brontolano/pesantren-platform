@@ -9,3 +9,4 @@ class ListTabungan extends ListRecords
 {
     protected static string $resource = TabunganResource::class;
 }
+

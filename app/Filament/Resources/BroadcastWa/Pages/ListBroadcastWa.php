@@ -9,3 +9,4 @@ class ListBroadcastWa extends ListRecords
 {
     protected static string $resource = BroadcastWaResource::class;
 }
+

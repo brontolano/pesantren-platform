@@ -4,11 +4,15 @@ namespace Tests\Concerns;
 
 use App\Models\Tenant;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 trait InteractsWithPpdbTestDatabase
 {
+    protected static bool $ppdbTestingSchemaReady = false;
+
     /**
      * @param  array<int, string>  $tables
      */
@@ -33,6 +37,44 @@ trait InteractsWithPpdbTestDatabase
         Config::set('database.connections.pgsql.database', 'pesantren_platform_test');
         Config::set('database.connections.pgsql.username', 'postgres');
         Config::set('database.connections.pgsql.password', 'secret');
+    }
+
+    /**
+     * @param  array<int, string>  $requiredTables
+     */
+    protected function ensurePpdbTestingSchemaReady(array $requiredTables = []): void
+    {
+        $this->configurePpdbTestingDatabase();
+
+        if (static::$ppdbTestingSchemaReady && $this->allTablesExist($requiredTables)) {
+            return;
+        }
+
+        DB::disconnect('pgsql');
+        DB::purge('pgsql');
+        DB::reconnect('pgsql');
+
+        if (! Schema::connection('pgsql')->hasTable('migrations') || ! $this->allTablesExist($requiredTables)) {
+            Artisan::call('migrate:fresh', ['--force' => true]);
+        }
+
+        static::$ppdbTestingSchemaReady = true;
+    }
+
+    /**
+     * @param  array<int, string>  $tables
+     */
+    protected function allTablesExist(array $tables): bool
+    {
+        $schema = Schema::connection('pgsql');
+
+        foreach ($tables as $table) {
+            if (! $schema->hasTable($table)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected function createTestTenant(string $id, string $name, ?string $domain = null): Tenant

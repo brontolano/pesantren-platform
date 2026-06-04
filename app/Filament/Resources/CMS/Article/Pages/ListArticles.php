@@ -17,3 +17,4 @@ class ListArticles extends ListRecords
         ];
     }
 }
+

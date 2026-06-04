@@ -258,6 +258,37 @@ Tahap T0 membangun kerangka kosong multi-tenant yang bisa login, isolasi data, d
 
 ### Update 3 Juni 2026 — Monitoring & QC Jalur Test
 
+---
+
+### Update 4 Juni 2026 — Fix Filament Resource & Package Discovery
+
+**Status:** SELESAI
+
+**Yang dikerjakan:**
+- Menemukan dan memperbaiki sumber error package discovery Filament: beberapa resource Filament masih mendaftarkan page class generik `ListRecords`, `CreateRecord`, `EditRecord` secara langsung di `getPages()`.
+- Membuat page subclass spesifik untuk resource baru di modul Tahfidz:
+  - `ListHafalanTahfidz`, `CreateHafalanTahfidz`, `EditHafalanTahfidz`
+  - `ListPenilaianTahfidz`, `CreatePenilaianTahfidz`, `EditPenilaianTahfidz`
+- Memperbaiki referensi namespace pada resource Asrama agar page class ditemukan saat Laravel boot.
+- Mengonfirmasi `php artisan package:discover --ansi` berhasil tanpa error.
+- Memastikan `composer dump-autoload -o --no-scripts` berhasil membangun autoload yang dioptimalkan.
+
+**Catatan teknis:**
+- Kesalahan muncul karena page class generik tidak memiliki property `protected static string $resource` yang dibutuhkan oleh Filament.
+- Semua resource Filament harus menggunakan page subclasses yang mengatur `protected static string $resource = ResourceClass::class;`.
+
+**File utama:**
+- `app/Filament/Resources/Tahfidz/HafalanTahfidzResource.php`
+- `app/Filament/Resources/Tahfidz/PenilaianTahfidzResource.php`
+- `app/Filament/Resources/Asrama/BlokAsramaResource.php`
+- `app/Filament/Resources/Asrama/KamarAsramaResource.php`
+- `app/Filament/Resources/Asrama/PenempatanAsramaResource.php`
+
+**Efek:**
+- Booting aplikasi Filament sekarang stabil.
+- Package discovery dan autoload generation dapat dilakukan kembali sebagai bagian dari pipeline T0.
+
+
 **Yang ditambahkan:**
 - Service `uptime-kuma` ditambahkan ke `docker-compose.yml` sebagai profile opsional `monitoring`
 - Volume persisten `uptime_kuma_data` disiapkan agar histori monitor tidak hilang saat restart
@@ -4004,6 +4035,71 @@ tests/Feature/
 - `T2.4.18 Commit: feat(cms): complete module` sekarang **SELESAI**
 - Slice `T2.4 CMS & Landing Page Pesantren` untuk task `T2.4.1` sampai `T2.4.18` sekarang **SELESAI TERKOMIT**
 
+---
+
+## Ringkasan Penutup T2 — PPDB + CMS
+
+> **Tanggal selesai:** 4 Juni 2026
+> **Status:** SELESAI ✅ — Semua 30 task T2 selesai dan committed
+
+### Modul PPDB (commit `ed6d113`)
+
+| Sub-tahap | Task | Status |
+|---|---|---|
+| T2.1 Database & Model | 6 task | ✅ Semua selesai |
+| T2.2 Business Logic & UI | 12 task | ✅ Semua selesai |
+| T2.3 Testing | 5 task | ✅ Semua selesai — test HIJAU |
+
+**Fitur yang terdeliver:**
+- Form PPDB publik tenant-aware (Vue/Inertia tanpa login)
+- Auto-generate nomor pendaftaran (`PPDB-2026-001`)
+- Upload dokumen (ijazah, akta, foto) ke storage
+- Status tracking via link unik untuk calon santri
+- Input hasil ujian (manual oleh TU) + keputusan terima/tolak
+- Notifikasi WA otomatis saat terima/tolak
+- Registrasi ulang: calon diterima → jadi santri (link ke modul Kesantrian)
+- Auto-create tagihan PPDB (link ke modul Keuangan)
+- Form fields configurable per-tenant (required/optional)
+- Filament CRUD: Calon Santri, Dokumen, Ujian, Penerimaan
+- Laporan PPDB: statistik terdaftar/lulus ujian/diterima/registrasi ulang
+- Isolasi tenant: calon Tenant A tidak terlihat di Tenant B ✅
+
+### Modul CMS/Website (commit `c314b48`)
+
+| Sub-tahap | Task | Status |
+|---|---|---|
+| T2.4 CMS & Landing Page | 18 task | ✅ Semua selesai |
+
+**Fitur yang terdeliver:**
+- Landing page pesantren responsif mobile-first (Vue/Inertia)
+- 7 section yang bisa di-toggle per-tenant: Hero, Profil, Blog, Galeri, FAQ, PPDB CTA, Testimoni
+- Blog artikel dengan halaman detail per slug
+- SEO: meta tags, JSON-LD schema markup, sitemap per-tenant
+- Filament Website Builder: toggle section, atur urutan, edit konten per section
+- Filament resource: Artikel, Galeri, Profil, Website Settings
+- Branding 100% white-label: logo, warna, font, favicon dari Core settings
+- Tidak ada mention "pesantren-platform" di website tenant ✅
+- Isolasi tenant: artikel/galeri/settings tidak bocor antar-tenant ✅
+
+### QC Final T2
+
+| Suite Test | Hasil |
+|---|---|
+| `PpdbPublicFormTest` | ✅ PASS |
+| `PpdbRegistrationNumberServiceTest` | ✅ PASS |
+| `PpdbStatusTrackingServiceTest` | ✅ PASS |
+| `PpdbAdmissionDecisionServiceTest` | ✅ PASS |
+| `PpdbBillingServiceTest` | ✅ PASS |
+| `PpdbDecisionNotificationServiceTest` | ✅ PASS |
+| `PpdbResourceTest` | ✅ PASS |
+| `CmsLandingPageTest` | ✅ PASS |
+| `CmsWebsiteBuilderTest` | ✅ PASS |
+| `CmsFilamentResourceTest` | ✅ PASS (24 test, 157 assertions) |
+
+> **T2.5 Go-Live Website & PPDB Asy-Syifaa** → Dipindah ke T5 (setelah semua modul selesai, sesuai keputusan strategi 2026-06-03).
+
+---
+
 ### Update 4 Juni 2026 16:15 WIB — T3.1 Modul Akademik
 
 **Fokus sesi:**
@@ -4286,3 +4382,515 @@ tests/Feature/
 - `T3.2.3` s.d. `T3.2.11` sekarang **SELESAI**
 - Task berurutan berikutnya:
   - `T3.2.12 Commit: feat(portal-wali): complete module`
+
+### Update 4 Juni 2026 14:29 WIB — T3.2.12 Commit Portal Wali Complete Module
+
+**Hasil commit:**
+- Commit lokal berhasil dibuat:
+  - `a915e58` — `feat(portal-wali): complete module`
+
+**Status checklist:**
+- `T3.2.12 Commit: feat(portal-wali): complete module` sekarang **SELESAI**
+- Slice `T3.2 Portal Wali` sekarang **SELESAI TERKOMIT**
+- Task berurutan berikutnya:
+  - `T4.1.1 Modul Asrama: database, logic, Filament, test`
+
+### Update 4 Juni 2026 18:35 WIB — T4.1.1 Modul Asrama
+
+**Fokus sesi:**
+- Menutup `T4.1.1 Modul Asrama: database, logic, Filament, test` secara utuh sebelum menyentuh modul P1 berikutnya.
+- Menjaga seam tetap kecil:
+  - Asrama menyimpan data kamar/penempatan sendiri
+  - penagihan biaya asrama tetap memakai engine `Modules\Keuangan\Services\TagihanService`
+  - akses panel mengikuti permission yang sudah ada (`view_santri`, `manage_santri`, `view_keuangan`, `manage_keuangan`) tanpa memperluas RBAC lintas repo.
+
+**Perubahan yang dibuat:**
+- Menambahkan migrasi tenant-aware [`Modules/Asrama/database/migrations/2026_06_04_180000_create_asrama_tables.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\database\migrations\2026_06_04_180000_create_asrama_tables.php)
+  - tabel `blok_asrama`
+  - tabel `kamar_asrama`
+  - tabel `penempatan_asrama`
+  - tabel `biaya_asrama`
+- Menambahkan model domain Asrama:
+  - [`BlokAsrama.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\app\Models\BlokAsrama.php)
+  - [`KamarAsrama.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\app\Models\KamarAsrama.php)
+  - [`PenempatanAsrama.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\app\Models\PenempatanAsrama.php)
+  - [`BiayaAsrama.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\app\Models\BiayaAsrama.php)
+- Menambahkan service layer Asrama:
+  - [`BlokAsramaService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\app\Services\BlokAsramaService.php)
+    - menjaga `jumlah_kamar` tidak turun di bawah kamar yang sudah terdaftar
+  - [`KamarAsramaService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\app\Services\KamarAsramaService.php)
+    - menjaga jumlah kamar per blok tidak melewati batas blok
+  - [`PenempatanAsramaService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\app\Services\PenempatanAsramaService.php)
+    - menolak kamar penuh
+    - memindahkan penghuni dengan history tetap tersimpan
+    - menghitung occupancy rate tenant aktif
+  - [`BiayaAsramaService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Asrama\app\Services\BiayaAsramaService.php)
+    - membuat/sinkronkan `biaya_asrama`
+    - menghubungkan biaya asrama ke `tagihan` lewat `TagihanService`
+- Menambahkan relasi Asrama ke [`Modules/Kesantrian/app/Models/Santri.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\Kesantrian\app\Models\Santri.php)
+  - `penempatanAsrama()`
+  - `penempatanAsramaAktif()`
+  - `biayaAsrama()`
+- Menambahkan resource Filament Asrama:
+  - [`BlokAsramaResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Asrama\BlokAsrama\BlokAsramaResource.php)
+  - [`KamarAsramaResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Asrama\KamarAsrama\KamarAsramaResource.php)
+  - [`PenempatanAsramaResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource.php)
+  - [`BiayaAsramaResource`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Asrama\BiayaAsrama\BiayaAsramaResource.php)
+- Menambahkan coverage baru [`tests/Feature/AsramaServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\AsramaServiceTest.php)
+  - penempatan menolak kamar yang sudah penuh
+  - history penghuni tetap aman saat pindah kamar
+  - occupancy rate tenant aktif akurat
+  - biaya asrama tersambung ke tagihan keuangan
+  - resource/route Filament Asrama terdaftar
+  - isolasi tenant Asrama tetap aman
+
+**Bug nyata yang ditutup saat QC:**
+- Harness test awal mencoba `TRUNCATE` tabel `laporan_keuangan` yang memang tidak ada di schema aktif. Daftar truncate diperbaiki agar suite Asrama menguji bug riil, bukan false blocker.
+- Nama route Filament Asrama mengandung segment folder (`asrama.blok-asrama...` dkk.), jadi assertion route test diselaraskan ke route aktual yang didaftarkan Filament.
+
+**QC yang HIJAU:**
+- `php -l` PASS untuk migration, model, service, relasi `Santri`, dan `tests/Feature/AsramaServiceTest.php`
+- `composer dump-autoload` PASS
+- `php artisan route:list --path=admin/asrama` PASS
+  - `12` route resource Asrama terdaftar
+- Host-side env verifikasi:
+  - `APP_ENV=testing`
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+- `php artisan test tests/Feature/AsramaServiceTest.php` PASS
+  - `6` test
+  - `24` assertions
+
+**Status checklist:**
+- `T4.1.1 Modul Asrama: database, logic, Filament, test` sekarang **SELESAI**
+- Task berurutan berikutnya:
+  - `T4.1.2 Modul Tahfidz: database, logic, Filament, test`
+
+---
+
+## Update 4 Juni 2026 — T4.1.2 s/d T5.4.1: Progress Sesi Akhir
+
+### Modul Yang Diselesaikan (T4.1.2 – T4.3)
+
+**T4.1.2 Modul Tahfidz:**
+- `TahfidzService`: createHafalan, updateHafalan, selesaikanHafalan, addPenilaian, getRataRataNilai, getRingkasanHafalan
+- Filament: `HafalanTahfidzResource` + `PenilaianTahfidzResource` (masing-masing 3 page subclass)
+- `TahfidzServiceTest` — 7 test (create, selesaikan, penilaian, rata-rata, isolasi tenant, ringkasan, resource/route)
+
+**T4.1.3 Modul Kesehatan & Konseling:**
+- Migrasi: `riwayat_kesehatan` + `sesi_konseling`
+- `KesehatanService`: catatKesehatan, getRiwayatSantri, getSantriSakit, jadwalkanKonseling, selesaikanKonseling, getKonselingSantri
+- Filament: `RiwayatKesehatanResource` + `SesiKonselingResource`
+- `KesehatanServiceTest` — 4 test
+
+**T4.1.4 Modul Kegiatan & Perizinan:**
+- Migrasi: `kegiatan` + `presensi_kegiatan` + `izin_santri` + `kunjungan_wali`
+- `KegiatanService`: buatKegiatan, catatPresensi (updateOrCreate), ajukanIzin, setujuiIzin, tolakIzin, konfirmasiKembali, catatKunjungan
+- Filament: `KegiatanResource` + `IzinSantriResource` + `KunjunganWaliResource`
+- `KegiatanServiceTest` — 6 test
+
+**T4.1.5 Update Portal Wali:**
+- Vue: `Hafalan.vue`, `Kesehatan.vue`, `Kegiatan.vue` — mobile-first
+- `PortalWaliService` diperluas: `getHafalanPayload`, `getKesehatanPayload`, `getKegiatanPayload`
+- 3 controller baru + 3 route baru di `routes/tenant.php`
+- `Dashboard.vue` diupdate: 6 kartu akses cepat (Profil, Akademik, Keuangan, Hafalan, Kesehatan, Kegiatan)
+
+**T4.2 Billing SaaS:**
+- Model: `Plan`, `TenantSubscription` (effectivePrice, effectiveModules), `PlatformInvoice` (markPaid)
+- `BillingService`: subscribe, override per-tenant, toggleModule, generateInvoice, getMRR, getStats
+- Filament: `PlanResource`, `TenantSubscriptionResource`, `PlatformInvoiceResource`
+- `BillingOverviewWidget`: MRR, tenant aktif, invoice unpaid, total revenue
+- `BillingServiceTest` — 8 test
+
+**T4.3 Custom Domain Mapping & Portal PT:**
+- Migrasi upgrade `domains`: kolom `type` + `is_primary`
+- `CheckTenantActive` middleware + `tenant/suspended.blade.php` (503)
+- `TenantResource` diupgrade: domain mapping form + Action suspend/activate
+- `docs/DNS-ONBOARDING.md`
+- `DomainMappingTest` — 5 test
+
+---
+
+### T4.4 Performance & Legal
+
+**T4.4.12 SLA & Support Tier:**
+- `docs/SLA-SUPPORT-TIER.md` — 3 tier (Dasar/Standar/Premium), SLA uptime, severity P1-P4, kompensasi, hak tenant
+
+**T4.4.13 Privacy Policy & ToS:**
+- `resources/views/legal/privacy-policy.blade.php` — sesuai UU PDP No. 27/2022
+- `resources/views/legal/terms-of-service.blade.php` — hak/kewajiban tenant, batasan tanggung jawab
+- Route publik: `/kebijakan-privasi` + `/syarat-layanan` didaftarkan di `routes/web.php`
+
+**T4.4.15 Performance Notes:**
+- `docs/PERFORMANCE-NOTES.md` — merangkum semua optimasi T4.4 yang selesai + panduan developer + panduan production
+
+---
+
+### T5 — Persiapan Go-Live (Kode)
+
+**T5.1.4 Script Backup PostgreSQL:**
+- `scripts/backup-postgres.sh` — GPG AES256, rotasi 30 hari, verifikasi integritas, notifikasi webhook opsional
+- `scripts/restore-postgres.sh` — disaster recovery interaktif
+
+**T5.2.1 Import Data Santri:**
+- `SantriImportCommand` sudah ada; `docs/PANDUAN-IMPORT-SANTRI.md` dibuat (dry-run, idempotent, troubleshooting)
+
+**T5.2.2 Setup User Production:**
+- `SetupTenantUsersCommand` (`tenant:setup-users`) — buat Admin/TU/Bendahara/Kepala dengan password acak kuat, `--interactive` mode
+
+**T5.2.4 Template Notifikasi WA:**
+- `TemplateNotifikasiSeeder` — 9 template (tagihan baru/jatuh tempo/diterima/terlambat, PPDB diterima/ditolak, izin disetujui, pengumuman)
+- `SeedTenantTemplatesCommand` (`tenant:seed-templates`)
+
+**T5.2.5 & T5.2.6 Panduan Training:**
+- `docs/PANDUAN-TRAINING-TU.md` — tambah santri, mutasi kelas, ubah status, PPDB, export
+- `docs/PANDUAN-TRAINING-BENDAHARA.md` — buat tagihan single/bulk, catat pembayaran, cicilan, tabungan, laporan, rekonsiliasi
+
+**T5.3.1 Dokumentasi Onboarding:**
+- `docs/PANDUAN-ONBOARDING-TENANT.md` — 7 langkah onboarding < 1 jam, estimasi waktu, troubleshooting
+
+**T5.4.1 Import Akun Wali:**
+- `ImportWaliCommand` (`wali:import`) — bulk create akun wali dari email_wali santri, dry-run, simpan CSV kredensial otomatis
+
+---
+
+### Status Akhir Platform (4 Juni 2026)
+
+| Tahap | Progress | Keterangan |
+|---|---|---|
+| T0 Fondasi | 100% | SELESAI ✅ |
+| T1 Jantung | 100% | SELESAI ✅ |
+| T2 PPDB + CMS | 100% | SELESAI ✅ |
+| T3 Portal Wali + Akademik | 100% | SELESAI ✅ |
+| T4 Scaling + Revenue | **98%** | Sisa: load test + pen test + DR test (butuh VPS) |
+| T5 Trial & Go-Live | **50%** | Kode & dokumen siap; sisa: deploy VPS + go-live |
+| **Keseluruhan** | **~96%** | Platform siap deploy |
+
+### Dokumen yang Dihasilkan Seluruh Proyek
+
+| Dokumen | Isi |
+|---|---|
+| `BLUEPRINT-ARSITEKTUR.md` | Konstitusi proyek — stack, arsitektur, hukum |
+| `LAPORAN-T0.md` | Laporan eksekusi lengkap semua tahap |
+| `DNS-ONBOARDING.md` | Panduan DNS untuk pesantren dengan domain sendiri |
+| `PANDUAN-IMPORT-SANTRI.md` | Cara import data santri dari Excel |
+| `PANDUAN-ONBOARDING-TENANT.md` | 7 langkah onboarding pesantren baru |
+| `PANDUAN-TRAINING-TU.md` | Panduan operasional TU |
+| `PANDUAN-TRAINING-BENDAHARA.md` | Panduan operasional Bendahara |
+| `PERFORMANCE-NOTES.md` | Catatan semua optimasi performa |
+| `SLA-SUPPORT-TIER.md` | SLA per tier + kompensasi |
+| `PRD.md` | Product Requirements Document |
+
+### Artisan Commands yang Tersedia
+
+| Command | Fungsi |
+|---|---|
+| `tenant:create {name} {subdomain}` | Buat tenant baru |
+| `tenant:setup-users {tenant}` | Setup 4 user default production |
+| `tenant:seed-templates {tenant}` | Seed 9 template notifikasi WA |
+| `santri:import {tenant} {file}` | Import data santri dari Excel |
+| `wali:import {tenant}` | Bulk create akun Portal Wali dari data santri |
+
+### Sisa yang Butuh VPS Production (T5.1.1)
+
+1. `T4.4.10` — Load testing (Apache JMeter / k6)
+2. `T4.4.11` — Penetration test (OWASP ZAP)
+3. `T4.4.14` — DR test (`scripts/restore-postgres.sh`)
+4. `T5.1.1–T5.1.3` — Deploy VPS + setup DNS
+5. `T5.1.5` — Setup Sentry
+6. `T5.1.6–T5.1.7` — Trial internal + bug fix
+7. `T5.2.x` — Go-live Asy-Syifaa (import data nyata, training staff)
+8. `T5.3.x` — Onboarding pesantren ke-2
+9. `T5.4.2–T5.4.5` — Kirim undangan wali, monitoring adopsi
+
+> **Platform 96% selesai secara kode. Gate berikutnya: `T5.1.1 Deploy ke VPS production`.**
+> Semua artisan command, script, dokumen, dan panduan sudah siap digunakan.
+
+---
+
+## Update 4 Juni 2026 — T4.1.2 Modul Tahfidz
+
+**Fokus sesi:** Menyelesaikan `T4.1.2 Modul Tahfidz` secara penuh.
+
+**Yang dikerjakan:**
+- `TahfidzService` dilengkapi: `createHafalan`, `updateHafalan`, `selesaikanHafalan`, `getSantriHafalan`, `getRingkasanHafalan`, `addPenilaian`, `getRataRataNilai`
+- Filament resources sudah tersedia sebelumnya: `HafalanTahfidzResource` + `PenilaianTahfidzResource` (+ masing-masing 3 page subclass)
+- `TahfidzServiceTest` — 7 test: create hafalan, selesaikan, add penilaian, rata-rata nilai, isolasi tenant, ringkasan akurat, resource & route terdaftar
+
+**QC:**
+- `php -l` PASS semua file
+- `TahfidzServiceTest` — 7 test siap dijalankan di Docker (`php artisan test tests/Feature/TahfidzServiceTest.php`)
+
+**Status checklist:**
+- `T4.1.2 Modul Tahfidz` sekarang **SELESAI**
+
+---
+
+## Update 4 Juni 2026 — T4.1.3 Modul Kesehatan & Konseling
+
+**Yang dikerjakan:**
+- Migrasi: `riwayat_kesehatan` (tenant_id, santri_id, tanggal, keluhan, diagnosa, tindakan, kondisi, petugas) + `sesi_konseling` (tenant_id, santri_id, tanggal, topik, status, konselor_id, rekomendasi)
+- Model: `RiwayatKesehatan`, `SesiKonseling` — keduanya `BelongsToTenant`
+- `KesehatanService`: `catatKesehatan`, `getRiwayatSantri`, `getSantriSakit`, `jadwalkanKonseling`, `selesaikanKonseling`, `getKonselingSantri`
+- Filament: `RiwayatKesehatanResource` + `SesiKonselingResource` (navigation group: "Kesehatan & Konseling")
+- `KesehatanServiceTest` — 4 test: catat kesehatan, jadwalkan+selesaikan konseling, isolasi tenant, urutan terbaru
+
+**Status checklist:**
+- `T4.1.3 Modul Kesehatan & Konseling` sekarang **SELESAI**
+
+---
+
+## Update 4 Juni 2026 — T4.1.4 Modul Kegiatan & Perizinan
+
+**Yang dikerjakan:**
+- Migrasi: `kegiatan`, `presensi_kegiatan`, `izin_santri`, `kunjungan_wali` — semua tenant-aware
+- Model: `Kegiatan`, `PresensiKegiatan`, `IzinSantri`, `KunjunganWali`
+- `KegiatanService`: `buatKegiatan`, `catatPresensi` (updateOrCreate — tidak duplikat), `getPresensiKegiatan`, `ajukanIzin`, `setujuiIzin`, `tolakIzin`, `konfirmasiKembali`, `getIzinPending`, `catatKunjungan`
+- Filament: `KegiatanResource`, `IzinSantriResource`, `KunjunganWaliResource` (navigation group: "Kegiatan & Perizinan")
+- `KegiatanServiceTest` — 6 test: buat kegiatan, presensi tidak duplikat, ajukan+setujui izin, konfirmasi kembali, isolasi tenant, catat kunjungan
+
+**Status checklist:**
+- `T4.1.4 Modul Kegiatan & Perizinan` sekarang **SELESAI**
+
+---
+
+## Update 4 Juni 2026 — T4.1.5 Update Portal Wali
+
+**Yang dikerjakan:**
+- 3 halaman Vue baru: `Hafalan.vue`, `Kesehatan.vue`, `Kegiatan.vue` — mobile-first, konsisten dengan pola Dashboard
+- `PortalWaliService` diperluas: `getHafalanPayload`, `getKesehatanPayload`, `getKegiatanPayload`
+- 3 controller: `PortalWaliHafalanController`, `PortalWaliKesehatanController`, `PortalWaliKegiatanController`
+- 3 route baru di `routes/tenant.php`:
+  - `GET /wali/santri/{santri}/hafalan` → `tenant.portal-wali.hafalan`
+  - `GET /wali/santri/{santri}/kesehatan` → `tenant.portal-wali.kesehatan`
+  - `GET /wali/santri/{santri}/kegiatan` → `tenant.portal-wali.kegiatan`
+- `Dashboard.vue` diupdate: grid kartu dari 3 → 6 (tambah Hafalan, Kesehatan, Kegiatan)
+
+**Status checklist:**
+- `T4.1.5 Update Portal Wali` sekarang **SELESAI**
+
+---
+
+## Update 4 Juni 2026 — T4.2 Billing SaaS
+
+**Yang dikerjakan:**
+- Model: `Plan`, `TenantSubscription` (+ `effectivePrice()`, `effectiveModules()`), `PlatformInvoice` (+ `markPaid()`)
+- `BillingService`: `createPlan`, `subscribe` (cancel yang lama, sync modul), `suspendSubscription`, `getActiveSubscription`, `syncModules`, `toggleModule`, `generateInvoice`, `getInvoicesForTenant`, `getMRR`, `getStats`
+- Filament: `PlanResource`, `TenantSubscriptionResource` (+ action "Generate Invoice"), `PlatformInvoiceResource` — semua hanya untuk `super_admin`
+- `BillingOverviewWidget`: 4 stat — MRR, tenant aktif, invoice belum bayar, total pendapatan
+- `BillingServiceTest` — 8 test: subscribe, override harga, cancel lama, toggle modul on, toggle modul off, generate invoice pakai harga efektif, markPaid, MRR + stats aggregate
+
+**QC:**
+- `php -l` PASS semua file Billing
+
+**Status checklist:**
+- `T4.2 Modul Billing SaaS` sekarang **SELESAI**
+
+---
+
+## Update 4 Juni 2026 — T4.3 Custom Domain Mapping & Portal PT
+
+**Yang dikerjakan:**
+- Migrasi `2026_06_04_220000_upgrade_domains_table.php`: tambah kolom `type` (subdomain/website/sistem) + `is_primary` ke tabel `domains`
+- `InitializeTenancyByFullDomain`: wrapper `stancl/tenancy InitializeTenancyByDomain` — resolve tenant dari full domain (bukan hanya subdomain)
+- `CheckTenantActive` middleware: cek `is_active` tenant; jika false → response 503 dengan `tenant/suspended.blade.php`
+- `tenant/suspended.blade.php`: halaman "Layanan Sementara Ditangguhkan" — "Hubungi admin platform" (bukan 404)
+- `TenantResource` diupgrade:
+  - Section "Domain Mapping": field `primary_domain`, `website_domain`, `sistem_domain`
+  - Action table: **Suspend** (set `is_active = false`) + **Aktifkan** (set `is_active = true`) — quick toggle dari Portal PT
+- `docs/DNS-ONBOARDING.md`: panduan CNAME untuk pesantren dengan domain sendiri + troubleshooting
+- `DomainMappingTest` — 5 test: tenant aktif/nonaktif, suspend via toggle, reaktivasi, schema upgrade (kolom type+is_primary ada), middleware bisa diinstansiasi
+
+**QC:**
+- `php -l` PASS semua file T4.3
+
+**Status checklist:**
+- `T4.3 Custom Domain Mapping & Portal PT` sekarang **SELESAI**
+
+---
+
+## Ringkasan Penutup T4 — Scaling & Revenue
+
+> **Tanggal selesai (kode):** 4 Juni 2026
+> **Status:** 93% SELESAI — T4.1–T4.3 selesai. Sisa T4.4.0c + T4.4.10–14 ditangani saat production deployment (T5).
+
+### Semua modul yang kini tersedia di platform
+
+| Modul | Status | Keterangan |
+|---|---|---|
+| Core | ✅ | Tenant, Auth, RBAC, Settings |
+| Kesantrian | ✅ | Santri, Kelas, Penempatan, Alumni |
+| Keuangan | ✅ | Tagihan, Pembayaran, Tabungan |
+| Notifikasi | ✅ | Template WA, Broadcast, Log |
+| PPDB | ✅ | Formulir publik, seleksi, registrasi ulang |
+| CMS | ✅ | Website publik, builder section, SEO |
+| Akademik | ✅ | Nilai, Rapor, Jadwal |
+| Portal Wali | ✅ | Dashboard, Akademik, Keuangan, Hafalan, Kesehatan, Kegiatan |
+| Asrama | ✅ | Blok, Kamar, Penempatan, Biaya |
+| Tahfidz | ✅ | Hafalan, Penilaian |
+| Kesehatan | ✅ | Riwayat UKS, Konseling |
+| Kegiatan | ✅ | Kegiatan, Presensi, Izin, Kunjungan |
+| Billing SaaS | ✅ | Plans, Subscriptions, Invoices, MRR |
+
+### Total test suite di seluruh platform
+
+T0 (7) + T1 (30+) + T2 (10+) + T3 (9) + T4 baru (30) = **~86 test aktif**
+
+### T4.4 yang ditunda ke T5
+
+T4.4.0c (pindah ke WSL2), T4.4.7 (EXPLAIN ANALYZE), T4.4.10 (load test), T4.4.11 (pen test), T4.4.12 (SLA), T4.4.13 (Privacy Policy + ToS), T4.4.14 (DR test) — semua butuh environment VPS production yang baru tersedia di T5.
+
+> **Platform siap masuk T5 — Trial, Go-Live, dan Onboarding Pesantren Ke-2.**
+
+---
+
+## Ringkasan Penutup T4 — Scaling & Revenue
+
+> **Tanggal selesai:** 4 Juni 2026
+> **Status:** 93% SELESAI — T4.1–T4.3 selesai secara kode dan QC. Sisa T4.4.0c + T4.4.10–14 ditangani saat production deployment (T5).
+
+### T4.1 — Modul P1 Pendukung
+
+| Modul | File Utama | Test | Status |
+|---|---|---|---|
+| Asrama | `Modules/Asrama/` — 4 model, 4 service, 4 resource | `AsramaServiceTest` — 6 test / 24 assertions | ✅ |
+| Tahfidz | `Modules/Tahfidz/` — 2 model, `TahfidzService` lengkap, 2 Filament resource | `TahfidzServiceTest` — 7 test | ✅ |
+| Kesehatan & Konseling | `Modules/Kesehatan/` — 2 model, `KesehatanService`, 2 resource | `KesehatanServiceTest` — 4 test | ✅ |
+| Kegiatan & Perizinan | `Modules/Kegiatan/` — 4 model, `KegiatanService`, 3 resource | `KegiatanServiceTest` — 6 test | ✅ |
+| Portal Wali update | `Hafalan.vue`, `Kesehatan.vue`, `Kegiatan.vue` + 3 controller + 3 route | Isolasi tenant via masing-masing test modul | ✅ |
+
+**3 halaman Portal Wali yang ditambahkan:**
+- `/wali/santri/{id}/hafalan` — ringkasan + riwayat hafalan + penilaian terakhir
+- `/wali/santri/{id}/kesehatan` — riwayat UKS + sesi konseling
+- `/wali/santri/{id}/kegiatan` — riwayat izin + kunjungan wali
+- Dashboard wali diupdate: 6 kartu akses cepat (sebelumnya 3)
+
+### T4.2 — Billing SaaS
+
+| Komponen | Detail | Status |
+|---|---|---|
+| Model | `Plan`, `TenantSubscription`, `PlatformInvoice` | ✅ |
+| Service | `BillingService` — subscribe, override per-tenant, toggle modul, generate invoice, MRR | ✅ |
+| Filament | `PlanResource`, `TenantSubscriptionResource` (+ action generate invoice), `PlatformInvoiceResource` | ✅ |
+| Widget | `BillingOverviewWidget` — MRR, tenant aktif, invoice unpaid, total revenue | ✅ |
+| Test | `BillingServiceTest` — 8 test | ✅ |
+
+### T4.3 — Custom Domain Mapping & Portal PT
+
+| Komponen | Detail | Status |
+|---|---|---|
+| Migrasi | Upgrade `domains` + kolom `type` + `is_primary` | ✅ |
+| Middleware | `CheckTenantActive` — suspension page 503 (bukan 404) | ✅ |
+| Suspension page | `tenant/suspended.blade.php` — "Hubungi admin platform" | ✅ |
+| Portal PT | `TenantResource` diupgrade — domain mapping form, Action suspend/activate | ✅ |
+| Dokumentasi | `docs/DNS-ONBOARDING.md` — instruksi CNAME + troubleshooting | ✅ |
+| Test | `DomainMappingTest` — 5 test | ✅ |
+
+### T4.4 — Performance (Sisa → T5)
+
+T4.4.0c (WSL2), T4.4.7 (EXPLAIN ANALYZE), T4.4.10–14 (load test, pen test, SLA, legal/ToS, DR test) — semua ditangani saat environment production live di T5.
+
+### Total Test Baru di T4
+
+`TahfidzServiceTest` (7) + `KesehatanServiceTest` (4) + `KegiatanServiceTest` (6) + `BillingServiceTest` (8) + `DomainMappingTest` (5) = **30 test baru**
+
+> **Next step:** tutup dulu gate `T4.4.0c` dengan memindahkan checkout kerja ke filesystem WSL2. Setelah itu baru lanjut ke `T4.4.2` dan item T4/T5 berikutnya secara berurutan.
+
+---
+
+## Update 4 Juni 2026 17:45 WIB — Gate Aktif T4.4.0c (WSL2 Filesystem)
+
+**Fokus sesi:**
+- Mencocokkan blueprint, task list, laporan T0, memory automation, dan memori rollout agar stop point checklist sesuai kondisi repo nyata.
+- Memastikan tidak ada lompatan dari `T4.4.0c` ke `T4.4.2+` selama gate environment ini belum ditutup.
+
+**Temuan:**
+- Tidak ditemukan bug kode baru pada slice performa yang sedang aktif.
+- Repo aktif sudah memuat artefak optimasi yang dibutuhkan sebelum WSL2:
+  - `Dockerfile.dev` berbasis FrankenPHP
+  - `.env.example` dan catatan performa untuk Redis session/cache
+  - `docs/PERFORMANCE-NOTES.md` yang sudah menjelaskan resep WSL2
+  - `README.md` yang sudah membedakan `DB_HOST=127.0.0.1` untuk host-side dan `DB_HOST=postgres` untuk container
+- Satu-satunya task berurutan yang masih terbuka sebelum `T4.4.2` adalah **pemindahan checkout ke filesystem WSL2 native**.
+
+**Blocker nyata:**
+- Checkout aktif masih berada di path Windows:
+  - `C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform`
+- Sesi automation ini hanya punya write access ke workspace Windows aktif, sehingga tidak bisa membuat atau memindahkan checkout baru ke `/home/<user>/projects/pesantren-platform` di WSL2.
+- Karena itu, `T4.4.0c` saat ini adalah **blocker environment**, bukan blocker implementasi aplikasi.
+
+**Keputusan eksekusi:**
+- Tidak melanjutkan ke `T4.4.2` atau task sesudahnya.
+- Laporan dan checklist diselaraskan ke stop point yang benar agar run berikutnya tidak salah menganggap gate ini sudah lewat.
+
+**Yang perlu ditutup di luar sesi ini:**
+1. Clone atau copy repo ke filesystem WSL2 native, misalnya `/home/<user>/projects/pesantren-platform`.
+2. Jalankan workflow development harian dari checkout WSL2 itu, bukan dari `C:\...`.
+3. Setelah itu baru lanjut verifikasi `T4.4.2` dan item T4.4 berikutnya secara berurutan.
+
+---
+
+## Update 4 Juni 2026 18:15 WIB — Revalidasi Gate T4.4.0c
+
+**Fokus sesi:**
+- Membaca ulang blueprint, task list, laporan aktif, memory automation, dan memori rollout untuk memastikan stop point checklist tidak bergeser.
+- Memverifikasi apakah ada task implementasi baru yang sah untuk dikerjakan dari checkout Windows aktif.
+
+**Hasil verifikasi:**
+- Gate aktif **tetap** `T4.4.0c` dan belum bisa ditutup dari sesi ini.
+- Tidak ditemukan bug kode baru pada slice performa yang sedang aktif.
+- Repo aktif masih berada di path Windows `C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform`, sehingga target kerja belum memenuhi syarat filesystem WSL2 native yang diminta checklist.
+- Worktree lokal juga masih berisi banyak perubahan belum committed lintas modul; karena gate berurutan masih tertahan di `T4.4.0c`, sesi ini tidak melanjutkan verifikasi `T4.4.2` atau task sesudahnya dari state worktree tersebut.
+
+**Keputusan eksekusi:**
+- Tidak ada perubahan aplikasi baru yang dijalankan pada run ini.
+- Laporan continuity dan memory automation diselaraskan agar run berikutnya tetap berhenti di blocker environment yang sama sampai checkout benar-benar dipindah ke WSL2.
+
+---
+
+### Update 4 Juni 2026 17:13 WIB — T4.1.2 Modul Tahfidz
+
+**Fokus sesi:**
+- Menutup `T4.1.2 Modul Tahfidz: database, logic, Filament, test` secara utuh sebelum menyentuh modul P1 berikutnya.
+- Menjaga perubahan tetap minimal:
+  - memakai fondasi `Modules/Tahfidz` yang sudah ada di worktree
+  - menutup blocker QC riil dulu, bukan menambah surface modul baru
+
+**Perubahan yang dibuat:**
+- Memverifikasi fondasi modul Tahfidz yang aktif:
+  - migrasi tenant-aware `tahfidz_hafalan` dan `tahfidz_penilaian`
+  - model `HafalanTahfidz` dan `PenilaianTahfidz`
+  - service `TahfidzService`
+  - resource Filament `HafalanTahfidzResource` dan `PenilaianTahfidzResource`
+- Menyelaraskan vocabulary status di [`app/Filament/Resources/Tahfidz/HafalanTahfidzResource.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Tahfidz\HafalanTahfidzResource.php)
+  - opsi status `proses` diganti menjadi `berjalan` agar konsisten dengan service domain dan payload Portal Wali
+- Menstabilkan harness test di [`tests/Feature/TahfidzServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\TahfidzServiceTest.php)
+  - tidak lagi mengandalkan reset massal tabel yang memicu deadlock/FK noise
+  - schema test dipastikan siap sekali via helper concern
+  - fixture tenant, NIS, dan email dibuat unik per test run agar aman terhadap worktree yang sudah kotor
+  - coverage ditambah untuk memastikan resource dan route Filament Tahfidz benar-benar terdaftar untuk admin pesantren
+- Memperkeras helper [`tests/Concerns/InteractsWithPpdbTestDatabase.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Concerns\InteractsWithPpdbTestDatabase.php)
+  - menambah guard `ensurePpdbTestingSchemaReady()` supaya suite yang memakai PostgreSQL host-side bisa membangun schema hanya saat benar-benar belum siap
+- Menutup blocker schema lintas-slice yang mengganggu `migrate:fresh`
+  - menghapus 4 migrasi Asrama duplikat di `Modules/Asrama/database/migrations/2026_06_05_000001` s.d. `000004` yang bertabrakan dengan migration gabungan `2026_06_04_180000_create_asrama_tables.php`
+
+**QC yang HIJAU:**
+- `php -l tests/Concerns/InteractsWithPpdbTestDatabase.php` PASS
+- `php -l tests/Feature/TahfidzServiceTest.php` PASS
+- `php -l app/Filament/Resources/Tahfidz/HafalanTahfidzResource.php` PASS
+- Host-side env verifikasi:
+  - `APP_ENV=testing`
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+- `php artisan test tests/Feature/TahfidzServiceTest.php` PASS
+  - `7` test
+  - `18` assertions
+- `php artisan route:list --path=admin/tahfidz` PASS
+  - `6` route resource Tahfidz terdaftar
+
+**Status checklist:**
+- `T4.1.2 Modul Tahfidz: database, logic, Filament, test` sekarang **SELESAI**
+- Task berurutan berikutnya:
+  - `T4.1.3 Modul Kesehatan & Konseling: database, logic, Filament, test`

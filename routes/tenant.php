@@ -7,6 +7,9 @@ use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
 use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
 use App\Http\Controllers\PortalWali\PortalWaliFinancialController;
+use App\Http\Controllers\PortalWali\PortalWaliHafalanController;
+use App\Http\Controllers\PortalWali\PortalWaliKegiatanController;
+use App\Http\Controllers\PortalWali\PortalWaliKesehatanController;
 use App\Http\Controllers\PortalWali\PortalWaliIzinController;
 use App\Http\Controllers\PortalWali\PortalWaliNotificationController;
 use App\Http\Controllers\PortalWali\PortalWaliProfileController;
@@ -38,6 +41,9 @@ Route::domain('{tenant}.localhost')->middleware([
         Route::get('/izin', [PortalWaliIzinController::class, 'index'])->name('izin');
         Route::post('/izin', [PortalWaliIzinController::class, 'store'])->name('izin.store');
         Route::get('/santri/{santri}/rapor/{rapor}/download', PortalWaliRaporDownloadController::class)->name('rapor.download');
+        Route::get('/santri/{santri}/hafalan', PortalWaliHafalanController::class)->name('hafalan');
+        Route::get('/santri/{santri}/kesehatan', PortalWaliKesehatanController::class)->name('kesehatan');
+        Route::get('/santri/{santri}/kegiatan', PortalWaliKegiatanController::class)->name('kegiatan');
     });
 
     Route::middleware('auth')->prefix('admin/kesantrian/santri/export')->name('tenant.kesantrian.santri.export.')->group(function () {

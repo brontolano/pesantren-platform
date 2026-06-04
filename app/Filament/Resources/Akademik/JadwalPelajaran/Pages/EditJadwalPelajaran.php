@@ -23,3 +23,4 @@ class EditJadwalPelajaran extends EditRecord
         return app(JadwalPelajaranService::class)->simpan($data, $record);
     }
 }
+

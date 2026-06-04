@@ -17,3 +17,4 @@ class ListPenempatanKelas extends ListRecords
         ];
     }
 }
+

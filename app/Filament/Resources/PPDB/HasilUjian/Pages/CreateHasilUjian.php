@@ -9,3 +9,4 @@ class CreateHasilUjian extends CreateRecord
 {
     protected static string $resource = HasilUjianResource::class;
 }
+

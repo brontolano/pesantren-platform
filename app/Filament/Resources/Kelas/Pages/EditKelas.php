@@ -17,3 +17,4 @@ class EditKelas extends EditRecord
         ];
     }
 }
+

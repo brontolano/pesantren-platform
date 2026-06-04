@@ -20,3 +20,4 @@ class CreateTagihan extends CreateRecord
         return $data;
     }
 }
+

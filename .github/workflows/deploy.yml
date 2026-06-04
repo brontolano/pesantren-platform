@@ -87,5 +87,7 @@ jobs:
             docker compose exec -T app php artisan route:cache
             docker compose exec -T app php artisan view:cache
             docker compose exec -T app php artisan event:cache
+            docker compose exec -T app php artisan filament:cache-components
+            docker compose exec -T app php artisan icons:cache
 
             rm -f "/tmp/$RELEASE_NAME"

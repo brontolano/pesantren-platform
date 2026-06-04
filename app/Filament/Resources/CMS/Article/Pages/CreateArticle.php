@@ -17,3 +17,4 @@ class CreateArticle extends CreateRecord
         return $data;
     }
 }
+

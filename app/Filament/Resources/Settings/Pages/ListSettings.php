@@ -17,3 +17,4 @@ class ListSettings extends ListRecords
         ];
     }
 }
+

@@ -9,3 +9,4 @@ class EditTemplateNotifikasi extends EditRecord
 {
     protected static string $resource = TemplateNotifikasiResource::class;
 }
+

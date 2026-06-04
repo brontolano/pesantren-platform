@@ -45,7 +45,15 @@
             "Modules\\CMS\\": "Modules/CMS/app/",
             "Modules\\CMS\\Database\\Seeders\\": "Modules/CMS/database/seeders/",
             "Modules\\Akademik\\": "Modules/Akademik/app/",
-            "Modules\\Akademik\\Database\\Seeders\\": "Modules/Akademik/database/seeders/"
+            "Modules\\Akademik\\Database\\Seeders\\": "Modules/Akademik/database/seeders/",
+            "Modules\\Asrama\\": "Modules/Asrama/app/",
+            "Modules\\Asrama\\Database\\Seeders\\": "Modules/Asrama/database/seeders/",
+            "Modules\\Tahfidz\\": "Modules/Tahfidz/app/",
+            "Modules\\Tahfidz\\Database\\Seeders\\": "Modules/Tahfidz/database/seeders/",
+            "Modules\\Kesehatan\\": "Modules/Kesehatan/app/",
+            "Modules\\Kesehatan\\Database\\Seeders\\": "Modules/Kesehatan/database/seeders/",
+            "Modules\\Kegiatan\\": "Modules/Kegiatan/app/",
+            "Modules\\Kegiatan\\Database\\Seeders\\": "Modules/Kegiatan/database/seeders/"
         }
     },
     "autoload-dev": {

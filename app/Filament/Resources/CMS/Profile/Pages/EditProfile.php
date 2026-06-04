@@ -14,3 +14,4 @@ class EditProfile extends EditRecord
         return [];
     }
 }
+

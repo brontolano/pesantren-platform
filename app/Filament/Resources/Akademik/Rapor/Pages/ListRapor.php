@@ -9,3 +9,4 @@ class ListRapor extends ListRecords
 {
     protected static string $resource = RaporResource::class;
 }
+

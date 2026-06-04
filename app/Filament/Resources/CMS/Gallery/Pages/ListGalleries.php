@@ -17,3 +17,4 @@ class ListGalleries extends ListRecords
         ];
     }
 }
+

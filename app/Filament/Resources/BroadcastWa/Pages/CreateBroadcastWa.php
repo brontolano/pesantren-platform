@@ -9,3 +9,4 @@ class CreateBroadcastWa extends CreateRecord
 {
     protected static string $resource = BroadcastWaResource::class;
 }
+

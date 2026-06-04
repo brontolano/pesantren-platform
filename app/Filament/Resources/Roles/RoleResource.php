@@ -107,3 +107,4 @@ class RoleResource extends Resource
         return auth()->user()?->can('manage_roles') ?? false;
     }
 }
+

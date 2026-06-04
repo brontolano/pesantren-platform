@@ -17,3 +17,4 @@ class EditPelajaran extends EditRecord
         ];
     }
 }
+

@@ -17,3 +17,4 @@ class ListJadwalPelajaran extends ListRecords
         ];
     }
 }
+

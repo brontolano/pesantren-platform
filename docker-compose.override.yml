@@ -1,0 +1,17 @@
+# docker-compose.override.yml
+# Otomatis dibaca oleh "docker compose" di development lokal
+# Jangan commit ke production
+
+services:
+  # Nonaktifkan Traefik di dev lokal — tidak perlu untuk single developer
+  traefik:
+    profiles:
+      - production-only
+
+  # Expose app di dua port:
+  #   port 80  → asy-syifaa.localhost (tanpa nomor port di browser)
+  #   port 8000→ localhost:8000 (fallback jika port 80 bentrok)
+  app:
+    ports:
+      - "8000:80"
+      - "80:80"

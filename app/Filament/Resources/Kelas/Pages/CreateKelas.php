@@ -9,3 +9,4 @@ class CreateKelas extends CreateRecord
 {
     protected static string $resource = KelasResource::class;
 }
+

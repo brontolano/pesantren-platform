@@ -9,3 +9,4 @@ class CreateSantri extends CreateRecord
 {
     protected static string $resource = SantriResource::class;
 }
+

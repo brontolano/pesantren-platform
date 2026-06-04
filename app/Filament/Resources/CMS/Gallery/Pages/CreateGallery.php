@@ -17,3 +17,4 @@ class CreateGallery extends CreateRecord
         return $data;
     }
 }
+

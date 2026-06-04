@@ -17,3 +17,4 @@ class ListKelas extends ListRecords
         ];
     }
 }
+

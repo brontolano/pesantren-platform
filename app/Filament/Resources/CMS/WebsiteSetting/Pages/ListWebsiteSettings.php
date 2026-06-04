@@ -14,3 +14,4 @@ class ListWebsiteSettings extends ListRecords
         return [];
     }
 }
+

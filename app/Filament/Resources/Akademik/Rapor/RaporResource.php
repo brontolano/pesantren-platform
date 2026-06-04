@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Akademik\Rapor;
 use App\Filament\Resources\Akademik\Rapor\Pages\ListRapor;
 use Filament\Actions\Action;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -97,3 +98,4 @@ class RaporResource extends Resource
         ];
     }
 }
+

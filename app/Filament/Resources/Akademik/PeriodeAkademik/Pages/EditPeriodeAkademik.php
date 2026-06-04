@@ -23,3 +23,4 @@ class EditPeriodeAkademik extends EditRecord
         return app(PeriodeAkademikService::class)->simpan($data, $record);
     }
 }
+

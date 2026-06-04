@@ -9,3 +9,4 @@ class CreatePelajaran extends CreateRecord
 {
     protected static string $resource = PelajaranResource::class;
 }
+

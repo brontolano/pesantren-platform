@@ -9,3 +9,4 @@ class ListTemplateNotifikasi extends ListRecords
 {
     protected static string $resource = TemplateNotifikasiResource::class;
 }
+

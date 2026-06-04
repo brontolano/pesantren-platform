@@ -9,3 +9,4 @@ class EditHasilUjian extends EditRecord
 {
     protected static string $resource = HasilUjianResource::class;
 }
+

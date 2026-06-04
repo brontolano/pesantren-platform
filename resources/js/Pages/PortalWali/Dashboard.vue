@@ -140,6 +140,24 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
                         >
                             Keuangan
                         </Link>
+                        <Link
+                            :href="`/wali/santri/${child.id}/hafalan`"
+                            class="rounded-2xl bg-violet-50 px-3 py-3 text-center text-violet-700"
+                        >
+                            Hafalan
+                        </Link>
+                        <Link
+                            :href="`/wali/santri/${child.id}/kesehatan`"
+                            class="rounded-2xl bg-rose-50 px-3 py-3 text-center text-rose-700"
+                        >
+                            Kesehatan
+                        </Link>
+                        <Link
+                            :href="`/wali/santri/${child.id}/kegiatan`"
+                            class="rounded-2xl bg-blue-50 px-3 py-3 text-center text-blue-700"
+                        >
+                            Kegiatan
+                        </Link>
                     </div>
                 </article>
             </div>

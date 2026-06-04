@@ -18,3 +18,4 @@ class CreateProfile extends CreateRecord
         return $data;
     }
 }
+

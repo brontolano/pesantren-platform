@@ -9,3 +9,4 @@ class ListCalonSantri extends ListRecords
 {
     protected static string $resource = CalonSantriResource::class;
 }
+

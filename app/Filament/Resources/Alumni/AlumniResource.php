@@ -82,3 +82,4 @@ class AlumniResource extends Resource
         ];
     }
 }
+

@@ -17,3 +17,4 @@ class ListPeriodeAkademik extends ListRecords
         ];
     }
 }
+

@@ -1,0 +1,11 @@
+{
+    "name": "Tahfidz",
+    "alias": "tahfidz",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Tahfidz\\Providers\\TahfidzServiceProvider"
+    ],
+    "files": []
+}

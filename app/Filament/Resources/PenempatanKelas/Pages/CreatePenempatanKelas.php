@@ -26,3 +26,4 @@ class CreatePenempatanKelas extends CreateRecord
             ->update(['kelas_id' => $record->kelas_id]);
     }
 }
+
