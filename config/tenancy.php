@@ -29,7 +29,8 @@ return [
      * To configure their behavior, see the config keys below.
      */
     'bootstrappers' => [
-        // DatabaseTenancyBootstrapper NOT used — we use single-database, row-level isolation
+        // Database-per-tenant (2026-06-05): switch koneksi DB ke database tenant
+        Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,

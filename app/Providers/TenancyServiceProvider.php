@@ -39,9 +39,13 @@ class TenancyServiceProvider extends ServiceProvider
                 })->shouldBeQueued(false),
             ],
 
-            // CATATAN: wiring switch koneksi (TenancyInitialized => BootstrapTenancy,
-            // TenancyEnded => RevertToCentralContext) ditambahkan saat CUTOVER multi-DB,
-            // bersama pengaktifan DatabaseTenancyBootstrapper. Tahap 1 hanya provisioning.
+            // Switch koneksi DB ke/dari database tenant saat request
+            Events\TenancyInitialized::class => [
+                Listeners\BootstrapTenancy::class,
+            ],
+            Events\TenancyEnded::class => [
+                Listeners\RevertToCentralContext::class,
+            ],
         ];
     }
 
