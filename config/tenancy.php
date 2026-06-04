@@ -137,7 +137,9 @@ return [
          * disable asset() helper tenancy and explicitly use tenant_asset() calls in places
          * where you want to use tenant-specific assets (product images, avatars, etc).
          */
-        'asset_helper_tenancy' => true,
+        // Aset Filament/app bersifat global (sama untuk semua tenant) — JANGAN
+        // di-rewrite ke /tenancy/assets (menyebabkan MIME salah & panel tampil polos).
+        'asset_helper_tenancy' => false,
     ],
 
     /**
