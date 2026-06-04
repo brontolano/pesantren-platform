@@ -21,6 +21,7 @@ use Modules\Akademik\Models\PeriodeAkademik;
 
 class PeriodeAkademikResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = PeriodeAkademik::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calendar-days';
@@ -37,12 +38,12 @@ class PeriodeAkademikResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false;
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false;
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canCreate(): bool

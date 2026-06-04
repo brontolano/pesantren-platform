@@ -22,6 +22,17 @@ use Modules\Kesantrian\Models\Santri;
 
 class PenilaianTahfidzResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('tahfidz');
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::moduleVisible('tahfidz');
+    }
     protected static ?string $model = PenilaianTahfidz::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-pencil-square';

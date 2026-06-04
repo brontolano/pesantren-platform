@@ -21,6 +21,7 @@ use Modules\Kesehatan\Models\RiwayatKesehatan;
 
 class RiwayatKesehatanResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = RiwayatKesehatan::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-heart';
@@ -105,6 +106,6 @@ class RiwayatKesehatanResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('view_santri') ?? false;
+        return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_santri') ?? false);
     }
 }

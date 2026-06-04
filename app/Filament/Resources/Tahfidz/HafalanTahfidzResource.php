@@ -21,6 +21,17 @@ use Modules\Kesantrian\Models\Santri;
 
 class HafalanTahfidzResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('tahfidz');
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::moduleVisible('tahfidz');
+    }
     protected static ?string $model = HafalanTahfidz::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-book-open';

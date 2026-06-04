@@ -21,6 +21,7 @@ use Modules\Kegiatan\Models\KunjunganWali;
 
 class KunjunganWaliResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = KunjunganWali::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
@@ -76,6 +77,6 @@ class KunjunganWaliResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('view_santri') ?? false;
+        return static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
     }
 }

@@ -19,6 +19,7 @@ use Modules\Asrama\Models\KamarAsrama;
 
 class KamarAsramaResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = KamarAsrama::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home-modern';
@@ -31,12 +32,12 @@ class KamarAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function canCreate(): bool

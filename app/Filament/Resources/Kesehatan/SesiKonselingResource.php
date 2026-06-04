@@ -21,6 +21,7 @@ use Modules\Kesehatan\Models\SesiKonseling;
 
 class SesiKonselingResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = SesiKonseling::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
@@ -108,6 +109,6 @@ class SesiKonselingResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('view_santri') ?? false;
+        return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_santri') ?? false);
     }
 }

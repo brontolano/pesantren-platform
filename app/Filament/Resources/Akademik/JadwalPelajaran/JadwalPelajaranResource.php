@@ -22,6 +22,7 @@ use Modules\Kesantrian\Models\Kelas;
 
 class JadwalPelajaranResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = JadwalPelajaran::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
@@ -34,12 +35,12 @@ class JadwalPelajaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false;
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false;
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canCreate(): bool

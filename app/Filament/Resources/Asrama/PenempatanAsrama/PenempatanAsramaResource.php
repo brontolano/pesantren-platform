@@ -21,6 +21,7 @@ use Modules\Kesantrian\Models\Santri;
 
 class PenempatanAsramaResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = PenempatanAsrama::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
@@ -33,12 +34,12 @@ class PenempatanAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function canCreate(): bool

@@ -21,6 +21,7 @@ use Modules\Kegiatan\Models\IzinSantri;
 
 class IzinSantriResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = IzinSantri::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-check';
@@ -88,6 +89,6 @@ class IzinSantriResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return static::moduleVisible('kegiatan') && (auth()->user()?->can('manage_santri') ?? false);
     }
 }

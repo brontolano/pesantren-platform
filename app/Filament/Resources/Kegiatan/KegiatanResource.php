@@ -21,6 +21,7 @@ use Modules\Kegiatan\Models\Kegiatan;
 
 class KegiatanResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = Kegiatan::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-calendar-days';
@@ -86,6 +87,6 @@ class KegiatanResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('view_santri') ?? false;
+        return static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
     }
 }

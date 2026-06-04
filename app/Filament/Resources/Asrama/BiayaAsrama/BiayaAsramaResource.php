@@ -20,6 +20,7 @@ use Modules\Kesantrian\Models\Santri;
 
 class BiayaAsramaResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = BiayaAsrama::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
@@ -32,22 +33,22 @@ class BiayaAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false;
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false;
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->canAny(['manage_keuangan', 'manage_santri']) ?? false;
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_santri']) ?? false);
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return auth()->user()?->canAny(['manage_keuangan', 'manage_santri']) ?? false;
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_santri']) ?? false);
     }
 
     public static function form(Schema $schema): Schema
