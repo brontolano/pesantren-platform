@@ -64,7 +64,7 @@ class TenantPanelProvider extends PanelProvider
     {
         return $panel
             ->id('tenant')
-            ->path('sistem')
+            ->path('admin')
             ->login()
             ->passwordReset()
             ->profile()

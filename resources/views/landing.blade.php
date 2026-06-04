@@ -175,7 +175,7 @@
             <a href="#modul">Modul</a>
             <a href="#keunggulan">Keunggulan</a>
             <a href="{{ route('legal.contact') }}">Kontak</a>
-            <a href="/admin" class="btn btn-primary">Masuk</a>
+            <a href="/platform" class="btn btn-primary">Masuk</a>
         </div>
     </div>
 </nav>
