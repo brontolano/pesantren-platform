@@ -24,21 +24,17 @@ class PpdbBillingServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->resetPpdbSchema();
-
-        $this->tenantA = Tenant::create([
-            'id' => 'ppdb-tagihan-a',
-            'name' => 'Pesantren A',
-            'is_active' => true,
+        $this->truncatePpdbTables([
+            'tagihan',
+            'tagihan_ppdb',
+            'santri',
+            'calon_santri',
+            'domains',
+            'tenants',
         ]);
-        $this->tenantA->domains()->create(['domain' => 'ppdb-tagihan-a']);
 
-        $this->tenantB = Tenant::create([
-            'id' => 'ppdb-tagihan-b',
-            'name' => 'Pesantren B',
-            'is_active' => true,
-        ]);
-        $this->tenantB->domains()->create(['domain' => 'ppdb-tagihan-b']);
+        $this->tenantA = $this->createTestTenant('ppdb-tagihan-a', 'Pesantren A', 'ppdb-tagihan-a');
+        $this->tenantB = $this->createTestTenant('ppdb-tagihan-b', 'Pesantren B', 'ppdb-tagihan-b');
     }
 
     public function test_create_or_sync_tagihan_creates_ppdb_and_keuangan_records(): void

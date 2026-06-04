@@ -24,21 +24,16 @@ class PpdbReregistrationServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->resetPpdbSchema();
-
-        $this->tenantA = Tenant::create([
-            'id' => 'ppdb-daftar-ulang-a',
-            'name' => 'Pesantren A',
-            'is_active' => true,
+        $this->truncatePpdbTables([
+            'hasil_ujian',
+            'santri',
+            'calon_santri',
+            'domains',
+            'tenants',
         ]);
-        $this->tenantA->domains()->create(['domain' => 'ppdb-daftar-ulang-a']);
 
-        $this->tenantB = Tenant::create([
-            'id' => 'ppdb-daftar-ulang-b',
-            'name' => 'Pesantren B',
-            'is_active' => true,
-        ]);
-        $this->tenantB->domains()->create(['domain' => 'ppdb-daftar-ulang-b']);
+        $this->tenantA = $this->createTestTenant('ppdb-daftar-ulang-a', 'Pesantren A', 'ppdb-daftar-ulang-a');
+        $this->tenantB = $this->createTestTenant('ppdb-daftar-ulang-b', 'Pesantren B', 'ppdb-daftar-ulang-b');
     }
 
     public function test_register_creates_santri_for_accepted_candidate(): void

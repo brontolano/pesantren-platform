@@ -2883,3 +2883,271 @@ tests/Feature/
 **Task aktif berikutnya:**
 - `T2.2.10 Setting per-tenant: form fields configurable (required/optional fields)`
 - Jangan lanjut ke `T2.2.11` sebelum kontrak field configurable PPDB dan persist setting tenant-nya benar-benar jelas
+
+### Update 4 Juni 2026 01:20 WIB — T2.2.10 Setting Field Form PPDB Per-Tenant
+
+**Fokus sesi:**
+- Menyelesaikan task aktif:
+  - `T2.2.10 Setting per-tenant: form fields configurable (required/optional fields)`
+- Menjaga perubahan tetap minimal pada seam publik PPDB:
+  - setting tetap memakai tabel `settings`
+  - form publik tetap source of truth untuk field yang terlihat ke calon/wali
+- Tidak mengklaim `T2.2.11` atau `T2.2.12` selesai sebelum Filament PPDB benar-benar lolos bootstrap dan flow CRUD/report diverifikasi
+
+**Perubahan yang dibuat:**
+- Menambah service baru [`Modules/PPDB/app/Services/PpdbFormFieldConfigurationService.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\PPDB\app\Services\PpdbFormFieldConfigurationService.php)
+  - key setting tenant dikunci ke `ppdb_form_fields`
+  - default config field PPDB sekarang eksplisit per field
+  - mode yang diizinkan hanya:
+    - `required`
+    - `optional`
+    - `hidden`
+  - konfigurasi dinormalisasi dan ditolak bila field tidak dikenal
+- Memperbarui [`Modules/PPDB/app/Http/Controllers/PublicPpdbController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\PPDB\app\Http\Controllers\PublicPpdbController.php)
+  - halaman `GET /ppdb` sekarang mengirim `fieldConfiguration` tenant-aware ke Inertia
+  - submit `POST /ppdb` sekarang membangun validation rules dari konfigurasi field tenant, bukan hardcode field wajib lama
+- Memperbarui halaman publik [`resources/js/Pages/PPDB/PublicForm.vue`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\resources\js\Pages\PPDB\PublicForm.vue)
+  - setiap field sekarang membaca mode:
+    - tampil + wajib
+    - tampil + opsional
+    - disembunyikan
+  - copy halaman diperbarui agar sesuai dengan state nyata bahwa submit backend sudah aktif
+- Memperbarui [`app/Filament/Resources/Settings/SettingResource.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\Settings\SettingResource.php)
+  - opsi setting baru `ppdb_form_fields`
+  - value editor untuk field PPDB diubah dari string "required fields" menjadi key-value mode per field
+- Menambah test baru [`tests/Feature/PpdbFormFieldConfigurationServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbFormFieldConfigurationServiceTest.php)
+  - default config tersedia tanpa setting eksplisit
+  - penyimpanan config per tenant tetap terisolasi
+  - field tidak dikenal ditolak
+  - tenant context wajib aktif
+- Memperluas [`tests/Feature/PpdbPublicFormTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbPublicFormTest.php)
+  - memastikan props Inertia membawa konfigurasi field tenant
+  - memastikan override seperti `nik=hidden` dan `catatan_tambahan=required` benar-benar sampai ke halaman
+
+**Blocker yang ditemukan saat QC dan ditutup:**
+- Draft artefak `T2.2.11` / `T2.2.12` sudah ada di repo, tetapi belum kompatibel penuh dengan signature Filament 5
+- Fatal bootstrap yang menutup jalur test:
+  - [`app/Filament/Resources/PPDB/CalonSantriDokumenResource.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\PPDB\CalonSantriDokumenResource.php)
+  - [`app/Filament/Resources/PPDB/HasilUjianResource.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\PPDB\HasilUjianResource.php)
+  - [`app/Filament/Pages/PpdbReport.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Pages\PpdbReport.php)
+- Perbaikannya dibatasi ke kompatibilitas bootstrap:
+  - type declaration navigation diselaraskan ke kontrak Filament 5
+  - property `$view` pada `PpdbReport` dikembalikan ke bentuk non-static
+- Setelah itu, checklist eksternal direkonsiliasi:
+  - `T2.2.10` ditandai selesai
+  - `T2.2.11` dan `T2.2.12` dikembalikan ke belum selesai karena belum ada verifikasi CRUD/report yang sah
+
+**Catatan verifikasi environment:**
+- Harness PostgreSQL repo ini masih tidak stabil bila `migrate:fresh` dijalankan dari dalam lifecycle test method
+- Jalur QC yang stabil untuk slice ini adalah:
+  - reset DB sekali dari host dengan `CACHE_STORE=array` dan `QUEUE_CONNECTION=sync`
+  - jalankan suite target secara sequential
+
+**QC:**
+- `php -l Modules/PPDB/app/Services/PpdbFormFieldConfigurationService.php` PASS
+- `php -l Modules/PPDB/app/Http/Controllers/PublicPpdbController.php` PASS
+- `php -l tests/Feature/PpdbFormFieldConfigurationServiceTest.php` PASS
+- `php -l tests/Feature/PpdbPublicFormTest.php` PASS
+- Host-side DB reset:
+  - `php artisan migrate:fresh --force`
+  - dengan `CACHE_STORE=array` dan `QUEUE_CONNECTION=sync`
+  - PASS
+- `php artisan test tests/Feature/PpdbFormFieldConfigurationServiceTest.php tests/Feature/PpdbPublicFormTest.php` PASS
+  - `7` test, `20` assertions, hijau
+
+**Status checklist:**
+- `T2.2.10 Setting per-tenant: form fields configurable (required/optional fields)` sekarang **SELESAI**
+
+**Task aktif berikutnya:**
+- `T2.2.11 Filament resource: CRUD Calon Santri, Dokumen, Ujian, Penerimaan`
+- Jangan lanjut ke `T2.2.12` sebelum resource PPDB benar-benar lolos bootstrap Filament dan CRUD tenant-aware-nya bersih
+
+### Update 4 Juni 2026 03:25 WIB — T2.2.11 Resource PPDB, T2.2.12 Report PPDB, dan verifikasi submit publik
+
+**Fokus sesi:**
+- Menyelesaikan task aktif:
+  - `T2.2.11 Filament resource: CRUD Calon Santri, Dokumen, Ujian, Penerimaan`
+- Melanjutkan berurutan ke:
+  - `T2.2.12 Filament: report PPDB`
+- Menutup bug nyata yang ditemukan selama verifikasi resource/admin:
+  - mismatch field resource lama vs skema model PPDB aktif
+  - mismatch enum `jenis_kelamin` (`L/P` di DB vs `Laki-laki/Perempuan` di form)
+  - kolom `program_diminati` dipakai oleh model/controller, tetapi belum ada di tabel `calon_santri`
+
+**Perubahan yang dibuat:**
+- Memperbarui resource admin [`app/Filament/Resources/PPDB/CalonSantriResource.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\PPDB\CalonSantriResource.php)
+  - slug dirapikan menjadi `/admin/ppdb/calon-santri`
+  - akses sekarang mengikuti pola Kesantrian:
+    - `view_santri` / `manage_santri` untuk akses lihat
+    - `manage_santri` untuk create/edit/delete
+  - opsi `jenis_kelamin` diselaraskan ke enum DB:
+    - `L`
+    - `P`
+  - status `registrasi_ulang` ikut ditampilkan
+  - tabel sekarang memuat hitungan hasil ujian per calon
+- Memperbarui resource admin [`app/Filament/Resources/PPDB/CalonSantriDokumenResource.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\PPDB\CalonSantriDokumenResource.php)
+  - slug dirapikan menjadi `/admin/ppdb/dokumen`
+  - field lama `dokumen/status` diganti ke field aktif:
+    - `jenis_dokumen`
+    - `file_url`
+  - query list dibuat eager-load `calonSantri`
+- Memperbarui resource admin [`app/Filament/Resources/PPDB/HasilUjianResource.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Resources\PPDB\HasilUjianResource.php)
+  - slug dirapikan menjadi `/admin/ppdb/hasil-ujian`
+  - field lama `tanggal_ujian/keterangan` diganti ke field aktif:
+    - `kategori_ujian`
+    - `catatan`
+  - query list dibuat eager-load `calonSantri`
+- Memperbarui halaman report [`app/Filament/Pages/PpdbReport.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\app\Filament\Pages\PpdbReport.php)
+  - slug dirapikan menjadi `/admin/ppdb/report`
+  - akses report mengikuti `view_santri/manage_santri`
+  - statistik tetap tenant-aware karena membaca model `CalonSantri`
+- Menambah migration baru [`Modules/PPDB/database/migrations/2026_06_04_031000_add_program_diminati_to_calon_santri_table.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\PPDB\database\migrations\2026_06_04_031000_add_program_diminati_to_calon_santri_table.php)
+  - kolom `program_diminati`
+  - index `tenant_id + program_diminati`
+- Memperbarui submit publik [`Modules/PPDB/app/Http/Controllers/PublicPpdbController.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\Modules\PPDB\app\Http\Controllers\PublicPpdbController.php)
+  - `jenisKelamin` dari UI sekarang dinormalisasi ke enum DB `L/P`
+  - field tambahan PPDB publik disimpan konsisten di `data_ortu`:
+    - `nik`
+    - `jenjang_asal`
+    - `hubungan`
+    - `catatan_tambahan`
+- Menambah test baru [`tests/Feature/PpdbResourceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbResourceTest.php)
+  - TU bisa mengakses resource & report PPDB
+  - query resource tetap tenant-aware
+  - wali tanpa izin santri ditolak
+  - statistik report hanya menghitung tenant aktif
+- Memperluas [`tests/Feature/PpdbPublicFormTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbPublicFormTest.php)
+  - sekarang ada test submit nyata `POST /ppdb`
+  - test membuktikan data calon masuk ke DB tenant yang benar
+  - test juga menutup konversi `Laki-laki -> L`
+
+**Temuan penting dari verifikasi:**
+- Bug pertama yang muncul bukan di Filament 5 lagi, tetapi di kontrak data PPDB sendiri:
+  - resource draft masih memakai field legacy yang sudah tidak ada
+  - tabel `calon_santri` belum punya `program_diminati`, padahal dipakai model/controller
+- Dengan mismatch itu, `T2.2.11` tidak aman ditutup tanpa perbaikan skema
+- Setelah skema + resource diselaraskan, route admin PPDB sekarang normal:
+  - `/admin/ppdb/calon-santri`
+  - `/admin/ppdb/dokumen`
+  - `/admin/ppdb/hasil-ujian`
+  - `/admin/ppdb/report`
+
+**QC yang HIJAU:**
+- `php -l app/Filament/Resources/PPDB/CalonSantriResource.php` PASS
+- `php -l app/Filament/Resources/PPDB/CalonSantriDokumenResource.php` PASS
+- `php -l app/Filament/Resources/PPDB/HasilUjianResource.php` PASS
+- `php -l app/Filament/Pages/PpdbReport.php` PASS
+- `php -l Modules/PPDB/app/Http/Controllers/PublicPpdbController.php` PASS
+- `php -l Modules/PPDB/database/migrations/2026_06_04_031000_add_program_diminati_to_calon_santri_table.php` PASS
+- `php -l tests/Feature/PpdbResourceTest.php` PASS
+- `php -l tests/Feature/PpdbPublicFormTest.php` PASS
+- `php artisan route:list --path=admin | Select-String 'ppdb|calon-santri|hasil-ujian|dokumen'` PASS
+  - route admin PPDB tampil dengan slug baru `/admin/ppdb/*`
+- `php artisan test tests/Feature/PpdbPublicFormTest.php tests/Feature/PpdbResourceTest.php tests/Feature/PpdbExamResultServiceTest.php tests/Feature/PpdbAdmissionDecisionServiceTest.php` PASS
+  - `18` test, `64` assertions, hijau
+
+**Status checklist:**
+- `T2.2.11 Filament resource: CRUD Calon Santri, Dokumen, Ujian, Penerimaan` sekarang **SELESAI**
+- `T2.2.12 Filament: report PPDB (terdaftar, lulus ujian, diterima, registrasi ulang)` sekarang **SELESAI**
+- `T2.3.1 Test: form submit -> data masuk database` sekarang **SELESAI**
+
+### Update 4 Juni 2026 06:41 WIB — Stabilisasi Harness Test PPDB untuk T2.3.2 sampai T2.3.4
+
+**Fokus sesi:**
+- Menutup blocker aktif berurutan sebelum lanjut ke task baru:
+  - `T2.3.2 Test: nomor pendaftaran unique`
+  - `T2.3.3 Test: status tracking akurat`
+  - `T2.3.4 Test isolasi tenant: calon Tenant A tidak terlihat di Tenant B`
+- Menjaga perubahan tetap minimal:
+  - tidak mengubah logic domain service PPDB
+  - hanya menstabilkan harness PostgreSQL untuk suite feature PPDB
+
+**Akar masalah yang ditemukan:**
+- Harness test PPDB memakai pola campuran:
+  - sebagian suite memakai `RefreshDatabase`
+  - sebagian suite menjalankan `migrate:fresh` di `setUp()`
+  - sebagian suite melakukan `TRUNCATE` manual
+- Pada PostgreSQL repo ini, pola campuran itu memicu error tidak deterministik seperti:
+  - `drop table ... does not exist`
+  - `duplicate table ... already exists`
+  - `relation "migrations" does not exist`
+- Saat saya sempat mencoba menjalankan suite paralel, muncul deadlock `TRUNCATE`; jadi jalur verifikasi yang valid untuk slice ini harus sequential.
+
+**Perubahan yang dibuat:**
+- Menambah helper baru [`tests/Concerns/InteractsWithPpdbTestDatabase.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Concerns\InteractsWithPpdbTestDatabase.php)
+  - menyetel koneksi test PostgreSQL host-side ke `127.0.0.1`
+  - menyediakan reset tabel PPDB berbasis `TRUNCATE ... RESTART IDENTITY CASCADE`
+  - menyediakan helper `createTestTenant()` agar bootstrap tenant+domain test stabil tanpa bergantung pada create flow model tenancy saat database baru di-reset
+- Memperbarui suite berikut agar memakai harness yang seragam:
+  - [`tests/Feature/PpdbRegistrationNumberServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbRegistrationNumberServiceTest.php)
+  - [`tests/Feature/PpdbStatusTrackingServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbStatusTrackingServiceTest.php)
+  - [`tests/Feature/PpdbPublicFormTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbPublicFormTest.php)
+  - [`tests/Feature/PpdbResourceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbResourceTest.php)
+  - [`tests/Feature/PpdbExamResultServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbExamResultServiceTest.php)
+  - [`tests/Feature/PpdbAdmissionDecisionServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbAdmissionDecisionServiceTest.php)
+  - [`tests/Feature/PpdbReregistrationServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbReregistrationServiceTest.php)
+  - [`tests/Feature/PpdbBillingServiceTest.php`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\tests\Feature\PpdbBillingServiceTest.php)
+
+**Jalur QC yang dinyatakan valid:**
+- Siapkan schema sekali dari host:
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+  - `php artisan migrate:fresh --force`
+- Jalankan suite PPDB **sequential**, bukan paralel
+
+**QC yang HIJAU:**
+- `php artisan test tests/Feature/PpdbRegistrationNumberServiceTest.php` PASS
+  - `5` test, `6` assertions
+- `php artisan test tests/Feature/PpdbStatusTrackingServiceTest.php` PASS
+  - `5` test, `13` assertions
+- `php artisan test tests/Feature/PpdbPublicFormTest.php` PASS
+  - `3` test, `15` assertions
+- `php artisan test tests/Feature/PpdbResourceTest.php` PASS
+  - `4` test, `23` assertions
+- Regression sequential:
+  - `php artisan test tests/Feature/PpdbExamResultServiceTest.php` PASS
+    - `5` test, `13` assertions
+  - `php artisan test tests/Feature/PpdbAdmissionDecisionServiceTest.php` PASS
+    - `6` test, `13` assertions
+  - `php artisan test tests/Feature/PpdbReregistrationServiceTest.php` PASS
+    - `6` test, `18` assertions
+  - `php artisan test tests/Feature/PpdbBillingServiceTest.php` PASS
+    - `5` test, `22` assertions
+
+**Status checklist:**
+- `T2.3.2 Test: nomor pendaftaran unique` sekarang **SELESAI**
+- `T2.3.3 Test: status tracking akurat` sekarang **SELESAI**
+- `T2.3.4 Test isolasi tenant: calon Tenant A tidak terlihat di Tenant B` sekarang **SELESAI**
+
+**Task aktif berikutnya:**
+- `T2.3.5 Commit: feat(ppdb): complete module`
+- Saya berhenti di sini sesuai urutan, karena task berikutnya eksplisit adalah commit modul PPDB.
+
+### Update 4 Juni 2026 09:05 WIB — T2.3.5 Commit Modul PPDB
+
+**Fokus sesi:**
+- Menutup task aktif berurutan:
+  - `T2.3.5 Commit: feat(ppdb): complete module`
+- Memastikan commit hanya dilakukan setelah seluruh slice PPDB yang sudah dikerjakan benar-benar lolos QC sequential di host PostgreSQL
+
+**Verifikasi final sebelum commit:**
+- Reset schema host-side:
+  - `DB_HOST=127.0.0.1`
+  - `CACHE_STORE=array`
+  - `QUEUE_CONNECTION=sync`
+  - `php artisan migrate:fresh --force`
+- Jalankan suite PPDB sequential:
+  - `php artisan test tests/Feature/PpdbRegistrationNumberServiceTest.php tests/Feature/PpdbStatusTrackingServiceTest.php tests/Feature/PpdbPublicFormTest.php tests/Feature/PpdbResourceTest.php tests/Feature/PpdbExamResultServiceTest.php tests/Feature/PpdbAdmissionDecisionServiceTest.php tests/Feature/PpdbReregistrationServiceTest.php tests/Feature/PpdbBillingServiceTest.php`
+
+**QC yang HIJAU:**
+- `php artisan migrate:fresh --force` PASS
+- Suite PPDB sequential PASS
+  - `39` test
+  - `123` assertions
+  - tanpa kegagalan
+
+**Status checklist:**
+- `T2.3.5 Commit: feat(ppdb): complete module` sekarang **SIAP DITUTUP**
+- Setelah commit ini dibuat, task berurutan berikutnya adalah:
+  - `T2.4.1 Buat module CMS via nwidart`

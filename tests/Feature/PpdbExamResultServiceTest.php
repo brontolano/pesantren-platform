@@ -22,21 +22,15 @@ class PpdbExamResultServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->resetPpdbSchema();
-
-        $this->tenantA = Tenant::create([
-            'id' => 'ppdb-ujian-a',
-            'name' => 'Pesantren A',
-            'is_active' => true,
+        $this->truncatePpdbTables([
+            'hasil_ujian',
+            'calon_santri',
+            'domains',
+            'tenants',
         ]);
-        $this->tenantA->domains()->create(['domain' => 'ppdb-ujian-a']);
 
-        $this->tenantB = Tenant::create([
-            'id' => 'ppdb-ujian-b',
-            'name' => 'Pesantren B',
-            'is_active' => true,
-        ]);
-        $this->tenantB->domains()->create(['domain' => 'ppdb-ujian-b']);
+        $this->tenantA = $this->createTestTenant('ppdb-ujian-a', 'Pesantren A', 'ppdb-ujian-a');
+        $this->tenantB = $this->createTestTenant('ppdb-ujian-b', 'Pesantren B', 'ppdb-ujian-b');
     }
 
     public function test_input_result_creates_exam_result_for_candidate(): void

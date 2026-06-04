@@ -18,18 +18,20 @@ class PpdbPublicFormTest extends TestCase
 
         $this->withoutVite();
 
-        $this->resetPpdbSchema();
+        $this->truncatePpdbTables([
+            'settings',
+            'tagihan_ppdb',
+            'hasil_ujian',
+            'calon_santri_dokumen',
+            'calon_santri',
+            'domains',
+            'tenants',
+        ]);
     }
 
     public function test_public_ppdb_form_is_accessible_without_login_on_tenant_domain(): void
     {
-        $tenant = Tenant::create([
-            'id' => 'asy-syifaa',
-            'name' => 'Asy-Syifaa',
-            'is_active' => true,
-        ]);
-
-        $tenant->domains()->create(['domain' => 'asy-syifaa']);
+        $tenant = $this->createTestTenant('asy-syifaa', 'Asy-Syifaa', 'asy-syifaa');
 
         $response = $this
             ->withHeaders([
@@ -48,13 +50,7 @@ class PpdbPublicFormTest extends TestCase
 
     public function test_public_ppdb_form_receives_tenant_field_configuration(): void
     {
-        $tenant = Tenant::create([
-            'id' => 'config-ppdb',
-            'name' => 'PPDB Config',
-            'is_active' => true,
-        ]);
-
-        $tenant->domains()->create(['domain' => 'config-ppdb']);
+        $tenant = $this->createTestTenant('config-ppdb', 'PPDB Config', 'config-ppdb');
 
         tenancy()->initialize($tenant);
 
@@ -87,13 +83,7 @@ class PpdbPublicFormTest extends TestCase
 
     public function test_public_ppdb_form_submit_persists_candidate_for_current_tenant(): void
     {
-        $tenant = Tenant::create([
-            'id' => 'submit-ppdb',
-            'name' => 'PPDB Submit',
-            'is_active' => true,
-        ]);
-
-        $tenant->domains()->create(['domain' => 'submit-ppdb']);
+        $tenant = $this->createTestTenant('submit-ppdb', 'PPDB Submit', 'submit-ppdb');
 
         $response = $this->from('http://submit-ppdb.localhost/ppdb')->post('http://submit-ppdb.localhost/ppdb', [
             'nama' => 'Calon Baru',

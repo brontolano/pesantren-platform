@@ -23,21 +23,16 @@ class PpdbStatusTrackingServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->resetPpdbSchema();
-
-        $this->tenantA = Tenant::create([
-            'id' => 'ppdb-track-a',
-            'name' => 'Pesantren A',
-            'is_active' => true,
+        $this->truncatePpdbTables([
+            'hasil_ujian',
+            'calon_santri_dokumen',
+            'calon_santri',
+            'domains',
+            'tenants',
         ]);
-        $this->tenantA->domains()->create(['domain' => 'ppdb-track-a']);
 
-        $this->tenantB = Tenant::create([
-            'id' => 'ppdb-track-b',
-            'name' => 'Pesantren B',
-            'is_active' => true,
-        ]);
-        $this->tenantB->domains()->create(['domain' => 'ppdb-track-b']);
+        $this->tenantA = $this->createTestTenant('ppdb-track-a', 'Pesantren A', 'ppdb-track-a');
+        $this->tenantB = $this->createTestTenant('ppdb-track-b', 'Pesantren B', 'ppdb-track-b');
     }
 
     public function test_issue_tracking_link_generates_token_and_url_once(): void

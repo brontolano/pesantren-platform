@@ -24,21 +24,15 @@ class PpdbAdmissionDecisionServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->resetPpdbSchema();
-
-        $this->tenantA = Tenant::create([
-            'id' => 'ppdb-keputusan-a',
-            'name' => 'Pesantren A',
-            'is_active' => true,
+        $this->truncatePpdbTables([
+            'hasil_ujian',
+            'calon_santri',
+            'domains',
+            'tenants',
         ]);
-        $this->tenantA->domains()->create(['domain' => 'ppdb-keputusan-a']);
 
-        $this->tenantB = Tenant::create([
-            'id' => 'ppdb-keputusan-b',
-            'name' => 'Pesantren B',
-            'is_active' => true,
-        ]);
-        $this->tenantB->domains()->create(['domain' => 'ppdb-keputusan-b']);
+        $this->tenantA = $this->createTestTenant('ppdb-keputusan-a', 'Pesantren A', 'ppdb-keputusan-a');
+        $this->tenantB = $this->createTestTenant('ppdb-keputusan-b', 'Pesantren B', 'ppdb-keputusan-b');
     }
 
     public function test_decide_updates_candidate_to_lulus_with_note_and_timestamp(): void

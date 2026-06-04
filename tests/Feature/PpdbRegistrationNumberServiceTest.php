@@ -20,21 +20,14 @@ class PpdbRegistrationNumberServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->resetPpdbSchema();
-
-        $this->tenantA = Tenant::create([
-            'id' => 'ppdb-a',
-            'name' => 'Pesantren A',
-            'is_active' => true,
+        $this->truncatePpdbTables([
+            'calon_santri',
+            'domains',
+            'tenants',
         ]);
-        $this->tenantA->domains()->create(['domain' => 'ppdb-a']);
 
-        $this->tenantB = Tenant::create([
-            'id' => 'ppdb-b',
-            'name' => 'Pesantren B',
-            'is_active' => true,
-        ]);
-        $this->tenantB->domains()->create(['domain' => 'ppdb-b']);
+        $this->tenantA = $this->createTestTenant('ppdb-a', 'Pesantren A', 'ppdb-a');
+        $this->tenantB = $this->createTestTenant('ppdb-b', 'Pesantren B', 'ppdb-b');
     }
 
     public function test_generate_returns_first_number_when_tenant_has_no_candidate(): void
