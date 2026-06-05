@@ -5,11 +5,25 @@ namespace Modules\Notifikasi\Services;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
+use Modules\Notifikasi\Support\NotifikasiSettings;
 
 class WaGatewayService
 {
     public function send(string $target, TemplateNotifikasi $template, string $message, array $context = []): array
     {
+        // Hormati toggle di Pengaturan Notifikasi: bila WA dimatikan, tak ada pesan keluar.
+        if (! NotifikasiSettings::waEnabled()) {
+            return [
+                'status' => 'disabled',
+                'message' => 'Notifikasi WhatsApp dinonaktifkan di Pengaturan Notifikasi.',
+            ];
+        }
+
+        // Tambahkan tanda tangan/footer (jika diatur) ke akhir pesan.
+        if ($signature = NotifikasiSettings::signature()) {
+            $message = rtrim($message)."\n\n".$signature;
+        }
+
         $payload = [
             'tenant_id' => tenant()?->getTenantKey(),
             'template_code' => $template->kode_template,

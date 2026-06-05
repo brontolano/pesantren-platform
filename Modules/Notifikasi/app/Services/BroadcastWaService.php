@@ -59,7 +59,7 @@ class BroadcastWaService
         });
 
         $sender = app(WaNotificationService::class);
-        $interval = max(0, (int) config('notifikasi.broadcast_interval_seconds', 10));
+        $interval = \Modules\Notifikasi\Support\NotifikasiSettings::broadcastInterval();
         $recipientList = $recipients->values();
         $lastIndex = $recipientList->count() - 1;
 

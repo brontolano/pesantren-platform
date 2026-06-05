@@ -5,6 +5,7 @@ namespace Modules\Notifikasi\Services;
 use Illuminate\Support\Facades\Mail;
 use Modules\Notifikasi\Mail\GenericNotificationMail;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
+use Modules\Notifikasi\Support\NotifikasiSettings;
 
 class EmailNotificationService
 {
@@ -16,6 +17,11 @@ class EmailNotificationService
 
     public function send(TemplateNotifikasi $template, string $email, array $variables = []): void
     {
+        // Hormati toggle di Pengaturan Notifikasi: bila email dimatikan, tak ada email keluar.
+        if (! NotifikasiSettings::emailEnabled()) {
+            return;
+        }
+
         $subject = $this->renderer->render($template->judul, $variables);
         $body = $this->renderer->render($template->isi, $variables);
 
