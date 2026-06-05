@@ -118,13 +118,17 @@ class DevRoadmapSeeder extends Seeder
 
             // Fase 6 — Akun Santri & Wali (Aplikasi)
             ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Konversi LULUS → akun santri aktif + akun orang tua/wali',
-                'Saat calon LULUS & daftar ulang (Santri terbentuk): (1) akun calon (ber-No.HP wali) di-upgrade role peserta → WALI + ditautkan ke Santri via access_wali (is_primary); (2) dibuatkan akun SANTRI (role santri) untuk login aplikasi santri. Satu wali bisa menaungi beberapa anak.',
-                'SEDANG DIKERJAKAN (perencanaan). Konversi DATA calon→Santri sudah ada (PpdbReregistrationService); sisi AKUN (upgrade role + akun wali + akun santri) belum. Memperluas sistem akun peserta aktif (PesertaAccountService/PWA SPMB) — perlu selaras agar tak tabrakan. KEPUTUSAN PENDING: identitas login SANTRI (NIS+password sementara vs No.HP sendiri).',
-                'in_progress', 'high', 10, 'M', 18],
+                'Saat calon LULUS & daftar ulang (Santri terbentuk): akun calon (ber-No.HP wali) di-upgrade role peserta → WALI + ditautkan ke Santri via access_wali (is_primary). KEPUTUSAN: untuk sekarang cukup akun WALI; akun login SANTRI terpisah ditunda (lihat task "Akun & login SANTRI").',
+                'RENCANA FINAL tercatat; EKSEKUSI DITUNDA (keputusan Hamdan: selaraskan dulu dgn sistem akun peserta SPMB yang aktif digarap — PesertaAccountService/PWA — agar tak tabrakan, belum sentuh kode). Pondasi data konversi calon→Santri sudah ada (PpdbReregistrationService).',
+                'todo', 'high', 5, 'M', 18],
             ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Onboarding santri aktif tanpa akun: kredensial sementara sekali-pakai + install app',
                 'Santri aktif yang BELUM punya akun / No. HP terdaftar: admin kirim pemberitahuan via WhatsApp berisi akun + password sementara SEKALI PAKAI + tautan install aplikasi; paksa ganti password saat login pertama. Dukung per-santri maupun massal.',
                 'Belum ada. Santri lama (non-PPDB) belum punya jalur penerbitan akun + onboarding aplikasi.',
                 'todo', 'high', 0, 'M', 19],
+            ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Akun & login SANTRI: NIS + fingerprint (mode dev) → integrasi smart card NFC',
+                'Akun login khusus santri: identitas NIS + verifikasi fingerprint (mode pengembangan). Arah jangka panjang: integrasi kartu pintar NFC untuk absensi/akses/identitas santri di aplikasi.',
+                'Ide tahap awal (keputusan Hamdan). Belum dibangun — menunggu akun wali + sistem akun SPMB final. Smart card NFC = fase lanjutan.',
+                'todo', 'low', 0, 'L', 20],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
