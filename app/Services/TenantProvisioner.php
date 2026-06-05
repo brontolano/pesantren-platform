@@ -59,7 +59,8 @@ class TenantProvisioner
                 return ['email' => $adminEmail, 'password' => null];
             }
 
-            $password = Str::password(16);
+            // Alfanumerik (tanpa simbol) — mudah diketik & aman ditampilkan.
+            $password = Str::password(14, letters: true, numbers: true, symbols: false);
             $admin = User::withoutGlobalScopes()->create([
                 'email' => $adminEmail,
                 'name' => 'Admin '.$tenant->name,
