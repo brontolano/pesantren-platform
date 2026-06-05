@@ -59,8 +59,11 @@ class BroadcastWaService
         });
 
         $sender = app(WaNotificationService::class);
+        $interval = max(0, (int) config('notifikasi.broadcast_interval_seconds', 10));
+        $recipientList = $recipients->values();
+        $lastIndex = $recipientList->count() - 1;
 
-        foreach ($recipients as $recipient) {
+        foreach ($recipientList as $i => $recipient) {
             $sent = $sender->sendToRecipient(
                 $broadcast,
                 $broadcast->template,
@@ -72,6 +75,12 @@ class BroadcastWaService
                 $result['sent']++;
             } else {
                 $result['failed']++;
+            }
+
+            // Throttle: jeda antar-pesan (default 10 dtk) agar tak kena rate-limit/blokir WhatsApp.
+            // Job ini berjalan di queue 'broadcast' (worker terpisah) supaya tidak menahan OTP.
+            if ($interval > 0 && $i < $lastIndex) {
+                sleep($interval);
             }
         }
 

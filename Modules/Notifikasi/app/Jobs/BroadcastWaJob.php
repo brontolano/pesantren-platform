@@ -14,15 +14,15 @@ class BroadcastWaJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
-
-    public array $backoff = [60, 300, 900];
+    // tries=1: broadcast mengirim ke banyak target dalam 1 job; retry = kirim ulang DUPLIKAT.
+    public int $tries = 1;
 
     public function __construct(
         public readonly int $broadcastId,
         public readonly ?string $tenantId,
     ) {
-        $this->onQueue('notifikasi');
+        // Queue terpisah dari 'notifikasi' (OTP) agar throttle 10 dtk/pesan tak men-starve OTP.
+        $this->onQueue('broadcast');
     }
 
     public function handle(BroadcastWaService $service): void

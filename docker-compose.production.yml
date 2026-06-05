@@ -7,6 +7,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: pesantren-platform-app:latest
     container_name: pesantren-app
     restart: unless-stopped
     ports:
@@ -23,6 +24,47 @@ services:
       - ./.env:/app/.env:ro
       - caddy_data:/data
       - caddy_config:/config
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # ── Queue worker: OTP peserta (queue 'notifikasi') + job umum (queue 'default') ──
+  # Pakai image hasil build service `app` (kode sama). Tanpa worker, semua job antrian menumpuk.
+  worker:
+    image: pesantren-platform-app:latest
+    container_name: pesantren-worker
+    restart: unless-stopped
+    command: php artisan queue:work redis --queue=notifikasi,default --sleep=3 --tries=3 --max-time=3600
+    env_file:
+      - .env
+    volumes:
+      - app_storage:/app/storage
+      - ./.env:/app/.env:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # ── Queue worker KHUSUS broadcast WA (queue 'broadcast') ──
+  # Job broadcast memberi jeda 10 dtk/pesan (timeout besar). Queue & worker terpisah
+  # agar throttle ini TIDAK menahan OTP/notifikasi. tries=1 → tak kirim ulang duplikat.
+  worker-broadcast:
+    image: pesantren-platform-app:latest
+    container_name: pesantren-worker-broadcast
+    restart: unless-stopped
+    command: php artisan queue:work redis --queue=broadcast --sleep=5 --tries=1 --timeout=7200
+    env_file:
+      - .env
+    volumes:
+      - app_storage:/app/storage
+      - ./.env:/app/.env:ro
     depends_on:
       postgres:
         condition: service_healthy

@@ -7,4 +7,7 @@ return [
     'waha_base_url' => env('WAHA_BASE_URL'),
     'waha_session' => env('WAHA_SESSION', 'default'),
     'default_email_from' => env('MAIL_FROM_ADDRESS'),
+
+    // Jeda antar-pesan saat broadcast WA (detik) untuk hindari rate-limit/blokir. Default 10 dtk.
+    'broadcast_interval_seconds' => (int) env('BROADCAST_WA_INTERVAL_SECONDS', 10),
 ];
