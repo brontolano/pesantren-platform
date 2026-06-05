@@ -17,6 +17,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -72,85 +74,110 @@ class ArticleResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('Konten Artikel')->schema([
-                TextInput::make('title')
-                    ->label('Judul')
-                    ->required()
-                    ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create'
-                        ? $set('slug', Str::slug($state))
-                        : null
-                    ),
-                TextInput::make('slug')
-                    ->label('Slug URL')
-                    ->required()
-                    ->maxLength(255)
-                    ->unique(Article::class, 'slug', ignoreRecord: true)
-                    ->helperText('Contoh: berita-kegiatan-santri. Otomatis dari judul.'),
-                Select::make('category')
-                    ->label('Kategori')
-                    ->options([
-                        'article' => 'Artikel Umum',
-                        'announcement' => 'Pengumuman',
-                        'achievement' => 'Prestasi',
-                    ])
-                    ->default('article')
-                    ->required()
-                    ->helperText('Menentukan di halaman mana artikel tampil di website (artikel / pengumuman / prestasi).'),
-                Textarea::make('excerpt')
-                    ->label('Ringkasan')
-                    ->maxLength(500)
-                    ->rows(3)
-                    ->helperText('Tampil di list artikel dan meta deskripsi SEO.'),
-                RichEditor::make('content')
-                    ->label('Isi Artikel')
-                    ->columnSpanFull()
-                    ->toolbarButtons([
-                        'bold', 'italic', 'underline', 'strike',
-                        'h2', 'h3',
-                        'bulletList', 'orderedList',
-                        'blockquote',
-                        'link',
-                        'redo', 'undo',
-                    ]),
-            ])->columns(2),
+            Grid::make(3)->schema([
+                // ── KOLOM UTAMA: area menulis (fokus, lebar 2/3) ──
+                Group::make([
+                    Section::make('Konten Artikel')
+                        ->description('Judul, ringkasan, dan isi artikel.')
+                        ->icon('heroicon-o-pencil-square')
+                        ->schema([
+                            TextInput::make('title')
+                                ->label('Judul')
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(fn (string $context, $state, callable $set) => $context === 'create'
+                                    ? $set('slug', Str::slug($state))
+                                    : null
+                                )
+                                ->columnSpanFull(),
+                            TextInput::make('slug')
+                                ->label('Slug URL')
+                                ->required()
+                                ->maxLength(255)
+                                ->unique(Article::class, 'slug', ignoreRecord: true)
+                                ->prefix('/artikel/')
+                                ->helperText('Otomatis dari judul. Contoh: berita-kegiatan-santri.')
+                                ->columnSpanFull(),
+                            Textarea::make('excerpt')
+                                ->label('Ringkasan')
+                                ->maxLength(500)
+                                ->rows(2)
+                                ->helperText('Tampil di list artikel & meta deskripsi SEO. (maks 500 karakter)')
+                                ->columnSpanFull(),
+                            RichEditor::make('content')
+                                ->label('Isi Artikel')
+                                ->columnSpanFull()
+                                ->toolbarButtons([
+                                    'bold', 'italic', 'underline', 'strike',
+                                    'h2', 'h3',
+                                    'bulletList', 'orderedList',
+                                    'blockquote',
+                                    'link',
+                                    'redo', 'undo',
+                                ]),
+                        ]),
+                ])->columnSpan(2),
 
-            Section::make('Gambar & Publikasi')->schema([
-                FileUpload::make('featured_image_url')
-                    ->label('Gambar Utama')
-                    ->image()
-                    ->imageEditor()
-                    ->directory('cms/articles')
-                    ->maxSize(2048)
-                    ->helperText('Maks 2MB. Rasio 16:9 direkomendasikan.'),
-                DateTimePicker::make('published_at')
-                    ->label('Tanggal Terbit')
-                    ->native(false)
-                    ->seconds(false),
-                Toggle::make('is_published')
-                    ->label('Publikasikan')
-                    ->helperText('Aktifkan agar artikel tampil di website.')
-                    ->default(false)
-                    ->live()
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if ($state) {
-                            $set('published_at', now());
-                        }
-                    }),
-            ])->columns(2),
-
-            Section::make('SEO (Opsional)')->schema([
-                TextInput::make('meta_title')
-                    ->label('Meta Title')
-                    ->maxLength(70)
-                    ->helperText('Biarkan kosong untuk pakai judul artikel. Maks 70 karakter.'),
-                Textarea::make('meta_description')
-                    ->label('Meta Description')
-                    ->maxLength(160)
-                    ->rows(2)
-                    ->helperText('Biarkan kosong untuk pakai ringkasan. Maks 160 karakter.'),
-            ])->columns(2)->collapsed(),
+                // ── SIDEBAR: publikasi & meta (lebar 1/3) ──
+                Group::make([
+                    Section::make('Publikasi')
+                        ->icon('heroicon-o-paper-airplane')
+                        ->schema([
+                            Toggle::make('is_published')
+                                ->label('Publikasikan')
+                                ->helperText('Aktifkan agar tampil di website.')
+                                ->default(false)
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $set) {
+                                    if ($state) {
+                                        $set('published_at', now());
+                                    }
+                                }),
+                            DateTimePicker::make('published_at')
+                                ->label('Tanggal Terbit')
+                                ->native(false)
+                                ->seconds(false),
+                            Select::make('category')
+                                ->label('Kategori')
+                                ->options([
+                                    'article' => 'Artikel Umum',
+                                    'announcement' => 'Pengumuman',
+                                    'achievement' => 'Prestasi',
+                                ])
+                                ->default('article')
+                                ->required()
+                                ->native(false)
+                                ->helperText('Halaman tampil: artikel / pengumuman / prestasi.'),
+                        ]),
+                    Section::make('Gambar Utama')
+                        ->icon('heroicon-o-photo')
+                        ->schema([
+                            FileUpload::make('featured_image_url')
+                                ->label('Gambar Utama')
+                                ->hiddenLabel()
+                                ->image()
+                                ->imageEditor()
+                                ->directory('cms/articles')
+                                ->maxSize(2048)
+                                ->helperText('Maks 2MB. Rasio 16:9 direkomendasikan.'),
+                        ]),
+                    Section::make('SEO (Opsional)')
+                        ->icon('heroicon-o-magnifying-glass')
+                        ->collapsed()
+                        ->schema([
+                            TextInput::make('meta_title')
+                                ->label('Meta Title')
+                                ->maxLength(70)
+                                ->helperText('Kosong = pakai judul artikel. Maks 70.'),
+                            Textarea::make('meta_description')
+                                ->label('Meta Description')
+                                ->maxLength(160)
+                                ->rows(2)
+                                ->helperText('Kosong = pakai ringkasan. Maks 160.'),
+                        ]),
+                ])->columnSpan(1),
+            ]),
         ]);
     }
 
