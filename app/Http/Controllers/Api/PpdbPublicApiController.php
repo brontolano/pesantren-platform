@@ -44,6 +44,7 @@ class PpdbPublicApiController extends Controller
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
+        try { // TEMP-DEBUG: surface exact exception for the register 500
         $participantPhone = $this->normalizePhone($data['participant_phone'] ?? $data['guardian_phone'] ?? $data['parent_phone'] ?? '');
         $nomor = $numbers->generate();
         $token = Str::random(40);
@@ -93,6 +94,14 @@ class PpdbPublicApiController extends Controller
             ],
             'account' => ['username' => $username],
         ], 201);
+        } catch (\Throwable $e) { // TEMP-DEBUG
+            return response()->json(['ok' => false, 'debug' => [
+                'type' => get_class($e),
+                'msg' => $e->getMessage(),
+                'where' => basename($e->getFile()).':'.$e->getLine(),
+                'trace' => collect($e->getTrace())->take(5)->map(fn ($f) => (isset($f['file']) ? basename($f['file']) : '?').':'.($f['line'] ?? '?').' '.($f['class'] ?? '').($f['type'] ?? '').($f['function'] ?? ''))->all(),
+            ]], 500);
+        }
     }
 
     /**
