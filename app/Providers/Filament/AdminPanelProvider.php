@@ -5,10 +5,13 @@ namespace App\Providers\Filament;
 use App\Filament\Resources\Billing\PlanResource;
 use App\Filament\Resources\Billing\PlatformInvoiceResource;
 use App\Filament\Resources\Billing\TenantSubscriptionResource;
+use App\Filament\Resources\DevProjects\DevProjectResource;
+use App\Filament\Resources\DevTasks\DevTaskResource;
 use App\Filament\Resources\Modules\ModuleResource;
 use App\Filament\Resources\Tenants\TenantResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\BillingOverviewWidget;
+use App\Filament\Widgets\DevProgressWidget;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -55,6 +58,9 @@ class AdminPanelProvider extends PanelProvider
                 PlanResource::class,
                 TenantSubscriptionResource::class,
                 PlatformInvoiceResource::class,
+                // Manajemen Proyek (internal — pantau progres pengembangan)
+                DevProjectResource::class,
+                DevTaskResource::class,
             ])
             ->pages([
                 Dashboard::class,
@@ -63,6 +69,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 BillingOverviewWidget::class,
+                DevProgressWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
