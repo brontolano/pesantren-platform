@@ -39,6 +39,8 @@ services:
     container_name: pesantren-worker
     restart: unless-stopped
     command: php artisan queue:work redis --queue=notifikasi,default --sleep=3 --tries=3 --max-time=3600
+    healthcheck:
+      disable: true
     env_file:
       - .env
     volumes:
@@ -60,6 +62,8 @@ services:
     container_name: pesantren-worker-broadcast
     restart: unless-stopped
     command: php artisan queue:work redis --queue=broadcast --sleep=5 --tries=1 --timeout=7200
+    healthcheck:
+      disable: true
     env_file:
       - .env
     volumes:
