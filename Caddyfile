@@ -9,19 +9,6 @@
 	}
 }
 
-# HTTP — melayani app + tantangan ACME + endpoint ssl-check
-:80 {
-	root * /app/public
-	encode zstd br gzip
-	php_server
-}
-
-# HTTPS — sertifikat otomatis (on-demand) untuk pesantren.online & semua subdomain tenant
-:443 {
-	tls {
-		on_demand
-	}
-	root * /app/public
-	encode zstd br gzip
-	php_server
-}
+# ──────────────────────────────────────────────────────────────
+# Website tenant: Pondok Pesantren Asy-Syifaa (asy-syifaa.com)
+# PHP native thin-client, dilayani container ter

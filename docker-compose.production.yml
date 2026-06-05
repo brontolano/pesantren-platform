@@ -64,13 +64,5 @@ services:
     networks:
       - internal
 
-volumes:
-  postgres_data:
-  redis_data:
-  app_storage:
-  caddy_data:
-  caddy_config:
-
-networks:
-  internal:
-    driver: bridge
+  # ── Website tenant: Asy-Syifaa (asy-syifaa.com) ──
+  # PHP native thin-client. Source + media di /opt/asy-syifaa-web
