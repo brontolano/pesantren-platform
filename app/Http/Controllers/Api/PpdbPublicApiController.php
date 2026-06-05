@@ -5,21 +5,24 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Services\PpdbRegistrationNumberService;
+use Modules\PPDB\Services\PpdbWhatsappNotifier;
+use Modules\PPDB\Support\PpdbPhone;
 
 /**
  * API publik PPDB untuk website tenant (mis. asy-syifaa.com).
  * Tenant di-resolve dari domain (api.<tenant>) oleh middleware tenancy web.
  * Kontrak: docs/SPEC-API-WEBSITE-ASY-SYIFAA.md (POST /api/v1/spmb/register).
  *
- * Fase ini = MINIMAL: simpan pendaftaran + balas e-tiket. Akun login = fase berikutnya.
+ * Simpan pendaftaran + balas e-tiket + kirim notifikasi WhatsApp (n8n→WAHA).
+ * Penerbitan akun & kredensial login peserta ditangani panel staf
+ * (aksi "Kirim Kredensial / Reset Password" pada resource Calon Santri).
  */
 class PpdbPublicApiController extends Controller
 {
-    public function register(Request $request, PpdbRegistrationNumberService $numbers): JsonResponse
+    public function register(Request $request, PpdbRegistrationNumberService $numbers, PpdbWhatsappNotifier $notifier): JsonResponse
     {
         if (! tenancy()->initialized || tenant() === null) {
             return response()->json(['ok' => false, 'message' => 'Tenant tidak ditemukan'], 404);
@@ -45,7 +48,7 @@ class PpdbPublicApiController extends Controller
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $participantPhone = $this->normalizePhone($data['participant_phone'] ?? $data['guardian_phone'] ?? $data['parent_phone'] ?? '');
+        $participantPhone = PpdbPhone::normalize($data['participant_phone'] ?? $data['guardian_phone'] ?? $data['parent_phone'] ?? '');
         $nomor = $numbers->generate();
         $token = Str::random(40);
 
@@ -58,7 +61,7 @@ class PpdbPublicApiController extends Controller
             'tempat_lahir' => $data['birth_place'] ?? null,
             'jenis_kelamin' => $data['gender'] ?? null,
             'nama_ayah' => $data['parent_name'] ?? null,
-            'no_hp_wali' => $this->normalizePhone($data['guardian_phone'] ?? $data['parent_phone'] ?? '') ?: null,
+            'no_hp_wali' => PpdbPhone::normalize($data['guardian_phone'] ?? $data['parent_phone'] ?? '') ?: null,
             'alamat' => $data['address'] ?? null,
             'asal_sekolah' => $data['origin_school'] ?? null,
             'program_diminati' => 'Reguler',
@@ -75,11 +78,11 @@ class PpdbPublicApiController extends Controller
             ],
         ]);
 
-        // Username = No. HP peserta (calon login di fase akun nanti). Fallback nomor pendaftaran.
+        // Username = No. HP peserta (identitas login portal). Fallback nomor pendaftaran.
         $username = $participantPhone !== '' ? $participantPhone : $nomor;
 
         // Notifikasi WhatsApp via n8n + WAHA (fire-and-forget, tak memblokir pendaftaran).
-        $this->notifyWhatsapp($participantPhone, $calon->nama, $nomor, $username);
+        $notifier->sendRegistrationConfirmation($participantPhone, $calon->nama, $nomor, $username);
 
         return response()->json([
             'ok' => true,
@@ -94,56 +97,5 @@ class PpdbPublicApiController extends Controller
             ],
             'account' => ['username' => $username],
         ], 201);
-    }
-
-    /**
-     * Kirim notifikasi WhatsApp via n8n → WAHA. Fire-and-forget:
-     * kegagalan WA TIDAK boleh menggagalkan pendaftaran (try-catch + timeout pendek).
-     * Endpoint internal: http://n8n:5678/webhook/ppdb-wa (override via PPDB_WA_WEBHOOK_URL).
-     */
-    private function notifyWhatsapp(string $phone, string $name, string $nomor, string $username): void
-    {
-        if ($phone === '') {
-            return;
-        }
-
-        try {
-            $pesantren = tenant()?->name ?? 'Pondok Pesantren';
-            $message = "Assalamu'alaikum Wr. Wb.\n\n"
-                ."Pendaftaran PPDB *{$pesantren}* atas nama *{$name}* telah *BERHASIL* diterima. 🎉\n\n"
-                ."🎫 Nomor Pendaftaran: *{$nomor}*\n"
-                ."👤 Username Portal: {$username}\n\n"
-                ."Simpan nomor pendaftaran ini sebagai bukti. Informasi jadwal seleksi, pengumuman, dan daftar ulang akan kami sampaikan melalui WhatsApp ini.\n\n"
-                ."Jazaakumullaahu khairan.\n"
-                ."— Panitia PPDB {$pesantren}";
-
-            Http::timeout(8)->post(
-                config('services.ppdb_wa.webhook', 'http://n8n:5678/webhook/ppdb-wa'),
-                [
-                    'to' => $phone,
-                    'message' => $message,
-                    'eticket_no' => $nomor,
-                    'student_name' => $name,
-                ],
-            );
-        } catch (\Throwable) {
-            // Senyap: pendaftaran tetap sukses meski notifikasi WA gagal terkirim.
-        }
-    }
-
-    private function normalizePhone(string $raw): string
-    {
-        $digits = preg_replace('/[^\d+]/', '', $raw) ?? '';
-        if ($digits === '') {
-            return '';
-        }
-        if (str_starts_with($digits, '+62')) {
-            $digits = '62'.substr($digits, 3);
-        }
-        if (str_starts_with($digits, '0')) {
-            $digits = '62'.substr($digits, 1);
-        }
-
-        return $digits;
     }
 }

@@ -27,6 +27,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_akademik',
             'manage_akademik',
             'view_own_children',
+            // PPDB — portal peserta (akun calon santri ber-role `peserta`)
+            'view_own_ppdb_status',
+            'complete_own_ppdb',
+            'upload_own_ppdb_docs',
         ];
 
         foreach ($permissions as $permission) {
@@ -99,6 +103,12 @@ class RolesAndPermissionsSeeder extends Seeder
             ],
             'wali' => [
                 'view_own_children',
+            ],
+            // Peserta PPDB — akun calon santri (portal /portal). Hanya kelola pendaftarannya sendiri.
+            'peserta' => [
+                'view_own_ppdb_status',
+                'complete_own_ppdb',
+                'upload_own_ppdb_docs',
             ],
         ];
 

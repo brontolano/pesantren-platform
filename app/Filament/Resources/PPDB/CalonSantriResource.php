@@ -9,8 +9,10 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
@@ -20,6 +22,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\CalonSantri;
+use Modules\PPDB\Services\PpdbApplicantAccountService;
+use Modules\PPDB\Services\PpdbWhatsappNotifier;
 
 class CalonSantriResource extends Resource
 {
@@ -199,6 +203,44 @@ class CalonSantriResource extends Resource
             ])
             ->actions([
                 EditAction::make(),
+                Action::make('kirimKredensial')
+                    ->label('Kirim Kredensial / Reset Password')
+                    ->icon('heroicon-o-key')
+                    ->color('warning')
+                    ->visible(fn (): bool => Auth::user()?->can('manage_santri') ?? false)
+                    ->modalHeading('Kirim Kredensial Portal via WhatsApp')
+                    ->modalDescription('Akun login peserta dibuat/di-reset & password baru dikirim via WhatsApp. Password lama (bila ada) langsung tidak berlaku.')
+                    ->modalSubmitActionLabel('Terbitkan & Kirim')
+                    ->form([
+                        TextInput::make('no_hp')
+                            ->label('Nomor WhatsApp Tujuan')
+                            ->tel()
+                            ->required()
+                            ->default(fn (CalonSantri $record): ?string => $record->no_hp_wali)
+                            ->helperText('Perbaiki nomor bila peserta salah input. Nomor ini juga menjadi username login portal.'),
+                    ])
+                    ->action(function (CalonSantri $record, array $data): void {
+                        $result = app(PpdbApplicantAccountService::class)
+                            ->issueOrResetCredentials($record, $data['no_hp']);
+
+                        $sent = app(PpdbWhatsappNotifier::class)->sendCredentials(
+                            $result['username'],
+                            $record->nama,
+                            $record->nomor_pendaftaran,
+                            $result['username'],
+                            $result['password'],
+                            $result['login_url'],
+                        );
+
+                        $notification = Notification::make()
+                            ->title($sent
+                                ? 'Kredensial terkirim via WhatsApp'
+                                : 'WA gagal terkirim — bacakan kredensial ke peserta')
+                            ->body("Username: {$result['username']}\nPassword: {$result['password']}")
+                            ->persistent();
+
+                        ($sent ? $notification->success() : $notification->warning())->send();
+                    }),
                 DeleteAction::make(),
             ]);
     }

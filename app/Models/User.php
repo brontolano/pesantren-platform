@@ -18,7 +18,7 @@ use Illuminate\Notifications\Notifiable;
 use Modules\Kesantrian\Models\Santri;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'tenant_id', 'email_authentication_enabled'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'must_reset_password', 'tenant_id', 'email_authentication_enabled'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements HasEmailAuthentication, FilamentUser
 {
@@ -35,6 +35,7 @@ class User extends Authenticatable implements HasEmailAuthentication, FilamentUs
         return [
             'email_verified_at' => 'datetime',
             'email_authentication_enabled' => 'boolean',
+            'must_reset_password' => 'boolean',
             'password' => 'hashed',
         ];
     }
@@ -46,8 +47,14 @@ class User extends Authenticatable implements HasEmailAuthentication, FilamentUs
             return $this->hasRole('super_admin') && $this->tenant_id === null;
         }
 
-        // Panel tenant — user harus terhubung ke sebuah tenant
-        return $this->tenant_id !== null;
+        if ($panel->getId() === 'portal') {
+            // Portal peserta PPDB — hanya akun calon santri ber-role `peserta`.
+            return $this->hasRole('peserta');
+        }
+
+        // Panel tenant (staf) — terhubung ke sebuah tenant DAN bukan akun eksternal.
+        // Peserta (PPDB) & wali memakai portalnya sendiri; tidak boleh masuk panel staf.
+        return $this->tenant_id !== null && ! $this->hasAnyRole(['peserta', 'wali']);
     }
 
     public function hasEmailAuthentication(): bool

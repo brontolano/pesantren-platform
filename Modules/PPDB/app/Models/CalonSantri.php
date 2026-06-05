@@ -2,6 +2,7 @@
 
 namespace Modules\PPDB\Models;
 
+use App\Models\User;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +19,7 @@ class CalonSantri extends Model
     protected $fillable = [
         'tenant_id',
         'santri_id',
+        'user_id',
         'nomor_pendaftaran',
         'tracking_token',
         'tracking_token_generated_at',
@@ -32,6 +34,8 @@ class CalonSantri extends Model
         'alamat',
         'asal_sekolah',
         'program_diminati',
+        'tahun_ajaran',
+        'gelombang',
         'status_pendaftaran',
         'catatan_keputusan',
         'tanggal_keputusan',
@@ -50,6 +54,12 @@ class CalonSantri extends Model
     public function santri(): BelongsTo
     {
         return $this->belongsTo(Santri::class, 'santri_id');
+    }
+
+    /** Akun peserta PWA (user role `peserta`) — penghubung F0.3. */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function dokumen(): HasMany
