@@ -20,12 +20,17 @@ Route::get('/caddy/ssl-check', function () {
     return response('ok');
 })->name('caddy.ssl-check');
 
-// Root: central landing (pesantren.online) atau website pesantren (tenant domain)
+// Root: central landing (pesantren.online) atau HUB APLIKASI tenant (domain sistem).
+// Domain sistem tenant (mis. pesantren.asy-syifaa.com) menampilkan launcher portal
+// login bergaya menu aplikasi (icon grid). Website publik = domain terpisah (asy-syifaa.com).
 Route::get('/', function () {
     if (in_array(request()->getHost(), config('tenancy.central_domains', []), true)) {
         return view('landing');
     }
-    return app(TenantWebsiteController::class)->home(request());
+
+    return view('tenant.launcher', [
+        'pesantren' => tenant()?->name ?? 'Portal Pesantren',
+    ]);
 })->name('home');
 
 // PPDB publik — hanya aktif di domain tenant (controller 404 di central)
