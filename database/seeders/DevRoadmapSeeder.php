@@ -118,9 +118,9 @@ class DevRoadmapSeeder extends Seeder
 
             // Fase 6 — Akun Santri & Wali (Aplikasi)
             ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Konversi LULUS → akun santri aktif + akun orang tua/wali',
-                'Saat calon LULUS & daftar ulang, akun peserta dikonversi otomatis: role peserta → santri (login aplikasi santri), DAN terbitkan/tautkan akun orang tua/wali (role `wali`, No. HP ortu) via pivot access_wali — satu wali bisa menaungi beberapa anak.',
-                'Konversi DATA calon → Santri sudah ada (PpdbReregistrationService). Upgrade ROLE peserta→santri + pembuatan akun wali otomatis belum ada.',
-                'todo', 'high', 0, 'M', 18],
+                'Saat calon LULUS & daftar ulang (Santri terbentuk): (1) akun calon (ber-No.HP wali) di-upgrade role peserta → WALI + ditautkan ke Santri via access_wali (is_primary); (2) dibuatkan akun SANTRI (role santri) untuk login aplikasi santri. Satu wali bisa menaungi beberapa anak.',
+                'SEDANG DIKERJAKAN (perencanaan). Konversi DATA calon→Santri sudah ada (PpdbReregistrationService); sisi AKUN (upgrade role + akun wali + akun santri) belum. Memperluas sistem akun peserta aktif (PesertaAccountService/PWA SPMB) — perlu selaras agar tak tabrakan. KEPUTUSAN PENDING: identitas login SANTRI (NIS+password sementara vs No.HP sendiri).',
+                'in_progress', 'high', 10, 'M', 18],
             ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Onboarding santri aktif tanpa akun: kredensial sementara sekali-pakai + install app',
                 'Santri aktif yang BELUM punya akun / No. HP terdaftar: admin kirim pemberitahuan via WhatsApp berisi akun + password sementara SEKALI PAKAI + tautan install aplikasi; paksa ganti password saat login pertama. Dukung per-santri maupun massal.',
                 'Belum ada. Santri lama (non-PPDB) belum punya jalur penerbitan akun + onboarding aplikasi.',
