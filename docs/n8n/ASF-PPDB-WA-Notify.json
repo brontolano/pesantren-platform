@@ -1,0 +1,66 @@
+{
+  "name": "ASF PPDB WA Notify (WAHA)",
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ppdb-wa",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f9d8fd0c-2d1d-499d-9972-cebce0a28ee1",
+      "name": "PPDB Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "asf-ppdb-wa-waha"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfunction trim(v) {\n  return String(v ?? '').trim();\n}\n\nfunction normalizePhone(v) {\n  const raw = trim(v).replace(/[^\\d+]/g, '');\n  if (!raw) return '';\n  const canonical = raw.startsWith('+62') ? `62${raw.slice(3)}` : raw;\n  return canonical.startsWith('0') ? `62${canonical.slice(1)}` : canonical;\n}\n\nreturn items.map((item) => {\n  // Webhook n8n (v2) membungkus body POST di item.json.body. Fallback ke root.\n  const payload = (item.json && item.json.body) ? item.json.body : (item.json || {});\n  // Generik: terima `to` (PpdbWhatsappNotifier) ATAU `target` (modul Notifikasi/WaGatewayService).\n  const to = normalizePhone(payload.to || payload.target);\n  const message = trim(payload.message);\n\n  if (!to) throw new Error('Payload invalid: field \"to\"/\"target\" wajib diisi.');\n  if (!message) throw new Error('Payload invalid: field \"message\" wajib diisi.');\n\n  return {\n    json: {\n      to,\n      chatId: `${to}@c.us`,\n      message,\n      eticket_no: trim(payload.eticket_no) || null,\n      student_name: trim(payload.student_name) || null,\n      template_code: trim(payload.template_code) || null,\n      source: trim(payload.source) || 'ppdb_register',\n      received_at: new Date().toISOString()\n    }\n  };\n});"
+      },
+      "id": "af4dc7e2-1dd9-49eb-82cd-8502c35c861e",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [272, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst endpointBase = String($env.N8N_WAHA_BASE_URL || 'http://waha:3000').trim().replace(/\\/+$/, '');\nconst endpoint = `${endpointBase}/api/sendText`;\nconst token = String($env.N8N_WAHA_API_KEY || '').trim();\nconst session = String($env.N8N_WAHA_SESSION || 'default').trim() || 'default';\n\nconst out = [];\nfor (const { json } of items) {\n  try {\n    const response = await this.helpers.httpRequest({\n      method: 'POST',\n      url: endpoint,\n      headers: token ? { 'X-Api-Key': token } : {},\n      body: { session, chatId: json.chatId, text: json.message },\n      json: true,\n      returnFullResponse: true,\n    });\n    const bodyStr = typeof response.body === 'string' ? response.body : JSON.stringify(response.body);\n    out.push({ json: { ...json, sent: true, provider: 'waha', reason: 'sent', gateway_status: response.statusCode, gateway_response: bodyStr ? bodyStr.slice(0, 500) : null } });\n  } catch (error) {\n    const status = error.statusCode || error.httpCode || 0;\n    out.push({ json: { ...json, sent: false, provider: 'waha', reason: status ? `http_${status}` : 'request_error', gateway_status: status, gateway_response: String(error?.message || error || 'unknown_error').slice(0, 500) } });\n  }\n}\n\nreturn out;"
+      },
+      "id": "d2a843eb-28e5-435d-9f1f-76eccda9916f",
+      "name": "Send WAHA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [544, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, provider: $json.provider, sent: $json.sent, reason: $json.reason, eticket_no: $json.eticket_no, student_name: $json.student_name, to: $json.to, chatId: $json.chatId } }}",
+        "options": {}
+      },
+      "id": "ce73db8a-3ee6-4b16-b0c7-773fad86384e",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [800, 0]
+    }
+  ],
+  "connections": {
+    "PPDB Webhook": {
+      "main": [[{ "node": "Validate Payload", "type": "main", "index": 0 }]]
+    },
+    "Validate Payload": {
+      "main": [[{ "node": "Send WAHA", "type": "main", "index": 0 }]]
+    },
+    "Send WAHA": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  }
+}
