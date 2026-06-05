@@ -29,6 +29,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'module' => \App\Http\Middleware\CheckModuleActive::class,
         ]);
+
+        // API publik (lintas-origin dari website tenant) — stateless, dilindungi CORS.
+        $middleware->validateCsrfTokens(except: [
+            'api/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

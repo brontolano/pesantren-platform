@@ -7,7 +7,7 @@ return [
      */
     'paths' => ['api/*'],
 
-    'allowed_methods' => ['GET', 'OPTIONS'],
+    'allowed_methods' => ['GET', 'POST', 'OPTIONS'],
 
     'allowed_origins' => [
         'https://asy-syifaa.com',
