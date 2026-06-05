@@ -27,6 +27,8 @@ use Modules\Keuangan\Services\PembayaranService;
 
 class PembayaranResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = Pembayaran::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
@@ -43,12 +45,12 @@ class PembayaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false;
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false;
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
     }
 
     public static function canCreate(): bool

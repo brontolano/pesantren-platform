@@ -11,6 +11,8 @@ use Modules\Keuangan\Models\Tagihan;
 
 class LaporanKeuanganResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = Tagihan::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-chart-bar';
@@ -29,12 +31,12 @@ class LaporanKeuanganResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false;
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false;
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
     }
 
     public static function canCreate(): bool

@@ -20,6 +20,8 @@ use Modules\CMS\Models\WebsiteSection;
 
 class ProfileResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = WebsiteSection::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
@@ -36,12 +38,12 @@ class ProfileResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('cms') && (static::canAccess());
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('manage_tenant_settings') ?? false;
+        return static::moduleVisible('cms') && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public static function canViewAny(): bool

@@ -25,6 +25,8 @@ use Modules\CMS\Models\Gallery;
 
 class GalleryResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = Gallery::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-photo';
@@ -41,12 +43,12 @@ class GalleryResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false;
+        return static::moduleVisible('cms') && (auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false;
+        return static::moduleVisible('cms') && (auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false);
     }
 
     public static function canCreate(): bool

@@ -21,6 +21,8 @@ use Modules\PPDB\Models\CalonSantriDokumen;
 
 class CalonSantriDokumenResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = CalonSantriDokumen::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-folder-open';
@@ -39,12 +41,12 @@ class CalonSantriDokumenResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('ppdb') && (static::canAccess());
     }
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function canCreate(): bool

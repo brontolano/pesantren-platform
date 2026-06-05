@@ -22,6 +22,8 @@ use Modules\Notifikasi\Services\BroadcastWaService;
 
 class BroadcastWaResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = BroadcastWa::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
@@ -38,12 +40,12 @@ class BroadcastWaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false;
+        return static::moduleVisible('notifikasi') && (auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false;
+        return static::moduleVisible('notifikasi') && (auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false);
     }
 
     public static function canCreate(): bool

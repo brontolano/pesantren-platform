@@ -22,6 +22,8 @@ use Modules\Notifikasi\Models\TemplateNotifikasi;
 
 class TemplateNotifikasiResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = TemplateNotifikasi::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
@@ -38,12 +40,12 @@ class TemplateNotifikasiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false;
+        return static::moduleVisible('notifikasi') && (auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false;
+        return static::moduleVisible('notifikasi') && (auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false);
     }
 
     public static function canCreate(): bool

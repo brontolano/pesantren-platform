@@ -22,6 +22,8 @@ use Modules\PPDB\Models\HasilUjian;
 
 class HasilUjianResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = HasilUjian::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
@@ -40,12 +42,12 @@ class HasilUjianResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('ppdb') && (static::canAccess());
     }
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function canCreate(): bool

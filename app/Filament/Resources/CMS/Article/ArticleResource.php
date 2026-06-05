@@ -27,6 +27,8 @@ use Modules\CMS\Models\Article;
 
 class ArticleResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = Article::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-newspaper';
@@ -43,12 +45,12 @@ class ArticleResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false;
+        return static::moduleVisible('cms') && (auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false;
+        return static::moduleVisible('cms') && (auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false);
     }
 
     public static function canCreate(): bool

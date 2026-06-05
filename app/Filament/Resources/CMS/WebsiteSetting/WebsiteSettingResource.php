@@ -13,6 +13,8 @@ use Modules\CMS\Models\WebsiteSetting;
 
 class WebsiteSettingResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = WebsiteSetting::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
@@ -29,12 +31,12 @@ class WebsiteSettingResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->can('manage_tenant_settings') ?? false;
+        return static::moduleVisible('cms') && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('manage_tenant_settings') ?? false;
+        return static::moduleVisible('cms') && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public static function canCreate(): bool
