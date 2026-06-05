@@ -24,6 +24,17 @@ www.asy-syifaa.com {
 	redir https://asy-syifaa.com{uri} permanent
 }
 
+# ── Automasi (n8n + WAHA), dilayani container terpisah ──
+n8n.asy-syifaa.com {
+	encode zstd br gzip
+	reverse_proxy n8n:5678
+}
+
+waha.asy-syifaa.com {
+	encode zstd br gzip
+	reverse_proxy waha:3000
+}
+
 # Redirect HTTP → HTTPS untuk domain website (host-match menang atas catch-all :80)
 http://asy-syifaa.com, http://www.asy-syifaa.com {
 	redir https://asy-syifaa.com{uri} permanent

@@ -88,12 +88,57 @@ services:
     networks:
       - internal
 
+  # ── Automasi: n8n (workflow) + WAHA (WhatsApp HTTP API) ──
+  # UI: n8n.asy-syifaa.com / waha.asy-syifaa.com (Caddyfile). Internal:
+  # platform → http://n8n:5678/webhook/ppdb-wa ; n8n → http://waha:3000
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      - N8N_HOST=n8n.asy-syifaa.com
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      - N8N_LISTEN_ADDRESS=0.0.0.0
+      - WEBHOOK_URL=https://n8n.asy-syifaa.com/
+      - N8N_EDITOR_BASE_URL=https://n8n.asy-syifaa.com/
+      - N8N_PROXY_HOPS=1
+      - N8N_RUNNERS_ENABLED=true
+      - GENERIC_TIMEZONE=Asia/Jakarta
+      - TZ=Asia/Jakarta
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_WAHA_BASE_URL=http://waha:3000
+      - N8N_WAHA_API_KEY=${WAHA_API_KEY}
+      - N8N_WAHA_SESSION=default
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - internal
+
+  waha:
+    image: devlikeapro/waha:latest
+    container_name: waha
+    restart: unless-stopped
+    environment:
+      - WHATSAPP_API_KEY=${WAHA_API_KEY}
+      - WAHA_DASHBOARD_USERNAME=${WAHA_DASHBOARD_USERNAME}
+      - WAHA_DASHBOARD_PASSWORD=${WAHA_DASHBOARD_PASSWORD}
+      - WHATSAPP_DEFAULT_ENGINE=WEBJS
+      - WHATSAPP_RESTART_ALL_SESSIONS=true
+      - TZ=Asia/Jakarta
+    volumes:
+      - waha_sessions:/app/.sessions
+    networks:
+      - internal
+
 volumes:
   postgres_data:
   redis_data:
   app_storage:
   caddy_data:
   caddy_config:
+  n8n_data:
+  waha_sessions:
 
 networks:
   internal:
