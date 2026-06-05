@@ -139,7 +139,7 @@ class DevRoadmapSeeder extends Seeder
             ['slug' => 'integrasi-website-api'],
             [
                 'name' => 'Integrasi Website / API',
-                'description' => 'Integrasi website pesantren (WordPress/custom, dikelola Hamdan atau pesantren) dengan modul platform via 3 pola: subdomain delegation, embed (iframe/widget), dan API (REST+Sanctum). Tenant-scoped & terisolasi.',
+                'description' => 'Integrasi website pesantren (WordPress/custom, dikelola Hamdan atau pesantren) dengan modul platform via 3 pola: subdomain delegation, embed (iframe/widget), dan API (REST+Sanctum). Tenant-scoped & terisolasi. Kontrak API website Asy-Syifaa terdokumentasi di docs/SPEC-API-WEBSITE-ASY-SYIFAA.md.',
                 'status' => 'planning',
                 'color' => 'warning',
                 'icon' => 'heroicon-o-globe-alt',
@@ -196,10 +196,20 @@ class DevRoadmapSeeder extends Seeder
                 'Plugin siap-pasang untuk pesantren yang pakai WordPress.',
                 'Belum ada.',
                 'todo', 'low', 0, 'L', 10],
-            ['Fase D — Distribusi & Uji Coba', 'Uji coba dengan client pertama (situs dikelola Hamdan)',
-                'POC pola A: arahkan ppdb./portal.<domain-client> ke platform, verifikasi SSL + isolasi.',
-                'Ada client menunggu — kandidat uji coba pertama.',
-                'todo', 'high', 0, 'M', 11],
+            ['Fase D — Distribusi & Uji Coba', 'Uji coba dengan client pertama: Asy-Syifaa',
+                'Situs PHP custom asy-syifaa.com (thin-client) diintegrasikan ke API platform via pola C.',
+                'Sistem tenant asy-syifaa SUDAH LIVE (pesantren.asy-syifaa.com + fallback). Tinggal bangun API + repoint website.',
+                'in_progress', 'high', 20, 'M', 11],
+
+            // Kontrak konkret dari studi website asy-syifaa (lihat docs/SPEC-API-WEBSITE-ASY-SYIFAA.md)
+            ['Fase C — API Publik (headless)', 'API #1: POST /api/v1/spmb/register (kontrak website asy-syifaa)',
+                'Endpoint pendaftaran sesuai kontrak; balas eticket_no + registration_number + username (= PPDB v2 Fase 1).',
+                'Website sudah memanggil endpoint ini & mengharapkan e-tiket+username. Belum ada di platform.',
+                'todo', 'high', 0, 'M', 12],
+            ['Fase D — Distribusi & Uji Coba', 'Repoint api.asy-syifaa.com → API platform + tes end-to-end',
+                'Arahkan base URL website ke API platform (resolusi tenant by-domain), uji semua halaman dinamis.',
+                'DNS api.asy-syifaa.com sudah ke VPS. Menunggu endpoint platform siap.',
+                'todo', 'high', 0, 'M', 13],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
