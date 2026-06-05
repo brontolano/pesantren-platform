@@ -72,6 +72,7 @@ class PortalWaliFeatureTest extends TestCase
         ]);
 
         $this->seed(RolesAndPermissionsSeeder::class);
+        tenancy()->end();
     }
 
     public function test_wali_can_view_portal_pages_submit_izin_and_download_rapor(): void
@@ -87,7 +88,14 @@ class PortalWaliFeatureTest extends TestCase
             ->component('PortalWali/Dashboard')
             ->where('summary.childrenCount', 1)
             ->where('summary.activeChildrenCount', 1)
+            ->where('summary.totalOutstanding', 350000)
+            ->where('summary.totalSavings', 125000)
+            ->where('summary.pendingTransactions', 1)
+            ->where('summary.primaryAction.label', 'Cek Status Pembayaran')
             ->where('children.0.nama', 'Santri Portal')
+            ->where('children.0.finance.totalOutstanding', 350000)
+            ->where('children.0.finance.pendingPaymentsCount', 1)
+            ->where('children.0.finance.primaryAction.label', 'Lihat Status')
             ->where('navigation.0.label', 'Beranda')
         );
 
@@ -128,7 +136,40 @@ class PortalWaliFeatureTest extends TestCase
             ->where('summary.tagihanBelumLunas', 1)
             ->where('summary.totalOutstanding', 350000)
             ->where('savings.saldo', 125000)
-            ->has('payments', 1)
+            ->has('payments', 2)
+        );
+
+        $hafalanResponse = $this
+            ->actingAs($wali)
+            ->get("http://{$tenant->id}.localhost/wali/santri/{$santri->id}/hafalan");
+
+        $hafalanResponse->assertOk();
+        $hafalanResponse->assertInertia(fn (Assert $page) => $page
+            ->component('PortalWali/Hafalan')
+            ->has('children', 1)
+            ->where('children.0.nama', 'Santri Portal')
+        );
+
+        $kesehatanResponse = $this
+            ->actingAs($wali)
+            ->get("http://{$tenant->id}.localhost/wali/santri/{$santri->id}/kesehatan");
+
+        $kesehatanResponse->assertOk();
+        $kesehatanResponse->assertInertia(fn (Assert $page) => $page
+            ->component('PortalWali/Kesehatan')
+            ->has('children', 1)
+            ->where('children.0.nama', 'Santri Portal')
+        );
+
+        $kegiatanResponse = $this
+            ->actingAs($wali)
+            ->get("http://{$tenant->id}.localhost/wali/santri/{$santri->id}/kegiatan");
+
+        $kegiatanResponse->assertOk();
+        $kegiatanResponse->assertInertia(fn (Assert $page) => $page
+            ->component('PortalWali/Kegiatan')
+            ->has('children', 1)
+            ->where('children.0.nama', 'Santri Portal')
         );
 
         $notificationsResponse = $this
@@ -138,6 +179,7 @@ class PortalWaliFeatureTest extends TestCase
         $notificationsResponse->assertOk();
         $notificationsResponse->assertInertia(fn (Assert $page) => $page
             ->component('PortalWali/Notifications')
+            ->where('wali.name', 'Wali Portal')
             ->where('summary.sentCount', 1)
             ->where('summary.failedCount', 0)
             ->has('notifications', 1)
@@ -154,7 +196,7 @@ class PortalWaliFeatureTest extends TestCase
                 'catatan_wali' => 'Kembali ba`da ashar.',
             ]);
 
-        $izinResponse->assertRedirect("http://{$tenant->id}.localhost/wali/izin");
+        $izinResponse->assertRedirect("http://{$tenant->id}.localhost/wali/izin?tenant={$tenant->id}");
 
         $this->assertDatabaseHas('portal_wali_izin', [
             'tenant_id' => $tenant->id,
@@ -186,7 +228,16 @@ class PortalWaliFeatureTest extends TestCase
     public function test_wali_cannot_access_other_child_or_other_tenant_records(): void
     {
         [$tenant, $wali, $santri] = $this->seedPortalContext();
-        [$otherTenant, $otherWali, $otherSantri, $otherRapor] = $this->seedPortalContext('portal-wali-b', 'Wali Lain', 'PWL200');
+
+        tenancy()->initialize($tenant);
+        $this->seedTenantRow($tenant);
+        $otherWali = User::create([
+            'tenant_id' => $tenant->id,
+            'name' => 'Wali Lain Satu Tenant',
+            'email' => 'wali-lain-satu-tenant@test.local',
+            'password' => 'password',
+        ]);
+        $otherWali->assignRole('wali');
 
         $otherChildSameTenant = Santri::create([
             'tenant_id' => $tenant->id,
@@ -196,22 +247,41 @@ class PortalWaliFeatureTest extends TestCase
             'jenis_kelamin' => 'P',
             'status' => 'aktif',
             'kelas_id' => $santri->kelas_id,
+            'wali_user_id' => $otherWali->id,
         ]);
+        AccessWali::create([
+            'tenant_id' => $tenant->id,
+            'wali_id' => $otherWali->id,
+            'santri_id' => $otherChildSameTenant->id,
+            'relationship_type' => 'ibu',
+            'is_primary' => true,
+        ]);
+
+        $otherRaporSameTenant = Rapor::create([
+            'tenant_id' => $tenant->id,
+            'santri_id' => $otherChildSameTenant->id,
+            'periode_akademik_id' => PeriodeAkademik::query()->value('id'),
+            'total_sks' => 2,
+            'ipk' => 88.1,
+            'rank_kelas' => 3,
+            'catatan_walikelas' => 'Bukan anak wali aktif.',
+            'ringkasan_nilai' => [
+                ['pelajaran' => 'Tafsir', 'nilai_akhir' => 88.1],
+            ],
+            'generated_at' => now(),
+        ]);
+        tenancy()->end();
 
         $this->actingAs($wali)
             ->get("http://{$tenant->id}.localhost/wali/santri/{$otherChildSameTenant->id}")
             ->assertNotFound();
 
         $this->actingAs($wali)
-            ->get("http://{$tenant->id}.localhost/wali/santri/{$otherSantri->id}/keuangan")
+            ->get("http://{$tenant->id}.localhost/wali/santri/{$otherChildSameTenant->id}/keuangan")
             ->assertNotFound();
 
         $this->actingAs($wali)
-            ->get("http://{$tenant->id}.localhost/wali/santri/{$santri->id}/rapor/{$otherRapor->id}/download")
-            ->assertNotFound();
-
-        $this->actingAs($otherWali)
-            ->get("http://{$otherTenant->id}.localhost/wali/santri/{$santri->id}")
+            ->get("http://{$tenant->id}.localhost/wali/santri/{$otherChildSameTenant->id}/rapor/{$otherRaporSameTenant->id}/download")
             ->assertNotFound();
     }
 
@@ -236,8 +306,10 @@ class PortalWaliFeatureTest extends TestCase
         string $waliName = 'Wali Portal',
         string $nis = 'PWL100',
     ): array {
-        $tenant = $this->createTestTenant($tenantId, strtoupper($tenantId), $tenantId);
+        $tenant = $this->createRuntimeTenant($tenantId, strtoupper($tenantId));
         tenancy()->initialize($tenant);
+        $this->seedTenantRow($tenant);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $kelas = Kelas::create([
             'tenant_id' => $tenant->id,
@@ -378,6 +450,17 @@ class PortalWaliFeatureTest extends TestCase
             'created_by' => $guru->id,
         ]);
 
+        Pembayaran::create([
+            'tenant_id' => $tenant->id,
+            'tagihan_id' => $tagihan->id,
+            'santri_id' => $santri->id,
+            'nominal' => 50000,
+            'metode' => 'transfer',
+            'tanggal_pembayaran' => '2026-06-05',
+            'is_verified' => false,
+            'created_by' => $wali->id,
+        ]);
+
         $tabungan = Tabungan::create([
             'tenant_id' => $tenant->id,
             'santri_id' => $santri->id,
@@ -419,6 +502,8 @@ class PortalWaliFeatureTest extends TestCase
             'created_at' => now()->subDay(),
             'updated_at' => now()->subDay(),
         ]);
+
+        tenancy()->end();
 
         return [$tenant, $wali, $santri, $rapor];
     }

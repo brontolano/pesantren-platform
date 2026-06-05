@@ -3,6 +3,7 @@
 namespace Tests\Concerns;
 
 use App\Models\Tenant;
+use App\Services\TenantProvisioner;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
@@ -37,6 +38,7 @@ trait InteractsWithPpdbTestDatabase
         Config::set('database.connections.pgsql.database', 'pesantren_platform_test');
         Config::set('database.connections.pgsql.username', 'postgres');
         Config::set('database.connections.pgsql.password', 'secret');
+        Config::set('database.connections.tenant', Config::get('database.connections.pgsql'));
     }
 
     /**
@@ -100,5 +102,67 @@ trait InteractsWithPpdbTestDatabase
         }
 
         return Tenant::query()->findOrFail($id);
+    }
+
+    protected function createRuntimeTenant(string $prefix, string $name, ?string $domain = null): Tenant
+    {
+        $id = sprintf('%s-%s', $prefix, str()->lower(str()->random(6)));
+
+        $tenant = Tenant::create([
+            'id' => $id,
+            'name' => $name,
+            'is_active' => true,
+        ]);
+
+        $tenant->domains()->create([
+            'domain' => $domain ?? "{$id}.localhost",
+        ]);
+
+        return $tenant;
+    }
+
+    protected function seedTenantRow(Tenant $tenant): void
+    {
+        DB::connection('tenant')->table('tenants')->updateOrInsert(
+            ['id' => $tenant->id],
+            [
+                'name' => $tenant->name,
+                'is_active' => $tenant->is_active,
+                'data' => json_encode([]),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        );
+    }
+
+    protected function createProvisionedTenant(string $id, string $name, string $domain): Tenant
+    {
+        $this->configurePpdbTestingDatabase();
+
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            tenancy()->end();
+        }
+
+        Config::set('database.default', 'pgsql');
+        DB::setDefaultConnection('pgsql');
+
+        $tenant = Tenant::create([
+            'id' => $id,
+            'name' => $name,
+            'is_active' => true,
+        ]);
+
+        $tenant->domains()->create(['domain' => $id]);
+        $tenant->domains()->create(['domain' => $domain]);
+        app(TenantProvisioner::class)->provision($tenant);
+
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            tenancy()->end();
+        }
+
+        Config::set('database.default', 'pgsql');
+        DB::setDefaultConnection('pgsql');
+
+        return $tenant->fresh();
     }
 }

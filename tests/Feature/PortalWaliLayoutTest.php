@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Schema;
 use Inertia\Testing\AssertableInertia as Assert;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Models\Pembayaran;
+use Modules\Keuangan\Models\Tabungan;
+use Modules\Keuangan\Models\Tagihan;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -52,12 +55,15 @@ class PortalWaliLayoutTest extends TestCase
         ]);
 
         $this->seed(RolesAndPermissionsSeeder::class);
+        tenancy()->end();
     }
 
     public function test_wali_dashboard_uses_inertia_mobile_layout_payload(): void
     {
-        $tenant = $this->createTestTenant('portal-wali-layout', 'Portal Wali Layout', 'portal-wali-layout');
+        $tenant = $this->createRuntimeTenant('portal-wali-layout', 'Portal Wali Layout');
         tenancy()->initialize($tenant);
+        $this->seedTenantRow($tenant);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $kelas = Kelas::create([
             'tenant_id' => $tenant->id,
@@ -93,9 +99,41 @@ class PortalWaliLayoutTest extends TestCase
             'is_primary' => true,
         ]);
 
+        $tagihan = Tagihan::create([
+            'tenant_id' => $tenant->id,
+            'santri_id' => $santri->id,
+            'jenis_tagihan' => 'SPP',
+            'keterangan' => 'SPP Juli 2026',
+            'nominal' => 450000,
+            'diskon' => 0,
+            'nominal_akhir' => 450000,
+            'jatuh_tempo' => '2026-07-10',
+            'status' => 'belum_bayar',
+            'created_by' => $wali->id,
+        ]);
+
+        Pembayaran::create([
+            'tenant_id' => $tenant->id,
+            'tagihan_id' => $tagihan->id,
+            'santri_id' => $santri->id,
+            'nominal' => 100000,
+            'metode' => 'transfer',
+            'tanggal_pembayaran' => '2026-07-02',
+            'is_verified' => false,
+            'created_by' => $wali->id,
+        ]);
+
+        Tabungan::create([
+            'tenant_id' => $tenant->id,
+            'santri_id' => $santri->id,
+            'saldo' => 80000,
+        ]);
+
+        tenancy()->end();
+
         $response = $this
             ->actingAs($wali)
-            ->get('http://portal-wali-layout.localhost/wali');
+            ->get("http://{$tenant->id}.localhost/wali");
 
         $response->assertOk();
         $response->assertInertia(fn (Assert $page) => $page
@@ -103,11 +141,23 @@ class PortalWaliLayoutTest extends TestCase
             ->where('wali.name', 'Wali Layout')
             ->where('summary.childrenCount', 1)
             ->where('summary.activeChildrenCount', 1)
+            ->where('summary.totalOutstanding', 450000)
+            ->where('summary.totalSavings', 80000)
+            ->where('summary.pendingTransactions', 1)
+            ->has('navigation', 5)
+            ->where('navigation.0.label', 'Beranda')
+            ->where('navigation.1.label', 'Tagihan')
+            ->where('navigation.2.label', 'Tabungan')
+            ->where('navigation.3.label', 'Anak')
+            ->where('navigation.4.label', 'Akun')
             ->has('children', 1)
             ->where('children.0.nama', 'Santri Layout')
             ->where('children.0.kelas.nama', 'VIII-B')
             ->where('children.0.hubungan', 'ayah')
             ->where('children.0.isPrimary', true)
+            ->where('children.0.finance.totalOutstanding', 450000)
+            ->where('children.0.finance.savingsBalance', 80000)
+            ->where('children.0.finance.pendingPaymentsCount', 1)
         );
     }
 }

@@ -21,6 +21,7 @@ class PortalWaliHafalanController extends Controller
 
         return Inertia::render('PortalWali/Hafalan', [
             'wali' => ['id' => $wali->id, 'name' => $wali->name],
+            'children' => $dashboard['children'],
             'santri' => [
                 'id'   => $child->id,
                 'nama' => $child->nama,

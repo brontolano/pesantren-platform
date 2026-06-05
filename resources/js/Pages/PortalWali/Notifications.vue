@@ -7,6 +7,10 @@ defineOptions({
 })
 
 defineProps({
+    wali: {
+        type: Object,
+        required: true,
+    },
     notifications: {
         type: Array,
         default: () => [],
@@ -21,18 +25,18 @@ defineProps({
 <template>
     <div class="space-y-5">
         <Head>
-            <title>Notifikasi Wali</title>
+            <title>Akun Wali</title>
         </Head>
 
         <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
-                Notifikasi
+                Akun Wali
             </p>
             <h2 class="mt-3 font-serif text-3xl leading-tight">
-                Pusat Informasi
+                {{ wali.name }}
             </h2>
             <p class="mt-2 text-sm leading-6 text-white/75">
-                Ringkasan pesan email dan WA untuk wali.
+                {{ wali.email || 'Notifikasi penting dan status akun wali.' }}
             </p>
         </section>
 

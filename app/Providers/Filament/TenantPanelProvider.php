@@ -32,7 +32,6 @@ use App\Filament\Resources\Pembayaran\PembayaranResource;
 use App\Filament\Resources\PenempatanKelas\PenempatanKelasResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Santri\SantriResource;
-use App\Filament\Resources\Settings\SettingResource;
 use App\Filament\Resources\Tabungan\TabunganResource;
 use App\Filament\Resources\Tagihan\TagihanResource;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource;
@@ -77,7 +76,6 @@ class TenantPanelProvider extends PanelProvider
                 // Core tenant
                 UserResource::class,
                 RoleResource::class,
-                SettingResource::class,
                 // Kesantrian
                 SantriResource::class,
                 KelasResource::class,

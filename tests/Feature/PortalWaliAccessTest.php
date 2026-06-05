@@ -50,14 +50,17 @@ class PortalWaliAccessTest extends TestCase
         ]);
 
         $this->seed(RolesAndPermissionsSeeder::class);
+        tenancy()->end();
     }
 
     public function test_access_wali_relation_only_returns_children_in_same_tenant(): void
     {
-        $tenantA = $this->createTestTenant('wali-a', 'Wali A', 'wali-a');
-        $tenantB = $this->createTestTenant('wali-b', 'Wali B', 'wali-b');
+        $tenantA = $this->createRuntimeTenant('wali-a', 'Wali A');
+        $tenantB = $this->createRuntimeTenant('wali-b', 'Wali B');
 
         tenancy()->initialize($tenantA);
+        $this->seedTenantRow($tenantA);
+        $this->seed(RolesAndPermissionsSeeder::class);
         $kelasA = Kelas::create([
             'tenant_id' => $tenantA->id,
             'nama_kelas' => 'VII-A',
@@ -91,6 +94,8 @@ class PortalWaliAccessTest extends TestCase
         tenancy()->end();
 
         tenancy()->initialize($tenantB);
+        $this->seedTenantRow($tenantB);
+        $this->seed(RolesAndPermissionsSeeder::class);
         $kelasB = Kelas::create([
             'tenant_id' => $tenantB->id,
             'nama_kelas' => 'VII-B',

@@ -21,6 +21,7 @@ class PortalWaliKegiatanController extends Controller
 
         return Inertia::render('PortalWali/Kegiatan', [
             'wali'       => ['id' => $wali->id, 'name' => $wali->name],
+            'children'   => $dashboard['children'],
             'santri'     => ['id' => $child->id, 'nama' => $child->nama, 'nis' => $child->nis],
             'navigation' => $this->navigationItems($dashboard['children'], $child->id),
             ...$portalWaliService->getKegiatanPayload($child),

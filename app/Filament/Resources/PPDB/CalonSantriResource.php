@@ -22,8 +22,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\CalonSantri;
-use Modules\PPDB\Services\PpdbApplicantAccountService;
-use Modules\PPDB\Services\PpdbWhatsappNotifier;
+use Modules\PPDB\Models\UserOtp;
+use Modules\PPDB\Services\PesertaAccountService;
 
 class CalonSantriResource extends Resource
 {
@@ -203,43 +203,38 @@ class CalonSantriResource extends Resource
             ])
             ->actions([
                 EditAction::make(),
-                Action::make('kirimKredensial')
-                    ->label('Kirim Kredensial / Reset Password')
+                // F1.1.7 — re-issue OTP & koreksi nomor WA (mitigasi R-1, R-2).
+                // Menggantikan aksi legacy "Kirim Kredensial": password TIDAK
+                // pernah dikirim — peserta membuat password sendiri via OTP.
+                Action::make('kirimUlangOtp')
+                    ->label('Kirim Ulang OTP / Koreksi No. WA')
                     ->icon('heroicon-o-key')
                     ->color('warning')
                     ->visible(fn (): bool => Auth::user()?->can('manage_santri') ?? false)
-                    ->modalHeading('Kirim Kredensial Portal via WhatsApp')
-                    ->modalDescription('Akun login peserta dibuat/di-reset & password baru dikirim via WhatsApp. Password lama (bila ada) langsung tidak berlaku.')
-                    ->modalSubmitActionLabel('Terbitkan & Kirim')
+                    ->modalHeading('Kirim Ulang Kode OTP Portal SPMB')
+                    ->modalDescription('Untuk peserta yang tidak menerima kode atau salah menulis nomor WA. Perbaiki nomor bila perlu — kode OTP baru dikirim ke nomor di bawah dan blokir percobaan sebelumnya dibuka. Password TIDAK ikut terkirim; peserta membuat password sendiri saat memakai kode.')
+                    ->modalSubmitActionLabel('Simpan Nomor & Kirim OTP')
                     ->form([
                         TextInput::make('no_hp')
-                            ->label('Nomor WhatsApp Tujuan')
+                            ->label('Nomor WhatsApp Wali')
                             ->tel()
                             ->required()
                             ->default(fn (CalonSantri $record): ?string => $record->no_hp_wali)
-                            ->helperText('Perbaiki nomor bila peserta salah input. Nomor ini juga menjadi username login portal.'),
+                            ->helperText('Periksa baik-baik — nomor ini tersimpan ke data pendaftaran dan menjadi salah satu cara login peserta.'),
                     ])
                     ->action(function (CalonSantri $record, array $data): void {
-                        $result = app(PpdbApplicantAccountService::class)
-                            ->issueOrResetCredentials($record, $data['no_hp']);
+                        $result = app(PesertaAccountService::class)
+                            ->reissueOtpByStaff($record, $data['no_hp'], Auth::user());
 
-                        $sent = app(PpdbWhatsappNotifier::class)->sendCredentials(
-                            $result['username'],
-                            $record->nama,
-                            $record->nomor_pendaftaran,
-                            $result['username'],
-                            $result['password'],
-                            $result['login_url'],
-                        );
+                        $tujuan = $result['purpose'] === UserOtp::PURPOSE_AKTIVASI
+                            ? 'AKTIVASI akun (peserta membuat password baru)'
+                            : 'RESET password (akun sudah pernah aktif)';
 
-                        $notification = Notification::make()
-                            ->title($sent
-                                ? 'Kredensial terkirim via WhatsApp'
-                                : 'WA gagal terkirim — bacakan kredensial ke peserta')
-                            ->body("Username: {$result['username']}\nPassword: {$result['password']}")
-                            ->persistent();
-
-                        ($sent ? $notification->success() : $notification->warning())->send();
+                        Notification::make()
+                            ->title('Kode OTP terkirim')
+                            ->body("Kode {$tujuan} dikirim via WhatsApp ke {$result['phone']}. Berlaku ".UserOtp::TTL_MINUTES.' menit.')
+                            ->success()
+                            ->send();
                     }),
                 DeleteAction::make(),
             ]);

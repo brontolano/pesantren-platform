@@ -48,8 +48,11 @@ class User extends Authenticatable implements HasEmailAuthentication, FilamentUs
         }
 
         if ($panel->getId() === 'portal') {
-            // Portal peserta PPDB — hanya akun calon santri ber-role `peserta`.
-            return $this->hasRole('peserta');
+            // DITUTUP (F1.1.6, PRD PWA Peserta §11): portal peserta resmi kini
+            // PWA Inertia di /spmb — role `peserta` ditolak dari SEMUA panel
+            // Filament tanpa kecuali. Panel `portal` legacy menjadi inert dan
+            // dijadwalkan dihapus saat pengerasan F4 (keputusan Hamdan).
+            return false;
         }
 
         // Panel tenant (staf) — terhubung ke sebuah tenant DAN bukan akun eksternal.

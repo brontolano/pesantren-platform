@@ -48,7 +48,7 @@ defineProps({
             </p>
         </section>
 
-        <section class="grid grid-cols-2 gap-3">
+        <section id="tabungan" class="grid scroll-mt-36 grid-cols-2 gap-3">
             <div class="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
                 <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
                     Outstanding
@@ -67,7 +67,7 @@ defineProps({
             </div>
         </section>
 
-        <section class="space-y-3">
+        <section id="tagihan" class="space-y-3 scroll-mt-36">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
                     Tagihan

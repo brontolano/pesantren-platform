@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
 
 defineOptions({
@@ -27,41 +28,115 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
     month: 'long',
     year: 'numeric',
 }).format(new Date())
+
+const currencyFormatter = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0,
+})
+
+const totalOutstandingLabel = computed(() => currencyFormatter.format(props.summary.totalOutstanding || 0))
+const totalSavingsLabel = computed(() => currencyFormatter.format(props.summary.totalSavings || 0))
+const nextDueAmountLabel = computed(() => currencyFormatter.format(props.summary.nextDueBill?.amount || 0))
+
+function formatCurrency(value) {
+    return currencyFormatter.format(value || 0)
+}
+
+function resolveActionClass(tone) {
+    if (tone === 'emerald') {
+        return 'bg-emerald-600 text-white'
+    }
+
+    if (tone === 'amber') {
+        return 'bg-amber-500 text-slate-950'
+    }
+
+    return 'bg-slate-900 text-white'
+}
 </script>
 
 <template>
     <div class="space-y-5">
         <Head>
-            <title>Dashboard Wali</title>
+            <title>Beranda Wali</title>
         </Head>
 
         <section class="overflow-hidden rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
-                Assalamu alaikum
+                Keuangan Wali
             </p>
             <h2 class="mt-3 font-serif text-3xl leading-tight">
-                {{ wali.name }}
+                Ringkasan yang perlu dibereskan hari ini
             </h2>
             <p class="mt-2 text-sm leading-6 text-white/75">
-                {{ todayLabel }}
+                {{ todayLabel }} · Total kewajiban, saldo, dan status transaksi semua anak tampil di satu layar.
             </p>
 
             <div class="mt-5 grid grid-cols-2 gap-3">
                 <div class="rounded-[1.5rem] bg-white/8 px-4 py-4">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/55">
-                        Anak Terhubung
+                        Total Tunggakan
                     </p>
                     <p class="mt-2 text-2xl font-semibold">
-                        {{ summary.childrenCount }}
+                        {{ totalOutstandingLabel }}
                     </p>
                 </div>
                 <div class="rounded-[1.5rem] bg-white/8 px-4 py-4">
                     <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/55">
-                        Status Aktif
+                        Saldo Tabungan
                     </p>
                     <p class="mt-2 text-2xl font-semibold">
-                        {{ summary.activeChildrenCount }}
+                        {{ totalSavingsLabel }}
                     </p>
+                </div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-3 text-sm text-white/72">
+                <div class="rounded-[1.35rem] border border-white/10 bg-white/8 px-4 py-3">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
+                        Menunggu Verifikasi
+                    </p>
+                    <p class="mt-2 text-xl font-semibold text-white">
+                        {{ summary.pendingTransactions }}
+                    </p>
+                </div>
+                <div class="rounded-[1.35rem] border border-white/10 bg-white/8 px-4 py-3">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50">
+                        Anak Perlu Ditindak
+                    </p>
+                    <p class="mt-2 text-xl font-semibold text-white">
+                        {{ summary.childrenNeedingAttention }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-4 rounded-[1.5rem] border border-amber-300/20 bg-amber-300/10 px-4 py-4">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-200/80">
+                            Langkah Utama
+                        </p>
+                        <h3 class="mt-2 font-serif text-2xl text-white">
+                            {{ summary.primaryAction?.label || 'Pantau Keuangan Anak' }}
+                        </h3>
+                        <p class="mt-2 text-sm leading-6 text-white/75">
+                            <template v-if="summary.nextDueBill">
+                                Tagihan terdekat {{ summary.nextDueBill.label }} jatuh tempo dengan sisa {{ nextDueAmountLabel }}.
+                            </template>
+                            <template v-else>
+                                Semua anak yang terhubung sudah tampil di beranda ini.
+                            </template>
+                        </p>
+                    </div>
+                    <Link
+                        v-if="summary.primaryAction?.href"
+                        :href="summary.primaryAction.href"
+                        class="shrink-0 rounded-[1.25rem] px-4 py-3 text-sm font-semibold"
+                        :class="resolveActionClass(summary.primaryAction.tone)"
+                    >
+                        Buka
+                    </Link>
                 </div>
             </div>
         </section>
@@ -70,10 +145,10 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
             <div class="flex items-end justify-between">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                        Akses Anak
+                        Per Anak
                     </p>
                     <h3 class="mt-1 font-serif text-2xl text-slate-900">
-                        Ringkasan Santri
+                        Finance Home Santri
                     </h3>
                 </div>
             </div>
@@ -96,7 +171,7 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
                                 {{ child.nama }}
                             </h4>
                             <p class="mt-1 text-sm text-slate-500">
-                                NIS {{ child.nis }}
+                                NIS {{ child.nis }} · {{ child.kelas?.nama || 'Belum ditempatkan' }}
                             </p>
                         </div>
                         <div
@@ -107,24 +182,58 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
                         </div>
                     </div>
 
-                    <div class="mt-4 grid gap-2 rounded-[1.25rem] bg-slate-50 px-4 py-4 text-sm text-slate-600">
-                        <p>
-                            <span class="font-semibold text-slate-900">Kelas:</span>
-                            {{ child.kelas?.nama || 'Belum ditempatkan' }}
+                    <div class="mt-4 grid grid-cols-2 gap-3 rounded-[1.25rem] bg-slate-50 px-4 py-4">
+                        <div>
+                            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                                Tunggakan
+                            </p>
+                            <p class="mt-2 text-lg font-semibold text-slate-900">
+                                {{ formatCurrency(child.finance?.totalOutstanding) }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                                Saldo
+                            </p>
+                            <p class="mt-2 text-lg font-semibold text-slate-900">
+                                {{ formatCurrency(child.finance?.savingsBalance) }}
+                            </p>
+                        </div>
+                        <div class="text-sm text-slate-600">
+                            <span class="font-semibold text-slate-900">Tagihan aktif:</span>
+                            {{ child.finance?.outstandingBillsCount || 0 }}
+                        </div>
+                        <div class="text-sm text-slate-600">
+                            <span class="font-semibold text-slate-900">Pending:</span>
+                            {{ child.finance?.pendingPaymentsCount || 0 }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 grid gap-2 rounded-[1.25rem] border border-black/5 bg-white px-4 py-4 text-sm text-slate-600">
+                        <p v-if="child.finance?.nextDueBill">
+                            <span class="font-semibold text-slate-900">Jatuh tempo terdekat:</span>
+                            {{ child.finance.nextDueBill.label }} · {{ child.finance.nextDueBill.dueDate || '-' }}
                         </p>
-                        <p>
-                            <span class="font-semibold text-slate-900">Tingkat:</span>
-                            {{ child.kelas?.tingkat || '-' }}
+                        <p v-else>
+                            <span class="font-semibold text-slate-900">Status:</span>
+                            Tidak ada tagihan aktif yang menunggu dibayar.
                         </p>
                         <p v-if="child.isPrimary" class="font-semibold text-emerald-700">
                             Akses utama wali
                         </p>
                     </div>
 
-                    <div class="mt-4 grid grid-cols-3 gap-2 text-xs font-semibold uppercase tracking-[0.16em]">
+                    <div class="mt-4 grid grid-cols-2 gap-2 text-xs font-semibold uppercase tracking-[0.16em]">
+                        <Link
+                            :href="child.finance?.primaryAction?.href || `/wali/santri/${child.id}/keuangan#tagihan`"
+                            class="rounded-2xl px-3 py-3 text-center"
+                            :class="resolveActionClass(child.finance?.primaryAction?.tone)"
+                        >
+                            {{ child.finance?.primaryAction?.label || 'Buka Keuangan' }}
+                        </Link>
                         <Link
                             :href="`/wali/santri/${child.id}`"
-                            class="rounded-2xl bg-slate-900 px-3 py-3 text-center text-white"
+                            class="rounded-2xl bg-slate-100 px-3 py-3 text-center text-slate-700"
                         >
                             Profil
                         </Link>
@@ -135,28 +244,10 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
                             Akademik
                         </Link>
                         <Link
-                            :href="`/wali/santri/${child.id}/keuangan`"
+                            :href="`/wali/santri/${child.id}/keuangan#tagihan`"
                             class="rounded-2xl bg-amber-50 px-3 py-3 text-center text-amber-700"
                         >
                             Keuangan
-                        </Link>
-                        <Link
-                            :href="`/wali/santri/${child.id}/hafalan`"
-                            class="rounded-2xl bg-violet-50 px-3 py-3 text-center text-violet-700"
-                        >
-                            Hafalan
-                        </Link>
-                        <Link
-                            :href="`/wali/santri/${child.id}/kesehatan`"
-                            class="rounded-2xl bg-rose-50 px-3 py-3 text-center text-rose-700"
-                        >
-                            Kesehatan
-                        </Link>
-                        <Link
-                            :href="`/wali/santri/${child.id}/kegiatan`"
-                            class="rounded-2xl bg-blue-50 px-3 py-3 text-center text-blue-700"
-                        >
-                            Kegiatan
                         </Link>
                     </div>
                 </article>
@@ -179,7 +270,7 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
                     Notifikasi
                 </p>
                 <p class="mt-2 font-serif text-xl text-slate-900">
-                    Info wali
+                    Pembayaran Saya
                 </p>
             </Link>
             <Link
@@ -190,7 +281,7 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
                     Perizinan
                 </p>
                 <p class="mt-2 font-serif text-xl text-slate-900">
-                    Ajukan izin
+                    Layanan Wali
                 </p>
             </Link>
         </section>

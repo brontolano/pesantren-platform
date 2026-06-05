@@ -24,6 +24,7 @@ class Pembayaran extends Model
         'nomor_bukti',
         'bukti_pembayaran',
         'catatan',
+        'alasan_penolakan',
         'is_verified',
         'verified_by',
         'verified_at',

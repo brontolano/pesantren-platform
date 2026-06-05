@@ -35,29 +35,54 @@ trait ResolvesPortalWaliContext
 
         $firstChildId = $activeChildId ?? data_get($children, '0.id');
         $tenantId = tenant('id') ?? request()->route('tenant');
+        $dashboardHref = route('tenant.portal-wali.dashboard', ['tenant' => $tenantId]);
+        $financialHref = $firstChildId
+            ? route('tenant.portal-wali.financial', ['tenant' => $tenantId, 'santri' => $firstChildId])
+            : $dashboardHref;
+        $profileHref = $firstChildId
+            ? route('tenant.portal-wali.profile', ['tenant' => $tenantId, 'santri' => $firstChildId])
+            : $dashboardHref;
+        $financialSection = request()->query('section', 'tagihan');
 
         return [
             [
+                'key' => 'beranda',
                 'label' => 'Beranda',
-                'href' => route('tenant.portal-wali.dashboard', ['tenant' => $tenantId]),
+                'href' => $dashboardHref,
                 'active' => request()->routeIs('tenant.portal-wali.dashboard'),
             ],
             [
-                'label' => 'Akademik',
+                'key' => 'tagihan',
+                'label' => 'Tagihan',
                 'href' => $firstChildId
-                    ? route('tenant.portal-wali.academic', ['tenant' => $tenantId, 'santri' => $firstChildId])
-                    : route('tenant.portal-wali.dashboard', ['tenant' => $tenantId]),
-                'active' => request()->routeIs('tenant.portal-wali.academic'),
+                    ? "{$financialHref}?section=tagihan#tagihan"
+                    : $dashboardHref,
+                'active' => request()->routeIs('tenant.portal-wali.financial') && $financialSection !== 'tabungan',
             ],
             [
-                'label' => 'Keuangan',
+                'key' => 'tabungan',
+                'label' => 'Tabungan',
                 'href' => $firstChildId
-                    ? route('tenant.portal-wali.financial', ['tenant' => $tenantId, 'santri' => $firstChildId])
-                    : route('tenant.portal-wali.dashboard', ['tenant' => $tenantId]),
-                'active' => request()->routeIs('tenant.portal-wali.financial'),
+                    ? "{$financialHref}?section=tabungan#tabungan"
+                    : $dashboardHref,
+                'active' => request()->routeIs('tenant.portal-wali.financial') && $financialSection === 'tabungan',
             ],
             [
-                'label' => 'Notif',
+                'key' => 'anak',
+                'label' => 'Anak',
+                'href' => $profileHref,
+                'active' => request()->routeIs(
+                    'tenant.portal-wali.profile',
+                    'tenant.portal-wali.academic',
+                    'tenant.portal-wali.hafalan',
+                    'tenant.portal-wali.kesehatan',
+                    'tenant.portal-wali.kegiatan',
+                    'tenant.portal-wali.rapor.download',
+                ),
+            ],
+            [
+                'key' => 'akun',
+                'label' => 'Akun',
                 'href' => route('tenant.portal-wali.notifications', ['tenant' => $tenantId]),
                 'active' => request()->routeIs('tenant.portal-wali.notifications', 'tenant.portal-wali.izin'),
             ],

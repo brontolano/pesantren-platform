@@ -55,13 +55,37 @@ class PortalWaliService
 
     public function getDashboardPayload(User $user): array
     {
-        $children = $this->getAccessibleSantri($user);
+        $santriCollection = $this->getAccessibleSantriQuery($user)->get();
+        $children = $santriCollection
+            ->map(fn (Santri $santri): array => [
+                ...$this->transformSantriSummary($user, $santri),
+                'finance' => $this->getFinancialHomeSnapshot($santri),
+            ])
+            ->values();
+
+        $totalOutstanding = round((float) $children->sum('finance.totalOutstanding'), 2);
+        $totalSavings = round((float) $children->sum('finance.savingsBalance'), 2);
+        $pendingTransactions = (int) $children->sum('finance.pendingPaymentsCount');
+        $childrenNeedingAttention = $children
+            ->filter(fn (array $child): bool => ($child['finance']['totalOutstanding'] ?? 0) > 0 || ($child['finance']['pendingPaymentsCount'] ?? 0) > 0)
+            ->count();
+        $nextDue = $children
+            ->pluck('finance.nextDueBill')
+            ->filter()
+            ->sortBy('dueDate')
+            ->first();
 
         return [
             'children' => $children,
             'summary' => [
                 'childrenCount' => $children->count(),
                 'activeChildrenCount' => $children->where('status', 'aktif')->count(),
+                'totalOutstanding' => $totalOutstanding,
+                'totalSavings' => $totalSavings,
+                'pendingTransactions' => $pendingTransactions,
+                'childrenNeedingAttention' => $childrenNeedingAttention,
+                'nextDueBill' => $nextDue,
+                'primaryAction' => $this->resolveDashboardPrimaryAction($children, $pendingTransactions),
             ],
         ];
     }
@@ -454,6 +478,100 @@ class PortalWaliService
             ] : null,
             'hubungan' => $accessRecord?->relationship_type ?? ($santri->wali_user_id === $user->getKey() ? 'wali' : 'wali'),
             'isPrimary' => (bool) ($accessRecord?->is_primary ?? ($santri->wali_user_id === $user->getKey())),
+        ];
+    }
+
+    protected function getFinancialHomeSnapshot(Santri $santri): array
+    {
+        $tagihan = Tagihan::query()
+            ->where('santri_id', $santri->getKey())
+            ->orderBy('jatuh_tempo')
+            ->get();
+
+        $payments = Pembayaran::query()
+            ->where('santri_id', $santri->getKey())
+            ->latest('tanggal_pembayaran')
+            ->get();
+
+        $tabungan = Tabungan::query()
+            ->where('santri_id', $santri->getKey())
+            ->first();
+
+        $outstandingBills = $tagihan->filter(fn (Tagihan $item): bool => in_array($item->status, ['belum_bayar', 'sebagian'], true));
+        $nextDueBill = $outstandingBills
+            ->filter(fn (Tagihan $item): bool => filled($item->jatuh_tempo))
+            ->sortBy(fn (Tagihan $item) => $item->jatuh_tempo?->getTimestamp() ?? PHP_INT_MAX)
+            ->first();
+        $pendingPayments = $payments->where('is_verified', false);
+
+        $primaryAction = $pendingPayments->isNotEmpty()
+            ? [
+                'label' => 'Lihat Status',
+                'href' => "/wali/santri/{$santri->id}/keuangan#pembayaran",
+                'tone' => 'amber',
+            ]
+            : (($outstandingBills->sum('sisa_tagihan') > 0)
+                ? [
+                    'label' => 'Bayar Sekarang',
+                    'href' => "/wali/santri/{$santri->id}/keuangan#tagihan",
+                    'tone' => 'emerald',
+                ]
+                : [
+                    'label' => 'Lihat Tabungan',
+                    'href' => "/wali/santri/{$santri->id}/keuangan?section=tabungan#tabungan",
+                    'tone' => 'slate',
+                ]);
+
+        return [
+            'totalOutstanding' => round((float) $outstandingBills->sum('sisa_tagihan'), 2),
+            'outstandingBillsCount' => $outstandingBills->count(),
+            'pendingPaymentsCount' => $pendingPayments->count(),
+            'savingsBalance' => round((float) ($tabungan?->saldo ?? 0), 2),
+            'nextDueBill' => $nextDueBill ? [
+                'id' => $nextDueBill->id,
+                'label' => $nextDueBill->jenis_tagihan,
+                'amount' => (float) $nextDueBill->sisa_tagihan,
+                'dueDate' => optional($nextDueBill->jatuh_tempo)?->format('Y-m-d'),
+                'status' => $nextDueBill->status,
+            ] : null,
+            'primaryAction' => $primaryAction,
+        ];
+    }
+
+    protected function resolveDashboardPrimaryAction(Collection $children, int $pendingTransactions): array
+    {
+        $firstPending = $children->first(fn (array $child): bool => ($child['finance']['pendingPaymentsCount'] ?? 0) > 0);
+
+        if ($firstPending) {
+            return [
+                'label' => 'Cek Status Pembayaran',
+                'href' => $firstPending['finance']['primaryAction']['href'],
+                'tone' => 'amber',
+            ];
+        }
+
+        $firstOutstanding = $children->first(fn (array $child): bool => ($child['finance']['totalOutstanding'] ?? 0) > 0);
+
+        if ($firstOutstanding) {
+            return [
+                'label' => 'Bayar Tagihan Terdekat',
+                'href' => $firstOutstanding['finance']['primaryAction']['href'],
+                'tone' => 'emerald',
+            ];
+        }
+
+        if ($children->isNotEmpty()) {
+            return [
+                'label' => 'Lihat Saldo Anak',
+                'href' => $children->first()['finance']['primaryAction']['href'],
+                'tone' => 'slate',
+            ];
+        }
+
+        return [
+            'label' => 'Lengkapi Data Anak',
+            'href' => '/wali/notifikasi',
+            'tone' => $pendingTransactions > 0 ? 'amber' : 'slate',
         ];
     }
 }
