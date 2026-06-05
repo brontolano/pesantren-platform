@@ -104,6 +104,8 @@ services:
       - N8N_EDITOR_BASE_URL=https://n8n.asy-syifaa.com/
       - N8N_PROXY_HOPS=1
       - N8N_RUNNERS_ENABLED=true
+      # Izinkan Code node membaca $env (N8N_WAHA_* dipakai node "Send WAHA")
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
       - GENERIC_TIMEZONE=Asia/Jakarta
       - TZ=Asia/Jakarta
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
