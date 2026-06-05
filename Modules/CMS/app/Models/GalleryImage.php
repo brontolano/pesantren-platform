@@ -32,4 +32,10 @@ class GalleryImage extends Model
     {
         return $this->belongsTo(Gallery::class, 'gallery_id');
     }
+
+    /** URL foto absolut (URL penuh apa adanya, path disk → Storage::url). */
+    public function getUrlAttribute(): ?string
+    {
+        return Gallery::resolveMediaUrl($this->image_url);
+    }
 }

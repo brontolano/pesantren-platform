@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -149,14 +150,25 @@ class GalleryResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('cover_url')
+                    ->label('Cover')
+                    ->height(56)
+                    ->width(84)
+                    ->extraImgAttributes(['class' => 'rounded-lg object-cover'])
+                    ->toggleable(),
                 TextColumn::make('title')
                     ->label('Judul')
+                    ->weight('semibold')
+                    ->description(fn (Gallery $r): ?string => $r->description ? Str::limit($r->description, 60) : null)
                     ->searchable()
                     ->sortable()
                     ->limit(50),
                 TextColumn::make('images_count')
                     ->label('Foto')
                     ->counts('images')
+                    ->badge()
+                    ->color('info')
+                    ->icon('heroicon-m-photo')
                     ->sortable(),
                 IconColumn::make('is_published')
                     ->label('Publik')
@@ -172,6 +184,8 @@ class GalleryResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->striped()
+            ->defaultPaginationPageOption(25)
             ->defaultSort('published_at', 'desc')
             ->filters([
                 TernaryFilter::make('is_published')

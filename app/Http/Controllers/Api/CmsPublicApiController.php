@@ -103,7 +103,7 @@ class CmsPublicApiController extends Controller
 
         $data = $this->mapGallery($gallery);
         $data['images'] = $gallery->images->map(fn ($img) => [
-            'url' => $img->image_url,
+            'url' => $img->url,
             'caption' => $img->caption,
         ])->all();
 
@@ -137,7 +137,7 @@ class CmsPublicApiController extends Controller
             'description' => $g->description,
             'category' => null,
             'date' => optional($g->published_at)?->toDateString(),
-            'cover_url' => $g->cover_image_url,
+            'cover_url' => $g->cover_url,
             'folder_name' => $g->slug,
         ];
     }
