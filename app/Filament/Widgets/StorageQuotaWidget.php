@@ -18,10 +18,12 @@ class StorageQuotaWidget extends BaseWidget
         }
 
         $svc = app(StorageQuotaService::class);
-        $used = $svc->usedBytes();
+        $b = $svc->breakdown();
+        $used = (int) $b['footprint_bytes']; // file disk + DB tenant (footprint riil)
         $quotaBytes = $svc->quotaBytes($tenantId);
-        $pct = $svc->percentUsed($tenantId);
+        $pct = $quotaBytes > 0 ? min(100.0, round($used / $quotaBytes * 100, 1)) : 100.0;
         $remaining = max(0, $quotaBytes - $used);
+        $h = fn (int $x) => StorageQuotaService::humanBytes($x);
 
         return [
             Stat::make('Kuota', $svc->quotaGb($tenantId).' GB')
@@ -29,8 +31,8 @@ class StorageQuotaWidget extends BaseWidget
                 ->color('gray')
                 ->icon('heroicon-o-circle-stack'),
 
-            Stat::make('Terpakai', StorageQuotaService::humanBytes($used))
-                ->description($pct.'% terpakai')
+            Stat::make('Terpakai', $h($used))
+                ->description('File '.$h((int) $b['disk_bytes']).' + DB '.$h((int) $b['db_bytes']).' · '.$pct.'%')
                 ->color($pct >= 90 ? 'danger' : ($pct >= 70 ? 'warning' : 'success'))
                 ->icon('heroicon-o-chart-pie'),
 

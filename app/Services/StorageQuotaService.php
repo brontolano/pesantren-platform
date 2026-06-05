@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\MediaFile;
 use App\Models\TenantStorage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Sumber kebenaran kuota penyimpanan per tenant.
@@ -75,6 +77,67 @@ class StorageQuotaService
     public function usedBytes(): int
     {
         return (int) MediaFile::withTrashed()->sum('size_bytes');
+    }
+
+    /**
+     * Ukuran byte AKTUAL file tenant di disk (du folder tenant).
+     * Dipanggil dalam konteks tenant — disk 'public' sudah di-suffix per tenant
+     * oleh FilesystemTenancyBootstrapper, jadi hanya menghitung file milik tenant
+     * ini (bukan sistem, modul, atau tenant lain). Termasuk turunan (webp/thumbnail)
+     * & orphan yang tak tercatat di media_files.
+     */
+    public function diskBytes(): int
+    {
+        try {
+            $disk = Storage::disk(self::diskName());
+            $total = 0;
+            foreach ($disk->allFiles() as $path) {
+                $total += (int) $disk->size($path);
+            }
+
+            return $total;
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Ukuran byte DB tenant aktif (pg_database_size) — dipanggil dalam konteks
+     * tenant. Karena setiap tenant punya database fisik terpisah, ini murni data
+     * tenant tsb (records santri, pembayaran, dll), TIDAK termasuk DB central,
+     * sistem, atau tenant lain. 0 bila bukan Postgres / gagal.
+     */
+    public function databaseBytes(): int
+    {
+        try {
+            return (int) (DB::selectOne('SELECT pg_database_size(current_database()) AS s')->s ?? 0);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Rincian footprint penyimpanan tenant aktif (dipanggil dalam konteks tenant).
+     * - media_bytes : SUM(media_files.size_bytes) — metrik billable gerbang upload.
+     * - disk_bytes  : ukuran file aktual di disk tenant (du).
+     * - db_bytes    : ukuran database fisik tenant.
+     * - footprint_bytes : disk + db = total jejak penyimpanan riil tenant
+     *   (murni data tenant; sistem/modul/OS/tenant-lain TIDAK ikut terhitung).
+     *
+     * @return array{media_bytes:int,disk_bytes:int,db_bytes:int,footprint_bytes:int}
+     */
+    public function breakdown(): array
+    {
+        $media = $this->usedBytes();
+        $disk = $this->diskBytes();
+        $db = $this->databaseBytes();
+
+        return [
+            'media_bytes' => $media,
+            'disk_bytes' => $disk,
+            'db_bytes' => $db,
+            'footprint_bytes' => $disk + $db,
+        ];
     }
 
     public function remainingBytes(string $tenantId): int

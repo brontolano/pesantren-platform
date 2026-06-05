@@ -126,12 +126,19 @@ class KelolaKuotaPenyimpanan extends Page implements HasForms
         }
 
         $svc = app(StorageQuotaService::class);
-        $used = (int) $tenant->run(fn () => $svc->usedBytes());
+        $b = $tenant->run(fn () => $svc->breakdown());
         $this->data['quota_gb'] = $svc->quotaGb($tenantId);
 
         $quotaBytes = $svc->quotaBytes($tenantId);
-        $pct = $quotaBytes > 0 ? round($used / $quotaBytes * 100, 1) : 0;
-        $this->usageLabel = StorageQuotaService::humanBytes($used).' dari '.$svc->quotaGb($tenantId).' GB ('.$pct.'%)';
+        $footprint = (int) $b['footprint_bytes'];
+        $pct = $quotaBytes > 0 ? round($footprint / $quotaBytes * 100, 1) : 0;
+        $h = fn (int $x) => StorageQuotaService::humanBytes($x);
+
+        // Footprint riil tenant (file disk + DB tenant) — murni data tenant,
+        // sistem/modul/OS/tenant-lain tidak ikut terhitung.
+        $this->usageLabel = $h($footprint).' dari '.$svc->quotaGb($tenantId).' GB ('.$pct.'%) '
+            .'— file: '.$h((int) $b['disk_bytes']).' + DB: '.$h((int) $b['db_bytes'])
+            .' (media tercatat: '.$h((int) $b['media_bytes']).')';
     }
 
     public function save(): void
