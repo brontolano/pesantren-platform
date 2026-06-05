@@ -31,11 +31,20 @@ Fondasi `FilesystemTenancyBootstrapper` (sudah aktif) → file otomatis tersimpa
 ## 5. Fase
 | Fase | Isi | Status |
 |---|---|---|
-| **1** | Module + upload + media_files + kuota default + enforcement (disk lokal) | ✅ dibangun |
-| **2** | Menu kelola kuota per tenant (super_admin) + tie-in billing | ⬜ |
-| **3** | **Object storage (S3)** → unlock tier 64/128/256 GB + migrasi | ⬜ |
-| **4** | Thumbnail, kompresi, trash/retensi, audit | ⬜ |
+| **1** | Module + upload + media_files + kuota default + enforcement | ✅ selesai |
+| **2** | Menu kelola kuota per tenant (super_admin) | ✅ selesai |
+| **3** | Object storage (S3) → unlock tier 64/128/256 GB | 🟡 **siap** (config + gating); butuh akun S3 |
+| **4** | Thumbnail, folder, trash/restore, filter, bulk | ✅ selesai |
+| **4b** | Kompresi gambar + audit log | ⬜ opsional |
 
-## 6. Catatan
+## 6. Mengaktifkan tier besar (64/128/256 GB) — Fase 3
+Sudah disiapkan via `config/media.php`. Saat punya object storage (Hostinger Object Storage / Wasabi / Backblaze B2 / DO Spaces):
+1. Tambah disk `s3` di `config/filesystems.php` + kredensial di `.env` (AWS_*).
+2. Set env: `MEDIA_DISK=s3` dan `MEDIA_OBJECT_STORAGE=true`.
+3. Tier 64/128/256 GB otomatis aktif di menu **Kuota Penyimpanan** (Radio tidak lagi disabled).
+4. (Opsional) migrasikan file lama dari disk lokal ke S3.
+
+## 7. Catatan
 - Modul `file_storage` = **development** → hanya tampil di **demo** (2 GB) untuk uji coba. Set **Released** di Modul Platform saat siap untuk tenant nyata.
-- Enforcement: upload diblokir bila `pemakaian + file > kuota`. Maks 100 MB/file (Fase 1).
+- Enforcement: upload diblokir bila `pemakaian + file > kuota`. Maks 100 MB/file (`MEDIA_MAX_FILE_MB`).
+- Soft-delete: file masuk **trash** (masih makan kuota); **kosongkan** (force-delete) untuk benar-benar hapus file & reklaim ruang.

@@ -16,7 +16,45 @@ class StorageQuotaService
 {
     public const DEFAULT_GB = 8;
 
+    /** Tier yang bisa dipilih sekarang (disk lokal). */
+    public const TIERS_AVAILABLE = [8, 16, 32];
+
+    /** Tier yang butuh object storage (Soon). */
+    public const TIERS_SOON = [64, 128, 256];
+
     private const BYTES_PER_GB = 1073741824; // 1024^3
+
+    /** Disk media aktif (public lokal, atau s3 bila object storage). */
+    public static function diskName(): string
+    {
+        return config('media.disk', 'public');
+    }
+
+    /** Batas ukuran per file dalam KB (untuk Filament FileUpload). */
+    public static function maxFileKb(): int
+    {
+        return ((int) config('media.max_file_mb', 100)) * 1024;
+    }
+
+    /** Apakah object storage sudah siap (membuka tier 64/128/256 GB). */
+    public static function objectStorageReady(): bool
+    {
+        return (bool) config('media.object_storage', false);
+    }
+
+    /** Semua tier + status ketersediaan: [gb => bool tersedia]. */
+    public static function tierAvailability(): array
+    {
+        $out = [];
+        foreach (self::TIERS_AVAILABLE as $gb) {
+            $out[$gb] = true;
+        }
+        foreach (self::TIERS_SOON as $gb) {
+            $out[$gb] = self::objectStorageReady();
+        }
+
+        return $out;
+    }
 
     public function quotaGb(string $tenantId): int
     {
@@ -30,10 +68,13 @@ class StorageQuotaService
         return $this->quotaGb($tenantId) * self::BYTES_PER_GB;
     }
 
-    /** Pemakaian byte tenant aktif (dipanggil dalam konteks tenant). */
+    /**
+     * Pemakaian byte tenant aktif (dipanggil dalam konteks tenant).
+     * Termasuk file ter-trash — file fisik masih ada sampai force-delete.
+     */
     public function usedBytes(): int
     {
-        return (int) MediaFile::query()->sum('size_bytes');
+        return (int) MediaFile::withTrashed()->sum('size_bytes');
     }
 
     public function remainingBytes(string $tenantId): int

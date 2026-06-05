@@ -8,11 +8,22 @@ use App\Models\MediaFile;
 use App\Services\StorageQuotaService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 
 class MediaFileResource extends Resource
@@ -44,18 +55,28 @@ class MediaFileResource extends Resource
         return static::canAccess();
     }
 
+    /** Sertakan record ter-trash agar filter "Dihapus" berfungsi (tenant scope tetap). */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([SoftDeletingScope::class]);
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
             FileUpload::make('path')
                 ->label('Pilih file media')
-                ->disk('public')
+                ->disk(StorageQuotaService::diskName())
                 ->directory('media')
                 ->storeFileNamesIn('original_name')
-                ->maxSize(102400) // 100 MB / file
-                ->helperText('Maks 100 MB per file. Total dibatasi kuota tenant.')
+                ->maxSize(StorageQuotaService::maxFileKb())
+                ->helperText('Maks '.config('media.max_file_mb', 100).' MB/file. Total dibatasi kuota tenant.')
                 ->required()
                 ->columnSpanFull(),
+            TextInput::make('folder')
+                ->label('Folder (opsional)')
+                ->placeholder('mis. galeri, dokumen, brosur')
+                ->maxLength(100),
         ]);
     }
 
@@ -63,22 +84,61 @@ class MediaFileResource extends Resource
     {
         return $table
             ->columns([
+                ImageColumn::make('thumb')
+                    ->label('')
+                    ->disk(StorageQuotaService::diskName())
+                    ->square()
+                    ->size(44)
+                    ->getStateUsing(fn (MediaFile $r): ?string => $r->isImage() ? $r->path : null),
                 TextColumn::make('original_name')->label('Nama File')->searchable()->wrap(),
-                TextColumn::make('mime')->label('Tipe')->badge()->color('gray')->toggleable(),
+                TextColumn::make('folder')->label('Folder')->badge()->color('gray')
+                    ->placeholder('—')->toggleable(),
+                TextColumn::make('mime')->label('Tipe')->badge()->color('info')->toggleable(),
                 TextColumn::make('size_bytes')->label('Ukuran')
                     ->formatStateUsing(fn (int $state): string => StorageQuotaService::humanBytes($state))
                     ->sortable(),
                 TextColumn::make('created_at')->label('Diunggah')->since()->sortable(),
+                TextColumn::make('deleted_at')->label('Dihapus')->since()->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->filters([
+                TrashedFilter::make(),
+                SelectFilter::make('folder')
+                    ->label('Folder')
+                    ->options(fn (): array => MediaFile::query()
+                        ->whereNotNull('folder')->distinct()->orderBy('folder')
+                        ->pluck('folder', 'folder')->all()),
+                SelectFilter::make('type')
+                    ->label('Tipe')
+                    ->options([
+                        'image' => 'Gambar',
+                        'video' => 'Video',
+                        'audio' => 'Audio',
+                        'application' => 'Dokumen',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        $v = $data['value'] ?? null;
+
+                        return $v ? $query->where('mime', 'like', $v.'/%') : $query;
+                    }),
+            ])
             ->actions([
                 Action::make('download')
                     ->label('Unduh')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (MediaFile $r): ?string => Storage::disk('public')->exists($r->path) ? Storage::disk('public')->url($r->path) : null, shouldOpenInNewTab: true)
-                    ->visible(fn (MediaFile $r): bool => Storage::disk('public')->exists($r->path)),
-                DeleteAction::make()
-                    ->before(fn (MediaFile $r) => Storage::disk('public')->delete($r->path)),
+                    ->url(fn (MediaFile $r): ?string => Storage::disk(StorageQuotaService::diskName())->exists($r->path)
+                        ? Storage::disk(StorageQuotaService::diskName())->url($r->path) : null, shouldOpenInNewTab: true)
+                    ->visible(fn (MediaFile $r): bool => $r->deleted_at === null
+                        && Storage::disk(StorageQuotaService::diskName())->exists($r->path)),
+                DeleteAction::make(),
+                RestoreAction::make(),
+                ForceDeleteAction::make(),
+            ])
+            ->bulkActions([
+                DeleteBulkAction::make(),
+                RestoreBulkAction::make(),
+                ForceDeleteBulkAction::make(),
             ]);
     }
 

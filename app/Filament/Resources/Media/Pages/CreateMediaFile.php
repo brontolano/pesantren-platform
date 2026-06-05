@@ -16,8 +16,8 @@ class CreateMediaFile extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        $disk = Storage::disk(StorageQuotaService::diskName());
         $path = is_array($data['path'] ?? null) ? ($data['path'][0] ?? null) : ($data['path'] ?? null);
-        $disk = Storage::disk('public');
 
         $size = ($path && $disk->exists($path)) ? (int) $disk->size($path) : 0;
         $mime = ($path && $disk->exists($path)) ? $disk->mimeType($path) : null;
@@ -49,6 +49,7 @@ class CreateMediaFile extends CreateRecord
             'original_name' => $original ?: basename((string) $path),
             'mime' => $mime,
             'size_bytes' => $size,
+            'folder' => $data['folder'] ?? null,
             'uploaded_by' => auth()->id(),
         ]);
     }

@@ -66,6 +66,7 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
                 \App\Filament\Pages\KalkulatorLangganan::class,
                 \App\Filament\Pages\AktivasiModulTenant::class,
+                \App\Filament\Pages\KelolaKuotaPenyimpanan::class,
             ])
             ->widgets([
                 AccountWidget::class,
