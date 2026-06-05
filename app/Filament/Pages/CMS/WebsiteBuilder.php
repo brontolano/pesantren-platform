@@ -11,6 +11,8 @@ use Modules\CMS\Models\WebsiteSetting;
 
 class WebsiteBuilder extends Page
 {
+    use \App\Filament\Concerns\BuiltInWebsiteGate;
+
     protected string $view = 'filament.pages.cms.website-builder';
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-paint-brush';
@@ -36,12 +38,14 @@ class WebsiteBuilder extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->can('manage_tenant_settings') ?? false;
+        return static::builtInWebsiteEnabled()
+            && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('manage_tenant_settings') ?? false;
+        return static::builtInWebsiteEnabled()
+            && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public function saveSections(): void
