@@ -15,6 +15,7 @@ class DevRoadmapSeeder extends Seeder
     public function run(): void
     {
         $this->seedPpdbV2();
+        $this->seedIntegrasiWebsite();
         $this->seedPlatform();
     }
 
@@ -113,6 +114,92 @@ class DevRoadmapSeeder extends Seeder
                 'Akun calon dikonversi jadi akun santri aktif untuk login via aplikasi santri / orang tua.',
                 'Konversi data ke Santri sudah ada. Akun login santri/wali untuk aplikasi belum ada.',
                 'todo', 'high', 15, 'M', 17],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    private function seedIntegrasiWebsite(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'integrasi-website-api'],
+            [
+                'name' => 'Integrasi Website / API',
+                'description' => 'Integrasi website pesantren (WordPress/custom, dikelola Hamdan atau pesantren) dengan modul platform via 3 pola: subdomain delegation, embed (iframe/widget), dan API (REST+Sanctum). Tenant-scoped & terisolasi.',
+                'status' => 'planning',
+                'color' => 'warning',
+                'icon' => 'heroicon-o-globe-alt',
+                'sort' => 3,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            // Fase A — Subdomain Delegation (tercepat)
+            ['Fase A — Subdomain Delegation', 'SOP & flow subdomain delegation (ppdb./portal. → platform)',
+                'Dokumentasikan cara arahkan subdomain tenant ke platform + dapat auto-SSL.',
+                'Custom domain + on-demand TLS sudah jalan. Tinggal SOP + registrasi domain tenant.',
+                'todo', 'high', 20, 'S', 1],
+            ['Fase A — Subdomain Delegation', 'Registrasi & verifikasi kepemilikan domain/subdomain tenant',
+                'Tenant daftarkan domain; sistem verifikasi kepemilikan sebelum delegasi.',
+                'Model Domain + InitializeTenancyByDomain ada. UI registrasi/verifikasi belum.',
+                'todo', 'medium', 15, 'M', 2],
+
+            // Fase B — Embed
+            ['Fase B — Embed (iframe/widget)', 'Halaman PPDB iframe-friendly (X-Frame-Options/CSP per domain)',
+                'Siapkan form PPDB agar bisa di-embed ke situs WP/custom dengan aman.',
+                'Form PPDB ada, tapi belum disiapkan untuk embed lintas-domain.',
+                'todo', 'medium', 10, 'M', 3],
+            ['Fase B — Embed (iframe/widget)', 'Widget <script> embed (statistik / berita / tombol PPDB)',
+                'Snippet JS yang bisa ditempel di halaman mana pun untuk menampilkan data dinamis.',
+                'Belum ada.',
+                'todo', 'low', 0, 'M', 4],
+
+            // Fase C — API Publik
+            ['Fase C — API Publik (headless)', 'API publik read: profil tenant, statistik, artikel/berita, jadwal PPDB',
+                'Endpoint baca data tenant untuk dikonsumsi situs eksternal (headless).',
+                'API baru ada data wilayah + skeleton PPDB v1 (Sanctum). API konten/statistik belum.',
+                'todo', 'high', 10, 'L', 5],
+            ['Fase C — API Publik (headless)', 'API submit PPDB dari form website eksternal + anti-spam',
+                'Endpoint terima pendaftaran dari form di situs tenant; proteksi spam/captcha.',
+                'Belum ada endpoint publik submit.',
+                'todo', 'medium', 5, 'M', 6],
+            ['Fase C — API Publik (headless)', "Token/API key per tenant + halaman 'Integrasi & API' di dashboard tenant",
+                'Tenant generate API key sendiri; kelola di dashboard tenant.',
+                'Sanctum terpasang. Manajemen token per tenant belum ada.',
+                'todo', 'high', 5, 'M', 7],
+            ['Fase C — API Publik (headless)', 'CORS per domain tenant + rate-limit (jaga isolasi antar pesantren)',
+                'CORS whitelist per domain tenant (bukan wildcard) + rate-limit endpoint publik.',
+                'Belum dikonfigurasi. WAJIB: token tenant A tak boleh akses data tenant B.',
+                'todo', 'high', 0, 'S', 8],
+
+            // Fase D — Distribusi & Uji Coba
+            ['Fase D — Distribusi & Uji Coba', 'Dokumentasi integrasi untuk developer pesantren',
+                'Panduan integrasi (3 pola) + contoh kode untuk tim website pesantren.',
+                'Belum ada.',
+                'todo', 'medium', 0, 'M', 9],
+            ['Fase D — Distribusi & Uji Coba', 'Plugin WordPress resmi (embed PPDB + statistik via API)',
+                'Plugin siap-pasang untuk pesantren yang pakai WordPress.',
+                'Belum ada.',
+                'todo', 'low', 0, 'L', 10],
+            ['Fase D — Distribusi & Uji Coba', 'Uji coba dengan client pertama (situs dikelola Hamdan)',
+                'POC pola A: arahkan ppdb./portal.<domain-client> ke platform, verifikasi SSL + isolasi.',
+                'Ada client menunggu — kandidat uji coba pertama.',
+                'todo', 'high', 0, 'M', 11],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
