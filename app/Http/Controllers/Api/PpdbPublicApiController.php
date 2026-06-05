@@ -29,9 +29,10 @@ class PpdbPublicApiController extends Controller
             'student_name' => ['required', 'string', 'max:255'],
             'nik' => ['nullable', 'string', 'max:50'],
             'nisn' => ['nullable', 'string', 'max:50'],
-            'gender' => ['nullable', 'in:L,P'],
+            // Wajib: kolom NOT NULL di tabel calon_santri (jenis_kelamin & tanggal_lahir).
+            'gender' => ['required', 'in:L,P'],
             'birth_place' => ['nullable', 'string', 'max:100'],
-            'birth_date' => ['nullable', 'date'],
+            'birth_date' => ['required', 'date'],
             'origin_school' => ['nullable', 'string', 'max:255'],
             'address' => ['nullable', 'string', 'max:1000'],
             'village_code' => ['nullable', 'string', 'max:50'],
@@ -44,7 +45,6 @@ class PpdbPublicApiController extends Controller
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        try { // TEMP-DEBUG: surface exact exception for the register 500
         $participantPhone = $this->normalizePhone($data['participant_phone'] ?? $data['guardian_phone'] ?? $data['parent_phone'] ?? '');
         $nomor = $numbers->generate();
         $token = Str::random(40);
@@ -94,14 +94,6 @@ class PpdbPublicApiController extends Controller
             ],
             'account' => ['username' => $username],
         ], 201);
-        } catch (\Throwable $e) { // TEMP-DEBUG
-            return response()->json(['ok' => false, 'debug' => [
-                'type' => get_class($e),
-                'msg' => $e->getMessage(),
-                'where' => basename($e->getFile()).':'.$e->getLine(),
-                'trace' => collect($e->getTrace())->take(5)->map(fn ($f) => (isset($f['file']) ? basename($f['file']) : '?').':'.($f['line'] ?? '?').' '.($f['class'] ?? '').($f['type'] ?? '').($f['function'] ?? ''))->all(),
-            ]], 500);
-        }
     }
 
     /**
@@ -115,16 +107,16 @@ class PpdbPublicApiController extends Controller
             return;
         }
 
-        $pesantren = tenant()?->name ?? 'Pondok Pesantren';
-        $message = "Assalamu'alaikum Wr. Wb.\n\n"
-            ."Pendaftaran PPDB *{$pesantren}* atas nama *{$name}* telah *BERHASIL* diterima. 🎉\n\n"
-            ."🎫 Nomor Pendaftaran: *{$nomor}*\n"
-            ."👤 Username Portal: {$username}\n\n"
-            ."Simpan nomor pendaftaran ini sebagai bukti. Informasi jadwal seleksi, pengumuman, dan daftar ulang akan kami sampaikan melalui WhatsApp ini.\n\n"
-            ."Jazaakumullaahu khairan.\n"
-            ."— Panitia PPDB {$pesantren}";
-
         try {
+            $pesantren = tenant()?->name ?? 'Pondok Pesantren';
+            $message = "Assalamu'alaikum Wr. Wb.\n\n"
+                ."Pendaftaran PPDB *{$pesantren}* atas nama *{$name}* telah *BERHASIL* diterima. 🎉\n\n"
+                ."🎫 Nomor Pendaftaran: *{$nomor}*\n"
+                ."👤 Username Portal: {$username}\n\n"
+                ."Simpan nomor pendaftaran ini sebagai bukti. Informasi jadwal seleksi, pengumuman, dan daftar ulang akan kami sampaikan melalui WhatsApp ini.\n\n"
+                ."Jazaakumullaahu khairan.\n"
+                ."— Panitia PPDB {$pesantren}";
+
             Http::timeout(8)->post(
                 config('services.ppdb_wa.webhook', 'http://n8n:5678/webhook/ppdb-wa'),
                 [
