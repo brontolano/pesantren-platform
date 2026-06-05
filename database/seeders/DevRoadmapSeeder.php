@@ -15,9 +15,56 @@ class DevRoadmapSeeder extends Seeder
     public function run(): void
     {
         $this->seedPpdbV2();
+        $this->seedPwaRoadmap();
         $this->seedIntegrasiWebsite();
         $this->seedFileStorage();
         $this->seedPlatform();
+    }
+
+    /**
+     * Roadmap PWA Peserta SPMB + PWA Wali — di-seed dari hasil ekstraksi PRD
+     * (database/seeders/data/pwa-roadmap.json, lihat PRD-PWA-PESERTA-SPMB.md & PRD-PWA-WALI.md).
+     * Idempotent: updateOrCreate by project.slug + task.title.
+     */
+    private function seedPwaRoadmap(): void
+    {
+        $path = database_path('seeders/data/pwa-roadmap.json');
+        if (! is_file($path)) {
+            return;
+        }
+
+        $projects = json_decode((string) file_get_contents($path), true) ?: [];
+        $dec = static fn ($s): string => html_entity_decode((string) $s, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        foreach ($projects as $i => $pj) {
+            $project = DevProject::updateOrCreate(
+                ['slug' => $pj['project']['slug']],
+                [
+                    'name' => $dec($pj['project']['name']),
+                    'description' => $dec($pj['project']['description']),
+                    'status' => $pj['project']['status'],
+                    'color' => $pj['project']['color'],
+                    'icon' => $pj['project']['icon'],
+                    'sort' => 5 + $i,
+                ]
+            );
+
+            foreach ($pj['tasks'] as $t) {
+                DevTask::updateOrCreate(
+                    ['dev_project_id' => $project->id, 'title' => $dec($t['title'])],
+                    [
+                        'phase' => $dec($t['phase']),
+                        'detail' => $dec($t['detail']),
+                        'current_state' => $dec($t['current_state']),
+                        'status' => $t['status'],
+                        'priority' => $t['priority'],
+                        'progress' => (int) $t['progress'],
+                        'effort' => $t['effort'],
+                        'sort' => (int) $t['sort'],
+                    ]
+                );
+            }
+        }
     }
 
     private function seedPpdbV2(): void

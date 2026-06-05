@@ -1,0 +1,499 @@
+[
+  {
+    "project": {
+      "name": "PWA Peserta SPMB",
+      "slug": "pwa-peserta-spmb",
+      "description": "Portal/PWA self-service calon santri & ortu pendaftar di {domain-tenant}/spmb: akun peserta (role Spatie 'peserta', satu auth), aktivasi OTP WA, lengkapi data, unggah dokumen, tagihan & bukti bayar manual, jadwal/kartu ujian, pengumuman seleksi, dan daftar ulang → jadi Santri. Inertia+Vue di monolith Laravel, database-per-tenant, white-label. Mesin bisnis backend PPDB sudah ~80% siap; pekerjaan utama = frontend peserta + lapisan auth.",
+      "icon": "heroicon-o-device-phone-mobile",
+      "color": "info",
+      "status": "in_progress"
+    },
+    "tasks": [
+      {
+        "phase": "F0 - Gerbang Keputusan & Skema",
+        "title": "Skema akun peserta: user_id di calon_santri + tabel user_otps + tahun_ajaran/gelombang",
+        "detail": "Migrasi tenant menambah kolom user_id (FK users, unique) di calon_santri, tabel user_otps (kode hash, purpose, expires_at, attempts, used_at), serta tahun_ajaran+gelombang; semua di path DB tenant.",
+        "current_state": "SELESAI. Migrasi tenant + model UserOtp (konstanta TTL/attempts) + relasi user() pada CalonSantri ada; OQ-1 & OQ-2 sudah diputuskan Hamdan 2026-06-05. Review skema hijau.",
+        "status": "done",
+        "priority": "critical",
+        "progress": 100,
+        "effort": "M",
+        "sort": 1
+      },
+      {
+        "phase": "F0 - Gerbang Keputusan & Skema",
+        "title": "Role Spatie 'peserta' tanpa permission Filament + seeder",
+        "detail": "Role 'peserta' terdaftar di seeder default tenant tanpa satu pun permission panel Filament; akses dibatasi policy 'hanya data calon_santri miliknya'.",
+        "current_state": "SELESAI. PesertaRoleSeeder modul PPDB + terdaftar di RolesAndPermissionsSeeder via TenantProvisioner.",
+        "status": "done",
+        "priority": "high",
+        "progress": 100,
+        "effort": "S",
+        "sort": 2
+      },
+      {
+        "phase": "F1 - Gerbang & Status",
+        "title": "Akun peserta otomatis + aktivasi OTP WA + set password (AUTH-1, AUTH-2)",
+        "detail": "Submit formulir publik membuat user role 'peserta' & link calon_santri.user_id, lalu kirim OTP aktivasi via Modules/Notifikasi; peserta verifikasi OTP (TTL 5 mnt, single-use) → set password → auto-login.",
+        "current_state": "SELESAI. PesertaAccountService + PesertaOtpService + SendPesertaOtpJob (queue notifikasi) + PesertaAuthController (POST /spmb/aktivasi, kirim-ulang). PublicPpdbController@store redirect ke /spmb/aktivasi.",
+        "status": "done",
+        "priority": "critical",
+        "progress": 100,
+        "effort": "L",
+        "sort": 3
+      },
+      {
+        "phase": "F1 - Gerbang & Status",
+        "title": "Login multi-identifier, lupa password OTP & rate-limit anti-abuse (AUTH-3,4,5)",
+        "detail": "Login via no.HP/nomor pendaftaran/email + password (error generik anti-enumeration), lupa password via OTP WA dengan cooldown, dan throttle maks 3 OTP/15 mnt/nomor + log percobaan.",
+        "current_state": "SELESAI. PesertaIdentifierResolver + login/logout, /spmb/lupa-password(+reset) purpose 'reset' cooldown, RateLimiter per nomor & per identifier+IP, log terstruktur ppdb_otp.* tanpa plaintext.",
+        "status": "done",
+        "priority": "critical",
+        "progress": 100,
+        "effort": "M",
+        "sort": 4
+      },
+      {
+        "phase": "F1 - Gerbang & Status",
+        "title": "Isolasi tenant, policy /spmb hanya peserta & blokir Filament (AUTH-7)",
+        "detail": "Middleware EnsureUserIsPeserta untuk /spmb/*, CalonSantriPolicy membatasi akses ke milik sendiri, role peserta ditolak semua panel Filament; sesi tervalidasi per-DB tenant.",
+        "current_state": "SELESAI. Middleware alias 'peserta' + CalonSantriPolicy + panel portal legacy ditutup; jalur re-issue OTP/koreksi no.WA panitia dari ERP juga ada.",
+        "status": "done",
+        "priority": "high",
+        "progress": 100,
+        "effort": "M",
+        "sort": 5
+      },
+      {
+        "phase": "F1 - Gerbang & Status",
+        "title": "Layout PWA white-label, halaman aktivasi/login/lupa-password (Inertia+Vue)",
+        "detail": "SpmbLayout bertema tenant (logo/warna/nama via settings), halaman Portal/Aktivasi, Login, LupaPassword dengan copywriting bahasa awam dan redirect peserta sudah-login.",
+        "current_state": "SELESAI. SpmbLayout.vue + ShareSpmbPageData (branding_* + flash), Portal/Aktivasi.vue (kirim-ulang ber-cooldown), Portal/Login.vue, Portal/LupaPassword.vue 2 langkah.",
+        "status": "done",
+        "priority": "high",
+        "progress": 100,
+        "effort": "M",
+        "sort": 6
+      },
+      {
+        "phase": "F1 - Gerbang & Status",
+        "title": "Dashboard status (stepper 6 tahap) + lengkapi biodata + tracking read-only (DASH-1,2, AUTH-6)",
+        "detail": "Satu layar status: stepper Daftar→Berkas→Bayar→Ujian→Pengumuman→Daftar Ulang + checklist + 1 CTA; form biodata mengikuti PpdbFormFieldConfigurationService; tracking token read-only + CTA login.",
+        "current_state": "SELESAI. PesertaPortalController + Portal/Dashboard.vue; form peserta tenant-configurable (field hidden diabaikan server-side); /ppdb/tracking/{token} tenant-aware + Portal/Tracking.vue.",
+        "status": "done",
+        "priority": "high",
+        "progress": 100,
+        "effort": "M",
+        "sort": 7
+      },
+      {
+        "phase": "F1 - Gerbang & Status",
+        "title": "Manifest PWA dinamis, service worker dasar & budget performa (PWA-1,2)",
+        "detail": "Endpoint /spmb/manifest.json + ikon per tenant, registrasi service worker dasar, route-split dengan JS awal <200KB dan TTI <5dtk @3G.",
+        "current_state": "SELESAI. PesertaPwaController + PesertaBrandingService + registerPwa.js; build PASS main JS 175.67kB, chunk split route portal tervalidasi. Test auth-flow + isolasi tenant + blokir Filament hijau; hanya commit (F1.3.4) tertunda sesuai kebijakan no-git agent.",
+        "status": "done",
+        "priority": "high",
+        "progress": 95,
+        "effort": "M",
+        "sort": 8
+      },
+      {
+        "phase": "F2 - Berkas & Bayar",
+        "title": "Endpoint upload dokumen peserta + signed URL + status verifikasi (DOC-1,2,3)",
+        "detail": "Endpoint upload 6 jenis dokumen (pdf/jpg/jpeg/png/webp, 5MB) reuse PpdbDocumentUploadService, akses via signed/temporary URL (hanya pemilik & panitia), ekspos status verifikasi + alasan tolak + izin unggah ulang.",
+        "current_state": "BELUM. Backend PpdbDocumentUploadService + model CalonSantriDokumen lengkap (sisi admin), tapi belum ada endpoint/akses untuk peserta maupun signed URL.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 10,
+        "effort": "M",
+        "sort": 9
+      },
+      {
+        "phase": "F2 - Berkas & Bayar",
+        "title": "Halaman unggah dokumen peserta dari kamera/galeri + checklist wajib (DOC-1,4)",
+        "detail": "Halaman Vue ambil foto kamera/galeri, progress upload, status per jenis, alasan tolak; checklist dokumen wajib per tenant menghitung kelengkapan di dashboard.",
+        "current_state": "BELUM. Tidak ada UI dokumen sisi peserta; setting daftar dokumen wajib per tenant belum dibuat.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 0,
+        "effort": "M",
+        "sort": 10
+      },
+      {
+        "phase": "F2 - Berkas & Bayar",
+        "title": "Tagihan PPDB + unggah bukti transfer manual (BILL-1,2)",
+        "detail": "Halaman tagihan menampilkan nominal/jatuh tempo/instruksi transfer per tenant; upload bukti membuat record Pembayaran (Modules/Keuangan) status menunggu verifikasi, terhubung keuangan_tagihan_id; status & alasan tolak tampil ke peserta.",
+        "current_state": "BELUM. Backend TagihanPpdb + PpdbBillingService + relasi ke Modules/Keuangan ada, namun belum ada halaman tagihan & alur unggah bukti untuk peserta.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 10,
+        "effort": "M",
+        "sort": 11
+      },
+      {
+        "phase": "F2 - Berkas & Bayar",
+        "title": "Notifikasi WA event berkas & tagihan + antrean verifikasi ERP (NOTIF-1, BILL-3)",
+        "detail": "Event memicu template WA per tenant (dokumen ditolak, tagihan terbit, bukti diverifikasi/ditolak) lewat antrean; pastikan antrean verifikasi dokumen & bukti bayar di Filament terhubung benar ke TagihanPpdb.",
+        "current_state": "BELUM. Pipeline Notifikasi (BroadcastWa/TemplateNotifikasi/LogNotifikasi) tersedia, tapi event-event F2 belum dipasang; penyesuaian antrean ERP belum dikerjakan.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 5,
+        "effort": "M",
+        "sort": 12
+      },
+      {
+        "phase": "F2 - Berkas & Bayar",
+        "title": "Test F2 (upload→verifikasi→re-upload, bukti→lunas, keamanan URL & lintas tenant)",
+        "detail": "Feature test alur dokumen & pembayaran lengkap; test keamanan: URL dokumen tanpa sesi pemilik = 403 dan akses lintas tenant mustahil.",
+        "current_state": "BELUM. Belum ada test F2.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 0,
+        "effort": "S",
+        "sort": 13
+      },
+      {
+        "phase": "F3 - Ujian, Pengumuman & Daftar Ulang",
+        "title": "Jadwal ujian + kartu peserta digital (QR/PDF) + publikasi hasil (EXAM-1,2,3)",
+        "detail": "Migrasi tenant tabel jadwal_ujian + resource Filament panitia; kartu peserta digital (nomor, nama, foto, QR nomor pendaftaran) render PDF & tampil offline; flag publikasikan hasil per tenant lalu ekspos HasilUjian.",
+        "current_state": "BELUM. Entitas jadwal_ujian belum ada (gap PRD §10.2); HasilUjian + PpdbExamResultService ada di backend tapi tanpa flag publish & UI peserta.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 5,
+        "effort": "L",
+        "sort": 14
+      },
+      {
+        "phase": "F3 - Ujian, Pengumuman & Daftar Ulang",
+        "title": "Halaman pengumuman keputusan per-akun (lulus/cadangan/ditolak) + notif WA (ANN-1,2)",
+        "detail": "Tiga varian layar pengumuman empatik tanpa membocorkan data peserta lain reuse PpdbAdmissionDecisionService; pastikan notifikasi keputusan WA existing menyertakan link login PWA.",
+        "current_state": "BELUM (frontend). PpdbAdmissionDecisionService + PpdbDecisionNotificationService lengkap di backend; halaman pengumuman peserta belum dibangun.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 15,
+        "effort": "M",
+        "sort": 15
+      },
+      {
+        "phase": "F3 - Ujian, Pengumuman & Daftar Ulang",
+        "title": "Wizard daftar ulang → buat Santri + handoff App Wali (REREG-1,2)",
+        "detail": "Wizard konfirmasi/lengkapi data → tagihan daftar ulang (PpdbBillingService) → bukti bayar → verifikasi → PpdbReregistrationService membuat/me-link Santri; layar 'selamat datang santri baru' + ajakan instal App Wali.",
+        "current_state": "BELUM (frontend). PpdbReregistrationService lengkap & sudah membuat Santri di backend; alur/wizard sisi peserta belum ada.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 15,
+        "effort": "L",
+        "sort": 16
+      },
+      {
+        "phase": "F3 - Ujian, Pengumuman & Daftar Ulang",
+        "title": "Pengingat daftar ulang via WA + timeline riwayat aktivitas (NOTIF-1, DASH-3)",
+        "detail": "Pengingat daftar ulang otomatis (H-x jatuh tempo) lewat antrean WA; timeline kronologis perubahan status/verifikasi pendaftaran di dashboard peserta.",
+        "current_state": "BELUM. Belum ada penjadwalan pengingat maupun komponen timeline peserta.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 0,
+        "effort": "M",
+        "sort": 17
+      },
+      {
+        "phase": "F3 - Ujian, Pengumuman & Daftar Ulang",
+        "title": "Test F3 end-to-end (pending→ujian→lulus→daftar ulang→Santri, kunci hasil & status)",
+        "detail": "Feature test alur penuh hingga record Santri benar; test hasil tidak bocor sebelum publish, peserta ditolak terkunci dari upload/billing, dan daftar ulang ditolak untuk status selain lulus/cadangan.",
+        "current_state": "BELUM. Belum ada test F3.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 0,
+        "effort": "M",
+        "sort": 18
+      },
+      {
+        "phase": "F4 - Pengerasan & Rilis",
+        "title": "Offline shell service worker (status terakhir + kartu ujian) (PWA-3)",
+        "detail": "Service worker menyajikan status terakhir & kartu ujian offline dengan banner offline; aksi tulis diantre/ditolak dengan pesan jelas.",
+        "current_state": "BELUM. Baru registrasi service worker dasar (F1); offline shell belum dibangun.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 5,
+        "effort": "M",
+        "sort": 19
+      },
+      {
+        "phase": "F4 - Pengerasan & Rilis",
+        "title": "Uji beban musiman + audit keamanan isolasi tenant (R-3, R-5)",
+        "detail": "Simulasi lonjakan upload + broadcast WA serentak via queue Redis; audit checklist isolasi DB-per-tenant, signed URL, rate-limit OTP, role peserta tanpa Filament; Lighthouse PWA installable + TTI <5dtk @3G.",
+        "current_state": "BELUM. Belum ada uji beban, audit keamanan formal, maupun run Lighthouse.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 0,
+        "effort": "M",
+        "sort": 20
+      },
+      {
+        "phase": "F4 - Pengerasan & Rilis",
+        "title": "Smoke test produksi + monitoring /spmb + UAT Asy-Syifaa + dokumentasi & Go/No-Go",
+        "detail": "Smoke test & monitoring (Uptime Kuma + log) rute /spmb, UAT terpandu panitia tenant percontohan + perbaikan temuan, panduan peserta & panitia, lalu Go/No-Go rilis musim SPMB.",
+        "current_state": "BELUM. Belum ada smoke test/monitoring khusus /spmb, UAT, dokumentasi, atau keputusan rilis.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 0,
+        "effort": "M",
+        "sort": 21
+      }
+    ]
+  },
+  {
+    "project": {
+      "name": "PWA Wali Santri",
+      "slug": "pwa-wali",
+      "description": "Portal/PWA wali santri transaksional: pantau anak (read-only existing) + bayar tagihan self-service (upload bukti) + topup tabungan & bayar-dari-saldo atomik. Inertia+Vue mobile-first, satu auth (role wali), DB-per-tenant, verifikasi bendahara via ERP Filament + notifikasi WA.",
+      "icon": "heroicon-o-device-phone-mobile",
+      "color": "success",
+      "status": "in_progress"
+    },
+    "tasks": [
+      {
+        "phase": "W0 — Keputusan & Skema",
+        "title": "Keputusan terkunci OQ-2 & OQ-3 (bayar sebagian, akun wali otomatis)",
+        "detail": "Putuskan bayar-dari-saldo boleh sebagian (status tagihan sebagian) dan akun wali dibuat otomatis dari no_hp_wali + aktivasi OTP WA.",
+        "current_state": "Selesai. OQ-2 & OQ-3 diputuskan Hamdan 2026-06-05; tercatat di PRD §13 (W0.1, W0.2).",
+        "status": "done",
+        "priority": "critical",
+        "progress": 100,
+        "effort": "S",
+        "sort": 1
+      },
+      {
+        "phase": "W0 — Keputusan & Skema",
+        "title": "Skema DB tenant: metode_pembayaran, tabungan_topup, kolom transaksi wali",
+        "detail": "Migrasi metode_pembayaran, tabungan_topup, alter pembayaran (+saldo_tabungan, +alasan_penolakan) & tabungan (+limit_harian, +is_frozen) di path tenant tanpa FK central.",
+        "current_state": "Selesai. Migrasi 2026_06_05_140000/140100/140200 + model MetodePembayaran & TabunganTopup sudah ada di Modules/Keuangan. Belum di-commit (catat di laporan).",
+        "status": "done",
+        "priority": "critical",
+        "progress": 100,
+        "effort": "M",
+        "sort": 2
+      },
+      {
+        "phase": "W1 — Shell PWA & UX",
+        "title": "Redesign layout mobile: bottom-nav 5 tab + switcher multi-anak",
+        "detail": "PortalWaliLayout.vue jadi mobile bottom-nav (Beranda/Tagihan/Tabungan/Anak/Akun) + header switcher anak reuse getAccessibleSantri.",
+        "current_state": "PortalWaliLayout.vue ada tapi belum mobile bottom-nav. getAccessibleSantri di PortalWaliService sudah jadi. Redesign belum dikerjakan.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 10,
+        "effort": "L",
+        "sort": 3
+      },
+      {
+        "phase": "W1 — Shell PWA & UX",
+        "title": "Beranda ringkasan keuangan (total tunggakan, saldo, jatuh tempo, CTA)",
+        "detail": "Halaman beranda agregasi per anak dari getFinancialPayload: total tunggakan, saldo tabungan, tagihan jatuh tempo terdekat + CTA bayar.",
+        "current_state": "Dashboard.vue + getFinancialPayload sudah ada (read). Layar ringkasan agregat keuangan khusus mobile belum dibangun.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 15,
+        "effort": "M",
+        "sort": 4
+      },
+      {
+        "phase": "W1 — Shell PWA & UX",
+        "title": "Migrasi halaman monitoring existing ke layout baru tanpa regresi",
+        "detail": "Pindahkan Academic, Hafalan, Kesehatan, Kegiatan, Izin, Profile, Notifications ke shell mobile baru tanpa regresi.",
+        "current_state": "Semua halaman & controller monitoring sudah ada (9 Vue page + 11 controller, read-only berjalan). Tinggal adaptasi ke layout mobile baru.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 40,
+        "effort": "M",
+        "sort": 5
+      },
+      {
+        "phase": "W1 — Shell PWA & UX",
+        "title": "PWA installable white-label: manifest dinamis + service worker + offline",
+        "detail": "Endpoint /wali/manifest.json per tenant (nama/ikon/warna), service worker cache shell + data terakhir, banner offline.",
+        "current_state": "Belum ada untuk wali. Pola PWA sudah terbukti di SPMB (resources/js/spmb/registerPwa.js + SpmbLayout) — bisa diadopsi.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 5,
+        "effort": "M",
+        "sort": 6
+      },
+      {
+        "phase": "W1 — Shell PWA & UX",
+        "title": "Aktivasi akun wali otomatis + reset password OTP WA (AKS-3)",
+        "detail": "Provisioning massal akun wali dari no_hp_wali santri aktif (role wali) + aktivasi & reset password via OTP WA, reuse infra SPMB.",
+        "current_state": "Belum ada untuk wali. Infra reusable tersedia: Modules/PPDB UserOtp + PesertaOtpService.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 5,
+        "effort": "M",
+        "sort": 7
+      },
+      {
+        "phase": "W1 — Shell PWA & UX",
+        "title": "Policy & test akses per-anak + budget performa (AKS-2)",
+        "detail": "Policy wali hanya anaknya (uji otomatis lintas-wali & lintas-tenant 403) + route-split per tab, JS awal <200KB, Lighthouse installable lulus.",
+        "current_state": "Akses via getAccessibleSantriQuery (wali_user_id + access_wali) sudah ada di service. Policy formal + suite test keamanan & budget performa belum.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 15,
+        "effort": "M",
+        "sort": 8
+      },
+      {
+        "phase": "W2 — Tagihan & Pembayaran",
+        "title": "Filament resource MetodePembayaran per tenant (TGH-2, ERP-2)",
+        "detail": "CRUD metode pembayaran (bank/e-wallet/QRIS) di ERP: nomor, atas-nama, instruksi, upload gambar QRIS, urutan, toggle aktif — tanpa coding.",
+        "current_state": "Model MetodePembayaran + tabel sudah ada. Belum ada Filament Resource sama sekali di Modules/Keuangan/app/Filament.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 20,
+        "effort": "M",
+        "sort": 9
+      },
+      {
+        "phase": "W2 — Tagihan & Pembayaran",
+        "title": "Halaman Tagihan & 'Cara Bayar' di PWA (TGH-1, TGH-2)",
+        "detail": "Daftar+rincian tagihan per anak (pecah dari Financial.vue) + halaman Cara Bayar menampilkan metode tenant, salin-nomor, QRIS via signed URL.",
+        "current_state": "Financial.vue + read tagihan via getFinancialPayload sudah ada. Pemisahan halaman tagihan & halaman cara bayar belum dibangun.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 15,
+        "effort": "M",
+        "sort": 10
+      },
+      {
+        "phase": "W2 — Tagihan & Pembayaran",
+        "title": "Flow unggah bukti pembayaran wali + status verifikasi (TGH-3, TGH-4)",
+        "detail": "Form upload bukti (nominal/tanggal/foto) buat Pembayaran is_verified=false + idempotency anti double-submit; tampilkan status menunggu/terverifikasi/ditolak + unggah ulang.",
+        "current_state": "Skema Pembayaran siap (PembayaranService ada). Route wali masih GET-only; aksi tulis upload bukti dari wali belum ada.",
+        "status": "todo",
+        "priority": "critical",
+        "progress": 5,
+        "effort": "L",
+        "sort": 11
+      },
+      {
+        "phase": "W2 — Tagihan & Pembayaran",
+        "title": "ERP antrean verifikasi bukti bayar + wiring update status tagihan (ERP-1, TGH-4)",
+        "detail": "Antrean verifikasi bendahara di Filament (badge, preview, verifikasi/tolak+alasan, audit); verifikasi update total_dibayar/sisa/status (parsial→sebagian).",
+        "current_state": "Logika Keuangan (PembayaranService/TagihanService/RekonsiliasiService) ada. UI antrean verifikasi wali-submitted di Filament belum ada (belum ada Resource Keuangan).",
+        "status": "todo",
+        "priority": "high",
+        "progress": 10,
+        "effort": "M",
+        "sort": 12
+      },
+      {
+        "phase": "W2 — Tagihan & Pembayaran",
+        "title": "Notifikasi WA event pembayaran + riwayat bukti (TGH-5)",
+        "detail": "Template & event WA: tagihan terbit, bukti diterima, terverifikasi, ditolak; halaman riwayat pembayaran + nomor bukti.",
+        "current_state": "Modul Notifikasi WA tersedia (pola SPMB n8n/WAHA). Template & wiring event keuangan wali belum dibuat.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 5,
+        "effort": "M",
+        "sort": 13
+      },
+      {
+        "phase": "W2 — Tagihan & Pembayaran",
+        "title": "Test keamanan & integritas pembayaran (W2.11/W2.12)",
+        "detail": "Test: wali tak bisa unggah bukti tagihan anak lain (403); bukti tanpa sesi 403; status tagihan tidak pernah berubah tanpa verifikasi.",
+        "current_state": "Belum ada test untuk alur transaksional wali.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 0,
+        "effort": "S",
+        "sort": 14
+      },
+      {
+        "phase": "W3 — Tabungan: Topup & Bayar-dari-Saldo",
+        "title": "TabunganTopupService: ajukan → verifikasi (saldo naik atomik) → tolak (TAB-2)",
+        "detail": "Service topup: ajukan status menunggu; verifikasi membuat TabunganTransaksi masuk + naikkan saldo atomik; tolak + alasan + unggah ulang.",
+        "current_state": "Model TabunganTopup + tabel sudah ada. Service logika (ajukan/verifikasi/tolak) belum ada — TabunganService existing belum menangani topup terverifikasi.",
+        "status": "todo",
+        "priority": "critical",
+        "progress": 15,
+        "effort": "L",
+        "sort": 15
+      },
+      {
+        "phase": "W3 — Tabungan: Topup & Bayar-dari-Saldo",
+        "title": "Halaman Tabungan + bottom-sheet Setor Saldo + antrean ERP topup (TAB-1)",
+        "detail": "Kartu saldo + riwayat transaksi (redesign payload existing), bottom-sheet Setor Saldo (nominal/tanggal/pengirim/foto), antrean verifikasi topup terpisah di ERP.",
+        "current_state": "Read saldo+transaksi via getFinancialPayload ada. UI setor saldo & antrean verifikasi topup Filament belum ada.",
+        "status": "todo",
+        "priority": "high",
+        "progress": 10,
+        "effort": "L",
+        "sort": 16
+      },
+      {
+        "phase": "W3 — Tabungan: Topup & Bayar-dari-Saldo",
+        "title": "BayarDariSaldoService atomik + UI + idempotency (TAB-3)",
+        "detail": "Service transaksi DB tunggal + lockForUpdate: TabunganTransaksi keluar + Pembayaran metode saldo_tabungan auto-verified + update tagihan (penuh/sebagian OQ-2); UI tombol+konfirmasi + idempotency anti double-tap.",
+        "current_state": "Belum ada. Tidak ditemukan BayarDariSaldoService maupun penggunaan lockForUpdate/saldo_tabungan di Modules/Keuangan.",
+        "status": "todo",
+        "priority": "critical",
+        "progress": 0,
+        "effort": "L",
+        "sort": 17
+      },
+      {
+        "phase": "W3 — Tabungan: Topup & Bayar-dari-Saldo",
+        "title": "Notifikasi WA tabungan + kolom limit_harian/is_frozen UI (TAB-4, TAB-5)",
+        "detail": "Event WA: topup diverifikasi/ditolak, saldo terpakai bayar; UI wali set limit_harian & freeze (penegakan P1 menunggu POS, ditandai jelas).",
+        "current_state": "Kolom limit_harian/is_frozen sudah disiapkan di migrasi alter tabungan. Template WA & UI limit/freeze belum dibangun.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 5,
+        "effort": "M",
+        "sort": 18
+      },
+      {
+        "phase": "W3 — Tabungan: Topup & Bayar-dari-Saldo",
+        "title": "Test konkurensi & ledger saldo (W3.11/W3.12)",
+        "detail": "Test wajib: dua bayar-dari-saldo paralel → saldo konsisten & tak pernah negatif; setiap mutasi punya saldo_sebelum/sesudah koheren berurutan.",
+        "current_state": "Belum ada. Test konkurensi/ledger untuk mutasi saldo belum dibuat (kritis — menyentuh uang nyata).",
+        "status": "todo",
+        "priority": "critical",
+        "progress": 0,
+        "effort": "M",
+        "sort": 19
+      },
+      {
+        "phase": "W4 — Pengerasan, Migrasi & Rilis",
+        "title": "Audit keamanan, uji beban & offline shell penuh (W4.1-W4.4)",
+        "detail": "Uji beban upload+broadcast WA awal bulan (queue Redis), audit policy/signed URL/idempotency/isolasi DB, offline shell penuh, Lighthouse + uji HP low-end (TTI<5dtk @3G).",
+        "current_state": "Belum dikerjakan; tergantung penyelesaian W1-W3.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 0,
+        "effort": "M",
+        "sort": 20
+      },
+      {
+        "phase": "W4 — Pengerasan, Migrasi & Rilis",
+        "title": "Migrasi app lama (sunset + redirect) & dokumentasi (MIG-1)",
+        "detail": "Banner sunset di asy-syifaa-app + broadcast WA migrasi + masa transisi 2 minggu, lalu redirect ke {domain}/wali & arsip repo; panduan wali + bendahara.",
+        "current_state": "Belum dikerjakan. App lama asy-syifaa-app masih hidup; belum ada banner/redirect.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 0,
+        "effort": "M",
+        "sort": 21
+      },
+      {
+        "phase": "W4 — Pengerasan, Migrasi & Rilis",
+        "title": "UAT pilot, Go/No-Go & rilis v1.0 + pantau metrik (W4.5-W4.11)",
+        "detail": "UAT bendahara + 5-10 wali pilot Asy-Syifaa, keputusan Go/No-Go (Hamdan), tag release portal wali transaksional v1.0, pantau metrik §11 minggu pertama.",
+        "current_state": "Belum dikerjakan; gerbang akhir setelah semua fase hijau.",
+        "status": "todo",
+        "priority": "medium",
+        "progress": 0,
+        "effort": "M",
+        "sort": 22
+      }
+    ]
+  }
+]
