@@ -115,6 +115,16 @@ class DevRoadmapSeeder extends Seeder
                 'Akun calon dikonversi jadi akun santri aktif untuk login via aplikasi santri / orang tua.',
                 'Konversi data ke Santri sudah ada. Akun login santri/wali untuk aplikasi belum ada.',
                 'todo', 'high', 15, 'M', 17],
+
+            // Fase 6 — Akun Santri & Wali (Aplikasi)
+            ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Konversi LULUS → akun santri aktif + akun orang tua/wali',
+                'Saat calon LULUS & daftar ulang, akun peserta dikonversi otomatis: role peserta → santri (login aplikasi santri), DAN terbitkan/tautkan akun orang tua/wali (role `wali`, No. HP ortu) via pivot access_wali — satu wali bisa menaungi beberapa anak.',
+                'Konversi DATA calon → Santri sudah ada (PpdbReregistrationService). Upgrade ROLE peserta→santri + pembuatan akun wali otomatis belum ada.',
+                'todo', 'high', 0, 'M', 18],
+            ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Onboarding santri aktif tanpa akun: kredensial sementara sekali-pakai + install app',
+                'Santri aktif yang BELUM punya akun / No. HP terdaftar: admin kirim pemberitahuan via WhatsApp berisi akun + password sementara SEKALI PAKAI + tautan install aplikasi; paksa ganti password saat login pertama. Dukung per-santri maupun massal.',
+                'Belum ada. Santri lama (non-PPDB) belum punya jalur penerbitan akun + onboarding aplikasi.',
+                'todo', 'high', 0, 'M', 19],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
