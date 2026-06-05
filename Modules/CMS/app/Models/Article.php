@@ -17,6 +17,7 @@ class Article extends Model
         'tenant_id',
         'title',
         'slug',
+        'category',
         'excerpt',
         'content',
         'featured_image_url',

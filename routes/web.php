@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\CmsPublicApiController;
 use App\Http\Controllers\TenantWebsiteController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Database\Models\Domain;
@@ -40,3 +41,11 @@ Route::get('/syarat-layanan', fn () => view('legal.terms-of-service'))->name('le
 Route::get('/disclaimer', fn () => view('legal.disclaimer'))->name('legal.disclaimer');
 Route::get('/cookie-policy', fn () => view('legal.cookie-policy'))->name('legal.cookies');
 Route::get('/kontak', fn () => view('legal.contact'))->name('legal.contact');
+
+// ── API publik konten CMS untuk website tenant (mis. api.asy-syifaa.com) ──
+// Tenant di-resolve dari domain oleh middleware tenancy web. CORS: config/cors.php.
+// Kontrak: docs/SPEC-API-WEBSITE-ASY-SYIFAA.md
+Route::get('/api/v1/posts', [CmsPublicApiController::class, 'posts']);
+Route::get('/api/v1/posts/{slug}', [CmsPublicApiController::class, 'post']);
+Route::get('/api/public/content/gallery', [CmsPublicApiController::class, 'gallery']);
+Route::get('/api/public/content/gallery/{slug}', [CmsPublicApiController::class, 'galleryItem']);

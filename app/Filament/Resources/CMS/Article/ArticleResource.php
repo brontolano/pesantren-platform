@@ -10,6 +10,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -87,6 +88,16 @@ class ArticleResource extends Resource
                     ->maxLength(255)
                     ->unique(Article::class, 'slug', ignoreRecord: true)
                     ->helperText('Contoh: berita-kegiatan-santri. Otomatis dari judul.'),
+                Select::make('category')
+                    ->label('Kategori')
+                    ->options([
+                        'article' => 'Artikel Umum',
+                        'announcement' => 'Pengumuman',
+                        'achievement' => 'Prestasi',
+                    ])
+                    ->default('article')
+                    ->required()
+                    ->helperText('Menentukan di halaman mana artikel tampil di website (artikel / pengumuman / prestasi).'),
                 Textarea::make('excerpt')
                     ->label('Ringkasan')
                     ->maxLength(500)
