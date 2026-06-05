@@ -21,7 +21,6 @@ use Modules\CMS\Models\WebsiteSection;
 class ProfileResource extends Resource
 {
     use \App\Filament\Concerns\ModuleGate;
-    use \App\Filament\Concerns\BuiltInWebsiteGate;
 
     protected static ?string $model = WebsiteSection::class;
 
@@ -44,9 +43,7 @@ class ProfileResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::builtInWebsiteEnabled()
-            && static::moduleVisible('cms')
-            && (auth()->user()?->can('manage_tenant_settings') ?? false);
+        return static::moduleVisible('cms') && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public static function canViewAny(): bool
