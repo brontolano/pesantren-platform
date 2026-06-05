@@ -14,7 +14,8 @@ class DevRoadmapSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->seedPpdbV2();
+        $this->seedPpdbAdmin();
+        $this->seedAppSantri();
         $this->seedPwaRoadmap();
         $this->seedIntegrasiWebsite();
         $this->seedFileStorage();
@@ -67,115 +68,102 @@ class DevRoadmapSeeder extends Seeder
         }
     }
 
-    private function seedPpdbV2(): void
+    private function seedPpdbAdmin(): void
     {
+        // Proyek lama "PPDB Portal v2" kini dipecah: PWA Peserta SPMB (frontend
+        // pendaftar), PWA Wali, App Santri, dan proyek admin/ERP ini. Bersihkan
+        // yang lama supaya papan tidak tumpang-tindih (cascade hapus task-nya).
+        DevProject::where('slug', 'ppdb-portal-v2')->delete();
+
         $project = DevProject::updateOrCreate(
-            ['slug' => 'ppdb-portal-v2'],
+            ['slug' => 'ppdb-admin-ujian'],
             [
-                'name' => 'PPDB Portal v2',
-                'description' => 'Portal calon santri self-service: akun login (No. HP), e-tiket QR, notifikasi WhatsApp (n8n+WAHA), ujian online, pembayaran, ID card, dan konversi ke akun santri aktif.',
+                'name' => 'PPDB Admin & Ujian (ERP)',
+                'description' => 'Sisi ADMIN/panitia PPDB di ERP (Filament) + mesin ujian online — DI LUAR PWA peserta: CRUD/monitoring/approval pendaftar, pengaturan notifikasi WA per tenant, bank soal & ujian bertimer auto-grade, penempatan kelas/asrama saat daftar ulang, dan generator ID Card santri.',
                 'status' => 'in_progress',
-                'color' => 'info',
-                'icon' => 'heroicon-o-academic-cap',
+                'color' => 'primary',
+                'icon' => 'heroicon-o-clipboard-document-check',
                 'sort' => 1,
             ]
         );
 
         // [phase, title, detail, current_state, status, priority, progress, effort, sort]
         $tasks = [
-            // Fase 0 — Pondasi Akun
-            ['Fase 0 — Pondasi Akun Calon Santri', 'Akun login calon santri (No. HP = username utama)',
-                'Setiap pendaftar punya akun (guard/role calon_santri) dengan No. HP sebagai identitas login.',
-                'Belum ada. calon_santri kini hanya baris data tanpa akun login.',
-                'todo', 'critical', 0, 'M', 1],
-            ['Fase 0 — Pondasi Akun Calon Santri', 'Password sementara + paksa reset saat login pertama',
-                'Generate password sementara, kirim ke wali, dan paksa ganti password baru saat pertama login.',
-                'Belum ada.',
-                'todo', 'high', 0, 'S', 2],
-
-            // Fase 1 — Pendaftaran & Onboarding
-            ['Fase 1 — Pendaftaran & Onboarding', 'Form pendaftaran online publik (CTA wajib No. HP utama)',
-                'Satu form di website tenant; No. HP wajib & menjadi nomor login utama.',
-                'Form Blade dasar sudah ada di /ppdb (TenantWebsiteController), tapi belum membuat akun & belum menjadikan No. HP sebagai login.',
-                'in_progress', 'high', 40, 'M', 3],
-            ['Fase 1 — Pendaftaran & Onboarding', 'Generate E-Tiket QR Code Nomor Peserta (PDF + visual)',
-                'E-tiket berisi Nomor Peserta, Nama, No. HP, Username & Password sementara + QR code; bisa diunduh PDF.',
-                'Nomor pendaftaran (PPDB-YYYY-xxxx) + tracking_token sudah ada. QR code, e-tiket, dan kredensial belum ada. Perlu lib QR + PDF.',
-                'todo', 'high', 15, 'M', 4],
-            ['Fase 1 — Pendaftaran & Onboarding', 'Notifikasi WhatsApp via webhook n8n + WAHA',
-                'Saat daftar/keputusan, app menembak webhook n8n yang meneruskan ke WAHA sendText.',
-                'Workflow n8n+WAHA (ppdb-wa) sudah ada sebagai template. Sisi Laravel (kirim webhook + template pesan) belum dibangun.',
-                'in_progress', 'high', 30, 'M', 5],
-            ['Fase 1 — Pendaftaran & Onboarding', 'Pengaturan integrasi WA per tenant (URL webhook, template, toggle)',
-                'Menu setting tenant untuk URL webhook n8n, template pesan, dan on/off notifikasi.',
-                'Belum ada.',
-                'todo', 'medium', 0, 'S', 6],
-
-            // Fase 2 — Portal Calon Santri (frontend user)
-            ['Fase 2 — Portal Calon Santri', 'Isi data lengkap: diri, orang tua, wali',
-                'Form bertahap untuk biodata calon, data ayah/ibu, dan data wali.',
-                'Field dasar sudah ada di tabel calon_santri. UI lengkap & terstruktur untuk user belum ada.',
-                'todo', 'medium', 20, 'M', 7],
-            ['Fase 2 — Portal Calon Santri', 'Upload dokumen pendukung (image / PDF)',
-                'User unggah KK, akta, ijazah, pas foto, dll (image/pdf) dari portal.',
-                'Model CalonSantriDokumen + PpdbDocumentUploadService sudah ada (sisi admin). UI upload untuk user belum ada.',
-                'todo', 'medium', 25, 'M', 8],
-            ['Fase 2 — Portal Calon Santri', 'Halaman tagihan, jadwal seleksi & info daftar ulang',
-                'User melihat tagihan, jadwal/lokasi seleksi, dan instruksi daftar ulang.',
-                'Billing tersedia sisi admin (PpdbBillingService → Keuangan). Tampilan untuk user belum ada.',
-                'todo', 'medium', 10, 'M', 9],
-            ['Fase 2 — Portal Calon Santri', 'Fitur pembayaran (gateway / konfirmasi)',
-                'Pembayaran biaya pendaftaran/daftar ulang online atau konfirmasi manual.',
-                'Tagihan Keuangan sudah ada. Pembayaran online (gateway) belum ada.',
-                'todo', 'medium', 0, 'L', 10],
-
-            // Fase 3 — Admin PPDB
-            ['Fase 3 — Admin PPDB', 'CRUD peserta + monitoring + approval',
-                'Admin kelola pendaftar, pantau status, dan setujui/tolak.',
-                'Filament CalonSantriResource + PpdbAdmissionDecisionService (lulus/cadangan/ditolak) sudah ada.',
-                'in_progress', 'medium', 55, 'M', 11],
-            ['Fase 3 — Admin PPDB', 'Push notifikasi on-app / WhatsApp dari admin',
-                'Admin kirim broadcast/notifikasi ke peserta lewat in-app & WhatsApp.',
-                'Belum ada (tergantung integrasi WA fase 1).',
-                'todo', 'medium', 10, 'M', 12],
-
-            // Fase 4 — Ujian Online
-            ['Fase 4 — Ujian Online', 'Bank soal + jawaban (admin membuat soal)',
+            ['Admin & Notifikasi', 'CRUD peserta + monitoring + approval (Filament)',
+                'Panitia kelola pendaftar, pantau status, setujui/tolak (lulus/cadangan/ditolak).',
+                'Sebagian besar SUDAH ADA: CalonSantriResource + PpdbAdmissionDecisionService + aksi re-issue OTP/koreksi No.WA dari ERP.',
+                'in_progress', 'high', 60, 'M', 1],
+            ['Admin & Notifikasi', 'Pengaturan integrasi WA per tenant (webhook n8n, template, toggle)',
+                'Menu setting tenant: URL webhook n8n, template pesan per-event, on/off notifikasi.',
+                'Pipa n8n+WAHA jalan global; pengaturan per-tenant (template/toggle) belum.',
+                'todo', 'medium', 10, 'S', 2],
+            ['Admin & Notifikasi', 'Push notifikasi on-app / WhatsApp dari admin (broadcast)',
+                'Panitia kirim broadcast/notifikasi massal ke peserta via in-app + WhatsApp.',
+                'Modul Notifikasi (BroadcastWa/TemplateNotifikasi) tersedia; wiring event PPDB belum lengkap.',
+                'todo', 'medium', 15, 'M', 3],
+            ['Ujian Online', 'Bank soal + kunci jawaban (admin authoring)',
                 'Admin membuat bank soal (pilihan ganda/essay) beserta kunci jawaban.',
-                'Saat ini hanya input nilai manual (HasilUjian). Bank soal belum ada.',
-                'todo', 'medium', 5, 'L', 13],
-            ['Fase 4 — Ujian Online', 'Ujian online bertimer + auto-grading + nilai manual',
-                'User mengerjakan soal dengan timer; nilai otomatis untuk PG, manual untuk essay.',
-                'Belum ada.',
-                'todo', 'medium', 0, 'L', 14],
-
-            // Fase 5 — Daftar Ulang & Konversi
-            ['Fase 5 — Daftar Ulang & Konversi', 'Penempatan kelas & asrama saat daftar ulang',
-                'Santri lulus + lunas datang ke pondok; sistem menetapkan kelas & asrama.',
-                'Registrasi ulang → membuat record Santri sudah ada (PpdbReregistrationService). Integrasi penempatan kelas & asrama di alur belum ada.',
-                'in_progress', 'high', 30, 'M', 15],
-            ['Fase 5 — Daftar Ulang & Konversi', 'Auto-generate ID Card santri (cetak PDF + visual di akun)',
-                'Sistem otomatis membuat ID card yang bisa dicetak PDF & tampil sebagai kartu visual di akun santri.',
+                'Belum ada. Saat ini hanya input nilai manual (HasilUjian).',
+                'todo', 'medium', 0, 'L', 4],
+            ['Ujian Online', 'Ujian online bertimer + auto-grading PG + nilai manual essay',
+                'Peserta mengerjakan soal dengan timer server-side; nilai otomatis untuk PG, manual untuk essay; hasil ke HasilUjian.',
+                'Belum ada (tabel ujian_sesi/jawaban_peserta belum dibuat).',
+                'todo', 'medium', 0, 'L', 5],
+            ['Penempatan & Identitas', 'Penempatan kelas & asrama saat daftar ulang',
+                'Santri lulus + lunas → sistem menetapkan kelas & asrama saat daftar ulang.',
+                'Konversi daftar-ulang → Santri sudah ada (PpdbReregistrationService); integrasi penempatan kelas/asrama di alur belum.',
+                'in_progress', 'high', 30, 'M', 6],
+            ['Penempatan & Identitas', 'Auto-generate ID Card santri (PDF + visual)',
+                'Sistem otomatis membuat ID card (cetak PDF + kartu visual di akun santri).',
                 'Belum ada. Perlu lib PDF + template kartu.',
-                'todo', 'medium', 0, 'M', 16],
-            ['Fase 5 — Daftar Ulang & Konversi', 'Konversi akun calon → akun santri aktif (login app santri/wali)',
-                'Akun calon dikonversi jadi akun santri aktif untuk login via aplikasi santri / orang tua.',
-                'Konversi data ke Santri sudah ada. Akun login santri/wali untuk aplikasi belum ada.',
-                'todo', 'high', 15, 'M', 17],
+                'todo', 'medium', 0, 'M', 7],
+        ];
 
-            // Fase 6 — Akun Santri & Wali (Aplikasi)
-            ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Konversi LULUS → akun santri aktif + akun orang tua/wali',
-                'Saat calon LULUS & daftar ulang (Santri terbentuk): akun calon (ber-No.HP wali) di-upgrade role peserta → WALI + ditautkan ke Santri via access_wali (is_primary). KEPUTUSAN: untuk sekarang cukup akun WALI; akun login SANTRI terpisah ditunda (lihat task "Akun & login SANTRI").',
-                'RENCANA FINAL tercatat; EKSEKUSI DITUNDA (keputusan Hamdan: selaraskan dulu dgn sistem akun peserta SPMB yang aktif digarap — PesertaAccountService/PWA — agar tak tabrakan, belum sentuh kode). Pondasi data konversi calon→Santri sudah ada (PpdbReregistrationService).',
-                'todo', 'high', 5, 'M', 18],
-            ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Onboarding santri aktif tanpa akun: kredensial sementara sekali-pakai + install app',
-                'Santri aktif yang BELUM punya akun / No. HP terdaftar: admin kirim pemberitahuan via WhatsApp berisi akun + password sementara SEKALI PAKAI + tautan install aplikasi; paksa ganti password saat login pertama. Dukung per-santri maupun massal.',
-                'Belum ada. Santri lama (non-PPDB) belum punya jalur penerbitan akun + onboarding aplikasi.',
-                'todo', 'high', 0, 'M', 19],
-            ['Fase 6 — Akun Santri & Wali (Aplikasi)', 'Akun & login SANTRI: NIS + fingerprint (mode dev) → integrasi smart card NFC',
-                'Akun login khusus santri: identitas NIS + verifikasi fingerprint (mode pengembangan). Arah jangka panjang: integrasi kartu pintar NFC untuk absensi/akses/identitas santri di aplikasi.',
-                'Ide tahap awal (keputusan Hamdan). Belum dibangun — menunggu akun wali + sistem akun SPMB final. Smart card NFC = fase lanjutan.',
-                'todo', 'low', 0, 'L', 20],
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    private function seedAppSantri(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'app-santri'],
+            [
+                'name' => 'App Santri',
+                'description' => 'Aplikasi & akun SANTRI aktif (pasca-lulus): konversi calon→santri, onboarding santri lama tanpa akun, dan identitas login santri (NIS + fingerprint → smart card NFC). Pembuatan akun WALI ditangani PWA Wali; daftar-ulang→Santri ditangani PWA Peserta SPMB.',
+                'status' => 'planning',
+                'color' => 'warning',
+                'icon' => 'heroicon-o-identification',
+                'sort' => 7,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            ['Konversi & Akun', 'Konversi LULUS → akun santri aktif (tautan ke wali)',
+                'Saat daftar ulang membentuk Santri: terbitkan akun login santri (role santri) + tautkan ke akun wali via access_wali. Sisi data calon→Santri & akun wali sudah dicakup PWA Peserta F3 + PWA Wali W1.',
+                'Pondasi (PpdbReregistrationService, access_wali, role wali) ada. Penerbitan akun ROLE santri + identitas loginnya belum; eksekusi diselaraskan dgn sistem akun SPMB.',
+                'todo', 'high', 5, 'M', 1],
+            ['Onboarding', 'Onboarding santri aktif lama tanpa akun: kredensial sementara + install app',
+                'Santri lama (non-PPDB) tanpa akun/No.HP terdaftar: admin kirim akun + password sementara sekali-pakai via WA + tautan install app; paksa ganti saat login pertama. Per-santri & massal.',
+                'Belum ada jalur akun untuk santri lama. Mekanisme kredensial+WA bisa reuse PpdbWhatsappNotifier.',
+                'todo', 'high', 0, 'M', 2],
+            ['Identitas', 'Login santri: NIS + fingerprint (mode dev) → smart card NFC',
+                'Identitas login santri = NIS + verifikasi fingerprint (mode pengembangan); arah lanjut integrasi kartu pintar NFC (absensi/akses/identitas).',
+                'Ide tahap awal (keputusan Hamdan). Belum dibangun; fase lanjutan.',
+                'todo', 'low', 0, 'L', 3],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
