@@ -11,4 +11,37 @@
 
 # ──────────────────────────────────────────────────────────────
 # Website tenant: Pondok Pesantren Asy-Syifaa (asy-syifaa.com)
-# PHP native thin-client, dilayani container ter
+# PHP native thin-client, dilayani container terpisah
+# (website-nginx + website-php, lihat docker-compose.production.yml).
+# Sertifikat Let's Encrypt otomatis — DNS sudah mengarah ke VPS ini.
+# ──────────────────────────────────────────────────────────────
+asy-syifaa.com {
+	encode zstd br gzip
+	reverse_proxy website-nginx:80
+}
+
+www.asy-syifaa.com {
+	redir https://asy-syifaa.com{uri} permanent
+}
+
+# Redirect HTTP → HTTPS untuk domain website (host-match menang atas catch-all :80)
+http://asy-syifaa.com, http://www.asy-syifaa.com {
+	redir https://asy-syifaa.com{uri} permanent
+}
+
+# HTTP — melayani app + tantangan ACME + endpoint ssl-check
+:80 {
+	root * /app/public
+	encode zstd br gzip
+	php_server
+}
+
+# HTTPS — sertifikat otomatis (on-demand) untuk pesantren.online & semua subdomain tenant
+:443 {
+	tls {
+		on_demand
+	}
+	root * /app/public
+	encode zstd br gzip
+	php_server
+}
