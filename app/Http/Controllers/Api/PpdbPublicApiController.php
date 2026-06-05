@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Services\PpdbRegistrationNumberService;
@@ -76,6 +77,9 @@ class PpdbPublicApiController extends Controller
         // Username = No. HP peserta (calon login di fase akun nanti). Fallback nomor pendaftaran.
         $username = $participantPhone !== '' ? $participantPhone : $nomor;
 
+        // Notifikasi WhatsApp via n8n + WAHA (fire-and-forget, tak memblokir pendaftaran).
+        $this->notifyWhatsapp($participantPhone, $calon->nama, $nomor, $username);
+
         return response()->json([
             'ok' => true,
             'success' => true,
@@ -89,6 +93,41 @@ class PpdbPublicApiController extends Controller
             ],
             'account' => ['username' => $username],
         ], 201);
+    }
+
+    /**
+     * Kirim notifikasi WhatsApp via n8n → WAHA. Fire-and-forget:
+     * kegagalan WA TIDAK boleh menggagalkan pendaftaran (try-catch + timeout pendek).
+     * Endpoint internal: http://n8n:5678/webhook/ppdb-wa (override via PPDB_WA_WEBHOOK_URL).
+     */
+    private function notifyWhatsapp(string $phone, string $name, string $nomor, string $username): void
+    {
+        if ($phone === '') {
+            return;
+        }
+
+        $pesantren = tenant()?->name ?? 'Pondok Pesantren';
+        $message = "Assalamu'alaikum Wr. Wb.\n\n"
+            ."Pendaftaran PPDB *{$pesantren}* atas nama *{$name}* telah *BERHASIL* diterima. 🎉\n\n"
+            ."🎫 Nomor Pendaftaran: *{$nomor}*\n"
+            ."👤 Username Portal: {$username}\n\n"
+            ."Simpan nomor pendaftaran ini sebagai bukti. Informasi jadwal seleksi, pengumuman, dan daftar ulang akan kami sampaikan melalui WhatsApp ini.\n\n"
+            ."Jazaakumullaahu khairan.\n"
+            ."— Panitia PPDB {$pesantren}";
+
+        try {
+            Http::timeout(8)->post(
+                config('services.ppdb_wa.webhook', 'http://n8n:5678/webhook/ppdb-wa'),
+                [
+                    'to' => $phone,
+                    'message' => $message,
+                    'eticket_no' => $nomor,
+                    'student_name' => $name,
+                ],
+            );
+        } catch (\Throwable) {
+            // Senyap: pendaftaran tetap sukses meski notifikasi WA gagal terkirim.
+        }
     }
 
     private function normalizePhone(string $raw): string

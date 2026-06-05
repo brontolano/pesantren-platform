@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    // Notifikasi WhatsApp PPDB via n8n → WAHA (jaringan internal Docker).
+    // Override di .env bila endpoint berubah. Default = service `n8n` di compose.
+    'ppdb_wa' => [
+        'webhook' => env('PPDB_WA_WEBHOOK_URL', 'http://n8n:5678/webhook/ppdb-wa'),
+    ],
+
 ];
