@@ -38,6 +38,27 @@ class MediaFile extends Model
                 Storage::disk(StorageQuotaService::diskName())->delete($media->path);
             }
         });
+
+        // Audit trail.
+        static::created(fn (MediaFile $m) => self::writeAudit('upload', $m));
+        static::deleted(fn (MediaFile $m) => self::writeAudit($m->isForceDeleting() ? 'kosongkan' : 'hapus', $m));
+        static::restored(fn (MediaFile $m) => self::writeAudit('pulihkan', $m));
+    }
+
+    /** Catat aksi ke media_audit (tidak boleh mengganggu operasi utama). */
+    protected static function writeAudit(string $action, self $media): void
+    {
+        try {
+            MediaAudit::create([
+                'action' => $action,
+                'media_file_id' => $media->getKey(),
+                'file_name' => $media->original_name,
+                'size_bytes' => (int) ($media->size_bytes ?? 0),
+                'user_id' => auth()->id(),
+            ]);
+        } catch (\Throwable) {
+            // diam — audit gagal tidak boleh memblokir upload/hapus.
+        }
     }
 
     public function isImage(): bool

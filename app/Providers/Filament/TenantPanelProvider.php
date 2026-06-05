@@ -123,6 +123,7 @@ class TenantPanelProvider extends PanelProvider
                 KunjunganWaliResource::class,
                 // File Storage
                 MediaFileResource::class,
+                \App\Filament\Resources\Media\MediaAuditResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

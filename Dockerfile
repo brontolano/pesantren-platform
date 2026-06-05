@@ -19,6 +19,7 @@ RUN install-php-extensions \
     bcmath \
     pcntl \
     redis \
+    gd \
     opcache
 
 # postgresql-client 16 (cocok dgn server pg16) untuk backup/restore DB tenant dari panel.

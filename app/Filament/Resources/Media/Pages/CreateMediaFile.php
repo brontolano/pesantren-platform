@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Media\Pages;
 
 use App\Filament\Resources\Media\MediaFileResource;
 use App\Models\MediaFile;
+use App\Services\MediaImageService;
 use App\Services\StorageQuotaService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -16,11 +17,18 @@ class CreateMediaFile extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        $disk = Storage::disk(StorageQuotaService::diskName());
+        $diskName = StorageQuotaService::diskName();
+        $disk = Storage::disk($diskName);
         $path = is_array($data['path'] ?? null) ? ($data['path'][0] ?? null) : ($data['path'] ?? null);
 
-        $size = ($path && $disk->exists($path)) ? (int) $disk->size($path) : 0;
         $mime = ($path && $disk->exists($path)) ? $disk->mimeType($path) : null;
+
+        // Kompres gambar (in-place) SEBELUM hitung ukuran & kuota — hemat ruang.
+        if ($path && $mime) {
+            app(MediaImageService::class)->compress($diskName, $path, $mime);
+        }
+
+        $size = ($path && $disk->exists($path)) ? (int) $disk->size($path) : 0;
 
         $quota = app(StorageQuotaService::class);
         $tenantId = tenant()?->getKey() ?? '';
