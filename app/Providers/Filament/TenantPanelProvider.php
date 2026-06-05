@@ -24,6 +24,7 @@ use App\Filament\Resources\Kelas\KelasResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
 use App\Filament\Resources\Kesehatan\SesiKonselingResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
+use App\Filament\Resources\Media\MediaFileResource;
 use App\Filament\Resources\PPDB\CalonSantriDokumenResource;
 use App\Filament\Resources\PPDB\CalonSantriResource;
 use App\Filament\Resources\PPDB\HasilUjianResource;
@@ -120,6 +121,8 @@ class TenantPanelProvider extends PanelProvider
                 KegiatanResource::class,
                 IzinSantriResource::class,
                 KunjunganWaliResource::class,
+                // File Storage
+                MediaFileResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

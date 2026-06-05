@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Models\Tenant;
+use App\Models\TenantStorage;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Services\StorageQuotaService;
 use Illuminate\Support\Str;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -31,6 +33,12 @@ class TenantProvisioner
     public function provision(Tenant $tenant, ?string $adminEmail = null): array
     {
         $adminEmail ??= 'admin@'.$tenant->getKey().'.localhost';
+
+        // Kuota penyimpanan default (CENTRAL) — seperti OS memberi disk default.
+        TenantStorage::firstOrCreate(
+            ['tenant_id' => $tenant->getKey()],
+            ['quota_gb' => StorageQuotaService::DEFAULT_GB],
+        );
 
         return $tenant->run(function () use ($tenant, $adminEmail): array {
             // (a) Roles & permissions untuk DB tenant ini.

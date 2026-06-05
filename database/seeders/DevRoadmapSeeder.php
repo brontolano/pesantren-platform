@@ -16,6 +16,7 @@ class DevRoadmapSeeder extends Seeder
     {
         $this->seedPpdbV2();
         $this->seedIntegrasiWebsite();
+        $this->seedFileStorage();
         $this->seedPlatform();
     }
 
@@ -210,6 +211,64 @@ class DevRoadmapSeeder extends Seeder
                 'Arahkan base URL website ke API platform (resolusi tenant by-domain), uji semua halaman dinamis.',
                 'DNS api.asy-syifaa.com sudah ke VPS. Menunggu endpoint platform siap.',
                 'todo', 'high', 0, 'M', 13],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    private function seedFileStorage(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'file-storage'],
+            [
+                'name' => 'File Storage',
+                'description' => 'Penyimpanan media per tenant berkuota (model "disk OS"): default 8 GB auto saat tenant dibuat, upgrade manual/billing. Tier 8/16/32 GB di disk lokal; 64/128/256 GB menyusul (butuh object storage S3). VPS 96 GB.',
+                'status' => 'in_progress',
+                'color' => 'info',
+                'icon' => 'heroicon-o-circle-stack',
+                'sort' => 4,
+            ]
+        );
+
+        $tasks = [
+            ['Fase 1 — MVP (disk lokal)', 'Module + media_files + tenant_storage + StorageQuotaService',
+                'Skema kuota (central) + file (tenant DB) + service hitung pakai/sisa.',
+                'Selesai dibangun — TenantStorage, MediaFile, StorageQuotaService.',
+                'done', 'high', 100, 'M', 1],
+            ['Fase 1 — MVP (disk lokal)', 'UI upload media + enforcement kuota + widget pemakaian',
+                'MediaFileResource (panel tenant): upload, daftar, hapus, blokir saat kuota penuh, widget X/Y GB.',
+                'Selesai — resource + CreateMediaFile (cek kuota) + StorageQuotaWidget.',
+                'done', 'high', 100, 'M', 2],
+            ['Fase 1 — MVP (disk lokal)', 'Kuota default 8 GB auto (TenantProvisioner) + demo 2 GB',
+                'Tiap tenant baru otomatis 8 GB; demo di-set 2 GB.',
+                'Selesai — provisioner set default; demo 2 GB.',
+                'done', 'high', 100, 'S', 3],
+            ['Fase 2 — Manajemen & Billing', 'Menu kelola kuota per tenant (super_admin) + tie-in paket',
+                'Central: super_admin atur tier kuota per tenant; opsi ikut Plan langganan.',
+                'Belum — Fase 1 set kuota via tinker/provisioner.',
+                'todo', 'medium', 0, 'M', 4],
+            ['Fase 3 — Object Storage', 'Driver S3-compatible → unlock tier 64/128/256 GB',
+                'Pindah backend ke object storage (Hostinger/Wasabi/B2/S3) per-tenant prefix; migrasi file.',
+                'Wajib sebelum tier besar / banyak tenant. VPS lokal hanya muat ~8 tenant @8GB.',
+                'todo', 'high', 0, 'L', 5],
+            ['Fase 4 — Penyempurnaan', 'Thumbnail, kompresi gambar, trash/retensi, audit',
+                'Optimasi media + sampah + jejak audit upload/hapus.',
+                'Belum.',
+                'todo', 'low', 0, 'M', 6],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
