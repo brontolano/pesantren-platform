@@ -55,6 +55,8 @@ Route::get('/api/v1/posts', [CmsPublicApiController::class, 'posts']);
 Route::get('/api/v1/posts/{slug}', [CmsPublicApiController::class, 'post']);
 Route::get('/api/public/content/gallery', [CmsPublicApiController::class, 'gallery']);
 Route::get('/api/public/content/gallery/{slug}', [CmsPublicApiController::class, 'galleryItem']);
+Route::get('/api/public/content/profile', [CmsPublicApiController::class, 'profile']);
+Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'settings']);
 
 // PPDB publik — terima pendaftaran dari form website (Fase minimal: simpan + e-tiket).
 Route::post('/api/v1/spmb/register', [PpdbPublicApiController::class, 'register']);

@@ -7,6 +7,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Models\Gallery;
+use Modules\CMS\Models\WebsiteSection;
+use Modules\CMS\Models\WebsiteSetting;
 
 /**
  * API publik konten CMS untuk website tenant (mis. asy-syifaa.com).
@@ -34,6 +36,7 @@ class CmsPublicApiController extends Controller
         $query = Article::query()
             ->where('is_published', true)
             ->whereNotNull('published_at')
+            ->where('published_at', '<=', now()) // penjadwalan: belum tampil sebelum waktunya
             ->orderByDesc('published_at');
 
         if (is_string($category) && $category !== '') {
@@ -55,6 +58,7 @@ class CmsPublicApiController extends Controller
         $article = Article::query()
             ->where('slug', $slug)
             ->where('is_published', true)
+            ->where('published_at', '<=', now())
             ->first();
 
         if (! $article) {
@@ -62,6 +66,42 @@ class CmsPublicApiController extends Controller
         }
 
         return response()->json(['ok' => true, 'data' => $this->mapPost($article)]);
+    }
+
+    /** GET /api/public/content/profile — section profil website (Tentang/Visi/Misi/dll) */
+    public function profile(): JsonResponse
+    {
+        if (! $this->hasTenant()) {
+            return response()->json(['ok' => true, 'data' => []]);
+        }
+
+        $data = WebsiteSection::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (WebsiteSection $s) => [
+                'type' => $s->section_type,
+                'sort' => (int) $s->sort_order,
+                'config' => $s->config ?? [],
+            ])
+            ->all();
+
+        return response()->json(['ok' => true, 'data' => $data]);
+    }
+
+    /** GET /api/public/content/settings — pengaturan website (key → value) */
+    public function settings(): JsonResponse
+    {
+        if (! $this->hasTenant()) {
+            return response()->json(['ok' => true, 'data' => (object) []]);
+        }
+
+        $map = WebsiteSetting::query()
+            ->get()
+            ->mapWithKeys(fn (WebsiteSetting $s) => [$s->key => $s->value])
+            ->all();
+
+        return response()->json(['ok' => true, 'data' => empty($map) ? (object) [] : $map]);
     }
 
     /** GET /api/public/content/gallery?limit= */
