@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\Tenant;
-use App\Models\User;
+use App\Services\TenantProvisioner;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
 
 class TenantCreateCommand extends Command
 {
@@ -13,7 +12,7 @@ class TenantCreateCommand extends Command
 
     protected $description = 'Create a new tenant with the given name and subdomain';
 
-    public function handle(): int
+    public function handle(TenantProvisioner $provisioner): int
     {
         $name = trim((string) $this->argument('name'));
         $subdomain = strtolower(trim((string) $this->argument('subdomain')));
@@ -30,67 +29,41 @@ class TenantCreateCommand extends Command
             return self::FAILURE;
         }
 
-        if (Tenant::query()->where('name', $name)->exists()) {
-            $existingTenant = Tenant::query()->where('name', $name)->first();
+        $existingByName = Tenant::query()->where('name', $name)->first();
+        if ($existingByName && $existingByName->getKey() !== $subdomain) {
+            $this->error("Nama tenant '{$name}' sudah dipakai tenant lain.");
 
-            if ($existingTenant?->id !== $subdomain) {
-                $this->error("Nama tenant '{$name}' sudah dipakai tenant lain.");
-
-                return self::FAILURE;
-            }
+            return self::FAILURE;
         }
 
-        $existingTenant = Tenant::query()->find($subdomain);
+        $tenant = Tenant::query()->find($subdomain);
 
-        if ($existingTenant) {
-            $existingTenant->domains()->firstOrCreate([
-                'domain' => $subdomain,
+        if ($tenant) {
+            $this->warn("Tenant '{$subdomain}' sudah ada — memverifikasi data awal.");
+        } else {
+            // create() memicu TenantCreated -> CreateDatabase + MigrateDatabase (sync).
+            $tenant = Tenant::create([
+                'id' => $subdomain,
+                'name' => $name,
+                'is_active' => true,
             ]);
-
-            $this->bootstrapUsers($existingTenant);
-
-            $this->warn("Tenant dengan subdomain '{$subdomain}' sudah ada. Data awal diverifikasi.");
-
-            return self::SUCCESS;
+            $this->info("Tenant '{$name}' dibuat (subdomain: {$subdomain}).");
         }
 
-        $tenant = Tenant::create([
-            'id' => $subdomain,
-            'name' => $name,
-            'is_active' => true,
-        ]);
+        $tenant->domains()->firstOrCreate(['domain' => $subdomain]);
 
-        $tenant->domains()->firstOrCreate([
-            'domain' => $subdomain,
-        ]);
+        // Seed roles + baris tenant lokal + user admin (DRY via service bersama).
+        $creds = $provisioner->provision($tenant);
 
-        $this->bootstrapUsers($tenant);
-
-        $this->info("Tenant '{$name}' created with subdomain '{$subdomain}'");
+        if ($creds['password'] !== null) {
+            $this->newLine();
+            $this->warn('⚠ SIMPAN KREDENSIAL ADMIN (ditampilkan sekali):');
+            $this->table(['Email', 'Password'], [[$creds['email'], $creds['password']]]);
+            $this->error('Ganti password setelah login pertama.');
+        } else {
+            $this->line("User admin sudah ada: {$creds['email']}");
+        }
 
         return self::SUCCESS;
-    }
-
-    protected function bootstrapUsers(Tenant $tenant): void
-    {
-        $admin = User::withoutGlobalScopes()->firstOrCreate(
-            ['email' => 'admin@'.$tenant->id.'.localhost'],
-            [
-                'name' => 'Admin '.$tenant->name,
-                'password' => Hash::make('password'),
-                'tenant_id' => $tenant->id,
-            ]
-        );
-        $admin->assignRole('super_admin');
-
-        $tu = User::withoutGlobalScopes()->firstOrCreate(
-            ['email' => 'tu@'.$tenant->id.'.localhost'],
-            [
-                'name' => 'TU '.$tenant->name,
-                'password' => Hash::make('password'),
-                'tenant_id' => $tenant->id,
-            ]
-        );
-        $tu->assignRole('tu');
     }
 }
