@@ -35,6 +35,17 @@ class Gallery extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        // Cover yang diupload (path disk) otomatis ter-index ke Media File.
+        static::saved(function (Gallery $g): void {
+            if ($g->cover_image_url) {
+                app(\App\Services\MediaRegistrar::class)
+                    ->register($g->cover_image_url, 'Galeri/'.$g->title);
+            }
+        });
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(GalleryImage::class, 'gallery_id')->orderBy('sort_order');

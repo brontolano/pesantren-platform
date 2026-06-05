@@ -28,6 +28,22 @@ class GalleryImage extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        // Foto yang diupload (path disk) otomatis ter-index ke Media File,
+        // dikelompokkan per galeri. URL eksternal dilewati oleh MediaRegistrar.
+        static::saved(function (GalleryImage $img): void {
+            if (! $img->image_url) {
+                return;
+            }
+            $title = $img->relationLoaded('gallery')
+                ? optional($img->gallery)->title
+                : optional($img->gallery()->first())->title;
+            app(\App\Services\MediaRegistrar::class)
+                ->register($img->image_url, $title ? 'Galeri/'.$title : 'Galeri');
+        });
+    }
+
     public function gallery(): BelongsTo
     {
         return $this->belongsTo(Gallery::class, 'gallery_id');
