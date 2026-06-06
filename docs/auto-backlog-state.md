@@ -13,7 +13,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## Pointer rotasi
-- Iterasi berikutnya: **area 1 — File Storage (putaran 2)**
+- Iterasi berikutnya: **area 2 — PPDB upload dokumen (putaran 2)**
 
 ## Log iterasi
 | # | Area | Increment | Commit | Status |
@@ -22,11 +22,12 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 | 2 | PPDB upload dokumen | Status verifikasi dokumen (migrasi kolom `status/verified_at/verified_by/catatan` + helper model + scopes) + unit test | (lihat git log) | ✅ |
 | 3 | PPDB ujian | Bank soal `SoalUjian` (migrasi `soal_ujian` + model PG/essay + auto-grade `nilaiUntukJawaban`) + unit test | (lihat git log) | ✅ |
 | 4 | Integrasi Website/API | API key per tenant `TenantApiKey` (migrasi central + generate/hash sha256/verify timing-safe + scope active) + unit test | (lihat git log) | ✅ |
+| 5 | File Storage | `diskName()` auto-resolve ke disk S3 saat object storage aktif (+ config `object_storage_disk`) + unit test | (lihat git log) | ✅ |
 
 ## Checklist target per area
 ### File Storage
 - [x] Gerbang tier S3 server-side (`setQuota` tolak 64/128/256 bila object storage belum siap)
-- [ ] Resolusi disk media otomatis ke `s3` saat `media.object_storage` aktif
+- [x] Resolusi disk media otomatis ke `s3` saat `media.object_storage` aktif (`diskName()` + `object_storage_disk`)
 - [ ] Kompresi gambar (lanjutan) + audit log unggah/hapus
 
 ### PPDB upload dokumen & ujian

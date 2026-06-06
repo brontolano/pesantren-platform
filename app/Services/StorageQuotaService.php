@@ -26,10 +26,18 @@ class StorageQuotaService
 
     private const BYTES_PER_GB = 1073741824; // 1024^3
 
-    /** Disk media aktif (public lokal, atau s3 bila object storage). */
+    /**
+     * Disk media aktif. Saat object storage SIAP, otomatis beralih ke disk S3
+     * (media.object_storage_disk, default 's3'); selain itu disk lokal (media.disk).
+     * Mencegah media tetap mendarat di disk lokal padahal tier object storage aktif.
+     */
     public static function diskName(): string
     {
-        return config('media.disk', 'public');
+        if (self::objectStorageReady()) {
+            return (string) config('media.object_storage_disk', 's3');
+        }
+
+        return (string) config('media.disk', 'public');
     }
 
     /** Batas ukuran per file dalam KB (untuk Filament FileUpload). */

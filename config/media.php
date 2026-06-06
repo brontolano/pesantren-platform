@@ -16,4 +16,11 @@ return [
      * 64/128/256 GB di menu Kuota Penyimpanan. Default false → tier itu "Soon".
      */
     'object_storage' => (bool) env('MEDIA_OBJECT_STORAGE', false),
+
+    /*
+     * Nama disk (config/filesystems.php) yang dipakai saat object_storage aktif.
+     * StorageQuotaService::diskName() otomatis beralih ke sini begitu object
+     * storage siap — tak perlu lagi mengubah MEDIA_DISK secara manual.
+     */
+    'object_storage_disk' => env('MEDIA_OBJECT_STORAGE_DISK', 's3'),
 ];
