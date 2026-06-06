@@ -30,6 +30,16 @@ class TenantApiKey extends Model
         'revoked_at' => 'datetime',
     ];
 
+    /**
+     * Paksa koneksi central — tabel ini hanya ada di DB central, tapi model
+     * sering dipanggil saat tenancy aktif (middleware api.key di domain tenant,
+     * panel tenant). Tanpa ini query akan kena DB tenant & gagal (tabel tak ada).
+     */
+    public function getConnectionName(): ?string
+    {
+        return config('tenancy.database.central_connection', parent::getConnectionName());
+    }
+
     /** Hash sha256 (hex) dari kunci plaintext. */
     public static function hashKey(string $plain): string
     {
