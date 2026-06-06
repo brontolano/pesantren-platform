@@ -13,7 +13,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## Pointer rotasi
-- Iterasi berikutnya: **area 2b — PPDB ujian (putaran 3)**
+- Iterasi berikutnya: **area 3 — Integrasi Website / API (putaran 3)**
 
 > Area habis target aditif aman (LEWATI): **File Storage** (3/3 ✅) · **PPDB upload dokumen** (sisanya milik tim /spmb). Rotasi efektif kini: PPDB ujian ↔ Integrasi Website/API.
 
@@ -29,6 +29,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 | 7 | PPDB ujian | `UjianScoringService` (agregasi auto-grade PG + pisah essay manual + persen) atas `SoalUjian` + unit test | (lihat git log) | ✅ |
 | 8 | Integrasi Website/API | Middleware `AuthenticateTenantApiKey` (X-Api-Key/Bearer → TenantApiKey, isolasi tenant, last_used) + `ApiKeyExtractor` pure + unit test | (lihat git log) | ✅ |
 | 9 | File Storage | Test coverage `MediaImageService.compress` (guard mime/file + resize GD-guarded); konfirmasi kompresi+audit sudah ada → area File Storage 3/3 | (lihat git log) | ✅ |
+| 10 | PPDB ujian | Persistensi `SesiUjian` (migrasi `sesi_ujian` + model: jawaban/auto_score/butuh_manual, `isiDariSkor` dari UjianScoringService, persenAuto, status) + unit test | (lihat git log) | ✅ |
 
 ## Checklist target per area
 ### File Storage
@@ -42,7 +43,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 
 > Sisa area PPDB upload (endpoint/signed-URL/UI) adalah milik tim /spmb — tak ada lagi target aditif yang aman di sini.
 - [~] Ujian: bank soal + kunci jawaban *(data layer `SoalUjian` + migrasi DONE; admin authoring UI pending)*
-- [~] Ujian online bertimer + auto-grading PG + nilai manual essay *(auto-grade `nilaiUntukJawaban` + agregasi `UjianScoringService` DONE; timer + UI ujian + persistensi sesi pending)*
+- [~] Ujian online bertimer + auto-grading PG + nilai manual essay *(auto-grade + `UjianScoringService` + persistensi `SesiUjian` DONE; backend lengkap — sisa: Filament resource authoring bank soal & UI ujian bertimer/timer = front-end)*
 
 ### Integrasi Website / API
 - [~] API publik read: profil tenant, artikel/berita, galeri *(sebagian sudah ada: CmsPublicApiController; statistik/jadwal PPDB pending)*
