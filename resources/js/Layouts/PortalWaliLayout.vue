@@ -221,16 +221,15 @@ onBeforeUnmount(() => {
         <link rel="apple-touch-icon" :href="branding.icon192Url || faviconUrl">
     </Head>
 
-    <div class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+    <div class="font-jost min-h-screen bg-[var(--wali-bg,#fffaf3)] text-[#111] antialiased">
         <FlashToast />
 
         <div class="mx-auto flex min-h-screen w-full max-w-md flex-col">
             <header class="relative z-20">
-                <!-- HERO PREMIUM: gradient brand + dekorasi glow, sudut bawah membulat besar -->
-                <div class="relative overflow-hidden rounded-b-[2.25rem] bg-brand-grad-hero px-4 pb-6 pt-[calc(env(safe-area-inset-top)+1.25rem)] text-white shadow-soft-lg">
-                    <!-- Dekorasi radial glow lembut -->
-                    <span aria-hidden="true" class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/20 blur-3xl" />
-                    <span aria-hidden="true" class="pointer-events-none absolute -bottom-24 -left-14 h-52 w-52 rounded-full bg-teal-300/25 blur-3xl" />
+                <!-- HERO PIXIO: emerald solid-elegan, ringan, sudut bawah membulat — minim glow -->
+                <div class="relative overflow-hidden rounded-b-[2.25rem] bg-brand-grad-hero px-4 pb-6 pt-[calc(env(safe-area-inset-top)+1.25rem)] text-white shadow-soft">
+                    <!-- Aksen highlight tipis (bukan glow berat) -->
+                    <span aria-hidden="true" class="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
 
                     <div class="relative">
                         <div
@@ -244,52 +243,52 @@ onBeforeUnmount(() => {
 
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
-                                <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-emerald-100/90">
+                                <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-50/90">
                                     Portal Wali
                                 </p>
-                                <h1 class="mt-1.5 text-[1.7rem] font-extrabold leading-tight tracking-tight">
+                                <h1 class="mt-1.5 text-[1.75rem] font-bold leading-tight tracking-tight">
                                     {{ sectionTitle }}
                                 </h1>
-                                <p class="mt-1.5 text-sm leading-6 text-white/80">
+                                <p class="mt-1.5 text-sm font-normal leading-6 text-white/80">
                                     {{ sectionKicker }}
                                 </p>
                             </div>
-                            <div class="flex shrink-0 items-center gap-2 rounded-full bg-white/15 px-3 py-2 ring-1 ring-inset ring-white/20 backdrop-blur-sm">
+                            <div class="flex shrink-0 items-center gap-2 rounded-full bg-white/15 px-3 py-2 ring-1 ring-inset ring-white/20">
                                 <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20">
                                     <UiIcon name="user" class="h-4 w-4 text-white" />
                                 </span>
-                                <p class="max-w-[5.5rem] truncate text-xs font-bold text-white">
+                                <p class="max-w-[5.5rem] truncate text-xs font-semibold text-white">
                                     {{ wali.name || 'Akun Wali' }}
                                 </p>
                             </div>
                         </div>
 
-                        <!-- Anak aktif (kartu glass) -->
+                        <!-- Anak aktif (kartu glass ringan) -->
                         <div
                             v-if="activeChild"
-                            class="mt-5 rounded-2xl bg-white/15 px-4 py-3.5 ring-1 ring-inset ring-white/20 backdrop-blur-sm"
+                            class="mt-5 rounded-2xl bg-white/12 px-4 py-3.5 ring-1 ring-inset ring-white/20"
                         >
                             <div class="flex items-center justify-between gap-3">
                                 <div class="flex min-w-0 items-center gap-3">
-                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-base font-extrabold text-white">
+                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-base font-bold text-white">
                                         {{ (activeChild.nama || '?').charAt(0).toUpperCase() }}
                                     </span>
                                     <div class="min-w-0">
-                                        <p class="truncate text-base font-bold text-white">
+                                        <p class="truncate text-base font-semibold text-white">
                                             {{ activeChild.nama }}
                                         </p>
-                                        <p class="mt-0.5 truncate text-xs text-white/70">
+                                        <p class="mt-0.5 truncate text-xs font-normal text-white/70">
                                             {{ activeChild.kelas?.nama || 'Belum ada kelas' }} · {{ activeChild.hubungan || 'wali' }}
                                         </p>
                                     </div>
                                 </div>
-                                <span class="shrink-0 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-emerald-50">
+                                <span class="shrink-0 rounded-full bg-white/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-50">
                                     {{ activeChild.status || 'aktif' }}
                                 </span>
                             </div>
                         </div>
 
-                        <!-- Switcher anak (pill premium glass) -->
+                        <!-- Switcher anak (pill outline ala Pixio) -->
                         <div
                             v-if="children.length > 1"
                             class="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -298,10 +297,10 @@ onBeforeUnmount(() => {
                                 v-for="child in children"
                                 :key="child.id"
                                 :href="resolveChildHref(child.id)"
-                                class="shrink-0 rounded-full px-4 py-2 text-sm font-bold tracking-tight transition-all duration-200 active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                                class="shrink-0 rounded-full px-5 py-2 text-sm font-semibold tracking-tight transition-all duration-200 active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                                 :class="child.id === activeChildId
                                     ? 'bg-white text-emerald-700 shadow-soft'
-                                    : 'bg-white/15 text-white/85 ring-1 ring-inset ring-white/20 hover:bg-white/25'"
+                                    : 'bg-transparent text-white/90 ring-1 ring-inset ring-white/40 hover:bg-white/10'"
                             >
                                 {{ child.nama }}
                             </Link>
@@ -331,35 +330,31 @@ onBeforeUnmount(() => {
                 <slot />
             </main>
 
-            <!-- Bottom nav: FLOATING GLASS — melayang, blur, indikator pill gradient -->
+            <!-- Bottom nav PIXIO: floating ringan, putih bersih, tab aktif = LINGKARAN emerald solid (ikon putih) -->
             <footer class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-md px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-                <nav class="grid grid-cols-5 gap-1 rounded-[1.6rem] border border-white/60 bg-white/80 p-1.5 shadow-soft-lg backdrop-blur-xl">
+                <nav class="grid grid-cols-5 gap-1 rounded-full border border-[var(--wali-border,#efe7da)] bg-white p-1.5 shadow-soft">
                     <Link
                         v-for="item in navigationItems"
                         :key="item.key || item.label"
                         :href="item.href"
-                        class="group relative flex flex-col items-center gap-1 rounded-2xl px-1 py-2 transition-all duration-200 active:scale-[.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
+                        class="group relative flex flex-col items-center gap-1 rounded-full px-1 py-1.5 transition-all duration-200 active:scale-[.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
                         :class="item.active ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'"
                         :aria-current="item.active ? 'page' : undefined"
                     >
                         <span
-                            class="flex h-9 w-9 items-center justify-center rounded-2xl transition-all duration-200"
-                            :class="item.active ? 'bg-emerald-50 text-emerald-600 shadow-[0_6px_16px_-8px_rgba(5,150,105,0.6)]' : 'bg-transparent group-hover:bg-slate-50'"
+                            class="flex h-9 w-9 items-center justify-center rounded-full transition-all duration-200"
+                            :class="item.active
+                                ? 'bg-[var(--wali-primary,#059669)] text-white shadow-brand'
+                                : 'bg-transparent text-slate-400 group-hover:bg-slate-900/[0.04]'"
                         >
                             <UiIcon :name="navIcons[item.key] || 'home'" class="h-5 w-5" />
                         </span>
                         <span
                             class="text-[10px] leading-none tracking-tight transition-all duration-200"
-                            :class="item.active ? 'font-extrabold' : 'font-semibold'"
+                            :class="item.active ? 'font-bold text-emerald-700' : 'font-medium'"
                         >
                             {{ item.label }}
                         </span>
-                        <!-- Titik indikator gradient untuk tab aktif -->
-                        <span
-                            v-if="item.active"
-                            aria-hidden="true"
-                            class="absolute -bottom-0.5 h-1 w-1 rounded-full bg-brand-grad"
-                        />
                     </Link>
                 </nav>
             </footer>

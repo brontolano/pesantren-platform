@@ -1,6 +1,7 @@
-/* Tipografi premium Portal Wali — Plus Jakarta Sans (Google Fonts).
+/* Tipografi Portal Wali — Plus Jakarta Sans (default global, dipakai SPMB/landing)
+   + Jost (Google Fonts, geometric sans) khusus Portal Wali (gaya "Pixio").
    Harus mendahului semua aturan lain (selain @charset/@layer) agar tidak di-drop. */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Jost:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -16,6 +17,9 @@
  * Token brand Portal Wali (brandable per tenant).
  * Override --wali-primary di scope tenant nanti tanpa menyentuh komponen.
  * Dipakai oleh komponen di resources/js/Components/Ui/*.
+ *
+ * Estetika "Pixio": cream hangat + monokrom near-black + SATU aksen emerald,
+ * tombol/chip pill (rounded-full) outline untuk sekunder, minimalis.
  */
 :root {
     --wali-primary: #059669;       /* emerald-600 — CTA utama */
@@ -28,24 +32,25 @@
     --wali-info: #3b82f6;           /* info (blue-500) */
 
     --wali-surface: #ffffff;        /* kartu */
-    --wali-bg: #f8fafc;             /* page bg (slate-50) */
-    --wali-ink: #0f172a;            /* teks utama (slate-900) */
+    --wali-bg: #fffaf3;             /* page bg — cream hangat (Pixio) */
+    --wali-ink: #111111;            /* teks utama (near-black) */
     --wali-muted: #64748b;          /* teks muted (slate-500) */
+    --wali-border: #efe7da;         /* border tipis hangat untuk kartu */
 
-    /* === PREMIUM TOKENS === */
-    /* Gradient brand 135deg: emerald-400 -> emerald-600 -> emerald-700 */
-    --brand-grad: linear-gradient(135deg, #34d399 0%, #059669 55%, #047857 100%);
-    /* Gradient hero gelap (header/kartu hero) — sedikit lebih dalam untuk teks putih */
-    --brand-grad-hero: linear-gradient(135deg, #10b981 0%, #059669 50%, #065f46 100%);
+    /* === TOKENS PIXIO === */
+    /* Aksen emerald solid lembut untuk CTA & angka penting. */
+    --brand-grad: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    /* Hero: emerald solid-elegan (TETAP gelap/kontras agar teks putih terbaca). */
+    --brand-grad-hero: linear-gradient(160deg, #0b8f63 0%, #059669 45%, #047857 100%);
     /* Aksen sekunder teal/cyan lembut */
     --wali-accent: #14b8a6;         /* teal-500 */
     --wali-accent-soft: #99f6e4;    /* teal-200 */
 
-    /* Shadow lembut berlapis (kartu & elemen melayang) */
-    --shadow-soft: 0 12px 40px -12px rgba(2, 6, 23, 0.12);
-    --shadow-soft-lg: 0 24px 60px -20px rgba(2, 6, 23, 0.20);
-    /* Shadow tombol gradient (warna brand) */
-    --shadow-brand: 0 10px 24px -10px rgba(5, 150, 105, 0.55);
+    /* Shadow SANGAT lembut (minimalis, bukan glow berat). */
+    --shadow-soft: 0 6px 24px -16px rgba(17, 17, 17, 0.18);
+    --shadow-soft-lg: 0 16px 44px -24px rgba(17, 17, 17, 0.22);
+    /* Shadow tombol emerald (halus, bukan glow). */
+    --shadow-brand: 0 8px 20px -12px rgba(5, 150, 105, 0.45);
 }
 
 /* Anti-aliasing & rendering teks lebih halus untuk feel premium. */
@@ -56,9 +61,13 @@ html {
 }
 
 /*
- * Utilitas premium reusable (scoped via class — aman, tidak menyentuh Filament).
+ * Utilitas reusable (scoped via class — aman, tidak menyentuh Filament/SPMB).
  * Dipakai komponen Ui Portal Wali.
  */
+/* Font Jost khusus Portal Wali (dipasang di root layout, tidak mengubah font global app). */
+.font-jost {
+    font-family: 'Jost', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+}
 .bg-brand-grad {
     background-image: var(--brand-grad);
 }

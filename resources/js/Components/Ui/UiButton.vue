@@ -34,41 +34,45 @@ const tag = computed(() => {
 
 const isDisabled = computed(() => props.disabled || props.loading)
 
+// Pill (rounded-full) dominan + font Jost semibold ala "Pixio".
 const base =
-    'relative inline-flex items-center justify-center gap-2 font-bold tracking-tight rounded-2xl ' +
+    'relative inline-flex items-center justify-center gap-2 font-jost font-semibold tracking-tight rounded-full ' +
     'transition-all duration-200 select-none active:scale-[.97] ' +
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ' +
     'focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:active:scale-100'
 
+// Padding lega (Pixio): py vertikal lewat min-h, px horizontal lega.
 const sizes = {
-    sm: 'min-h-[40px] px-4 text-sm',
-    md: 'min-h-[44px] px-5 text-sm',
-    lg: 'min-h-[52px] px-6 text-base',
+    sm: 'min-h-[40px] px-5 text-sm',
+    md: 'min-h-[46px] px-6 text-sm',
+    lg: 'min-h-[54px] px-7 text-base',
 }
 
 const variants = {
-    // Primary = gradient brand + shadow lembut warna brand
+    // Primary = FILLED emerald solid + shadow lembut (bukan glow berat).
     primary:
-        'bg-brand-grad text-white shadow-brand ' +
-        'hover:brightness-[1.03] hover:shadow-soft-lg active:brightness-95 ' +
+        'bg-[var(--wali-primary,#059669)] text-white shadow-brand ' +
+        'hover:bg-[var(--wali-primary-strong,#047857)] active:bg-[var(--wali-primary-strong,#047857)] ' +
         'focus-visible:ring-[var(--wali-primary,#059669)] ' +
         'disabled:opacity-50 disabled:shadow-none',
+    // Secondary = OUTLINE 1px near-black, bg transparan.
     secondary:
-        'bg-white text-[var(--wali-primary,#059669)] ring-1 ring-inset ring-slate-200 shadow-soft ' +
-        'hover:bg-emerald-50/60 hover:ring-emerald-200 active:bg-emerald-100 ' +
+        'bg-transparent text-slate-900 ring-1 ring-inset ring-slate-900/15 ' +
+        'hover:bg-slate-900/[0.04] hover:ring-slate-900/30 active:bg-slate-900/[0.06] ' +
         'focus-visible:ring-[var(--wali-primary,#059669)] ' +
         'disabled:opacity-50',
+    // Ghost = transparan tanpa border, hover halus.
     ghost:
         'bg-transparent text-slate-700 ' +
-        'hover:bg-slate-100 active:bg-slate-200 ' +
+        'hover:bg-slate-900/[0.04] active:bg-slate-900/[0.08] ' +
         'focus-visible:ring-slate-400 ' +
         'disabled:opacity-50',
+    // Danger = OUTLINE rose (minimalis), kontras tegas.
     danger:
-        'text-white shadow-[0_10px_24px_-10px_rgba(244,63,94,0.55)] ' +
-        'bg-gradient-to-br from-rose-500 to-rose-600 ' +
-        'hover:brightness-[1.03] active:brightness-95 ' +
+        'bg-transparent text-rose-600 ring-1 ring-inset ring-rose-300 ' +
+        'hover:bg-rose-50 hover:ring-rose-400 active:bg-rose-100 ' +
         'focus-visible:ring-rose-500 ' +
-        'disabled:opacity-50 disabled:shadow-none',
+        'disabled:opacity-50',
 }
 
 const classes = computed(() => [

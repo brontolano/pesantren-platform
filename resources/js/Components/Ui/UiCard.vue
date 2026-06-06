@@ -19,9 +19,11 @@ const props = defineProps({
 const isHero = computed(() => props.variant === 'hero-dark')
 
 const surfaces = {
-    default: 'bg-white ring-1 ring-slate-100 text-slate-900',
+    // Surface putih + border tipis hangat (Pixio), shadow sangat lembut.
+    default: 'bg-white ring-1 ring-[var(--wali-border,#efe7da)] text-slate-900',
+    // hero-dark: emerald solid-elegan, TETAP gelap/kontras (halaman pakai teks putih di dalamnya).
     'hero-dark': 'bg-brand-grad-hero text-white ring-1 ring-emerald-900/10',
-    muted: 'bg-slate-50 ring-1 ring-slate-100 text-slate-900',
+    muted: 'bg-[#f6f0e6] ring-1 ring-[var(--wali-border,#efe7da)] text-slate-900',
 }
 
 const paddings = {
@@ -52,15 +54,11 @@ const dividerClass = computed(() =>
 
 <template>
     <div :class="rootClass">
-        <!-- Dekorasi glow lembut untuk hero (radial blobs, presentasional) -->
+        <!-- Aksen highlight tipis untuk hero (minimalis, bukan glow berat) -->
         <template v-if="isHero">
             <span
                 aria-hidden="true"
-                class="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-white/20 blur-3xl"
-            />
-            <span
-                aria-hidden="true"
-                class="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-teal-300/25 blur-3xl"
+                class="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-white/10 blur-2xl"
             />
         </template>
 

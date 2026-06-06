@@ -53,7 +53,7 @@ const iconSize = computed(() => (props.size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5'
 
 <template>
     <span
-        class="inline-flex items-center rounded-full font-bold tracking-tight ring-1 ring-inset"
+        class="inline-flex items-center rounded-full font-jost font-semibold tracking-tight ring-1 ring-inset"
         :class="[toneClass, sizeClass]"
     >
         <UiIcon :name="meta.icon" :class="iconSize" />

@@ -31,8 +31,8 @@ const SIZES = {
 
 const activeSkin = computed(() => {
     if (props.tone === 'soft') return 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-100'
-    if (props.tone === 'solid') return 'bg-[var(--wali-primary,#059669)] text-white shadow-brand'
-    return 'bg-brand-grad text-white shadow-brand'
+    // brand & solid sama-sama emerald solid (Pixio: aksen tunggal, bukan gradient berat).
+    return 'bg-[var(--wali-primary,#059669)] text-white shadow-brand'
 })
 </script>
 
@@ -41,12 +41,12 @@ const activeSkin = computed(() => {
         :is="tag"
         :href="href || undefined"
         :type="tag === 'button' ? 'button' : undefined"
-        class="inline-flex shrink-0 items-center justify-center rounded-full font-bold tracking-tight transition-all duration-200 select-none active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--wali-primary,#059669)]"
+        class="inline-flex shrink-0 items-center justify-center rounded-full font-jost font-semibold tracking-tight transition-all duration-200 select-none active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--wali-primary,#059669)]"
         :class="[
             SIZES[size] ?? SIZES.md,
             active
                 ? activeSkin
-                : 'bg-white text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50 hover:text-slate-800',
+                : 'bg-transparent text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-900/[0.04] hover:text-slate-900',
         ]"
         :aria-pressed="tag === 'button' ? active : undefined"
         :aria-current="href && active ? 'page' : undefined"
