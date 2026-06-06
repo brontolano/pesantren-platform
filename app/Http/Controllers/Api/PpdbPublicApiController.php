@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Services\PpdbRegistrationNumberService;
@@ -26,6 +27,17 @@ class PpdbPublicApiController extends Controller
     {
         if (! tenancy()->initialized || tenant() === null) {
             return response()->json(['ok' => false, 'message' => 'Tenant tidak ditemukan'], 404);
+        }
+
+        // Honeypot: field `website` HARUS kosong (disembunyikan di form via CSS).
+        // Bot pengisi-otomatis akan mengisinya → tolak diam-diam tanpa simpan DB.
+        if (filled($request->input('website'))) {
+            Log::warning('PPDB register honeypot terpicu — request ditolak.', [
+                'tenant' => tenant()?->getTenantKey(),
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json(['ok' => false, 'message' => 'Permintaan tidak valid.'], 422);
         }
 
         $data = $request->validate([

@@ -43,6 +43,16 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(PublicApiThrottle::perMinute())->by($key);
         });
 
+        // Limiter ketat khusus submit PPDB publik (anti-spam form pendaftaran).
+        // Per tenant + IP; default 5/menit (override config services.public_api.ppdb_submit_per_minute).
+        RateLimiter::for('ppdb-submit', function (Request $request) {
+            $tenantId = tenant()?->getTenantKey() ?? 'central';
+            $perMinute = (int) config('services.public_api.ppdb_submit_per_minute', 5);
+
+            return Limit::perMinute(max(1, $perMinute))
+                ->by('ppdb-submit:'.$tenantId.':'.$request->ip());
+        });
+
         Event::listen(Login::class, function (Login $event): void {
             app(AuditLogger::class)->log(
                 action: 'auth.login',

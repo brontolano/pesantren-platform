@@ -67,7 +67,9 @@ Route::get('/api/public/content/profile', [CmsPublicApiController::class, 'profi
 Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'settings']);
 
 // PPDB publik — terima pendaftaran dari form website (Fase minimal: simpan + e-tiket).
-Route::post('/api/v1/spmb/register', [PpdbPublicApiController::class, 'register']);
+// Anti-spam: rate-limit ketat per tenant+IP (honeypot ditangani di controller).
+Route::post('/api/v1/spmb/register', [PpdbPublicApiController::class, 'register'])
+    ->middleware('throttle:ppdb-submit');
 
 // API publik headless TERPROTEKSI (X-Api-Key per tenant + rate-limit). Kontrak:
 // docs/INTEGRASI-API.md. Aditif — tak mengubah endpoint publik di atas.
