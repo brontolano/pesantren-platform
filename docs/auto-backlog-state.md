@@ -18,7 +18,8 @@ Keputusan: nilai=keputusan-only · daftar ulang=PENUH(→Santri+Wali) · kartu u
 - #21 **Notif WA #64**: `sendPengumuman` ter-wire di `PpdbAdmissionDecisionService::decide()` (kirim WA saat keputusan lulus/cadangan/ditolak dipublikasikan).
 - #22 **#63a**: model+migrasi `jadwal_ujian` + Filament `JadwalUjianResource`.
 - #23 **#63b**: kartu peserta `/spmb/kartu-ujian` (controller+route+Vue, identitas+jadwal+QR API publik+cetak, taut Dashboard). **#63 LENGKAP.**
-- Sisa: #65 daftar ulang→Santri+Wali (lintas Kesantrian) · #66 pengingat+timeline · #62/#67 test · #68 offline · #69 checklist · #70 smoke · #103 TWA config.
+- #24 **#65a**: `DaftarUlangService` (lulus→Santri aktif + wali_user_id + nis dari nomor pendaftaran; transaksional, idempoten via status-guard→'daftar_ulang'). Skema Santri: nis NOT NULL+unique, tanggal_lahir/jenis_kelamin wajib.
+- Sisa: #65b endpoint+halaman `/spmb/daftar-ulang` (+taut) · #66 pengingat+timeline · #62/#67 test · #68 offline · #69 checklist · #70 smoke · #103 TWA config.
 
 ## FASE 3 — Selesaikan Modul PPDB + PWA PPDB (lalu deploy)
 - Berikutnya: verifikasi BUKTI BAYAR (panitia) → lalu authoring bank soal → sisa feasible → finalisasi (merge+deploy+migrate).
