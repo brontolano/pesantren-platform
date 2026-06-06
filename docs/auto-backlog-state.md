@@ -12,11 +12,16 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > Hindari menyentuh file milik kerja tim (PWA Peserta SPMB `/spmb`, PesertaAccountService,
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
-## FASE 2 — PWA front-end (diizinkan Hamdan: penuh termasuk Vue/file tim)
-- Iterasi berikutnya: **PWA Peserta SPMB**
-- Catatan: **PWA Wali Santri tampak habis celah aditif bersih** (23 halaman, nav per-anak
-  matang). Fitur barunya butuh keputusan desain Hamdan / merombak file matang → LEWATI.
-  Loop fokus ke PWA Peserta sampai celah aditif bersihnya juga habis, lalu berhenti.
+## FASE 2 — PWA front-end — **LOOP BERHENTI @ iterasi #15**
+- 4 increment PWA Peserta selesai (Berkas, Pengumuman, Tagihan, + taut Dashboard). Build hijau.
+- Semua fitur PWA tersisa butuh **model/data baru ATAU keputusan desain/kebijakan Hamdan** → STOP.
+
+### Sisa PWA (butuh arahan Hamdan)
+- **Hasil Ujian/Nilai (PWA Peserta):** data `HasilUjian` ADA & relasinya ada, TAPI menampilkan
+  skor ke calon santri = keputusan kebijakan (umumkan nilai mentah, atau cukup keputusan via Pengumuman?). → tunggu keputusan.
+- **Kartu Ujian / jadwal ujian:** belum ada model jadwal ujian (perlu dibuat dulu).
+- **Daftar Ulang:** flow besar + konversi peserta lulus → Santri (lihat project "App Santri").
+- **PWA Wali Santri:** sudah sangat lengkap; fitur baru perlu desain spesifik.
 - Rotasi (interval 60 dtk): **PWA Peserta SPMB ↔ PWA Wali Santri**
 - **Verifikasi:** `npm run build` (Vue compile ~5s) + `php -l`. BUKAN unit test.
 - **Bias AMAN:** utamakan FILE BARU (halaman/komponen/endpoint/route untuk fitur yang
