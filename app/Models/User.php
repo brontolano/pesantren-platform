@@ -47,16 +47,9 @@ class User extends Authenticatable implements HasEmailAuthentication, FilamentUs
             return $this->hasRole('super_admin') && $this->tenant_id === null;
         }
 
-        if ($panel->getId() === 'portal') {
-            // DITUTUP (F1.1.6, PRD PWA Peserta §11): portal peserta resmi kini
-            // PWA Inertia di /spmb — role `peserta` ditolak dari SEMUA panel
-            // Filament tanpa kecuali. Panel `portal` legacy menjadi inert dan
-            // dijadwalkan dihapus saat pengerasan F4 (keputusan Hamdan).
-            return false;
-        }
-
         // Panel tenant (staf) — terhubung ke sebuah tenant DAN bukan akun eksternal.
-        // Peserta (PPDB) & wali memakai portalnya sendiri; tidak boleh masuk panel staf.
+        // Peserta (PPDB) & wali memakai portalnya sendiri (PWA /spmb, /wali); tidak
+        // boleh masuk panel staf. Panel `portal` Filament legacy sudah dihapus.
         return $this->tenant_id !== null && ! $this->hasAnyRole(['peserta', 'wali']);
     }
 
