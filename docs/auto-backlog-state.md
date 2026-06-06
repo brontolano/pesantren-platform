@@ -23,7 +23,8 @@ Keputusan: nilai=keputusan-only · daftar ulang=PENUH(→Santri+Wali) · kartu u
 - #26 **#66**: pengingat WA — `sendPengingatDaftarUlang` + aksi Filament "Ingatkan Daftar Ulang" (CalonSantriResource, visible saat lulus). Timeline aktivitas = sudah tercakup stepper 6-tahap di Dashboard. **#66 SELESAI.**
 - #27 **#62/#67**: `DaftarUlangServiceTest` (guard non-lulus/tanpa-tgl-lahir + mapJenisKelamin + konstanta) 4 test hijau.
 - #28 **#68**: offline shell — perluas SW (PesertaPwaController) cache network-first halaman peserta (dashboard/berkas/pengumuman/tagihan/kartu/daftar-ulang) → tampil offline (status terakhir).
-- Sisa: #69 checklist audit (doc) · #70 smoke/UAT (doc) · #103 TWA config (doc+placeholder). Lalu FINALISASI.
+- #29 **#69/#70/#103**: docs SECURITY-AUDIT-PPDB.md + UAT-SPMB.md + twa/README.md + public/.well-known/assetlinks.json (placeholder `[]`).
+- **FASE 4 SELESAI (11/11).** Finalisasi: merge auto/backlog→main + deploy + tenants:migrate. Sisa MANUAL: Play publish, uji beban, isi SHA256 assetlinks.
 
 ## FASE 3 — Selesaikan Modul PPDB + PWA PPDB (lalu deploy)
 - Berikutnya: verifikasi BUKTI BAYAR (panitia) → lalu authoring bank soal → sisa feasible → finalisasi (merge+deploy+migrate).
