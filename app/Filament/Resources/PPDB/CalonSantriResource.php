@@ -236,6 +236,25 @@ class CalonSantriResource extends Resource
                             ->success()
                             ->send();
                     }),
+                Action::make('ingatkanDaftarUlang')
+                    ->label('Ingatkan Daftar Ulang')
+                    ->icon('heroicon-o-bell-alert')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->visible(fn (CalonSantri $record): bool => (string) $record->status_pendaftaran === 'lulus' && (Auth::user()?->can('manage_santri') ?? false))
+                    ->action(function (CalonSantri $record): void {
+                        if ($record->no_hp_wali) {
+                            app(\Modules\PPDB\Services\PpdbWhatsappNotifier::class)->sendPengingatDaftarUlang(
+                                (string) $record->no_hp_wali,
+                                (string) $record->nama,
+                                (string) $record->nomor_pendaftaran,
+                            );
+                        }
+                        Notification::make()
+                            ->title('Pengingat daftar ulang dikirim via WhatsApp')
+                            ->success()
+                            ->send();
+                    }),
                 DeleteAction::make(),
             ]);
     }

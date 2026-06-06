@@ -153,4 +153,18 @@ class PpdbWhatsappNotifier
 
         $this->dispatch($phone, $message, $nomor, $name);
     }
+
+    /** Pengingat agar peserta lulus segera daftar ulang (F3/NOTIF). */
+    public function sendPengingatDaftarUlang(string $phone, string $name, string $nomor): void
+    {
+        $pesantren = tenant()?->name ?? 'Pondok Pesantren';
+        $message = "Assalamu'alaikum Wr. Wb.\n\n"
+            ."Pengingat: *{$name}* telah dinyatakan LULUS di PPDB *{$pesantren}*. "
+            ."Mohon segera selesaikan *DAFTAR ULANG* melalui Portal SPMB agar kursi Anda aman.\n\n"
+            ."🎫 No. Pendaftaran: {$nomor}\n\n"
+            ."Jazaakumullaahu khairan.\n"
+            ."— Panitia PPDB {$pesantren}";
+
+        $this->dispatch($phone, $message, $nomor, $name);
+    }
 }

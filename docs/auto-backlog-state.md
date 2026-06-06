@@ -20,7 +20,8 @@ Keputusan: nilai=keputusan-only · daftar ulang=PENUH(→Santri+Wali) · kartu u
 - #23 **#63b**: kartu peserta `/spmb/kartu-ujian` (controller+route+Vue, identitas+jadwal+QR API publik+cetak, taut Dashboard). **#63 LENGKAP.**
 - #24 **#65a**: `DaftarUlangService` (lulus→Santri aktif + wali_user_id + nis dari nomor pendaftaran; transaksional, idempoten via status-guard→'daftar_ulang'). Skema Santri: nis NOT NULL+unique, tanggal_lahir/jenis_kelamin wajib.
 - #25 **#65b**: endpoint `daftarUlang`/`prosesDaftarUlang` + route GET/POST `/spmb/daftar-ulang` + Vue DaftarUlang (konfirmasi → service) + CTA dashboard (prop `bolehDaftarUlang`). **#65 LENGKAP.**
-- Sisa: #66 pengingat+timeline · #62/#67 test · #68 offline · #69 checklist · #70 smoke · #103 TWA config.
+- #26 **#66**: pengingat WA — `sendPengingatDaftarUlang` + aksi Filament "Ingatkan Daftar Ulang" (CalonSantriResource, visible saat lulus). Timeline aktivitas = sudah tercakup stepper 6-tahap di Dashboard. **#66 SELESAI.**
+- Sisa: #62/#67 test · #68 offline · #69 checklist · #70 smoke · #103 TWA config.
 
 ## FASE 3 — Selesaikan Modul PPDB + PWA PPDB (lalu deploy)
 - Berikutnya: verifikasi BUKTI BAYAR (panitia) → lalu authoring bank soal → sisa feasible → finalisasi (merge+deploy+migrate).
