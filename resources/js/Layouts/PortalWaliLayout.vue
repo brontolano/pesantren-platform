@@ -1,6 +1,17 @@
 <script setup>
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { Head, Link, usePage } from '@inertiajs/vue3'
+import UiIcon from '@/Components/Ui/UiIcon.vue'
+import FlashToast from '@/Components/Ui/FlashToast.vue'
+
+// Peta ikon bottom-nav (presentasional; selaras dengan key dari backend).
+const navIcons = {
+    beranda: 'home',
+    tagihan: 'receipt',
+    pembayaran: 'card',
+    tabungan: 'wallet',
+    akun: 'user',
+}
 
 const props = defineProps({
     title: {
@@ -209,101 +220,98 @@ onBeforeUnmount(() => {
         <link rel="apple-touch-icon" :href="branding.icon192Url || faviconUrl">
     </Head>
 
-    <div class="min-h-screen bg-[radial-gradient(circle_at_top,#f4eee3_0%,#f8f5ed_34%,#fffdf9_100%)] text-slate-900 antialiased">
+    <div class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+        <FlashToast />
+
         <div class="mx-auto flex min-h-screen w-full max-w-md flex-col">
-            <header class="sticky top-0 z-20 px-4 pb-3 pt-4 backdrop-blur">
+            <header class="sticky top-0 z-20 bg-slate-50/80 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+1rem)] backdrop-blur">
                 <div
                     v-if="isOffline"
-                    class="mb-3 rounded-[1.35rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900 shadow-[0_18px_45px_-42px_rgba(217,119,6,0.45)]"
+                    class="mb-3 flex items-start gap-2.5 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-900 ring-1 ring-amber-100"
                     role="status"
                 >
-                    Anda sedang offline. Portal Wali menampilkan data terakhir yang tersimpan, dan aksi transaksi baru akan aktif lagi saat jaringan kembali.
+                    <UiIcon name="wifi-off" class="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                    <span>Anda sedang offline. Portal Wali menampilkan data terakhir yang tersimpan; aksi transaksi aktif lagi saat jaringan kembali.</span>
                 </div>
 
-                <div class="overflow-hidden rounded-[2rem] bg-slate-950 px-4 py-4 text-white shadow-[0_28px_80px_-48px_rgba(15,23,42,0.95)]">
+                <!-- Hero gelap: identitas wali + anak aktif -->
+                <div class="overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-700 to-emerald-900 px-4 py-4 text-white shadow-md ring-1 ring-emerald-900/20">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
-                            <p class="text-[10px] font-semibold uppercase tracking-[0.32em] text-amber-300/90">
+                            <p class="text-[10px] font-semibold uppercase tracking-wide text-emerald-200/90">
                                 Portal Wali
                             </p>
-                            <h1 class="mt-2 font-serif text-[1.85rem] leading-tight">
+                            <h1 class="mt-1.5 text-2xl font-bold leading-tight">
                                 {{ sectionTitle }}
                             </h1>
-                            <p class="mt-2 text-sm leading-6 text-white/72">
+                            <p class="mt-1.5 text-sm leading-6 text-white/75">
                                 {{ sectionKicker }}
                             </p>
                         </div>
-                        <div class="shrink-0 rounded-[1.35rem] border border-white/10 bg-white/10 px-3 py-2 text-right">
-                            <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/55">
-                                Wali
-                            </p>
-                            <p class="mt-1 max-w-[7rem] truncate text-sm font-semibold text-white">
+                        <div class="flex shrink-0 items-center gap-2 rounded-full bg-white/10 px-3 py-2 ring-1 ring-white/15">
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white/15">
+                                <UiIcon name="user" class="h-4 w-4 text-white" />
+                            </span>
+                            <p class="max-w-[5.5rem] truncate text-xs font-semibold text-white">
                                 {{ wali.name || 'Akun Wali' }}
                             </p>
                         </div>
                     </div>
 
+                    <!-- Anak aktif + switcher horizontal (jika >1 anak) -->
                     <div
                         v-if="activeChild"
-                        class="mt-4 rounded-[1.5rem] border border-white/10 bg-white/8 px-4 py-3"
+                        class="mt-4 rounded-xl bg-white/10 px-4 py-3 ring-1 ring-white/15"
                     >
                         <div class="flex items-center justify-between gap-3">
                             <div class="min-w-0">
-                                <p class="truncate text-base font-semibold text-white">
+                                <p class="truncate text-base font-bold text-white">
                                     {{ activeChild.nama }}
                                 </p>
-                                <p class="mt-1 truncate text-xs uppercase tracking-[0.18em] text-white/60">
+                                <p class="mt-0.5 truncate text-xs text-white/65">
                                     {{ activeChild.kelas?.nama || 'Belum ada kelas' }} · {{ activeChild.hubungan || 'wali' }}
                                 </p>
                             </div>
-                            <div class="rounded-full bg-amber-300/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-200">
+                            <span class="shrink-0 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-100">
                                 {{ activeChild.status || 'aktif' }}
-                            </div>
+                            </span>
                         </div>
                     </div>
 
                     <div
-                        v-if="secondaryChildItems.length"
-                        class="mt-3 overflow-x-auto pb-1"
+                        v-if="children.length > 1"
+                        class="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1"
                     >
-                        <div class="flex min-w-max gap-2">
-                            <Link
-                                v-for="item in secondaryChildItems"
-                                :key="item.key"
-                                :href="item.href"
-                                class="rounded-full border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] transition"
-                                :class="item.active
-                                    ? 'border-amber-300/30 bg-amber-300/18 text-amber-100'
-                                    : 'border-white/10 bg-white/8 text-white/72'"
-                            >
-                                {{ item.label }}
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    v-if="children.length > 1"
-                    class="mt-3 overflow-x-auto pb-1"
-                >
-                    <div class="flex min-w-max gap-2">
                         <Link
                             v-for="child in children"
                             :key="child.id"
                             :href="resolveChildHref(child.id)"
-                            class="rounded-[1.4rem] border px-4 py-3 text-left transition"
+                            class="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                             :class="child.id === activeChildId
-                                ? 'border-emerald-200 bg-emerald-50 text-emerald-900 shadow-[0_18px_45px_-38px_rgba(5,150,105,0.9)]'
-                                : 'border-black/5 bg-white/90 text-slate-600 shadow-[0_18px_45px_-42px_rgba(15,23,42,0.5)]'"
+                                ? 'bg-white text-emerald-800 shadow-sm'
+                                : 'bg-white/10 text-white/80 ring-1 ring-white/15 hover:bg-white/15'"
                         >
-                            <p class="text-sm font-semibold">
-                                {{ child.nama }}
-                            </p>
-                            <p class="mt-1 text-[11px] uppercase tracking-[0.18em] text-current/70">
-                                {{ child.kelas?.nama || 'Belum ada kelas' }}
-                            </p>
+                            {{ child.nama }}
                         </Link>
                     </div>
+                </div>
+
+                <!-- Tab anak sekunder (profil/akademik/...) -->
+                <div
+                    v-if="secondaryChildItems.length"
+                    class="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1"
+                >
+                    <Link
+                        v-for="item in secondaryChildItems"
+                        :key="item.key"
+                        :href="item.href"
+                        class="shrink-0 rounded-full px-3.5 py-2 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                        :class="item.active
+                            ? 'bg-emerald-600 text-white shadow-sm'
+                            : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'"
+                    >
+                        {{ item.label }}
+                    </Link>
                 </div>
             </header>
 
@@ -311,22 +319,24 @@ onBeforeUnmount(() => {
                 <slot />
             </main>
 
-            <footer class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-md px-4 pb-4">
-                <nav class="grid grid-cols-5 gap-2 rounded-[2rem] border border-black/5 bg-white/95 p-2 shadow-[0_24px_50px_-35px_rgba(15,23,42,0.45)] backdrop-blur">
+            <!-- Bottom nav 5 tab profesional -->
+            <footer class="fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-md px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)]">
+                <nav class="grid grid-cols-5 gap-1 rounded-2xl bg-white/95 p-1.5 shadow-lg ring-1 ring-slate-100 backdrop-blur">
                     <Link
                         v-for="item in navigationItems"
                         :key="item.key || item.label"
                         :href="item.href"
-                        class="rounded-[1.25rem] px-2 py-2 text-center transition"
-                        :class="item.active ? 'bg-slate-950 text-white' : 'text-slate-500'"
+                        class="group flex flex-col items-center gap-1 rounded-xl px-1 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
+                        :class="item.active ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'"
+                        :aria-current="item.active ? 'page' : undefined"
                     >
                         <span
-                            class="mx-auto flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold uppercase tracking-[0.18em]"
-                            :class="item.active ? 'bg-white/12 text-white' : 'bg-slate-100 text-slate-600'"
+                            class="flex h-9 w-9 items-center justify-center rounded-full transition"
+                            :class="item.active ? 'bg-emerald-50' : 'bg-transparent group-hover:bg-slate-50'"
                         >
-                            {{ tabMonograms[item.key] || item.label.slice(0, 2) }}
+                            <UiIcon :name="navIcons[item.key] || 'home'" class="h-5 w-5" />
                         </span>
-                        <span class="mt-1 block text-[10px] font-semibold uppercase tracking-[0.16em]">
+                        <span class="text-[10px] font-semibold leading-none tracking-tight">
                             {{ item.label }}
                         </span>
                     </Link>

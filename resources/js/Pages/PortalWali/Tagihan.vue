@@ -2,6 +2,14 @@
 import { computed } from 'vue'
 import { Head, Link } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import {
+    UiCard,
+    SectionCard,
+    ListRow,
+    StatusBadge,
+    MoneyText,
+    EmptyState,
+} from '@/Components/Ui'
 
 defineOptions({
     layout: PortalWaliLayout,
@@ -50,87 +58,73 @@ const totalTagihan = computed(() =>
             <title>Tagihan</title>
         </Head>
 
-        <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+        <!-- HERO -->
+        <UiCard variant="hero-dark" padding="lg">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                 Tagihan
             </p>
-            <h2 class="mt-3 font-serif text-3xl leading-tight">
+            <h2 class="mt-2 text-2xl font-bold leading-tight">
                 {{ child.nama }}
             </h2>
-            <p class="mt-2 text-sm leading-6 text-white/75">
+            <p class="mt-1 text-sm text-white/80">
                 {{ child.kelas || 'Belum ada kelas' }}
             </p>
-            <div class="mt-4 rounded-[1.4rem] border border-white/10 bg-white/8 px-4 py-3">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">
+
+            <div class="mt-5 rounded-2xl bg-white/10 px-4 py-4 ring-1 ring-inset ring-white/15">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                     Total yang perlu dibayar
                 </p>
-                <p class="mt-1 text-2xl font-semibold text-white">
-                    {{ rupiah(totalTagihan) }}
-                </p>
+                <MoneyText
+                    :amount="totalTagihan"
+                    size="xl"
+                    tone="inherit"
+                    class="mt-1 block text-white"
+                />
             </div>
-        </section>
+        </UiCard>
 
-        <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Daftar tagihan
-                </p>
-                <h3 class="mt-1 font-serif text-2xl text-slate-900">
-                    Tagihan Santri
-                </h3>
-            </div>
-
-            <div v-if="bills.length" class="grid gap-3">
-                <Link
+        <!-- DAFTAR TAGIHAN -->
+        <SectionCard
+            v-if="bills.length"
+            kicker="Daftar tagihan"
+            title="Tagihan Santri"
+            flush
+        >
+            <div class="divide-y divide-slate-100">
+                <ListRow
                     v-for="bill in bills"
                     :key="bill.id"
                     :href="`/wali/santri/${child.id}/tagihan/${bill.id}`"
-                    class="block rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)] transition active:scale-[0.99]"
+                    :title="bill.jenisTagihan"
+                    :subtitle="bill.keterangan || 'Tidak ada keterangan'"
+                    chevron
                 >
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="min-w-0">
-                            <h4 class="text-lg font-semibold text-slate-900">
-                                {{ bill.jenisTagihan }}
-                            </h4>
-                            <p class="mt-1 truncate text-sm text-slate-500">
-                                {{ bill.keterangan || 'Tidak ada keterangan' }}
-                            </p>
-                        </div>
-                        <span
-                            class="shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold"
-                            :class="badgeFor(bill.status).class"
-                        >
-                            {{ badgeFor(bill.status).label }}
-                        </span>
-                    </div>
+                    <template #trailing>
+                        <StatusBadge :status="bill.status" size="sm" />
+                    </template>
 
-                    <div class="mt-3 flex items-end justify-between">
+                    <div class="flex items-end justify-between gap-3">
                         <div>
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                                 Sisa tagihan
                             </p>
-                            <p class="mt-1 text-xl font-semibold text-slate-900">
-                                {{ rupiah(bill.sisaTagihan) }}
-                            </p>
+                            <MoneyText :amount="bill.sisaTagihan" size="lg" class="mt-0.5 block" />
                         </div>
                         <p class="text-xs text-slate-500">
                             Jatuh tempo {{ bill.jatuhTempo || '-' }}
                         </p>
                     </div>
-                </Link>
+                </ListRow>
             </div>
+        </SectionCard>
 
-            <div
-                v-else
-                class="rounded-[1.5rem] border border-dashed border-emerald-200 bg-emerald-50/60 px-5 py-8 text-center"
-            >
-                <p class="text-base font-semibold text-emerald-800">
-                    Tidak ada tagihan
-                </p>
-                <p class="mt-1 text-sm text-emerald-700/80">
-                    Semua tagihan anak Anda sudah lunas.
-                </p>
-            </div>
-        </section>
+        <!-- EMPTY STATE -->
+        <EmptyState
+            v-else
+            tone="emerald"
+            icon="check-circle"
+            title="Tidak ada tagihan"
+            message="Semua tagihan anak Anda sudah lunas."
+        />
     </div>
 </template>

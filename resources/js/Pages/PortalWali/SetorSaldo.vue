@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import { UiCard, UiField, UiInput, UiButton, MoneyText } from '@/Components/Ui'
 
 defineOptions({
     layout: PortalWaliLayout,
@@ -62,96 +63,100 @@ function submit() {
             <title>Setor Saldo</title>
         </Head>
 
-        <section class="rounded-[2rem] bg-slate-950 px-5 py-6 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+        <!-- HERO -->
+        <UiCard variant="hero-dark">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                 Setor Saldo
             </p>
-            <p class="mt-3 text-sm text-white/75">
+            <p class="mt-2 text-sm text-white/80">
                 {{ child.nama }} · {{ child.kelas || 'Belum ada kelas' }}
             </p>
-            <p class="mt-3 text-sm text-white/60">
+            <p class="mt-4 text-[11px] font-semibold uppercase tracking-wide text-white/60">
                 Saldo saat ini
             </p>
-            <p class="mt-1 font-serif text-3xl leading-tight">
-                {{ rupiah(saldo) }}
-            </p>
-        </section>
+            <MoneyText :amount="saldo" size="xl" tone="inherit" class="mt-1 block text-white" />
+        </UiCard>
 
-        <form
-            class="space-y-3 rounded-[1.75rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
-            @submit.prevent="submit"
-        >
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                Nominal setor
-                <input
-                    v-model="form.nominal"
-                    type="number"
-                    min="1"
-                    inputmode="numeric"
-                    placeholder="0"
-                    class="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-                >
-                <span v-if="form.errors.nominal" class="text-xs font-normal text-rose-600">{{ form.errors.nominal }}</span>
-            </label>
+        <!-- FORM SETOR -->
+        <UiCard padding="sm">
+            <form class="space-y-4" @submit.prevent="submit">
+                <UiField label="Nominal setor" :error="form.errors.nominal">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="form.nominal"
+                            type="number"
+                            :min="1"
+                            inputmode="numeric"
+                            placeholder="0"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
 
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                Tanggal transfer
-                <input
-                    v-model="form.tanggal_transfer"
-                    type="date"
-                    class="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-                >
-                <span v-if="form.errors.tanggal_transfer" class="text-xs font-normal text-rose-600">{{ form.errors.tanggal_transfer }}</span>
-            </label>
+                <UiField label="Tanggal transfer" :error="form.errors.tanggal_transfer">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="form.tanggal_transfer"
+                            type="date"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
 
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                Nama pengirim
-                <input
-                    v-model="form.nama_pengirim"
-                    type="text"
-                    placeholder="Nama di rekening pengirim"
-                    class="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-                >
-                <span v-if="form.errors.nama_pengirim" class="text-xs font-normal text-rose-600">{{ form.errors.nama_pengirim }}</span>
-            </label>
+                <UiField label="Nama pengirim" :error="form.errors.nama_pengirim">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="form.nama_pengirim"
+                            type="text"
+                            placeholder="Nama di rekening pengirim"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
 
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                Bukti transfer
-                <input
-                    type="file"
-                    accept="image/*"
-                    class="rounded-2xl border border-slate-200 px-4 py-3 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-slate-100 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-slate-700"
-                    @input="form.bukti = $event.target.files[0]"
-                >
-                <span v-if="form.errors.bukti" class="text-xs font-normal text-rose-600">{{ form.errors.bukti }}</span>
-            </label>
+                <UiField label="Bukti transfer" :error="form.errors.bukti" hint="Foto/struk transfer (format gambar).">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            type="file"
+                            accept="image/*"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                            @change="form.bukti = $event.target.files[0]"
+                        />
+                    </template>
+                </UiField>
 
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
-                <div class="flex items-center justify-between text-slate-600">
-                    <span>Saldo sebelum</span>
-                    <span class="font-semibold text-slate-900">{{ rupiah(saldo) }}</span>
+                <!-- Ringkasan saldo sebelum -> sesudah -->
+                <div class="rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-100">
+                    <div class="flex items-center justify-between text-sm text-slate-600">
+                        <span>Saldo sebelum</span>
+                        <MoneyText :amount="saldo" size="sm" />
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-sm text-slate-600">
+                        <span>Setoran</span>
+                        <MoneyText :amount="form.nominal || 0" size="sm" tone="emerald" sign="plus" />
+                    </div>
+                    <div class="mt-2 flex items-center justify-between border-t border-dashed border-slate-200 pt-2 text-sm text-slate-600">
+                        <span>Saldo sesudah (jika disetujui)</span>
+                        <MoneyText :amount="saldoSetelahSetor" size="sm" tone="emerald" />
+                    </div>
                 </div>
-                <div class="mt-2 flex items-center justify-between text-slate-600">
-                    <span>Setoran</span>
-                    <span class="font-semibold text-emerald-700">+ {{ rupiah(form.nominal || 0) }}</span>
-                </div>
-                <div class="mt-2 border-t border-dashed border-slate-200 pt-2 flex items-center justify-between text-slate-600">
-                    <span>Saldo sesudah (jika disetujui)</span>
-                    <span class="font-semibold text-emerald-700">{{ rupiah(saldoSetelahSetor) }}</span>
-                </div>
-            </div>
 
-            <p class="text-xs text-slate-400">
-                Permintaan setor akan diverifikasi bendahara sebelum saldo bertambah.
-            </p>
+                <p class="text-xs text-slate-400">
+                    Permintaan setor akan diverifikasi bendahara sebelum saldo bertambah.
+                </p>
 
-            <button
-                type="submit"
-                class="w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white disabled:opacity-60"
-                :disabled="form.processing"
-            >
-                Kirim Permintaan Setor
-            </button>
-        </form>
+                <UiButton variant="primary" block type="submit" :loading="form.processing" icon-left="plus">
+                    Kirim Permintaan Setor
+                </UiButton>
+            </form>
+        </UiCard>
     </div>
 </template>

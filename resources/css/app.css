@@ -7,3 +7,24 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/*
+ * Token brand Portal Wali (brandable per tenant).
+ * Override --wali-primary di scope tenant nanti tanpa menyentuh komponen.
+ * Dipakai oleh komponen di resources/js/Components/Ui/*.
+ */
+:root {
+    --wali-primary: #059669;       /* emerald-600 — CTA utama */
+    --wali-primary-strong: #047857; /* emerald-700 — hover/active & teks aksen */
+    --wali-primary-tint: #ecfdf5;   /* emerald-50 — background tint */
+
+    --wali-success: #059669;        /* lunas / terverifikasi */
+    --wali-warning: #f59e0b;        /* menunggu (amber-500) */
+    --wali-danger: #f43f5e;         /* ditolak (rose-500) */
+    --wali-info: #3b82f6;           /* info (blue-500) */
+
+    --wali-surface: #ffffff;        /* kartu */
+    --wali-bg: #f8fafc;             /* page bg (slate-50) */
+    --wali-ink: #0f172a;            /* teks utama (slate-900) */
+    --wali-muted: #64748b;          /* teks muted (slate-500) */
+}

@@ -1,6 +1,15 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import {
+    UiCard,
+    SectionCard,
+    ListRow,
+    StatusBadge,
+    MoneyText,
+    UiButton,
+    EmptyState,
+} from '@/Components/Ui'
 
 defineOptions({
     layout: PortalWaliLayout,
@@ -36,113 +45,156 @@ defineProps({
             <title>Keuangan Santri</title>
         </Head>
 
-        <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+        <UiCard variant="hero-dark">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                 Keuangan
             </p>
-            <h2 class="mt-3 font-serif text-3xl leading-tight">
+            <h2 class="mt-2 text-2xl font-bold leading-tight">
                 {{ child.nama }}
             </h2>
-            <p class="mt-2 text-sm leading-6 text-white/75">
+            <p class="mt-1 text-sm text-white/75">
                 {{ child.kelas || 'Belum ada kelas' }}
             </p>
-        </section>
+        </UiCard>
 
         <section id="tabungan" class="grid scroll-mt-36 grid-cols-2 gap-3">
-            <div class="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+            <UiCard padding="sm">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                     Outstanding
                 </p>
-                <p class="mt-2 text-2xl font-semibold text-slate-900">
-                    {{ summary.totalOutstanding }}
-                </p>
-            </div>
-            <div class="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
+                <MoneyText
+                    :amount="summary.totalOutstanding"
+                    size="xl"
+                    class="mt-2 block"
+                />
+            </UiCard>
+            <UiCard padding="sm">
+                <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                     Saldo Tabungan
                 </p>
-                <p class="mt-2 text-2xl font-semibold text-slate-900">
-                    {{ savings.saldo }}
-                </p>
-            </div>
+                <MoneyText
+                    :amount="savings.saldo"
+                    size="xl"
+                    tone="emerald"
+                    class="mt-2 block"
+                />
+            </UiCard>
         </section>
 
-        <section id="tagihan" class="space-y-3 scroll-mt-36">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Tagihan
-                </p>
-                <h3 class="mt-1 font-serif text-2xl text-slate-900">
-                    Laporan Tagihan
-                </h3>
-            </div>
-
-            <div v-if="bills.length" class="grid gap-3">
-                <article
+        <SectionCard
+            id="tagihan"
+            class="scroll-mt-36"
+            kicker="Tagihan"
+            title="Laporan Tagihan"
+        >
+            <div v-if="bills.length" class="space-y-3">
+                <UiCard
                     v-for="bill in bills"
                     :key="bill.id"
-                    class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
+                    padding="sm"
                 >
                     <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <h4 class="text-lg font-semibold text-slate-900">
+                        <div class="min-w-0">
+                            <h4 class="text-[15px] font-semibold text-slate-900">
                                 {{ bill.jenisTagihan }}
                             </h4>
-                            <p class="mt-1 text-sm text-slate-500">
+                            <p class="mt-0.5 text-sm text-slate-500">
                                 {{ bill.keterangan || '-' }}
                             </p>
                         </div>
-                        <div class="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
-                            {{ bill.status }}
+                        <div class="shrink-0 text-right">
+                            <StatusBadge :status="bill.status" size="sm" />
+                            <MoneyText
+                                :amount="bill.nominalAkhir"
+                                size="md"
+                                class="mt-1.5 block"
+                            />
                         </div>
                     </div>
-                    <div class="mt-3 grid grid-cols-2 gap-3 text-sm text-slate-600">
-                        <p><span class="font-semibold text-slate-900">Nominal:</span> {{ bill.nominalAkhir }}</p>
-                        <p><span class="font-semibold text-slate-900">Sisa:</span> {{ bill.sisaTagihan }}</p>
-                        <p><span class="font-semibold text-slate-900">Dibayar:</span> {{ bill.totalDibayar }}</p>
-                        <p><span class="font-semibold text-slate-900">Jatuh tempo:</span> {{ bill.jatuhTempo || '-' }}</p>
-                    </div>
-                    <div v-if="bill.status !== 'lunas'" class="mt-3 flex gap-2">
-                        <Link
+
+                    <dl class="mt-3 grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
+                        <div>
+                            <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                                Sisa
+                            </dt>
+                            <dd class="mt-0.5">
+                                <MoneyText :amount="bill.sisaTagihan" size="sm" tone="rose" />
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                                Dibayar
+                            </dt>
+                            <dd class="mt-0.5">
+                                <MoneyText :amount="bill.totalDibayar" size="sm" tone="emerald" />
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                                Jatuh tempo
+                            </dt>
+                            <dd class="mt-0.5 text-sm font-semibold tabular-nums text-slate-700">
+                                {{ bill.jatuhTempo || '-' }}
+                            </dd>
+                        </div>
+                    </dl>
+
+                    <div v-if="bill.status !== 'lunas'" class="mt-4 flex gap-2">
+                        <UiButton
+                            variant="primary"
+                            as="link"
                             :href="`/wali/santri/${child.id}/tagihan/${bill.id}/bayar`"
-                            class="flex-1 rounded-2xl bg-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white"
-                        >Bayar</Link>
-                        <Link
+                            block
+                            icon-left="card"
+                        >
+                            Bayar
+                        </UiButton>
+                        <UiButton
+                            variant="secondary"
+                            as="link"
                             :href="`/wali/santri/${child.id}/tabungan`"
-                            class="flex-1 rounded-2xl border border-emerald-600 px-4 py-3 text-center text-sm font-semibold text-emerald-700"
-                        >Dari Saldo</Link>
+                            block
+                            icon-left="wallet"
+                        >
+                            Dari Saldo
+                        </UiButton>
                     </div>
-                </article>
-            </div>
-        </section>
-
-        <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Pembayaran
-                </p>
-                <h3 class="mt-1 font-serif text-2xl text-slate-900">
-                    Riwayat Pembayaran
-                </h3>
+                </UiCard>
             </div>
 
-            <div v-if="payments.length" class="grid gap-3">
-                <article
+            <EmptyState
+                v-else
+                tone="emerald"
+                icon="check-circle"
+                title="Tidak ada tagihan"
+                message="Semua tagihan anak Anda sudah lunas."
+            />
+        </SectionCard>
+
+        <SectionCard
+            kicker="Pembayaran"
+            title="Riwayat Pembayaran"
+            flush
+        >
+            <div v-if="payments.length" class="divide-y divide-slate-100">
+                <ListRow
                     v-for="payment in payments"
                     :key="payment.id"
-                    class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 text-sm shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
+                    :title="payment.tagihan || 'Pembayaran'"
+                    :subtitle="`${payment.tanggalPembayaran || '-'} · ${payment.metode || '-'}`"
                 >
-                    <p class="font-semibold text-slate-900">
-                        {{ payment.tagihan || 'Pembayaran' }}
-                    </p>
-                    <p class="mt-1 text-slate-500">
-                        {{ payment.tanggalPembayaran || '-' }} · {{ payment.metode || '-' }}
-                    </p>
-                    <p class="mt-2 font-semibold text-emerald-700">
-                        {{ payment.nominal }}
-                    </p>
-                </article>
+                    <template #trailing>
+                        <MoneyText :amount="payment.nominal" tone="emerald" size="md" />
+                    </template>
+                </ListRow>
             </div>
-        </section>
+
+            <EmptyState
+                v-else
+                icon="receipt"
+                title="Belum ada pembayaran"
+                message="Riwayat pembayaran untuk anak ini akan tampil di sini."
+            />
+        </SectionCard>
     </div>
 </template>

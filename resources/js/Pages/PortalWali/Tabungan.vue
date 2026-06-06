@@ -2,6 +2,19 @@
 import { computed, ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import {
+    UiCard,
+    SectionCard,
+    ListRow,
+    MoneyText,
+    UiField,
+    UiInput,
+    UiButton,
+    EmptyState,
+    BottomSheet,
+    StatusBadge,
+    UiIcon,
+} from '@/Components/Ui'
 
 defineOptions({
     layout: PortalWaliLayout,
@@ -98,6 +111,15 @@ function submitBayar() {
         onSuccess: () => tutupBayar(),
     })
 }
+
+// --- UI: kontrol bottom-sheet konfirmasi bayar (presentasional saja) ---
+// Terbuka saat ada tagihan aktif; menutup memanggil tutupBayar() yang sudah ada.
+const bayarSheetOpen = computed({
+    get: () => activeBillId.value !== null,
+    set: (open) => {
+        if (!open) tutupBayar()
+    },
+})
 </script>
 
 <template>
@@ -106,245 +128,251 @@ function submitBayar() {
             <title>Tabungan Santri</title>
         </Head>
 
-        <section class="rounded-[2rem] bg-slate-950 px-5 py-6 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+        <!-- HERO: kartu saldo besar -->
+        <UiCard variant="hero-dark">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                 Saldo Tabungan
             </p>
-            <p class="mt-3 text-sm text-white/75">
+            <p class="mt-2 text-sm text-white/80">
                 {{ child.nama }} · {{ child.kelas || 'Belum ada kelas' }}
             </p>
-            <p class="mt-3 font-serif text-4xl leading-tight">
-                {{ rupiah(saldo) }}
-            </p>
-        </section>
+            <MoneyText :amount="saldo" size="2xl" tone="inherit" class="mt-4 block text-white" />
+        </UiCard>
 
-        <!-- Mutasi -->
-        <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Mutasi
-                </p>
-                <h3 class="mt-1 font-serif text-2xl text-slate-900">
-                    Riwayat Tabungan
-                </h3>
-            </div>
-
-            <div v-if="transactions.length" class="grid gap-3">
-                <article
+        <!-- MUTASI -->
+        <SectionCard kicker="Mutasi" title="Riwayat Tabungan" :flush="transactions.length > 0">
+            <div v-if="transactions.length" class="divide-y divide-slate-100">
+                <ListRow
                     v-for="trx in transactions"
                     :key="trx.id"
-                    class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
+                    :title="trx.keterangan || (trx.tipe === 'setor' ? 'Setoran saldo' : 'Penarikan saldo')"
+                    :subtitle="trx.tanggal || '-'"
                 >
-                    <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <span
-                                class="inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]"
-                                :class="trx.tipe === 'setor'
-                                    ? 'bg-emerald-50 text-emerald-700'
-                                    : 'bg-rose-50 text-rose-700'"
-                            >
-                                {{ trx.tipe === 'setor' ? 'Setor' : 'Tarik' }}
-                            </span>
-                            <p class="mt-2 text-sm text-slate-500">
-                                {{ trx.keterangan || '-' }}
-                            </p>
-                            <p class="mt-1 text-xs text-slate-400">
-                                {{ trx.tanggal || '-' }}
-                            </p>
-                        </div>
-                        <div class="text-right">
-                            <p
-                                class="text-base font-semibold"
-                                :class="trx.tipe === 'setor' ? 'text-emerald-700' : 'text-rose-700'"
-                            >
-                                {{ trx.tipe === 'setor' ? '+' : '-' }}{{ rupiah(trx.nominal) }}
-                            </p>
-                            <p class="mt-1 text-xs text-slate-400">
-                                Saldo: {{ rupiah(trx.saldoSesudah) }}
-                            </p>
-                        </div>
-                    </div>
-                </article>
+                    <template #leading>
+                        <span
+                            class="flex h-10 w-10 items-center justify-center rounded-full"
+                            :class="trx.tipe === 'setor'
+                                ? 'bg-emerald-50 text-emerald-600'
+                                : 'bg-rose-50 text-rose-600'"
+                        >
+                            <UiIcon
+                                :name="trx.tipe === 'setor' ? 'arrow-down-left' : 'arrow-up-right'"
+                                class="h-5 w-5"
+                            />
+                        </span>
+                    </template>
+                    <template #trailing>
+                        <MoneyText
+                            :amount="trx.nominal"
+                            :sign="trx.tipe === 'setor' ? 'plus' : 'minus'"
+                            :tone="trx.tipe === 'setor' ? 'emerald' : 'rose'"
+                        />
+                        <p class="mt-0.5 text-[11px] text-slate-400">
+                            Saldo: {{ rupiah(trx.saldoSesudah) }}
+                        </p>
+                    </template>
+                </ListRow>
             </div>
-            <p v-else class="rounded-[1.5rem] border border-dashed border-slate-200 bg-white/60 px-4 py-6 text-center text-sm text-slate-400">
-                Belum ada mutasi tabungan.
-            </p>
-        </section>
+            <EmptyState
+                v-else
+                icon="wallet"
+                title="Belum ada mutasi"
+                message="Riwayat setor dan tarik tabungan akan tampil di sini."
+            />
+        </SectionCard>
 
-        <!-- Setor Saldo -->
-        <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Setor Saldo
-                </p>
-                <h3 class="mt-1 font-serif text-2xl text-slate-900">
-                    Top Up Tabungan
-                </h3>
-            </div>
+        <!-- SETOR SALDO -->
+        <SectionCard kicker="Setor Saldo" title="Top Up Tabungan">
+            <form class="space-y-4" @submit.prevent="submitSetor">
+                <UiField label="Nominal setor" :error="setorForm.errors.nominal">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="setorForm.nominal"
+                            type="number"
+                            :min="1"
+                            inputmode="numeric"
+                            placeholder="0"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
 
-            <form
-                class="space-y-3 rounded-[1.75rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
-                @submit.prevent="submitSetor"
-            >
-                <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                    Nominal setor
-                    <input
-                        v-model="setorForm.nominal"
-                        type="number"
-                        min="1"
-                        inputmode="numeric"
-                        placeholder="0"
-                        class="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-                    >
-                    <span v-if="setorForm.errors.nominal" class="text-xs font-normal text-rose-600">{{ setorForm.errors.nominal }}</span>
-                </label>
+                <UiField label="Tanggal transfer" :error="setorForm.errors.tanggal_transfer">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="setorForm.tanggal_transfer"
+                            type="date"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
 
-                <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                    Tanggal transfer
-                    <input
-                        v-model="setorForm.tanggal_transfer"
-                        type="date"
-                        class="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-                    >
-                    <span v-if="setorForm.errors.tanggal_transfer" class="text-xs font-normal text-rose-600">{{ setorForm.errors.tanggal_transfer }}</span>
-                </label>
+                <UiField label="Nama pengirim" :error="setorForm.errors.nama_pengirim">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="setorForm.nama_pengirim"
+                            type="text"
+                            placeholder="Nama di rekening pengirim"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
 
-                <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                    Nama pengirim
-                    <input
-                        v-model="setorForm.nama_pengirim"
-                        type="text"
-                        placeholder="Nama di rekening pengirim"
-                        class="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-                    >
-                    <span v-if="setorForm.errors.nama_pengirim" class="text-xs font-normal text-rose-600">{{ setorForm.errors.nama_pengirim }}</span>
-                </label>
+                <UiField label="Bukti transfer" :error="setorForm.errors.bukti" hint="Foto/struk transfer (format gambar).">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            type="file"
+                            accept="image/*"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                            @change="setorForm.bukti = $event.target.files[0]"
+                        />
+                    </template>
+                </UiField>
 
-                <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                    Bukti transfer
-                    <input
-                        type="file"
-                        accept="image/*"
-                        class="rounded-2xl border border-slate-200 px-4 py-3 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-slate-100 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-slate-700"
-                        @input="setorForm.bukti = $event.target.files[0]"
-                    >
-                    <span v-if="setorForm.errors.bukti" class="text-xs font-normal text-rose-600">{{ setorForm.errors.bukti }}</span>
-                </label>
-
-                <button
-                    type="submit"
-                    class="w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white disabled:opacity-60"
-                    :disabled="setorForm.processing"
-                >
+                <UiButton variant="primary" block type="submit" :loading="setorForm.processing" icon-left="plus">
                     Kirim Permintaan Setor
-                </button>
+                </UiButton>
             </form>
-        </section>
+        </SectionCard>
 
-        <!-- Bayar dari Saldo -->
-        <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Bayar dari Saldo
-                </p>
-                <h3 class="mt-1 font-serif text-2xl text-slate-900">
-                    Lunasi Tagihan
-                </h3>
+        <!-- BAYAR DARI SALDO -->
+        <SectionCard kicker="Bayar dari Saldo" title="Lunasi Tagihan">
+            <div class="space-y-3">
+                <UiCard v-if="!hasSaldo" variant="muted" padding="sm">
+                    <div class="flex items-start gap-3">
+                        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                        </span>
+                        <p class="text-sm text-amber-900">
+                            Saldo tabungan masih kosong. Lakukan setor saldo terlebih dahulu untuk membayar tagihan dari saldo.
+                        </p>
+                    </div>
+                </UiCard>
+
+                <template v-if="bills.length">
+                    <UiCard v-for="bill in bills" :key="bill.id" padding="sm">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <h4 class="text-base font-bold text-slate-900">
+                                    {{ bill.jenisTagihan }}
+                                </h4>
+                                <p class="mt-1 text-sm text-slate-500">
+                                    {{ bill.keterangan || '-' }}
+                                </p>
+                            </div>
+                            <StatusBadge :status="bill.status" size="sm" class="shrink-0" />
+                        </div>
+                        <div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+                            <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Sisa tagihan</span>
+                            <MoneyText :amount="bill.sisaTagihan" size="lg" />
+                        </div>
+
+                        <UiButton
+                            variant="primary"
+                            block
+                            type="button"
+                            class="mt-3"
+                            :disabled="!hasSaldo"
+                            icon-left="wallet"
+                            @click="bukaBayar(bill)"
+                        >
+                            Bayar dari Saldo
+                        </UiButton>
+                    </UiCard>
+                </template>
+
+                <EmptyState
+                    v-else
+                    tone="emerald"
+                    icon="check-circle"
+                    title="Tidak ada tagihan"
+                    message="Semua tagihan anak Anda sudah lunas."
+                />
             </div>
+        </SectionCard>
 
-            <div v-if="!hasSaldo" class="rounded-[1.5rem] border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-900">
-                Saldo tabungan masih kosong. Lakukan setor saldo terlebih dahulu untuk membayar tagihan dari saldo.
-            </div>
-
-            <div v-if="bills.length" class="grid gap-3">
-                <article
-                    v-for="bill in bills"
-                    :key="bill.id"
-                    class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
-                >
+        <!-- BOTTOM SHEET: konfirmasi bayar dari saldo -->
+        <BottomSheet v-model="bayarSheetOpen" title="Konfirmasi Bayar dari Saldo">
+            <div v-if="activeBill" class="space-y-4">
+                <div class="rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-100">
                     <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <h4 class="text-lg font-semibold text-slate-900">
-                                {{ bill.jenisTagihan }}
-                            </h4>
-                            <p class="mt-1 text-sm text-slate-500">
-                                {{ bill.keterangan || '-' }}
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-slate-900">
+                                {{ activeBill.jenisTagihan }}
+                            </p>
+                            <p class="mt-0.5 truncate text-xs text-slate-500">
+                                {{ activeBill.keterangan || '-' }}
                             </p>
                         </div>
-                        <div class="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
-                            {{ bill.status }}
-                        </div>
+                        <StatusBadge :status="activeBill.status" size="sm" class="shrink-0" />
                     </div>
-                    <p class="mt-3 text-sm text-slate-600">
-                        <span class="font-semibold text-slate-900">Sisa tagihan:</span> {{ rupiah(bill.sisaTagihan) }}
-                    </p>
-
-                    <button
-                        v-if="activeBillId !== bill.id"
-                        type="button"
-                        class="mt-3 w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white disabled:cursor-not-allowed disabled:opacity-50"
-                        :disabled="!hasSaldo"
-                        @click="bukaBayar(bill)"
-                    >
-                        Bayar dari Saldo
-                    </button>
-
-                    <!-- Form konfirmasi bayar (saldo sebelum -> sesudah) -->
-                    <div v-else class="mt-4 space-y-3 rounded-2xl bg-slate-50 px-4 py-4">
-                        <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                            Nominal bayar
-                            <input
-                                v-model="bayarForm.nominal"
-                                type="number"
-                                min="1"
-                                :max="Math.min(Number(bill.sisaTagihan), saldo)"
-                                inputmode="numeric"
-                                class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm"
-                            >
-                            <span v-if="bayarForm.errors.nominal" class="text-xs font-normal text-rose-600">{{ bayarForm.errors.nominal }}</span>
-                        </label>
-
-                        <div class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm">
-                            <div class="flex items-center justify-between text-slate-600">
-                                <span>Saldo sebelum</span>
-                                <span class="font-semibold text-slate-900">{{ rupiah(saldo) }}</span>
-                            </div>
-                            <div class="mt-2 flex items-center justify-between text-slate-600">
-                                <span>Nominal bayar</span>
-                                <span class="font-semibold text-rose-700">- {{ rupiah(bayarForm.nominal || 0) }}</span>
-                            </div>
-                            <div class="mt-2 border-t border-dashed border-slate-200 pt-2 flex items-center justify-between text-slate-600">
-                                <span>Saldo sesudah</span>
-                                <span
-                                    class="font-semibold"
-                                    :class="saldoSetelahBayar < 0 ? 'text-rose-700' : 'text-emerald-700'"
-                                >{{ rupiah(saldoSetelahBayar) }}</span>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-2">
-                            <button
-                                type="button"
-                                class="flex-1 rounded-2xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-600"
-                                @click="tutupBayar"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                type="button"
-                                class="flex-[2] rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white disabled:cursor-not-allowed disabled:opacity-50"
-                                :disabled="!nominalBayarValid || bayarForm.processing"
-                                @click="submitBayar"
-                            >
-                                Konfirmasi Bayar
-                            </button>
-                        </div>
+                    <div class="mt-2 flex items-center justify-between border-t border-slate-200 pt-2">
+                        <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Sisa tagihan</span>
+                        <MoneyText :amount="activeBill.sisaTagihan" size="sm" />
                     </div>
-                </article>
+                </div>
+
+                <UiField label="Nominal bayar" :error="bayarForm.errors.nominal">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="bayarForm.nominal"
+                            type="number"
+                            :min="1"
+                            :max="Math.min(Number(activeBill.sisaTagihan), saldo)"
+                            inputmode="numeric"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
+
+                <div class="rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-100">
+                    <div class="flex items-center justify-between text-sm text-slate-600">
+                        <span>Saldo sebelum</span>
+                        <MoneyText :amount="saldo" size="sm" />
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-sm text-slate-600">
+                        <span>Nominal bayar</span>
+                        <MoneyText :amount="bayarForm.nominal || 0" size="sm" tone="rose" sign="minus" />
+                    </div>
+                    <div class="mt-2 flex items-center justify-between border-t border-dashed border-slate-200 pt-2 text-sm text-slate-600">
+                        <span>Saldo sesudah</span>
+                        <MoneyText
+                            :amount="saldoSetelahBayar"
+                            size="sm"
+                            :tone="saldoSetelahBayar < 0 ? 'rose' : 'emerald'"
+                        />
+                    </div>
+                </div>
             </div>
-            <p v-else class="rounded-[1.5rem] border border-dashed border-slate-200 bg-white/60 px-4 py-6 text-center text-sm text-slate-400">
-                Tidak ada tagihan yang perlu dibayar.
-            </p>
-        </section>
+
+            <template #footer>
+                <div class="flex gap-2">
+                    <UiButton variant="secondary" class="flex-1" type="button" @click="tutupBayar">
+                        Batal
+                    </UiButton>
+                    <UiButton
+                        variant="primary"
+                        class="flex-[2]"
+                        type="button"
+                        :disabled="!nominalBayarValid"
+                        :loading="bayarForm.processing"
+                        icon-left="check"
+                        @click="submitBayar"
+                    >
+                        Konfirmasi Bayar
+                    </UiButton>
+                </div>
+            </template>
+        </BottomSheet>
     </div>
 </template>

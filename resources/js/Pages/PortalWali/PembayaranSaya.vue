@@ -2,6 +2,14 @@
 import { computed } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import {
+    UiCard,
+    SectionCard,
+    ListRow,
+    StatusBadge,
+    MoneyText,
+    EmptyState,
+} from '@/Components/Ui'
 
 defineOptions({
     layout: PortalWaliLayout,
@@ -49,101 +57,89 @@ const pendingCount = computed(() => props.payments.filter((p) => !p.isVerified &
             <title>Pembayaran Saya</title>
         </Head>
 
-        <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+        <UiCard variant="hero-dark">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                 Pembayaran saya
             </p>
-            <h2 class="mt-3 font-serif text-3xl leading-tight">
+            <h2 class="mt-2 text-2xl font-bold leading-tight">
                 Status Pembayaran
             </h2>
             <div class="mt-4 grid grid-cols-2 gap-3">
-                <div class="rounded-[1.4rem] border border-white/10 bg-white/8 px-4 py-3">
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                <div class="rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-inset ring-white/15">
+                    <p class="text-[11px] font-semibold uppercase tracking-wide text-white/60">
                         Menunggu
                     </p>
-                    <p class="mt-1 text-2xl font-semibold text-amber-300">
+                    <p class="mt-1 text-3xl font-bold tabular-nums text-amber-300">
                         {{ pendingCount }}
                     </p>
                 </div>
-                <div class="rounded-[1.4rem] border border-white/10 bg-white/8 px-4 py-3">
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/55">
+                <div class="rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-inset ring-white/15">
+                    <p class="text-[11px] font-semibold uppercase tracking-wide text-white/60">
                         Terverifikasi
                     </p>
-                    <p class="mt-1 text-2xl font-semibold text-emerald-300">
+                    <p class="mt-1 text-3xl font-bold tabular-nums text-emerald-300">
                         {{ verifiedCount }}
                     </p>
                 </div>
             </div>
-        </section>
+        </UiCard>
 
-        <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Riwayat
-                </p>
-                <h3 class="mt-1 font-serif text-2xl text-slate-900">
-                    Pembayaran Terkirim
-                </h3>
-            </div>
-
-            <div v-if="payments.length" class="grid gap-3">
-                <article
+        <SectionCard
+            kicker="Riwayat"
+            title="Pembayaran Terkirim"
+        >
+            <div v-if="payments.length" class="space-y-3">
+                <UiCard
                     v-for="payment in payments"
                     :key="payment.id"
-                    class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
+                    padding="sm"
                 >
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
-                            <h4 class="text-lg font-semibold text-slate-900">
+                            <h4 class="text-[15px] font-semibold text-slate-900">
                                 {{ payment.tagihan || 'Pembayaran' }}
                             </h4>
-                            <p v-if="payment.santriNama" class="mt-1 text-sm text-slate-500">
+                            <p v-if="payment.santriNama" class="mt-0.5 text-sm text-slate-500">
                                 {{ payment.santriNama }}
                             </p>
                         </div>
-                        <span
-                            class="shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold"
-                            :class="badgeFor(payment).class"
-                        >
-                            {{ badgeFor(payment).label }}
-                        </span>
+                        <StatusBadge
+                            class="shrink-0"
+                            size="sm"
+                            :status="payment.alasanPenolakan
+                                ? 'ditolak'
+                                : (payment.isVerified ? 'terverifikasi' : 'menunggu')"
+                        />
                     </div>
 
-                    <div class="mt-3 flex items-end justify-between gap-3">
+                    <div class="mt-3 flex items-end justify-between gap-3 border-t border-slate-100 pt-3">
                         <div>
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
                                 {{ metodeLabel[payment.metode] || payment.metode || 'Pembayaran' }}
                             </p>
-                            <p class="mt-1 text-xl font-semibold text-slate-900">
-                                {{ rupiah(payment.nominal) }}
-                            </p>
+                            <MoneyText :amount="payment.nominal" size="lg" class="mt-1 block" />
                         </div>
-                        <p class="text-xs text-slate-500">
+                        <p class="text-xs font-medium tabular-nums text-slate-500">
                             {{ payment.tanggalPembayaran || '-' }}
                         </p>
                     </div>
 
                     <p
                         v-if="payment.alasanPenolakan"
-                        class="mt-3 rounded-2xl bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-800"
+                        class="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700 ring-1 ring-inset ring-rose-100"
                     >
                         <span class="font-semibold">Alasan ditolak:</span>
                         {{ payment.alasanPenolakan }}
                     </p>
-                </article>
+                </UiCard>
             </div>
 
-            <div
+            <EmptyState
                 v-else
-                class="rounded-[1.5rem] border border-dashed border-slate-200 bg-white px-5 py-8 text-center"
-            >
-                <p class="text-base font-semibold text-slate-700">
-                    Belum ada pembayaran
-                </p>
-                <p class="mt-1 text-sm text-slate-500">
-                    Pembayaran yang Anda kirim akan muncul di sini beserta statusnya.
-                </p>
-            </div>
-        </section>
+                icon="inbox"
+                title="Belum ada pembayaran"
+                message="Pembayaran yang Anda kirim akan muncul di sini beserta statusnya."
+            />
+        </SectionCard>
     </div>
 </template>

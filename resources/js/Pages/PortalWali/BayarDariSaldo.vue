@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import { UiCard, StatusBadge, MoneyText, UiField, UiInput, UiButton } from '@/Components/Ui'
 
 defineOptions({
     layout: PortalWaliLayout,
@@ -71,90 +72,101 @@ function submit() {
             <title>Bayar dari Saldo</title>
         </Head>
 
-        <section class="rounded-[2rem] bg-slate-950 px-5 py-6 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+        <!-- HERO -->
+        <UiCard variant="hero-dark">
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
                 Bayar dari Saldo
             </p>
-            <p class="mt-3 text-sm text-white/75">
+            <p class="mt-2 text-sm text-white/80">
                 {{ child.nama }} · {{ child.kelas || 'Belum ada kelas' }}
             </p>
-            <p class="mt-4 text-sm text-white/60">
+            <p class="mt-4 text-[11px] font-semibold uppercase tracking-wide text-white/60">
                 Saldo tabungan
             </p>
-            <p class="mt-1 font-serif text-3xl leading-tight">
-                {{ rupiah(saldo) }}
-            </p>
-        </section>
+            <MoneyText :amount="saldo" size="xl" tone="inherit" class="mt-1 block text-white" />
+        </UiCard>
 
-        <section class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
+        <!-- KARTU TAGIHAN -->
+        <UiCard padding="sm">
             <div class="flex items-start justify-between gap-3">
-                <div>
-                    <h4 class="text-lg font-semibold text-slate-900">
+                <div class="min-w-0">
+                    <h4 class="text-base font-bold text-slate-900">
                         {{ bill.jenisTagihan }}
                     </h4>
                     <p class="mt-1 text-sm text-slate-500">
                         {{ bill.keterangan || '-' }}
                     </p>
                 </div>
-                <div class="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
-                    {{ bill.status }}
-                </div>
+                <StatusBadge :status="bill.status" size="sm" class="shrink-0" />
             </div>
-            <p class="mt-3 text-sm text-slate-600">
-                <span class="font-semibold text-slate-900">Sisa tagihan:</span> {{ rupiah(sisaTagihan) }}
-            </p>
-        </section>
+            <div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
+                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Sisa tagihan</span>
+                <MoneyText :amount="sisaTagihan" size="lg" />
+            </div>
+        </UiCard>
 
-        <div
-            v-if="!hasSaldo"
-            class="rounded-[1.5rem] border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-900"
-        >
-            Saldo tabungan masih kosong. Lakukan setor saldo terlebih dahulu untuk membayar tagihan dari saldo.
-        </div>
+        <!-- BANNER SALDO KOSONG -->
+        <UiCard v-if="!hasSaldo" variant="muted" padding="sm">
+            <div class="flex items-start gap-3">
+                <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                </span>
+                <p class="text-sm text-amber-900">
+                    Saldo tabungan masih kosong. Lakukan setor saldo terlebih dahulu untuk membayar tagihan dari saldo.
+                </p>
+            </div>
+        </UiCard>
 
-        <form
-            class="space-y-3 rounded-[1.75rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
-            @submit.prevent="submit"
-        >
-            <label class="grid gap-2 text-sm font-semibold text-slate-700">
-                Nominal bayar
-                <input
-                    v-model="form.nominal"
-                    type="number"
-                    min="1"
-                    :max="maxNominal"
-                    inputmode="numeric"
-                    class="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
-                    :disabled="!hasSaldo"
+        <!-- FORM BAYAR -->
+        <UiCard padding="sm">
+            <form class="space-y-4" @submit.prevent="submit">
+                <UiField label="Nominal bayar" :error="form.errors.nominal">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="form.nominal"
+                            type="number"
+                            :min="1"
+                            :max="maxNominal"
+                            inputmode="numeric"
+                            :disabled="!hasSaldo"
+                            :invalid="invalid"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
+
+                <!-- Ringkasan saldo sebelum -> sesudah -->
+                <div class="rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-100">
+                    <div class="flex items-center justify-between text-sm text-slate-600">
+                        <span>Saldo sebelum</span>
+                        <MoneyText :amount="saldo" size="sm" />
+                    </div>
+                    <div class="mt-2 flex items-center justify-between text-sm text-slate-600">
+                        <span>Nominal bayar</span>
+                        <MoneyText :amount="form.nominal || 0" size="sm" tone="rose" sign="minus" />
+                    </div>
+                    <div class="mt-2 flex items-center justify-between border-t border-dashed border-slate-200 pt-2 text-sm text-slate-600">
+                        <span>Saldo sesudah</span>
+                        <MoneyText
+                            :amount="saldoSetelahBayar"
+                            size="sm"
+                            :tone="saldoSetelahBayar < 0 ? 'rose' : 'emerald'"
+                        />
+                    </div>
+                </div>
+
+                <UiButton
+                    variant="primary"
+                    block
+                    type="submit"
+                    :disabled="!hasSaldo || !nominalValid"
+                    :loading="form.processing"
+                    icon-left="wallet"
                 >
-                <span v-if="form.errors.nominal" class="text-xs font-normal text-rose-600">{{ form.errors.nominal }}</span>
-            </label>
-
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
-                <div class="flex items-center justify-between text-slate-600">
-                    <span>Saldo sebelum</span>
-                    <span class="font-semibold text-slate-900">{{ rupiah(saldo) }}</span>
-                </div>
-                <div class="mt-2 flex items-center justify-between text-slate-600">
-                    <span>Nominal bayar</span>
-                    <span class="font-semibold text-rose-700">- {{ rupiah(form.nominal || 0) }}</span>
-                </div>
-                <div class="mt-2 border-t border-dashed border-slate-200 pt-2 flex items-center justify-between text-slate-600">
-                    <span>Saldo sesudah</span>
-                    <span
-                        class="font-semibold"
-                        :class="saldoSetelahBayar < 0 ? 'text-rose-700' : 'text-emerald-700'"
-                    >{{ rupiah(saldoSetelahBayar) }}</span>
-                </div>
-            </div>
-
-            <button
-                type="submit"
-                class="w-full rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white disabled:cursor-not-allowed disabled:opacity-50"
-                :disabled="!hasSaldo || !nominalValid || form.processing"
-            >
-                Konfirmasi Bayar dari Saldo
-            </button>
-        </form>
+                    Konfirmasi Bayar dari Saldo
+                </UiButton>
+            </form>
+        </UiCard>
     </div>
 </template>
