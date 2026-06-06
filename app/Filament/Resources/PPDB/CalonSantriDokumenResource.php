@@ -113,6 +113,11 @@ class CalonSantriDokumenResource extends Resource
             ])
             ->defaultSort('id')
             ->actions([
+                Action::make('lihatFile')
+                    ->label('Lihat')
+                    ->icon('heroicon-o-eye')
+                    ->visible(fn (CalonSantriDokumen $record): bool => $record->file_url !== null)
+                    ->url(fn (CalonSantriDokumen $record): string => route('ppdb.file.dokumen', $record), shouldOpenInNewTab: true),
                 Action::make('verifikasi')
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-circle')

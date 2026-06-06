@@ -63,6 +63,7 @@ class PesertaPortalController extends Controller
             $doc = $uploaded->get($jenis);
 
             $items[] = [
+                'id' => $doc?->id,
                 'jenis' => $jenis,
                 'label' => $meta['label'],
                 'wajib' => $meta['required'],

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\PPDB\Http\Controllers\PesertaAuthController;
 use Modules\PPDB\Http\Controllers\PesertaPwaController;
 use Modules\PPDB\Http\Controllers\PesertaPortalController;
+use Modules\PPDB\Http\Controllers\PpdbFileController;
 use Modules\PPDB\Http\Controllers\PublicPpdbController;
 use Modules\PPDB\Http\Controllers\PPDBController;
 use Modules\PPDB\Http\Middleware\ShareSpmbPageData;
@@ -124,6 +125,23 @@ Route::middleware([
         Route::put('/biodata', [PesertaPortalController::class, 'updateBiodata'])
             ->name('biodata.update');
     });
+});
+
+// Serving file PPDB (dokumen & bukti) dari disk privat. Tenancy by domain + auth
+// web (peserta & panitia sama-sama web guard). Otorisasi halus di controller:
+// panitia (manage_santri) semua; peserta hanya miliknya.
+Route::middleware([
+    'web',
+    InitializeTenancyByDomain::class,
+    PreventAccessFromCentralDomains::class,
+    'auth',
+])->prefix('ppdb/file')->name('ppdb.file.')->group(function () {
+    Route::get('/dokumen/{dokumen}', [PpdbFileController::class, 'dokumen'])
+        ->whereNumber('dokumen')
+        ->name('dokumen');
+    Route::get('/bukti/{tagihan}', [PpdbFileController::class, 'bukti'])
+        ->whereNumber('tagihan')
+        ->name('bukti');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

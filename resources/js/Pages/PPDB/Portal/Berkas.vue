@@ -130,7 +130,14 @@ function statusText(item) {
                             <span v-if="sedangUnggah(item.jenis)">Mengunggah…</span>
                             <span v-else>{{ item.terunggah ? 'Ganti file' : 'Unggah file' }}</span>
                         </label>
-                        <span class="ml-2 text-[11px] text-stone-400">PDF/JPG/PNG, maks 5 MB</span>
+                        <a
+                            v-if="item.terunggah && item.id"
+                            :href="`/ppdb/file/dokumen/${item.id}`"
+                            target="_blank"
+                            rel="noopener"
+                            class="ml-2 inline-flex items-center gap-1 rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600 transition hover:border-stone-400"
+                        >👁️ Lihat</a>
+                        <span class="ml-2 text-[11px] text-stone-400">maks 5 MB</span>
                     </div>
                 </li>
             </ul>

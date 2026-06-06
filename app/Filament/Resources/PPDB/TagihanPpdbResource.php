@@ -92,6 +92,11 @@ class TagihanPpdbResource extends Resource
             ])
             ->defaultSort('id', 'desc')
             ->actions([
+                Action::make('lihatBukti')
+                    ->label('Lihat Bukti')
+                    ->icon('heroicon-o-eye')
+                    ->visible(fn (TagihanPpdb $record): bool => $record->bukti_transfer !== null)
+                    ->url(fn (TagihanPpdb $record): string => route('ppdb.file.bukti', $record), shouldOpenInNewTab: true),
                 Action::make('konfirmasiLunas')
                     ->label('Konfirmasi Lunas')
                     ->icon('heroicon-o-check-badge')

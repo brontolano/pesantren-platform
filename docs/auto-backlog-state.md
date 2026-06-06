@@ -18,7 +18,8 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
   - F2 upload peserta (dokumen + bukti bayar) — committed.
   - #16 ERP **verifikasi dokumen**: aksi Verifikasi/Tolak + kolom status di CalonSantriDokumenResource (set verified/rejected + verified_at/by + catatan).
   - #17 ERP **verifikasi bukti bayar**: `TagihanPpdbResource` baru (panel tenant, group PPDB) — list tagihan + aksi Konfirmasi Lunas / Tolak Bukti.
-  - SISA: serving file aman (dokumen/bukti di disk privat belum bisa di-view) → increment berikut · authoring bank soal Filament.
+  - #18 **serving file aman**: `PpdbFileController` (stream dokumen/bukti dari disk privat + cek auth: panitia semua, peserta miliknya) + route `ppdb.file.*` + link "Lihat" di TagihanPpdbResource, CalonSantriDokumenResource & halaman Berkas peserta.
+  - SISA: authoring bank soal Filament (`SoalUjian`) → lalu finalisasi (merge+deploy+migrate). Sisa butuh-keputusan: nilai ujian ke peserta, jadwal/kartu ujian (model), daftar-ulang→Santri.
 
 ## FASE 2 — PWA front-end — **LOOP BERHENTI @ iterasi #15**
 - 4 increment PWA Peserta selesai (Berkas, Pengumuman, Tagihan, + taut Dashboard). Build hijau.
