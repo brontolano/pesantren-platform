@@ -13,7 +13,20 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## Pointer rotasi
-- Iterasi berikutnya: **area 2b — PPDB ujian (putaran 4)**
+- **LOOP DIHENTIKAN @ iterasi #11** — target backend aditif-aman di kedua area
+  tersisa (PPDB ujian & Integrasi API) sudah tuntas. Sisa pekerjaan = UI/Filament/
+  wiring yang butuh arahan desain Hamdan & tes Livewire+DB (di luar disiplin loop
+  "increment kecil + unit test tanpa DB"). Lihat "Sisa & langkah lanjut" di bawah.
+
+## Sisa & langkah lanjut (butuh keputusan/arahan)
+- **PPDB ujian:** backend lengkap (SoalUjian + UjianScoringService + SesiUjian). Sisa:
+  Filament resource authoring bank soal + UI ujian bertimer (front-end; UI peserta = /spmb tim).
+- **Integrasi API:** TenantApiKey + middleware + rate-limit helper siap. Sisa: daftarkan
+  alias middleware & named limiter `public-api` di provider, CORS per-domain tenant,
+  endpoint publik statistik, Filament page 'Integrasi & API' (kelola key).
+- **Rekomendasi:** review & **merge `auto/backlog` → main**, jalankan migrasi
+  (`tenant_api_keys` central + `*_dokumen` verifikasi/`soal_ujian`/`sesi_ujian` tenant),
+  deploy, lalu garap UI di atas fondasi ini.
 
 > Area habis target aditif aman (LEWATI): **File Storage** (3/3 ✅) · **PPDB upload dokumen** (sisanya milik tim /spmb). Rotasi efektif kini: PPDB ujian ↔ Integrasi Website/API.
 
