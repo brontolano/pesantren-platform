@@ -119,6 +119,10 @@ Route::middleware([
             ->name('pengumuman');
         Route::get('/kartu-ujian', [PesertaPortalController::class, 'kartuUjian'])
             ->name('kartu-ujian');
+        Route::get('/daftar-ulang', [PesertaPortalController::class, 'daftarUlang'])
+            ->name('daftar-ulang');
+        Route::post('/daftar-ulang', [PesertaPortalController::class, 'prosesDaftarUlang'])
+            ->name('daftar-ulang.proses');
         Route::get('/tagihan', [PesertaPortalController::class, 'tagihan'])
             ->name('tagihan');
         Route::post('/tagihan/{tagihan}/bukti', [PesertaPortalController::class, 'uploadBukti'])

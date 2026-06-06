@@ -13,6 +13,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\JadwalUjian;
+use Modules\PPDB\Services\DaftarUlangService;
 use Modules\PPDB\Services\PpdbDocumentUploadService;
 use Modules\PPDB\Services\PpdbFormFieldConfigurationService;
 use Modules\PPDB\Services\PpdbStatusTrackingService;
@@ -46,6 +47,7 @@ class PesertaPortalController extends Controller
                 'path' => $tracking['tracking_path'],
                 'token' => $tracking['tracking_token'],
             ],
+            'bolehDaftarUlang' => (string) $calon->status_pendaftaran === 'lulus',
         ]);
     }
 
@@ -234,6 +236,44 @@ class PesertaPortalController extends Controller
             'nama' => (string) $calon->nama,
             'jadwal' => $jadwal,
         ]);
+    }
+
+    /**
+     * Halaman daftar ulang (F3/REREG-1) — hanya peserta LULUS. Ringkasan data
+     * + tombol konfirmasi yang memicu konversi ke Santri.
+     */
+    public function daftarUlang(Request $request): Response|RedirectResponse
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+
+        if ((string) $calon->status_pendaftaran === DaftarUlangService::STATUS_SELESAI) {
+            return redirect('/spmb')->with('info', 'Anda sudah menyelesaikan daftar ulang.');
+        }
+
+        if ((string) $calon->status_pendaftaran !== 'lulus') {
+            return redirect('/spmb')->with('info', 'Daftar ulang dibuka setelah Anda dinyatakan lulus.');
+        }
+
+        return Inertia::render('PPDB/Portal/DaftarUlang', [
+            'nomorPendaftaran' => (string) $calon->nomor_pendaftaran,
+            'nama' => (string) $calon->nama,
+            'asalSekolah' => (string) ($calon->asal_sekolah ?? ''),
+            'noHpWali' => (string) ($calon->no_hp_wali ?? ''),
+        ]);
+    }
+
+    /** Proses daftar ulang (F3/REREG-2): konversi lulus → Santri via service. */
+    public function prosesDaftarUlang(Request $request, DaftarUlangService $service): RedirectResponse
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+
+        try {
+            $service->process($calon);
+        } catch (\Throwable $e) {
+            return back()->withErrors(['daftar_ulang' => $e->getMessage()]);
+        }
+
+        return redirect('/spmb')->with('success', 'Daftar ulang berhasil. Selamat bergabung menjadi santri! 🎉');
     }
 
     public function updateBiodata(Request $request): RedirectResponse

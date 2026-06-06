@@ -31,6 +31,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    bolehDaftarUlang: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const form = useForm({
@@ -85,6 +89,15 @@ const submit = () => {
 
     <SpmbLayout>
         <div class="space-y-6">
+            <!-- CTA Daftar Ulang (auto-backlog): tampil hanya bila peserta lulus -->
+            <Link
+                v-if="bolehDaftarUlang"
+                href="/spmb/daftar-ulang"
+                class="block rounded-2xl bg-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+            >
+                🎉 Anda LULUS — Daftar Ulang sekarang
+            </Link>
+
             <!-- Navigasi cepat (auto-backlog): Berkas, Pengumuman, Tagihan, Kartu Ujian -->
             <section class="grid grid-cols-2 gap-3">
                 <Link
