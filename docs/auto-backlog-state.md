@@ -13,7 +13,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## Pointer rotasi
-- Iterasi berikutnya: **area 2 — PPDB upload dokumen (putaran 2)**
+- Iterasi berikutnya: **area 2b — PPDB ujian (putaran 2)**
 
 ## Log iterasi
 | # | Area | Increment | Commit | Status |
@@ -23,6 +23,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 | 3 | PPDB ujian | Bank soal `SoalUjian` (migrasi `soal_ujian` + model PG/essay + auto-grade `nilaiUntukJawaban`) + unit test | (lihat git log) | ✅ |
 | 4 | Integrasi Website/API | API key per tenant `TenantApiKey` (migrasi central + generate/hash sha256/verify timing-safe + scope active) + unit test | (lihat git log) | ✅ |
 | 5 | File Storage | `diskName()` auto-resolve ke disk S3 saat object storage aktif (+ config `object_storage_disk`) + unit test | (lihat git log) | ✅ |
+| 6 | PPDB upload dokumen | Registry tipe dokumen `PpdbDocumentTypes` (label + wajib/opsional + `missingRequired()` checklist) + unit test | (lihat git log) | ✅ |
 
 ## Checklist target per area
 ### File Storage
@@ -32,7 +33,9 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 
 ### PPDB upload dokumen & ujian
 - [~] Endpoint upload dokumen peserta + signed URL + status verifikasi *(status verifikasi: kolom + helper model DONE; endpoint/signed-URL = milik tim PWA)*
-- [ ] UI unggah dokumen (kamera/galeri) + checklist wajib
+- [~] UI unggah dokumen (kamera/galeri) + checklist wajib *(registry `PpdbDocumentTypes` + `missingRequired()` DONE; UI kamera/galeri = milik tim PWA)*
+
+> Sisa area PPDB upload (endpoint/signed-URL/UI) adalah milik tim /spmb — tak ada lagi target aditif yang aman di sini.
 - [~] Ujian: bank soal + kunci jawaban *(data layer `SoalUjian` + migrasi DONE; admin authoring UI pending)*
 - [~] Ujian online bertimer + auto-grading PG + nilai manual essay *(logika auto-grade `nilaiUntukJawaban` DONE; timer + UI ujian pending)*
 
