@@ -44,15 +44,25 @@ class StorageQuotaService
         return (bool) config('media.object_storage', false);
     }
 
+    /**
+     * Apakah satu tier (GB) boleh dipakai sekarang.
+     * Tier "soon" (64/128/256) butuh object storage (S3) aktif; selain itu bebas.
+     */
+    public static function isTierAvailable(int $gb): bool
+    {
+        if (in_array($gb, self::TIERS_SOON, true)) {
+            return self::objectStorageReady();
+        }
+
+        return true;
+    }
+
     /** Semua tier + status ketersediaan: [gb => bool tersedia]. */
     public static function tierAvailability(): array
     {
         $out = [];
-        foreach (self::TIERS_AVAILABLE as $gb) {
-            $out[$gb] = true;
-        }
-        foreach (self::TIERS_SOON as $gb) {
-            $out[$gb] = self::objectStorageReady();
+        foreach ([...self::TIERS_AVAILABLE, ...self::TIERS_SOON] as $gb) {
+            $out[$gb] = self::isTierAvailable($gb);
         }
 
         return $out;
@@ -160,12 +170,28 @@ class StorageQuotaService
         return min(100.0, round($this->usedBytes() / $quota * 100, 1));
     }
 
-    /** Set/ubah kuota tenant (GB). */
+    /**
+     * Set/ubah kuota tenant (GB).
+     *
+     * Gerbang tier S3: tier 64/128/256 GB hanya boleh di-set bila object storage
+     * sudah aktif (media.object_storage). Mencegah kuota "Soon" diaktifkan sebelum
+     * backend object storage siap (server-side, bukan sekadar UI).
+     *
+     * @throws \InvalidArgumentException bila tier butuh object storage yang belum aktif.
+     */
     public function setQuota(string $tenantId, int $quotaGb): TenantStorage
     {
+        $quotaGb = max(1, $quotaGb);
+
+        if (! self::isTierAvailable($quotaGb)) {
+            throw new \InvalidArgumentException(
+                "Tier {$quotaGb} GB membutuhkan object storage (S3) yang belum aktif."
+            );
+        }
+
         return TenantStorage::updateOrCreate(
             ['tenant_id' => $tenantId],
-            ['quota_gb' => max(1, $quotaGb)],
+            ['quota_gb' => $quotaGb],
         );
     }
 
