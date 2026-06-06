@@ -55,6 +55,9 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 | 11 | Integrasi Website/API | Rate-limit API publik `PublicApiThrottle` (kunci per api-key/tenant+IP/IP, limit dari config `services.public_api`) + unit test | (lihat git log) | ✅ |
 | 12 | PWA Peserta (Fase 2) | Halaman **Berkas** `/spmb/berkas` (Vue + route + `PesertaPortalController::berkas`) — checklist dokumen via PpdbDocumentTypes + status verifikasi CalonSantriDokumen; build hijau | (lihat git log) | ✅ |
 | 13 | PWA Peserta (Fase 2) | Halaman **Pengumuman** `/spmb/pengumuman` (Vue + route + `pengumuman()` reuse helper status) — keputusan lulus/cadangan/ditolak atau status proses; build hijau | (lihat git log) | ✅ |
+| 14 | PWA Peserta (Fase 2) | **Tautkan** Berkas & Pengumuman dari Dashboard (section navigasi cepat + import `Link`) — keduanya kini terjangkau (bukan orphan); build hijau | (lihat git log) | ✅ |
+
+> **Mendekati exhaustion Fase 2:** PWA Peserta sisa kandidat = Kartu Ujian / Tagihan-view yang BUTUH model/data baru (jadwal ujian, tagihan PPDB) → keputusan desain Hamdan. PWA Wali sudah lengkap. Iterasi berikut kemungkinan BERHENTI & rekomendasikan merge.
 
 ## Checklist target per area
 ### File Storage

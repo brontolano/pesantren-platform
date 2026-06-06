@@ -1,5 +1,5 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import SpmbLayout from '../../../Layouts/SpmbLayout.vue';
 
 const props = defineProps({
@@ -85,6 +85,22 @@ const submit = () => {
 
     <SpmbLayout>
         <div class="space-y-6">
+            <!-- Navigasi cepat (auto-backlog): akses halaman Berkas & Pengumuman -->
+            <section class="grid grid-cols-2 gap-3">
+                <Link
+                    href="/spmb/berkas"
+                    class="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
+                >
+                    <span aria-hidden="true">📄</span> Berkas
+                </Link>
+                <Link
+                    href="/spmb/pengumuman"
+                    class="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
+                >
+                    <span aria-hidden="true">📣</span> Pengumuman
+                </Link>
+            </section>
+
             <section class="overflow-hidden rounded-[2rem] border border-stone-200 bg-white shadow-sm">
                 <div class="border-b border-stone-100 px-5 py-5">
                     <div class="flex flex-wrap items-start justify-between gap-4">
