@@ -13,13 +13,14 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## Pointer rotasi
-- Iterasi berikutnya: **area 2b — PPDB ujian (bank soal + ujian online)**
+- Iterasi berikutnya: **area 3 — Integrasi Website / API**
 
 ## Log iterasi
 | # | Area | Increment | Commit | Status |
 |---|------|-----------|--------|--------|
 | 1 | File Storage | Gerbang tier S3 di StorageQuotaService (`isTierAvailable` + validasi `setQuota`) + unit test | (lihat git log) | ✅ |
 | 2 | PPDB upload dokumen | Status verifikasi dokumen (migrasi kolom `status/verified_at/verified_by/catatan` + helper model + scopes) + unit test | (lihat git log) | ✅ |
+| 3 | PPDB ujian | Bank soal `SoalUjian` (migrasi `soal_ujian` + model PG/essay + auto-grade `nilaiUntukJawaban`) + unit test | (lihat git log) | ✅ |
 
 ## Checklist target per area
 ### File Storage
@@ -30,8 +31,8 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 ### PPDB upload dokumen & ujian
 - [~] Endpoint upload dokumen peserta + signed URL + status verifikasi *(status verifikasi: kolom + helper model DONE; endpoint/signed-URL = milik tim PWA)*
 - [ ] UI unggah dokumen (kamera/galeri) + checklist wajib
-- [ ] Ujian: bank soal + kunci jawaban (admin authoring)
-- [ ] Ujian online bertimer + auto-grading PG + nilai manual essay
+- [~] Ujian: bank soal + kunci jawaban *(data layer `SoalUjian` + migrasi DONE; admin authoring UI pending)*
+- [~] Ujian online bertimer + auto-grading PG + nilai manual essay *(logika auto-grade `nilaiUntukJawaban` DONE; timer + UI ujian pending)*
 
 ### Integrasi Website / API
 - [ ] API publik read: profil tenant, statistik, artikel/berita, jadwal PPDB
