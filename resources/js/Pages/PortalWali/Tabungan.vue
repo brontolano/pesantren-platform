@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { Head, useForm } from '@inertiajs/vue3'
+import { Head, Link, useForm } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
 import {
     UiCard,
@@ -60,21 +60,8 @@ const saldo = computed(() => Number(props.savings?.saldo || 0))
 const transactions = computed(() => props.savings?.transactions ?? [])
 const hasSaldo = computed(() => saldo.value > 0)
 
-// --- Setor Saldo (topup) ---
-const setorForm = useForm({
-    nominal: '',
-    tanggal_transfer: '',
-    nama_pengirim: props.wali?.name ?? '',
-    bukti: null,
-})
-
-function submitSetor() {
-    setorForm.post(`/wali/santri/${props.child.id}/tabungan/topup`, {
-        forceFormData: true,
-        preserveScroll: true,
-        onSuccess: () => setorForm.reset('nominal', 'tanggal_transfer', 'bukti'),
-    })
-}
+// --- Top Up Saldo (checkout marketplace) ---
+const topupUrl = computed(() => `/wali/santri/${props.child.id}/topup`)
 
 // --- Bayar dari Saldo ---
 const bayarForm = useForm({
@@ -191,66 +178,32 @@ const bayarSheetOpen = computed({
             />
         </SectionCard>
 
-        <!-- SETOR SALDO -->
+        <!-- TOP UP SALDO -->
         <SectionCard kicker="Setor Saldo" title="Top Up Tabungan">
-            <form class="space-y-4" @submit.prevent="submitSetor">
-                <UiField label="Nominal setor" :error="setorForm.errors.nominal">
-                    <template #default="{ fieldId, describedby, invalid }">
-                        <UiInput
-                            :id="fieldId"
-                            v-model="setorForm.nominal"
-                            type="number"
-                            :min="1"
-                            inputmode="numeric"
-                            placeholder="0"
-                            :invalid="invalid"
-                            :aria-describedby="describedby"
-                        />
-                    </template>
-                </UiField>
+            <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                    <IconCircle icon="plus" tone="emerald" size="md" />
+                    <div class="min-w-0">
+                        <p class="text-[15px] font-bold tracking-tight text-slate-900">
+                            Top up instan via banyak metode
+                        </p>
+                        <p class="mt-0.5 text-sm leading-6 text-slate-500">
+                            Virtual Account, e-wallet, QRIS, hingga gerai retail. Pilih nominal, bayar, saldo langsung bertambah.
+                        </p>
+                    </div>
+                </div>
 
-                <UiField label="Tanggal transfer" :error="setorForm.errors.tanggal_transfer">
-                    <template #default="{ fieldId, describedby, invalid }">
-                        <UiInput
-                            :id="fieldId"
-                            v-model="setorForm.tanggal_transfer"
-                            type="date"
-                            :invalid="invalid"
-                            :aria-describedby="describedby"
-                        />
-                    </template>
-                </UiField>
-
-                <UiField label="Nama pengirim" :error="setorForm.errors.nama_pengirim">
-                    <template #default="{ fieldId, describedby, invalid }">
-                        <UiInput
-                            :id="fieldId"
-                            v-model="setorForm.nama_pengirim"
-                            type="text"
-                            placeholder="Nama di rekening pengirim"
-                            :invalid="invalid"
-                            :aria-describedby="describedby"
-                        />
-                    </template>
-                </UiField>
-
-                <UiField label="Bukti transfer" :error="setorForm.errors.bukti" hint="Foto/struk transfer (format gambar).">
-                    <template #default="{ fieldId, describedby, invalid }">
-                        <UiInput
-                            :id="fieldId"
-                            type="file"
-                            accept="image/*"
-                            :invalid="invalid"
-                            :aria-describedby="describedby"
-                            @change="setorForm.bukti = $event.target.files[0]"
-                        />
-                    </template>
-                </UiField>
-
-                <UiButton variant="primary" block type="submit" :loading="setorForm.processing" icon-left="plus">
-                    Kirim Permintaan Setor
+                <UiButton
+                    as="link"
+                    :href="topupUrl"
+                    variant="primary"
+                    block
+                    icon-left="wallet"
+                    icon-right="chevron-right"
+                >
+                    Top Up Saldo
                 </UiButton>
-            </form>
+            </div>
         </SectionCard>
 
         <!-- BAYAR DARI SALDO -->

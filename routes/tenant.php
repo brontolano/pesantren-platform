@@ -18,6 +18,7 @@ use App\Http\Controllers\PortalWali\PortalWaliPwaController;
 use App\Http\Controllers\PortalWali\PortalWaliProfileController;
 use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
+use App\Http\Controllers\PortalWali\PortalWaliTopupController;
 use App\Http\Controllers\SantriExportController;
 use Illuminate\Support\Facades\Route;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
@@ -79,6 +80,13 @@ Route::middleware([
         Route::get('/santri/{santri}/tabungan', [PortalWaliTabunganController::class, 'show'])->name('tabungan.show');
         Route::post('/santri/{santri}/tabungan/topup', [PortalWaliTabunganController::class, 'topup'])->name('tabungan.topup');
         Route::post('/santri/{santri}/tagihan/{tagihan}/bayar-saldo', [PortalWaliTabunganController::class, 'bayarDariSaldo'])->name('tabungan.bayar-saldo');
+
+        // W3+ Top Up Tabungan — checkout marketplace (DEMO simulasi pembayaran)
+        Route::get('/santri/{santri}/topup', [PortalWaliTopupController::class, 'checkout'])->name('topup.checkout');
+        Route::post('/santri/{santri}/topup', [PortalWaliTopupController::class, 'store'])->name('topup.store');
+        Route::get('/santri/{santri}/topup/{topup}/instruksi', [PortalWaliTopupController::class, 'instruksi'])->name('topup.instruksi');
+        Route::post('/santri/{santri}/topup/{topup}/konfirmasi', [PortalWaliTopupController::class, 'konfirmasi'])->name('topup.konfirmasi');
+        Route::get('/santri/{santri}/topup/{topup}/sukses', [PortalWaliTopupController::class, 'sukses'])->name('topup.sukses');
     });
 
     Route::middleware('auth')->prefix('admin/kesantrian/santri/export')->name('tenant.kesantrian.santri.export.')->group(function () {
