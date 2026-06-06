@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\TagihanPpdb;
+use Modules\PPDB\Services\PpdbWhatsappNotifier;
 
 /**
  * Verifikasi tagihan PPDB (panitia). Read + aksi: Konfirmasi Lunas / Tolak Bukti.
@@ -103,7 +104,18 @@ class TagihanPpdbResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->visible(fn (TagihanPpdb $record): bool => $record->status !== 'lunas' && (Auth::user()?->can('manage_santri') ?? false))
-                    ->action(fn (TagihanPpdb $record) => $record->update(['status' => 'lunas'])),
+                    ->action(function (TagihanPpdb $record): void {
+                        $record->update(['status' => 'lunas']);
+                        $calon = $record->calonSantri;
+                        if ($calon && $calon->no_hp_wali) {
+                            app(PpdbWhatsappNotifier::class)->sendPembayaranLunas(
+                                (string) $calon->no_hp_wali,
+                                (string) $calon->nama,
+                                (string) $calon->nomor_pendaftaran,
+                                (string) ($record->tipe ?: 'Pembayaran'),
+                            );
+                        }
+                    }),
                 Action::make('tolakBukti')
                     ->label('Tolak Bukti')
                     ->icon('heroicon-o-x-circle')

@@ -20,6 +20,8 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\CalonSantriDokumen;
+use Modules\PPDB\Services\PpdbWhatsappNotifier;
+use Modules\PPDB\Support\PpdbDocumentTypes;
 
 class CalonSantriDokumenResource extends Resource
 {
@@ -124,12 +126,23 @@ class CalonSantriDokumenResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isVerified() && (Auth::user()?->can('manage_santri') ?? false))
-                    ->action(fn (CalonSantriDokumen $record) => $record->update([
-                        'status' => CalonSantriDokumen::STATUS_VERIFIED,
-                        'verified_at' => now(),
-                        'verified_by' => Auth::id(),
-                        'catatan_verifikasi' => null,
-                    ])),
+                    ->action(function (CalonSantriDokumen $record): void {
+                        $record->update([
+                            'status' => CalonSantriDokumen::STATUS_VERIFIED,
+                            'verified_at' => now(),
+                            'verified_by' => Auth::id(),
+                            'catatan_verifikasi' => null,
+                        ]);
+                        $calon = $record->calonSantri;
+                        if ($calon && $calon->no_hp_wali) {
+                            app(PpdbWhatsappNotifier::class)->sendDokumenDiverifikasi(
+                                (string) $calon->no_hp_wali,
+                                (string) $calon->nama,
+                                (string) $calon->nomor_pendaftaran,
+                                PpdbDocumentTypes::label($record->jenis_dokumen),
+                            );
+                        }
+                    }),
                 Action::make('tolak')
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
@@ -141,12 +154,24 @@ class CalonSantriDokumenResource extends Resource
                             ->required()
                             ->maxLength(500),
                     ])
-                    ->action(fn (CalonSantriDokumen $record, array $data) => $record->update([
-                        'status' => CalonSantriDokumen::STATUS_REJECTED,
-                        'catatan_verifikasi' => $data['catatan_verifikasi'],
-                        'verified_at' => now(),
-                        'verified_by' => Auth::id(),
-                    ])),
+                    ->action(function (CalonSantriDokumen $record, array $data): void {
+                        $record->update([
+                            'status' => CalonSantriDokumen::STATUS_REJECTED,
+                            'catatan_verifikasi' => $data['catatan_verifikasi'],
+                            'verified_at' => now(),
+                            'verified_by' => Auth::id(),
+                        ]);
+                        $calon = $record->calonSantri;
+                        if ($calon && $calon->no_hp_wali) {
+                            app(PpdbWhatsappNotifier::class)->sendDokumenDitolak(
+                                (string) $calon->no_hp_wali,
+                                (string) $calon->nama,
+                                (string) $calon->nomor_pendaftaran,
+                                PpdbDocumentTypes::label($record->jenis_dokumen),
+                                (string) $data['catatan_verifikasi'],
+                            );
+                        }
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
             ]);

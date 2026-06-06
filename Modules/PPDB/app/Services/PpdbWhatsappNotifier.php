@@ -95,4 +95,62 @@ class PpdbWhatsappNotifier
 
         return $this->dispatch($phone, $message, $nomor, $name);
     }
+
+    /** Dokumen peserta diverifikasi panitia (F2/NOTIF-1). */
+    public function sendDokumenDiverifikasi(string $phone, string $name, string $nomor, string $jenisDokumen): void
+    {
+        $pesantren = tenant()?->name ?? 'Pondok Pesantren';
+        $message = "Assalamu'alaikum Wr. Wb.\n\n"
+            ."Dokumen *{$jenisDokumen}* atas nama *{$name}* telah *DIVERIFIKASI* panitia ✅\n\n"
+            ."🎫 No. Pendaftaran: {$nomor}\n\n"
+            ."— Panitia PPDB {$pesantren}";
+
+        $this->dispatch($phone, $message, $nomor, $name);
+    }
+
+    /** Dokumen peserta ditolak panitia + alasan (F2/NOTIF-1). */
+    public function sendDokumenDitolak(string $phone, string $name, string $nomor, string $jenisDokumen, string $alasan): void
+    {
+        $pesantren = tenant()?->name ?? 'Pondok Pesantren';
+        $message = "Assalamu'alaikum Wr. Wb.\n\n"
+            ."Dokumen *{$jenisDokumen}* atas nama *{$name}* *DITOLAK* dan perlu diunggah ulang.\n\n"
+            ."📝 Alasan: {$alasan}\n"
+            ."🎫 No. Pendaftaran: {$nomor}\n\n"
+            ."Silakan unggah ulang lewat Portal SPMB.\n"
+            ."— Panitia PPDB {$pesantren}";
+
+        $this->dispatch($phone, $message, $nomor, $name);
+    }
+
+    /** Bukti pembayaran dikonfirmasi lunas (F2/BILL-3). */
+    public function sendPembayaranLunas(string $phone, string $name, string $nomor, string $tipe = 'Pembayaran'): void
+    {
+        $pesantren = tenant()?->name ?? 'Pondok Pesantren';
+        $message = "Assalamu'alaikum Wr. Wb.\n\n"
+            ."*{$tipe}* atas nama *{$name}* telah *LUNAS* dan terverifikasi ✅\n\n"
+            ."🎫 No. Pendaftaran: {$nomor}\n\n"
+            ."Jazaakumullaahu khairan.\n"
+            ."— Panitia PPDB {$pesantren}";
+
+        $this->dispatch($phone, $message, $nomor, $name);
+    }
+
+    /** Pengumuman hasil seleksi dipublikasikan (F3/ANN-2). */
+    public function sendPengumuman(string $phone, string $name, string $nomor, string $keputusan): void
+    {
+        $pesantren = tenant()?->name ?? 'Pondok Pesantren';
+        $label = match ($keputusan) {
+            'lulus' => 'DITERIMA 🎉',
+            'cadangan' => 'masuk daftar CADANGAN',
+            'ditolak' => 'belum lulus',
+            default => 'tersedia',
+        };
+        $message = "Assalamu'alaikum Wr. Wb.\n\n"
+            ."Pengumuman seleksi PPDB *{$pesantren}* atas nama *{$name}*: *{$label}*.\n\n"
+            ."🎫 No. Pendaftaran: {$nomor}\n"
+            ."Detail & langkah berikutnya ada di Portal SPMB.\n\n"
+            ."— Panitia PPDB {$pesantren}";
+
+        $this->dispatch($phone, $message, $nomor, $name);
+    }
 }
