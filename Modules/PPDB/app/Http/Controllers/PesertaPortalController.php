@@ -84,6 +84,34 @@ class PesertaPortalController extends Controller
         ]);
     }
 
+    /**
+     * Halaman Pengumuman hasil seleksi (F3/ANN). Hanya-baca: menampilkan
+     * keputusan (lulus/cadangan/belum lulus) bila sudah dipublikasikan, atau
+     * status proses bila belum. Memakai interpretasi status yang sama dgn dashboard.
+     */
+    public function pengumuman(Request $request): Response
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+        $status = (string) $calon->status_pendaftaran;
+
+        $keputusan = match ($status) {
+            'lulus' => 'lulus',
+            'cadangan' => 'cadangan',
+            'ditolak' => 'ditolak',
+            default => null,
+        };
+
+        return Inertia::render('PPDB/Portal/Pengumuman', [
+            'nomorPendaftaran' => (string) $calon->nomor_pendaftaran,
+            'nama' => (string) $calon->nama,
+            'sudahAda' => $keputusan !== null,
+            'keputusan' => $keputusan,
+            'badge' => $this->humanizeStatus($status),
+            'title' => $this->statusTitle($status),
+            'description' => $this->statusDescription($status),
+        ]);
+    }
+
     public function updateBiodata(Request $request): RedirectResponse
     {
         $calon = $this->resolveOwnedCandidate($request->user());

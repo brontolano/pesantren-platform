@@ -112,6 +112,8 @@ Route::middleware([
             ->name('dashboard');
         Route::get('/berkas', [PesertaPortalController::class, 'berkas'])
             ->name('berkas');
+        Route::get('/pengumuman', [PesertaPortalController::class, 'pengumuman'])
+            ->name('pengumuman');
         Route::put('/biodata', [PesertaPortalController::class, 'updateBiodata'])
             ->name('biodata.update');
     });

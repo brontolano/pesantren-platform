@@ -13,7 +13,10 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## FASE 2 — PWA front-end (diizinkan Hamdan: penuh termasuk Vue/file tim)
-- Iterasi berikutnya: **PWA Wali Santri**
+- Iterasi berikutnya: **PWA Peserta SPMB**
+- Catatan: **PWA Wali Santri tampak habis celah aditif bersih** (23 halaman, nav per-anak
+  matang). Fitur barunya butuh keputusan desain Hamdan / merombak file matang → LEWATI.
+  Loop fokus ke PWA Peserta sampai celah aditif bersihnya juga habis, lalu berhenti.
 - Rotasi (interval 60 dtk): **PWA Peserta SPMB ↔ PWA Wali Santri**
 - **Verifikasi:** `npm run build` (Vue compile ~5s) + `php -l`. BUKAN unit test.
 - **Bias AMAN:** utamakan FILE BARU (halaman/komponen/endpoint/route untuk fitur yang
@@ -51,6 +54,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 | 10 | PPDB ujian | Persistensi `SesiUjian` (migrasi `sesi_ujian` + model: jawaban/auto_score/butuh_manual, `isiDariSkor` dari UjianScoringService, persenAuto, status) + unit test | (lihat git log) | ✅ |
 | 11 | Integrasi Website/API | Rate-limit API publik `PublicApiThrottle` (kunci per api-key/tenant+IP/IP, limit dari config `services.public_api`) + unit test | (lihat git log) | ✅ |
 | 12 | PWA Peserta (Fase 2) | Halaman **Berkas** `/spmb/berkas` (Vue + route + `PesertaPortalController::berkas`) — checklist dokumen via PpdbDocumentTypes + status verifikasi CalonSantriDokumen; build hijau | (lihat git log) | ✅ |
+| 13 | PWA Peserta (Fase 2) | Halaman **Pengumuman** `/spmb/pengumuman` (Vue + route + `pengumuman()` reuse helper status) — keputusan lulus/cadangan/ditolak atau status proses; build hijau | (lihat git log) | ✅ |
 
 ## Checklist target per area
 ### File Storage
