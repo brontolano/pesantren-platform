@@ -7,10 +7,12 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\PPDB\Models\CalonSantri;
+use Modules\PPDB\Services\PpdbDocumentUploadService;
 use Modules\PPDB\Services\PpdbFormFieldConfigurationService;
 use Modules\PPDB\Services\PpdbStatusTrackingService;
 use Modules\PPDB\Support\PpdbDocumentTypes;
@@ -85,6 +87,36 @@ class PesertaPortalController extends Controller
     }
 
     /**
+     * Unggah satu dokumen peserta (F2/DOC-1). Validasi jenis + file (≤5MB,
+     * pdf/jpg/png/webp) lalu simpan via PpdbDocumentUploadService (status awal
+     * 'pending' utk verifikasi panitia). Dokumen lama jenis sama dihapus agar
+     * checklist menampilkan unggahan terbaru saja.
+     */
+    public function uploadDokumen(Request $request, PpdbDocumentUploadService $uploader): RedirectResponse
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+
+        $validated = $request->validate([
+            'jenis_dokumen' => ['required', 'string', Rule::in(PpdbDocumentTypes::keys())],
+            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        // Ganti dokumen jenis sama: buang baris lama (hindari duplikat di checklist).
+        $calon->dokumen()
+            ->where('jenis_dokumen', $validated['jenis_dokumen'])
+            ->get()
+            ->each(static fn ($doc) => $doc->delete());
+
+        try {
+            $uploader->upload($calon, $validated['jenis_dokumen'], $request->file('file'));
+        } catch (\InvalidArgumentException $e) {
+            return back()->withErrors(['file' => $e->getMessage()]);
+        }
+
+        return back()->with('success', 'Dokumen '.PpdbDocumentTypes::label($validated['jenis_dokumen']).' berhasil diunggah.');
+    }
+
+    /**
      * Halaman Pengumuman hasil seleksi (F3/ANN). Hanya-baca: menampilkan
      * keputusan (lulus/cadangan/belum lulus) bila sudah dipublikasikan, atau
      * status proses bila belum. Memakai interpretasi status yang sama dgn dashboard.
@@ -123,12 +155,14 @@ class PesertaPortalController extends Controller
         $tagihan = $calon->tagihanPpdb()->orderBy('jatuh_tempo')->get();
 
         $items = $tagihan->map(static fn ($t): array => [
+            'id' => $t->id,
             'tipe' => (string) $t->tipe,
             'nominal' => (float) $t->nominal,
             'jatuhTempo' => $t->jatuh_tempo?->format('Y-m-d'),
             'status' => (string) $t->status,
             'keterangan' => (string) ($t->keterangan ?? ''),
             'lunas' => $t->status === 'lunas',
+            'buktiAda' => $t->bukti_transfer !== null,
         ])->values()->all();
 
         $totalTagihan = (float) $tagihan->sum('nominal');
@@ -141,6 +175,34 @@ class PesertaPortalController extends Controller
             'totalLunas' => $totalLunas,
             'sisa' => max(0, $totalTagihan - $totalLunas),
         ]);
+    }
+
+    /**
+     * Unggah bukti transfer untuk satu tagihan PPDB (F2/BILL-2). Kepemilikan
+     * ditegakkan via relasi calon (tagihan harus milik peserta ybs). File ≤5MB.
+     * Status tagihan → 'menunggu_verifikasi' (antrean verifikasi panitia).
+     */
+    public function uploadBukti(Request $request, int $tagihan): RedirectResponse
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+
+        // firstOrFail pada relasi = jaminan kepemilikan + isolasi tenant.
+        $t = $calon->tagihanPpdb()->whereKey($tagihan)->firstOrFail();
+
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'],
+        ]);
+
+        $disk = config('filesystems.default', 'local');
+        $path = $request->file('file')->store(sprintf('ppdb-bukti/%d', $calon->id), $disk);
+
+        $t->update([
+            'bukti_transfer' => $path,
+            'bukti_diunggah_at' => now(),
+            'status' => 'menunggu_verifikasi',
+        ]);
+
+        return back()->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi panitia.');
     }
 
     public function updateBiodata(Request $request): RedirectResponse

@@ -112,10 +112,15 @@ Route::middleware([
             ->name('dashboard');
         Route::get('/berkas', [PesertaPortalController::class, 'berkas'])
             ->name('berkas');
+        Route::post('/berkas/upload', [PesertaPortalController::class, 'uploadDokumen'])
+            ->name('berkas.upload');
         Route::get('/pengumuman', [PesertaPortalController::class, 'pengumuman'])
             ->name('pengumuman');
         Route::get('/tagihan', [PesertaPortalController::class, 'tagihan'])
             ->name('tagihan');
+        Route::post('/tagihan/{tagihan}/bukti', [PesertaPortalController::class, 'uploadBukti'])
+            ->whereNumber('tagihan')
+            ->name('tagihan.bukti');
         Route::put('/biodata', [PesertaPortalController::class, 'updateBiodata'])
             ->name('biodata.update');
     });

@@ -1,5 +1,6 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import SpmbLayout from '../../../Layouts/SpmbLayout.vue';
 
 const props = defineProps({
@@ -9,7 +10,29 @@ const props = defineProps({
     lengkapWajib: { type: Boolean, default: false },
 });
 
-// Warna badge per status verifikasi dokumen.
+const page = usePage();
+const flashSuccess = computed(() => page.props.flash?.success ?? null);
+
+const form = useForm({ jenis_dokumen: null, file: null });
+
+function onFileChange(event, jenis) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    form.jenis_dokumen = jenis;
+    form.file = file;
+    form.post('/spmb/berkas/upload', {
+        forceFormData: true,
+        preserveScroll: true,
+        onFinish: () => {
+            form.reset('file');
+            event.target.value = '';
+        },
+    });
+}
+
+const sedangUnggah = (jenis) => form.processing && form.jenis_dokumen === jenis;
+
 function statusClass(status, terunggah) {
     if (!terunggah) return 'bg-stone-100 text-stone-500';
     return {
@@ -33,8 +56,15 @@ function statusText(item) {
             <div>
                 <h1 class="text-lg font-semibold text-stone-900">Berkas Pendaftaran</h1>
                 <p class="text-sm text-stone-500">
-                    Kelengkapan dokumen<span v-if="nomorPendaftaran"> &middot; No. {{ nomorPendaftaran }}</span>
+                    Unggah dokumen<span v-if="nomorPendaftaran"> &middot; No. {{ nomorPendaftaran }}</span>
                 </p>
+            </div>
+
+            <div v-if="flashSuccess" class="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                {{ flashSuccess }}
+            </div>
+            <div v-if="form.errors.file" class="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                {{ form.errors.file }}
             </div>
 
             <!-- Ringkasan kelengkapan wajib -->
@@ -42,9 +72,7 @@ function statusText(item) {
                 class="rounded-xl px-4 py-3 text-sm"
                 :class="lengkapWajib ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'"
             >
-                <template v-if="lengkapWajib">
-                    ✓ Semua dokumen wajib sudah diunggah.
-                </template>
+                <template v-if="lengkapWajib">✓ Semua dokumen wajib sudah diunggah.</template>
                 <template v-else>
                     Dokumen wajib yang belum diunggah:
                     <span class="font-medium">{{ kurangWajib.join(', ') }}</span>
@@ -75,12 +103,35 @@ function statusText(item) {
                             {{ statusText(item) }}
                         </span>
                     </div>
+
                     <p
                         v-if="item.status === 'rejected' && item.catatan"
                         class="mt-2 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700"
                     >
                         Catatan: {{ item.catatan }}
                     </p>
+
+                    <!-- Kontrol unggah -->
+                    <div class="mt-2">
+                        <input
+                            :id="`f-${item.jenis}`"
+                            type="file"
+                            class="hidden"
+                            accept=".pdf,.jpg,.jpeg,.png,.webp"
+                            :disabled="form.processing"
+                            @change="onFileChange($event, item.jenis)"
+                        >
+                        <label
+                            :for="`f-${item.jenis}`"
+                            class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--spmb-primary)] px-3 py-1.5 text-xs font-medium text-[var(--spmb-primary)] transition hover:bg-[var(--spmb-primary)] hover:text-white"
+                            :class="form.processing ? 'pointer-events-none opacity-50' : ''"
+                        >
+                            <span aria-hidden="true">⬆️</span>
+                            <span v-if="sedangUnggah(item.jenis)">Mengunggah…</span>
+                            <span v-else>{{ item.terunggah ? 'Ganti file' : 'Unggah file' }}</span>
+                        </label>
+                        <span class="ml-2 text-[11px] text-stone-400">PDF/JPG/PNG, maks 5 MB</span>
+                    </div>
                 </li>
             </ul>
         </div>

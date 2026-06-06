@@ -22,11 +22,14 @@ class TagihanPpdb extends Model
         'jatuh_tempo',
         'status',
         'keterangan',
+        'bukti_transfer',
+        'bukti_diunggah_at',
     ];
 
     protected $casts = [
         'nominal' => 'decimal:2',
         'jatuh_tempo' => 'date',
+        'bukti_diunggah_at' => 'datetime',
     ];
 
     public function calonSantri(): BelongsTo
