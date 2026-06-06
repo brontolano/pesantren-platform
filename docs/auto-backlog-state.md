@@ -13,7 +13,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## Pointer rotasi
-- Iterasi berikutnya: **area 3 — Integrasi Website / API (putaran 2)**
+- Iterasi berikutnya: **area 1 — File Storage (putaran 3)** — item tersisa: kompresi gambar + audit log
 
 ## Log iterasi
 | # | Area | Increment | Commit | Status |
@@ -25,6 +25,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 | 5 | File Storage | `diskName()` auto-resolve ke disk S3 saat object storage aktif (+ config `object_storage_disk`) + unit test | (lihat git log) | ✅ |
 | 6 | PPDB upload dokumen | Registry tipe dokumen `PpdbDocumentTypes` (label + wajib/opsional + `missingRequired()` checklist) + unit test | (lihat git log) | ✅ |
 | 7 | PPDB ujian | `UjianScoringService` (agregasi auto-grade PG + pisah essay manual + persen) atas `SoalUjian` + unit test | (lihat git log) | ✅ |
+| 8 | Integrasi Website/API | Middleware `AuthenticateTenantApiKey` (X-Api-Key/Bearer → TenantApiKey, isolasi tenant, last_used) + `ApiKeyExtractor` pure + unit test | (lihat git log) | ✅ |
 
 ## Checklist target per area
 ### File Storage
@@ -42,5 +43,5 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 
 ### Integrasi Website / API
 - [~] API publik read: profil tenant, artikel/berita, galeri *(sebagian sudah ada: CmsPublicApiController; statistik/jadwal PPDB pending)*
-- [~] Token/API key per tenant *(model+migrasi `TenantApiKey` + generate/verify DONE; middleware auth + halaman 'Integrasi & API' pending)*
+- [~] Token/API key per tenant *(model+migrasi `TenantApiKey` + middleware `AuthenticateTenantApiKey` DONE; wiring alias + halaman 'Integrasi & API' pending)*
 - [ ] CORS per domain tenant + rate-limit
