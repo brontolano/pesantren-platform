@@ -57,7 +57,7 @@ trait ResolvesPortalWaliContext
                 'key' => 'tagihan',
                 'label' => 'Tagihan',
                 'href' => $firstChildId
-                    ? "{$financialHref}?section=tagihan#tagihan"
+                    ? "{$financialHref}&section=tagihan#tagihan"
                     : $dashboardHref,
                 'active' => request()->routeIs('tenant.portal-wali.financial') && $financialSection !== 'tabungan',
             ],
@@ -71,9 +71,9 @@ trait ResolvesPortalWaliContext
                 'key' => 'tabungan',
                 'label' => 'Tabungan',
                 'href' => $firstChildId
-                    ? "{$financialHref}?section=tabungan#tabungan"
+                    ? route('tenant.portal-wali.tabungan.show', ['tenant' => $tenantId, 'santri' => $firstChildId])
                     : $dashboardHref,
-                'active' => request()->routeIs('tenant.portal-wali.financial') && $financialSection === 'tabungan',
+                'active' => request()->routeIs('tenant.portal-wali.tabungan.*'),
             ],
             [
                 'key' => 'akun',
