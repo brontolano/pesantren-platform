@@ -13,7 +13,9 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## Pointer rotasi
-- Iterasi berikutnya: **area 1 — File Storage (putaran 3)** — item tersisa: kompresi gambar + audit log
+- Iterasi berikutnya: **area 2b — PPDB ujian (putaran 3)**
+
+> Area habis target aditif aman (LEWATI): **File Storage** (3/3 ✅) · **PPDB upload dokumen** (sisanya milik tim /spmb). Rotasi efektif kini: PPDB ujian ↔ Integrasi Website/API.
 
 ## Log iterasi
 | # | Area | Increment | Commit | Status |
@@ -26,12 +28,13 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 | 6 | PPDB upload dokumen | Registry tipe dokumen `PpdbDocumentTypes` (label + wajib/opsional + `missingRequired()` checklist) + unit test | (lihat git log) | ✅ |
 | 7 | PPDB ujian | `UjianScoringService` (agregasi auto-grade PG + pisah essay manual + persen) atas `SoalUjian` + unit test | (lihat git log) | ✅ |
 | 8 | Integrasi Website/API | Middleware `AuthenticateTenantApiKey` (X-Api-Key/Bearer → TenantApiKey, isolasi tenant, last_used) + `ApiKeyExtractor` pure + unit test | (lihat git log) | ✅ |
+| 9 | File Storage | Test coverage `MediaImageService.compress` (guard mime/file + resize GD-guarded); konfirmasi kompresi+audit sudah ada → area File Storage 3/3 | (lihat git log) | ✅ |
 
 ## Checklist target per area
 ### File Storage
 - [x] Gerbang tier S3 server-side (`setQuota` tolak 64/128/256 bila object storage belum siap)
 - [x] Resolusi disk media otomatis ke `s3` saat `media.object_storage` aktif (`diskName()` + `object_storage_disk`)
-- [ ] Kompresi gambar (lanjutan) + audit log unggah/hapus
+- [x] Kompresi gambar + audit log unggah/hapus *(sudah ada: MediaImageService + MediaAudit/MediaFile; ditambah test coverage `compress`)*
 
 ### PPDB upload dokumen & ujian
 - [~] Endpoint upload dokumen peserta + signed URL + status verifikasi *(status verifikasi: kolom + helper model DONE; endpoint/signed-URL = milik tim PWA)*
