@@ -3,7 +3,8 @@
 ## FASE 5 — Integrasi Website / API (loop cron 1 mnt)
 - #32: register alias middleware `api.key` (AuthenticateTenantApiKey) di bootstrap/app.php + named RateLimiter `public-api` (PublicApiThrottle) di AppServiceProvider::boot. Siap dipasang `->middleware(['api.key','throttle:public-api'])`.
 - #33: `TenantApiController` (profile/statistics/jadwalPpdb) + grup route `/api/v1/{profil,statistik,jadwal-ppdb}` middleware `api.key`+`throttle:public-api` (terdaftar). Aditif, tak ubah endpoint publik existing.
-- Sisa feasible: CORS per-domain · halaman Filament Integrasi&API (kelola TenantApiKey) · API submit PPDB+anti-spam · docs/INTEGRASI-API.md. LEWATI (eksternal): subdomain delegation, repoint DNS, WordPress plugin, trial client.
+- #34: `config/cors.php` env-driven + pola per-domain tenant (apex `asy-syifaa.com`,`pesantren.online` → semua subdomain otomatis diizinkan; anti lookalike & non-https). Env: CORS_ALLOWED_ORIGINS / CORS_APEX_DOMAINS / CORS_ALLOWED_ORIGIN_PATTERNS. Diuji tinker: origin sah ALLOW, evilasy-syifaa.com & *.evil.com & http DENY.
+- Sisa feasible: halaman Filament Integrasi&API (kelola TenantApiKey) · API submit PPDB+anti-spam · docs/INTEGRASI-API.md. LEWATI (eksternal): subdomain delegation, repoint DNS, WordPress plugin, trial client.
 
 ## Limit kapasitas tenant (cegah over-storage server)
 - #31: `StorageQuotaService::usedBytes()` kini hitung media_files + dokumen PPDB (`ppdbBytes`, dari metadata.size). Penegakan `canUpload` ditambah di upload dokumen & bukti PPDB (PesertaPortalController::kuotaTerlampaui). Semua jalur unggah (media + PPDB) kini dibatasi kuota tenant (default 8GB, settable per tenant via KelolaKuotaPenyimpanan). Catatan: total server = jumlah kuota tenant (kebijakan admin); DB & ukuran bukti exact = penyempurnaan lanjutan.
