@@ -85,8 +85,8 @@ const submit = () => {
 
     <SpmbLayout>
         <div class="space-y-6">
-            <!-- Navigasi cepat (auto-backlog): akses halaman Berkas, Pengumuman, Tagihan -->
-            <section class="grid grid-cols-3 gap-3">
+            <!-- Navigasi cepat (auto-backlog): Berkas, Pengumuman, Tagihan, Kartu Ujian -->
+            <section class="grid grid-cols-2 gap-3">
                 <Link
                     href="/spmb/berkas"
                     class="flex flex-col items-center gap-1 rounded-2xl border border-stone-200 bg-white px-2 py-3 text-xs font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
@@ -104,6 +104,12 @@ const submit = () => {
                     class="flex flex-col items-center gap-1 rounded-2xl border border-stone-200 bg-white px-2 py-3 text-xs font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
                 >
                     <span class="text-lg" aria-hidden="true">🧾</span> Tagihan
+                </Link>
+                <Link
+                    href="/spmb/kartu-ujian"
+                    class="flex flex-col items-center gap-1 rounded-2xl border border-stone-200 bg-white px-2 py-3 text-xs font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
+                >
+                    <span class="text-lg" aria-hidden="true">🪪</span> Kartu Ujian
                 </Link>
             </section>
 

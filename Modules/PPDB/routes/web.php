@@ -117,6 +117,8 @@ Route::middleware([
             ->name('berkas.upload');
         Route::get('/pengumuman', [PesertaPortalController::class, 'pengumuman'])
             ->name('pengumuman');
+        Route::get('/kartu-ujian', [PesertaPortalController::class, 'kartuUjian'])
+            ->name('kartu-ujian');
         Route::get('/tagihan', [PesertaPortalController::class, 'tagihan'])
             ->name('tagihan');
         Route::post('/tagihan/{tagihan}/bukti', [PesertaPortalController::class, 'uploadBukti'])

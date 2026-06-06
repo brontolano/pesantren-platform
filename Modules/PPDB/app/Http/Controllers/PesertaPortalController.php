@@ -12,6 +12,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\PPDB\Models\CalonSantri;
+use Modules\PPDB\Models\JadwalUjian;
 use Modules\PPDB\Services\PpdbDocumentUploadService;
 use Modules\PPDB\Services\PpdbFormFieldConfigurationService;
 use Modules\PPDB\Services\PpdbStatusTrackingService;
@@ -204,6 +205,35 @@ class PesertaPortalController extends Controller
         ]);
 
         return back()->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi panitia.');
+    }
+
+    /**
+     * Kartu peserta ujian digital (F3/EXAM-2): identitas + jadwal ujian + QR.
+     * Read-only; QR (nomor pendaftaran) dirender client-side di Vue.
+     */
+    public function kartuUjian(Request $request): Response
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+
+        $jadwal = JadwalUjian::query()
+            ->orderBy('tanggal')
+            ->orderBy('waktu_mulai')
+            ->get()
+            ->map(static fn (JadwalUjian $j): array => [
+                'kategori' => (string) $j->kategori_ujian,
+                'tanggal' => $j->tanggal?->format('Y-m-d'),
+                'waktuMulai' => $j->waktu_mulai ? substr((string) $j->waktu_mulai, 0, 5) : null,
+                'waktuSelesai' => $j->waktu_selesai ? substr((string) $j->waktu_selesai, 0, 5) : null,
+                'ruang' => (string) ($j->ruang ?? ''),
+                'keterangan' => (string) ($j->keterangan ?? ''),
+            ])->values()->all();
+
+        return Inertia::render('PPDB/Portal/KartuUjian', [
+            'pesantren' => tenant()?->name ?? 'Pesantren',
+            'nomorPendaftaran' => (string) $calon->nomor_pendaftaran,
+            'nama' => (string) $calon->nama,
+            'jadwal' => $jadwal,
+        ]);
     }
 
     public function updateBiodata(Request $request): RedirectResponse
