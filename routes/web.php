@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\CmsPublicApiController;
 use App\Http\Controllers\Api\PpdbPublicApiController;
+use App\Http\Controllers\Api\TenantApiController;
 use App\Http\Controllers\TenantWebsiteController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Database\Models\Domain;
@@ -67,3 +68,11 @@ Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'sett
 
 // PPDB publik — terima pendaftaran dari form website (Fase minimal: simpan + e-tiket).
 Route::post('/api/v1/spmb/register', [PpdbPublicApiController::class, 'register']);
+
+// API publik headless TERPROTEKSI (X-Api-Key per tenant + rate-limit). Kontrak:
+// docs/INTEGRASI-API.md. Aditif — tak mengubah endpoint publik di atas.
+Route::middleware(['api.key', 'throttle:public-api'])->prefix('api/v1')->group(function () {
+    Route::get('/profil', [TenantApiController::class, 'profile'])->name('api.tenant.profil');
+    Route::get('/statistik', [TenantApiController::class, 'statistics'])->name('api.tenant.statistik');
+    Route::get('/jadwal-ppdb', [TenantApiController::class, 'jadwalPpdb'])->name('api.tenant.jadwal-ppdb');
+});
