@@ -25,6 +25,7 @@ use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
 use App\Filament\Resources\Kesehatan\SesiKonselingResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
 use App\Filament\Resources\Media\MediaFileResource;
+use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use App\Filament\Resources\PPDB\CalonSantriDokumenResource;
 use App\Filament\Resources\PPDB\CalonSantriResource;
 use App\Filament\Resources\PPDB\HasilUjianResource;
@@ -33,6 +34,7 @@ use App\Filament\Resources\PenempatanKelas\PenempatanKelasResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Santri\SantriResource;
 use App\Filament\Resources\Tabungan\TabunganResource;
+use App\Filament\Resources\TabunganTopup\TabunganTopupResource;
 use App\Filament\Resources\Tagihan\TagihanResource;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource;
 use App\Filament\Resources\Tahfidz\PenilaianTahfidzResource;
@@ -85,6 +87,8 @@ class TenantPanelProvider extends PanelProvider
                 TagihanResource::class,
                 PembayaranResource::class,
                 TabunganResource::class,
+                MetodePembayaranResource::class,
+                TabunganTopupResource::class,
                 LaporanKeuanganResource::class,
                 // Notifikasi
                 TemplateNotifikasiResource::class,

@@ -68,6 +68,14 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_notifikasi',
                 'view_santri',
             ],
+            // Alias bendahara — sama persis dengan 'keuangan' (demo seeder memakai role ini).
+            'bendahara' => [
+                'view_dashboard',
+                'view_keuangan',
+                'manage_keuangan',
+                'view_notifikasi',
+                'view_santri',
+            ],
             'guru' => [
                 'view_dashboard',
                 'view_santri',

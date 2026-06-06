@@ -25,25 +25,25 @@ defineProps({
 <template>
     <div class="space-y-5">
         <Head>
-            <title>Akun Wali</title>
+            <title>Pembayaran Saya</title>
         </Head>
 
         <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
-                Akun Wali
+                Pembayaran Saya
             </p>
             <h2 class="mt-3 font-serif text-3xl leading-tight">
-                {{ wali.name }}
+                Status pembayaran dan notifikasi
             </h2>
             <p class="mt-2 text-sm leading-6 text-white/75">
-                {{ wali.email || 'Notifikasi penting dan status akun wali.' }}
+                {{ wali.name }} · {{ wali.email || 'Pantau pembayaran yang sedang diverifikasi tanpa japri bendahara.' }}
             </p>
         </section>
 
         <section class="grid grid-cols-2 gap-3">
             <div class="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
                 <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                    Terkirim
+                    Notifikasi Terkirim
                 </p>
                 <p class="mt-2 text-2xl font-semibold text-slate-900">
                     {{ summary.sentCount }}
@@ -51,15 +51,33 @@ defineProps({
             </div>
             <div class="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
                 <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                    Gagal
+                    Perlu Tindak Lanjut
                 </p>
                 <p class="mt-2 text-2xl font-semibold text-slate-900">
                     {{ summary.failedCount }}
                 </p>
-            </div>
+                </div>
         </section>
 
-        <div class="grid gap-3">
+        <section class="space-y-3">
+            <div class="flex items-end justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
+                        Riwayat Status
+                    </p>
+                    <h3 class="mt-1 font-serif text-2xl text-slate-900">
+                        Pembayaran dan notifikasi terbaru
+                    </h3>
+                </div>
+                <Link
+                    href="/wali/izin"
+                    class="rounded-full bg-amber-50 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-700"
+                >
+                    Buka Akun
+                </Link>
+            </div>
+
+            <div class="grid gap-3">
             <article
                 v-for="notification in notifications"
                 :key="notification.id"
@@ -82,13 +100,7 @@ defineProps({
                     {{ notification.createdAt || '-' }}
                 </p>
             </article>
-        </div>
-
-        <Link
-            href="/wali/izin"
-            class="block rounded-[1.5rem] bg-amber-50 px-4 py-4 text-center text-sm font-semibold uppercase tracking-[0.18em] text-amber-700"
-        >
-            Buka pengajuan izin
-        </Link>
+            </div>
+        </section>
     </div>
 </template>

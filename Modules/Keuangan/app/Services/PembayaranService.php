@@ -89,6 +89,32 @@ class PembayaranService
     }
 
     /**
+     * Tolak pembayaran wali (set alasan + verifier, lalu recalculate status tagihan).
+     */
+    public function tolakPembayaran(Pembayaran|int $pembayaran, int $verifiedBy, string $alasan): Pembayaran
+    {
+        $this->ensureTenantContext();
+
+        $model = $pembayaran instanceof Pembayaran
+            ? $pembayaran
+            : Pembayaran::query()->findOrFail($pembayaran);
+
+        if ($model->is_verified) {
+            throw new InvalidArgumentException('Pembayaran sudah diverifikasi, tidak bisa ditolak.');
+        }
+
+        $model->update([
+            'alasan_penolakan' => $alasan,
+            'verified_by' => $verifiedBy,
+            'verified_at' => now(),
+        ]);
+
+        $this->updateStatusTagihan($model->tagihan);
+
+        return $model->fresh();
+    }
+
+    /**
      * Batalkan pembayaran (soft — hanya hapus record, tagihan di-recalculate).
      */
     public function batalkanPembayaran(Pembayaran|int $pembayaran): void

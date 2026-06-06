@@ -97,6 +97,10 @@ class PortalWaliFeatureTest extends TestCase
             ->where('children.0.finance.pendingPaymentsCount', 1)
             ->where('children.0.finance.primaryAction.label', 'Lihat Status')
             ->where('navigation.0.label', 'Beranda')
+            ->where('navigation.1.label', 'Tagihan')
+            ->where('navigation.2.label', 'Pembayaran')
+            ->where('navigation.3.label', 'Tabungan')
+            ->where('navigation.4.label', 'Akun')
         );
 
         $profileResponse = $this
@@ -183,6 +187,7 @@ class PortalWaliFeatureTest extends TestCase
             ->where('summary.sentCount', 1)
             ->where('summary.failedCount', 0)
             ->has('notifications', 1)
+            ->where('navigation.2.active', true)
         );
 
         $izinResponse = $this

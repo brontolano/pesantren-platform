@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
+use App\Http\Controllers\PortalWali\PortalWaliAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
 use App\Http\Controllers\PortalWali\PortalWaliFinancialController;
 use App\Http\Controllers\PortalWali\PortalWaliHafalanController;
@@ -12,8 +13,11 @@ use App\Http\Controllers\PortalWali\PortalWaliKegiatanController;
 use App\Http\Controllers\PortalWali\PortalWaliKesehatanController;
 use App\Http\Controllers\PortalWali\PortalWaliIzinController;
 use App\Http\Controllers\PortalWali\PortalWaliNotificationController;
+use App\Http\Controllers\PortalWali\PortalWaliPembayaranController;
+use App\Http\Controllers\PortalWali\PortalWaliPwaController;
 use App\Http\Controllers\PortalWali\PortalWaliProfileController;
 use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
+use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\SantriExportController;
 use Illuminate\Support\Facades\Route;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
@@ -34,9 +38,27 @@ Route::middleware([
 ])->group(function () {
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
+    Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {
+        Route::get('/manifest.json', [PortalWaliPwaController::class, 'manifest'])->name('manifest');
+        Route::get('/icon.svg', [PortalWaliPwaController::class, 'icon'])->name('icon');
+        Route::get('/screenshot.svg', [PortalWaliPwaController::class, 'screenshot'])->name('screenshot');
+        Route::get('/sw.js', [PortalWaliPwaController::class, 'serviceWorker'])->name('service-worker');
+    });
 
-    Route::middleware('auth')->prefix('wali')->name('tenant.portal-wali.')->group(function () {
+    Route::prefix('wali')->name('tenant.portal-wali.auth.')->group(function () {
+        Route::get('/login', [PortalWaliAuthController::class, 'showLogin'])->name('login');
+        Route::get('/aktivasi', [PortalWaliAuthController::class, 'showAktivasi'])->name('activation');
+        Route::get('/lupa-password', [PortalWaliAuthController::class, 'showLupaPassword'])->name('password.forgot');
+        Route::post('/login', [PortalWaliAuthController::class, 'login'])->middleware('throttle:10,1')->name('login.attempt');
+        Route::post('/aktivasi', [PortalWaliAuthController::class, 'aktivasi'])->middleware('throttle:10,15')->name('activation.verify');
+        Route::post('/aktivasi/kirim-ulang', [PortalWaliAuthController::class, 'kirimUlang'])->middleware('throttle:3,15')->name('activation.resend');
+        Route::post('/lupa-password', [PortalWaliAuthController::class, 'lupaPassword'])->middleware('throttle:5,15')->name('password.request');
+        Route::post('/lupa-password/reset', [PortalWaliAuthController::class, 'resetPassword'])->middleware('throttle:10,15')->name('password.reset');
+    });
+
+    Route::middleware('wali')->prefix('wali')->name('tenant.portal-wali.')->group(function () {
         Route::get('/', PortalWaliDashboardController::class)->name('dashboard');
+        Route::post('/logout', [PortalWaliAuthController::class, 'logout'])->name('logout');
         Route::get('/santri/{santri}', PortalWaliProfileController::class)->name('profile');
         Route::get('/santri/{santri}/akademik', PortalWaliAcademicController::class)->name('academic');
         Route::get('/santri/{santri}/keuangan', PortalWaliFinancialController::class)->name('financial');
@@ -47,6 +69,16 @@ Route::middleware([
         Route::get('/santri/{santri}/hafalan', PortalWaliHafalanController::class)->name('hafalan');
         Route::get('/santri/{santri}/kesehatan', PortalWaliKesehatanController::class)->name('kesehatan');
         Route::get('/santri/{santri}/kegiatan', PortalWaliKegiatanController::class)->name('kegiatan');
+
+        // W2 Pembayaran
+        Route::get('/santri/{santri}/tagihan/{tagihan}/bayar', [PortalWaliPembayaranController::class, 'create'])->name('pembayaran.create');
+        Route::post('/santri/{santri}/tagihan/{tagihan}/bayar', [PortalWaliPembayaranController::class, 'store'])->name('pembayaran.store');
+        Route::get('/pembayaran-saya', [PortalWaliPembayaranController::class, 'index'])->name('pembayaran.index');
+
+        // W3 Tabungan
+        Route::get('/santri/{santri}/tabungan', [PortalWaliTabunganController::class, 'show'])->name('tabungan.show');
+        Route::post('/santri/{santri}/tabungan/topup', [PortalWaliTabunganController::class, 'topup'])->name('tabungan.topup');
+        Route::post('/santri/{santri}/tagihan/{tagihan}/bayar-saldo', [PortalWaliTabunganController::class, 'bayarDariSaldo'])->name('tabungan.bayar-saldo');
     });
 
     Route::middleware('auth')->prefix('admin/kesantrian/santri/export')->name('tenant.kesantrian.santri.export.')->group(function () {

@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
 
 defineOptions({
@@ -101,6 +101,16 @@ defineProps({
                         <p><span class="font-semibold text-slate-900">Sisa:</span> {{ bill.sisaTagihan }}</p>
                         <p><span class="font-semibold text-slate-900">Dibayar:</span> {{ bill.totalDibayar }}</p>
                         <p><span class="font-semibold text-slate-900">Jatuh tempo:</span> {{ bill.jatuhTempo || '-' }}</p>
+                    </div>
+                    <div v-if="bill.status !== 'lunas'" class="mt-3 flex gap-2">
+                        <Link
+                            :href="`/wali/santri/${child.id}/tagihan/${bill.id}/bayar`"
+                            class="flex-1 rounded-2xl bg-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white"
+                        >Bayar</Link>
+                        <Link
+                            :href="`/wali/santri/${child.id}/tabungan`"
+                            class="flex-1 rounded-2xl border border-emerald-600 px-4 py-3 text-center text-sm font-semibold text-emerald-700"
+                        >Dari Saldo</Link>
                     </div>
                 </article>
             </div>

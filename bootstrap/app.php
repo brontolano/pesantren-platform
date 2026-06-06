@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         );
         $middleware->alias([
             'module' => \App\Http\Middleware\CheckModuleActive::class,
+            'wali' => \App\Http\Middleware\EnsureUserIsWali::class,
         ]);
 
         // API publik (lintas-origin dari website tenant) — stateless, dilindungi CORS.

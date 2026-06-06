@@ -117,6 +117,41 @@ class TenantDemoSeeder extends Seeder
         }
         $santriIds = DB::table('santri')->where('tenant_id', $t)->where('status', 'aktif')->pluck('id');
 
+        // 6b. Demo PWA Wali (W2/W3) — user wali + akses anak + metode bayar + saldo tabungan.
+        $waliUser = \App\Models\User::withoutGlobalScopes()->updateOrCreate(
+            ['email' => 'wali@demo.pesantren.online'],
+            ['name' => 'Bapak Ahmad (Wali)', 'password' => Hash::make('demo1234'), 'tenant_id' => $t]
+        );
+        if (\Spatie\Permission\Models\Role::where('name', 'wali')->exists()) {
+            $waliUser->syncRoles(['wali']);
+        }
+
+        $santriDemo = DB::table('santri')->where('tenant_id', $t)->where('nis', '2024001')->first();
+        if ($santriDemo) {
+            DB::table('access_wali')->updateOrInsert(
+                ['tenant_id' => $t, 'wali_id' => $waliUser->id, 'santri_id' => $santriDemo->id],
+                ['relationship_type' => 'orang_tua', 'is_primary' => true, 'created_at' => $now, 'updated_at' => $now]
+            );
+            DB::table('santri')->where('id', $santriDemo->id)->update(['wali_user_id' => $waliUser->id]);
+
+            // Tabungan + saldo awal untuk santri demo (agar bayar-dari-saldo bisa langsung didemokan).
+            DB::table('tabungan')->updateOrInsert(
+                ['tenant_id' => $t, 'santri_id' => $santriDemo->id],
+                ['saldo' => 750000, 'is_frozen' => false, 'created_at' => $now, 'updated_at' => $now]
+            );
+        }
+
+        // Metode pembayaran tenant (minimal 2: bank + qris).
+        foreach ([
+            ['tipe' => 'bank', 'nama' => 'Bank Syariah Indonesia', 'nomor' => '7012345678', 'atas_nama' => 'Yayasan Pesantren Demo', 'instruksi' => 'Transfer lalu unggah bukti.', 'urutan' => 1],
+            ['tipe' => 'qris', 'nama' => 'QRIS Pesantren', 'nomor' => null, 'atas_nama' => 'Pesantren Demo', 'instruksi' => 'Scan QR di aplikasi e-wallet.', 'urutan' => 2],
+        ] as $m) {
+            DB::table('metode_pembayaran')->updateOrInsert(
+                ['tenant_id' => $t, 'nama' => $m['nama']],
+                array_merge($m, ['tenant_id' => $t, 'gambar' => null, 'is_active' => true, 'created_at' => $now, 'updated_at' => $now])
+            );
+        }
+
         // 7. Tagihan SPP Mei (10 lunas, sisa belum) + Juni (belum)
         foreach ($santriIds as $i => $sid) {
             $statusMei = $i < 10 ? 'lunas' : 'belum_bayar';

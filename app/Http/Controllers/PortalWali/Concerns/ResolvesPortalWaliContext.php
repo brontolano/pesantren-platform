@@ -14,7 +14,12 @@ trait ResolvesPortalWaliContext
     {
         $user = $request->user();
 
-        abort_unless($user?->can('view_own_children'), 403);
+        abort_unless(
+            $user instanceof User
+            && $user->hasRole('wali')
+            && $user->can('view_own_children'),
+            403,
+        );
 
         return $user;
     }
@@ -39,9 +44,6 @@ trait ResolvesPortalWaliContext
         $financialHref = $firstChildId
             ? route('tenant.portal-wali.financial', ['tenant' => $tenantId, 'santri' => $firstChildId])
             : $dashboardHref;
-        $profileHref = $firstChildId
-            ? route('tenant.portal-wali.profile', ['tenant' => $tenantId, 'santri' => $firstChildId])
-            : $dashboardHref;
         $financialSection = request()->query('section', 'tagihan');
 
         return [
@@ -60,6 +62,12 @@ trait ResolvesPortalWaliContext
                 'active' => request()->routeIs('tenant.portal-wali.financial') && $financialSection !== 'tabungan',
             ],
             [
+                'key' => 'pembayaran',
+                'label' => 'Pembayaran',
+                'href' => route('tenant.portal-wali.pembayaran.index', ['tenant' => $tenantId]),
+                'active' => request()->routeIs('tenant.portal-wali.pembayaran.*'),
+            ],
+            [
                 'key' => 'tabungan',
                 'label' => 'Tabungan',
                 'href' => $firstChildId
@@ -68,23 +76,10 @@ trait ResolvesPortalWaliContext
                 'active' => request()->routeIs('tenant.portal-wali.financial') && $financialSection === 'tabungan',
             ],
             [
-                'key' => 'anak',
-                'label' => 'Anak',
-                'href' => $profileHref,
-                'active' => request()->routeIs(
-                    'tenant.portal-wali.profile',
-                    'tenant.portal-wali.academic',
-                    'tenant.portal-wali.hafalan',
-                    'tenant.portal-wali.kesehatan',
-                    'tenant.portal-wali.kegiatan',
-                    'tenant.portal-wali.rapor.download',
-                ),
-            ],
-            [
                 'key' => 'akun',
                 'label' => 'Akun',
                 'href' => route('tenant.portal-wali.notifications', ['tenant' => $tenantId]),
-                'active' => request()->routeIs('tenant.portal-wali.notifications', 'tenant.portal-wali.izin'),
+                'active' => request()->routeIs('tenant.portal-wali.izin'),
             ],
         ];
     }

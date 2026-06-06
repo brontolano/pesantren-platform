@@ -31,7 +31,27 @@ class PpdbWhatsappNotifier
                 ],
             );
 
-            return $response->successful();
+            if (! $response->successful()) {
+                Log::warning('ppdb_wa.send_failed', ['nomor' => $nomor, 'http_status' => $response->status()]);
+
+                return false;
+            }
+
+            // Workflow n8n SELALU balas HTTP 200 lewat Respond node, bahkan saat
+            // gateway WAHA gagal (sent:false). Jadi status 2xx saja TIDAK cukup —
+            // wajib cek flag `sent` agar pemanggil (mis. aksi staf) tahu pesan
+            // benar-benar terkirim atau perlu dibacakan manual.
+            if ($response->json('sent') === false) {
+                Log::warning('ppdb_wa.not_sent', [
+                    'nomor' => $nomor,
+                    'reason' => $response->json('reason'),
+                    'gateway_status' => $response->json('gateway_status'),
+                ]);
+
+                return false;
+            }
+
+            return true;
         } catch (\Throwable $e) {
             // Hanya metadata — JANGAN log $message / kredensial.
             Log::warning('ppdb_wa.send_failed', ['nomor' => $nomor, 'error' => $e->getMessage()]);

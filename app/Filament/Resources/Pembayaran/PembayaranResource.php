@@ -144,6 +144,7 @@ class PembayaranResource extends Resource
                         'tunai' => 'Tunai',
                         'transfer' => 'Transfer Bank',
                         'qris' => 'QRIS',
+                        'saldo_tabungan' => 'Saldo Tabungan',
                     ]),
             ])
             ->actions([
@@ -155,6 +156,20 @@ class PembayaranResource extends Resource
                     ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_keuangan'))
                     ->action(function (Pembayaran $record): void {
                         (new PembayaranService())->verifikasiPembayaran($record, auth()->id());
+                    }),
+                Action::make('tolak')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_keuangan'))
+                    ->form([
+                        Textarea::make('alasan_penolakan')
+                            ->label('Alasan Penolakan')
+                            ->required()
+                            ->rows(3),
+                    ])
+                    ->action(function (Pembayaran $record, array $data): void {
+                        (new PembayaranService())->tolakPembayaran($record, auth()->id(), $data['alasan_penolakan']);
                     }),
             ]);
     }
