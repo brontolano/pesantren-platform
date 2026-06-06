@@ -35,6 +35,17 @@ class PpdbAdmissionDecisionService
             'tanggal_keputusan' => $payload['tanggal_keputusan'] ?? Carbon::now(),
         ])->save();
 
+        // F3/ANN-2: kabari peserta via WA saat keputusan seleksi dipublikasikan
+        // (fire-and-forget; tak menggagalkan keputusan bila WA gagal).
+        if ($candidate->no_hp_wali) {
+            app(PpdbWhatsappNotifier::class)->sendPengumuman(
+                (string) $candidate->no_hp_wali,
+                (string) $candidate->nama,
+                (string) $candidate->nomor_pendaftaran,
+                $status,
+            );
+        }
+
         return $candidate->fresh();
     }
 

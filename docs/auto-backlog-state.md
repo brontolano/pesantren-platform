@@ -14,8 +14,9 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 
 ## FASE 4 — Selesaikan 11 task PWA Peserta SPMB (keputusan Hamdan final)
 Keputusan: nilai=keputusan-only · daftar ulang=PENUH(→Santri+Wali) · kartu ujian=LENGKAP(model JadwalUjian+QR) · #103/#69=prep saja.
-- #20 **Notif WA #61**: PpdbWhatsappNotifier + method (dokumenDiverifikasi/Ditolak, pembayaranLunas, pengumuman) + wiring di CalonSantriDokumenResource (verify/tolak) & TagihanPpdbResource (konfirmasi lunas). `sendPengumuman` siap utk #64.
-- Sisa: #64 wire notif pengumuman · #63 JadwalUjian+kartu QR · #65 daftar ulang→Santri · #66 pengingat+timeline · #62/#67 test · #68 offline · #69 checklist · #70 smoke · #103 TWA config.
+- #20 **Notif WA #61**: PpdbWhatsappNotifier + method + wiring verifikasi dokumen/pembayaran.
+- #21 **Notif WA #64**: `sendPengumuman` ter-wire di `PpdbAdmissionDecisionService::decide()` (kirim WA saat keputusan lulus/cadangan/ditolak dipublikasikan).
+- Sisa: #63 JadwalUjian+kartu QR · #65 daftar ulang→Santri · #66 pengingat+timeline · #62/#67 test · #68 offline · #69 checklist · #70 smoke · #103 TWA config.
 
 ## FASE 3 — Selesaikan Modul PPDB + PWA PPDB (lalu deploy)
 - Berikutnya: verifikasi BUKTI BAYAR (panitia) → lalu authoring bank soal → sisa feasible → finalisasi (merge+deploy+migrate).
