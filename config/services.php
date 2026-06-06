@@ -41,4 +41,10 @@ return [
         'webhook' => env('PPDB_WA_WEBHOOK_URL', 'http://n8n:5678/webhook/ppdb-wa'),
     ],
 
+    // API publik headless per tenant: batas laju default (per menit).
+    // Dipakai App\Support\PublicApiThrottle untuk named limiter 'public-api'.
+    'public_api' => [
+        'rate_per_minute' => (int) env('PUBLIC_API_RATE_PER_MINUTE', 60),
+    ],
+
 ];

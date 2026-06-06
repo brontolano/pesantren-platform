@@ -13,7 +13,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
 ## Pointer rotasi
-- Iterasi berikutnya: **area 3 — Integrasi Website / API (putaran 3)**
+- Iterasi berikutnya: **area 2b — PPDB ujian (putaran 4)**
 
 > Area habis target aditif aman (LEWATI): **File Storage** (3/3 ✅) · **PPDB upload dokumen** (sisanya milik tim /spmb). Rotasi efektif kini: PPDB ujian ↔ Integrasi Website/API.
 
@@ -30,6 +30,7 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 | 8 | Integrasi Website/API | Middleware `AuthenticateTenantApiKey` (X-Api-Key/Bearer → TenantApiKey, isolasi tenant, last_used) + `ApiKeyExtractor` pure + unit test | (lihat git log) | ✅ |
 | 9 | File Storage | Test coverage `MediaImageService.compress` (guard mime/file + resize GD-guarded); konfirmasi kompresi+audit sudah ada → area File Storage 3/3 | (lihat git log) | ✅ |
 | 10 | PPDB ujian | Persistensi `SesiUjian` (migrasi `sesi_ujian` + model: jawaban/auto_score/butuh_manual, `isiDariSkor` dari UjianScoringService, persenAuto, status) + unit test | (lihat git log) | ✅ |
+| 11 | Integrasi Website/API | Rate-limit API publik `PublicApiThrottle` (kunci per api-key/tenant+IP/IP, limit dari config `services.public_api`) + unit test | (lihat git log) | ✅ |
 
 ## Checklist target per area
 ### File Storage
@@ -48,4 +49,4 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 ### Integrasi Website / API
 - [~] API publik read: profil tenant, artikel/berita, galeri *(sebagian sudah ada: CmsPublicApiController; statistik/jadwal PPDB pending)*
 - [~] Token/API key per tenant *(model+migrasi `TenantApiKey` + middleware `AuthenticateTenantApiKey` DONE; wiring alias + halaman 'Integrasi & API' pending)*
-- [ ] CORS per domain tenant + rate-limit
+- [~] CORS per domain tenant + rate-limit *(rate-limit `PublicApiThrottle` + config DONE; CORS per-domain + wiring limiter pending)*
