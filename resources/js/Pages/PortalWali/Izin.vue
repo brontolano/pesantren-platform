@@ -41,7 +41,7 @@ function submit() {
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
                 Pengajuan Izin
             </p>
-            <h2 class="mt-3 font-serif text-3xl leading-tight">
+            <h2 class="mt-3 font-jost text-3xl leading-tight">
                 Form Izin Santri
             </h2>
         </section>
@@ -104,7 +104,7 @@ function submit() {
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
                     Riwayat
                 </p>
-                <h3 class="mt-1 font-serif text-2xl text-slate-900">
+                <h3 class="mt-1 font-jost text-2xl text-slate-900">
                     Pengajuan Terakhir
                 </h3>
             </div>

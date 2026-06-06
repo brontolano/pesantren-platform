@@ -66,7 +66,7 @@ function resolveActionClass(tone) {
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
                 Keuangan Wali
             </p>
-            <h2 class="mt-3 font-serif text-3xl leading-tight">
+            <h2 class="mt-3 font-jost text-3xl leading-tight">
                 Ringkasan yang perlu dibereskan hari ini
             </h2>
             <p class="mt-2 text-sm leading-6 text-white/75">
@@ -117,7 +117,7 @@ function resolveActionClass(tone) {
                         <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-200/80">
                             Langkah Utama
                         </p>
-                        <h3 class="mt-2 font-serif text-2xl text-white">
+                        <h3 class="mt-2 font-jost text-2xl text-white">
                             {{ summary.primaryAction?.label || 'Pantau Keuangan Anak' }}
                         </h3>
                         <p class="mt-2 text-sm leading-6 text-white/75">
@@ -147,7 +147,7 @@ function resolveActionClass(tone) {
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
                         Per Anak
                     </p>
-                    <h3 class="mt-1 font-serif text-2xl text-slate-900">
+                    <h3 class="mt-1 font-jost text-2xl text-slate-900">
                         Finance Home Santri
                     </h3>
                 </div>
@@ -167,7 +167,7 @@ function resolveActionClass(tone) {
                             <p class="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">
                                 {{ child.hubungan }}
                             </p>
-                            <h4 class="mt-2 font-serif text-2xl text-slate-900">
+                            <h4 class="mt-2 font-jost text-2xl text-slate-900">
                                 {{ child.nama }}
                             </h4>
                             <p class="mt-1 text-sm text-slate-500">
@@ -269,7 +269,7 @@ function resolveActionClass(tone) {
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                     Notifikasi
                 </p>
-                <p class="mt-2 font-serif text-xl text-slate-900">
+                <p class="mt-2 font-jost text-xl text-slate-900">
                     Pembayaran Saya
                 </p>
             </Link>
@@ -280,7 +280,7 @@ function resolveActionClass(tone) {
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                     Perizinan
                 </p>
-                <p class="mt-2 font-serif text-xl text-slate-900">
+                <p class="mt-2 font-jost text-xl text-slate-900">
                     Layanan Wali
                 </p>
             </Link>

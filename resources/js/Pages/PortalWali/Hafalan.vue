@@ -31,7 +31,7 @@ const statusColor = (status) => ({
             </Link>
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">Tahfidz</p>
-                <h2 class="font-serif text-2xl text-slate-900">Hafalan {{ santri.nama }}</h2>
+                <h2 class="font-jost text-2xl text-slate-900">Hafalan {{ santri.nama }}</h2>
             </div>
         </div>
 
@@ -49,7 +49,7 @@ const statusColor = (status) => ({
 
         <!-- Daftar Hafalan -->
         <section class="space-y-3">
-            <h3 class="font-serif text-xl text-slate-900">Riwayat Hafalan</h3>
+            <h3 class="font-jost text-xl text-slate-900">Riwayat Hafalan</h3>
 
             <div v-if="hafalan.length" class="space-y-3">
                 <article

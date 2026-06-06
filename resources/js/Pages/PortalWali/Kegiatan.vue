@@ -31,13 +31,13 @@ const formatDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', { day:'num
             </Link>
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-blue-600">Kegiatan & Perizinan</p>
-                <h2 class="font-serif text-2xl text-slate-900">{{ santri.nama }}</h2>
+                <h2 class="font-jost text-2xl text-slate-900">{{ santri.nama }}</h2>
             </div>
         </div>
 
         <!-- Riwayat Izin -->
         <section class="space-y-3">
-            <h3 class="font-serif text-xl text-slate-900">Riwayat Izin</h3>
+            <h3 class="font-jost text-xl text-slate-900">Riwayat Izin</h3>
 
             <div v-if="izin.length" class="space-y-3">
                 <article
@@ -71,7 +71,7 @@ const formatDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', { day:'num
 
         <!-- Kunjungan Wali -->
         <section class="space-y-3">
-            <h3 class="font-serif text-xl text-slate-900">Kunjungan Wali</h3>
+            <h3 class="font-jost text-xl text-slate-900">Kunjungan Wali</h3>
 
             <div v-if="kunjungan.length" class="space-y-3">
                 <article

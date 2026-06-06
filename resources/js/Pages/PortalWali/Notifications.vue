@@ -32,7 +32,7 @@ defineProps({
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
                 Pembayaran Saya
             </p>
-            <h2 class="mt-3 font-serif text-3xl leading-tight">
+            <h2 class="mt-3 font-jost text-3xl leading-tight">
                 Status pembayaran dan notifikasi
             </h2>
             <p class="mt-2 text-sm leading-6 text-white/75">
@@ -65,7 +65,7 @@ defineProps({
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
                         Riwayat Status
                     </p>
-                    <h3 class="mt-1 font-serif text-2xl text-slate-900">
+                    <h3 class="mt-1 font-jost text-2xl text-slate-900">
                         Pembayaran dan notifikasi terbaru
                     </h3>
                 </div>
