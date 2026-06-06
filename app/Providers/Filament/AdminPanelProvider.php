@@ -45,8 +45,12 @@ class AdminPanelProvider extends PanelProvider
                 isRequired: fn (): bool => auth()->user()?->hasAnyRole(['super_admin', 'kepala']) ?? false,
             )
             ->spa()
+            ->viteTheme('resources/css/filament/pesantren/theme.css')
+            ->brandLogo(fn () => view('filament.brand'))
+            ->brandLogoHeight('2.25rem')
             ->colors([
                 'primary' => Color::Emerald,
+                'gray' => Color::Slate,
             ])
             ->resources([
                 // Central domain only — kelola platform/SaaS (BUKAN data operasional tenant).

@@ -71,8 +71,12 @@ class TenantPanelProvider extends PanelProvider
             ->passwordReset()
             ->profile()
             ->spa()
+            ->viteTheme('resources/css/filament/pesantren/theme.css')
+            ->brandLogo(fn () => view('filament.brand'))
+            ->brandLogoHeight('2.25rem')
             ->colors([
-                'primary' => Color::Sky,
+                'primary' => Color::Emerald,
+                'gray' => Color::Slate,
             ])
             ->resources([
                 // Core tenant
