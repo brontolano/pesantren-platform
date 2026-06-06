@@ -9,6 +9,7 @@
  */
 import { computed } from 'vue'
 import UiIcon from './UiIcon.vue'
+import IslamicPattern from './IslamicPattern.vue'
 
 const props = defineProps({
     icon: { type: String, default: 'inbox' },
@@ -24,6 +25,7 @@ const tones = {
         circle: 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-400 ring-white',
         title: 'text-slate-800',
         message: 'text-slate-500',
+        pattern: '#94a3b8', // slate-400
     },
     emerald: {
         wrap: 'bg-emerald-50/50 ring-emerald-100',
@@ -31,6 +33,7 @@ const tones = {
         circle: 'bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-600 ring-white',
         title: 'text-emerald-800',
         message: 'text-emerald-700/80',
+        pattern: '#059669', // emerald-600
     },
 }
 const t = computed(() => tones[props.tone] ?? tones.slate)
@@ -46,6 +49,13 @@ const t = computed(() => tones[props.tone] ?? tones.slate)
             class="pointer-events-none absolute -top-10 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full blur-3xl opacity-60"
             :class="t.halo"
         />
+        <!-- Medali pola geometris islami lembut di belakang ikon -->
+        <span
+            aria-hidden="true"
+            class="pointer-events-none absolute left-1/2 top-[1.35rem] h-28 w-28 -translate-x-1/2 overflow-hidden rounded-full [mask-image:radial-gradient(circle,#000_38%,transparent_72%)]"
+        >
+            <IslamicPattern :color="t.pattern" :opacity="0.14" :size="34" />
+        </span>
         <span
             class="relative flex h-16 w-16 items-center justify-center rounded-2xl ring-4 shadow-soft"
             :class="t.circle"

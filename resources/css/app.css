@@ -46,6 +46,12 @@
     --wali-accent: #14b8a6;         /* teal-500 */
     --wali-accent-soft: #99f6e4;    /* teal-200 */
 
+    /* === AKSEN EMAS ISLAMI (muted gold) ===
+       Dipakai untuk ornamen halus (hairline, bintang-bulan sabit, divider).
+       Tenang & elegan — bukan emas mengkilap. */
+    --wali-gold: #c9a24a;           /* muted gold — aksen ornamental */
+    --wali-gold-soft: #e7d3a1;      /* gold lembut — highlight/halo */
+
     /* Shadow SANGAT lembut (minimalis, bukan glow berat). */
     --shadow-soft: 0 6px 24px -16px rgba(17, 17, 17, 0.18);
     --shadow-soft-lg: 0 16px 44px -24px rgba(17, 17, 17, 0.22);
@@ -82,4 +88,15 @@ html {
 }
 .shadow-brand {
     box-shadow: var(--shadow-brand);
+}
+/* Hairline emas islami — garis tipis gradient emas (fade di tepi), aksen ornamen. */
+.bg-gold-hairline {
+    background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(201, 162, 74, 0) 8%,
+        var(--wali-gold) 50%,
+        rgba(201, 162, 74, 0) 92%,
+        transparent 100%
+    );
 }

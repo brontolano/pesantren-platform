@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import IslamicPattern from './IslamicPattern.vue'
 
 /**
  * UiCard — permukaan dasar premium.
@@ -56,6 +57,8 @@ const dividerClass = computed(() =>
     <div :class="rootClass">
         <!-- Aksen highlight tipis untuk hero (minimalis, bukan glow berat) -->
         <template v-if="isHero">
+            <!-- Tekstur islami subtil agar semua kartu hero konsisten -->
+            <IslamicPattern :color="'#ffffff'" :opacity="0.05" :size="54" />
             <span
                 aria-hidden="true"
                 class="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-white/10 blur-2xl"

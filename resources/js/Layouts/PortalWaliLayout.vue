@@ -4,6 +4,8 @@ import { Head, Link, usePage } from '@inertiajs/vue3'
 import UiIcon from '@/Components/Ui/UiIcon.vue'
 import FlashToast from '@/Components/Ui/FlashToast.vue'
 import Chip from '@/Components/Ui/Chip.vue'
+import IslamicPattern from '@/Components/Ui/IslamicPattern.vue'
+import MosqueSilhouette from '@/Components/Ui/MosqueSilhouette.vue'
 
 // Peta ikon bottom-nav (presentasional; selaras dengan key dari backend).
 const navIcons = {
@@ -228,10 +230,19 @@ onBeforeUnmount(() => {
             <header class="relative z-20">
                 <!-- HERO PIXIO: emerald solid-elegan, ringan, sudut bawah membulat — minim glow -->
                 <div class="relative overflow-hidden rounded-b-[2.25rem] bg-brand-grad-hero px-4 pb-6 pt-[calc(env(safe-area-inset-top)+1.25rem)] text-white shadow-soft">
+                    <!-- Tekstur islami (bintang 8-titik girih) di belakang teks — sangat subtil -->
+                    <IslamicPattern :color="'#ffffff'" :opacity="0.05" :size="58" class="z-0" />
                     <!-- Aksen highlight tipis (bukan glow berat) -->
-                    <span aria-hidden="true" class="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+                    <span aria-hidden="true" class="pointer-events-none absolute -right-16 -top-20 z-0 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+                    <!-- Siluet masjid menempel halus di dasar hero (putih low-opacity) -->
+                    <MosqueSilhouette
+                        class="absolute inset-x-0 bottom-0 z-0 h-24 text-white/[0.08]"
+                        aria-hidden="true"
+                    />
+                    <!-- Hairline emas islami di tepi bawah hero -->
+                    <span aria-hidden="true" class="bg-gold-hairline pointer-events-none absolute inset-x-10 bottom-0 z-0 h-px opacity-50" />
 
-                    <div class="relative">
+                    <div class="relative z-10">
                         <div
                             v-if="isOffline"
                             class="mb-4 flex items-start gap-2.5 rounded-2xl bg-white/15 px-4 py-3 text-sm font-medium text-white ring-1 ring-inset ring-white/20 backdrop-blur-sm"
@@ -243,7 +254,20 @@ onBeforeUnmount(() => {
 
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
-                                <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-50/90">
+                                <p class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-50/90">
+                                    <!-- Aksen emas: bulan sabit + bintang kecil di sisi nama brand -->
+                                    <svg
+                                        aria-hidden="true"
+                                        viewBox="0 0 16 16"
+                                        class="h-3 w-3 shrink-0"
+                                        fill="none"
+                                        stroke="var(--wali-gold,#c9a24a)"
+                                        stroke-width="1.2"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M9.4 2.2A5.2 5.2 0 1 0 13 11a4 4 0 1 1 -3.6 -8.8 Z" fill="var(--wali-gold,#c9a24a)" stroke="none" />
+                                        <path d="M13.6 3 L14.3 4.6 L16 5 L14.3 5.4 L13.6 7 L12.9 5.4 L11.2 5 L12.9 4.6 Z" fill="var(--wali-gold,#c9a24a)" stroke="none" />
+                                    </svg>
                                     Portal Wali
                                 </p>
                                 <h1 class="mt-1.5 text-[1.75rem] font-bold leading-tight tracking-tight">

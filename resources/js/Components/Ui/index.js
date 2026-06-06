@@ -18,3 +18,7 @@ export { default as FlashToast } from './FlashToast.vue'
 export { default as IconCircle } from './IconCircle.vue'
 export { default as StatCard } from './StatCard.vue'
 export { default as Chip } from './Chip.vue'
+// Ornamen / dekorasi islami (SVG)
+export { default as IslamicPattern } from './IslamicPattern.vue'
+export { default as MosqueSilhouette } from './MosqueSilhouette.vue'
+export { default as OrnamentDivider } from './OrnamentDivider.vue'
