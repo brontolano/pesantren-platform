@@ -179,6 +179,27 @@ services:
     networks:
       - internal
 
+  # ── Object storage S3-compatible (MinIO) — File Storage #43 ──
+  # API internal http://minio:9000 (dipakai disk 's3' app). Console :9001.
+  # CATATAN: data di disk VPS yang sama (uji jalur S3, bukan ekspansi kapasitas).
+  minio:
+    image: minio/minio:latest
+    container_name: pesantren-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-pesantrenminio}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD in .env}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - internal
+
 volumes:
   postgres_data:
   redis_data:
@@ -187,6 +208,7 @@ volumes:
   caddy_config:
   n8n_data:
   waha_sessions:
+  minio_data:
 
 networks:
   internal:

@@ -12,6 +12,7 @@
         "laravel/framework": "^13.8",
         "laravel/sanctum": "*",
         "laravel/tinker": "^3.0",
+        "league/flysystem-aws-s3-v3": "^3.0",
         "nwidart/laravel-modules": "*",
         "spatie/laravel-permission": "*",
         "stancl/tenancy": "*"

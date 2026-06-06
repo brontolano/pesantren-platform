@@ -1,5 +1,9 @@
 # Auto-Backlog Loop — State
 
+## File Storage #43 (object storage MinIO) — sedang dikerjakan
+- #30 (code): tambah `league/flysystem-aws-s3-v3`+aws-sdk (composer) + service `minio` di docker-compose (api minio:9000). Sisa (VPS): set env AWS_*/MINIO_* di .env, up minio, buat bucket, verifikasi `Storage::disk('s3')` r/w. Flip `MEDIA_OBJECT_STORAGE=true` = keputusan akhir (redirect media baru ke MinIO).
+
+
 Pekerja otonom backlog (interval 10 menit, bergiliran). **Pagar pengaman:**
 branch `auto/backlog` saja · TIDAK push ke `main` · TIDAK deploy · 1 increment + test
 per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputusan Hamdan.
