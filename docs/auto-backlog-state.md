@@ -19,7 +19,9 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
   - #16 ERP **verifikasi dokumen**: aksi Verifikasi/Tolak + kolom status di CalonSantriDokumenResource (set verified/rejected + verified_at/by + catatan).
   - #17 ERP **verifikasi bukti bayar**: `TagihanPpdbResource` baru (panel tenant, group PPDB) — list tagihan + aksi Konfirmasi Lunas / Tolak Bukti.
   - #18 **serving file aman**: `PpdbFileController` (stream dokumen/bukti dari disk privat + cek auth: panitia semua, peserta miliknya) + route `ppdb.file.*` + link "Lihat" di TagihanPpdbResource, CalonSantriDokumenResource & halaman Berkas peserta.
-  - SISA: authoring bank soal Filament (`SoalUjian`) → lalu finalisasi (merge+deploy+migrate). Sisa butuh-keputusan: nilai ujian ke peserta, jadwal/kartu ujian (model), daftar-ulang→Santri.
+  - #19 ERP **authoring bank soal**: `SoalUjianResource` Filament (CRUD SoalUjian: kategori, pertanyaan, tipe pg/essay, pilihan KeyValue, kunci, bobot, aktif) + Pages List/Create/Edit. Gate manage_santri.
+  - **FASE 3 SELESAI (feasible)** → finalisasi: merge auto/backlog→main + deploy + tenants:migrate.
+  - SISA butuh-keputusan Hamdan: tampilkan nilai ujian ke peserta · model jadwal/kartu ujian · daftar-ulang→Santri · fitur PWA Wali baru.
 
 ## FASE 2 — PWA front-end — **LOOP BERHENTI @ iterasi #15**
 - 4 increment PWA Peserta selesai (Berkas, Pengumuman, Tagihan, + taut Dashboard). Build hijau.
