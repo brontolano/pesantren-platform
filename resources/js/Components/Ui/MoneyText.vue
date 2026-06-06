@@ -40,8 +40,8 @@ const sizes = {
     sm: 'text-sm',
     md: 'text-base',
     lg: 'text-xl',
-    xl: 'text-3xl',
-    '2xl': 'text-4xl',
+    xl: 'text-[2rem] leading-none',
+    '2xl': 'text-[2.75rem] leading-none',
 }
 
 const tones = {
@@ -52,9 +52,12 @@ const tones = {
     inherit: '',
 }
 
+// Nominal besar (xl/2xl) -> extra-bold untuk karakter fintech premium.
+const big = computed(() => props.size === 'xl' || props.size === '2xl')
+
 const cls = computed(() => [
     'tabular-nums tracking-tight',
-    props.strong ? 'font-bold' : 'font-semibold',
+    big.value ? 'font-extrabold' : props.strong ? 'font-bold' : 'font-semibold',
     sizes[props.size] ?? sizes.md,
     tones[props.tone] ?? tones.default,
 ])

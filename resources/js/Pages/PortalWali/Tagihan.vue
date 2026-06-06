@@ -9,6 +9,9 @@ import {
     StatusBadge,
     MoneyText,
     EmptyState,
+    StatCard,
+    IconCircle,
+    UiIcon,
 } from '@/Components/Ui'
 
 defineOptions({
@@ -60,18 +63,23 @@ const totalTagihan = computed(() =>
 
         <!-- HERO -->
         <UiCard variant="hero-dark" padding="lg">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
-                Tagihan
-            </p>
-            <h2 class="mt-2 text-2xl font-bold leading-tight">
-                {{ child.nama }}
-            </h2>
-            <p class="mt-1 text-sm text-white/80">
-                {{ child.kelas || 'Belum ada kelas' }}
-            </p>
+            <div class="flex items-start gap-3">
+                <IconCircle icon="receipt" variant="glass" size="md" />
+                <div class="min-w-0">
+                    <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
+                        Tagihan
+                    </p>
+                    <h2 class="mt-1 truncate text-2xl font-extrabold leading-tight tracking-tight">
+                        {{ child.nama }}
+                    </h2>
+                    <p class="mt-1 text-sm text-white/80">
+                        {{ child.kelas || 'Belum ada kelas' }}
+                    </p>
+                </div>
+            </div>
 
             <div class="mt-5 rounded-2xl bg-white/10 px-4 py-4 ring-1 ring-inset ring-white/15">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+                <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
                     Total yang perlu dibayar
                 </p>
                 <MoneyText
@@ -80,8 +88,27 @@ const totalTagihan = computed(() =>
                     tone="inherit"
                     class="mt-1 block text-white"
                 />
+                <p class="mt-1.5 text-xs font-medium text-white/70">
+                    {{ unpaidBills.length }} tagihan menunggu pembayaran
+                </p>
             </div>
         </UiCard>
+
+        <!-- RINGKASAN STAT -->
+        <section v-if="bills.length" class="grid grid-cols-2 gap-3">
+            <StatCard label="Belum Lunas" icon="receipt" tone="rose">
+                <template #value>
+                    <MoneyText :amount="totalTagihan" size="lg" tone="rose" />
+                </template>
+            </StatCard>
+            <StatCard
+                label="Total Tagihan"
+                icon="document"
+                tone="slate"
+                :value="String(bills.length)"
+                hint="Termasuk yang sudah lunas"
+            />
+        </section>
 
         <!-- DAFTAR TAGIHAN -->
         <SectionCard
@@ -99,20 +126,33 @@ const totalTagihan = computed(() =>
                     :subtitle="bill.keterangan || 'Tidak ada keterangan'"
                     chevron
                 >
+                    <template #leading>
+                        <IconCircle
+                            icon="receipt"
+                            :tone="bill.status === 'lunas' ? 'emerald' : bill.status === 'sebagian' ? 'amber' : 'rose'"
+                            size="md"
+                        />
+                    </template>
                     <template #trailing>
                         <StatusBadge :status="bill.status" size="sm" />
                     </template>
 
                     <div class="flex items-end justify-between gap-3">
                         <div>
-                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            <p class="text-[11px] font-bold uppercase tracking-wide text-slate-400">
                                 Sisa tagihan
                             </p>
-                            <MoneyText :amount="bill.sisaTagihan" size="lg" class="mt-0.5 block" />
+                            <MoneyText
+                                :amount="bill.sisaTagihan"
+                                size="lg"
+                                :tone="bill.status === 'lunas' ? 'emerald' : 'default'"
+                                class="mt-0.5 block"
+                            />
                         </div>
-                        <p class="text-xs text-slate-500">
-                            Jatuh tempo {{ bill.jatuhTempo || '-' }}
-                        </p>
+                        <div class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">
+                            <UiIcon name="calendar" class="h-3.5 w-3.5" />
+                            {{ bill.jatuhTempo || '-' }}
+                        </div>
                     </div>
                 </ListRow>
             </div>

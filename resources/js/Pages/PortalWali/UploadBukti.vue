@@ -9,6 +9,8 @@ import {
     UiButton,
     MoneyText,
     UiIcon,
+    StatCard,
+    IconCircle,
 } from '@/Components/Ui'
 
 defineOptions({
@@ -78,22 +80,47 @@ function submit() {
 
         <!-- HERO -->
         <UiCard variant="hero-dark" padding="lg">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/60">
-                Unggah bukti
-            </p>
-            <h2 class="mt-2 text-2xl font-bold leading-tight">
-                {{ bill.jenisTagihan }}
-            </h2>
-            <p class="mt-2 flex flex-wrap items-center gap-x-1.5 text-sm text-white/75">
-                <span>Untuk {{ child.nama }} · Sisa</span>
+            <div class="flex items-start gap-3">
+                <IconCircle icon="upload" variant="glass" size="lg" />
+                <div class="min-w-0 flex-1">
+                    <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
+                        Unggah bukti
+                    </p>
+                    <h2 class="mt-1 text-2xl font-extrabold leading-tight tracking-tight">
+                        {{ bill.jenisTagihan }}
+                    </h2>
+                    <p class="mt-1 text-sm text-white/75">
+                        Untuk {{ child.nama }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-4 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+                <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
+                    Sisa yang harus dibayar
+                </p>
                 <MoneyText
                     :amount="bill.sisaTagihan"
-                    size="sm"
+                    size="xl"
                     tone="inherit"
-                    class="text-white"
+                    class="mt-1 block text-white"
                 />
-            </p>
+            </div>
         </UiCard>
+
+        <!-- RINGKASAN -->
+        <section class="grid grid-cols-2 gap-3">
+            <StatCard label="Tagihan" icon="receipt" tone="rose" compact>
+                <template #value>
+                    <MoneyText :amount="bill.sisaTagihan" size="lg" tone="rose" />
+                </template>
+            </StatCard>
+            <StatCard label="Yang Dibayar" icon="wallet" tone="emerald" compact>
+                <template #value>
+                    <MoneyText :amount="form.nominal" size="lg" tone="emerald" />
+                </template>
+            </StatCard>
+        </section>
 
         <!-- FORM -->
         <UiCard padding="lg">
@@ -120,8 +147,8 @@ function submit() {
                                 v-model="form.metode"
                                 :aria-describedby="describedby"
                                 :aria-invalid="invalid || undefined"
-                                class="min-h-[44px] w-full appearance-none rounded-xl bg-white py-3 pl-4 pr-10 text-sm text-slate-900 ring-1 ring-inset transition focus:outline-none focus:ring-2"
-                                :class="invalid ? 'ring-rose-300 focus:ring-rose-500' : 'ring-slate-200 focus:ring-[var(--wali-primary,#059669)]'"
+                                class="min-h-[48px] w-full appearance-none rounded-2xl bg-white py-3 pl-4 pr-11 text-sm font-medium text-slate-900 ring-1 ring-inset transition-all duration-200 focus:outline-none focus:ring-2"
+                                :class="invalid ? 'ring-rose-300 focus:ring-rose-500' : 'ring-slate-200 hover:ring-slate-300 focus:ring-[var(--wali-primary,#059669)]'"
                             >
                                 <option
                                     v-for="metode in metodePembayaran"
@@ -133,7 +160,7 @@ function submit() {
                             </select>
                             <UiIcon
                                 name="chevron-down"
-                                class="pointer-events-none absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+                                class="pointer-events-none absolute right-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
                             />
                         </div>
                     </template>
@@ -167,7 +194,7 @@ function submit() {
                 <UiField label="Foto bukti transfer" :error="form.errors.bukti_pembayaran">
                     <template #default="{ describedby }">
                         <label
-                            class="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-7 text-center transition hover:border-emerald-300 hover:bg-emerald-50/40 focus-within:ring-2 focus-within:ring-[var(--wali-primary,#059669)]"
+                            class="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-4 py-8 text-center transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-50/40 focus-within:border-emerald-300 focus-within:ring-2 focus-within:ring-[var(--wali-primary,#059669)]"
                         >
                             <input
                                 type="file"
@@ -180,20 +207,24 @@ function submit() {
                                 v-if="previewUrl"
                                 :src="previewUrl"
                                 alt="Pratinjau bukti"
-                                class="max-h-56 rounded-xl object-contain"
+                                class="max-h-56 rounded-2xl object-contain ring-1 ring-slate-100"
                             >
                             <template v-else>
-                                <span class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                                    <UiIcon name="camera" class="h-6 w-6" />
-                                </span>
-                                <span class="mt-3 text-sm font-semibold text-emerald-700">Pilih foto</span>
+                                <IconCircle
+                                    icon="camera"
+                                    tone="emerald"
+                                    variant="gradient"
+                                    size="lg"
+                                    class="transition-transform duration-200 group-hover:scale-105"
+                                />
+                                <span class="mt-3 text-sm font-bold text-emerald-700">Pilih foto</span>
                                 <span class="mt-1 text-xs font-normal text-slate-500">
                                     Ambil dari galeri atau kamera (maks. 2 MB)
                                 </span>
                             </template>
                         </label>
-                        <p v-if="previewUrl" class="mt-1.5 flex items-center gap-1 text-xs font-normal text-slate-500">
-                            <UiIcon name="upload" class="h-3.5 w-3.5" />
+                        <p v-if="previewUrl" class="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                            <UiIcon name="upload" class="h-3.5 w-3.5 text-emerald-600" />
                             Ketuk gambar untuk mengganti foto.
                         </p>
                     </template>

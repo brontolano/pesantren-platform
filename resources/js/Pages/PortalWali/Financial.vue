@@ -9,6 +9,8 @@ import {
     MoneyText,
     UiButton,
     EmptyState,
+    StatCard,
+    IconCircle,
 } from '@/Components/Ui'
 
 defineOptions({
@@ -45,40 +47,47 @@ defineProps({
             <title>Keuangan Santri</title>
         </Head>
 
-        <UiCard variant="hero-dark">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
-                Keuangan
-            </p>
-            <h2 class="mt-2 text-2xl font-bold leading-tight">
-                {{ child.nama }}
-            </h2>
-            <p class="mt-1 text-sm text-white/75">
-                {{ child.kelas || 'Belum ada kelas' }}
-            </p>
-        </UiCard>
+        <UiCard variant="hero-dark" padding="lg">
+            <div class="flex items-start gap-3.5">
+                <IconCircle icon="user" variant="glass" size="lg" />
+                <div class="min-w-0 flex-1">
+                    <p class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-white/70">
+                        <span class="h-1.5 w-1.5 rounded-full bg-white/80" />
+                        Keuangan
+                    </p>
+                    <h2 class="mt-1.5 truncate text-2xl font-extrabold leading-tight tracking-tight">
+                        {{ child.nama }}
+                    </h2>
+                    <p class="mt-0.5 truncate text-sm text-white/75">
+                        {{ child.kelas || 'Belum ada kelas' }}
+                    </p>
+                </div>
+            </div>
 
-        <section id="tabungan" class="grid scroll-mt-36 grid-cols-2 gap-3">
-            <UiCard padding="sm">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Outstanding
+            <div class="mt-5 rounded-2xl bg-white/10 px-4 py-4 ring-1 ring-inset ring-white/15">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-white/70">
+                    Total kewajiban
                 </p>
                 <MoneyText
                     :amount="summary.totalOutstanding"
                     size="xl"
-                    class="mt-2 block"
+                    tone="inherit"
+                    class="mt-1.5 block text-white"
                 />
-            </UiCard>
-            <UiCard padding="sm">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                    Saldo Tabungan
-                </p>
-                <MoneyText
-                    :amount="savings.saldo"
-                    size="xl"
-                    tone="emerald"
-                    class="mt-2 block"
-                />
-            </UiCard>
+            </div>
+        </UiCard>
+
+        <section id="tabungan" class="grid scroll-mt-36 grid-cols-2 gap-3">
+            <StatCard label="Outstanding" icon="receipt" tone="rose" hint="Belum terbayar">
+                <template #value>
+                    <MoneyText :amount="summary.totalOutstanding" size="lg" tone="rose" />
+                </template>
+            </StatCard>
+            <StatCard label="Saldo Tabungan" icon="wallet" tone="emerald" hint="Siap dipakai">
+                <template #value>
+                    <MoneyText :amount="savings.saldo" size="lg" tone="emerald" />
+                </template>
+            </StatCard>
         </section>
 
         <SectionCard
@@ -94,13 +103,16 @@ defineProps({
                     padding="sm"
                 >
                     <div class="flex items-start justify-between gap-3">
-                        <div class="min-w-0">
-                            <h4 class="text-[15px] font-semibold text-slate-900">
-                                {{ bill.jenisTagihan }}
-                            </h4>
-                            <p class="mt-0.5 text-sm text-slate-500">
-                                {{ bill.keterangan || '-' }}
-                            </p>
+                        <div class="flex min-w-0 items-start gap-3">
+                            <IconCircle icon="receipt" tone="slate" size="md" />
+                            <div class="min-w-0">
+                                <h4 class="text-[15px] font-bold tracking-tight text-slate-900">
+                                    {{ bill.jenisTagihan }}
+                                </h4>
+                                <p class="mt-0.5 text-sm text-slate-500">
+                                    {{ bill.keterangan || '-' }}
+                                </p>
+                            </div>
                         </div>
                         <div class="shrink-0 text-right">
                             <StatusBadge :status="bill.status" size="sm" />
@@ -114,7 +126,7 @@ defineProps({
 
                     <dl class="mt-3 grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
                         <div>
-                            <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                            <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                 Sisa
                             </dt>
                             <dd class="mt-0.5">
@@ -122,7 +134,7 @@ defineProps({
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                            <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                 Dibayar
                             </dt>
                             <dd class="mt-0.5">
@@ -130,10 +142,10 @@ defineProps({
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                            <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                 Jatuh tempo
                             </dt>
-                            <dd class="mt-0.5 text-sm font-semibold tabular-nums text-slate-700">
+                            <dd class="mt-0.5 text-sm font-bold tabular-nums text-slate-700">
                                 {{ bill.jatuhTempo || '-' }}
                             </dd>
                         </div>
@@ -183,6 +195,9 @@ defineProps({
                     :title="payment.tagihan || 'Pembayaran'"
                     :subtitle="`${payment.tanggalPembayaran || '-'} · ${payment.metode || '-'}`"
                 >
+                    <template #leading>
+                        <IconCircle icon="check-circle" tone="emerald" size="md" />
+                    </template>
                     <template #trailing>
                         <MoneyText :amount="payment.nominal" tone="emerald" size="md" />
                     </template>

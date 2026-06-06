@@ -8,6 +8,7 @@ import {
     MoneyText,
     UiButton,
     EmptyState,
+    IconCircle,
 } from '@/Components/Ui'
 
 defineOptions({
@@ -56,22 +57,25 @@ const canPay = computed(() => props.bill.status === 'belum_bayar' || props.bill.
         <!-- HERO -->
         <UiCard variant="hero-dark" padding="lg">
             <div class="flex items-start justify-between gap-3">
-                <div class="min-w-0">
-                    <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
-                        Detail tagihan
-                    </p>
-                    <h2 class="mt-2 text-2xl font-bold leading-tight">
-                        {{ bill.jenisTagihan }}
-                    </h2>
-                    <p class="mt-1 text-sm text-white/80">
-                        Untuk {{ child.nama }}
-                    </p>
+                <div class="flex min-w-0 items-start gap-3">
+                    <IconCircle icon="receipt" variant="glass" size="md" />
+                    <div class="min-w-0">
+                        <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
+                            Detail tagihan
+                        </p>
+                        <h2 class="mt-1 text-2xl font-extrabold leading-tight tracking-tight">
+                            {{ bill.jenisTagihan }}
+                        </h2>
+                        <p class="mt-1 text-sm text-white/80">
+                            Untuk {{ child.nama }}
+                        </p>
+                    </div>
                 </div>
                 <StatusBadge :status="bill.status" size="sm" class="shrink-0" />
             </div>
 
             <div class="mt-5 rounded-2xl bg-white/10 px-4 py-4 ring-1 ring-inset ring-white/15">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+                <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
                     Sisa yang harus dibayar
                 </p>
                 <MoneyText
@@ -85,39 +89,44 @@ const canPay = computed(() => props.bill.status === 'belum_bayar' || props.bill.
 
         <!-- RINCIAN -->
         <UiCard padding="none">
-            <div class="px-5 pt-5">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+            <div class="flex items-center gap-2.5 px-5 pt-5">
+                <span class="h-1.5 w-1.5 rounded-full bg-brand-grad" />
+                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                     Rincian
                 </p>
             </div>
             <dl class="mt-2 divide-y divide-slate-100">
-                <div class="flex items-center justify-between gap-3 px-5 py-3">
+                <div class="flex items-center justify-between gap-3 px-5 py-3.5">
                     <dt class="text-sm text-slate-500">Keterangan</dt>
-                    <dd class="text-right text-sm font-medium text-slate-900">
+                    <dd class="text-right text-sm font-semibold text-slate-900">
                         {{ bill.keterangan || '-' }}
                     </dd>
                 </div>
-                <div class="flex items-center justify-between gap-3 px-5 py-3">
+                <div class="flex items-center justify-between gap-3 px-5 py-3.5">
                     <dt class="text-sm text-slate-500">Total tagihan</dt>
                     <dd class="text-right">
                         <MoneyText :amount="bill.nominalAkhir" size="sm" />
                     </dd>
                 </div>
-                <div class="flex items-center justify-between gap-3 px-5 py-3">
+                <div class="flex items-center justify-between gap-3 px-5 py-3.5">
                     <dt class="text-sm text-slate-500">Sudah dibayar</dt>
                     <dd class="text-right">
                         <MoneyText :amount="bill.totalDibayar" size="sm" tone="emerald" />
                     </dd>
                 </div>
-                <div class="flex items-center justify-between gap-3 bg-slate-50/60 px-5 py-3.5">
-                    <dt class="text-sm font-semibold text-slate-700">Sisa tagihan</dt>
+                <div class="flex items-center justify-between gap-3 bg-slate-50/60 px-5 py-4">
+                    <dt class="text-sm font-bold tracking-tight text-slate-700">Sisa tagihan</dt>
                     <dd class="text-right">
-                        <MoneyText :amount="bill.sisaTagihan" size="lg" />
+                        <MoneyText
+                            :amount="bill.sisaTagihan"
+                            size="lg"
+                            :tone="canPay ? 'default' : 'emerald'"
+                        />
                     </dd>
                 </div>
-                <div class="flex items-center justify-between gap-3 px-5 py-3">
+                <div class="flex items-center justify-between gap-3 px-5 py-3.5">
                     <dt class="text-sm text-slate-500">Jatuh tempo</dt>
-                    <dd class="text-right text-sm font-medium text-slate-900">
+                    <dd class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-sm font-semibold tabular-nums text-slate-600">
                         {{ bill.jatuhTempo || '-' }}
                     </dd>
                 </div>

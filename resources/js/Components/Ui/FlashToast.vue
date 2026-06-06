@@ -52,8 +52,8 @@ watch(
 
 const tone = computed(() =>
     current.value.type === 'error'
-        ? { ring: 'ring-rose-100', bg: 'bg-white', icon: 'x-circle', color: 'text-rose-600', bar: 'bg-rose-500' }
-        : { ring: 'ring-emerald-100', bg: 'bg-white', icon: 'check-circle', color: 'text-emerald-600', bar: 'bg-emerald-500' },
+        ? { ring: 'ring-rose-100', iconWrap: 'bg-rose-50 text-rose-600', icon: 'x-circle', bar: 'bg-gradient-to-b from-rose-400 to-rose-600' }
+        : { ring: 'ring-emerald-100', iconWrap: 'bg-emerald-50 text-emerald-600', icon: 'check-circle', bar: 'bg-brand-grad' },
 )
 
 function dismiss() {
@@ -70,15 +70,16 @@ function dismiss() {
                 class="fixed inset-x-0 top-3 z-[60] mx-auto flex w-full max-w-md justify-center px-4"
             >
                 <div
-                    class="flex w-full items-start gap-3 overflow-hidden rounded-2xl py-3 pl-3 pr-3 shadow-lg ring-1"
-                    :class="[tone.bg, tone.ring]"
+                    class="relative flex w-full items-start gap-3 overflow-hidden rounded-2xl bg-white/90 py-3 pl-4 pr-3 shadow-soft-lg ring-1 backdrop-blur-xl"
+                    :class="tone.ring"
                     role="status"
                     aria-live="polite"
                 >
-                    <span class="mt-0.5 shrink-0" :class="tone.color">
+                    <span aria-hidden="true" class="absolute inset-y-2 left-0 w-1 rounded-full" :class="tone.bar" />
+                    <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl" :class="tone.iconWrap">
                         <UiIcon :name="tone.icon" class="h-5 w-5" />
                     </span>
-                    <p class="flex-1 pt-0.5 text-sm font-medium leading-5 text-slate-800">
+                    <p class="flex-1 pt-1 text-sm font-semibold leading-5 text-slate-800">
                         {{ current.message }}
                     </p>
                     <button

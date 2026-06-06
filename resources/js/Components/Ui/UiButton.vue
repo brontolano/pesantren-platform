@@ -35,26 +35,27 @@ const tag = computed(() => {
 const isDisabled = computed(() => props.disabled || props.loading)
 
 const base =
-    'relative inline-flex items-center justify-center gap-2 font-semibold rounded-xl ' +
-    'transition-all duration-150 select-none ' +
+    'relative inline-flex items-center justify-center gap-2 font-bold tracking-tight rounded-2xl ' +
+    'transition-all duration-200 select-none active:scale-[.97] ' +
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ' +
-    'focus-visible:ring-offset-white disabled:cursor-not-allowed'
+    'focus-visible:ring-offset-white disabled:cursor-not-allowed disabled:active:scale-100'
 
 const sizes = {
-    sm: 'min-h-[40px] px-3.5 text-sm',
+    sm: 'min-h-[40px] px-4 text-sm',
     md: 'min-h-[44px] px-5 text-sm',
     lg: 'min-h-[52px] px-6 text-base',
 }
 
 const variants = {
+    // Primary = gradient brand + shadow lembut warna brand
     primary:
-        'bg-[var(--wali-primary,#059669)] text-white shadow-sm ' +
-        'hover:brightness-95 active:brightness-90 ' +
+        'bg-brand-grad text-white shadow-brand ' +
+        'hover:brightness-[1.03] hover:shadow-soft-lg active:brightness-95 ' +
         'focus-visible:ring-[var(--wali-primary,#059669)] ' +
-        'disabled:opacity-50',
+        'disabled:opacity-50 disabled:shadow-none',
     secondary:
-        'bg-white text-[var(--wali-primary,#059669)] ring-1 ring-inset ring-[var(--wali-primary,#059669)] ' +
-        'hover:bg-emerald-50 active:bg-emerald-100 ' +
+        'bg-white text-[var(--wali-primary,#059669)] ring-1 ring-inset ring-slate-200 shadow-soft ' +
+        'hover:bg-emerald-50/60 hover:ring-emerald-200 active:bg-emerald-100 ' +
         'focus-visible:ring-[var(--wali-primary,#059669)] ' +
         'disabled:opacity-50',
     ghost:
@@ -63,10 +64,11 @@ const variants = {
         'focus-visible:ring-slate-400 ' +
         'disabled:opacity-50',
     danger:
-        'bg-rose-500 text-white shadow-sm ' +
-        'hover:bg-rose-600 active:bg-rose-700 ' +
+        'text-white shadow-[0_10px_24px_-10px_rgba(244,63,94,0.55)] ' +
+        'bg-gradient-to-br from-rose-500 to-rose-600 ' +
+        'hover:brightness-[1.03] active:brightness-95 ' +
         'focus-visible:ring-rose-500 ' +
-        'disabled:opacity-50',
+        'disabled:opacity-50 disabled:shadow-none',
 }
 
 const classes = computed(() => [

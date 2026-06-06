@@ -49,18 +49,18 @@ onBeforeUnmount(() => {
         <Transition name="sheet-fade">
             <div
                 v-if="modelValue"
-                class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 backdrop-blur-sm"
+                class="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/50 backdrop-blur-md"
                 @click.self="close"
             >
                 <Transition name="sheet-slide" appear>
                     <div
                         v-if="modelValue"
-                        class="w-full max-w-md rounded-t-3xl bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl"
+                        class="w-full max-w-md rounded-t-[1.75rem] bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-24px_60px_-20px_rgba(2,6,23,0.30)] ring-1 ring-slate-100"
                         role="dialog"
                         aria-modal="true"
                     >
                         <div class="flex justify-center pt-3">
-                            <span class="h-1.5 w-10 rounded-full bg-slate-200" />
+                            <span class="h-1.5 w-11 rounded-full bg-slate-300/80" />
                         </div>
 
                         <div

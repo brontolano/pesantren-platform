@@ -1,11 +1,15 @@
+/* Tipografi premium Portal Wali — Plus Jakarta Sans (Google Fonts).
+   Harus mendahului semua aturan lain (selain @charset/@layer) agar tidak di-drop. */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    /* Default sans = Plus Jakarta Sans (premium), fallback Instrument Sans/system. */
+    --font-sans: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 /*
@@ -27,4 +31,46 @@
     --wali-bg: #f8fafc;             /* page bg (slate-50) */
     --wali-ink: #0f172a;            /* teks utama (slate-900) */
     --wali-muted: #64748b;          /* teks muted (slate-500) */
+
+    /* === PREMIUM TOKENS === */
+    /* Gradient brand 135deg: emerald-400 -> emerald-600 -> emerald-700 */
+    --brand-grad: linear-gradient(135deg, #34d399 0%, #059669 55%, #047857 100%);
+    /* Gradient hero gelap (header/kartu hero) — sedikit lebih dalam untuk teks putih */
+    --brand-grad-hero: linear-gradient(135deg, #10b981 0%, #059669 50%, #065f46 100%);
+    /* Aksen sekunder teal/cyan lembut */
+    --wali-accent: #14b8a6;         /* teal-500 */
+    --wali-accent-soft: #99f6e4;    /* teal-200 */
+
+    /* Shadow lembut berlapis (kartu & elemen melayang) */
+    --shadow-soft: 0 12px 40px -12px rgba(2, 6, 23, 0.12);
+    --shadow-soft-lg: 0 24px 60px -20px rgba(2, 6, 23, 0.20);
+    /* Shadow tombol gradient (warna brand) */
+    --shadow-brand: 0 10px 24px -10px rgba(5, 150, 105, 0.55);
+}
+
+/* Anti-aliasing & rendering teks lebih halus untuk feel premium. */
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/*
+ * Utilitas premium reusable (scoped via class — aman, tidak menyentuh Filament).
+ * Dipakai komponen Ui Portal Wali.
+ */
+.bg-brand-grad {
+    background-image: var(--brand-grad);
+}
+.bg-brand-grad-hero {
+    background-image: var(--brand-grad-hero);
+}
+.shadow-soft {
+    box-shadow: var(--shadow-soft);
+}
+.shadow-soft-lg {
+    box-shadow: var(--shadow-soft-lg);
+}
+.shadow-brand {
+    box-shadow: var(--shadow-brand);
 }

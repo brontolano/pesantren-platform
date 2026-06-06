@@ -14,3 +14,7 @@ export { default as SectionCard } from './SectionCard.vue'
 export { default as ListRow } from './ListRow.vue'
 export { default as MetodeCard } from './MetodeCard.vue'
 export { default as FlashToast } from './FlashToast.vue'
+// Komponen premium tambahan
+export { default as IconCircle } from './IconCircle.vue'
+export { default as StatCard } from './StatCard.vue'
+export { default as Chip } from './Chip.vue'

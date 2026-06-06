@@ -5,10 +5,11 @@ import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
 import {
     UiCard,
     SectionCard,
-    ListRow,
     StatusBadge,
     MoneyText,
     EmptyState,
+    StatCard,
+    IconCircle,
 } from '@/Components/Ui'
 
 defineOptions({
@@ -57,32 +58,35 @@ const pendingCount = computed(() => props.payments.filter((p) => !p.isVerified &
             <title>Pembayaran Saya</title>
         </Head>
 
-        <UiCard variant="hero-dark">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
+        <UiCard variant="hero-dark" padding="lg">
+            <p class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-white/70">
+                <span class="h-1.5 w-1.5 rounded-full bg-white/80" />
                 Pembayaran saya
             </p>
-            <h2 class="mt-2 text-2xl font-bold leading-tight">
+            <h2 class="mt-2.5 text-2xl font-extrabold leading-tight tracking-tight">
                 Status Pembayaran
             </h2>
-            <div class="mt-4 grid grid-cols-2 gap-3">
-                <div class="rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-inset ring-white/15">
-                    <p class="text-[11px] font-semibold uppercase tracking-wide text-white/60">
-                        Menunggu
+            <p class="mt-1 text-sm text-white/75">
+                Pantau verifikasi setoran yang Anda kirim.
+            </p>
+
+            <div class="mt-5 flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-inset ring-white/15">
+                <IconCircle icon="inbox" variant="glass" size="md" />
+                <div class="min-w-0">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-white/60">
+                        Total terkirim
                     </p>
-                    <p class="mt-1 text-3xl font-bold tabular-nums text-amber-300">
-                        {{ pendingCount }}
-                    </p>
-                </div>
-                <div class="rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-inset ring-white/15">
-                    <p class="text-[11px] font-semibold uppercase tracking-wide text-white/60">
-                        Terverifikasi
-                    </p>
-                    <p class="mt-1 text-3xl font-bold tabular-nums text-emerald-300">
-                        {{ verifiedCount }}
+                    <p class="text-2xl font-extrabold tabular-nums leading-tight">
+                        {{ payments.length }}
                     </p>
                 </div>
             </div>
         </UiCard>
+
+        <section class="grid grid-cols-2 gap-3">
+            <StatCard label="Menunggu" icon="clock" tone="amber" :value="pendingCount" hint="Diproses admin" />
+            <StatCard label="Terverifikasi" icon="check-circle" tone="emerald" :value="verifiedCount" hint="Sudah disetujui" />
+        </section>
 
         <SectionCard
             kicker="Riwayat"
@@ -96,7 +100,7 @@ const pendingCount = computed(() => props.payments.filter((p) => !p.isVerified &
                 >
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
-                            <h4 class="text-[15px] font-semibold text-slate-900">
+                            <h4 class="text-[15px] font-bold tracking-tight text-slate-900">
                                 {{ payment.tagihan || 'Pembayaran' }}
                             </h4>
                             <p v-if="payment.santriNama" class="mt-0.5 text-sm text-slate-500">
@@ -114,23 +118,26 @@ const pendingCount = computed(() => props.payments.filter((p) => !p.isVerified &
 
                     <div class="mt-3 flex items-end justify-between gap-3 border-t border-slate-100 pt-3">
                         <div>
-                            <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                                 {{ metodeLabel[payment.metode] || payment.metode || 'Pembayaran' }}
                             </p>
                             <MoneyText :amount="payment.nominal" size="lg" class="mt-1 block" />
                         </div>
-                        <p class="text-xs font-medium tabular-nums text-slate-500">
+                        <p class="text-xs font-semibold tabular-nums text-slate-500">
                             {{ payment.tanggalPembayaran || '-' }}
                         </p>
                     </div>
 
-                    <p
+                    <div
                         v-if="payment.alasanPenolakan"
-                        class="mt-3 rounded-xl bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700 ring-1 ring-inset ring-rose-100"
+                        class="mt-3 flex items-start gap-3 rounded-2xl bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-700 ring-1 ring-inset ring-rose-100"
                     >
-                        <span class="font-semibold">Alasan ditolak:</span>
-                        {{ payment.alasanPenolakan }}
-                    </p>
+                        <IconCircle icon="x-circle" tone="rose" size="sm" />
+                        <p class="min-w-0">
+                            <span class="font-bold">Alasan ditolak:</span>
+                            {{ payment.alasanPenolakan }}
+                        </p>
+                    </div>
                 </UiCard>
             </div>
 

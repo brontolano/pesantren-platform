@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
-import { UiCard, StatusBadge, MoneyText, UiField, UiInput, UiButton } from '@/Components/Ui'
+import { UiCard, StatusBadge, MoneyText, UiField, UiInput, UiButton, IconCircle } from '@/Components/Ui'
 
 defineOptions({
     layout: PortalWaliLayout,
@@ -73,14 +73,19 @@ function submit() {
         </Head>
 
         <!-- HERO -->
-        <UiCard variant="hero-dark">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
-                Bayar dari Saldo
-            </p>
-            <p class="mt-2 text-sm text-white/80">
-                {{ child.nama }} · {{ child.kelas || 'Belum ada kelas' }}
-            </p>
-            <p class="mt-4 text-[11px] font-semibold uppercase tracking-wide text-white/60">
+        <UiCard variant="hero-dark" padding="lg">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
+                        Bayar dari Saldo
+                    </p>
+                    <p class="mt-2 truncate text-sm text-white/80">
+                        {{ child.nama }} · {{ child.kelas || 'Belum ada kelas' }}
+                    </p>
+                </div>
+                <IconCircle icon="wallet" variant="glass" size="md" />
+            </div>
+            <p class="mt-5 text-[11px] font-bold uppercase tracking-wide text-white/60">
                 Saldo tabungan
             </p>
             <MoneyText :amount="saldo" size="xl" tone="inherit" class="mt-1 block text-white" />
@@ -90,7 +95,7 @@ function submit() {
         <UiCard padding="sm">
             <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
-                    <h4 class="text-base font-bold text-slate-900">
+                    <h4 class="text-base font-bold tracking-tight text-slate-900">
                         {{ bill.jenisTagihan }}
                     </h4>
                     <p class="mt-1 text-sm text-slate-500">
@@ -100,25 +105,23 @@ function submit() {
                 <StatusBadge :status="bill.status" size="sm" class="shrink-0" />
             </div>
             <div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
-                <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Sisa tagihan</span>
-                <MoneyText :amount="sisaTagihan" size="lg" />
+                <span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Sisa tagihan</span>
+                <MoneyText :amount="sisaTagihan" size="lg" tone="rose" />
             </div>
         </UiCard>
 
         <!-- BANNER SALDO KOSONG -->
         <UiCard v-if="!hasSaldo" variant="muted" padding="sm">
             <div class="flex items-start gap-3">
-                <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
-                </span>
-                <p class="text-sm text-amber-900">
+                <IconCircle icon="info" tone="amber" size="md" />
+                <p class="pt-0.5 text-sm font-medium text-amber-900">
                     Saldo tabungan masih kosong. Lakukan setor saldo terlebih dahulu untuk membayar tagihan dari saldo.
                 </p>
             </div>
         </UiCard>
 
         <!-- FORM BAYAR -->
-        <UiCard padding="sm">
+        <UiCard padding="lg">
             <form class="space-y-4" @submit.prevent="submit">
                 <UiField label="Nominal bayar" :error="form.errors.nominal">
                     <template #default="{ fieldId, describedby, invalid }">
@@ -137,20 +140,23 @@ function submit() {
                 </UiField>
 
                 <!-- Ringkasan saldo sebelum -> sesudah -->
-                <div class="rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-100">
-                    <div class="flex items-center justify-between text-sm text-slate-600">
+                <div class="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Ringkasan Pembayaran
+                    </p>
+                    <div class="mt-3 flex items-center justify-between text-sm font-medium text-slate-600">
                         <span>Saldo sebelum</span>
                         <MoneyText :amount="saldo" size="sm" />
                     </div>
-                    <div class="mt-2 flex items-center justify-between text-sm text-slate-600">
+                    <div class="mt-2 flex items-center justify-between text-sm font-medium text-slate-600">
                         <span>Nominal bayar</span>
                         <MoneyText :amount="form.nominal || 0" size="sm" tone="rose" sign="minus" />
                     </div>
-                    <div class="mt-2 flex items-center justify-between border-t border-dashed border-slate-200 pt-2 text-sm text-slate-600">
-                        <span>Saldo sesudah</span>
+                    <div class="mt-3 flex items-center justify-between border-t border-dashed border-slate-200 pt-3">
+                        <span class="text-sm font-semibold text-slate-700">Saldo sesudah</span>
                         <MoneyText
                             :amount="saldoSetelahBayar"
-                            size="sm"
+                            size="lg"
                             :tone="saldoSetelahBayar < 0 ? 'rose' : 'emerald'"
                         />
                     </div>

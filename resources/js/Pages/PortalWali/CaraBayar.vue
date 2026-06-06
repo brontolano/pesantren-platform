@@ -9,6 +9,7 @@ import {
     EmptyState,
     UiButton,
     MoneyText,
+    IconCircle,
 } from '@/Components/Ui'
 
 defineOptions({
@@ -71,17 +72,23 @@ async function copyValue(value) {
 
         <!-- HERO -->
         <UiCard variant="hero-dark" padding="lg">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/60">
-                Cara bayar
-            </p>
-            <h2 class="mt-2 text-2xl font-bold leading-tight">
-                {{ bill.jenisTagihan }}
-            </h2>
-            <p class="mt-1 text-sm text-white/75">
-                Untuk {{ child.nama }}
-            </p>
+            <div class="flex items-start gap-3">
+                <IconCircle icon="bank" variant="glass" size="lg" />
+                <div class="min-w-0 flex-1">
+                    <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
+                        Cara bayar
+                    </p>
+                    <h2 class="mt-1 text-2xl font-extrabold leading-tight tracking-tight">
+                        {{ bill.jenisTagihan }}
+                    </h2>
+                    <p class="mt-1 text-sm text-white/75">
+                        Untuk {{ child.nama }}
+                    </p>
+                </div>
+            </div>
+
             <div class="mt-4 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
-                <p class="text-[11px] font-semibold uppercase tracking-wide text-white/60">
+                <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
                     Jumlah yang harus ditransfer
                 </p>
                 <MoneyText

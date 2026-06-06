@@ -13,7 +13,8 @@ import {
     EmptyState,
     BottomSheet,
     StatusBadge,
-    UiIcon,
+    StatCard,
+    IconCircle,
 } from '@/Components/Ui'
 
 defineOptions({
@@ -129,15 +130,30 @@ const bayarSheetOpen = computed({
         </Head>
 
         <!-- HERO: kartu saldo besar -->
-        <UiCard variant="hero-dark">
-            <p class="text-[11px] font-semibold uppercase tracking-wide text-white/70">
-                Saldo Tabungan
+        <UiCard variant="hero-dark" padding="lg">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">
+                        Saldo Tabungan
+                    </p>
+                    <p class="mt-2 truncate text-sm text-white/80">
+                        {{ child.nama }} · {{ child.kelas || 'Belum ada kelas' }}
+                    </p>
+                </div>
+                <IconCircle icon="wallet" variant="glass" size="md" />
+            </div>
+            <MoneyText :amount="saldo" size="2xl" tone="inherit" class="mt-5 block text-white" />
+            <p class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-white/85 ring-1 ring-inset ring-white/15">
+                <span class="h-1.5 w-1.5 rounded-full" :class="hasSaldo ? 'bg-emerald-200' : 'bg-amber-200'" />
+                {{ hasSaldo ? 'Saldo siap dipakai' : 'Belum ada saldo' }}
             </p>
-            <p class="mt-2 text-sm text-white/80">
-                {{ child.nama }} · {{ child.kelas || 'Belum ada kelas' }}
-            </p>
-            <MoneyText :amount="saldo" size="2xl" tone="inherit" class="mt-4 block text-white" />
         </UiCard>
+
+        <!-- RINGKASAN -->
+        <section class="grid grid-cols-2 gap-3">
+            <StatCard label="Mutasi" icon="receipt" tone="teal" :value="String(transactions.length)" hint="riwayat tercatat" />
+            <StatCard label="Tagihan Aktif" icon="card" tone="amber" :value="String(bills.length)" hint="bisa dari saldo" />
+        </section>
 
         <!-- MUTASI -->
         <SectionCard kicker="Mutasi" title="Riwayat Tabungan" :flush="transactions.length > 0">
@@ -149,17 +165,11 @@ const bayarSheetOpen = computed({
                     :subtitle="trx.tanggal || '-'"
                 >
                     <template #leading>
-                        <span
-                            class="flex h-10 w-10 items-center justify-center rounded-full"
-                            :class="trx.tipe === 'setor'
-                                ? 'bg-emerald-50 text-emerald-600'
-                                : 'bg-rose-50 text-rose-600'"
-                        >
-                            <UiIcon
-                                :name="trx.tipe === 'setor' ? 'arrow-down-left' : 'arrow-up-right'"
-                                class="h-5 w-5"
-                            />
-                        </span>
+                        <IconCircle
+                            :icon="trx.tipe === 'setor' ? 'arrow-down-left' : 'arrow-up-right'"
+                            :tone="trx.tipe === 'setor' ? 'emerald' : 'rose'"
+                            size="md"
+                        />
                     </template>
                     <template #trailing>
                         <MoneyText
@@ -167,7 +177,7 @@ const bayarSheetOpen = computed({
                             :sign="trx.tipe === 'setor' ? 'plus' : 'minus'"
                             :tone="trx.tipe === 'setor' ? 'emerald' : 'rose'"
                         />
-                        <p class="mt-0.5 text-[11px] text-slate-400">
+                        <p class="mt-0.5 text-[11px] font-medium text-slate-400">
                             Saldo: {{ rupiah(trx.saldoSesudah) }}
                         </p>
                     </template>
@@ -248,10 +258,8 @@ const bayarSheetOpen = computed({
             <div class="space-y-3">
                 <UiCard v-if="!hasSaldo" variant="muted" padding="sm">
                     <div class="flex items-start gap-3">
-                        <span class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
-                        </span>
-                        <p class="text-sm text-amber-900">
+                        <IconCircle icon="info" tone="amber" size="md" />
+                        <p class="pt-0.5 text-sm font-medium text-amber-900">
                             Saldo tabungan masih kosong. Lakukan setor saldo terlebih dahulu untuk membayar tagihan dari saldo.
                         </p>
                     </div>
@@ -261,7 +269,7 @@ const bayarSheetOpen = computed({
                     <UiCard v-for="bill in bills" :key="bill.id" padding="sm">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
-                                <h4 class="text-base font-bold text-slate-900">
+                                <h4 class="text-base font-bold tracking-tight text-slate-900">
                                     {{ bill.jenisTagihan }}
                                 </h4>
                                 <p class="mt-1 text-sm text-slate-500">
@@ -271,8 +279,8 @@ const bayarSheetOpen = computed({
                             <StatusBadge :status="bill.status" size="sm" class="shrink-0" />
                         </div>
                         <div class="mt-3 flex items-center justify-between border-t border-slate-100 pt-3">
-                            <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Sisa tagihan</span>
-                            <MoneyText :amount="bill.sisaTagihan" size="lg" />
+                            <span class="text-[11px] font-bold uppercase tracking-wide text-slate-400">Sisa tagihan</span>
+                            <MoneyText :amount="bill.sisaTagihan" size="lg" tone="rose" />
                         </div>
 
                         <UiButton

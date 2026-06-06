@@ -27,16 +27,16 @@ const isTextarea = computed(() => props.type === 'textarea')
 const isFile = computed(() => props.type === 'file')
 
 const baseClass = computed(() => [
-    'w-full rounded-xl bg-white px-4 text-sm text-slate-900 transition',
-    'placeholder:text-slate-400',
-    'ring-1 ring-inset focus:outline-none focus:ring-2',
+    'w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 transition-all duration-200',
+    'placeholder:font-normal placeholder:text-slate-400',
+    'ring-1 ring-inset focus:outline-none focus:ring-2 focus:ring-offset-0',
     props.invalid
         ? 'ring-rose-300 focus:ring-rose-500'
-        : 'ring-slate-200 focus:ring-[var(--wali-primary,#059669)]',
+        : 'ring-slate-200 hover:ring-slate-300 focus:ring-[var(--wali-primary,#059669)]',
     props.disabled ? 'cursor-not-allowed bg-slate-50 text-slate-400' : '',
-    isTextarea.value ? 'py-3 leading-6' : 'min-h-[44px] py-3',
+    isTextarea.value ? 'py-3 leading-6' : 'min-h-[48px] py-3',
     isFile.value
-        ? 'file:mr-3 file:rounded-full file:border-0 file:bg-emerald-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-emerald-700'
+        ? 'file:mr-3 file:rounded-full file:border-0 file:bg-emerald-50 file:px-3.5 file:py-2 file:text-xs file:font-bold file:text-emerald-700'
         : '',
 ])
 
