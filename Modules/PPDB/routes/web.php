@@ -110,6 +110,8 @@ Route::middleware([
     Route::middleware('peserta')->group(function () {
         Route::get('/', [PesertaPortalController::class, 'dashboard'])
             ->name('dashboard');
+        Route::get('/berkas', [PesertaPortalController::class, 'berkas'])
+            ->name('berkas');
         Route::put('/biodata', [PesertaPortalController::class, 'updateBiodata'])
             ->name('biodata.update');
     });

@@ -13,6 +13,7 @@ use Inertia\Response;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Services\PpdbFormFieldConfigurationService;
 use Modules\PPDB\Services\PpdbStatusTrackingService;
+use Modules\PPDB\Support\PpdbDocumentTypes;
 
 class PesertaPortalController extends Controller
 {
@@ -42,6 +43,44 @@ class PesertaPortalController extends Controller
                 'path' => $tracking['tracking_path'],
                 'token' => $tracking['tracking_token'],
             ],
+        ]);
+    }
+
+    /**
+     * Halaman Berkas — checklist kelengkapan dokumen peserta (F2/DOC-4).
+     * Hanya-baca: menampilkan tipe dokumen wajib/opsional + status verifikasi
+     * tiap dokumen yang sudah diunggah. (Aksi unggah ditangani alur upload tim.)
+     */
+    public function berkas(Request $request): Response
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+        $uploaded = $calon->dokumen()->get()->keyBy('jenis_dokumen');
+
+        $items = [];
+        foreach (PpdbDocumentTypes::all() as $jenis => $meta) {
+            $doc = $uploaded->get($jenis);
+
+            $items[] = [
+                'jenis' => $jenis,
+                'label' => $meta['label'],
+                'wajib' => $meta['required'],
+                'terunggah' => $doc !== null,
+                'status' => $doc?->effectiveStatus(),
+                'statusLabel' => $doc?->statusLabel(),
+                'catatan' => $doc?->catatan_verifikasi,
+            ];
+        }
+
+        $kurangWajib = PpdbDocumentTypes::missingRequired($uploaded->keys()->all());
+
+        return Inertia::render('PPDB/Portal/Berkas', [
+            'nomorPendaftaran' => (string) $calon->nomor_pendaftaran,
+            'items' => $items,
+            'kurangWajib' => array_map(
+                static fn (string $k): string => PpdbDocumentTypes::label($k),
+                $kurangWajib,
+            ),
+            'lengkapWajib' => $kurangWajib === [],
         ]);
     }
 
