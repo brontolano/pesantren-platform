@@ -114,6 +114,8 @@ Route::middleware([
             ->name('berkas');
         Route::get('/pengumuman', [PesertaPortalController::class, 'pengumuman'])
             ->name('pengumuman');
+        Route::get('/tagihan', [PesertaPortalController::class, 'tagihan'])
+            ->name('tagihan');
         Route::put('/biodata', [PesertaPortalController::class, 'updateBiodata'])
             ->name('biodata.update');
     });

@@ -112,6 +112,37 @@ class PesertaPortalController extends Controller
         ]);
     }
 
+    /**
+     * Halaman Tagihan PPDB (F2/BILL) — hanya-baca. Menampilkan daftar tagihan
+     * peserta (TagihanPpdb) + ringkasan total/lunas/sisa. Aksi bayar & unggah
+     * bukti ditangani alur pembayaran tim.
+     */
+    public function tagihan(Request $request): Response
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+        $tagihan = $calon->tagihanPpdb()->orderBy('jatuh_tempo')->get();
+
+        $items = $tagihan->map(static fn ($t): array => [
+            'tipe' => (string) $t->tipe,
+            'nominal' => (float) $t->nominal,
+            'jatuhTempo' => $t->jatuh_tempo?->format('Y-m-d'),
+            'status' => (string) $t->status,
+            'keterangan' => (string) ($t->keterangan ?? ''),
+            'lunas' => $t->status === 'lunas',
+        ])->values()->all();
+
+        $totalTagihan = (float) $tagihan->sum('nominal');
+        $totalLunas = (float) $tagihan->where('status', 'lunas')->sum('nominal');
+
+        return Inertia::render('PPDB/Portal/Tagihan', [
+            'nomorPendaftaran' => (string) $calon->nomor_pendaftaran,
+            'items' => $items,
+            'totalTagihan' => $totalTagihan,
+            'totalLunas' => $totalLunas,
+            'sisa' => max(0, $totalTagihan - $totalLunas),
+        ]);
+    }
+
     public function updateBiodata(Request $request): RedirectResponse
     {
         $calon = $this->resolveOwnedCandidate($request->user());

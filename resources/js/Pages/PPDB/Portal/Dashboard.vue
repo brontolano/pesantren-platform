@@ -85,19 +85,25 @@ const submit = () => {
 
     <SpmbLayout>
         <div class="space-y-6">
-            <!-- Navigasi cepat (auto-backlog): akses halaman Berkas & Pengumuman -->
-            <section class="grid grid-cols-2 gap-3">
+            <!-- Navigasi cepat (auto-backlog): akses halaman Berkas, Pengumuman, Tagihan -->
+            <section class="grid grid-cols-3 gap-3">
                 <Link
                     href="/spmb/berkas"
-                    class="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
+                    class="flex flex-col items-center gap-1 rounded-2xl border border-stone-200 bg-white px-2 py-3 text-xs font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
                 >
-                    <span aria-hidden="true">📄</span> Berkas
+                    <span class="text-lg" aria-hidden="true">📄</span> Berkas
                 </Link>
                 <Link
                     href="/spmb/pengumuman"
-                    class="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
+                    class="flex flex-col items-center gap-1 rounded-2xl border border-stone-200 bg-white px-2 py-3 text-xs font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
                 >
-                    <span aria-hidden="true">📣</span> Pengumuman
+                    <span class="text-lg" aria-hidden="true">📣</span> Pengumuman
+                </Link>
+                <Link
+                    href="/spmb/tagihan"
+                    class="flex flex-col items-center gap-1 rounded-2xl border border-stone-200 bg-white px-2 py-3 text-xs font-medium text-stone-800 shadow-sm transition hover:border-[var(--spmb-primary)]"
+                >
+                    <span class="text-lg" aria-hidden="true">🧾</span> Tagihan
                 </Link>
             </section>
 
