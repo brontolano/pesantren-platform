@@ -16,7 +16,8 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 Keputusan: nilai=keputusan-only · daftar ulang=PENUH(→Santri+Wali) · kartu ujian=LENGKAP(model JadwalUjian+QR) · #103/#69=prep saja.
 - #20 **Notif WA #61**: PpdbWhatsappNotifier + method + wiring verifikasi dokumen/pembayaran.
 - #21 **Notif WA #64**: `sendPengumuman` ter-wire di `PpdbAdmissionDecisionService::decide()` (kirim WA saat keputusan lulus/cadangan/ditolak dipublikasikan).
-- Sisa: #63 JadwalUjian+kartu QR · #65 daftar ulang→Santri · #66 pengingat+timeline · #62/#67 test · #68 offline · #69 checklist · #70 smoke · #103 TWA config.
+- #22 **#63a**: model+migrasi `jadwal_ujian` + Filament `JadwalUjianResource` (CRUD admin jadwal per kategori).
+- Sisa: #63b kartu peserta `/spmb/kartu-ujian` (+QR client-side tanpa install) · #65 daftar ulang→Santri · #66 pengingat+timeline · #62/#67 test · #68 offline · #69 checklist · #70 smoke · #103 TWA config.
 
 ## FASE 3 — Selesaikan Modul PPDB + PWA PPDB (lalu deploy)
 - Berikutnya: verifikasi BUKTI BAYAR (panitia) → lalu authoring bank soal → sisa feasible → finalisasi (merge+deploy+migrate).
