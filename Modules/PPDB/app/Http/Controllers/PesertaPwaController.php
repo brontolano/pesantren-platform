@@ -152,6 +152,13 @@ self.addEventListener('fetch', (event) => {
         url.pathname.startsWith('/spmb/login') ||
         url.pathname.startsWith('/spmb/aktivasi') ||
         url.pathname.startsWith('/spmb/lupa-password') ||
+        url.pathname === '/spmb' ||
+        url.pathname === '/spmb/' ||
+        url.pathname.startsWith('/spmb/berkas') ||
+        url.pathname.startsWith('/spmb/pengumuman') ||
+        url.pathname.startsWith('/spmb/tagihan') ||
+        url.pathname.startsWith('/spmb/kartu-ujian') ||
+        url.pathname.startsWith('/spmb/daftar-ulang') ||
         url.pathname === '/spmb/manifest.json' ||
         url.pathname === '/spmb/icon.svg';
 
