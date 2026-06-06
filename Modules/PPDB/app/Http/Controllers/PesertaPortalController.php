@@ -3,6 +3,7 @@
 namespace Modules\PPDB\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Services\StorageQuotaService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -105,6 +106,11 @@ class PesertaPortalController extends Controller
             'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
+        // Batas kuota tenant: cegah over-penyimpanan di server.
+        if ($over = $this->kuotaTerlampaui((int) $request->file('file')->getSize())) {
+            return back()->withErrors(['file' => $over]);
+        }
+
         // Ganti dokumen jenis sama: buang baris lama (hindari duplikat di checklist).
         $calon->dokumen()
             ->where('jenis_dokumen', $validated['jenis_dokumen'])
@@ -196,6 +202,10 @@ class PesertaPortalController extends Controller
         $request->validate([
             'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'],
         ]);
+
+        if ($over = $this->kuotaTerlampaui((int) $request->file('file')->getSize())) {
+            return back()->withErrors(['file' => $over]);
+        }
 
         $disk = config('filesystems.default', 'local');
         $path = $request->file('file')->store(sprintf('ppdb-bukti/%d', $calon->id), $disk);
@@ -305,6 +315,27 @@ class PesertaPortalController extends Controller
         ]);
 
         return back()->with('success', 'Biodata pendaftaran berhasil diperbarui.');
+    }
+
+    /**
+     * Penegakan kuota tenant pada unggahan PPDB (cegah over-penyimpanan server).
+     * Kembalikan pesan error bila kuota tak cukup, null bila aman.
+     */
+    private function kuotaTerlampaui(int $sizeBytes): ?string
+    {
+        $tenantId = tenant()?->getTenantKey();
+        if ($tenantId === null) {
+            return null;
+        }
+
+        $quota = app(StorageQuotaService::class);
+        if (! $quota->canUpload($tenantId, $sizeBytes)) {
+            return 'Kuota penyimpanan penuh (sisa '
+                .StorageQuotaService::humanBytes($quota->remainingBytes($tenantId))
+                .'). Hubungi panitia untuk menambah kuota.';
+        }
+
+        return null;
     }
 
     private function resolveOwnedCandidate(?User $user): CalonSantri

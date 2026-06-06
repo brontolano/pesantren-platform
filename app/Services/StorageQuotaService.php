@@ -94,7 +94,26 @@ class StorageQuotaService
      */
     public function usedBytes(): int
     {
-        return (int) MediaFile::withTrashed()->sum('size_bytes');
+        return (int) MediaFile::withTrashed()->sum('size_bytes') + $this->ppdbBytes();
+    }
+
+    /**
+     * Byte dokumen PPDB tenant aktif (dari metadata.size) — agar kuota juga
+     * membatasi unggahan berkas pendaftaran, bukan hanya media_files.
+     * Aman bila modul PPDB tidak ada / bukan Postgres (fallback 0).
+     */
+    public function ppdbBytes(): int
+    {
+        if (! class_exists(\Modules\PPDB\Models\CalonSantriDokumen::class)) {
+            return 0;
+        }
+
+        try {
+            return (int) \Modules\PPDB\Models\CalonSantriDokumen::query()
+                ->sum(DB::raw("COALESCE((metadata->>'size')::bigint, 0)"));
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
 
     /**

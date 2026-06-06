@@ -1,5 +1,8 @@
 # Auto-Backlog Loop — State
 
+## Limit kapasitas tenant (cegah over-storage server)
+- #31: `StorageQuotaService::usedBytes()` kini hitung media_files + dokumen PPDB (`ppdbBytes`, dari metadata.size). Penegakan `canUpload` ditambah di upload dokumen & bukti PPDB (PesertaPortalController::kuotaTerlampaui). Semua jalur unggah (media + PPDB) kini dibatasi kuota tenant (default 8GB, settable per tenant via KelolaKuotaPenyimpanan). Catatan: total server = jumlah kuota tenant (kebijakan admin); DB & ukuran bukti exact = penyempurnaan lanjutan.
+
 ## File Storage #43 (object storage MinIO) — sedang dikerjakan
 - #30 (code): tambah `league/flysystem-aws-s3-v3`+aws-sdk (composer) + service `minio` di docker-compose (api minio:9000). Sisa (VPS): set env AWS_*/MINIO_* di .env, up minio, buat bucket, verifikasi `Storage::disk('s3')` r/w. Flip `MEDIA_OBJECT_STORAGE=true` = keputusan akhir (redirect media baru ke MinIO).
 
