@@ -12,11 +12,17 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > Hindari menyentuh file milik kerja tim (PWA Peserta SPMB `/spmb`, PesertaAccountService,
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
-## Pointer rotasi
-- **LOOP DIHENTIKAN @ iterasi #11** — target backend aditif-aman di kedua area
-  tersisa (PPDB ujian & Integrasi API) sudah tuntas. Sisa pekerjaan = UI/Filament/
-  wiring yang butuh arahan desain Hamdan & tes Livewire+DB (di luar disiplin loop
-  "increment kecil + unit test tanpa DB"). Lihat "Sisa & langkah lanjut" di bawah.
+## FASE 2 — PWA front-end (diizinkan Hamdan: penuh termasuk Vue/file tim)
+- Iterasi berikutnya: **PWA Peserta SPMB**
+- Rotasi (interval 60 dtk): **PWA Peserta SPMB ↔ PWA Wali Santri**
+- **Verifikasi:** `npm run build` (Vue compile ~5s) + `php -l`. BUKAN unit test.
+- **Bias AMAN:** utamakan FILE BARU (halaman/komponen/endpoint/route untuk fitur yang
+  BELUM ada). HINDARI merombak logika di file matang (controller terstruktur, Vue padat,
+  PWA Wali 23 halaman) — cukup tambah method/route/section aditif. Kedua area MATANG &
+  hot → risiko bentrok merge diterima Hamdan.
+- Branch `auto/backlog`, TANPA push/deploy. Build harus hijau sebelum commit.
+
+## (Fase 1 backend SELESAI — 11 increment, log di bawah)
 
 ## Sisa & langkah lanjut (butuh keputusan/arahan)
 - **PPDB ujian:** backend lengkap (SoalUjian + UjianScoringService + SesiUjian). Sisa:
