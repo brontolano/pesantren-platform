@@ -41,6 +41,13 @@ Route::post('/ppdb', [TenantWebsiteController::class, 'ppdbStore'])->name('tenan
 // Pada domain tenant, /admin/login adalah halaman login panel tenant.
 Route::get('/login', fn () => redirect('/admin/login'))->name('login');
 
+// Portal peserta LAMA (/portal, panel Filament) sudah disatukan ke PWA /spmb.
+// Redirect semua /portal/* ke /spmb/login agar tautan/bookmark lama tetap berfungsi
+// dan pengalaman "portal" = "PWA" identik.
+Route::get('/portal/{any?}', fn () => redirect('/spmb/login'))
+    ->where('any', '.*')
+    ->name('portal.legacy.redirect');
+
 // Halaman legal — central domain
 Route::get('/kebijakan-privasi', fn () => view('legal.privacy-policy'))->name('legal.privacy');
 Route::get('/syarat-layanan', fn () => view('legal.terms-of-service'))->name('legal.terms');

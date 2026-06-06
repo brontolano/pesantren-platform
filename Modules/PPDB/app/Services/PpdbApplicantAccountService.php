@@ -61,7 +61,7 @@ class PpdbApplicantAccountService
         return [
             'username' => $phone,
             'password' => $plain,
-            'login_url' => url('/portal'),
+            'login_url' => url('/spmb/login'),
         ];
     }
 }
