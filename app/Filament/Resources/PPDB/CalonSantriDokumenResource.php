@@ -5,9 +5,11 @@ namespace App\Filament\Resources\PPDB;
 use App\Filament\Resources\PPDB\CalonSantriDokumen\Pages\CreateCalonSantriDokumen;
 use App\Filament\Resources\PPDB\CalonSantriDokumen\Pages\EditCalonSantriDokumen;
 use App\Filament\Resources\PPDB\CalonSantriDokumen\Pages\ListCalonSantriDokumen;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -99,9 +101,47 @@ class CalonSantriDokumenResource extends Resource
                 TextColumn::make('file_url')
                     ->label('File')
                     ->limit(40),
+                TextColumn::make('status')
+                    ->label('Verifikasi')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => CalonSantriDokumen::STATUS_LABELS[$state ?? CalonSantriDokumen::STATUS_PENDING] ?? 'Menunggu Verifikasi')
+                    ->color(fn (?string $state): string => match ($state) {
+                        CalonSantriDokumen::STATUS_VERIFIED => 'success',
+                        CalonSantriDokumen::STATUS_REJECTED => 'danger',
+                        default => 'warning',
+                    }),
             ])
             ->defaultSort('id')
             ->actions([
+                Action::make('verifikasi')
+                    ->label('Verifikasi')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isVerified() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->action(fn (CalonSantriDokumen $record) => $record->update([
+                        'status' => CalonSantriDokumen::STATUS_VERIFIED,
+                        'verified_at' => now(),
+                        'verified_by' => Auth::id(),
+                        'catatan_verifikasi' => null,
+                    ])),
+                Action::make('tolak')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isRejected() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->schema([
+                        Textarea::make('catatan_verifikasi')
+                            ->label('Alasan penolakan')
+                            ->required()
+                            ->maxLength(500),
+                    ])
+                    ->action(fn (CalonSantriDokumen $record, array $data) => $record->update([
+                        'status' => CalonSantriDokumen::STATUS_REJECTED,
+                        'catatan_verifikasi' => $data['catatan_verifikasi'],
+                        'verified_at' => now(),
+                        'verified_by' => Auth::id(),
+                    ])),
                 EditAction::make(),
                 DeleteAction::make(),
             ]);

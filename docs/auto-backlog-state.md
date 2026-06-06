@@ -12,6 +12,12 @@ per iterasi · berhenti bila area tuntas atau menemui blocker yang butuh keputus
 > Hindari menyentuh file milik kerja tim (PWA Peserta SPMB `/spmb`, PesertaAccountService,
 > PesertaOtpService, PesertaAuthController, PortalWali). Tambahan bersifat aditif.
 
+## FASE 3 — Selesaikan Modul PPDB + PWA PPDB (lalu deploy)
+- Berikutnya: verifikasi BUKTI BAYAR (panitia) → lalu authoring bank soal → sisa feasible → finalisasi (merge+deploy+migrate).
+- Log FASE 3:
+  - F2 upload peserta (dokumen + bukti bayar) — committed.
+  - #16 ERP **verifikasi dokumen**: aksi Verifikasi/Tolak + kolom status di CalonSantriDokumenResource (set verified/rejected + verified_at/by + catatan).
+
 ## FASE 2 — PWA front-end — **LOOP BERHENTI @ iterasi #15**
 - 4 increment PWA Peserta selesai (Berkas, Pengumuman, Tagihan, + taut Dashboard). Build hijau.
 - Semua fitur PWA tersisa butuh **model/data baru ATAU keputusan desain/kebijakan Hamdan** → STOP.
