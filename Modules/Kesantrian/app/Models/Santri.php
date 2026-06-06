@@ -108,6 +108,11 @@ class Santri extends Model
         return $this->hasOne(Alumni::class, 'santri_id');
     }
 
+    public function tagihan(): HasMany
+    {
+        return $this->hasMany(\Modules\Keuangan\Models\Tagihan::class, 'santri_id');
+    }
+
     public function isAktif(): bool
     {
         return $this->status === 'aktif';
