@@ -1,5 +1,10 @@
 # Auto-Backlog Loop — State
 
+## DASHBOARD Pixel-Perfect (loop cron 1 mnt, branch feat/dashboard-pixelperfect)
+Target: dashboard panel TENANT sama persis mockup TU Pesantren. Widget di TenantPanelProvider->widgets() dgn columnSpan+sort. Kontras WAJIB aman light/dark. Data NYATA (Santri/User/Pembayaran/Tagihan/Kegiatan); modul belum ada (Pengajuan/Kas Keluar/Pengumuman) → state kosong jujur.
+- #1: `StatsPesantren` (StatsOverviewWidget, sort -8): Total Santri (+baru bln ini), Pengurus/Ustadz (role guru/bendahara/kepala), Kas Masuk bln ini (Pembayaran verified), Kas Keluar (Rp 0 — modul belum aktif), Tagihan Belum Lunas. Guard class_exists. Panel tenant dirapikan → widget = [GreetingBanner, StatsPesantren] (AccountWidget + 2 overview lama dihapus). Verifikasi: php -l, boot, build hijau.
+- Sisa: #2 KeuanganAreaChart · #3 KategoriPengeluaranChart(donut) · #4 TransaksiTerbaru(table) · #5 panel kanan Pengumuman+Agenda · #6 QuickAccess · #7 poles grid/ukuran/kontras. SAAT BERES: minta izin deploy + CronDelete + minta screenshot.
+
 ## FASE 5 — Integrasi Website / API (loop cron 1 mnt)
 - #32: register alias middleware `api.key` (AuthenticateTenantApiKey) di bootstrap/app.php + named RateLimiter `public-api` (PublicApiThrottle) di AppServiceProvider::boot. Siap dipasang `->middleware(['api.key','throttle:public-api'])`.
 - #33: `TenantApiController` (profile/statistics/jadwalPpdb) + grup route `/api/v1/{profil,statistik,jadwal-ppdb}` middleware `api.key`+`throttle:public-api` (terdaftar). Aditif, tak ubah endpoint publik existing.
@@ -9,7 +14,9 @@
 - #37: Anti-spam `/api/v1/spmb/register`. (a) Honeypot: field `website` harus kosong; bila terisi → log warning + 422 "Permintaan tidak valid." tanpa simpan DB. (b) Limiter `ppdb-submit` (AppServiceProvider, per tenant+IP, default 5/mnt, config `services.public_api.ppdb_submit_per_minute`) dipasang `throttle:ppdb-submit` di route (terverifikasi route:list -v). Kontrak sukses tak berubah (aditif). Verifikasi: php -l ×3, boot, middleware terpasang.
 - #38: `docs/INTEGRASI-API.md` — kontrak lengkap: auth X-Api-Key (cara buat via panel + sekali-tampil), rate limit (public-api 60/mnt, ppdb-submit 5/mnt), CORS per-domain, endpoint publik CMS (posts/gallery/profile/settings), endpoint privat read (profil/statistik/jadwal-ppdb), submit PPDB + honeypot `website`, kode status, sisa manual eksternal. Shape respons diverifikasi dari controller existing.
 - ✅ SEMUA TASK FEASIBLE FASE 5 SELESAI (#32–#38). Sisa hanya eksternal: subdomain delegation, repoint api.asy-syifaa.com (DNS), WordPress plugin publish, uji client Asy-Syifaa.
-- NEXT: FINALISASI — merge auto/backlog→main, push, deploy.sh, recreate worker, tenants:migrate (cek migrasi baru), verify. Lalu CronDelete loop + laporan akhir. (Butuh izin prod sekali-klik.)
+- ✅ FINALISASI SELESAI 2026-06-06: merge --ff-only auto/backlog→main (`6c5320c`), push origin main (`48b50d0..6c5320c`), deploy `/opt/deploy.sh` (build+recreate app, migrate "Nothing to migrate", optimize:clear). Verifikasi prod: app healthy; 4 route live; endpoint privat 401 tanpa key; honeypot 422 tanpa tulis DB. Worker TIDAK di-recreate (tak ada kode job/queue baru). tenants:migrate TIDAK perlu (tak ada migrasi). Loop cron 468454f1 dihapus.
+- SISA MANUAL (eksternal, keputusan/akses Hamdan): (1) subdomain delegation SOP onboarding tenant baru, (2) repoint api.asy-syifaa.com via DNS bila mau API di subdomain khusus, (3) plugin WordPress publish, (4) uji end-to-end client Asy-Syifaa. Kontrak utk pihak luar: docs/INTEGRASI-API.md.
+- SARAN: patch /opt/deploy.sh agar `up -d --force-recreate app worker worker-broadcast` (sekarang hanya app → worker bisa tertinggal image lama bila ada perubahan job).
 
 ## Limit kapasitas tenant (cegah over-storage server)
 - #31: `StorageQuotaService::usedBytes()` kini hitung media_files + dokumen PPDB (`ppdbBytes`, dari metadata.size). Penegakan `canUpload` ditambah di upload dokumen & bukti PPDB (PesertaPortalController::kuotaTerlampaui). Semua jalur unggah (media + PPDB) kini dibatasi kuota tenant (default 8GB, settable per tenant via KelolaKuotaPenyimpanan). Catatan: total server = jumlah kuota tenant (kebijakan admin); DB & ukuran bukti exact = penyempurnaan lanjutan.

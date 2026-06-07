@@ -136,10 +136,9 @@ class TenantPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
+                // Dashboard mockup TU Pesantren — banner → statistik → (grafik/tabel/panel kanan menyusul).
                 \App\Filament\Widgets\GreetingBanner::class,
-                AccountWidget::class,
-                KesantrianOverviewWidget::class,
-                KeuanganOverviewWidget::class,
+                \App\Filament\Widgets\StatsPesantren::class,
             ])
             ->middleware([
                 // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user
