@@ -74,7 +74,10 @@ class ArticleResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(3)->schema([
+            // Responsif: 1 kolom (menumpuk) di layar sempit, baru 2:1 di layar lebar (lg+).
+            // Grid::make(3) lama bersifat 3-kolom di SEMUA breakpoint → sidebar gepeng,
+            // badge kategori "Artikel Umum" pecah per-huruf di layar laptop.
+            Grid::make(['default' => 1, 'lg' => 3])->schema([
                 // ── KOLOM UTAMA: area menulis (fokus, lebar 2/3) ──
                 Group::make([
                     Section::make('Konten Artikel')
@@ -117,7 +120,7 @@ class ArticleResource extends Resource
                                     'redo', 'undo',
                                 ]),
                         ]),
-                ])->columnSpan(2),
+                ])->columnSpan(['default' => 1, 'lg' => 2]),
 
                 // ── SIDEBAR: publikasi & meta (lebar 1/3) ──
                 Group::make([
@@ -176,7 +179,7 @@ class ArticleResource extends Resource
                                 ->rows(2)
                                 ->helperText('Kosong = pakai ringkasan. Maks 160.'),
                         ]),
-                ])->columnSpan(1),
+                ])->columnSpan(['default' => 1, 'lg' => 1]),
             ]),
         ]);
     }
