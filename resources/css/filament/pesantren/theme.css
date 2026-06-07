@@ -1,131 +1,321 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
-/* Pindai kelas Tailwind yang dipakai di widget & view Filament custom
-   (banner, kartu statistik, Quick Access, dll) agar utility-nya ikut digenerate. */
+/* Pindai kelas Tailwind yang dipakai di widget & view Filament custom */
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';
 
 /*
  |--------------------------------------------------------------------------
- | Tema Pesantren — nuansa Islami emerald
+ | Tema Pesantren v2 — WhatsApp Light · TikTok Dark
  |--------------------------------------------------------------------------
- | Dipakai panel tenant & central. Warna `primary` di-set via
- | PanelProvider->colors(); file ini menambah gaya komponen.
+ | Mode terang  : inspirasi WhatsApp — sidebar putih + header hijau #008069,
+ |                background #F0F2F5, active item tint #E7F7EE.
+ | Mode gelap   : inspirasi TikTok — sidebar #161823, surface #1C1C24,
+ |                border #2A2A35, high-contrast text.
+ | Compact      : padding lebih rapat di sidebar, kartu, tabel, tombol.
  |
- | Prinsip kontras: sidebar SELALU hijau gelap (elemen brand) di mode terang
- | MAUPUN gelap → semua teks/ikon di dalamnya dipaksa terang. Sisanya dibiarkan
- | mengikuti tema Filament bawaan agar light/dark tetap konsisten.
- |
- | Kelas mengikuti DOM asli Filament v5.6: .fi-sidebar-item-btn (BUKAN -button),
- | .fi-sidebar-item-label, .fi-sidebar-item-icon, .fi-sidebar-item.fi-active.
+ | Referensi kelas Filament v5.6 (DOM aktual, bukan asumsi):
+ |   .fi-sidebar-item-btn (BUKAN -button)
+ |   .fi-sidebar-item-label, .fi-sidebar-item-icon, .fi-icon
+ |   .fi-sidebar-item.fi-active
+ |   Filament pakai :where() (spesifisitas 0) → !important selalu menang.
  */
 
 @theme {
-    --radius-xl: 1rem;
+    --radius-xl: 0.875rem;
 }
 
-/* ===== Latar utama: semburat hijau hangat lembut (hanya mode terang) ===== */
+/* ===================================================================
+   LATAR UTAMA
+   =================================================================== */
+
+/* Light: WA signature background */
 .fi-body {
-    background-color: #f3f7f3;
+    background-color: #F0F2F5;
 }
+
+/* Dark: TikTok deep black */
 .dark .fi-body {
-    background-color: var(--color-gray-950);
+    background-color: #121212;
 }
 
-/* ===== Sidebar hijau gelap (brand) — kontras dijaga di light & dark ===== */
+/* ===================================================================
+   SIDEBAR LIGHT — WhatsApp style
+   Sidebar putih + header gelap hijau WA + item subtle
+   =================================================================== */
+
 .fi-sidebar {
-    background: linear-gradient(180deg, #0f3d2e 0%, #0b3024 100%) !important;
-    border-inline-end-color: rgba(255, 255, 255, 0.06) !important;
-}
-.fi-sidebar-header,
-.fi-sidebar-nav {
-    background: transparent !important;
-    border-color: rgba(255, 255, 255, 0.08) !important;
+    background: #FFFFFF !important;
+    border-inline-end: 1px solid #E9EDEF !important;
 }
 
-/* Logo/brand di sidebar gelap → selalu terang (wordmark pakai currentColor) */
-.fi-sidebar .fi-logo {
+/* Header brand: warna header WA (#008069) */
+.fi-sidebar-header {
+    background: #008069 !important;
+    border-bottom: 1px solid #007259 !important;
+    padding-top: 0.875rem !important;
+    padding-bottom: 0.875rem !important;
+}
+
+/* Teks & ikon dalam header harus putih (di atas hijau gelap WA) */
+.fi-sidebar-header,
+.fi-sidebar-header * {
     color: #ffffff !important;
 }
 
-/* Label grup */
-.fi-sidebar-group-label {
-    color: rgba(255, 255, 255, 0.5) !important;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-size: 0.6875rem;
-    font-weight: 600;
+/* Icon mark brand: subtle glass di atas header hijau */
+.fi-sidebar-header .fi-logo [class*="bg-primary"],
+.fi-sidebar-header .fi-logo span:first-child {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
 }
 
-/* Item navigasi — teks & ikon terang di SEMUA mode.
-   PENTING: Filament mewarnai LABEL & IKON dgn var(--primary-700) (gelap) di
-   mode terang & var(--primary-400) di gelap. Karena sidebar selalu hijau gelap,
-   warna itu harus di-override pada elemen label & ikon LANGSUNG (bukan hanya
-   tombolnya) — inilah penyebab teks tak terlihat di mode terang sebelumnya. */
-.fi-sidebar-item-btn {
-    border-radius: 0.625rem;
-    font-weight: 500;
+/* Nav wrapper */
+.fi-sidebar-nav {
+    background: transparent !important;
+    padding-top: 0.375rem !important;
+    gap: 0.0625rem !important;
 }
+
+/* Label grup: WA medium gray */
+.fi-sidebar-group-label {
+    color: #8696A0 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.625rem;
+    font-weight: 700;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.25rem !important;
+    padding-inline-start: 0.75rem !important;
+}
+
+/* Item btn: compact + soft radius */
+.fi-sidebar-item-btn {
+    border-radius: 0.5rem !important;
+    padding-top: 0.375rem !important;
+    padding-bottom: 0.375rem !important;
+    padding-inline-start: 0.625rem !important;
+    padding-inline-end: 0.625rem !important;
+    transition: background-color 120ms ease, color 120ms ease !important;
+}
+
+/* Label & ikon normal: WA secondary text (#41525D) */
 .fi-sidebar-item-btn > .fi-sidebar-item-label,
 .fi-sidebar-item-label {
-    color: rgba(255, 255, 255, 0.82) !important;
+    color: #41525D !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
 }
+
 .fi-sidebar-item-btn > .fi-icon,
 .fi-sidebar-item-btn .fi-sidebar-item-icon,
 .fi-sidebar-item-btn .fi-icon {
-    color: rgba(255, 255, 255, 0.72) !important;
+    color: #54656F !important;
+    width: 1.125rem !important;
+    height: 1.125rem !important;
 }
+
+/* Hover: latar abu WA */
 .fi-sidebar-item-btn:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important;
+    background-color: #F5F6F6 !important;
 }
 .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
 .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
-    color: #ffffff !important;
+    color: #111B21 !important;
 }
 .fi-sidebar-item-btn:hover > .fi-icon,
 .fi-sidebar-item-btn:hover .fi-sidebar-item-icon,
 .fi-sidebar-item-btn:hover .fi-icon {
-    color: #ffffff !important;
+    color: #41525D !important;
 }
 
-/* Item aktif: pil emerald + glow, teks/ikon putih */
+/* ACTIVE: tint hijau lembut + teks WA dark green */
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background: linear-gradient(90deg, #16a34a 0%, #15803d 100%) !important;
-    box-shadow: 0 8px 20px -8px rgba(22, 163, 74, 0.7);
+    background: #E7F7EE !important;
+    box-shadow: none !important;
 }
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
 .fi-sidebar-item.fi-active .fi-sidebar-item-label {
-    color: #ffffff !important;
+    color: #008069 !important;
+    font-weight: 600 !important;
 }
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-active .fi-icon {
-    color: #ffffff !important;
+    color: #008069 !important;
 }
 
-/* Tombol bawaan sidebar (collapse grup, notifikasi, kolaps sidebar) → terang */
+/* Tombol sidebar misc (collapse grup, notifikasi) */
 .fi-sidebar-group-btn,
 .fi-sidebar-group-collapse-btn,
 .fi-sidebar .fi-icon-btn,
 .fi-sidebar .fi-sidebar-database-notifications-btn {
-    color: rgba(255, 255, 255, 0.65) !important;
+    color: #54656F !important;
 }
 .fi-sidebar .fi-icon-btn:hover {
+    color: #111B21 !important;
+    background-color: #F5F6F6 !important;
+}
+
+/* ===================================================================
+   SIDEBAR DARK — TikTok style
+   Biru-hitam #161823, border subtle, active emerald pesantren
+   =================================================================== */
+
+.dark .fi-sidebar {
+    background: #161823 !important;
+    border-inline-end: 1px solid #2A2A35 !important;
+}
+
+.dark .fi-sidebar-header {
+    background: #161823 !important;
+    border-bottom: 1px solid #2A2A35 !important;
+}
+
+/* Logo dark: force putih, icon mark emerald glow */
+.dark .fi-sidebar-header,
+.dark .fi-sidebar-header * {
+    color: #ffffff !important;
+}
+.dark .fi-sidebar-header .fi-logo [class*="bg-primary"],
+.dark .fi-sidebar-header .fi-logo span:first-child {
+    background-color: rgba(16, 185, 129, 0.2) !important;
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3) !important;
+}
+
+.dark .fi-sidebar-nav {
+    background: transparent !important;
+}
+
+.dark .fi-sidebar-group-label {
+    color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Label & ikon normal: putih redup */
+.dark .fi-sidebar-item-btn > .fi-sidebar-item-label,
+.dark .fi-sidebar-item-label {
+    color: rgba(255, 255, 255, 0.72) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+.dark .fi-sidebar-item-btn > .fi-icon,
+.dark .fi-sidebar-item-btn .fi-sidebar-item-icon,
+.dark .fi-sidebar-item-btn .fi-icon {
+    color: rgba(255, 255, 255, 0.5) !important;
+    width: 1.125rem !important;
+    height: 1.125rem !important;
+}
+
+/* Hover TikTok: glass overlay */
+.dark .fi-sidebar-item-btn:hover {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+}
+.dark .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
+.dark .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+.dark .fi-sidebar-item-btn:hover > .fi-icon,
+.dark .fi-sidebar-item-btn:hover .fi-sidebar-item-icon,
+.dark .fi-sidebar-item-btn:hover .fi-icon {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* ACTIVE dark: emerald gradient (identitas pesantren) */
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: linear-gradient(90deg, #059669 0%, #047857 100%) !important;
+    box-shadow: 0 4px 14px -4px rgba(5, 150, 105, 0.45) !important;
+}
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-icon,
+.dark .fi-sidebar-item.fi-active .fi-icon {
+    color: #ffffff !important;
+}
+
+/* Misc sidebar buttons dark */
+.dark .fi-sidebar-group-btn,
+.dark .fi-sidebar-group-collapse-btn,
+.dark .fi-sidebar .fi-icon-btn,
+.dark .fi-sidebar .fi-sidebar-database-notifications-btn {
+    color: rgba(255, 255, 255, 0.45) !important;
+}
+.dark .fi-sidebar .fi-icon-btn:hover {
     color: #ffffff !important;
     background-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* ===== Kartu / Section: rounded 1rem + bayangan halus (light & dark) ===== */
+/* ===================================================================
+   KONTEN UTAMA DARK — TikTok surface colors
+   =================================================================== */
+
+/* TikTok topbar / header */
+.dark .fi-topbar,
+.dark .fi-header {
+    background-color: #161823 !important;
+    border-bottom-color: #2A2A35 !important;
+}
+
+/* TikTok card/section surface (#1C1C24) */
+.dark .fi-section,
+.dark .fi-wi-stats-overview-stat,
+.dark .fi-ta-ctn,
+.dark [class*="fi-card"],
+.dark .fi-widget-container > div {
+    background-color: #1C1C24 !important;
+    border-color: #2A2A35 !important;
+}
+
+/* ===================================================================
+   KARTU & SECTION — compact + rounded (KEDUA mode)
+   =================================================================== */
+
 .fi-section,
 .fi-wi-stats-overview-stat,
 .fi-ta-ctn {
-    border-radius: 1rem;
+    border-radius: 0.875rem;
     box-shadow:
-        0 1px 3px rgba(16, 24, 40, 0.04),
-        0 12px 28px -18px rgba(16, 24, 40, 0.18);
+        0 1px 2px rgba(16, 24, 40, 0.04),
+        0 6px 18px -10px rgba(16, 24, 40, 0.12);
 }
 
-/* ===== Tombol sedikit lebih bulat ===== */
+/* Light stat card: sedikit bayangan WA-style */
+.fi-wi-stats-overview-stat {
+    padding: 1rem 1.25rem !important;
+}
+
+/* Compact section header */
+.fi-section-header-ctn {
+    padding: 0.625rem 0.875rem !important;
+    min-height: 0 !important;
+}
+
+/* ===================================================================
+   TOMBOL — compact + soft radius
+   =================================================================== */
+
 .fi-btn {
-    border-radius: 0.625rem;
+    border-radius: 0.5rem !important;
+    padding-top: 0.375rem !important;
+    padding-bottom: 0.375rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+/* ===================================================================
+   TABEL — compact rows
+   =================================================================== */
+
+.fi-ta-cell {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+.fi-ta-header-cell {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    font-size: 0.75rem !important;
 }

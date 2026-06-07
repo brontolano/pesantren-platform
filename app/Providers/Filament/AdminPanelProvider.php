@@ -50,7 +50,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('filament.brand', ['name' => 'Pesantren.online']))
             ->brandLogoHeight('2.25rem')
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::Green,
                 'gray' => Color::Slate,
             ])
             ->resources([

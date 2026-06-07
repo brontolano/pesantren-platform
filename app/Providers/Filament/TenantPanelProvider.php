@@ -75,7 +75,7 @@ class TenantPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('filament.brand', ['name' => static::resolveTenantBrandName()]))
             ->brandLogoHeight('2.25rem')
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::Green,
                 'gray' => Color::Slate,
             ])
             ->resources([
