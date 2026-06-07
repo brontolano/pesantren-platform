@@ -18,7 +18,9 @@ class TransaksiTerbaru extends TableWidget
 
     protected int|string|array $columnSpan = 4;
 
-    protected ?string $heading = 'Transaksi Terbaru';
+    // WAJIB static — TableWidget::$heading dideklarasikan static (beda dgn
+    // ChartWidget/StatsOverviewWidget yang non-static). Non-static → fatal saat load.
+    protected static ?string $heading = 'Transaksi Terbaru';
 
     public function table(Table $table): Table
     {
