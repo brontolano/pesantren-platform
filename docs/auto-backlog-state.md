@@ -8,7 +8,8 @@ Target: dashboard panel TENANT sama persis mockup TU Pesantren. Widget di Tenant
 - #3: `KategoriPengeluaranChart` (ChartWidget doughnut, sort -5, columnSpan 2, cutout 65%): state kosong jujur (cincin abu "Belum ada data") krn modul kategori pengeluaran belum ada. getData() siap diisi saat modul dibuat. Verifikasi: php -l, boot, build hijau.
 - #4: `TransaksiTerbaru` (TableWidget, sort -4, columnSpan 4): Pembayaran terakhir (with santri), kolom Tanggal/Keterangan(+metode)/Tipe(badge Masuk)/Jumlah(money IDR), paginasi 5. Empty state rapi. Verifikasi: php -l, boot, build hijau.
 - #5: `AgendaPengumuman` (Blade widget, sort -3, columnSpan 2): kartu "Pengumuman Terbaru" (state kosong, modul belum ada) + "Agenda Mendatang" (Kegiatan mulai>=hari ini, badge tanggal + nama + waktu/lokasi). Kontras aman (utility + dark: variants). Verifikasi: php -l, boot, build hijau, utility ter-scan.
-- Sisa: #6 QuickAccessWidget(grid ikon shortcut) · #7 custom Dashboard page getColumns(6)+poles ukuran/kontras kedua mode. SAAT BERES: minta izin deploy + CronDelete + minta screenshot.
+- #6: `QuickAccessWidget` (Blade widget, sort -2, columnSpan 2): grid ikon pintasan ke resource ADA (Tambah Santri, Pembayaran, Tagihan, Buat Agenda, Laporan, Data Santri) via getUrl() try/catch; modul belum ada (Buat Surat, Pengajuan) = badge "Segera" non-aktif. Chip warna literal (dark: variants). Verifikasi: php -l, boot, build hijau, chip ter-scan.
+- Sisa: #7 custom Dashboard page getColumns(6) + poles columnSpan/ukuran/kontras kedua mode. SAAT BERES: minta izin deploy + CronDelete + minta screenshot.
 
 ## FASE 5 — Integrasi Website / API (loop cron 1 mnt)
 - #32: register alias middleware `api.key` (AuthenticateTenantApiKey) di bootstrap/app.php + named RateLimiter `public-api` (PublicApiThrottle) di AppServiceProvider::boot. Siap dipasang `->middleware(['api.key','throttle:public-api'])`.
