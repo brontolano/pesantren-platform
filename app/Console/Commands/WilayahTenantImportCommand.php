@@ -95,6 +95,16 @@ class WilayahTenantImportCommand extends Command
                 continue;
             }
 
+            // Sumber (ihsaninh) menyimpan nama kab/kota tanpa prefix, sehingga
+            // "Bandung" (kabupaten 3204) & "Bandung" (kota 3273) jadi kembar →
+            // opsi dropdown menyatu & cascade ambigu. Beri prefix berdasarkan
+            // kode BPS: 2 digit kode kab/kota >= 71 → "Kota", selain itu
+            // "Kabupaten". Sekaligus mencocokkan data lama "Kabupaten/Kota X".
+            if ($level === 'cities' && isset($row['name']) && $row['name'] !== '') {
+                $code = (int) substr((string) $row['id'], 2, 2);
+                $row['name'] = ($code >= 71 ? 'Kota ' : 'Kabupaten ') . $row['name'];
+            }
+
             $payload[] = $row;
             $total++;
 
