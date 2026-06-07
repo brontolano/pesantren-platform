@@ -2,7 +2,9 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\MediaFile;
 use App\Models\Setting;
+use App\Services\StorageQuotaService;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -16,6 +18,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Halaman pengaturan branding tenant dalam bentuk SATU form biasa
@@ -119,12 +122,16 @@ class PengaturanBranding extends Page implements HasForms
                     ->schema([
                         FileUpload::make('branding_logo')
                             ->label('Logo')
-                            ->disk('public')
+                            ->disk(StorageQuotaService::diskName())
                             ->directory('branding')
                             ->image()
-                            ->imageEditor()
+                            // imageEditor() SENGAJA dibuang — membutuhkan akses URL
+                            // ke file temp (via /livewire/preview-file) yang rawan
+                            // gagal di Docker + stancl/tenancy. Logo upload sederhana
+                            // tidak butuh crop editor.
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
                             ->maxSize(2048)
-                            ->helperText('Format gambar, maksimal 2 MB.'),
+                            ->helperText('Format JPG/PNG/WebP/SVG, maksimal 2 MB. File tersimpan ke media library.'),
                         TextInput::make('branding_favicon')
                             ->label('Favicon URL / Path')
                             ->helperText('Boleh URL absolut atau path file publik.')
@@ -148,15 +155,23 @@ class PengaturanBranding extends Page implements HasForms
     {
         $data = $this->form->getState();
 
+        $logoPath = $data['branding_logo'] ?? null;
+
+        // Integrasi media library: logo yang diunggah juga tercatat di media_files
+        // agar terlihat di halaman File Media & dihitung dalam kuota penyimpanan.
+        if ($logoPath) {
+            $this->registerLogoAsMediaFile($logoPath);
+        }
+
         $payloads = [
-            'branding_name' => ['text' => $data['branding_name'] ?? null],
-            'branding_tagline' => ['text' => $data['branding_tagline'] ?? null],
+            'branding_name'          => ['text' => $data['branding_name'] ?? null],
+            'branding_tagline'       => ['text' => $data['branding_tagline'] ?? null],
             'branding_primary_color' => ['color' => $data['branding_primary_color'] ?? null],
             'branding_secondary_color' => ['color' => $data['branding_secondary_color'] ?? null],
-            'branding_logo' => ['logo_path' => $data['branding_logo'] ?? null],
-            'branding_favicon' => ['text' => $data['branding_favicon'] ?? null],
-            'branding_font' => ['text' => $data['branding_font'] ?? 'default'],
-            'ppdb_form_fields' => ['fields' => $data['ppdb_form_fields'] ?? []],
+            'branding_logo'          => ['logo_path' => $logoPath],
+            'branding_favicon'       => ['text' => $data['branding_favicon'] ?? null],
+            'branding_font'          => ['text' => $data['branding_font'] ?? 'default'],
+            'ppdb_form_fields'       => ['fields' => $data['ppdb_form_fields'] ?? []],
         ];
 
         foreach ($payloads as $key => $value) {
@@ -167,5 +182,35 @@ class PengaturanBranding extends Page implements HasForms
             ->title('Pengaturan branding disimpan')
             ->success()
             ->send();
+    }
+
+    /**
+     * Daftarkan logo yang diunggah ke tabel media_files agar:
+     * 1. Muncul di halaman File Media (media-files).
+     * 2. Terhitung dalam kuota penyimpanan tenant.
+     * Idempotent: jika path sudah ada di DB, record di-update (tidak duplikat).
+     */
+    private function registerLogoAsMediaFile(string $path): void
+    {
+        try {
+            $disk = Storage::disk(StorageQuotaService::diskName());
+
+            if (! $disk->exists($path)) {
+                return;
+            }
+
+            MediaFile::updateOrCreate(
+                ['path' => $path],
+                [
+                    'original_name' => basename($path),
+                    'mime'          => $disk->mimeType($path) ?: 'image/png',
+                    'size_bytes'    => (int) $disk->size($path),
+                    'folder'        => 'branding',
+                    'uploaded_by'   => Auth::id(),
+                ],
+            );
+        } catch (\Throwable) {
+            // Jangan blokir penyimpanan branding jika registrasi media gagal.
+        }
     }
 }

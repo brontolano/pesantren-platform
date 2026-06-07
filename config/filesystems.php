@@ -47,6 +47,22 @@ return [
             'report' => false,
         ],
 
+        /*
+         * Disk khusus Livewire temporary upload.
+         * TIDAK dimasukkan ke tenancy.filesystem.disks agar path-nya
+         * tidak berubah per-tenant. Livewire mengupload ke /livewire/upload-file
+         * TANPA tenant context; callback Filament berjalan WITH tenant context.
+         * Jika disk 'local' dipakai (ada di tenancy disks), path berubah →
+         * file tidak ditemukan → loop "Menunggu ukuran berkas" tak berujung.
+         */
+        'livewire-tmp' => [
+            'driver'     => 'local',
+            'root'       => storage_path('app/livewire-tmp'),
+            'visibility' => 'private',
+            'throw'      => false,
+            'report'     => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

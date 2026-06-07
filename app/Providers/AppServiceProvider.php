@@ -31,6 +31,18 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventLazyLoading(! app()->isProduction());
 
+        /*
+         * Fix: Livewire temporary file upload HARUS pakai disk yang TIDAK masuk
+         * tenancy.filesystem.disks. Disk 'local' ada di daftar tenancy → root-nya
+         * berubah per-tenant oleh FilesystemTenancyBootstrapper. Upload ke
+         * /livewire/upload-file berjalan TANPA tenant context (file disimpan di
+         * path normal), tapi callback Filament berjalan WITH tenant context
+         * (mencari file di path tenant) → mismatch → loop "Menunggu ukuran berkas".
+         * Disk 'livewire-tmp' di config/filesystems.php sengaja TIDAK ada di
+         * tenancy.filesystem.disks → path-nya selalu statis → upload langsung bekerja.
+         */
+        config(['livewire.temporary_file_upload.disk' => 'livewire-tmp']);
+
         // Named limiter API publik headless (per API-key/tenant+IP). Pakai pada
         // route dgn middleware 'throttle:public-api'.
         RateLimiter::for('public-api', function (Request $request) {
