@@ -21,6 +21,94 @@ class DevRoadmapSeeder extends Seeder
         $this->seedFileStorage();
         $this->seedPlatform();
         $this->seedTemaModulPesantren();
+        $this->seedPolishUiSesi();
+    }
+
+    /**
+     * Program "Polish UI — Branding, Dashboard & CMS" — pekerjaan penyempurnaan
+     * tampilan & integrasi storage yang sudah shipped (Jun 2026). Idempotent:
+     * updateOrCreate by slug + task.title.
+     */
+    private function seedPolishUiSesi(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'polish-ui-branding-cms'],
+            [
+                'name' => 'Polish UI — Branding, Dashboard & CMS',
+                'description' => 'Penyempurnaan tampilan & integrasi: logo brand dinamis di semua surface, palet tema WhatsApp/TikTok, dashboard + widget jadwal sholat (GPS), perbaikan layout/CMS (artikel & galeri), serta perbaikan storage File Media (/_tenant-storage).',
+                'status' => 'done',
+                'color' => 'success',
+                'icon' => 'heroicon-o-sparkles',
+                'sort' => 7,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            ['Branding', 'Logo brand dinamis tampil di semua surface',
+                'Logo terunggah (branding_logo) tampil di panel admin, halaman login, launcher portal, dan Portal Wali — menggantikan ikon hardcoded, fallback otomatis bila belum ada logo. Helper App\\Support\\TenantBranding + resolve via /_tenant-storage.',
+                'Selesai & live. Diverifikasi: keempat surface memakai logo (HTTP 200).',
+                'done', 'high', 100, 'M', 1],
+            ['Branding', 'Palet tema WhatsApp (terang) + TikTok (gelap), desain compact',
+                'theme.css custom: light = WA (#008069 header, #F0F2F5 bg, sidebar putih); dark = TikTok (#121212/#161823/#1C1C24). Komponen lebih ringkas.',
+                'Selesai & live.',
+                'done', 'medium', 100, 'M', 2],
+            ['Branding', 'Fix loop "Menunggu ukuran berkas" upload logo + integrasi media',
+                'Disk livewire-tmp di luar tenancy.disks (atasi loop), FileUpload tak pre-fill path (atasi hang preview Docker), logo terindeks ke media_files.',
+                'Selesai & live.',
+                'done', 'high', 100, 'M', 3],
+
+            ['Dashboard', 'Widget jadwal sholat (hitung lokal PHP, metode Kemenag)',
+                'PrayerTimesService: port PrayTimes.org (Subuh 20deg, Isya 18deg, Ashar Syafii, ihtiyati). Menggantikan ilustrasi masjid di banner. Tanpa API eksternal.',
+                'Selesai & live. Akurasi diverifikasi vs jadwal Kemenag Bandung (+-1-2 mnt).',
+                'done', 'medium', 100, 'M', 4],
+            ['Dashboard', 'Jadwal sholat interaktif: jam live, hitung mundur, lokasi GPS',
+                'Alpine.js: jam saat ini per detik, hitung mundur ke sholat berikutnya, waktu sholat dihitung dari GPS perangkat (fallback koordinat tenant). Lokasi bisa diatur per-tenant (lintang/bujur).',
+                'Selesai & live.',
+                'done', 'medium', 100, 'M', 5],
+            ['Dashboard', 'Layout pixel-perfect: kartu statistik, grafik, quick access',
+                'Baris 5 kartu statistik, grafik area keuangan (warna WA), quick access full-width, banner sambutan WA-gradient.',
+                'Selesai & live.',
+                'done', 'high', 100, 'M', 6],
+
+            ['CMS', 'Fix layout form artikel (responsif, full-width)',
+                'Grid columnSpanFull + responsif (menumpuk di layar sempit, 2:1 di lg+). Atasi sidebar gepeng & badge kategori pecah per-huruf.',
+                'Selesai & live.',
+                'done', 'high', 100, 'S', 7],
+            ['CMS', 'Redesign form galeri: layout artikel, thumbnail, SEO',
+                'Layout main+sidebar responsif, thumbnail cover/foto via /_tenant-storage, kolom SEO meta_title/description (+migration tenant), resolveMediaUrl diperbaiki.',
+                'Selesai & live. Migrasi SEO sudah jalan di DB central + tenant (demo, asy-syifaa).',
+                'done', 'high', 100, 'M', 8],
+            ['CMS', 'Foto Galeri: satu dropzone multi-upload + grid thumbnail + folder per slug',
+                'Satu FileUpload multiple (panel grid) untuk unggah banyak foto; foto existing tampil grid thumbnail (caption/foto utama/urutan/hapus). File disimpan per folder cms/galleries/{slug}. Trait SyncsGalleryPhotos.',
+                'Selesai & live.',
+                'done', 'high', 100, 'L', 9],
+
+            ['Media & Infra', 'Fix thumbnail & unduh File Media (/_tenant-storage)',
+                'ImageColumn + aksi Unduh sebelumnya pakai Storage::url (404 di Docker). MediaFile::url()/existsOnDisk() resolve via /_tenant-storage -> preview & unduh benar.',
+                'Selesai & live.',
+                'done', 'medium', 100, 'S', 10],
+            ['Media & Infra', 'Guard migrasi wilayah tenant (Schema::hasTable)',
+                'Migrasi wilayah modul Kesantrian dijalankan di central & tenant; di-guard hasTable agar no-op di central (tabel sudah ada) -> atasi blocker deploy duplicate table.',
+                'Selesai & live.',
+                'done', 'medium', 100, 'S', 11],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
     }
 
     /**
