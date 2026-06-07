@@ -46,7 +46,8 @@ class AdminPanelProvider extends PanelProvider
             )
             ->spa()
             ->viteTheme('resources/css/filament/pesantren/theme.css')
-            ->brandLogo(fn () => view('filament.brand'))
+            ->brandName('Pesantren.online')
+            ->brandLogo(fn () => view('filament.brand', ['name' => 'Pesantren.online']))
             ->brandLogoHeight('2.25rem')
             ->colors([
                 'primary' => Color::Emerald,

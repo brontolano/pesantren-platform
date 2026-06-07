@@ -72,7 +72,7 @@ class TenantPanelProvider extends PanelProvider
             ->profile()
             ->spa()
             ->viteTheme('resources/css/filament/pesantren/theme.css')
-            ->brandLogo(fn () => view('filament.brand'))
+            ->brandLogo(fn () => view('filament.brand', ['name' => static::resolveTenantBrandName()]))
             ->brandLogoHeight('2.25rem')
             ->colors([
                 'primary' => Color::Emerald,
@@ -160,5 +160,28 @@ class TenantPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+    }
+
+    /**
+     * Nama brand panel tenant: pakai branding_name tenant (jika di-set),
+     * fallback ke nama tenant, lalu 'Pesantren'. Di-resolve saat render
+     * (tenancy sudah aktif via InitializeTenancyByDomain).
+     */
+    protected static function resolveTenantBrandName(): string
+    {
+        if (tenant() === null) {
+            return 'Pesantren';
+        }
+
+        try {
+            $name = \App\Models\Setting::getTenantStringValue('branding_name');
+            if (is_string($name) && trim($name) !== '') {
+                return trim($name);
+            }
+        } catch (\Throwable $e) {
+            // Setting belum termigrasi / tenancy belum siap → fallback nama tenant.
+        }
+
+        return (string) (tenant()->name ?? 'Pesantren') ?: 'Pesantren';
     }
 }

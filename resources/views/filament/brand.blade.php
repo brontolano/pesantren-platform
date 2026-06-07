@@ -1,5 +1,8 @@
 {{-- Logo brand adaptif: mark (kotak emerald + glyph masjid putih) + wordmark.
-     Wordmark pakai currentColor → putih di sidebar gelap, gelap di login. --}}
+     Wordmark pakai currentColor → putih di sidebar gelap, gelap di login.
+     $name: nama brand (central = Pesantren.online; tenant = branding_name).
+     Glyph masjid = placeholder, dapat diganti logo brand nanti. --}}
+@php($brandName = $name ?? 'Pesantren.online')
 <div class="flex items-center gap-2.5">
     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary-600 text-white shadow-sm shadow-primary-600/30">
         <svg viewBox="0 0 32 32" class="h-5 w-5" fill="none" stroke="currentColor"
@@ -18,6 +21,6 @@
         </svg>
     </span>
     <span class="text-base font-bold leading-none tracking-tight">
-        TU Pesantren
+        {{ $brandName }}
     </span>
 </div>
