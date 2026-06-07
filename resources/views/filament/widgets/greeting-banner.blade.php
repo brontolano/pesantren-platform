@@ -1,12 +1,16 @@
 <x-filament-widgets::widget>
-    <div class="relative isolate overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-600 px-6 py-6 text-white shadow-sm sm:px-8 sm:py-7">
-        {{-- Ornamen pola samar --}}
-        <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl"></div>
+    {{-- ===== Banner sambutan — gradient WA-green (light) / TikTok-dark (dark) ===== --}}
+    <div class="relative isolate overflow-hidden rounded-2xl px-6 py-5 text-white shadow-sm sm:px-8 sm:py-6
+                bg-gradient-to-r from-[#004a38] via-[#008069] to-[#00a884]
+                dark:from-[#0f1c14] dark:via-[#161823] dark:to-[#1a243a]">
 
-        {{-- Ilustrasi siluet masjid (kanan) --}}
-        <svg class="pointer-events-none absolute inset-y-0 right-0 h-full w-80 text-white/20"
+        {{-- Ornamen bulat samar kanan atas --}}
+        <div class="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10 blur-2xl"></div>
+        <div class="pointer-events-none absolute right-32 -bottom-6 h-24 w-24 rounded-full bg-white/5 blur-xl"></div>
+
+        {{-- Ilustrasi siluet masjid (kanan) — lebih terang di dark mode --}}
+        <svg class="pointer-events-none absolute inset-y-0 right-0 h-full w-72 text-white/15 dark:text-white/10"
              viewBox="0 0 320 160" fill="currentColor" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
-            {{-- baseline --}}
             <rect x="0" y="150" width="320" height="10" />
             {{-- menara kiri --}}
             <rect x="92" y="58" width="9" height="92" rx="2" />
@@ -29,15 +33,19 @@
             <path d="M190 150v-34h26v34Z" />
             <path d="M190 116c0-10 6-17 13-17s13 7 13 17Z" />
             {{-- pintu lengkung --}}
-            <path d="M150 150v-22a10 10 0 0 1 20 0v22Z" fill="#0b3024" />
+            <path d="M150 150v-22a10 10 0 0 1 20 0v22Z" fill="rgba(0,0,0,0.25)" />
         </svg>
 
-        <div class="relative z-10 max-w-2xl">
-            <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">
-                Assalamu&rsquo;alaikum, {{ $nama }} <span class="inline-block">&#128075;</span>
+        <div class="relative z-10 max-w-xl">
+            <p class="mb-0.5 text-xs font-medium tracking-widest text-white/60 uppercase">
+                {{ now()->translatedFormat('l, d F Y') }}
+            </p>
+            <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
+                Assalamu&rsquo;alaikum, <span class="text-white/90">{{ $nama }}</span>
+                <span class="inline-block">&#128075;</span>
             </h2>
-            <p class="mt-2 text-sm text-white/85 sm:text-base">
-                Selamat datang di Panel Admin. Semoga semua aktivitas hari ini bernilai ibadah.
+            <p class="mt-1 text-sm text-white/75">
+                Semoga semua aktivitas hari ini bernilai ibadah.
             </p>
         </div>
     </div>

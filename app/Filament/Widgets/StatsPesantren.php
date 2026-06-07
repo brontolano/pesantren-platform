@@ -17,7 +17,22 @@ class StatsPesantren extends StatsOverviewWidget
 {
     protected static ?int $sort = -8;
 
-    protected ?string $heading = 'Ringkasan';
+    protected int|string|array $columnSpan = 'full';
+
+    protected ?string $heading = null; // heading dibuang — kartu berbicara sendiri
+
+    /**
+     * 5 kartu statistik dalam satu baris di xl, 3 di sm, 2 di mobile.
+     * Sesuai mockup: Total Santri · Pengurus · Kas Masuk · Kas Keluar · Tagihan.
+     */
+    protected function getColumns(): int|array
+    {
+        return [
+            'default' => 2,
+            'sm'      => 3,
+            'xl'      => 5,
+        ];
+    }
 
     protected function getStats(): array
     {
