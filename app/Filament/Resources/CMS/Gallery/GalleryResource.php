@@ -20,7 +20,6 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
-use Illuminate\Support\HtmlString;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -113,20 +112,23 @@ class GalleryResource extends Resource
                             ]),
 
                         Section::make('Foto Galeri')
-                            ->description('Unggah foto galeri. Seret ↕ untuk mengubah urutan. Setiap foto otomatis masuk ke File Media.')
+                            ->description('Foto yang sudah ada tampil sebagai grid. Klik "Tambah Foto" untuk unggah baru, seret ↕ untuk urutan. Tiap foto otomatis masuk ke File Media.')
                             ->icon('heroicon-o-photo')
                             ->schema([
                                 Repeater::make('images')
                                     ->hiddenLabel()
                                     ->relationship('images')
+                                    // Tata letak GRID seperti galeri chat (responsif).
+                                    ->grid(['default' => 1, 'sm' => 2, 'xl' => 3])
                                     ->schema([
+                                        // Thumbnail foto yang SUDAH ada (tampil).
                                         Placeholder::make('image_preview')
                                             ->hiddenLabel()
-                                            ->content(fn ($get): ?HtmlString => self::thumbnail($get('image_url')))
-                                            ->visible(fn ($get): bool => filled($get('image_url')))
-                                            ->columnSpanFull(),
+                                            ->content(fn ($get) => self::thumbnail($get('image_url')))
+                                            ->visible(fn ($get): bool => filled($get('image_url'))),
+                                        // Dropzone hanya untuk kartu baru (belum ada foto).
                                         FileUpload::make('image_url')
-                                            ->label('Foto')
+                                            ->label('Unggah Foto')
                                             ->image()
                                             ->imageEditor()
                                             ->disk(StorageQuotaService::diskName())
@@ -134,26 +136,22 @@ class GalleryResource extends Resource
                                             ->directory('cms/galleries/images')
                                             ->maxSize(2048)
                                             ->required()
-                                            ->columnSpanFull(),
+                                            ->visible(fn ($get): bool => blank($get('image_url'))),
                                         TextInput::make('caption')
-                                            ->label('Keterangan Foto')
+                                            ->hiddenLabel()
+                                            ->placeholder('Keterangan foto (opsional)')
                                             ->maxLength(255),
-                                        TextInput::make('sort_order')
-                                            ->label('Urutan')
-                                            ->numeric()
-                                            ->default(0)
-                                            ->minValue(0),
                                         Toggle::make('is_featured')
-                                            ->label('Foto Utama')
+                                            ->label('Jadikan foto utama')
+                                            ->inline(false)
                                             ->default(false),
                                     ])
-                                    ->columns(2)
+                                    // Tiap kartu: konten menumpuk vertikal.
+                                    ->columns(1)
                                     ->defaultItems(0)
                                     ->addActionLabel('Tambah Foto')
                                     ->reorderable('sort_order')
-                                    ->collapsible()
-                                    ->collapsed()
-                                    ->itemLabel(fn (array $state): ?string => $state['caption'] ?? 'Foto'),
+                                    ->itemLabel(fn (array $state): ?string => $state['caption'] ?? null),
                             ]),
                     ])->columnSpan(['default' => 1, 'lg' => 2]),
 
@@ -183,7 +181,7 @@ class GalleryResource extends Resource
                             ->schema([
                                 Placeholder::make('cover_preview')
                                     ->hiddenLabel()
-                                    ->content(fn ($get): ?HtmlString => self::thumbnail($get('cover_image_url')))
+                                    ->content(fn ($get) => self::thumbnail($get('cover_image_url')))
                                     ->visible(fn ($get): bool => filled($get('cover_image_url'))),
                                 FileUpload::make('cover_image_url')
                                     ->label('Gambar Cover')
@@ -216,20 +214,15 @@ class GalleryResource extends Resource
         ]);
     }
 
-    /** Render thumbnail <img> dari path/URL media via Gallery::resolveMediaUrl. */
-    private static function thumbnail(?string $value): ?HtmlString
+    /**
+     * Render thumbnail foto via Blade view (robust: ada fallback bila gambar
+     * gagal dimuat). URL di-resolve ke /_tenant-storage via resolveMediaUrl.
+     */
+    private static function thumbnail(?string $value): \Illuminate\Contracts\View\View
     {
-        $url = Gallery::resolveMediaUrl($value);
-
-        if (! $url) {
-            return null;
-        }
-
-        return new HtmlString(
-            '<img src="' . e($url) . '" alt="preview" '
-            . 'class="rounded-lg max-h-40 w-auto object-cover ring-1 ring-gray-200 dark:ring-white/10" '
-            . 'onerror="this.style.display=\'none\'">'
-        );
+        return view('filament.forms.gallery-thumb', [
+            'url' => Gallery::resolveMediaUrl($value),
+        ]);
     }
 
     public static function table(Table $table): Table
