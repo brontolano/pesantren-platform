@@ -141,6 +141,7 @@ class TenantPanelProvider extends PanelProvider
                 \App\Filament\Widgets\StatsPesantren::class,
                 \App\Filament\Widgets\KeuanganAreaChart::class,
                 \App\Filament\Widgets\KategoriPengeluaranChart::class,
+                \App\Filament\Widgets\TransaksiTerbaru::class,
             ])
             ->middleware([
                 // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user

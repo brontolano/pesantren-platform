@@ -6,7 +6,8 @@ Target: dashboard panel TENANT sama persis mockup TU Pesantren. Widget di Tenant
 - #2: `KeuanganAreaChart` (ChartWidget line/area, sort -6, columnSpan 4): 2 seri Pemasukan (Pembayaran verified per hari bln ini) vs Pengeluaran (0 — modul belum ada). maxHeight 280, legend top-end, fill. Verifikasi: php -l, boot, build hijau.
 - Konvensi grid: target dashboard 6 kolom (di-set #7). columnSpan: stats full · area 4 · donut 2 · transaksi 4 · panel kanan 2 · quickaccess full. Sampai #7 grid masih default (clamp) — wajar, dirapikan di #7.
 - #3: `KategoriPengeluaranChart` (ChartWidget doughnut, sort -5, columnSpan 2, cutout 65%): state kosong jujur (cincin abu "Belum ada data") krn modul kategori pengeluaran belum ada. getData() siap diisi saat modul dibuat. Verifikasi: php -l, boot, build hijau.
-- Sisa: #4 TransaksiTerbaru(table, span 4) · #5 panel kanan Pengumuman+Agenda(span 2) · #6 QuickAccess · #7 custom Dashboard page getColumns(6)+poles ukuran/kontras. SAAT BERES: minta izin deploy + CronDelete + minta screenshot.
+- #4: `TransaksiTerbaru` (TableWidget, sort -4, columnSpan 4): Pembayaran terakhir (with santri), kolom Tanggal/Keterangan(+metode)/Tipe(badge Masuk)/Jumlah(money IDR), paginasi 5. Empty state rapi. Verifikasi: php -l, boot, build hijau.
+- Sisa: #5 panel kanan Pengumuman+Agenda(span 2) · #6 QuickAccess · #7 custom Dashboard page getColumns(6)+poles ukuran/kontras. SAAT BERES: minta izin deploy + CronDelete + minta screenshot.
 
 ## FASE 5 — Integrasi Website / API (loop cron 1 mnt)
 - #32: register alias middleware `api.key` (AuthenticateTenantApiKey) di bootstrap/app.php + named RateLimiter `public-api` (PublicApiThrottle) di AppServiceProvider::boot. Siap dipasang `->middleware(['api.key','throttle:public-api'])`.
