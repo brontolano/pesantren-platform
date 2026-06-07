@@ -73,6 +73,7 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Pages\KelolaKuotaPenyimpanan::class,
             ])
             ->widgets([
+                \App\Filament\Widgets\GreetingBanner::class,
                 AccountWidget::class,
                 BillingOverviewWidget::class,
                 DevProgressWidget::class,

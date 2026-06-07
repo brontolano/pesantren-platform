@@ -136,6 +136,7 @@ class TenantPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->widgets([
+                \App\Filament\Widgets\GreetingBanner::class,
                 AccountWidget::class,
                 KesantrianOverviewWidget::class,
                 KeuanganOverviewWidget::class,

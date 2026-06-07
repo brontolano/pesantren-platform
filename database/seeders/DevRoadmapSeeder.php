@@ -20,6 +20,101 @@ class DevRoadmapSeeder extends Seeder
         $this->seedIntegrasiWebsite();
         $this->seedFileStorage();
         $this->seedPlatform();
+        $this->seedTemaModulPesantren();
+    }
+
+    /**
+     * Program "Tema & Modul TU Pesantren (UI Mockup)" — penyesuaian tampilan
+     * panel admin agar sesuai mockup TU Pesantren + modul administrasi baru.
+     * Idempotent: updateOrCreate by slug + task.title.
+     */
+    private function seedTemaModulPesantren(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'tema-modul-tu-pesantren'],
+            [
+                'name' => 'Tema & Modul TU Pesantren (UI Mockup)',
+                'description' => 'Re-tema panel admin Filament (tenant & central) agar sesuai mockup TU Pesantren: nuansa Islami emerald, sidebar hijau gelap, dashboard kaya (banner sambutan, kartu statistik, grafik, panel kanan), plus modul administrasi baru (Surat, Pengajuan, Inventaris, Arsip, Kategori Pengeluaran) dan opsi tema yang dapat dipilih tenant.',
+                'status' => 'in_progress',
+                'color' => 'success',
+                'icon' => 'heroicon-o-paint-brush',
+                'sort' => 6,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            ['Tema (UI)', 'Fondasi tema emerald di kedua panel (sidebar gelap, brand, kartu rounded)',
+                'Theme CSS custom (Tailwind v4 + Filament v5): sidebar hijau gelap, latar hangat, kartu rounded + bayangan halus, brand logo (mark masjid + wordmark adaptif). Diterapkan ke AdminPanelProvider & TenantPanelProvider.',
+                'Selesai (branch feat/theme-pesantren): theme.css + viteTheme + brandLogo; warna disatukan Emerald. Build hijau → assets/theme-*.css.',
+                'done', 'high', 100, 'M', 1],
+            ['Tema (UI)', 'Opsi tema dapat dipilih tenant (palet/skin via setting tenant)',
+                'Tenant memilih tema/palet dari pengaturan; warna panel di-resolve dinamis per tenant.',
+                'Belum. Fondasi tema tunggal sudah ada; perlu mekanisme switch + penyimpanan pilihan per tenant.',
+                'todo', 'medium', 0, 'M', 2],
+
+            ['Dashboard (visual mockup)', "Banner sambutan 'Assalamu'alaikum' + ilustrasi masjid",
+                'Widget full-width di atas dashboard: salam + nama user + subjudul, latar gradient emerald + ilustrasi masjid.',
+                'Sedang dibangun (GreetingBanner widget).',
+                'in_progress', 'high', 50, 'S', 3],
+            ['Dashboard (visual mockup)', 'Kartu statistik (santri, ustadz/pengurus, kas masuk/keluar bulan ini)',
+                'StatsOverviewWidget bergaya kartu: ikon chip, nilai, delta vs bulan lalu — dari data nyata (Santri, User, Pembayaran/Tagihan).',
+                'Belum. Sumber data tersedia (Santri, Pembayaran, Tagihan).',
+                'todo', 'high', 0, 'M', 4],
+            ['Dashboard (visual mockup)', 'Grafik area Ringkasan Keuangan (pemasukan vs pengeluaran)',
+                'ChartWidget area dua seri (pemasukan/pengeluaran) per hari/bulan.',
+                'Belum. Data dari Pembayaran/Tagihan + kas keluar.',
+                'todo', 'medium', 0, 'M', 5],
+            ['Dashboard (visual mockup)', 'Grafik donat Kategori Pengeluaran',
+                'ChartWidget doughnut per kategori pengeluaran.',
+                'Belum — bergantung modul Kategori Pengeluaran.',
+                'todo', 'medium', 0, 'S', 6],
+            ['Dashboard (visual mockup)', 'Tabel Transaksi Terbaru + Quick Access shortcut',
+                'Table widget transaksi terakhir + baris shortcut aksi cepat (tambah santri, kas, surat, dll).',
+                'Belum. Transaksi dari Pembayaran/Tagihan.',
+                'todo', 'medium', 0, 'M', 7],
+            ['Dashboard (visual mockup)', 'Panel kanan: Pengumuman & Agenda Mendatang',
+                'Daftar pengumuman terbaru + agenda mendatang (dari Kegiatan).',
+                'Sebagian: Kegiatan ada; Pengumuman terpisah belum.',
+                'todo', 'medium', 0, 'M', 8],
+
+            ['Modul baru', 'Surat & Administrasi (surat masuk/keluar + penomoran + arsip)',
+                'CRUD surat masuk/keluar, nomor surat otomatis, lampiran, status disposisi.',
+                'Belum ada. Modul baru.',
+                'todo', 'medium', 0, 'L', 9],
+            ['Modul baru', 'Pengajuan (workflow ajukan → proses → setujui/tolak)',
+                'Pengurus mengajukan (dana/kegiatan/perbaikan); alur persetujuan + status + riwayat.',
+                'Belum ada. Modul baru (tampil di mockup: Pengajuan Aktif/Terbaru).',
+                'todo', 'medium', 0, 'L', 10],
+            ['Modul baru', 'Inventaris (aset/barang + stok + kondisi + lokasi)',
+                'Pendataan aset pesantren: kategori, jumlah, kondisi, lokasi, mutasi.',
+                'Belum ada. Modul baru.',
+                'todo', 'medium', 0, 'L', 11],
+            ['Modul baru', 'Arsip Dokumen (repositori dokumen + kategori + unduh)',
+                'Penyimpanan dokumen administrasi berkategori; integrasi File Storage/MediaFile.',
+                'Belum ada (bisa memanfaatkan modul File Storage yang sudah ada).',
+                'todo', 'low', 0, 'M', 12],
+            ['Modul baru', 'Kategori Pengeluaran (master + dipakai di kas keluar & grafik donat)',
+                'Master kategori pengeluaran; dipakai transaksi kas keluar + sumber grafik donat dashboard.',
+                'Belum ada sebagai master tersendiri.',
+                'todo', 'medium', 0, 'S', 13],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
     }
 
     /**
