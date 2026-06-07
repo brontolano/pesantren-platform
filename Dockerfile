@@ -63,7 +63,12 @@ COPY Caddyfile /etc/caddy/Caddyfile
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Buat direktori temp Livewire (disk 'livewire-tmp', lihat config/filesystems.php).
+# Direktori ini tidak ada di git (file-nya di-gitignore). Tanpa ini,
+# Storage::disk('livewire-tmp')->put() gagal senyap (throw:false) →
+# Livewire tidak bisa size() → loop "Menunggu ukuran berkas" tanpa henti.
+RUN mkdir -p storage/app/livewire-tmp \
+    && chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 80 443
 

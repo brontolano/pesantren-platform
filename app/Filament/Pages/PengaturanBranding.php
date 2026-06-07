@@ -20,6 +20,16 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+// NOTE: FileUpload SENGAJA tidak di-fill dengan logo path yang tersimpan.
+// Alasan: Filament v5 FileUpload yang diisi path existing akan memanggil
+// Storage::disk('public')->url($path) → APP_URL/storage/{path}.
+// Di Docker + stancl/tenancy, file sesungguhnya berada di
+// storage/tenantXXX/app/public/{path} (path tenant), tetapi symlink
+// public/storage → storage/app/public/ (non-tenant) → URL selalu 404.
+// Hasilnya: komponen Alpine.js hang di "awaitingFileSize = true" →
+// "Menunggu ukuran berkas" tak terbatas.
+// Solusi: logo existing ditampilkan via route /_tenant-storage/{path} di blade.
+
 /**
  * Halaman pengaturan branding tenant dalam bentuk SATU form biasa
  * (menggantikan resource CRUD key-value lama). Tiap field di-mapping ke
@@ -43,6 +53,13 @@ class PengaturanBranding extends Page implements HasForms
     protected string $view = 'filament.pages.pengaturan-branding';
 
     public ?array $data = [];
+
+    /**
+     * Path logo yang sudah tersimpan di disk 'public' tenant.
+     * Diisi di mount(), dibaca blade untuk preview via /_tenant-storage/{path}.
+     * TIDAK dimasukkan ke FileUpload (lihat komentar di bagian import).
+     */
+    public ?string $currentLogoPath = null;
 
     /** Pilihan font branding (key => label). */
     public const FONTS = [
@@ -72,15 +89,19 @@ class PengaturanBranding extends Page implements HasForms
     {
         $settings = Setting::query()->get()->keyBy('key');
 
+        // Simpan path logo tersimpan sebagai Livewire property terpisah.
+        // Blade template akan menampilkan preview via route /_tenant-storage/{path}.
+        $this->currentLogoPath = data_get($settings->get('branding_logo')?->value, 'logo_path');
+
         $this->form->fill([
-            'branding_name' => data_get($settings->get('branding_name')?->value, 'text'),
-            'branding_tagline' => data_get($settings->get('branding_tagline')?->value, 'text'),
-            'branding_primary_color' => data_get($settings->get('branding_primary_color')?->value, 'color', self::DEFAULT_PRIMARY),
-            'branding_secondary_color' => data_get($settings->get('branding_secondary_color')?->value, 'color', self::DEFAULT_SECONDARY),
-            'branding_logo' => data_get($settings->get('branding_logo')?->value, 'logo_path'),
-            'branding_favicon' => data_get($settings->get('branding_favicon')?->value, 'text'),
-            'branding_font' => data_get($settings->get('branding_font')?->value, 'text', 'default'),
-            'ppdb_form_fields' => data_get($settings->get('ppdb_form_fields')?->value, 'fields', []),
+            'branding_name'             => data_get($settings->get('branding_name')?->value, 'text'),
+            'branding_tagline'          => data_get($settings->get('branding_tagline')?->value, 'text'),
+            'branding_primary_color'    => data_get($settings->get('branding_primary_color')?->value, 'color', self::DEFAULT_PRIMARY),
+            'branding_secondary_color'  => data_get($settings->get('branding_secondary_color')?->value, 'color', self::DEFAULT_SECONDARY),
+            'branding_logo'             => null,   // SENGAJA null — lihat komentar di atas
+            'branding_favicon'          => data_get($settings->get('branding_favicon')?->value, 'text'),
+            'branding_font'             => data_get($settings->get('branding_font')?->value, 'text', 'default'),
+            'ppdb_form_fields'          => data_get($settings->get('ppdb_form_fields')?->value, 'fields', []),
         ]);
     }
 
@@ -121,17 +142,15 @@ class PengaturanBranding extends Page implements HasForms
                     ->description('Unggah logo pesantren dan tentukan favicon untuk tab browser.')
                     ->schema([
                         FileUpload::make('branding_logo')
-                            ->label('Logo')
+                            ->label('Upload Logo Baru')
                             ->disk(StorageQuotaService::diskName())
                             ->directory('branding')
                             ->image()
-                            // imageEditor() SENGAJA dibuang — membutuhkan akses URL
-                            // ke file temp (via /livewire/preview-file) yang rawan
-                            // gagal di Docker + stancl/tenancy. Logo upload sederhana
-                            // tidak butuh crop editor.
+                            // imageEditor() SENGAJA dibuang — butuh URL preview temp
+                            // file via /livewire/preview-file; rawan gagal di Docker.
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
                             ->maxSize(2048)
-                            ->helperText('Format JPG/PNG/WebP/SVG, maksimal 2 MB. File tersimpan ke media library.'),
+                            ->helperText('JPG/PNG/WebP/SVG, maks 2 MB. Logo lama tetap aktif sampai ada yang baru.'),
                         TextInput::make('branding_favicon')
                             ->label('Favicon URL / Path')
                             ->helperText('Boleh URL absolut atau path file publik.')
@@ -155,28 +174,44 @@ class PengaturanBranding extends Page implements HasForms
     {
         $data = $this->form->getState();
 
-        $logoPath = $data['branding_logo'] ?? null;
+        // Jika user upload logo baru → pakai; jika tidak → pertahankan logo lama.
+        $newLogoPath = $data['branding_logo'] ?? null;
+        $logoPath    = $newLogoPath ?: $this->currentLogoPath;
 
-        // Integrasi media library: logo yang diunggah juga tercatat di media_files
-        // agar terlihat di halaman File Media & dihitung dalam kuota penyimpanan.
-        if ($logoPath) {
-            $this->registerLogoAsMediaFile($logoPath);
+        if ($newLogoPath) {
+            // Daftarkan logo baru ke media library
+            $this->registerLogoAsMediaFile($newLogoPath);
+            // Update property agar blade langsung menampilkan logo baru
+            $this->currentLogoPath = $newLogoPath;
         }
 
         $payloads = [
-            'branding_name'          => ['text' => $data['branding_name'] ?? null],
-            'branding_tagline'       => ['text' => $data['branding_tagline'] ?? null],
-            'branding_primary_color' => ['color' => $data['branding_primary_color'] ?? null],
+            'branding_name'            => ['text' => $data['branding_name'] ?? null],
+            'branding_tagline'         => ['text' => $data['branding_tagline'] ?? null],
+            'branding_primary_color'   => ['color' => $data['branding_primary_color'] ?? null],
             'branding_secondary_color' => ['color' => $data['branding_secondary_color'] ?? null],
-            'branding_logo'          => ['logo_path' => $logoPath],
-            'branding_favicon'       => ['text' => $data['branding_favicon'] ?? null],
-            'branding_font'          => ['text' => $data['branding_font'] ?? 'default'],
-            'ppdb_form_fields'       => ['fields' => $data['ppdb_form_fields'] ?? []],
+            'branding_logo'            => ['logo_path' => $logoPath],
+            'branding_favicon'         => ['text' => $data['branding_favicon'] ?? null],
+            'branding_font'            => ['text' => $data['branding_font'] ?? 'default'],
+            'ppdb_form_fields'         => ['fields' => $data['ppdb_form_fields'] ?? []],
         ];
 
         foreach ($payloads as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
+
+        // Reset FileUpload ke kosong agar tidak mencoba preview path final
+        // (path final di disk tenant tidak bisa di-resolve via URL standar).
+        $this->form->fill([
+            'branding_name'            => $data['branding_name'] ?? null,
+            'branding_tagline'         => $data['branding_tagline'] ?? null,
+            'branding_primary_color'   => $data['branding_primary_color'] ?? null,
+            'branding_secondary_color' => $data['branding_secondary_color'] ?? null,
+            'branding_logo'            => null,   // Selalu kosong pasca-save
+            'branding_favicon'         => $data['branding_favicon'] ?? null,
+            'branding_font'            => $data['branding_font'] ?? 'default',
+            'ppdb_form_fields'         => $data['ppdb_form_fields'] ?? [],
+        ]);
 
         Notification::make()
             ->title('Pengaturan branding disimpan')

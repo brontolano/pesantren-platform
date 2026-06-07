@@ -37,6 +37,30 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
     InitializeTenancyByDomain::class,
 ])->group(function () {
+
+    /*
+     * Tenant storage file serve — dipakai blade Settings & Branding untuk
+     * menampilkan preview logo. Storage::url('public') menghasilkan URL
+     * APP_URL/storage/{path} yang tidak ter-resolve ke path tenant di Docker
+     * (tidak ada symlink tenant-specific). Route ini men-serve file langsung
+     * dari PHP menggunakan disk 'public' yang sudah ter-bootstrap untuk tenant,
+     * sehingga path-nya selalu benar tanpa memerlukan symlink.
+     *
+     * Akses hanya untuk pengguna yang sudah login (middleware 'auth' via
+     * Filament panel — request dari blade Livewire sudah terautentikasi).
+     * Fallback: 404 jika file tidak ada.
+     */
+    Route::get('/_tenant-storage/{path}', function (string $path) {
+        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+        // Sanitasi path — cegah directory traversal
+        $path = ltrim(str_replace('..', '', $path), '/');
+        abort_unless($disk->exists($path), 404);
+        return response()->file(
+            $disk->path($path),
+            ['Content-Type' => $disk->mimeType($path) ?: 'application/octet-stream'],
+        );
+    })->where('path', '.*')->name('tenant.storage.file');
+
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {
