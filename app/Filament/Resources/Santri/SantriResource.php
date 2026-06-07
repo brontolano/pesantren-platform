@@ -10,9 +10,12 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Illuminate\Support\Facades\DB;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
@@ -118,22 +121,89 @@ class SantriResource extends Resource
                     ->label('RT/RW')
                     ->maxLength(255)
                     ->placeholder('003/008'),
-                TextInput::make('desa_kelurahan')
-                    ->label('Desa / Kelurahan')
-                    ->maxLength(255),
-                TextInput::make('kecamatan')
-                    ->label('Kecamatan')
-                    ->maxLength(255),
-                TextInput::make('kabupaten_kota')
-                    ->label('Kabupaten / Kota')
-                    ->maxLength(255),
-                TextInput::make('provinsi')
-                    ->label('Provinsi')
-                    ->maxLength(255),
                 TextInput::make('kode_pos')
                     ->label('Kode POS')
                     ->maxLength(255)
                     ->placeholder('45321'),
+                Select::make('provinsi')
+                    ->label('Provinsi')
+                    ->options(function () {
+                        try {
+                            return DB::table('provinces')->orderBy('name')->pluck('name', 'name')->toArray();
+                        } catch (\Exception $e) {
+                            return [];
+                        }
+                    })
+                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set) {
+                        $set('kabupaten_kota', null);
+                        $set('kecamatan', null);
+                        $set('desa_kelurahan', null);
+                    }),
+                Select::make('kabupaten_kota')
+                    ->label('Kabupaten / Kota')
+                    ->options(function (Get $get) {
+                        try {
+                            $provinsi = $get('provinsi');
+                            if (! $provinsi) return [];
+                            $province = DB::table('provinces')->where('name', $provinsi)->first();
+                            if (! $province) return [];
+                            return DB::table('cities')
+                                ->where('province_id', $province->id)
+                                ->orderBy('name')
+                                ->pluck('name', 'name')
+                                ->toArray();
+                        } catch (\Exception $e) {
+                            return [];
+                        }
+                    })
+                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set) {
+                        $set('kecamatan', null);
+                        $set('desa_kelurahan', null);
+                    }),
+                Select::make('kecamatan')
+                    ->label('Kecamatan')
+                    ->options(function (Get $get) {
+                        try {
+                            $kota = $get('kabupaten_kota');
+                            if (! $kota) return [];
+                            $city = DB::table('cities')->where('name', $kota)->first();
+                            if (! $city) return [];
+                            return DB::table('districts')
+                                ->where('city_id', $city->id)
+                                ->orderBy('name')
+                                ->pluck('name', 'name')
+                                ->toArray();
+                        } catch (\Exception $e) {
+                            return [];
+                        }
+                    })
+                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set) {
+                        $set('desa_kelurahan', null);
+                    }),
+                Select::make('desa_kelurahan')
+                    ->label('Desa / Kelurahan')
+                    ->options(function (Get $get) {
+                        try {
+                            $kecamatan = $get('kecamatan');
+                            if (! $kecamatan) return [];
+                            $district = DB::table('districts')->where('name', $kecamatan)->first();
+                            if (! $district) return [];
+                            return DB::table('villages')
+                                ->where('district_id', $district->id)
+                                ->orderBy('name')
+                                ->pluck('name', 'name')
+                                ->toArray();
+                        } catch (\Exception $e) {
+                            return [];
+                        }
+                    })
+                    ->searchable(),
             ])->columns(2),
 
             Section::make('Data Wali / Orang Tua')->schema([
@@ -149,22 +219,89 @@ class SantriResource extends Resource
                         ->label('RT/RW')
                         ->maxLength(255)
                         ->placeholder('001/002'),
-                    TextInput::make('desa_kelurahan_wali')
-                        ->label('Desa / Kelurahan')
-                        ->maxLength(255),
-                    TextInput::make('kecamatan_wali')
-                        ->label('Kecamatan')
-                        ->maxLength(255),
-                    TextInput::make('kabupaten_kota_wali')
-                        ->label('Kabupaten / Kota')
-                        ->maxLength(255),
-                    TextInput::make('provinsi_wali')
-                        ->label('Provinsi')
-                        ->maxLength(255),
                     TextInput::make('kode_pos_wali')
                         ->label('Kode POS')
                         ->maxLength(255)
                         ->placeholder('45312'),
+                    Select::make('provinsi_wali')
+                        ->label('Provinsi')
+                        ->options(function () {
+                            try {
+                                return DB::table('provinces')->orderBy('name')->pluck('name', 'name')->toArray();
+                            } catch (\Exception $e) {
+                                return [];
+                            }
+                        })
+                        ->searchable()
+                        ->live()
+                        ->afterStateUpdated(function (Set $set) {
+                            $set('kabupaten_kota_wali', null);
+                            $set('kecamatan_wali', null);
+                            $set('desa_kelurahan_wali', null);
+                        }),
+                    Select::make('kabupaten_kota_wali')
+                        ->label('Kabupaten / Kota')
+                        ->options(function (Get $get) {
+                            try {
+                                $provinsi = $get('provinsi_wali');
+                                if (! $provinsi) return [];
+                                $province = DB::table('provinces')->where('name', $provinsi)->first();
+                                if (! $province) return [];
+                                return DB::table('cities')
+                                    ->where('province_id', $province->id)
+                                    ->orderBy('name')
+                                    ->pluck('name', 'name')
+                                    ->toArray();
+                            } catch (\Exception $e) {
+                                return [];
+                            }
+                        })
+                        ->searchable()
+                        ->live()
+                        ->afterStateUpdated(function (Set $set) {
+                            $set('kecamatan_wali', null);
+                            $set('desa_kelurahan_wali', null);
+                        }),
+                    Select::make('kecamatan_wali')
+                        ->label('Kecamatan')
+                        ->options(function (Get $get) {
+                            try {
+                                $kota = $get('kabupaten_kota_wali');
+                                if (! $kota) return [];
+                                $city = DB::table('cities')->where('name', $kota)->first();
+                                if (! $city) return [];
+                                return DB::table('districts')
+                                    ->where('city_id', $city->id)
+                                    ->orderBy('name')
+                                    ->pluck('name', 'name')
+                                    ->toArray();
+                            } catch (\Exception $e) {
+                                return [];
+                            }
+                        })
+                        ->searchable()
+                        ->live()
+                        ->afterStateUpdated(function (Set $set) {
+                            $set('desa_kelurahan_wali', null);
+                        }),
+                    Select::make('desa_kelurahan_wali')
+                        ->label('Desa / Kelurahan')
+                        ->options(function (Get $get) {
+                            try {
+                                $kecamatan = $get('kecamatan_wali');
+                                if (! $kecamatan) return [];
+                                $district = DB::table('districts')->where('name', $kecamatan)->first();
+                                if (! $district) return [];
+                                return DB::table('villages')
+                                    ->where('district_id', $district->id)
+                                    ->orderBy('name')
+                                    ->pluck('name', 'name')
+                                    ->toArray();
+                            } catch (\Exception $e) {
+                                return [];
+                            }
+                        })
+                        ->searchable(),
                 ])->columns(2)->columnSpanFull(),
             ])->columns(2),
 
