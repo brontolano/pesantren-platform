@@ -31,9 +31,9 @@ class TenantWebsiteService
             $brandingTagline
         );
 
-        $logoUrl = Setting::getTenantStringValue('branding_logo', null);
-        $favicon = Setting::getTenantStringValue('branding_favicon', null);
-        $font = Setting::getTenantStringValue('branding_font', 'default');
+        $logoUrl  = $this->resolveAssetUrl(Setting::getTenantStringValue('branding_logo', null));
+        $favicon  = Setting::getTenantStringValue('branding_favicon', null);
+        $font     = Setting::getTenantStringValue('branding_font', 'default');
         $fontFamily = $this->resolveFontFamily($font);
 
         return [
@@ -460,6 +460,25 @@ class TenantWebsiteService
         $description = is_string($preferredDescription) ? trim($preferredDescription) : '';
 
         return $description !== '' ? Str::limit($description, 160, '') : Str::limit($fallback, 160, '');
+    }
+
+    /**
+     * Resolve URL aset branding (logo, favicon) dari path relatif ke URL yang dapat diakses.
+     * Storage::disk('public')->url() TIDAK dipakai — menghasilkan APP_URL/storage/{path}
+     * yang 404 di Docker karena symlink hanya ke non-tenant storage.
+     * Route /_tenant-storage/{path} men-serve file langsung dari PHP dengan konteks tenant.
+     */
+    protected function resolveAssetUrl(?string $value): ?string
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/')) {
+            return $value;
+        }
+
+        return url('/_tenant-storage/' . ltrim($value, '/'));
     }
 
     protected function resolveFontFamily(?string $font): string

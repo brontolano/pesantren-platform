@@ -25,9 +25,26 @@ class TenantApiController extends Controller
                 'tagline' => Setting::getTenantStringValue('branding_tagline'),
                 'warna_primer' => Setting::getTenantStringValue('branding_primary_color'),
                 'warna_sekunder' => Setting::getTenantStringValue('branding_secondary_color'),
-                'logo' => Setting::getTenantStringValue('branding_logo'),
+                // logo_url: full URL via /_tenant-storage/{path} (bukan raw path).
+                // Storage::disk('public')->url() tidak dipakai — URL-nya 404 di Docker.
+                'logo_url' => $this->resolveTenantAssetUrl(Setting::getTenantStringValue('branding_logo')),
             ],
         ]]);
+    }
+
+    /**
+     * Ubah path relatif aset tenant (misal "branding/logo.png") menjadi URL publik
+     * yang benar via route /_tenant-storage/{path}.
+     */
+    private function resolveTenantAssetUrl(?string $path): ?string
+    {
+        if ($path === null || trim($path) === '') {
+            return null;
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+        return url('/_tenant-storage/' . ltrim($path, '/'));
     }
 
     /** Statistik ringkas (santri & pendaftar). */

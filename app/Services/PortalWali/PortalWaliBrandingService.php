@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services\PortalWali;
 
 use App\Models\Setting;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class PortalWaliBrandingService
@@ -74,10 +73,14 @@ class PortalWaliBrandingService
             return null;
         }
 
+        // URL absolut / path absolut — kembalikan apa adanya
         if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://') || str_starts_with($value, '/')) {
             return $value;
         }
 
-        return Storage::disk('public')->url($value);
+        // File di disk 'public' tenant: serve via route /_tenant-storage/{path}.
+        // Storage::disk('public')->url() TIDAK dipakai karena menghasilkan
+        // APP_URL/storage/{path} yang 404 di Docker (symlink hanya non-tenant).
+        return url('/_tenant-storage/' . ltrim($value, '/'));
     }
 }
