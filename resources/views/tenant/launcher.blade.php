@@ -25,6 +25,8 @@
             border:1px solid rgba(255,255,255,.14);box-shadow:0 10px 30px rgba(0,0,0,.35);backdrop-filter:blur(8px)
         }
         .badge svg{width:38px;height:38px;stroke:#5eead4;fill:none;stroke-width:1.5}
+        .badge img{width:100%;height:100%;object-fit:contain;border-radius:14px}
+        .badge.has-logo{background:#fff;border-color:rgba(255,255,255,.25);padding:8px}
         h1{font-size:clamp(1.05rem,4.4vw,1.55rem);font-weight:700;line-height:1.3;letter-spacing:-.01em}
         .subtitle{margin-top:8px;font-size:.86rem;color:#9fb0c0;font-weight:500}
         .grid{
@@ -85,9 +87,15 @@
 
     <div class="wrap">
         <header>
-            <div class="badge" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.33A48.4 48.4 0 0 0 12 9.75c-2.55 0-5.06.2-7.5.58V21M3 21h18M12 6.75h.01v.01H12V6.75Z"/></svg>
-            </div>
+            @if (! empty($logoUrl))
+                <div class="badge has-logo">
+                    <img src="{{ $logoUrl }}" alt="{{ $pesantren }}">
+                </div>
+            @else
+                <div class="badge" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.33A48.4 48.4 0 0 0 12 9.75c-2.55 0-5.06.2-7.5.58V21M3 21h18M12 6.75h.01v.01H12V6.75Z"/></svg>
+                </div>
+            @endif
             <h1>{{ $pesantren }}</h1>
             <p class="subtitle">Portal Sistem — pilih aplikasi</p>
         </header>

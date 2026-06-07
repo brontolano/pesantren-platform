@@ -8,45 +8,55 @@
         <div class="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10 blur-2xl"></div>
         <div class="pointer-events-none absolute right-32 -bottom-6 h-24 w-24 rounded-full bg-white/5 blur-xl"></div>
 
-        {{-- Ilustrasi siluet masjid (kanan) — lebih terang di dark mode --}}
-        <svg class="pointer-events-none absolute inset-y-0 right-0 h-full w-72 text-white/15 dark:text-white/10"
-             viewBox="0 0 320 160" fill="currentColor" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
-            <rect x="0" y="150" width="320" height="10" />
-            {{-- menara kiri --}}
-            <rect x="92" y="58" width="9" height="92" rx="2" />
-            <path d="M88 60c0-6 3.5-11 8.5-11S105 54 105 60Z" />
-            <circle cx="96.5" cy="44" r="3" />
-            {{-- menara kanan --}}
-            <rect x="219" y="58" width="9" height="92" rx="2" />
-            <path d="M215 60c0-6 3.5-11 8.5-11s8.5 5 8.5 11Z" />
-            <circle cx="223.5" cy="44" r="3" />
-            {{-- bangunan utama --}}
-            <path d="M120 150V92h80v58Z" />
-            {{-- kubah utama --}}
-            <path d="M120 92c0-22 18-36 40-36s40 14 40 36Z" />
-            <circle cx="160" cy="40" r="4" />
-            <path d="M160 36v-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-            {{-- kubah samping kiri --}}
-            <path d="M104 150v-34h26v34Z" />
-            <path d="M104 116c0-10 6-17 13-17s13 7 13 17Z" />
-            {{-- kubah samping kanan --}}
-            <path d="M190 150v-34h26v34Z" />
-            <path d="M190 116c0-10 6-17 13-17s13 7 13 17Z" />
-            {{-- pintu lengkung --}}
-            <path d="M150 150v-22a10 10 0 0 1 20 0v22Z" fill="rgba(0,0,0,0.25)" />
-        </svg>
+        <div class="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            {{-- Kiri: sambutan --}}
+            <div class="max-w-xl">
+                <p class="mb-0.5 text-xs font-medium tracking-widest text-white/60 uppercase">
+                    {{ now()->translatedFormat('l, d F Y') }}
+                </p>
+                <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
+                    Assalamu&rsquo;alaikum, <span class="text-white/90">{{ $nama }}</span>
+                    <span class="inline-block">&#128075;</span>
+                </h2>
+                <p class="mt-1 text-sm text-white/75">
+                    Semoga semua aktivitas hari ini bernilai ibadah.
+                </p>
+            </div>
 
-        <div class="relative z-10 max-w-xl">
-            <p class="mb-0.5 text-xs font-medium tracking-widest text-white/60 uppercase">
-                {{ now()->translatedFormat('l, d F Y') }}
-            </p>
-            <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
-                Assalamu&rsquo;alaikum, <span class="text-white/90">{{ $nama }}</span>
-                <span class="inline-block">&#128075;</span>
-            </h2>
-            <p class="mt-1 text-sm text-white/75">
-                Semoga semua aktivitas hari ini bernilai ibadah.
-            </p>
+            {{-- Kanan: JADWAL SHOLAT hari ini (pengganti ilustrasi masjid) --}}
+            <div class="shrink-0 rounded-2xl bg-white/10 p-3 ring-1 ring-inset ring-white/15 backdrop-blur-sm
+                        dark:bg-white/[0.06] dark:ring-white/10">
+                <div class="mb-2 flex items-center gap-1.5 px-1 text-[11px] font-semibold uppercase tracking-wider text-white/70">
+                    {{-- ikon bulan-sabit kecil --}}
+                    <svg viewBox="0 0 16 16" class="h-3.5 w-3.5" fill="currentColor" aria-hidden="true">
+                        <path d="M9.4 2.2A5.2 5.2 0 1 0 13 11a4 4 0 1 1-3.6-8.8Z" />
+                    </svg>
+                    Jadwal Sholat Hari Ini
+                </div>
+                <div class="flex items-stretch gap-1.5">
+                    @foreach ($prayers as $p)
+                        @php($isNext = $p['key'] === ($nextPrayer ?? null))
+                        <div @class([
+                                'flex min-w-[3.25rem] flex-col items-center rounded-xl px-2.5 py-2 text-center transition',
+                                'bg-white text-[#008069] shadow-sm dark:bg-[#00a884] dark:text-white' => $isNext,
+                                'text-white/85' => ! $isNext,
+                            ])>
+                            <span @class([
+                                    'text-[10px] font-semibold uppercase tracking-wide',
+                                    'text-[#008069]/80 dark:text-white/90' => $isNext,
+                                    'text-white/60' => ! $isNext,
+                                ])>{{ $p['label'] }}</span>
+                            <span class="mt-0.5 text-sm font-bold tabular-nums">{{ $p['time'] }}</span>
+                            @if ($isNext)
+                                <span class="mt-0.5 text-[8px] font-semibold uppercase tracking-wider text-[#008069]/70 dark:text-white/80">berikutnya</span>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+                <p class="mt-1.5 px-1 text-[10px] text-white/45">
+                    Perkiraan waktu (metode Kemenag) · zona WIB
+                </p>
+            </div>
         </div>
     </div>
 </x-filament-widgets::widget>

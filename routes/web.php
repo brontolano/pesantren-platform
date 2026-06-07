@@ -30,7 +30,8 @@ Route::get('/', function () {
     }
 
     return view('tenant.launcher', [
-        'pesantren' => tenant()?->name ?? 'Portal Pesantren',
+        'pesantren' => \App\Support\TenantBranding::name(tenant()?->name ?? 'Portal Pesantren'),
+        'logoUrl' => \App\Support\TenantBranding::logoUrl(),
     ]);
 })->name('home');
 

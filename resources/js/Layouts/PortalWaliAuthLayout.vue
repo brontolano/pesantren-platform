@@ -20,7 +20,16 @@ const rootStyle = computed(() => ({
     <div class="min-h-screen bg-stone-100 text-stone-900" :style="rootStyle">
         <div class="mx-auto flex min-h-screen max-w-md flex-col px-5 py-6">
             <Link href="/" class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-stone-600">
-                <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[var(--wali-primary)] text-sm font-semibold text-white">
+                <span
+                    v-if="branding.logoUrl"
+                    class="inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-2xl bg-white ring-1 ring-stone-200"
+                >
+                    <img :src="branding.logoUrl" :alt="branding.name ?? 'Logo'" class="h-full w-full object-contain p-1">
+                </span>
+                <span
+                    v-else
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[var(--wali-primary)] text-sm font-semibold text-white"
+                >
                     {{ (branding.shortName ?? 'PW').slice(0, 2).toUpperCase() }}
                 </span>
                 <span class="min-w-0">

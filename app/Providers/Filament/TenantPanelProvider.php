@@ -72,7 +72,10 @@ class TenantPanelProvider extends PanelProvider
             ->profile()
             ->spa()
             ->viteTheme('resources/css/filament/pesantren/theme.css')
-            ->brandLogo(fn () => view('filament.brand', ['name' => static::resolveTenantBrandName()]))
+            ->brandLogo(fn () => view('filament.brand', [
+                'name' => static::resolveTenantBrandName(),
+                'logoUrl' => \App\Support\TenantBranding::logoUrl(),
+            ]))
             ->brandLogoHeight('2.25rem')
             ->colors([
                 'primary' => Color::Green,

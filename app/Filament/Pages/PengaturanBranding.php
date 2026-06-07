@@ -101,6 +101,8 @@ class PengaturanBranding extends Page implements HasForms
             'branding_logo'             => null,   // SENGAJA null — lihat komentar di atas
             'branding_favicon'          => data_get($settings->get('branding_favicon')?->value, 'text'),
             'branding_font'             => data_get($settings->get('branding_font')?->value, 'text', 'default'),
+            'branding_latitude'         => data_get($settings->get('branding_latitude')?->value, 'text'),
+            'branding_longitude'        => data_get($settings->get('branding_longitude')?->value, 'text'),
             'ppdb_form_fields'          => data_get($settings->get('ppdb_form_fields')?->value, 'fields', []),
         ]);
     }
@@ -158,6 +160,24 @@ class PengaturanBranding extends Page implements HasForms
                     ])
                     ->columns(2),
 
+                Section::make('Lokasi & Jadwal Sholat')
+                    ->description('Koordinat pesantren untuk perhitungan jadwal sholat di dashboard (metode Kemenag, zona WIB). Kosongkan untuk memakai default Bandung.')
+                    ->schema([
+                        TextInput::make('branding_latitude')
+                            ->label('Lintang (Latitude)')
+                            ->helperText('Contoh: -6.85 (selatan = negatif)')
+                            ->numeric()
+                            ->minValue(-11)
+                            ->maxValue(6),
+                        TextInput::make('branding_longitude')
+                            ->label('Bujur (Longitude)')
+                            ->helperText('Contoh: 107.49')
+                            ->numeric()
+                            ->minValue(95)
+                            ->maxValue(141),
+                    ])
+                    ->columns(2),
+
                 Section::make('Form PPDB')
                     ->description('Atur mode tiap field formulir PPDB. Isi nilai dengan: required, optional, atau hidden.')
                     ->schema([
@@ -193,6 +213,8 @@ class PengaturanBranding extends Page implements HasForms
             'branding_logo'            => ['logo_path' => $logoPath],
             'branding_favicon'         => ['text' => $data['branding_favicon'] ?? null],
             'branding_font'            => ['text' => $data['branding_font'] ?? 'default'],
+            'branding_latitude'        => ['text' => $data['branding_latitude'] ?? null],
+            'branding_longitude'       => ['text' => $data['branding_longitude'] ?? null],
             'ppdb_form_fields'         => ['fields' => $data['ppdb_form_fields'] ?? []],
         ];
 
@@ -210,6 +232,8 @@ class PengaturanBranding extends Page implements HasForms
             'branding_logo'            => null,   // Selalu kosong pasca-save
             'branding_favicon'         => $data['branding_favicon'] ?? null,
             'branding_font'            => $data['branding_font'] ?? 'default',
+            'branding_latitude'        => $data['branding_latitude'] ?? null,
+            'branding_longitude'       => $data['branding_longitude'] ?? null,
             'ppdb_form_fields'         => $data['ppdb_form_fields'] ?? [],
         ]);
 

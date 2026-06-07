@@ -2,11 +2,15 @@
 
 namespace App\Filament\Widgets;
 
+use App\Services\PrayerTimesService;
+use App\Support\TenantBranding;
 use Filament\Widgets\Widget;
 
 /**
  * Banner sambutan full-width di puncak dashboard (kedua panel).
- * "Assalamu'alaikum, {nama}" + subjudul, latar gradient emerald + ilustrasi masjid.
+ * "Assalamu'alaikum, {nama}" + subjudul, latar gradient emerald.
+ * Sisi kanan menampilkan JADWAL SHOLAT hari ini (dihitung lokal via
+ * PrayerTimesService) menggantikan ilustrasi masjid dekoratif.
  */
 class GreetingBanner extends Widget
 {
@@ -21,8 +25,18 @@ class GreetingBanner extends Widget
         $name = trim((string) (auth()->user()?->name ?? 'Admin'));
         $first = $name !== '' ? explode(' ', $name)[0] : 'Admin';
 
+        $service = app(PrayerTimesService::class);
+
+        $prayers = $service->fivePrayers(
+            TenantBranding::latitude(),
+            TenantBranding::longitude(),
+            TenantBranding::timezoneOffset(),
+        );
+
         return [
-            'nama' => $first,
+            'nama'        => $first,
+            'prayers'     => $prayers,
+            'nextPrayer'  => $service->nextPrayerKey($prayers),
         ];
     }
 }
