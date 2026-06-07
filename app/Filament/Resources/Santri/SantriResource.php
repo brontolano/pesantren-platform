@@ -91,17 +91,49 @@ class SantriResource extends Resource
                     ->label('Agama')
                     ->default('Islam')
                     ->maxLength(50),
+                TextInput::make('nik')
+                    ->label('NIK')
+                    ->maxLength(30)
+                    ->placeholder('16 digit NIK'),
+                TextInput::make('nisn')
+                    ->label('NISN')
+                    ->maxLength(50)
+                    ->placeholder('10 digit NISN'),
                 TextInput::make('asal_sekolah')
                     ->label('Asal Sekolah')
                     ->maxLength(255),
-                Textarea::make('alamat')
-                    ->label('Alamat')
-                    ->rows(3),
                 FileUpload::make('photo_url')
                     ->label('Foto')
                     ->image()
                     ->directory('santri-photos')
                     ->maxSize(2048),
+            ])->columns(2),
+
+            Section::make('Alamat Santri')->schema([
+                Textarea::make('alamat')
+                    ->label('Alamat Lengkap')
+                    ->rows(2)
+                    ->columnSpanFull(),
+                TextInput::make('rt_rw')
+                    ->label('RT/RW')
+                    ->maxLength(255)
+                    ->placeholder('003/008'),
+                TextInput::make('desa_kelurahan')
+                    ->label('Desa / Kelurahan')
+                    ->maxLength(255),
+                TextInput::make('kecamatan')
+                    ->label('Kecamatan')
+                    ->maxLength(255),
+                TextInput::make('kabupaten_kota')
+                    ->label('Kabupaten / Kota')
+                    ->maxLength(255),
+                TextInput::make('provinsi')
+                    ->label('Provinsi')
+                    ->maxLength(255),
+                TextInput::make('kode_pos')
+                    ->label('Kode POS')
+                    ->maxLength(255)
+                    ->placeholder('45321'),
             ])->columns(2),
 
             Section::make('Data Wali / Orang Tua')->schema([
@@ -111,6 +143,29 @@ class SantriResource extends Resource
                 TextInput::make('pekerjaan_ibu')->label('Pekerjaan Ibu')->maxLength(255),
                 TextInput::make('no_hp_wali')->label('No. HP Wali')->tel()->maxLength(20),
                 TextInput::make('email_wali')->label('Email Wali')->email()->maxLength(255),
+
+                Section::make('Alamat Wali')->schema([
+                    TextInput::make('rt_rw_wali')
+                        ->label('RT/RW')
+                        ->maxLength(255)
+                        ->placeholder('001/002'),
+                    TextInput::make('desa_kelurahan_wali')
+                        ->label('Desa / Kelurahan')
+                        ->maxLength(255),
+                    TextInput::make('kecamatan_wali')
+                        ->label('Kecamatan')
+                        ->maxLength(255),
+                    TextInput::make('kabupaten_kota_wali')
+                        ->label('Kabupaten / Kota')
+                        ->maxLength(255),
+                    TextInput::make('provinsi_wali')
+                        ->label('Provinsi')
+                        ->maxLength(255),
+                    TextInput::make('kode_pos_wali')
+                        ->label('Kode POS')
+                        ->maxLength(255)
+                        ->placeholder('45312'),
+                ])->columns(2)->columnSpanFull(),
             ])->columns(2),
 
             Section::make('Akademik')->schema([
