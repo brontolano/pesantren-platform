@@ -10,6 +10,7 @@ use Filament\Actions\EditAction;
 use App\Services\StorageQuotaService;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
@@ -112,31 +113,38 @@ class GalleryResource extends Resource
                             ]),
 
                         Section::make('Foto Galeri')
-                            ->description('Foto yang sudah ada tampil sebagai grid. Klik "Tambah Foto" untuk unggah baru, seret ↕ untuk urutan. Tiap foto otomatis masuk ke File Media.')
+                            ->description('Unggah beberapa foto sekaligus pada SATU area di atas. Foto yang sudah ada tampil sebagai grid di bawah — atur keterangan, urutan (seret ↕), atau hapus. File disimpan per folder slug & otomatis masuk File Media.')
                             ->icon('heroicon-o-photo')
                             ->schema([
+                                // ── SATU dropzone untuk unggah banyak foto sekaligus ──
+                                FileUpload::make('new_photos')
+                                    ->label('Unggah Foto Baru')
+                                    ->multiple()
+                                    ->image()
+                                    ->panelLayout('grid')
+                                    ->reorderable()
+                                    ->appendFiles()
+                                    ->disk(StorageQuotaService::diskName())
+                                    ->visibility('public')
+                                    ->directory(fn ($get): string => self::photoDir($get))
+                                    ->maxSize(2048)
+                                    ->maxFiles(30)
+                                    ->helperText('Pilih banyak foto sekaligus. Klik "Simpan" untuk menambahkannya ke galeri di bawah.')
+                                    ->columnSpanFull(),
+
+                                // ── Grid foto yang SUDAH tersimpan (thumbnail tampil) ──
                                 Repeater::make('images')
                                     ->hiddenLabel()
                                     ->relationship('images')
-                                    // Tata letak GRID seperti galeri chat (responsif).
                                     ->grid(['default' => 1, 'sm' => 2, 'xl' => 3])
                                     ->schema([
-                                        // Thumbnail foto yang SUDAH ada (tampil).
+                                        // image_url tidak diedit di sini (upload lewat dropzone),
+                                        // tapi WAJIB ada agar tersimpan kembali (tidak ter-null) &
+                                        // bisa dibaca oleh thumbnail.
+                                        Hidden::make('image_url'),
                                         Placeholder::make('image_preview')
                                             ->hiddenLabel()
-                                            ->content(fn ($get) => self::thumbnail($get('image_url')))
-                                            ->visible(fn ($get): bool => filled($get('image_url'))),
-                                        // Dropzone hanya untuk kartu baru (belum ada foto).
-                                        FileUpload::make('image_url')
-                                            ->label('Unggah Foto')
-                                            ->image()
-                                            ->imageEditor()
-                                            ->disk(StorageQuotaService::diskName())
-                                            ->visibility('public')
-                                            ->directory('cms/galleries/images')
-                                            ->maxSize(2048)
-                                            ->required()
-                                            ->visible(fn ($get): bool => blank($get('image_url'))),
+                                            ->content(fn ($get) => self::thumbnail($get('image_url'))),
                                         TextInput::make('caption')
                                             ->hiddenLabel()
                                             ->placeholder('Keterangan foto (opsional)')
@@ -146,12 +154,14 @@ class GalleryResource extends Resource
                                             ->inline(false)
                                             ->default(false),
                                     ])
-                                    // Tiap kartu: konten menumpuk vertikal.
                                     ->columns(1)
                                     ->defaultItems(0)
-                                    ->addActionLabel('Tambah Foto')
+                                    // Tambah foto lewat dropzone di atas, bukan tombol repeater.
+                                    ->addable(false)
+                                    ->deletable()
                                     ->reorderable('sort_order')
-                                    ->itemLabel(fn (array $state): ?string => $state['caption'] ?? null),
+                                    ->itemLabel(fn (array $state): ?string => $state['caption'] ?? null)
+                                    ->visible(fn (?\Modules\CMS\Models\Gallery $record): bool => $record !== null && $record->images()->exists()),
                             ]),
                     ])->columnSpan(['default' => 1, 'lg' => 2]),
 
@@ -190,7 +200,7 @@ class GalleryResource extends Resource
                                     ->imageEditor()
                                     ->disk(StorageQuotaService::diskName())
                                     ->visibility('public')
-                                    ->directory('cms/galleries/covers')
+                                    ->directory(fn ($get): string => self::photoDir($get))
                                     ->maxSize(2048)
                                     ->helperText('Opsional. Jika kosong, foto pertama dipakai sebagai cover.'),
                             ]),
@@ -223,6 +233,18 @@ class GalleryResource extends Resource
         return view('filament.forms.gallery-thumb', [
             'url' => Gallery::resolveMediaUrl($value),
         ]);
+    }
+
+    /**
+     * Folder penyimpanan file per galeri = cms/galleries/{slug}.
+     * Slug diambil dari field form (fallback judul, lalu "umum") sehingga
+     * tiap postingan galeri punya foldernya sendiri sesuai Slug URL.
+     */
+    private static function photoDir(callable $get): string
+    {
+        $slug = Str::slug((string) ($get('slug') ?: $get('title') ?: ''));
+
+        return 'cms/galleries/' . ($slug !== '' ? $slug : 'umum');
     }
 
     public static function table(Table $table): Table
