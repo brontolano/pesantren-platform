@@ -86,10 +86,10 @@ class MediaFileResource extends Resource
             ->columns([
                 ImageColumn::make('thumb')
                     ->label('')
-                    ->disk(StorageQuotaService::diskName())
                     ->square()
                     ->size(44)
-                    ->getStateUsing(fn (MediaFile $r): ?string => $r->isImage() ? $r->path : null),
+                    // URL via /_tenant-storage (bukan ->disk()/Storage::url yang 404 di Docker).
+                    ->getStateUsing(fn (MediaFile $r): ?string => $r->isImage() ? $r->url() : null),
                 TextColumn::make('original_name')->label('Nama File')->searchable()->wrap(),
                 TextColumn::make('folder')->label('Folder')->badge()->color('gray')
                     ->placeholder('—')->toggleable(),
@@ -127,10 +127,8 @@ class MediaFileResource extends Resource
                 Action::make('download')
                     ->label('Unduh')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (MediaFile $r): ?string => Storage::disk(StorageQuotaService::diskName())->exists($r->path)
-                        ? Storage::disk(StorageQuotaService::diskName())->url($r->path) : null, shouldOpenInNewTab: true)
-                    ->visible(fn (MediaFile $r): bool => $r->deleted_at === null
-                        && Storage::disk(StorageQuotaService::diskName())->exists($r->path)),
+                    ->url(fn (MediaFile $r): ?string => $r->existsOnDisk() ? $r->url() : null, shouldOpenInNewTab: true)
+                    ->visible(fn (MediaFile $r): bool => $r->deleted_at === null && $r->existsOnDisk()),
                 DeleteAction::make(),
                 RestoreAction::make(),
                 ForceDeleteAction::make(),

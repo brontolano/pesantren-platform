@@ -65,4 +65,28 @@ class MediaFile extends Model
     {
         return str_starts_with((string) $this->mime, 'image/');
     }
+
+    /**
+     * URL file untuk preview/unduh. File disk tenant di-serve via route
+     * /_tenant-storage/{path} (Storage::url 404 di Docker + stancl/tenancy).
+     * Nilai berupa URL penuh dikembalikan apa adanya.
+     */
+    public function url(): ?string
+    {
+        if (! $this->path) {
+            return null;
+        }
+        if (str_starts_with($this->path, 'http://') || str_starts_with($this->path, 'https://')) {
+            return $this->path;
+        }
+
+        return url('/_tenant-storage/' . ltrim($this->path, '/'));
+    }
+
+    /** Apakah file fisik benar-benar ada di disk tenant. */
+    public function existsOnDisk(): bool
+    {
+        return $this->path
+            && Storage::disk(StorageQuotaService::diskName())->exists($this->path);
+    }
 }
