@@ -3,42 +3,43 @@
 namespace App\Console\Commands;
 
 use App\Models\Tenant;
+use App\Services\IndonesiaRegionImporter;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Import data wilayah Indonesia (BPS) ke dalam tenant DB.
- * Sumber: CSV dari https://github.com/cahyadsn/wilayah
+ * Import data wilayah Indonesia ke dalam tenant DB.
  *
- * Format CSV per level:
- *   provinces.csv  → id (2 char), name
- *   cities.csv     → id (4 char), province_id (2 char), name
- *   districts.csv  → id (7 char), city_id (4 char), name
- *   villages.csv   → id (10 char), district_id (7 char), name
+ * Memakai ulang App\Services\IndonesiaRegionImporter (sumber & normalisasi
+ * SAMA PERSIS dengan central: ihsaninh/wilayah-indonesia, format id 2/4/7/10),
+ * lalu menulis hasilnya ke database tenant. Dengan begitu format wilayah di
+ * tenant dijamin identik dengan central — penting untuk dropdown bertingkat.
  *
  * Usage:
  *   php artisan wilayah:import-tenant asy-syifaa
- *   php artisan wilayah:import-tenant asy-syifaa --path=/app/storage/app/wilayah
+ *   php artisan wilayah:import-tenant asy-syifaa --only=provinces,cities
  */
 class WilayahTenantImportCommand extends Command
 {
     protected $signature = 'wilayah:import-tenant
         {tenant : ID tenant (mis. asy-syifaa)}
-        {--path= : Folder berisi file provinces/cities/districts/villages.csv}';
+        {--only= : Import hanya level tertentu: provinces,cities,districts,villages}';
 
-    protected $description = 'Import data wilayah Indonesia ke dalam database tenant';
+    protected $description = 'Import data wilayah Indonesia ke dalam database tenant (sumber sama dengan central)';
 
+    /**
+     * Mapping level → kolom yang di-update saat upsert (selain id).
+     */
     private array $levels = [
-        'provinces' => ['table' => 'provinces', 'columns' => ['id', 'name']],
-        'cities'    => ['table' => 'cities',    'columns' => ['id', 'province_id', 'name']],
-        'districts' => ['table' => 'districts', 'columns' => ['id', 'city_id', 'name']],
-        'villages'  => ['table' => 'villages',  'columns' => ['id', 'district_id', 'name']],
+        'provinces' => ['name'],
+        'cities'    => ['province_id', 'name'],
+        'districts' => ['city_id', 'name'],
+        'villages'  => ['district_id', 'name'],
     ];
 
-    public function handle(): int
+    public function handle(IndonesiaRegionImporter $importer): int
     {
         $tenantId = $this->argument('tenant');
-        $basePath = $this->option('path') ?: storage_path('app/wilayah');
 
         $tenant = Tenant::find($tenantId);
         if (! $tenant) {
@@ -46,87 +47,71 @@ class WilayahTenantImportCommand extends Command
             return self::FAILURE;
         }
 
-        if (! is_dir($basePath)) {
-            $this->error("Folder tidak ditemukan: {$basePath}");
-            $this->line('Isi folder dengan: provinces.csv, cities.csv, districts.csv, villages.csv');
-            return self::FAILURE;
-        }
+        $onlyLevels = $this->option('only')
+            ? array_map('trim', explode(',', $this->option('only')))
+            : array_keys($this->levels);
 
         tenancy()->initialize($tenant);
 
         try {
-            foreach ($this->levels as $level => $config) {
-                $csv = "{$basePath}/{$level}.csv";
-
-                if (! file_exists($csv)) {
-                    $this->warn("  File tidak ditemukan: {$csv} — skip");
+            foreach ($onlyLevels as $level) {
+                if (! isset($this->levels[$level])) {
+                    $this->warn("Level tidak dikenal: {$level} — skip");
                     continue;
                 }
 
-                $this->importCsv($level, $csv, $config);
+                $this->importLevel($importer, $level);
             }
+
+            $this->newLine();
+            $this->info("Import wilayah selesai untuk tenant: {$tenantId}");
+            $this->table(
+                ['Tabel', 'Jumlah Record'],
+                collect($onlyLevels)
+                    ->filter(fn ($l) => isset($this->levels[$l]))
+                    ->map(fn ($l) => [$l, DB::table($l)->count()])
+                    ->toArray()
+            );
         } finally {
             tenancy()->end();
         }
 
-        $this->newLine();
-        $this->info("Import wilayah selesai untuk tenant: {$tenantId}");
-
         return self::SUCCESS;
     }
 
-    private function importCsv(string $level, string $csvFile, array $config): void
+    private function importLevel(IndonesiaRegionImporter $importer, string $level): void
     {
-        $table   = $config['table'];
-        $columns = $config['columns'];
-
-        $handle = fopen($csvFile, 'r');
-        if (! $handle) {
-            $this->error("Gagal membuka: {$csvFile}");
-            return;
-        }
-
-        // Baca dan normalisasi header
-        $header = array_map(fn($h) => strtolower(trim($h)), fgetcsv($handle) ?? []);
-
-        $rows      = [];
-        $total     = 0;
-        $chunkSize = 500;
+        $updateColumns = $this->levels[$level];
 
         $this->info("Importing {$level}...");
         $bar = $this->output->createProgressBar();
         $bar->start();
 
-        while (($line = fgetcsv($handle)) !== false) {
-            if (count($line) < 2) continue;
+        $payload = [];
+        $total   = 0;
 
-            $row = array_combine($header, array_pad($line, count($header), null));
-            if (! $row || empty($row['id'])) continue;
-
-            $data = [];
-            foreach ($columns as $col) {
-                $data[$col] = trim($row[$col] ?? '');
+        foreach ($importer->rowsFor($level) as $row) {
+            if (empty($row['id'])) {
+                continue;
             }
 
-            $rows[] = $data;
+            $payload[] = $row;
             $total++;
 
-            if (count($rows) >= $chunkSize) {
-                DB::table($table)->upsert($rows, ['id'], array_diff($columns, ['id']));
-                $rows = [];
-                $bar->advance($chunkSize);
+            if (count($payload) >= 1000) {
+                DB::table($level)->upsert($payload, ['id'], $updateColumns);
+                $payload = [];
+                $bar->advance(1000);
             }
         }
 
-        if (! empty($rows)) {
-            DB::table($table)->upsert($rows, ['id'], array_diff($columns, ['id']));
-            $bar->advance(count($rows));
+        if ($payload !== []) {
+            DB::table($level)->upsert($payload, ['id'], $updateColumns);
+            $bar->advance(count($payload));
         }
 
         $bar->finish();
         $this->newLine();
         $this->line("  → {$total} record {$level}");
-
-        fclose($handle);
     }
 }
