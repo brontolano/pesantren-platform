@@ -37,6 +37,10 @@ class GreetingBanner extends Widget
             'nama'        => $first,
             'prayers'     => $prayers,
             'nextPrayer'  => $service->nextPrayerKey($prayers),
+            // Koordinat fallback + zona waktu untuk JS (dipakai bila GPS ditolak).
+            'lat'         => TenantBranding::latitude(),
+            'lng'         => TenantBranding::longitude(),
+            'tz'          => TenantBranding::timezoneOffset(),
         ];
     }
 }
