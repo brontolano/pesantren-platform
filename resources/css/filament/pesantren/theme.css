@@ -57,33 +57,49 @@
     font-weight: 600;
 }
 
-/* Item navigasi: teks & ikon terang */
+/* Item navigasi — teks & ikon terang di SEMUA mode.
+   PENTING: Filament mewarnai LABEL & IKON dgn var(--primary-700) (gelap) di
+   mode terang & var(--primary-400) di gelap. Karena sidebar selalu hijau gelap,
+   warna itu harus di-override pada elemen label & ikon LANGSUNG (bukan hanya
+   tombolnya) — inilah penyebab teks tak terlihat di mode terang sebelumnya. */
 .fi-sidebar-item-btn {
-    color: rgba(255, 255, 255, 0.82) !important;
     border-radius: 0.625rem;
     font-weight: 500;
 }
+.fi-sidebar-item-btn > .fi-sidebar-item-label,
+.fi-sidebar-item-label {
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+.fi-sidebar-item-btn > .fi-icon,
 .fi-sidebar-item-btn .fi-sidebar-item-icon,
 .fi-sidebar-item-btn .fi-icon {
-    color: rgba(255, 255, 255, 0.7) !important;
+    color: rgba(255, 255, 255, 0.72) !important;
 }
 .fi-sidebar-item-btn:hover {
     background-color: rgba(255, 255, 255, 0.08) !important;
+}
+.fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
+.fi-sidebar-item-btn:hover .fi-sidebar-item-label {
     color: #ffffff !important;
 }
+.fi-sidebar-item-btn:hover > .fi-icon,
 .fi-sidebar-item-btn:hover .fi-sidebar-item-icon,
 .fi-sidebar-item-btn:hover .fi-icon {
     color: #ffffff !important;
 }
 
-/* Item aktif: pil emerald + glow */
+/* Item aktif: pil emerald + glow, teks/ikon putih */
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background: linear-gradient(90deg, #16a34a 0%, #15803d 100%) !important;
-    color: #ffffff !important;
     box-shadow: 0 8px 20px -8px rgba(22, 163, 74, 0.7);
 }
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-icon {
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: #ffffff !important;
+}
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active .fi-icon {
     color: #ffffff !important;
 }
 
