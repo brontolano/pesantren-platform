@@ -127,13 +127,7 @@ class SantriResource extends Resource
                     ->placeholder('45321'),
                 Select::make('provinsi')
                     ->label('Provinsi')
-                    ->options(function () {
-                        try {
-                            return DB::table('provinces')->orderBy('name')->pluck('name', 'name')->toArray();
-                        } catch (\Exception $e) {
-                            return [];
-                        }
-                    })
+                    ->options(fn (Get $get) => static::provinsiOptions($get('provinsi')))
                     ->searchable()
                     ->live()
                     ->afterStateUpdated(function (Set $set) {
@@ -143,21 +137,7 @@ class SantriResource extends Resource
                     }),
                 Select::make('kabupaten_kota')
                     ->label('Kabupaten / Kota')
-                    ->options(function (Get $get) {
-                        try {
-                            $provinsi = $get('provinsi');
-                            if (! $provinsi) return [];
-                            $province = DB::table('provinces')->where('name', $provinsi)->first();
-                            if (! $province) return [];
-                            return DB::table('cities')
-                                ->where('province_id', $province->id)
-                                ->orderBy('name')
-                                ->pluck('name', 'name')
-                                ->toArray();
-                        } catch (\Exception $e) {
-                            return [];
-                        }
-                    })
+                    ->options(fn (Get $get) => static::kotaOptions($get('provinsi'), $get('kabupaten_kota')))
                     ->searchable()
                     ->live()
                     ->afterStateUpdated(function (Set $set) {
@@ -166,21 +146,7 @@ class SantriResource extends Resource
                     }),
                 Select::make('kecamatan')
                     ->label('Kecamatan')
-                    ->options(function (Get $get) {
-                        try {
-                            $kota = $get('kabupaten_kota');
-                            if (! $kota) return [];
-                            $city = DB::table('cities')->where('name', $kota)->first();
-                            if (! $city) return [];
-                            return DB::table('districts')
-                                ->where('city_id', $city->id)
-                                ->orderBy('name')
-                                ->pluck('name', 'name')
-                                ->toArray();
-                        } catch (\Exception $e) {
-                            return [];
-                        }
-                    })
+                    ->options(fn (Get $get) => static::kecamatanOptions($get('kabupaten_kota'), $get('kecamatan')))
                     ->searchable()
                     ->live()
                     ->afterStateUpdated(function (Set $set) {
@@ -188,21 +154,7 @@ class SantriResource extends Resource
                     }),
                 Select::make('desa_kelurahan')
                     ->label('Desa / Kelurahan')
-                    ->options(function (Get $get) {
-                        try {
-                            $kecamatan = $get('kecamatan');
-                            if (! $kecamatan) return [];
-                            $district = DB::table('districts')->where('name', $kecamatan)->first();
-                            if (! $district) return [];
-                            return DB::table('villages')
-                                ->where('district_id', $district->id)
-                                ->orderBy('name')
-                                ->pluck('name', 'name')
-                                ->toArray();
-                        } catch (\Exception $e) {
-                            return [];
-                        }
-                    })
+                    ->options(fn (Get $get) => static::desaOptions($get('kecamatan'), $get('desa_kelurahan')))
                     ->searchable(),
             ])->columns(2),
 
@@ -225,13 +177,7 @@ class SantriResource extends Resource
                         ->placeholder('45312'),
                     Select::make('provinsi_wali')
                         ->label('Provinsi')
-                        ->options(function () {
-                            try {
-                                return DB::table('provinces')->orderBy('name')->pluck('name', 'name')->toArray();
-                            } catch (\Exception $e) {
-                                return [];
-                            }
-                        })
+                        ->options(fn (Get $get) => static::provinsiOptions($get('provinsi_wali')))
                         ->searchable()
                         ->live()
                         ->afterStateUpdated(function (Set $set) {
@@ -241,21 +187,7 @@ class SantriResource extends Resource
                         }),
                     Select::make('kabupaten_kota_wali')
                         ->label('Kabupaten / Kota')
-                        ->options(function (Get $get) {
-                            try {
-                                $provinsi = $get('provinsi_wali');
-                                if (! $provinsi) return [];
-                                $province = DB::table('provinces')->where('name', $provinsi)->first();
-                                if (! $province) return [];
-                                return DB::table('cities')
-                                    ->where('province_id', $province->id)
-                                    ->orderBy('name')
-                                    ->pluck('name', 'name')
-                                    ->toArray();
-                            } catch (\Exception $e) {
-                                return [];
-                            }
-                        })
+                        ->options(fn (Get $get) => static::kotaOptions($get('provinsi_wali'), $get('kabupaten_kota_wali')))
                         ->searchable()
                         ->live()
                         ->afterStateUpdated(function (Set $set) {
@@ -264,21 +196,7 @@ class SantriResource extends Resource
                         }),
                     Select::make('kecamatan_wali')
                         ->label('Kecamatan')
-                        ->options(function (Get $get) {
-                            try {
-                                $kota = $get('kabupaten_kota_wali');
-                                if (! $kota) return [];
-                                $city = DB::table('cities')->where('name', $kota)->first();
-                                if (! $city) return [];
-                                return DB::table('districts')
-                                    ->where('city_id', $city->id)
-                                    ->orderBy('name')
-                                    ->pluck('name', 'name')
-                                    ->toArray();
-                            } catch (\Exception $e) {
-                                return [];
-                            }
-                        })
+                        ->options(fn (Get $get) => static::kecamatanOptions($get('kabupaten_kota_wali'), $get('kecamatan_wali')))
                         ->searchable()
                         ->live()
                         ->afterStateUpdated(function (Set $set) {
@@ -286,21 +204,7 @@ class SantriResource extends Resource
                         }),
                     Select::make('desa_kelurahan_wali')
                         ->label('Desa / Kelurahan')
-                        ->options(function (Get $get) {
-                            try {
-                                $kecamatan = $get('kecamatan_wali');
-                                if (! $kecamatan) return [];
-                                $district = DB::table('districts')->where('name', $kecamatan)->first();
-                                if (! $district) return [];
-                                return DB::table('villages')
-                                    ->where('district_id', $district->id)
-                                    ->orderBy('name')
-                                    ->pluck('name', 'name')
-                                    ->toArray();
-                            } catch (\Exception $e) {
-                                return [];
-                            }
-                        })
+                        ->options(fn (Get $get) => static::desaOptions($get('kecamatan_wali'), $get('desa_kelurahan_wali')))
                         ->searchable(),
                 ])->columns(2)->columnSpanFull(),
             ])->columns(2),
@@ -328,6 +232,97 @@ class SantriResource extends Resource
                     ->required(),
             ])->columns(2),
         ]);
+    }
+
+    /**
+     * Opsi provinsi (nama baku dari tabel wilayah tenant).
+     * Selalu menyertakan nilai lama (hasil import) agar tidak terhapus.
+     */
+    protected static function provinsiOptions(?string $current): array
+    {
+        return static::wilayahOptions(
+            fn () => DB::table('provinces')->orderBy('name')->pluck('name', 'name')->toArray(),
+            $current
+        );
+    }
+
+    protected static function kotaOptions(?string $provinsi, ?string $current): array
+    {
+        return static::wilayahOptions(function () use ($provinsi) {
+            if (! $provinsi) {
+                return [];
+            }
+            $province = DB::table('provinces')->where('name', $provinsi)->first();
+            if (! $province) {
+                return [];
+            }
+
+            return DB::table('cities')
+                ->where('province_id', $province->id)
+                ->orderBy('name')
+                ->pluck('name', 'name')
+                ->toArray();
+        }, $current);
+    }
+
+    protected static function kecamatanOptions(?string $kota, ?string $current): array
+    {
+        return static::wilayahOptions(function () use ($kota) {
+            if (! $kota) {
+                return [];
+            }
+            $city = DB::table('cities')->where('name', $kota)->first();
+            if (! $city) {
+                return [];
+            }
+
+            return DB::table('districts')
+                ->where('city_id', $city->id)
+                ->orderBy('name')
+                ->pluck('name', 'name')
+                ->toArray();
+        }, $current);
+    }
+
+    protected static function desaOptions(?string $kecamatan, ?string $current): array
+    {
+        return static::wilayahOptions(function () use ($kecamatan) {
+            if (! $kecamatan) {
+                return [];
+            }
+            $district = DB::table('districts')->where('name', $kecamatan)->first();
+            if (! $district) {
+                return [];
+            }
+
+            return DB::table('villages')
+                ->where('district_id', $district->id)
+                ->orderBy('name')
+                ->pluck('name', 'name')
+                ->toArray();
+        }, $current);
+    }
+
+    /**
+     * Jalankan query opsi dengan aman, lalu pastikan nilai lama tetap
+     * jadi opsi valid (ditandai "data lama") agar tidak hilang saat disimpan.
+     *
+     * @param  \Closure(): array<string, string>  $fetch
+     * @return array<string, string>
+     */
+    protected static function wilayahOptions(\Closure $fetch, ?string $current): array
+    {
+        try {
+            $options = $fetch();
+        } catch (\Throwable $e) {
+            $options = [];
+        }
+
+        if ($current !== null && $current !== '' && ! array_key_exists($current, $options)) {
+            $options[$current] = $current . ' (data lama)';
+        }
+
+        return $options;
     }
 
     public static function table(Table $table): Table
