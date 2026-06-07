@@ -1,3 +1,11 @@
+# Stage 0: Composer deps (vendor/) — dibutuhkan stage frontend karena tema Filament
+# custom meng-@import 'vendor/filament/.../theme.css' & @source memindai app/Filament.
+FROM composer:latest AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist \
+    --no-interaction --ignore-platform-reqs
+
 # Stage 1: Build frontend assets
 FROM node:22-alpine AS frontend
 WORKDIR /app
@@ -5,6 +13,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 COPY vite.config.js ./
 COPY resources/ resources/
+# Theme Filament butuh vendor (@import) + app/Filament (@source) saat build CSS.
+COPY app/ app/
+COPY --from=vendor /app/vendor vendor
 RUN npm run build
 
 # Stage 2: PHP application with FrankenPHP
