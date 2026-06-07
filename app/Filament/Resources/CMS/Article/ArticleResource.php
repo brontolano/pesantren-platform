@@ -74,10 +74,13 @@ class ArticleResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            // Responsif: 1 kolom (menumpuk) di layar sempit, baru 2:1 di layar lebar (lg+).
-            // Grid::make(3) lama bersifat 3-kolom di SEMUA breakpoint → sidebar gepeng,
-            // badge kategori "Artikel Umum" pecah per-huruf di layar laptop.
-            Grid::make(['default' => 1, 'lg' => 3])->schema([
+            // Root schema resource Filament default 2 kolom → Grid ini WAJIB
+            // columnSpanFull(), kalau tidak ia hanya mengisi 1 dari 2 kolom (separuh
+            // kiri) sehingga separuh kanan kosong & sidebar 1/3 jadi gepeng.
+            // Responsif: menumpuk 1 kolom di layar sempit, 2:1 di lg+ (≥1024px).
+            Grid::make(['default' => 1, 'lg' => 3])
+                ->columnSpanFull()
+                ->schema([
                 // ── KOLOM UTAMA: area menulis (fokus, lebar 2/3) ──
                 Group::make([
                     Section::make('Konten Artikel')
