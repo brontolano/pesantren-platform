@@ -20,6 +20,8 @@ class Gallery extends Model
         'title',
         'slug',
         'description',
+        'meta_title',
+        'meta_description',
         'cover_image_url',
         'is_published',
         'published_at',
@@ -69,7 +71,15 @@ class Gallery extends Model
         return self::resolveMediaUrl($value);
     }
 
-    /** Konversi path disk → URL absolut; biarkan URL penuh apa adanya. */
+    /**
+     * Konversi path disk → URL absolut; biarkan URL penuh apa adanya.
+     *
+     * File di disk 'public' tenant di-serve via route /_tenant-storage/{path}.
+     * Storage::disk('public')->url() TIDAK dipakai karena menghasilkan
+     * APP_URL/storage/{path} yang 404 di Docker + stancl/tenancy (symlink
+     * hanya menunjuk app/public non-tenant). Route /_tenant-storage men-serve
+     * langsung dari disk tenant → thumbnail admin & gambar website publik muncul.
+     */
     public static function resolveMediaUrl(?string $value): ?string
     {
         if (! $value) {
@@ -79,6 +89,6 @@ class Gallery extends Model
             return $value;
         }
 
-        return Storage::disk(config('media.disk', 'public'))->url(ltrim($value, '/'));
+        return url('/_tenant-storage/' . ltrim($value, '/'));
     }
 }
