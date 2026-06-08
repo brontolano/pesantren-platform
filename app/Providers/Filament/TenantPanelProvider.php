@@ -23,6 +23,16 @@ use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kelas\KelasResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
 use App\Filament\Resources\Kesehatan\SesiKonselingResource;
+use App\Filament\Resources\Ledger\AkunResource;
+use App\Filament\Resources\Ledger\DivisiUnitResource;
+use App\Filament\Resources\Ledger\JurnalResource;
+use App\Filament\Resources\Ledger\PeriodeAkuntansiResource;
+use App\Filament\Resources\Ledger\SumberDanaResource;
+use App\Filament\Resources\Pengadaan\BelanjaResource;
+use App\Filament\Resources\Payroll\SlipGajiResource;
+use App\Filament\Resources\Pembiayaan\AsetResource;
+use App\Filament\Resources\Pembiayaan\PembiayaanResource;
+use App\Filament\Resources\Mutu\DokumenMutuResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
 use App\Filament\Resources\Media\MediaFileResource;
 use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
@@ -97,6 +107,17 @@ class TenantPanelProvider extends PanelProvider
                 MetodePembayaranResource::class,
                 TabunganTopupResource::class,
                 LaporanKeuanganResource::class,
+                // Ledger / Baitul Maal (Buku Besar)
+                AkunResource::class,
+                SumberDanaResource::class,
+                DivisiUnitResource::class,
+                PeriodeAkuntansiResource::class,
+                JurnalResource::class,
+                BelanjaResource::class,
+                SlipGajiResource::class,
+                AsetResource::class,
+                PembiayaanResource::class,
+                DokumenMutuResource::class,
                 // Notifikasi
                 TemplateNotifikasiResource::class,
                 BroadcastWaResource::class,

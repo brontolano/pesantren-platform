@@ -1,0 +1,11 @@
+{
+    "name": "modules/pajak",
+    "description": "Modul Pajak (Baitul Maal) untuk Platform Pesantren",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Pajak\\": "app/",
+            "Modules\\Pajak\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

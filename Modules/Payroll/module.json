@@ -1,0 +1,11 @@
+{
+    "name": "Payroll",
+    "alias": "payroll",
+    "description": "Modul Payroll (Baitul Maal) — honor asatidz poin/KPI, PPh21, slip & jurnal gaji",
+    "keywords": ["payroll", "gaji", "honor", "asatidz", "pph21"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Payroll\\Providers\\PayrollServiceProvider"
+    ],
+    "files": []
+}

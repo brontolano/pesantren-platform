@@ -1,0 +1,11 @@
+{
+    "name": "Pembiayaan",
+    "alias": "pembiayaan",
+    "description": "Modul Pembiayaan (Baitul Maal) — analisis DSCR syariah, agunan non-wakaf, persetujuan Pembina",
+    "keywords": ["pembiayaan", "dscr", "kredit", "agunan"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Pembiayaan\\Providers\\PembiayaanServiceProvider"
+    ],
+    "files": []
+}

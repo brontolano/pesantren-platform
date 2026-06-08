@@ -1,0 +1,11 @@
+{
+    "name": "modules/pengadaan",
+    "description": "Modul Pengadaan (Baitul Maal) untuk Platform Pesantren",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Pengadaan\\": "app/",
+            "Modules\\Pengadaan\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}
