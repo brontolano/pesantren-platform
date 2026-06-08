@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { Head, useForm, usePage } from '@inertiajs/vue3'
 
 const props = defineProps({
     tenant: {
@@ -23,6 +23,43 @@ const renderSectionTitle = (section) => section.config?.title ?? section.type
 const renderHeroDescription = (section) => section.config?.description || props.website.branding.tagline
 const seo = props.website.seo ?? {}
 const schemaMarkup = seo.schema ? JSON.stringify(seo.schema) : null
+const admission = props.website.admission ?? { enabled: false, transfer: {}, programOptions: [], classOptions: [] }
+const flash = usePage().props.flash ?? {}
+
+const form = useForm({
+    nama_anak: '',
+    nama_panggilan: '',
+    nik_anak: '',
+    tempat_lahir: '',
+    tanggal_lahir: '',
+    jenis_kelamin: '',
+    kelas_tujuan: admission.classOptions?.[0] ?? '',
+    program_diminati: admission.programOptions?.[0] ?? '',
+    asal_sekolah: '',
+    nama_ayah: '',
+    nama_ibu: '',
+    nama_wali: '',
+    hubungan_wali: 'Ibu',
+    no_hp_wali: '',
+    email_wali: '',
+    alamat: '',
+    kota_domisili: '',
+    nama_pengirim_transfer: '',
+    bank_pengirim: '',
+    nominal_transfer: admission.transfer?.nominal ?? '',
+    tanggal_transfer: '',
+    sumber_informasi: '',
+    catatan_tambahan: '',
+    bukti_transfer: null,
+})
+
+const submitAdmission = () => {
+    form.post(admission.endpoint, {
+        forceFormData: true,
+        preserveScroll: true,
+        onSuccess: () => form.reset('bukti_transfer'),
+    })
+}
 </script>
 
 <template>
@@ -85,11 +122,11 @@ const schemaMarkup = seo.schema ? JSON.stringify(seo.schema) : null
                 </div>
 
                 <a
-                    href="/ppdb"
+                    :href="admission.enabled ? '#form-pendaftaran' : '/ppdb'"
                     class="rounded-full px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
                     :style="{ backgroundColor: 'var(--brand-primary)' }"
                 >
-                    PPDB Online
+                    {{ admission.enabled ? 'Daftar Alba Kids' : 'PPDB Online' }}
                 </a>
             </div>
         </header>
@@ -168,6 +205,7 @@ const schemaMarkup = seo.schema ? JSON.stringify(seo.schema) : null
 
                 <div
                     v-else-if="section.type === 'profile'"
+                    :id="section.type === 'profile' ? 'program' : undefined"
                     class="grid gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[1fr_0.9fr] lg:px-10"
                 >
                     <div class="space-y-5">
@@ -516,6 +554,200 @@ const schemaMarkup = seo.schema ? JSON.stringify(seo.schema) : null
                     <h2 class="mt-3 font-serif text-3xl">
                         {{ renderSectionTitle(section) }}
                     </h2>
+                </div>
+            </section>
+
+            <section
+                v-if="admission.enabled"
+                id="form-pendaftaran"
+                class="overflow-hidden rounded-[2rem] border border-black/5 bg-white shadow-[0_20px_60px_-35px_rgba(15,23,42,0.25)]"
+            >
+                <div class="grid gap-8 px-6 py-8 sm:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:px-10 lg:py-10">
+                    <div class="space-y-5">
+                        <p class="text-sm font-semibold uppercase tracking-[0.3em] text-[color:var(--brand-secondary)]">
+                            Form Pendaftaran
+                        </p>
+                        <div class="space-y-3">
+                            <h2 class="font-serif text-3xl sm:text-4xl">
+                                {{ admission.headline }}
+                            </h2>
+                            <p class="text-base leading-7 text-slate-600">
+                                {{ admission.description }}
+                            </p>
+                        </div>
+
+                        <div class="rounded-[1.5rem] bg-slate-50 px-5 py-5">
+                            <p class="text-xs font-semibold uppercase tracking-[0.25em] text-[color:var(--brand-secondary)]">
+                                Informasi Transfer
+                            </p>
+                            <div class="mt-4 grid gap-2 text-sm leading-6 text-slate-700">
+                                <p><strong>Bank:</strong> {{ admission.transfer.bankName }}</p>
+                                <p><strong>No. Rekening:</strong> {{ admission.transfer.accountNumber }}</p>
+                                <p><strong>Atas Nama:</strong> {{ admission.transfer.accountName }}</p>
+                                <p v-if="admission.transfer.nominal"><strong>Nominal:</strong> {{ admission.transfer.nominal }}</p>
+                                <p>{{ admission.transfer.instructions }}</p>
+                            </div>
+                        </div>
+
+                        <div class="rounded-[1.5rem] bg-slate-950 px-5 py-5 text-white">
+                            <p class="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">
+                                Setelah Submit
+                            </p>
+                            <ul class="mt-4 grid gap-3 text-sm leading-6 text-white/85">
+                                <li class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                                    Sistem mengirim ucapan terima kasih ke WhatsApp wali.
+                                </li>
+                                <li class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                                    Admin Alba Kids langsung menerima notifikasi pendaftar baru.
+                                </li>
+                                <li class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                                    Bukti transfer masuk ke antrean verifikasi admin.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[1.75rem] border border-slate-200 bg-slate-50/70 px-5 py-5 sm:px-6">
+                        <div
+                            v-if="flash.success"
+                            class="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+                        >
+                            {{ flash.success }}
+                        </div>
+
+                        <div
+                            v-if="Object.keys(form.errors).length"
+                            class="mb-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700"
+                        >
+                            Mohon periksa kembali field yang masih perlu dilengkapi.
+                        </div>
+
+                        <form class="grid gap-4" @submit.prevent="submitAdmission">
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Nama lengkap anak *</span>
+                                    <input v-model="form.nama_anak" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Nama panggilan</span>
+                                    <input v-model="form.nama_panggilan" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Tempat lahir *</span>
+                                    <input v-model="form.tempat_lahir" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Tanggal lahir *</span>
+                                    <input v-model="form.tanggal_lahir" type="date" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Jenis kelamin *</span>
+                                    <select v-model="form.jenis_kelamin" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                        <option value="">Pilih</option>
+                                        <option value="L">Laki-laki</option>
+                                        <option value="P">Perempuan</option>
+                                    </select>
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Kelas tujuan *</span>
+                                    <select v-model="form.kelas_tujuan" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                        <option v-for="option in admission.classOptions" :key="option" :value="option">{{ option }}</option>
+                                    </select>
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Program *</span>
+                                    <select v-model="form.program_diminati" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                        <option v-for="option in admission.programOptions" :key="option" :value="option">{{ option }}</option>
+                                    </select>
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Asal sekolah</span>
+                                    <input v-model="form.asal_sekolah" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Nama ayah</span>
+                                    <input v-model="form.nama_ayah" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Nama ibu *</span>
+                                    <input v-model="form.nama_ibu" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Nama wali/pengisi form *</span>
+                                    <input v-model="form.nama_wali" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Hubungan dengan anak *</span>
+                                    <input v-model="form.hubungan_wali" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>No. WhatsApp wali *</span>
+                                    <input v-model="form.no_hp_wali" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Email wali</span>
+                                    <input v-model="form.email_wali" type="email" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                            </div>
+
+                            <label class="grid gap-2 text-sm text-slate-700">
+                                <span>Alamat domisili *</span>
+                                <textarea v-model="form.alamat" rows="3" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]"></textarea>
+                            </label>
+
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Kota domisili</span>
+                                    <input v-model="form.kota_domisili" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Sumber informasi</span>
+                                    <input v-model="form.sumber_informasi" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-2">
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Nama pengirim transfer *</span>
+                                    <input v-model="form.nama_pengirim_transfer" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Bank pengirim *</span>
+                                    <input v-model="form.bank_pengirim" type="text" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Nominal transfer *</span>
+                                    <input v-model="form.nominal_transfer" type="number" min="0" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                                <label class="grid gap-2 text-sm text-slate-700">
+                                    <span>Tanggal transfer *</span>
+                                    <input v-model="form.tanggal_transfer" type="date" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]">
+                                </label>
+                            </div>
+
+                            <label class="grid gap-2 text-sm text-slate-700">
+                                <span>Bukti transfer *</span>
+                                <input type="file" accept=".jpg,.jpeg,.png,.pdf,.webp" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" @input="form.bukti_transfer = $event.target.files[0]">
+                            </label>
+
+                            <label class="grid gap-2 text-sm text-slate-700">
+                                <span>Catatan tambahan</span>
+                                <textarea v-model="form.catatan_tambahan" rows="3" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-[color:var(--brand-primary)]"></textarea>
+                            </label>
+
+                            <button
+                                type="submit"
+                                :disabled="form.processing"
+                                class="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-white transition disabled:opacity-60"
+                                :style="{ backgroundColor: 'var(--brand-primary)' }"
+                            >
+                                {{ form.processing ? 'Mengirim pendaftaran...' : 'Kirim Pendaftaran Alba Kids' }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </section>
         </main>
