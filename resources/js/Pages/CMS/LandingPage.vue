@@ -24,7 +24,9 @@ const renderHeroDescription = (section) => section.config?.description || props.
 const seo = props.website.seo ?? {}
 const schemaMarkup = seo.schema ? JSON.stringify(seo.schema) : null
 const admission = props.website.admission ?? { enabled: false, transfer: {}, programOptions: [], classOptions: [] }
+const websiteContact = props.website.contact ?? { address: '', phone: '', email: '' }
 const flash = usePage().props.flash ?? {}
+const resolveSectionContact = (section) => section.config?.contact ?? websiteContact
 
 const form = useForm({
     nama_anak: '',
@@ -258,9 +260,9 @@ const submitAdmission = () => {
                                 Kontak Profil
                             </p>
                             <div class="mt-4 grid gap-2 text-sm leading-6 text-slate-700">
-                                <p>{{ section.config.contact.address }}</p>
-                                <p v-if="section.config.contact.phone">Telp: {{ section.config.contact.phone }}</p>
-                                <p v-if="section.config.contact.email">Email: {{ section.config.contact.email }}</p>
+                                <p>{{ resolveSectionContact(section).address }}</p>
+                                <p v-if="resolveSectionContact(section).phone">Telp: {{ resolveSectionContact(section).phone }}</p>
+                                <p v-if="resolveSectionContact(section).email">Email: {{ resolveSectionContact(section).email }}</p>
                             </div>
                         </div>
                     </div>
@@ -762,13 +764,13 @@ const submitAdmission = () => {
                         {{ website.branding.name }}
                     </h2>
                     <p class="max-w-xl text-sm leading-7 text-white/70">
-                        {{ website.contact.address }}
+                        {{ websiteContact.address }}
                     </p>
                 </div>
 
                 <div class="grid gap-2 text-sm text-white/75">
-                    <p v-if="website.contact.phone">Telp: {{ website.contact.phone }}</p>
-                    <p v-if="website.contact.email">Email: {{ website.contact.email }}</p>
+                    <p v-if="websiteContact.phone">Telp: {{ websiteContact.phone }}</p>
+                    <p v-if="websiteContact.email">Email: {{ websiteContact.email }}</p>
                     <p>Tenant ID: {{ tenant.id }}</p>
                 </div>
             </div>
