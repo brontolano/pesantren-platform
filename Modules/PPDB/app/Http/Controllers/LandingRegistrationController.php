@@ -155,7 +155,7 @@ class LandingRegistrationController extends Controller
     private function admissionSettings(): array
     {
         return [
-            'admin_whatsapp' => Setting::getTenantStringValue('admission_admin_whatsapp'),
+            'admin_whatsapp' => Setting::getTenantStringValue('admission_admin_whatsapp', '+6282260901399'),
             'success_message' => Setting::getTenantStringValue('admission_success_message', 'Panitia akan segera menghubungi Anda melalui WhatsApp.'),
         ];
     }

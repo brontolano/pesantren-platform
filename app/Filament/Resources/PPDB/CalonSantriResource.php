@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PPDB;
 
+use App\Support\AlbaKidsTenant;
 use App\Filament\Resources\PPDB\CalonSantri\Pages\CreateCalonSantri;
 use App\Filament\Resources\PPDB\CalonSantri\Pages\EditCalonSantri;
 use App\Filament\Resources\PPDB\CalonSantri\Pages\ListCalonSantri;
@@ -33,14 +34,6 @@ class CalonSantriResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationLabel = 'Calon Santri';
-
-    protected static ?string $modelLabel = 'Calon Santri';
-
-    protected static ?string $pluralModelLabel = 'Calon Santri';
-
-    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
-
     protected static ?string $slug = 'ppdb/calon-santri';
 
     protected static ?int $navigationSort = 1;
@@ -57,6 +50,10 @@ class CalonSantriResource extends Resource
 
     public static function canCreate(): bool
     {
+        if (AlbaKidsTenant::isActive()) {
+            return false;
+        }
+
         return Auth::user()?->can('manage_santri') ?? false;
     }
 
@@ -72,6 +69,26 @@ class CalonSantriResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
+        $programOptions = AlbaKidsTenant::isActive()
+            ? [
+                'Preschool' => 'Preschool',
+            ]
+            : [
+                'Reguler' => 'Reguler',
+                'Tahfidz' => 'Tahfidz',
+                'Muadalah' => 'Muadalah',
+            ];
+
+        $statusOptions = [
+            'pending' => 'Pending',
+            'menunggu_verifikasi' => 'Menunggu Verifikasi',
+            'verifikasi_berkas' => 'Verifikasi Berkas',
+            'lulus' => 'Lulus',
+            'cadangan' => 'Cadangan',
+            'ditolak' => 'Ditolak',
+            'registrasi_ulang' => 'Registrasi Ulang',
+        ];
+
         return $schema->components([
             Section::make('Data Calon Santri')->schema([
                 TextInput::make('nomor_pendaftaran')
@@ -101,11 +118,7 @@ class CalonSantriResource extends Resource
                     ->maxLength(255),
                 Select::make('program_diminati')
                     ->label('Program Diminati')
-                    ->options([
-                        'Reguler' => 'Reguler',
-                        'Tahfidz' => 'Tahfidz',
-                        'Muadalah' => 'Muadalah',
-                    ])
+                    ->options($programOptions)
                     ->required(),
             ])->columns(2),
 
@@ -130,15 +143,8 @@ class CalonSantriResource extends Resource
             Section::make('Keputusan PPDB')->schema([
                 Select::make('status_pendaftaran')
                     ->label('Status Pendaftaran')
-                    ->options([
-                        'pending' => 'Pending',
-                        'verifikasi_berkas' => 'Verifikasi Berkas',
-                        'lulus' => 'Lulus',
-                        'cadangan' => 'Cadangan',
-                        'ditolak' => 'Ditolak',
-                        'registrasi_ulang' => 'Registrasi Ulang',
-                    ])
-                    ->default('pending')
+                    ->options($statusOptions)
+                    ->default(AlbaKidsTenant::isActive() ? 'menunggu_verifikasi' : 'pending')
                     ->required(),
                 Textarea::make('catatan_keputusan')
                     ->label('Catatan Keputusan')
@@ -157,6 +163,15 @@ class CalonSantriResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $isAlbaKids = AlbaKidsTenant::isActive();
+        $programFilterOptions = $isAlbaKids
+            ? ['Preschool' => 'Preschool']
+            : [
+                'Reguler' => 'Reguler',
+                'Tahfidz' => 'Tahfidz',
+                'Muadalah' => 'Muadalah',
+            ];
+
         return $table
             ->columns([
                 TextColumn::make('nomor_pendaftaran')
@@ -179,15 +194,21 @@ class CalonSantriResource extends Resource
                     ->sortable(),
                 TextColumn::make('no_hp_wali')
                     ->label('No. HP Wali'),
+                TextColumn::make('created_at')
+                    ->label('Masuk')
+                    ->dateTime('d M Y H:i')
+                    ->visible($isAlbaKids),
                 TextColumn::make('hasil_ujian_count')
                     ->label('Hasil Ujian')
-                    ->counts('hasilUjian'),
+                    ->counts('hasilUjian')
+                    ->visible(! $isAlbaKids),
             ])
             ->defaultSort('nomor_pendaftaran')
             ->filters([
                 SelectFilter::make('status_pendaftaran')
                     ->options([
                         'pending' => 'Pending',
+                        'menunggu_verifikasi' => 'Menunggu Verifikasi',
                         'verifikasi_berkas' => 'Verifikasi Berkas',
                         'lulus' => 'Lulus',
                         'cadangan' => 'Cadangan',
@@ -195,11 +216,7 @@ class CalonSantriResource extends Resource
                         'registrasi_ulang' => 'Registrasi Ulang',
                     ]),
                 SelectFilter::make('program_diminati')
-                    ->options([
-                        'Reguler' => 'Reguler',
-                        'Tahfidz' => 'Tahfidz',
-                        'Muadalah' => 'Muadalah',
-                    ]),
+                    ->options($programFilterOptions),
             ])
             ->actions([
                 EditAction::make(),
@@ -261,8 +278,14 @@ class CalonSantriResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
+        $query = parent::getEloquentQuery()
             ->withCount('hasilUjian');
+
+        if (AlbaKidsTenant::isActive()) {
+            $query->where('gelombang', 'Landing Alba Kids');
+        }
+
+        return $query;
     }
 
     public static function getPages(): array
@@ -273,5 +296,24 @@ class CalonSantriResource extends Resource
             'edit' => EditCalonSantri::route('/{record}/edit'),
         ];
     }
-}
 
+    public static function getNavigationLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Daftar Pendaftar' : 'Calon Santri';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Pendaftar Alba Kids' : 'Calon Santri';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Daftar Pendaftar' : 'Calon Santri';
+    }
+
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return AlbaKidsTenant::isActive() ? 'PPDB Custom' : 'PPDB';
+    }
+}

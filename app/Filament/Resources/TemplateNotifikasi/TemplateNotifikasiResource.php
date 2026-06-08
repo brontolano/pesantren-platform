@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TemplateNotifikasi;
 
+use App\Support\AlbaKidsTenant;
 use App\Filament\Resources\TemplateNotifikasi\Pages\CreateTemplateNotifikasi;
 use App\Filament\Resources\TemplateNotifikasi\Pages\EditTemplateNotifikasi;
 use App\Filament\Resources\TemplateNotifikasi\Pages\ListTemplateNotifikasi;
@@ -27,14 +28,6 @@ class TemplateNotifikasiResource extends Resource
     protected static ?string $model = TemplateNotifikasi::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
-
-    protected static ?string $navigationLabel = 'Template Notifikasi';
-
-    protected static ?string $modelLabel = 'Template Notifikasi';
-
-    protected static ?string $pluralModelLabel = 'Template Notifikasi';
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Notifikasi';
 
     protected static ?int $navigationSort = 1;
 
@@ -135,5 +128,35 @@ class TemplateNotifikasiResource extends Resource
             'edit' => EditTemplateNotifikasi::route('/{record}/edit'),
         ];
     }
-}
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (AlbaKidsTenant::isActive()) {
+            $query->where('kode_template', 'like', 'albakids_%');
+        }
+
+        return $query;
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Template Pesan' : 'Template Notifikasi';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Template Pesan Alba Kids' : 'Template Notifikasi';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Template Pesan' : 'Template Notifikasi';
+    }
+
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Notifikasi';
+    }
+}

@@ -17,7 +17,7 @@ class AlbaKidsRegistrationNotificationService
 
     public function notify(CalonSantri $candidate, array $context = []): array
     {
-        $guardianPhone = $this->normalizePhone($candidate->no_hp_wali);
+        $guardianPhones = $this->guardianPhones($candidate);
         $adminPhone = $this->normalizePhone((string) ($context['admin_whatsapp'] ?? ''), false);
 
         $registrationTemplate = $this->resolveTemplate(
@@ -32,6 +32,12 @@ class AlbaKidsRegistrationNotificationService
             'Pendaftar baru Alba Kids masuk. Nama: {{nama_calon}}. Nomor: {{nomor_pendaftaran}}. Wali: {{nama_wali}} ({{no_hp_wali}}). Program: {{program_diminati}}. Segera cek admin untuk verifikasi bukti transfer.'
         );
 
+        $this->resolveTemplate(
+            'albakids_broadcast_general',
+            'Broadcast Alba Kids',
+            'Assalamu alaikum Bapak/Ibu, {{isi_pesan}}'
+        );
+
         $result = [
             'guardian' => null,
             'admin' => null,
@@ -41,7 +47,7 @@ class AlbaKidsRegistrationNotificationService
             'template_id' => $registrationTemplate->id,
             'target_group' => 'custom',
             'filter_criteria' => [
-                'targets' => [$guardianPhone],
+                'targets' => $guardianPhones,
                 'variables' => [
                     'nama_wali' => $candidate->nama_ayah ?: $candidate->nama_ibu ?: 'Bapak/Ibu Wali',
                     'nama_calon' => $candidate->nama,
@@ -93,11 +99,32 @@ class AlbaKidsRegistrationNotificationService
                     'program_diminati',
                     'no_hp_wali',
                     'pesan_tambahan',
+                    'isi_pesan',
                 ],
                 'channel' => 'wa',
                 'is_active' => true,
             ]
         );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function guardianPhones(CalonSantri $candidate): array
+    {
+        $phones = [
+            $this->normalizePhone($candidate->no_hp_wali, false),
+            $this->normalizePhone((string) data_get($candidate->data_ortu, 'no_hp_ayah', ''), false),
+            $this->normalizePhone((string) data_get($candidate->data_ortu, 'no_hp_ibu', ''), false),
+        ];
+
+        $phones = array_values(array_unique(array_filter($phones)));
+
+        if ($phones === []) {
+            throw new InvalidArgumentException('Nomor WhatsApp tujuan notifikasi wajib diisi.');
+        }
+
+        return $phones;
     }
 
     private function normalizePhone(?string $value, bool $required = true): ?string

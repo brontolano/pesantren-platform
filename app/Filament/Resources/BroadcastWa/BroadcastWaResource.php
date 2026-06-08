@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BroadcastWa;
 
+use App\Support\AlbaKidsTenant;
 use App\Filament\Resources\BroadcastWa\Pages\CreateBroadcastWa;
 use App\Filament\Resources\BroadcastWa\Pages\EditBroadcastWa;
 use App\Filament\Resources\BroadcastWa\Pages\ListBroadcastWa;
@@ -27,14 +28,6 @@ class BroadcastWaResource extends Resource
     protected static ?string $model = BroadcastWa::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
-
-    protected static ?string $navigationLabel = 'Broadcast WA';
-
-    protected static ?string $modelLabel = 'Broadcast WA';
-
-    protected static ?string $pluralModelLabel = 'Broadcast WA';
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Notifikasi';
 
     protected static ?int $navigationSort = 2;
 
@@ -67,6 +60,7 @@ class BroadcastWaResource extends Resource
                     ->options(fn () => TemplateNotifikasi::query()
                         ->where('channel', 'wa')
                         ->where('is_active', true)
+                        ->when(AlbaKidsTenant::isActive(), fn ($query) => $query->where('kode_template', 'like', 'albakids_%'))
                         ->pluck('judul', 'id'))
                     ->searchable()
                     ->required(),
@@ -143,7 +137,13 @@ class BroadcastWaResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('template');
+        $query = parent::getEloquentQuery()->with('template');
+
+        if (AlbaKidsTenant::isActive()) {
+            $query->whereHas('template', fn (Builder $builder) => $builder->where('kode_template', 'like', 'albakids_%'));
+        }
+
+        return $query;
     }
 
     public static function getPages(): array
@@ -154,5 +154,24 @@ class BroadcastWaResource extends Resource
             'edit' => EditBroadcastWa::route('/{record}/edit'),
         ];
     }
-}
 
+    public static function getNavigationLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Broadcast Pesan' : 'Broadcast WA';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Broadcast Pesan Alba Kids' : 'Broadcast WA';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return AlbaKidsTenant::isActive() ? 'Broadcast Pesan' : 'Broadcast WA';
+    }
+
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Notifikasi';
+    }
+}
