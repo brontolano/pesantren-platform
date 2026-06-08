@@ -22,6 +22,79 @@ class DevRoadmapSeeder extends Seeder
         $this->seedPlatform();
         $this->seedTemaModulPesantren();
         $this->seedPolishUiSesi();
+        $this->seedModulKeuangan();
+    }
+
+    /**
+     * Program "Modul Keuangan Baitul Maal" — akuntansi double-entry + pemisahan
+     * dana halal/syubhat + pajak BOS/BOP + payroll + DSCR + pelaporan L1–L7 + PWA.
+     * Dibangun 2026-06-08 (eksekusi otonom). Idempotent: updateOrCreate by slug + title.
+     */
+    private function seedModulKeuangan(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'modul-keuangan-baitul-maal'],
+            [
+                'name' => 'Modul Keuangan Baitul Maal',
+                'description' => 'Sistem keuangan pesantren lengkap: buku besar double-entry immutable (3 dimensi + KEHALALAN halal/syubhat), pajak BOS/BOP (PMK 59/2022), pengadaan+audit GPS, wallet/tabungan, payroll poin-KPI+PPh21, segregation of funds (PSAK 112/109), pembiayaan/DSCR 1,25×, mutu/SYAMIL, pelaporan L1–L7, EMIS export, Admin Filament + PWA Vue. 41 feature test hijau + vite build hijau. Gate kepatuhan: mesin pajak & DSCR wajib review penasihat sebelum rilis.',
+                'status' => 'in_progress',
+                'color' => 'success',
+                'icon' => 'heroicon-o-banknotes',
+                'sort' => 8,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            ['Fondasi (Ledger+Kehalalan)', 'Buku besar double-entry + dimensi Kehalalan + Dana Kebajikan',
+                'Modules/Ledger: COA hierarkis, jurnal immutable+pembalik, posting idempoten, kunci periode, 3 dimensi (akun·divisi·sumber_dana) + dimensi ke-4 kehalalan (halal/syubhat/non_halal). KehalalanGuard di JurnalService (toggle per tenant), DanaKebajikanService, auto-jurnal dari pembayaran.',
+                'SELESAI. 18 test hijau (balance, idempoten, periode, pembalik, BKU, isolasi, kehalalan: no-mix/no-income/blacklist masjid/whitelist).',
+                'done', 'critical', 100, 'L', 1],
+            ['Admin Filament', 'Panel Buku Besar + Pengaturan + Jurnal Manual',
+                'AkunResource (COA), SumberDana, Divisi, Periode+Tutup Buku, Jurnal read-only+pembalik, Jurnal Manual (Repeater→postJurnal), Pages Buku Besar/BKU/Neraca, Pengaturan (toggle halal/syubhat + jenis lembaga). RBAC 6 peran keuangan.',
+                'SELESAI. 19 test hijau (akses per peran).',
+                'done', 'high', 100, 'L', 2],
+            ['Pajak & Pengadaan', 'Mesin pajak BOS/BOP otomatis + belanja auto-jurnal',
+                'Modules/Pajak (tarif_pajak configurable PMK 59/2022) + Modules/Pengadaan (belanja → MesinPajakService PPN/PPh22/23/Final, barang BOS dikecualikan → BelanjaService auto-jurnal idempoten bendahara pemungut). BelanjaResource + cetak BKK + Buku Pembantu Pajak.',
+                'SELESAI. 6 test hijau (tiap aturan pajak + jurnal seimbang). GATE: review penasihat pajak sebelum rilis.',
+                'done', 'critical', 100, 'L', 3],
+            ['Pelaporan', 'L1–L7: Neraca, L/R, Arus Kas, LPJ BOS/BOP, RKAM, Dana Kebajikan, Dasbor',
+                'LaporanService (proyeksi jurnal): neraca seimbang, labaRugi, arusKas, danaBosBop per rezim, danaKebajikan terpisah surplus, danaTerikat PSAK112/109, realisasi RKAM. Pages L6/L2/L5/L1/L4/L7 + Pusat Laporan + EMIS export CSV.',
+                'SELESAI. 5 test hijau (neraca seimbang, surplus, dana kebajikan/terikat terpisah, BOS/BOP, EMIS).',
+                'done', 'high', 100, 'L', 4],
+            ['Payroll/Dana/Pembiayaan', 'Slip gaji poin/KPI+PPh21, DSCR 1,25×, agunan non-wakaf',
+                'Modules/Payroll (PayrollService poin×tarif configurable, PPh21, jurnal idempoten, slip), Modules/Pembiayaan (DscrService ambang 1,25× configurable; aset wakaf DITOLAK agunan UU41/2004; persetujuan Pembina+e-signature UU Yayasan Ps37), Modules/Mutu (dokumen SYAMIL). Resource + L3 paket kredit + Dosir L4.',
+                'SELESAI. 6 test hijau (slip neto+jurnal, DSCR 1,1×→waspada bukan reject, wakaf ditolak, Pembina e-signature).',
+                'done', 'high', 100, 'L', 5],
+            ['PWA Lapangan', 'API + shell Vue (Beranda/CatatBelanja+GPS/Pemasukan/Dasbor/Slip)',
+                'API api/keuangan/* (belanja idempoten client_ref / pemasukan auto-jurnal / saldo / dashboard / slip-saya) + offline-sync.js (IndexedDB) + camera-gps.js. KeuanganPwaController + 5 halaman Vue/Inertia role-based.',
+                'SELESAI (compile). 3 test API hijau + npm run build sukses. Runtime browser belum diuji manual (keterbatasan env).',
+                'done', 'medium', 100, 'L', 6],
+            ['Sisa / Polish', 'Layar PWA setor-keliling/lapor-progres/approval + notifikasi WA',
+                'KEU-W03 setor tabungan keliling, KEU-G03 lapor progres foto+GPS, KEU-B05 approval Pembina di PWA — backend/helper/API sudah ada, tinggal layar Vue. KEU-X02 wiring event → WaNotificationService.',
+                'BELUM. Fondasi siap; pekerjaan UI/wiring.',
+                'todo', 'low', 0, 'M', 7],
+            ['Ditunda (sadar)', 'QRIS otomatis & AI Keuangan',
+                'KEU-X04 QRIS+rekonsiliasi (ditunda sampai >10 klien; MVP transfer manual). KEU-X05 AI (OCR nota/anomali, Fase 3).',
+                'DITUNDA sesuai konstitusi (anti over-engineering).',
+                'todo', 'low', 0, 'L', 8],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
     }
 
     /**

@@ -1,0 +1,11 @@
+{
+    "name": "modules/mutu",
+    "description": "Modul Mutu/SYAMIL (Baitul Maal) untuk Platform Pesantren",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Mutu\\": "app/",
+            "Modules\\Mutu\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

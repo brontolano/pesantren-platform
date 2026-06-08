@@ -1,0 +1,11 @@
+{
+    "name": "modules/pembiayaan",
+    "description": "Modul Pembiayaan (Baitul Maal) untuk Platform Pesantren",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Pembiayaan\\": "app/",
+            "Modules\\Pembiayaan\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

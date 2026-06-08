@@ -19,6 +19,8 @@ class Tagihan extends Model
     protected $fillable = [
         'tenant_id',
         'santri_id',
+        'divisi_unit_id',
+        'sumber_dana_id',
         'jenis_tagihan',
         'keterangan',
         'nominal',

@@ -87,7 +87,7 @@ class TabunganService
 
         $tabungan = $this->getOrCreateTabungan($santri);
 
-        return DB::transaction(function () use ($tabungan, $tipe, $nominal, $options): TabunganTransaksi {
+        $transaksi = DB::transaction(function () use ($tabungan, $tipe, $nominal, $options): TabunganTransaksi {
             // Lock row for update
             $tabungan = Tabungan::query()->lockForUpdate()->find($tabungan->id);
 
@@ -111,6 +111,11 @@ class TabunganService
 
             return $transaksi;
         });
+
+        // Auto-jurnal (didengarkan modul Ledger bila aktif). Loose coupling.
+        \Modules\Keuangan\Events\TabunganTransaksiDicatat::dispatch($transaksi);
+
+        return $transaksi;
     }
 
     private function ensureTenantContext(): void

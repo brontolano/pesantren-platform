@@ -1,0 +1,11 @@
+{
+    "name": "Pajak",
+    "alias": "pajak",
+    "description": "Modul Pajak (Baitul Maal) — mesin PPN/PPh BOS/BOP otomatis (PMK 59/2022)",
+    "keywords": ["pajak", "ppn", "pph", "bos", "bop"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Pajak\\Providers\\PajakServiceProvider"
+    ],
+    "files": []
+}
