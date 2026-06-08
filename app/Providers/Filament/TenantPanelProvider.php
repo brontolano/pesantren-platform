@@ -95,7 +95,13 @@ class TenantPanelProvider extends PanelProvider
                 \App\Filament\Widgets\QuickAccessWidget::class,
             ];
 
+        // PENTING: ->id() & ->path() HARUS dipanggil SEBELUM ->resources()/
+        // ->discoverPages(), karena Filament memakai panel id utk cache path saat
+        // registrasi resource/page. Jika tidak, boot melempar
+        // "A panel has been registered without an id()" → 500 di SEMUA request.
         $panel = $panel
+            ->id('tenant')
+            ->path('admin')
             ->resources($resources)
             ->pages($pages)
             ->widgets($widgets);
@@ -105,8 +111,6 @@ class TenantPanelProvider extends PanelProvider
         }
 
         return $panel
-            ->id('tenant')
-            ->path('admin')
             ->login()
             ->passwordReset()
             ->profile()
