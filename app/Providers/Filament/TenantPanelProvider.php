@@ -26,6 +26,8 @@ use App\Filament\Resources\Kesehatan\SesiKonselingResource;
 use App\Filament\Resources\Ledger\AkunResource;
 use App\Filament\Resources\Ledger\DivisiUnitResource;
 use App\Filament\Resources\Ledger\JurnalResource;
+use App\Filament\Resources\Ledger\KebijakanKehalalanResource;
+use App\Filament\Resources\Pajak\TarifPajakResource;
 use App\Filament\Resources\Ledger\PeriodeAkuntansiResource;
 use App\Filament\Resources\Ledger\SumberDanaResource;
 use App\Filament\Resources\Pengadaan\BelanjaResource;
@@ -113,7 +115,9 @@ class TenantPanelProvider extends PanelProvider
                 DivisiUnitResource::class,
                 PeriodeAkuntansiResource::class,
                 JurnalResource::class,
+                KebijakanKehalalanResource::class,
                 BelanjaResource::class,
+                TarifPajakResource::class,
                 SlipGajiResource::class,
                 AsetResource::class,
                 PembiayaanResource::class,
