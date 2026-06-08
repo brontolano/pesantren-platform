@@ -43,56 +43,32 @@ const defaultTransferAmount = extractNumericValue(admission.transfer?.nominal)
 
 const form = useForm({
     nama_anak: '',
-    nama_panggilan: '',
-    nik_anak: '',
     tempat_lahir: '',
     tanggal_lahir: '',
     jenis_kelamin: '',
     child_order: '',
-    kelas_tujuan: admission.classOptions?.[0] ?? '',
-    program_diminati: admission.programOptions?.[0] ?? '',
-    asal_sekolah: '',
     nama_ayah: '',
     nama_ibu: '',
     pekerjaan_ayah: '',
     pekerjaan_ibu: '',
     no_hp_ayah: '',
     no_hp_ibu: '',
-    nama_wali: '',
-    hubungan_wali: 'Ibu',
-    no_hp_wali: '',
-    email_wali: '',
     alamat: '',
-    kota_domisili: '',
-    nama_pengirim_transfer: '',
-    bank_pengirim: admission.transfer?.bankName ?? '',
-    nominal_transfer: defaultTransferAmount,
-    tanggal_transfer: '',
-    sumber_informasi: '',
-    catatan_tambahan: '',
     bukti_transfer: null,
 })
 
 const submitAdmission = () => {
-    const guardianName = form.nama_ibu || form.nama_ayah || form.nama_wali
-    const guardianPhone = form.no_hp_ibu || form.no_hp_ayah || form.no_hp_wali
-    const notes = [
-        form.child_order ? `Anak ke: ${form.child_order}` : null,
-        form.pekerjaan_ayah ? `Pekerjaan Ayah: ${form.pekerjaan_ayah}` : null,
-        form.pekerjaan_ibu ? `Pekerjaan Ibu: ${form.pekerjaan_ibu}` : null,
-        form.no_hp_ayah ? `No. WhatsApp Ayah: ${form.no_hp_ayah}` : null,
-        form.no_hp_ibu ? `No. WhatsApp Ibu: ${form.no_hp_ibu}` : null,
-        form.catatan_tambahan || null,
-    ].filter(Boolean).join('\n')
-
     form.transform((data) => ({
         ...data,
-        nama_wali: guardianName,
-        hubungan_wali: data.hubungan_wali || (data.nama_ibu ? 'Ibu' : 'Ayah'),
-        no_hp_wali: guardianPhone,
-        bank_pengirim: data.bank_pengirim || admission.transfer?.bankName || '',
-        nominal_transfer: extractNumericValue(data.nominal_transfer) || defaultTransferAmount || '',
-        catatan_tambahan: notes,
+        nama_wali: data.nama_ibu || data.nama_ayah,
+        hubungan_wali: 'Ibu',
+        no_hp_wali: data.no_hp_ibu || data.no_hp_ayah,
+        kelas_tujuan: admission.classOptions?.[0] ?? 'Kelompok Bermain',
+        program_diminati: admission.programOptions?.[0] ?? 'Preschool',
+        nama_pengirim_transfer: data.nama_ibu || data.nama_ayah,
+        bank_pengirim: admission.transfer?.bankName || '',
+        nominal_transfer: defaultTransferAmount || '',
+        tanggal_transfer: new Date().toISOString().slice(0, 10),
     })).post(admission.endpoint, {
         forceFormData: true,
         preserveScroll: true,
@@ -193,7 +169,7 @@ const submitAdmission = () => {
                                             Formulir Pendaftaran Alba Kids
                                         </h2>
                                         <p class="text-base leading-7 text-slate-600">
-                                            Isi data calon siswa, data orang tua, lalu unggah bukti transfer pendaftaran. Tampilan form ini mengikuti brosur Alba Kids yang Ustadz kirim.
+                                            Isi form singkat berikut sesuai data yang diminta di brosur, lalu unggah bukti transfer pendaftaran.
                                         </p>
                                     </div>
 
@@ -254,13 +230,8 @@ const submitAdmission = () => {
                                             </label>
 
                                             <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
-                                                <span>Nama Panggilan</span>
-                                                <input v-model="form.nama_panggilan" type="text" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
-                                            </label>
-
-                                            <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
-                                                <span>Tempat Lahir*</span>
-                                                <input v-model="form.tempat_lahir" type="text" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
+                                                <span>Tempat, tanggal lahir*</span>
+                                                <input v-model="form.tempat_lahir" type="text" required placeholder="Tempat lahir" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
                                             </label>
 
                                             <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
@@ -271,20 +242,6 @@ const submitAdmission = () => {
                                             <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
                                                 <span>Anak ke-*</span>
                                                 <input v-model="form.child_order" type="text" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
-                                            </label>
-
-                                            <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
-                                                <span>Kelas Tujuan*</span>
-                                                <select v-model="form.kelas_tujuan" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
-                                                    <option v-for="option in admission.classOptions" :key="option" :value="option">{{ option }}</option>
-                                                </select>
-                                            </label>
-
-                                            <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
-                                                <span>Program*</span>
-                                                <select v-model="form.program_diminati" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
-                                                    <option v-for="option in admission.programOptions" :key="option" :value="option">{{ option }}</option>
-                                                </select>
                                             </label>
 
                                             <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
@@ -320,26 +277,6 @@ const submitAdmission = () => {
                                             <label class="grid gap-2 text-sm font-semibold text-[#315c4f] md:col-span-2">
                                                 <span>Alamat Lengkap (Jalan, Desa/Kelurahan, Kecamatan, Kabupaten/Kota, Provinsi)*</span>
                                                 <textarea v-model="form.alamat" rows="3" required class="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"></textarea>
-                                            </label>
-
-                                            <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
-                                                <span>Nama Pengirim Transfer*</span>
-                                                <input v-model="form.nama_pengirim_transfer" type="text" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
-                                            </label>
-
-                                            <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
-                                                <span>Tanggal Transfer*</span>
-                                                <input v-model="form.tanggal_transfer" type="date" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
-                                            </label>
-
-                                            <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
-                                                <span>Bank Pengirim*</span>
-                                                <input v-model="form.bank_pengirim" type="text" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
-                                            </label>
-
-                                            <label class="grid gap-2 text-sm font-semibold text-[#315c4f]">
-                                                <span>Nominal Transfer*</span>
-                                                <input v-model="form.nominal_transfer" type="number" min="0" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-normal text-slate-700 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100">
                                             </label>
 
                                             <label class="grid gap-2 text-sm font-semibold text-[#315c4f] md:col-span-2">

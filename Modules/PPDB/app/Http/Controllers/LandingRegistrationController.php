@@ -24,38 +24,41 @@ class LandingRegistrationController extends Controller
 
         $validated = $request->validate([
             'nama_anak' => ['required', 'string', 'max:255'],
-            'nama_panggilan' => ['nullable', 'string', 'max:100'],
-            'nik_anak' => ['nullable', 'string', 'max:50'],
             'tempat_lahir' => ['required', 'string', 'max:120'],
             'tanggal_lahir' => ['required', 'date', 'before:today'],
             'jenis_kelamin' => ['required', Rule::in(['L', 'P'])],
             'child_order' => ['nullable', 'string', 'max:50'],
-            'kelas_tujuan' => ['required', 'string', 'max:100'],
-            'program_diminati' => ['required', 'string', 'max:120'],
-            'asal_sekolah' => ['nullable', 'string', 'max:255'],
-            'nama_ayah' => ['nullable', 'string', 'max:255'],
+            'kelas_tujuan' => ['nullable', 'string', 'max:100'],
+            'program_diminati' => ['nullable', 'string', 'max:120'],
+            'nama_ayah' => ['required', 'string', 'max:255'],
             'nama_ibu' => ['required', 'string', 'max:255'],
             'pekerjaan_ayah' => ['nullable', 'string', 'max:255'],
             'pekerjaan_ibu' => ['nullable', 'string', 'max:255'],
             'no_hp_ayah' => ['nullable', 'string', 'max:30'],
             'no_hp_ibu' => ['nullable', 'string', 'max:30'],
-            'nama_wali' => ['required', 'string', 'max:255'],
-            'hubungan_wali' => ['required', 'string', 'max:120'],
-            'no_hp_wali' => ['required', 'string', 'max:30'],
-            'email_wali' => ['nullable', 'email', 'max:255'],
+            'nama_wali' => ['nullable', 'string', 'max:255'],
+            'hubungan_wali' => ['nullable', 'string', 'max:120'],
+            'no_hp_wali' => ['nullable', 'string', 'max:30'],
             'alamat' => ['required', 'string', 'max:1000'],
-            'kota_domisili' => ['nullable', 'string', 'max:120'],
-            'nama_pengirim_transfer' => ['required', 'string', 'max:255'],
-            'bank_pengirim' => ['required', 'string', 'max:120'],
-            'nominal_transfer' => ['required', 'numeric', 'min:0'],
-            'tanggal_transfer' => ['required', 'date'],
-            'catatan_tambahan' => ['nullable', 'string', 'max:2000'],
-            'sumber_informasi' => ['nullable', 'string', 'max:255'],
+            'nama_pengirim_transfer' => ['nullable', 'string', 'max:255'],
+            'bank_pengirim' => ['nullable', 'string', 'max:120'],
+            'nominal_transfer' => ['nullable', 'numeric', 'min:0'],
+            'tanggal_transfer' => ['nullable', 'date'],
             'bukti_transfer' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf,webp', 'max:5120'],
         ]);
 
         $candidate = DB::transaction(function () use ($validated, $registrationNumberService, $request): CalonSantri {
             $nomorPendaftaran = $registrationNumberService->generate();
+            $guardianName = $validated['nama_wali'] ?: $validated['nama_ibu'];
+            $guardianPhone = $validated['no_hp_wali'] ?: ($validated['no_hp_ibu'] ?: ($validated['no_hp_ayah'] ?: ''));
+            $program = $validated['program_diminati'] ?: 'Preschool';
+            $kelas = $validated['kelas_tujuan'] ?: 'Kelompok Bermain';
+            $bankPengirim = $validated['bank_pengirim'] ?: (Setting::getTenantStringValue('admission_bank_name', 'Bank Mandiri') ?? 'Bank Mandiri');
+            $nominalTransfer = isset($validated['nominal_transfer'])
+                ? (float) $validated['nominal_transfer']
+                : $this->defaultTransferAmount();
+            $tanggalTransfer = $validated['tanggal_transfer'] ?? now()->toDateString();
+            $namaPengirimTransfer = $validated['nama_pengirim_transfer'] ?: $guardianName;
 
             $candidate = CalonSantri::create([
                 'tenant_id' => tenant()?->getTenantKey(),
@@ -64,35 +67,30 @@ class LandingRegistrationController extends Controller
                 'tanggal_lahir' => $validated['tanggal_lahir'],
                 'tempat_lahir' => $validated['tempat_lahir'],
                 'jenis_kelamin' => $validated['jenis_kelamin'],
-                'nama_ayah' => $validated['nama_ayah'] ?: $validated['nama_wali'],
+                'nama_ayah' => $validated['nama_ayah'],
                 'nama_ibu' => $validated['nama_ibu'],
-                'no_hp_wali' => $validated['no_hp_wali'],
-                'email_wali' => $validated['email_wali'] ?? null,
+                'no_hp_wali' => $guardianPhone,
+                'email_wali' => null,
                 'alamat' => $validated['alamat'],
-                'asal_sekolah' => $validated['asal_sekolah'] ?? null,
-                'program_diminati' => $validated['program_diminati'],
+                'asal_sekolah' => null,
+                'program_diminati' => $program,
                 'tahun_ajaran' => $this->academicYear(),
                 'gelombang' => 'Landing Alba Kids',
                 'status_pendaftaran' => 'menunggu_verifikasi',
                 'data_ortu' => [
-                    'nama_panggilan' => $validated['nama_panggilan'] ?? null,
-                    'nik_anak' => $validated['nik_anak'] ?? null,
                     'child_order' => $validated['child_order'] ?? null,
-                    'kelas_tujuan' => $validated['kelas_tujuan'],
-                    'nama_wali' => $validated['nama_wali'],
-                    'hubungan_wali' => $validated['hubungan_wali'],
+                    'kelas_tujuan' => $kelas,
+                    'nama_wali' => $guardianName,
+                    'hubungan_wali' => $validated['hubungan_wali'] ?: 'Ibu',
                     'pekerjaan_ayah' => $validated['pekerjaan_ayah'] ?? null,
                     'pekerjaan_ibu' => $validated['pekerjaan_ibu'] ?? null,
                     'no_hp_ayah' => $validated['no_hp_ayah'] ?? null,
                     'no_hp_ibu' => $validated['no_hp_ibu'] ?? null,
-                    'kota_domisili' => $validated['kota_domisili'] ?? null,
-                    'sumber_informasi' => $validated['sumber_informasi'] ?? null,
-                    'catatan_tambahan' => $validated['catatan_tambahan'] ?? null,
                     'pembayaran' => [
-                        'nama_pengirim_transfer' => $validated['nama_pengirim_transfer'],
-                        'bank_pengirim' => $validated['bank_pengirim'],
-                        'nominal_transfer' => (float) $validated['nominal_transfer'],
-                        'tanggal_transfer' => $validated['tanggal_transfer'],
+                        'nama_pengirim_transfer' => $namaPengirimTransfer,
+                        'bank_pengirim' => $bankPengirim,
+                        'nominal_transfer' => $nominalTransfer,
+                        'tanggal_transfer' => $tanggalTransfer,
                     ],
                 ],
             ]);
@@ -107,10 +105,17 @@ class LandingRegistrationController extends Controller
                 'tenant_id' => tenant()?->getTenantKey(),
                 'calon_santri_id' => $candidate->getKey(),
                 'tipe' => 'pendaftaran_albakids',
-                'nominal' => (float) $validated['nominal_transfer'],
+                'nominal' => $nominalTransfer,
                 'jatuh_tempo' => now()->toDateString(),
                 'status' => 'menunggu_verifikasi',
-                'keterangan' => $this->buildPaymentSummary($validated),
+                'keterangan' => $this->buildPaymentSummary([
+                    ...$validated,
+                    'nama_pengirim_transfer' => $namaPengirimTransfer,
+                    'bank_pengirim' => $bankPengirim,
+                    'nominal_transfer' => $nominalTransfer,
+                    'program_diminati' => $program,
+                    'kelas_tujuan' => $kelas,
+                ]),
                 'bukti_transfer' => $proofPath,
                 'bukti_diunggah_at' => now(),
             ]);
@@ -165,5 +170,13 @@ class LandingRegistrationController extends Controller
             $validated['program_diminati'],
             $validated['kelas_tujuan'],
         );
+    }
+
+    private function defaultTransferAmount(): float
+    {
+        $value = Setting::getTenantStringValue('admission_transfer_amount', '1885000') ?? '1885000';
+        $normalized = preg_replace('/[^\d]/', '', $value);
+
+        return is_string($normalized) && $normalized !== '' ? (float) $normalized : 1885000.0;
     }
 }
