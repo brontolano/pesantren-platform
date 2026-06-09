@@ -128,4 +128,38 @@ Route::middleware([
         Route::get('/pembayaran/csv', [KeuanganExportController::class, 'pembayaranCsv'])->name('pembayaran.csv');
         Route::get('/pembayaran/print', [KeuanganExportController::class, 'pembayaranPrint'])->name('pembayaran.print');
     });
+
+    Route::middleware('auth')->prefix('admin/pengadaan')->name('tenant.pengadaan.')->group(function () {
+        Route::get('/bkk/{belanja}/print', [\App\Http\Controllers\PengadaanExportController::class, 'bkkPrint'])->name('bkk.print');
+    });
+
+    Route::middleware('auth')->prefix('admin/payroll')->name('tenant.payroll.')->group(function () {
+        Route::get('/slip/{slip}/print', [\App\Http\Controllers\PayrollExportController::class, 'slipPrint'])->name('slip.print');
+    });
+
+    Route::middleware('auth')->prefix('admin/emis')->name('tenant.emis.')->group(function () {
+        Route::get('/export/csv', [\App\Http\Controllers\EmisExportController::class, 'csv'])->name('export.csv');
+    });
+
+    // PWA Keuangan Lapangan (Vue/Inertia). Memakai API api/keuangan/* yang sudah ada.
+    Route::middleware('auth')->prefix('admin/keuangan/pwa')->name('tenant.keuangan.pwa.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\KeuanganPwaController::class, 'beranda'])->name('beranda');
+        Route::get('/catat-belanja', [\App\Http\Controllers\KeuanganPwaController::class, 'catatBelanja'])->name('belanja');
+        Route::get('/catat-pemasukan', [\App\Http\Controllers\KeuanganPwaController::class, 'catatPemasukan'])->name('pemasukan');
+        Route::get('/dasbor', [\App\Http\Controllers\KeuanganPwaController::class, 'dasbor'])->name('dasbor');
+        Route::get('/slip-saya', [\App\Http\Controllers\KeuanganPwaController::class, 'slipSaya'])->name('slip');
+    });
+
+    Route::middleware('auth')->prefix('admin/pembiayaan')->name('tenant.pembiayaan.')->group(function () {
+        Route::get('/{pengajuan}/paket-kredit/print', [\App\Http\Controllers\PembiayaanExportController::class, 'paketKreditPrint'])->name('paket.print');
+    });
+
+    // API PWA Keuangan Lapangan (staf). Tenant di-resolve via web group; auth Sanctum.
+    Route::middleware(['auth:sanctum'])->prefix('api/keuangan')->name('tenant.api.keuangan.')->group(function () {
+        Route::post('/belanja', [\App\Http\Controllers\KeuanganApiController::class, 'belanja'])->name('belanja');
+        Route::post('/pemasukan', [\App\Http\Controllers\KeuanganApiController::class, 'pemasukan'])->name('pemasukan');
+        Route::get('/saldo', [\App\Http\Controllers\KeuanganApiController::class, 'saldo'])->name('saldo');
+        Route::get('/dashboard-pimpinan', [\App\Http\Controllers\KeuanganApiController::class, 'dashboardPimpinan'])->name('dashboard');
+        Route::get('/slip-saya', [\App\Http\Controllers\KeuanganApiController::class, 'slipSaya'])->name('slip');
+    });
 });

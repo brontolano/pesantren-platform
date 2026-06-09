@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\TenantApiController;
 use App\Http\Controllers\TenantWebsiteController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Database\Models\Domain;
+use Modules\CMS\Http\Controllers\TenantLandingPageController;
+use Modules\PPDB\Http\Controllers\LandingRegistrationController;
 
 // Caddy on-demand TLS "ask" endpoint — izinkan terbitkan sertifikat hanya
 // untuk central domain atau domain tenant yang terdaftar. Mencegah penyalahgunaan.
@@ -29,11 +31,24 @@ Route::get('/', function () {
         return view('landing');
     }
 
-    return view('tenant.launcher', [
-        'pesantren' => \App\Support\TenantBranding::name(tenant()?->name ?? 'Portal Pesantren'),
-        'logoUrl' => \App\Support\TenantBranding::logoUrl(),
-    ]);
+    $domainType = Domain::query()
+        ->where('domain', request()->getHost())
+        ->value('type');
+
+    if ($domainType === 'sistem') {
+        return view('tenant.launcher', [
+            'pesantren' => \App\Support\TenantBranding::name(tenant()?->name ?? 'Portal Pesantren'),
+            'logoUrl' => \App\Support\TenantBranding::logoUrl(),
+        ]);
+    }
+
+    return app()->call([app(TenantLandingPageController::class), '__invoke']);
 })->name('home');
+
+// Submit formulir landing page tenant-specific (contoh: Alba Kids).
+Route::post('/daftar', [LandingRegistrationController::class, 'store'])
+    ->middleware('throttle:ppdb-submit')
+    ->name('tenant.landing.register');
 
 // PPDB publik — hanya aktif di domain tenant (controller 404 di central)
 Route::get('/ppdb', [TenantWebsiteController::class, 'ppdbForm'])->name('tenant.ppdb.form');

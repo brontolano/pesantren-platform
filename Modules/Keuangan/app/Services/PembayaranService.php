@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Services;
 
 use Illuminate\Support\Facades\DB;
+use Modules\Keuangan\Events\PembayaranDiverifikasi;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use RuntimeException;
@@ -84,6 +85,9 @@ class PembayaranService
 
         // Re-evaluate status tagihan setelah verifikasi
         $this->updateStatusTagihan($model->tagihan);
+
+        // Pancarkan event auto-jurnal (didengarkan modul Ledger bila aktif).
+        PembayaranDiverifikasi::dispatch($model->fresh(), $verifiedBy);
 
         return $model->fresh();
     }

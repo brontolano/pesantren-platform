@@ -1,0 +1,11 @@
+{
+    "name": "Mutu",
+    "alias": "mutu",
+    "description": "Modul Mutu/SYAMIL (Baitul Maal) — dosir SPMI/SPME, kesiapan asesmen Majelis Masyayikh",
+    "keywords": ["mutu", "syamil", "spmi", "asesmen"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Mutu\\Providers\\MutuServiceProvider"
+    ],
+    "files": []
+}

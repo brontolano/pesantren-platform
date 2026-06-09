@@ -1,0 +1,11 @@
+{
+    "name": "modules/ledger",
+    "description": "Modul Ledger (Baitul Maal) untuk Platform Pesantren",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Ledger\\": "app/",
+            "Modules\\Ledger\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}

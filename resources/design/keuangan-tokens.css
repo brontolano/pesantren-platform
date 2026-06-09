@@ -1,0 +1,12 @@
+/* Token desain tema Keuangan (Baitul Maal) — sumber tunggal untuk Filament & PWA.
+   Override per tenant di-inject runtime dari setting branding (white-label §14). */
+:root {
+  --keu-primary: #0A5C36;   /* Forest Green */
+  --keu-accent:  #D4AF37;   /* Gold */
+  --keu-surface: #FDFBF7;   /* Cream */
+  --keu-success: #0A5C36;
+  --keu-warning: #D4AF37;
+  --keu-danger:  #B3261E;
+  --keu-font-display: 'Marcellus', serif;
+  --keu-font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+}

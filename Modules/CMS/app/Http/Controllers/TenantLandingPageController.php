@@ -3,6 +3,7 @@
 namespace Modules\CMS\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Support\AlbaKidsTenant;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\CMS\Models\Article;
@@ -14,7 +15,11 @@ class TenantLandingPageController extends Controller
     {
         $website = $websiteService->buildLandingPagePayload();
 
-        return Inertia::render('CMS/LandingPage', [
+        // Tenant dengan landing custom dirender komponen sendiri agar LandingPage
+        // default tetap bersih & tenant lain tidak terdampak perubahan custom.
+        $component = AlbaKidsTenant::isActive() ? 'CMS/AlbaKidsLanding' : 'CMS/LandingPage';
+
+        return Inertia::render($component, [
             'tenant' => tenant(),
             'website' => $website,
             'blog' => [

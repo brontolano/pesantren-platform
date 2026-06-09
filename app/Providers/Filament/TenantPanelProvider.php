@@ -23,6 +23,18 @@ use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kelas\KelasResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
 use App\Filament\Resources\Kesehatan\SesiKonselingResource;
+use App\Filament\Resources\Ledger\AkunResource;
+use App\Filament\Resources\Ledger\DivisiUnitResource;
+use App\Filament\Resources\Ledger\JurnalResource;
+use App\Filament\Resources\Ledger\KebijakanKehalalanResource;
+use App\Filament\Resources\Pajak\TarifPajakResource;
+use App\Filament\Resources\Ledger\PeriodeAkuntansiResource;
+use App\Filament\Resources\Ledger\SumberDanaResource;
+use App\Filament\Resources\Pengadaan\BelanjaResource;
+use App\Filament\Resources\Payroll\SlipGajiResource;
+use App\Filament\Resources\Pembiayaan\AsetResource;
+use App\Filament\Resources\Pembiayaan\PembiayaanResource;
+use App\Filament\Resources\Mutu\DokumenMutuResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
 use App\Filament\Resources\Media\MediaFileResource;
 use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
@@ -40,6 +52,7 @@ use App\Filament\Resources\Tahfidz\HafalanTahfidzResource;
 use App\Filament\Resources\Tahfidz\PenilaianTahfidzResource;
 use App\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource;
 use App\Filament\Resources\Users\UserResource;
+use App\Support\AlbaKidsTenant;
 use App\Filament\Widgets\KesantrianOverviewWidget;
 use App\Filament\Widgets\KeuanganOverviewWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -64,9 +77,40 @@ class TenantPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $isAlbaKids = AlbaKidsTenant::isActive();
+        $resources = $isAlbaKids ? $this->albaKidsResources() : $this->defaultResources();
+        $pages = $isAlbaKids ? [Dashboard::class] : [\App\Filament\Pages\TenantDashboard::class];
+        $widgets = $isAlbaKids
+            ? [
+                \App\Filament\Widgets\GreetingBanner::class,
+                AccountWidget::class,
+            ]
+            : [
+                \App\Filament\Widgets\GreetingBanner::class,
+                \App\Filament\Widgets\StatsPesantren::class,
+                \App\Filament\Widgets\KeuanganAreaChart::class,
+                \App\Filament\Widgets\KategoriPengeluaranChart::class,
+                \App\Filament\Widgets\TransaksiTerbaru::class,
+                \App\Filament\Widgets\AgendaPengumuman::class,
+                \App\Filament\Widgets\QuickAccessWidget::class,
+            ];
+
+        // PENTING: ->id() & ->path() HARUS dipanggil SEBELUM ->resources()/
+        // ->discoverPages(), karena Filament memakai panel id utk cache path saat
+        // registrasi resource/page. Jika tidak, boot melempar
+        // "A panel has been registered without an id()" → 500 di SEMUA request.
+        $panel = $panel
             ->id('tenant')
             ->path('admin')
+            ->resources($resources)
+            ->pages($pages)
+            ->widgets($widgets);
+
+        if (! $isAlbaKids) {
+            $panel->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages');
+        }
+
+        return $panel
             ->login()
             ->passwordReset()
             ->profile()
@@ -80,73 +124,6 @@ class TenantPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Green,
                 'gray' => Color::Slate,
-            ])
-            ->resources([
-                // Core tenant
-                UserResource::class,
-                RoleResource::class,
-                // Kesantrian
-                SantriResource::class,
-                KelasResource::class,
-                PenempatanKelasResource::class,
-                AlumniResource::class,
-                // Keuangan
-                TagihanResource::class,
-                PembayaranResource::class,
-                TabunganResource::class,
-                MetodePembayaranResource::class,
-                TabunganTopupResource::class,
-                LaporanKeuanganResource::class,
-                // Notifikasi
-                TemplateNotifikasiResource::class,
-                BroadcastWaResource::class,
-                // PPDB
-                CalonSantriResource::class,
-                CalonSantriDokumenResource::class,
-                HasilUjianResource::class,
-                // CMS
-                ArticleResource::class,
-                GalleryResource::class,
-                ProfileResource::class,
-                WebsiteSettingResource::class,
-                // Akademik
-                PeriodeAkademikResource::class,
-                PelajaranResource::class,
-                JadwalPelajaranResource::class,
-                NilaiResource::class,
-                RaporResource::class,
-                // Asrama
-                BlokAsramaResource::class,
-                KamarAsramaResource::class,
-                PenempatanAsramaResource::class,
-                BiayaAsramaResource::class,
-                // Tahfidz
-                HafalanTahfidzResource::class,
-                PenilaianTahfidzResource::class,
-                // Kesehatan
-                RiwayatKesehatanResource::class,
-                SesiKonselingResource::class,
-                // Kegiatan
-                KegiatanResource::class,
-                IzinSantriResource::class,
-                KunjunganWaliResource::class,
-                // File Storage
-                MediaFileResource::class,
-                \App\Filament\Resources\Media\MediaAuditResource::class,
-            ])
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            ->pages([
-                \App\Filament\Pages\TenantDashboard::class,
-            ])
-            ->widgets([
-                // Dashboard mockup TU Pesantren — banner → statistik → (grafik/tabel/panel kanan menyusul).
-                \App\Filament\Widgets\GreetingBanner::class,
-                \App\Filament\Widgets\StatsPesantren::class,
-                \App\Filament\Widgets\KeuanganAreaChart::class,
-                \App\Filament\Widgets\KategoriPengeluaranChart::class,
-                \App\Filament\Widgets\TransaksiTerbaru::class,
-                \App\Filament\Widgets\AgendaPengumuman::class,
-                \App\Filament\Widgets\QuickAccessWidget::class,
             ])
             ->middleware([
                 // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user
@@ -190,5 +167,83 @@ class TenantPanelProvider extends PanelProvider
         }
 
         return (string) (tenant()->name ?? 'Pesantren') ?: 'Pesantren';
+    }
+
+    /**
+     * Resource penuh untuk tenant umum.
+     *
+     * @return array<int, class-string>
+     */
+    protected function defaultResources(): array
+    {
+        return [
+            UserResource::class,
+            RoleResource::class,
+            SantriResource::class,
+            KelasResource::class,
+            PenempatanKelasResource::class,
+            AlumniResource::class,
+            TagihanResource::class,
+            PembayaranResource::class,
+            TabunganResource::class,
+            MetodePembayaranResource::class,
+            TabunganTopupResource::class,
+            LaporanKeuanganResource::class,
+            // Ledger / Baitul Maal (Buku Besar)
+            AkunResource::class,
+            SumberDanaResource::class,
+            DivisiUnitResource::class,
+            PeriodeAkuntansiResource::class,
+            JurnalResource::class,
+            KebijakanKehalalanResource::class,
+            BelanjaResource::class,
+            TarifPajakResource::class,
+            SlipGajiResource::class,
+            AsetResource::class,
+            PembiayaanResource::class,
+            DokumenMutuResource::class,
+            TemplateNotifikasiResource::class,
+            BroadcastWaResource::class,
+            CalonSantriResource::class,
+            CalonSantriDokumenResource::class,
+            HasilUjianResource::class,
+            ArticleResource::class,
+            GalleryResource::class,
+            ProfileResource::class,
+            WebsiteSettingResource::class,
+            PeriodeAkademikResource::class,
+            PelajaranResource::class,
+            JadwalPelajaranResource::class,
+            NilaiResource::class,
+            RaporResource::class,
+            BlokAsramaResource::class,
+            KamarAsramaResource::class,
+            PenempatanAsramaResource::class,
+            BiayaAsramaResource::class,
+            HafalanTahfidzResource::class,
+            PenilaianTahfidzResource::class,
+            RiwayatKesehatanResource::class,
+            SesiKonselingResource::class,
+            KegiatanResource::class,
+            IzinSantriResource::class,
+            KunjunganWaliResource::class,
+            MediaFileResource::class,
+            \App\Filament\Resources\Media\MediaAuditResource::class,
+        ];
+    }
+
+    /**
+     * Surface admin khusus tenant Alba Kids.
+     *
+     * @return array<int, class-string>
+     */
+    protected function albaKidsResources(): array
+    {
+        return [
+            CalonSantriResource::class,
+            \App\Filament\Resources\PPDB\TagihanPpdbResource::class,
+            TemplateNotifikasiResource::class,
+            BroadcastWaResource::class,
+        ];
     }
 }

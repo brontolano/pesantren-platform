@@ -1,0 +1,11 @@
+{
+    "name": "Pengadaan",
+    "alias": "pengadaan",
+    "description": "Modul Pengadaan (Baitul Maal) — belanja + auto-jurnal + audit visual GPS",
+    "keywords": ["pengadaan", "belanja", "sarpras", "gps"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Pengadaan\\Providers\\PengadaanServiceProvider"
+    ],
+    "files": []
+}

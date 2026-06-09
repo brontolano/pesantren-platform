@@ -20,6 +20,9 @@ class CreateTenant extends CreateRecord
             $data['website_domain'] ?? null,
             $data['sistem_domain'] ?? null,
         ]);
+        $primaryDomain = $data['primary_domain'] ?? null;
+        $websiteDomain = $data['website_domain'] ?? null;
+        $sistemDomain = $data['sistem_domain'] ?? null;
         unset($data['primary_domain'], $data['website_domain'], $data['sistem_domain']);
 
         /** @var \App\Models\Tenant $tenant */
@@ -28,11 +31,24 @@ class CreateTenant extends CreateRecord
 
         // Daftarkan SEMUA domain yang diisi (deduplikasi).
         foreach (array_unique($domains) as $domain) {
-            $tenant->domains()->firstOrCreate(['domain' => $domain]);
+            $type = match ($domain) {
+                $websiteDomain => 'website',
+                $sistemDomain => 'sistem',
+                default => 'subdomain',
+            };
+
+            $tenant->domains()->updateOrCreate(
+                ['domain' => $domain],
+                [
+                    'type' => $type,
+                    'is_primary' => $type !== 'subdomain' || count(array_unique($domains)) === 1,
+                ]
+            );
         }
 
         // Seed roles + baris tenant lokal + user admin (DRY via service bersama).
-        $creds = app(TenantProvisioner::class)->provision($tenant);
+        $adminDomain = $sistemDomain ?? $websiteDomain ?? (($primaryDomain ?? $tenant->getKey()).'.localhost');
+        $creds = app(TenantProvisioner::class)->provision($tenant, 'admin@'.$adminDomain);
 
         if ($creds['password'] !== null) {
             Notification::make()

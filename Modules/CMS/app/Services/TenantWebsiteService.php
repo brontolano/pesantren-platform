@@ -14,11 +14,17 @@ class TenantWebsiteService
     public function buildLandingPagePayload(): array
     {
         $tenant = tenant();
+        $isAlbaKids = $this->isAlbaKidsTenant();
 
-        $brandingName = Setting::getTenantStringValue('branding_name', $tenant?->name ?? 'Pesantren');
-        $brandingTagline = Setting::getTenantStringValue('branding_tagline', 'Pendidikan adab, ilmu, dan layanan santri dalam satu sistem.');
-        $primaryColor = Setting::getTenantStringValue('branding_primary_color', '#14532d');
-        $secondaryColor = Setting::getTenantStringValue('branding_secondary_color', '#c2410c');
+        $brandingName = Setting::getTenantStringValue('branding_name', $isAlbaKids ? 'Alba Kids Pre-School' : ($tenant?->name ?? 'Pesantren'));
+        $brandingTagline = Setting::getTenantStringValue(
+            'branding_tagline',
+            $isAlbaKids
+                ? 'Ruang tumbuh yang fun, aktif, imajinatif, dan positif untuk langkah awal si kecil.'
+                : 'Pendidikan adab, ilmu, dan layanan santri dalam satu sistem.'
+        );
+        $primaryColor = Setting::getTenantStringValue('branding_primary_color', $isAlbaKids ? '#ff8a3d' : '#14532d');
+        $secondaryColor = Setting::getTenantStringValue('branding_secondary_color', $isAlbaKids ? '#1f9d8f' : '#c2410c');
         $contact = WebsiteSetting::getTenantValue('contact', []);
         $seo = WebsiteSetting::getTenantValue('seo', []);
         $canonicalUrl = url('/');
@@ -33,7 +39,7 @@ class TenantWebsiteService
 
         $logoUrl  = $this->resolveAssetUrl(Setting::getTenantStringValue('branding_logo', null));
         $favicon  = Setting::getTenantStringValue('branding_favicon', null);
-        $font     = Setting::getTenantStringValue('branding_font', 'default');
+        $font     = Setting::getTenantStringValue('branding_font', $isAlbaKids ? 'modern' : 'default');
         $fontFamily = $this->resolveFontFamily($font);
 
         return [
@@ -74,6 +80,7 @@ class TenantWebsiteService
                     ],
                 ],
             ],
+            'admission' => $this->buildAdmissionPayload($isAlbaKids),
             'sections' => $this->resolveSections($brandingName, $brandingTagline),
         ];
     }
@@ -117,6 +124,10 @@ class TenantWebsiteService
 
     protected function resolveSections(string $brandingName, string $brandingTagline): array
     {
+        if ($this->isAlbaKidsTenant() && ! WebsiteSection::query()->where('is_active', true)->exists()) {
+            return $this->defaultAlbaKidsSections($brandingName, $brandingTagline);
+        }
+
         $sections = WebsiteSection::query()
             ->where('is_active', true)
             ->orderBy('sort_order')
@@ -428,6 +439,100 @@ class TenantWebsiteService
         ];
     }
 
+    protected function defaultAlbaKidsSections(string $brandingName, string $brandingTagline): array
+    {
+        $admission = $this->buildAdmissionPayload(true);
+
+        return [
+            [
+                'type' => 'hero',
+                'order' => 1,
+                'config' => [
+                    'eyebrow' => 'Pendaftaran '.$admission['academicYear'],
+                    'title' => $brandingName,
+                    'description' => $brandingTagline,
+                    'primaryCtaLabel' => 'Isi Form Pendaftaran',
+                    'primaryCtaHref' => '#form-pendaftaran',
+                    'secondaryCtaLabel' => 'Lihat Program',
+                    'secondaryCtaHref' => '#program',
+                    'stats' => [
+                        ['label' => 'Karakter', 'value' => 'Aktif & Positif'],
+                        ['label' => 'Suasana', 'value' => 'Fun & Aman'],
+                        ['label' => 'Fokus', 'value' => 'Imajinatif'],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'profile',
+                'order' => 2,
+                'config' => [
+                    'title' => 'Tentang Alba Kids',
+                    'about' => 'Alba Kids Pre-School menghadirkan pengalaman belajar awal yang hangat, menyenangkan, dan penuh stimulasi agar anak bertumbuh percaya diri sejak langkah pertama.',
+                    'vision' => 'Menjadi ruang belajar awal yang menumbuhkan anak aktif, imajinatif, dan positif bersama keluarga.',
+                    'mission' => [
+                        'Mendorong eksplorasi anak melalui kegiatan bermain yang terarah.',
+                        'Membangun rutinitas belajar yang aman, hangat, dan penuh semangat.',
+                        'Menguatkan kolaborasi sekolah dan orang tua dalam setiap tahap tumbuh kembang anak.',
+                    ],
+                    'highlights' => [
+                        'Pembelajaran awal yang playful dan terarah.',
+                        'Lingkungan hangat bagi anak yang aktif dan imajinatif.',
+                        'Komunikasi pendaftaran yang praktis untuk orang tua muda.',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'testimonial',
+                'order' => 3,
+                'config' => [
+                    'title' => 'Mengapa Orang Tua Memilih Alba Kids',
+                    'description' => 'Lingkungan yang ceria, aman, dan mendorong setiap anak untuk percaya diri.',
+                    'quote' => 'Kami percaya masa awal sekolah harus terasa menyenangkan, penuh rasa ingin tahu, dan membangun semangat positif anak setiap hari.',
+                    'leaderName' => 'Tim Alba Kids',
+                    'leaderRole' => 'Early Childhood Educators',
+                    'highlights' => [
+                        'Aktivitas motorik, bahasa, dan sosial yang seimbang.',
+                        'Pendampingan hangat untuk masa adaptasi anak.',
+                        'Nuansa brand yang cerah, optimistis, dan ramah keluarga.',
+                    ],
+                ],
+            ],
+            [
+                'type' => 'faq',
+                'order' => 4,
+                'config' => [
+                    'title' => 'Informasi Pendaftaran',
+                    'description' => 'Semua hal penting sebelum mengisi formulir Alba Kids.',
+                    'items' => [
+                        [
+                            'question' => 'Bagaimana alur pendaftarannya?',
+                            'answer' => 'Isi formulir di halaman ini, unggah bukti transfer, lalu panitia Alba Kids akan memverifikasi data dan menghubungi Anda melalui WhatsApp.',
+                        ],
+                        [
+                            'question' => 'Apakah bukti transfer diunggah saat pendaftaran?',
+                            'answer' => 'Ya. Form ini dirancang satu langkah agar orang tua bisa mengirim data pendaftaran dan bukti transfer sekaligus.',
+                        ],
+                        [
+                            'question' => 'Kapan saya mendapat balasan?',
+                            'answer' => 'Sistem langsung mengirim pesan terima kasih ke wali dan notifikasi ke admin setelah submit berhasil.',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'type' => 'ppdb_cta',
+                'order' => 5,
+                'config' => [
+                    'title' => 'Formulir Pendaftaran Alba Kids',
+                    'body' => 'Siapkan data anak, data wali, dan bukti transfer. Setelah dikirim, panitia akan memeriksa dan menghubungi Anda kembali.',
+                    'buttonLabel' => 'Mulai Isi Form',
+                    'buttonHref' => '#form-pendaftaran',
+                    'helperText' => 'Satu form untuk pendaftaran dan upload bukti transfer.',
+                ],
+            ],
+        ];
+    }
+
     protected function normalizeTestimonialConfig(array $config): array
     {
         return [
@@ -489,5 +594,52 @@ class TenantWebsiteService
             'mono' => '"IBM Plex Mono", "Courier New", monospace',
             default => 'ui-sans-serif, system-ui, sans-serif',
         };
+    }
+
+    protected function buildAdmissionPayload(bool $isAlbaKids): array
+    {
+        $enabled = $isAlbaKids || (bool) Setting::getTenantValue('admission_inline_enabled', false);
+
+        return [
+            'enabled' => $enabled,
+            'endpoint' => '/daftar',
+            'academicYear' => Setting::getTenantStringValue('admission_academic_year', '2026/2027') ?? '2026/2027',
+            'programOptions' => $isAlbaKids ? ['Playgroup', 'TK A', 'TK B'] : ['Reguler', 'Tahfidz', 'Muadalah'],
+            'classOptions' => $isAlbaKids ? ['Kelompok Bermain', 'TK A', 'TK B'] : ['Kelas 1', 'Kelas 2', 'Kelas 3'],
+            'transfer' => [
+                'bankName' => Setting::getTenantStringValue('admission_bank_name', 'BCA') ?? 'BCA',
+                'accountNumber' => Setting::getTenantStringValue('admission_account_number', '-') ?? '-',
+                'accountName' => Setting::getTenantStringValue('admission_account_name', 'Alba Kids Pre-School') ?? 'Alba Kids Pre-School',
+                'nominal' => Setting::getTenantStringValue('admission_transfer_amount', '') ?? '',
+                'instructions' => Setting::getTenantStringValue(
+                    'admission_transfer_instructions',
+                    'Transfer biaya pendaftaran, lalu unggah bukti transfer pada form ini agar panitia dapat langsung memverifikasi.'
+                ) ?? '',
+            ],
+            'adminWhatsapp' => Setting::getTenantStringValue('admission_admin_whatsapp'),
+            'successMessage' => Setting::getTenantStringValue(
+                'admission_success_message',
+                'Panitia Alba Kids akan menghubungi Anda melalui WhatsApp setelah verifikasi data dan bukti transfer selesai.'
+            ) ?? '',
+            'headline' => $isAlbaKids
+                ? 'Daftarkan si kecil ke Alba Kids dengan satu form yang ringkas dan ramah orang tua.'
+                : 'Form pendaftaran online siap diisi langsung dari landing page.',
+            'description' => $isAlbaKids
+                ? 'Isi biodata anak, data wali, dan unggah bukti transfer dalam satu langkah tanpa berpindah ke portal lain.'
+                : 'Form publik ini akan menyimpan data pendaftar langsung ke ERP tenant.',
+        ];
+    }
+
+    protected function isAlbaKidsTenant(): bool
+    {
+        if (tenant()?->getTenantKey() === 'albakids') {
+            return true;
+        }
+
+        if (request()?->getHost() === 'albakids.pesantren.online') {
+            return true;
+        }
+
+        return tenant()?->domains()->where('domain', 'albakids.pesantren.online')->exists() ?? false;
     }
 }

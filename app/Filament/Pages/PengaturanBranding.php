@@ -104,6 +104,15 @@ class PengaturanBranding extends Page implements HasForms
             'branding_latitude'         => data_get($settings->get('branding_latitude')?->value, 'text'),
             'branding_longitude'        => data_get($settings->get('branding_longitude')?->value, 'text'),
             'ppdb_form_fields'          => data_get($settings->get('ppdb_form_fields')?->value, 'fields', []),
+            'admission_inline_enabled'  => (bool) data_get($settings->get('admission_inline_enabled')?->value, 'enabled', false),
+            'admission_academic_year'   => data_get($settings->get('admission_academic_year')?->value, 'text', '2026/2027'),
+            'admission_admin_whatsapp'  => data_get($settings->get('admission_admin_whatsapp')?->value, 'text'),
+            'admission_bank_name'       => data_get($settings->get('admission_bank_name')?->value, 'text'),
+            'admission_account_number'  => data_get($settings->get('admission_account_number')?->value, 'text'),
+            'admission_account_name'    => data_get($settings->get('admission_account_name')?->value, 'text'),
+            'admission_transfer_amount' => data_get($settings->get('admission_transfer_amount')?->value, 'text'),
+            'admission_transfer_instructions' => data_get($settings->get('admission_transfer_instructions')?->value, 'text'),
+            'admission_success_message' => data_get($settings->get('admission_success_message')?->value, 'text'),
         ]);
     }
 
@@ -187,6 +196,38 @@ class PengaturanBranding extends Page implements HasForms
                             ->valueLabel('Mode')
                             ->addActionLabel('Tambah field'),
                     ]),
+
+                Section::make('Landing Registration')
+                    ->description('Pengaturan form inline di landing page, termasuk admin WhatsApp dan informasi transfer.')
+                    ->schema([
+                        \Filament\Forms\Components\Toggle::make('admission_inline_enabled')
+                            ->label('Aktifkan form pendaftaran inline di landing page')
+                            ->inline(false),
+                        TextInput::make('admission_academic_year')
+                            ->label('Tahun Ajaran')
+                            ->maxLength(20),
+                        TextInput::make('admission_admin_whatsapp')
+                            ->label('WhatsApp Admin')
+                            ->helperText('Nomor tujuan notifikasi pendaftar baru.'),
+                        TextInput::make('admission_bank_name')
+                            ->label('Nama Bank'),
+                        TextInput::make('admission_account_number')
+                            ->label('Nomor Rekening'),
+                        TextInput::make('admission_account_name')
+                            ->label('Atas Nama Rekening'),
+                        TextInput::make('admission_transfer_amount')
+                            ->label('Nominal Transfer')
+                            ->helperText('Boleh angka atau teks, misalnya Rp350.000'),
+                        Textarea::make('admission_transfer_instructions')
+                            ->label('Instruksi Transfer')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        Textarea::make('admission_success_message')
+                            ->label('Pesan sukses setelah submit')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
             ]);
     }
 
@@ -216,6 +257,15 @@ class PengaturanBranding extends Page implements HasForms
             'branding_latitude'        => ['text' => $data['branding_latitude'] ?? null],
             'branding_longitude'       => ['text' => $data['branding_longitude'] ?? null],
             'ppdb_form_fields'         => ['fields' => $data['ppdb_form_fields'] ?? []],
+            'admission_inline_enabled' => ['enabled' => (bool) ($data['admission_inline_enabled'] ?? false)],
+            'admission_academic_year' => ['text' => $data['admission_academic_year'] ?? '2026/2027'],
+            'admission_admin_whatsapp' => ['text' => $data['admission_admin_whatsapp'] ?? null],
+            'admission_bank_name' => ['text' => $data['admission_bank_name'] ?? null],
+            'admission_account_number' => ['text' => $data['admission_account_number'] ?? null],
+            'admission_account_name' => ['text' => $data['admission_account_name'] ?? null],
+            'admission_transfer_amount' => ['text' => $data['admission_transfer_amount'] ?? null],
+            'admission_transfer_instructions' => ['text' => $data['admission_transfer_instructions'] ?? null],
+            'admission_success_message' => ['text' => $data['admission_success_message'] ?? null],
         ];
 
         foreach ($payloads as $key => $value) {
@@ -235,6 +285,15 @@ class PengaturanBranding extends Page implements HasForms
             'branding_latitude'        => $data['branding_latitude'] ?? null,
             'branding_longitude'       => $data['branding_longitude'] ?? null,
             'ppdb_form_fields'         => $data['ppdb_form_fields'] ?? [],
+            'admission_inline_enabled' => (bool) ($data['admission_inline_enabled'] ?? false),
+            'admission_academic_year' => $data['admission_academic_year'] ?? '2026/2027',
+            'admission_admin_whatsapp' => $data['admission_admin_whatsapp'] ?? null,
+            'admission_bank_name' => $data['admission_bank_name'] ?? null,
+            'admission_account_number' => $data['admission_account_number'] ?? null,
+            'admission_account_name' => $data['admission_account_name'] ?? null,
+            'admission_transfer_amount' => $data['admission_transfer_amount'] ?? null,
+            'admission_transfer_instructions' => $data['admission_transfer_instructions'] ?? null,
+            'admission_success_message' => $data['admission_success_message'] ?? null,
         ]);
 
         Notification::make()

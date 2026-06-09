@@ -8,7 +8,11 @@ use Illuminate\Console\Command;
 
 class TenantCreateCommand extends Command
 {
-    protected $signature = 'tenant:create {name} {subdomain}';
+    protected $signature = 'tenant:create
+        {name}
+        {subdomain}
+        {--website-domain=}
+        {--system-domain=}';
 
     protected $description = 'Create a new tenant with the given name and subdomain';
 
@@ -16,6 +20,8 @@ class TenantCreateCommand extends Command
     {
         $name = trim((string) $this->argument('name'));
         $subdomain = strtolower(trim((string) $this->argument('subdomain')));
+        $websiteDomain = strtolower(trim((string) $this->option('website-domain')));
+        $systemDomain = strtolower(trim((string) $this->option('system-domain')));
 
         if ($name === '' || $subdomain === '') {
             $this->error('Nama tenant dan subdomain wajib diisi.');
@@ -50,10 +56,17 @@ class TenantCreateCommand extends Command
             $this->info("Tenant '{$name}' dibuat (subdomain: {$subdomain}).");
         }
 
-        $tenant->domains()->firstOrCreate(['domain' => $subdomain]);
+        $this->syncDomain($tenant, $subdomain, 'subdomain', $websiteDomain === '' && $systemDomain === '');
+        if ($websiteDomain !== '') {
+            $this->syncDomain($tenant, $websiteDomain, 'website', true);
+        }
+        if ($systemDomain !== '') {
+            $this->syncDomain($tenant, $systemDomain, 'sistem', $websiteDomain === '');
+        }
 
         // Seed roles + baris tenant lokal + user admin (DRY via service bersama).
-        $creds = $provisioner->provision($tenant);
+        $adminDomain = $systemDomain !== '' ? $systemDomain : ($websiteDomain !== '' ? $websiteDomain : $subdomain.'.localhost');
+        $creds = $provisioner->provision($tenant, 'admin@'.$adminDomain);
 
         if ($creds['password'] !== null) {
             $this->newLine();
@@ -65,5 +78,16 @@ class TenantCreateCommand extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    private function syncDomain(Tenant $tenant, string $domain, string $type, bool $isPrimary): void
+    {
+        $tenant->domains()->updateOrCreate(
+            ['domain' => $domain],
+            [
+                'type' => $type,
+                'is_primary' => $isPrimary,
+            ]
+        );
     }
 }

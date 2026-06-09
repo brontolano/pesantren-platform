@@ -1,0 +1,11 @@
+{
+    "name": "modules/payroll",
+    "description": "Modul Payroll (Baitul Maal) untuk Platform Pesantren",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\Payroll\\": "app/",
+            "Modules\\Payroll\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}
