@@ -1,0 +1,131 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Modules\Notifikasi\Mail\GenericNotificationMail;
+use Modules\Notifikasi\Models\BroadcastWa;
+use Modules\Notifikasi\Models\LogNotifikasi;
+use Modules\Notifikasi\Models\TemplateNotifikasi;
+use Modules\Notifikasi\Services\NotifDispatcher;
+use Tests\Concerns\InteractsWithPpdbTestDatabase;
+use Tests\TestCase;
+
+/**
+ * F7 — Notification Hooks (NotifDispatcher). Menguji resolusi event→template,
+ * dispatch per channel (email/WA), fire-and-forget (tak melempar), dan isolasi.
+ */
+class NotifDispatcherTest extends TestCase
+{
+    use InteractsWithPpdbTestDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->ensurePpdbTestingSchemaReady([
+            'tenants', 'domains', 'users', 'template_notifikasi', 'broadcast_wa', 'log_notifikasi',
+        ]);
+
+        $this->truncatePpdbTables(['domains', 'tenants']);
+    }
+
+    private function boot(string $prefix): void
+    {
+        $tenant = $this->createRuntimeTenant($prefix, 'Pesantren '.$prefix);
+        tenancy()->initialize($tenant);
+        $this->seedTenantRow($tenant);
+    }
+
+    private function template(string $kode, string $channel): TemplateNotifikasi
+    {
+        return TemplateNotifikasi::create([
+            'kode_template' => $kode,
+            'judul' => 'Halo {nama}',
+            'isi' => 'Pesan untuk {nama} terkait '.$kode,
+            'variable_dinamis' => ['nama'],
+            'channel' => $channel,
+            'is_active' => true,
+        ]);
+    }
+
+    public function test_resolve_template_dari_registry(): void
+    {
+        $this->boot('ntf1');
+        $t = $this->template('keputusan_ppdb', 'email');
+
+        $svc = app(NotifDispatcher::class);
+        $this->assertSame($t->id, $svc->resolveTemplate('keputusan_ppdb')?->id);
+        $this->assertNull($svc->resolveTemplate('event_tak_dikenal'));
+        $this->assertContains('approval_chasing', $svc->eventTerdaftar());
+        tenancy()->end();
+    }
+
+    public function test_kirim_email_channel(): void
+    {
+        $this->boot('ntf2');
+        Mail::fake();
+        $this->template('keputusan_ppdb', 'email');
+
+        $hasil = app(NotifDispatcher::class)->kirim('keputusan_ppdb', [
+            'email' => ['a@contoh.test', 'b@contoh.test'],
+            'data' => ['nama' => 'Andi'],
+        ]);
+
+        $this->assertSame('email', $hasil['channel']);
+        $this->assertSame(2, $hasil['terkirim']);
+        $this->assertSame(0, $hasil['gagal']);
+        Mail::assertSent(GenericNotificationMail::class, 2);
+        tenancy()->end();
+    }
+
+    public function test_kirim_wa_channel_simulasi(): void
+    {
+        $this->boot('ntf3');
+        Http::fake(['*' => Http::response(['status' => 'ok'], 200)]); // netralkan gateway WA (n8n/waha)
+        $this->template('approval_chasing', 'wa');
+
+        $hasil = app(NotifDispatcher::class)->kirim('approval_chasing', [
+            'wa' => ['6281234567890'],
+            'data' => ['nama' => 'Bendahara'],
+        ]);
+
+        $this->assertSame('wa', $hasil['channel']);
+        $this->assertSame(1, $hasil['terkirim']);
+        $this->assertSame(1, BroadcastWa::query()->count());
+        $this->assertTrue(LogNotifikasi::query()->where('status', 'sent')->exists());
+        tenancy()->end();
+    }
+
+    public function test_template_tidak_aktif_fire_and_forget(): void
+    {
+        $this->boot('ntf4');
+        // Tak ada template → tak melempar, kembalikan alasan.
+        $hasil = app(NotifDispatcher::class)->kirim('tagihan_jatuh_tempo', ['wa' => ['628999']]);
+        $this->assertSame(0, $hasil['terkirim']);
+        $this->assertSame('template_tidak_aktif', $hasil['alasan']);
+        tenancy()->end();
+    }
+
+    public function test_tanpa_penerima(): void
+    {
+        $this->boot('ntf5');
+        $this->template('stok_expiry', 'wa');
+        $hasil = app(NotifDispatcher::class)->kirim('stok_expiry', ['data' => ['nama' => 'X']]);
+        $this->assertSame('tanpa_penerima', $hasil['alasan']);
+        tenancy()->end();
+    }
+
+    public function test_isolasi_tenant(): void
+    {
+        $this->boot('ntfA');
+        $this->template('keputusan_ppdb', 'email');
+        $this->assertNotNull(app(NotifDispatcher::class)->resolveTemplate('keputusan_ppdb'));
+        tenancy()->end();
+
+        $this->boot('ntfB');
+        $this->assertNull(app(NotifDispatcher::class)->resolveTemplate('keputusan_ppdb'));
+        tenancy()->end();
+    }
+}
