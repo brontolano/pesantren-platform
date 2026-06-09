@@ -41,6 +41,10 @@ use App\Filament\Resources\Pembiayaan\AsetResource;
 use App\Filament\Resources\Pembiayaan\MutasiAsetResource;
 use App\Filament\Resources\Pembiayaan\PembiayaanResource;
 use App\Filament\Resources\Mutu\DokumenMutuResource;
+use App\Filament\Resources\Mutu\MutuInspeksiResource;
+use App\Filament\Resources\Mutu\MutuSasaranResource;
+use App\Filament\Resources\Mutu\MutuSkmResource;
+use App\Filament\Resources\Mutu\MutuTemuanResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
 use App\Filament\Resources\Media\MediaFileResource;
 use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
@@ -215,6 +219,10 @@ class TenantPanelProvider extends PanelProvider
             MutasiAsetResource::class,
             PembiayaanResource::class,
             DokumenMutuResource::class,
+            MutuSasaranResource::class,
+            MutuTemuanResource::class,
+            MutuInspeksiResource::class,
+            MutuSkmResource::class,
             TemplateNotifikasiResource::class,
             BroadcastWaResource::class,
             CalonSantriResource::class,
