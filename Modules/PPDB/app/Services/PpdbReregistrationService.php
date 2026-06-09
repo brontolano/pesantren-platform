@@ -5,6 +5,8 @@ namespace Modules\PPDB\Services;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Modules\Asrama\Models\KamarAsrama;
+use Modules\Asrama\Services\AsramaService;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Services\SantriService;
 use Modules\PPDB\Models\CalonSantri;
@@ -53,8 +55,33 @@ class PpdbReregistrationService
                 'tanggal_registrasi_ulang' => now(),
             ])->save();
 
+            // Penempatan asrama (opsional) saat daftar ulang. Lewat AsramaService
+            // agar pagar kapasitas + isolasi tenant + penutupan penempatan lama
+            // ditegakkan. Hanya dijalankan bila kamar dipilih (modul asrama aktif).
+            $this->tempatkanAsrama($santri, $payload);
+
             return $candidate->fresh()->load('santri');
         });
+    }
+
+    /**
+     * Tempatkan santri ke kamar asrama bila `kamar_asrama_id` disertakan.
+     * No-op bila kosong (modul asrama tidak dipakai). Melempar bila kamar tak
+     * ditemukan / penuh / lintas-tenant → daftar ulang gagal jelas (rollback).
+     */
+    private function tempatkanAsrama(Santri $santri, array $payload): void
+    {
+        $kamarId = $payload['kamar_asrama_id'] ?? null;
+        if (empty($kamarId)) {
+            return;
+        }
+
+        $kamar = KamarAsrama::query()->find($kamarId);
+        if (! $kamar instanceof KamarAsrama) {
+            throw new ModelNotFoundException('Kamar asrama tujuan tidak ditemukan untuk tenant ini.');
+        }
+
+        app(AsramaService::class)->assignSantriToKamar($santri, $kamar);
     }
 
     private function ensureTenantContext(): void
