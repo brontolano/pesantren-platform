@@ -252,6 +252,10 @@ class TenantPanelProvider extends PanelProvider
             \App\Filament\Resources\Pengadaan\PurchaseOrder\PurchaseOrderResource::class,
             // Pegawai + Struktur Gaji (G2-10)
             \App\Filament\Resources\Payroll\Employee\EmployeeResource::class,
+            // Presensi + Khidmah + Cuti (G2-11)
+            \App\Filament\Resources\Payroll\PresensiStaf\PresensiStafResource::class,
+            \App\Filament\Resources\Payroll\Khidmah\KhidmahResource::class,
+            \App\Filament\Resources\Payroll\Cuti\CutiResource::class,
         ];
     }
 

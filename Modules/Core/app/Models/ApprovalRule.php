@@ -24,6 +24,7 @@ class ApprovalRule extends Model
         \Modules\Payroll\Models\SlipGaji::class => 'Slip Gaji',
         \Modules\Keuangan\Models\Pembayaran::class => 'Pembayaran',
         \Modules\Ledger\Models\Jurnal::class => 'Jurnal Manual',
+        \Modules\Payroll\Models\Cuti::class => 'Cuti / Leave',
     ];
 
     /**
@@ -37,6 +38,7 @@ class ApprovalRule extends Model
         \Modules\Payroll\Models\SlipGaji::class => ['bruto' => 'Bruto (gaji kotor)'],
         \Modules\Keuangan\Models\Pembayaran::class => ['nominal' => 'Nominal'],
         \Modules\Ledger\Models\Jurnal::class => ['total_debit' => 'Total Debit'],
+        \Modules\Payroll\Models\Cuti::class => ['jumlah_hari' => 'Jumlah Hari'],
     ];
 
     /** Operator perbandingan yang didukung engine terpicu(). */
