@@ -5,6 +5,7 @@ namespace Modules\Ledger\Models;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class JurnalBaris extends Model
 {
@@ -18,6 +19,8 @@ class JurnalBaris extends Model
         'akun_id',
         'divisi_id',
         'sumber_dana_id',
+        'party_type',
+        'party_id',
         'debit',
         'kredit',
         'memo',
@@ -46,5 +49,11 @@ class JurnalBaris extends Model
     public function sumberDana(): BelongsTo
     {
         return $this->belongsTo(SumberDana::class, 'sumber_dana_id');
+    }
+
+    /** Pihak terkait (santri/supplier/employee/wali) untuk buku pembantu (F4). */
+    public function party(): MorphTo
+    {
+        return $this->morphTo();
     }
 }

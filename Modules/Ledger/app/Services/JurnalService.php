@@ -171,6 +171,8 @@ class JurnalService
                     'akun_id' => $row->akun_id,
                     'divisi_id' => $row->divisi_id,
                     'sumber_dana_id' => $row->sumber_dana_id,
+                    'party_type' => $row->party_type,
+                    'party_id' => $row->party_id,
                     'debit' => $row->kredit, // ditukar
                     'kredit' => $row->debit,
                     'memo' => 'Pembalik: ' . ($row->memo ?? ''),
@@ -221,6 +223,8 @@ class JurnalService
                 'akun_id' => $row['akun_id'],
                 'divisi_id' => $row['divisi_id'] ?? null,
                 'sumber_dana_id' => $row['sumber_dana_id'] ?? null,
+                'party_type' => $row['party_type'] ?? null,
+                'party_id' => $row['party_id'] ?? null,
                 'debit' => $debit,
                 'kredit' => $kredit,
                 'memo' => $row['memo'] ?? null,
