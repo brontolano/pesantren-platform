@@ -24,6 +24,23 @@ class DevRoadmapSeeder extends Seeder
         $this->seedPolishUiSesi();
         $this->seedModulKeuangan();
         $this->seedStabilisasiHardening();
+
+        $this->normalizeProjectStatus();
+    }
+
+    /**
+     * Konsistensi: proyek yang SELURUH task-nya selesai (progres 100%) otomatis
+     * berstatus 'done'. Menjaga papan tetap sinkron tanpa edit manual.
+     */
+    private function normalizeProjectStatus(): void
+    {
+        DevProject::with('tasks')->get()->each(function (DevProject $project): void {
+            if ($project->tasks->isNotEmpty()
+                && $project->progressPercent() === 100
+                && $project->status !== 'done') {
+                $project->update(['status' => 'done']);
+            }
+        });
     }
 
     /**
