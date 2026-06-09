@@ -124,6 +124,11 @@ class JurnalManual extends Page implements HasForms
                 ], $data['baris'] ?? []),
             ]);
 
+            // G1-01 (non-blocking): catat jejak persetujuan bila ada ApprovalRule
+            // wajib (field 'total_debit') terpicu. Idempoten & no-op tanpa rule —
+            // jurnal tetap terposting (tak memblokir jalur posting).
+            $jurnal->ajukanPersetujuan(Auth::id());
+
             Notification::make()->title('Jurnal tersimpan: ' . $jurnal->nomor)->success()->send();
             $this->mount(); // reset form
         } catch (Throwable $e) {

@@ -159,6 +159,11 @@ class PembayaranService
             throw new InvalidArgumentException('Pembayaran sudah diverifikasi.');
         }
 
+        // G1-01: pagar persetujuan (F1). DEFAULT no-op (tak ada ApprovalRule wajib
+        // 'Pembayaran' ter-seed) → alur uang LIVE tidak terblokir. Aktif hanya bila
+        // tenant sengaja membuat rule (mis. nominal besar).
+        $model->pastikanBolehLanjut();
+
         $model->update([
             'is_verified' => true,
             'verified_by' => $verifiedBy,

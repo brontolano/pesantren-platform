@@ -76,6 +76,10 @@ class PayrollService
             return $slip;
         }
 
+        // G1-01: pagar persetujuan (F1). NO-OP tanpa ApprovalRule wajib (field 'bruto')
+        // terpicu; melempar bila wajib & belum disetujui — sebelum posting jurnal.
+        $slip->pastikanBolehLanjut();
+
         $bebanGaji = Akun::where('kode', '5-2000')->first();
         $utangPph = Akun::where('kode', '2-1120')->first();
         $kas = Akun::kasBank()->where('is_postable', true)->orderBy('kode')->first();

@@ -95,7 +95,7 @@ class BayarDariSaldoService
             $tabungan->update(['saldo' => $saldoSesudah]);
 
             // 3. Buat Pembayaran metode 'saldo_tabungan' AUTO-VERIFIED.
-            $pembayaran = Pembayaran::create([
+            $pembayaran = new Pembayaran([
                 'tagihan_id' => $tagihan->id,
                 'santri_id' => $santriId,
                 'nominal' => $nominal,
@@ -107,6 +107,12 @@ class BayarDariSaldoService
                 'verified_at' => now(),
                 'created_by' => $createdBy,
             ]);
+
+            // G1-01: pagar persetujuan konsisten lintas-metode. NO-OP tanpa ApprovalRule
+            // 'Pembayaran' → tak mengubah alur saldo-tabungan; throw (membatalkan seluruh
+            // transaksi termasuk penarikan saldo) bila tenant mengaktifkan rule nominal.
+            $pembayaran->pastikanBolehLanjut();
+            $pembayaran->save();
 
             // 4. Recalculate status tagihan (single source of truth).
             $this->pembayaranService->updateStatusTagihan($tagihan->fresh());
