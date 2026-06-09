@@ -51,6 +51,36 @@ class PayrollService
         ]);
     }
 
+    /**
+     * G2-12 — Terapkan potongan PPh21 (tiered PTKP) + BPJS ke slip (OPT-IN).
+     * Override pph21_dipotong + bpjs_dipotong, hitung ulang neto = bruto − pph21
+     * − bpjs. TIDAK mengubah buatSlip()/bruto. Hanya slip draft.
+     */
+    public function terapkanPotongan(SlipGaji $slip, \Modules\Payroll\Models\Employee $employee): SlipGaji
+    {
+        $this->ensureTenantContext();
+        if ($slip->status === 'final') {
+            throw new InvalidArgumentException('Slip sudah final — potongan tak dapat diubah.');
+        }
+
+        $bruto = (float) $slip->bruto;
+        $pph21 = app(\Modules\Pajak\Services\PajakPenghasilanService::class)
+            ->pph21Bulanan($bruto, $employee->ptkp_status ?? 'TK0');
+        $bpjs = app(BpjsService::class)->potonganPekerja($bruto);
+        $neto = round($bruto - $pph21 - $bpjs, 2);
+        if ($neto < 0) {
+            throw new InvalidArgumentException('Potongan (PPh21 + BPJS) melebihi bruto — neto tidak boleh negatif.');
+        }
+
+        $slip->update([
+            'pph21_dipotong' => $pph21,
+            'bpjs_dipotong' => $bpjs,
+            'neto' => $neto,
+        ]);
+
+        return $slip->fresh();
+    }
+
     /** Buat slip (status draft) dengan perhitungan otomatis. Idempoten per (users_id, periode). */
     public function buatSlip(array $data): SlipGaji
     {
@@ -111,16 +141,23 @@ class PayrollService
         $bebanGaji = Akun::where('kode', '5-2000')->first();
         $utangPph = Akun::where('kode', '2-1120')->first();
         $kas = Akun::kasBank()->where('is_postable', true)->orderBy('kode')->first();
+        // G2-12: utang BPJS (fallback ke utang PPh/kas agar jurnal tetap seimbang
+        // bila akun BPJS belum di-seed).
+        $utangBpjs = Akun::where('kode', '2-1160')->first() ?? $utangPph ?? $kas;
         if ($bebanGaji === null || $kas === null) {
             throw new RuntimeException('Akun beban gaji / kas belum tersedia (COA belum di-seed).');
         }
 
-        return DB::transaction(function () use ($slip, $dibuatOleh, $bebanGaji, $utangPph, $kas): SlipGaji {
+        return DB::transaction(function () use ($slip, $dibuatOleh, $bebanGaji, $utangPph, $utangBpjs, $kas): SlipGaji {
             $baris = [
                 ['akun_id' => $bebanGaji->id, 'debit' => (float) $slip->bruto, 'kredit' => 0, 'memo' => 'Beban gaji/honor'],
             ];
             if ((float) $slip->pph21_dipotong > 0 && $utangPph !== null) {
                 $baris[] = ['akun_id' => $utangPph->id, 'debit' => 0, 'kredit' => (float) $slip->pph21_dipotong, 'memo' => 'Utang PPh21'];
+            }
+            // G2-12: potongan BPJS = liabilitas (agar Debit bruto = total Kredit).
+            if ((float) $slip->bpjs_dipotong > 0 && $utangBpjs !== null) {
+                $baris[] = ['akun_id' => $utangBpjs->id, 'debit' => 0, 'kredit' => (float) $slip->bpjs_dipotong, 'memo' => 'Utang BPJS (potongan pekerja)'];
             }
             $baris[] = ['akun_id' => $kas->id, 'debit' => 0, 'kredit' => (float) $slip->neto, 'memo' => 'Pembayaran gaji neto'];
 

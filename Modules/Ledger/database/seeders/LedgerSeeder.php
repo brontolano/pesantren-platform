@@ -136,6 +136,7 @@ class LedgerSeeder extends Seeder
             ['2-1130', 'Utang PPh 22', 'KEWAJIBAN', '2-1100', false, true, null, false],
             ['2-1140', 'Utang PPh 23', 'KEWAJIBAN', '2-1100', false, true, null, false],
             ['2-1150', 'Utang PPh Final Pasal 4(2)', 'KEWAJIBAN', '2-1100', false, true, null, false],
+            ['2-1160', 'Utang BPJS (potongan pekerja)', 'KEWAJIBAN', '2-1100', false, true, null, false],
             // Dana Kebajikan = titipan untuk dibersihkan (BUKAN pendapatan/ekuitas).
             // Penyaluran = sub-akun KEWAJIBAN (mengurangi titipan) — TIDAK masuk surplus/defisit.
             ['2-2000', 'Dana Kebajikan / Pembersihan Harta', 'KEWAJIBAN', '2-0000', false, true, null, false],
