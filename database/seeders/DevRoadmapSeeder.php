@@ -23,6 +23,7 @@ class DevRoadmapSeeder extends Seeder
         $this->seedTemaModulPesantren();
         $this->seedPolishUiSesi();
         $this->seedModulKeuangan();
+        $this->seedStabilisasiHardening();
     }
 
     /**
@@ -619,6 +620,80 @@ class DevRoadmapSeeder extends Seeder
             ['Platform SaaS', 'Manajemen Modul (2 mode + CRUD + sebar)', 'Released vs development, CRUD, set release, sebar ke tenant.', 'Selesai & terverifikasi.', 'done', 'high', 100, 'M', 5],
             ['Platform SaaS', 'Kalkulator Langganan', 'Kalkulator billing di panel central.', 'Selesai (gated central-only).', 'done', 'medium', 100, 'S', 6],
             ['Platform SaaS', 'Manajemen Proyek (papan progres ini)', 'CRUD proyek & task + widget progres di dashboard.', 'Selesai — papan ini.', 'done', 'medium', 100, 'M', 7],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Program "Stabilisasi, QA & Hardening Produksi" — sprint pemantapan
+     * zero-error: provisioning idempotent, QA invarian I-1..I-7, modul loket
+     * POS Kas tunai, Mutu approval+versioning, landing AlbaKids v2, audit error
+     * log panel (perbaikan 3 sumber HTTP 500) + penanganan host non-tenant
+     * (www→301 / scanner→404). Jun 2026. Idempotent: updateOrCreate by slug + title.
+     */
+    private function seedStabilisasiHardening(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'stabilisasi-qa-hardening'],
+            [
+                'name' => 'Stabilisasi, QA & Hardening Produksi',
+                'description' => 'Sprint pemantapan zero-error: provisioning idempotent (ModuleRegistry + tenant:reprovision), QA invarian I-1..I-7 (integritas uang, isolasi tenant, RBAC, rekonsiliasi terjadwal), modul loket POS Kas tunai, Mutu approval+versioning dokumen, landing AlbaKids v2, audit menyeluruh error log panel + perbaikan 3 sumber HTTP 500 (Textarea/ArticleDetail/nama_wali), dan penanganan host non-tenant (www→301 apex / IP & scanner→404 ringan). ~64 test baru hijau + QC produksi pasca tiap deploy.',
+                'status' => 'in_progress',
+                'color' => 'warning',
+                'icon' => 'heroicon-o-shield-check',
+                'sort' => 9,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            ['Provisioning', 'ModuleRegistry + seedBranding/seedModules + tenant:reprovision',
+                'database/seeders/ModuleRegistrySeeder (katalog 19 key, 5 core, idempotent updateOrCreate). TenantProvisioner::seedBranding (Setting JSON non-destruktif) + seedModules (aktifkan released non-core ke tenant_modules). Command tenant:reprovision backfill semua tenant lama.',
+                'SELESAI. 6 test regresi provisioning end-to-end hijau.',
+                'done', 'high', 100, 'M', 1],
+            ['QA Invarian', 'I-1..I-7: integritas uang, isolasi, RBAC, rekonsiliasi',
+                'I-1 integritas uang (zero orphan/ganda), I-2 isolasi tenant lintas-modul, I-3 guard state-machine status, I-4 idempotensi operasi uang, I-5 segregasi tugas RBAC per peran, I-7 rekonsiliasi harian terjadwal 01:30 + alert. EmisExportService contract-validation. I-6 (rekonsiliasi gateway) menunggu Xendit.',
+                'SELESAI 6/7 (I-6 terblokir Xendit).',
+                'done', 'high', 100, 'L', 2],
+            ['Command Operasional', 'tenant:migrate-all + keuangan:rekonsiliasi-harian',
+                'Command tenant:migrate-all (migrasi semua DB fisik tenant, idempotent) + keuangan:rekonsiliasi-harian (terjadwal). Alur pasca-deploy: migrate-all lalu reprovision.',
+                'SELESAI. Terpakai di alur deploy produksi.',
+                'done', 'medium', 100, 'S', 3],
+            ['POS Kas (loket tunai)', 'Sesi kasir + rekonsiliasi + kategori configurable + posting Ledger',
+                'Modules/Keuangan: pos_sesi/pos_kategori/pos_transaksi + 3 model; PosKasService (buka/tutup sesi, rekonsiliasi selisih, catat() routing → Tabungan/Pembayaran/Jurnal, idempoten ref). PosKategoriResource (Filament, gated permission operate_pos). 18 test hijau.',
+                'BACKEND SELESAI & live (PR #4). UI kasir transaksional belum di-ship (spec di BLUEPRINT-MODUL-POS-KAS).',
+                'in_progress', 'medium', 80, 'L', 4],
+            ['Mutu approval', 'State-machine approval + versioning dokumen mutu',
+                'MutuService (draft→diajukan→disetujui/ditolak), migrasi additive dokumen_mutu_versi + kolom, permission approve_mutu (segregasi di kepala_keuangan), aksi panel DokumenMutuResource. 9 test hijau.',
+                'BACKEND SELESAI & live (PR #4). QC visual UI di VPS.',
+                'in_progress', 'low', 80, 'M', 5],
+            ['AlbaKids Landing v2', 'Komponen Vue on-brand + route /v2 + kontrak form',
+                'resources/js/Pages/CMS/AlbaKidsLandingV2.vue (desain playful via judge-panel) + route GET /v2 (abort 404 non-AlbaKids) + reuse kontrak POST /daftar + notif admin+ayah+ibu+wali. PR #5.',
+                'SELESAI & live. albakids/v2=200, demo/v2=404 (gated benar).',
+                'done', 'medium', 100, 'M', 6],
+            ['Audit Error Log Panel', 'Periksa menyeluruh + perbaiki 3 sumber HTTP 500',
+                'Analisis log produksi 06-07..06-09. Fix: PengaturanBranding import Textarea; ArticleDetailController hapus param route $tenant spurious; LandingRegistration guard field nullable (nama_wali) → cegah 500 saat form AlbaKids submit. Scan 263 file panel + audit kelas 85 komponen = 0 sisa. PR #6.',
+                'SELESAI & live. /artikel/{slug} dummy → 404 (bukan 500); 0 error aplikasi pasca-deploy.',
+                'done', 'critical', 100, 'M', 7],
+            ['Hardening Host', 'www→301 apex + host scanner/IP→404 (hapus noise 500)',
+                'InitializeTenancyForWebRequests redirect www.<apex> 301 ke apex (pertahankan path+query) + bootstrap/app.php withExceptions dontReport+render 404 untuk TenantCouldNotBeIdentifiedOnDomain (IP mentah/subdomain scanner). 4 feature test (HostResolutionTest) hijau. PR #7.',
+                'SELESAI & live. www→301, IP→404, 0 error TenantCouldNot ter-log pasca-deploy.',
+                'done', 'low', 100, 'S', 8],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
