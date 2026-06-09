@@ -8,6 +8,7 @@ use App\Filament\Resources\Inventory\InventoryItem\Pages\ListInventoryItem;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -19,6 +20,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Modules\Keuangan\Models\InventoryItem;
+use Modules\Keuangan\Models\InventoryLokasi;
+use Modules\Keuangan\Services\InventoryLokasiService;
 use Modules\Keuangan\Services\InventoryService;
 use Modules\Ledger\Models\Akun;
 
@@ -108,6 +111,9 @@ class InventoryItemResource extends Resource
                     ->label('Terima Stok')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
+                    // Sembunyikan jalur item-level begitu item dikelola per-lokasi,
+                    // agar item.stok tak divergen dari Σ stok per lokasi.
+                    ->visible(fn (InventoryItem $record): bool => $record->stokLokasi()->exists() === false)
                     ->schema([
                         TextInput::make('qty')->label('Jumlah masuk')->numeric()->required()->minValue(0.001),
                         TextInput::make('harga_beli')->label('Harga beli / unit')->numeric()->required()->minValue(0)->prefix('Rp'),
@@ -124,6 +130,7 @@ class InventoryItemResource extends Resource
                     ->label('Opname')
                     ->icon('heroicon-o-clipboard-document-check')
                     ->color('warning')
+                    ->visible(fn (InventoryItem $record): bool => $record->stokLokasi()->exists() === false)
                     ->schema([
                         TextInput::make('stok_fisik')->label('Stok fisik hasil hitung')->numeric()->required()->minValue(0),
                         TextInput::make('keterangan')->label('Keterangan')->maxLength(255),
@@ -135,9 +142,79 @@ class InventoryItemResource extends Resource
                         ]);
                         Notification::make()->title('Stok disesuaikan ke hasil opname')->success()->send();
                     }),
+                Action::make('terima_lokasi')
+                    ->label('Terima ke Lokasi')
+                    ->icon('heroicon-o-building-storefront')
+                    ->color('success')
+                    ->visible(fn (): bool => InventoryLokasi::query()->where('is_active', true)->exists())
+                    ->schema([
+                        Select::make('lokasi_id')->label('Lokasi')->required()->native(false)
+                            ->options(fn (): array => static::lokasiOptions()),
+                        TextInput::make('qty')->label('Jumlah masuk')->numeric()->required()->minValue(0.001),
+                        TextInput::make('harga_beli')->label('Harga beli / unit')->numeric()->required()->minValue(0)->prefix('Rp'),
+                        TextInput::make('nomor_batch')->label('Nomor Batch/Lot')->maxLength(80)->placeholder('opsional'),
+                        DatePicker::make('tanggal_kedaluwarsa')->label('Tanggal Kedaluwarsa')->placeholder('opsional'),
+                    ])
+                    ->action(function (array $data, InventoryItem $record): void {
+                        app(InventoryLokasiService::class)->terimaDiLokasi($record, (int) $data['lokasi_id'], (float) $data['qty'], (float) $data['harga_beli'], [
+                            'nomor_batch' => $data['nomor_batch'] ?: null,
+                            'tanggal_kedaluwarsa' => $data['tanggal_kedaluwarsa'] ?? null,
+                            'dibuat_oleh' => auth()->id(),
+                        ]);
+                        Notification::make()->title('Stok diterima di lokasi')->success()->send();
+                    }),
+                Action::make('transfer')
+                    ->label('Transfer Lokasi')
+                    ->icon('heroicon-o-arrows-right-left')
+                    ->color('info')
+                    ->visible(fn (): bool => InventoryLokasi::query()->where('is_active', true)->count() >= 2)
+                    ->schema([
+                        Select::make('dari')->label('Dari Lokasi')->required()->native(false)->options(fn (): array => static::lokasiOptions()),
+                        Select::make('ke')->label('Ke Lokasi')->required()->native(false)->options(fn (): array => static::lokasiOptions()),
+                        TextInput::make('qty')->label('Jumlah transfer')->numeric()->required()->minValue(0.001),
+                    ])
+                    ->action(function (array $data, InventoryItem $record): void {
+                        try {
+                            app(InventoryLokasiService::class)->transfer($record, (int) $data['dari'], (int) $data['ke'], (float) $data['qty'], [
+                                'dibuat_oleh' => auth()->id(),
+                            ]);
+                            Notification::make()->title('Transfer antar lokasi berhasil')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Transfer gagal')->body($e->getMessage())->danger()->send();
+                        }
+                    }),
+                Action::make('opname_lokasi')
+                    ->label('Opname Lokasi')
+                    ->icon('heroicon-o-clipboard-document-list')
+                    ->color('warning')
+                    ->visible(fn (): bool => InventoryLokasi::query()->where('is_active', true)->exists()
+                        && (auth()->user()?->can('manage_keuangan') ?? false))
+                    ->schema([
+                        Select::make('lokasi_id')->label('Lokasi')->required()->native(false)->options(fn (): array => static::lokasiOptions()),
+                        TextInput::make('stok_fisik')->label('Stok fisik di lokasi')->numeric()->required()->minValue(0),
+                        TextInput::make('keterangan')->label('Keterangan')->maxLength(255),
+                    ])
+                    ->action(function (array $data, InventoryItem $record): void {
+                        try {
+                            app(InventoryLokasiService::class)->opnameLokasi($record, (int) $data['lokasi_id'], (float) $data['stok_fisik'], [
+                                'keterangan' => $data['keterangan'] ?? 'Opname lokasi',
+                                'dibuat_oleh' => auth()->id(),
+                            ]);
+                            Notification::make()->title('Opname lokasi — selisih nilai diposting ke Buku Besar')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Opname gagal')->body($e->getMessage())->danger()->send();
+                        }
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
             ]);
+    }
+
+    /** @return array<int, string> id => "KODE — Nama" lokasi aktif. */
+    protected static function lokasiOptions(): array
+    {
+        return InventoryLokasi::query()->where('is_active', true)->orderBy('nama')
+            ->get()->mapWithKeys(fn (InventoryLokasi $l): array => [$l->id => $l->kode.' — '.$l->nama])->all();
     }
 
     public static function getPages(): array

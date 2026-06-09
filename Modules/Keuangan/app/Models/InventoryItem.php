@@ -42,6 +42,22 @@ class InventoryItem extends Model
         return $this->hasMany(InventoryMutasi::class, 'item_id');
     }
 
+    public function stokLokasi(): HasMany
+    {
+        return $this->hasMany(InventoryStokLokasi::class, 'item_id');
+    }
+
+    public function batch(): HasMany
+    {
+        return $this->hasMany(InventoryBatch::class, 'item_id');
+    }
+
+    /** Stok pada satu lokasi (0 bila belum ada baris). */
+    public function stokDiLokasi(int $lokasiId): float
+    {
+        return (float) ($this->stokLokasi()->where('lokasi_id', $lokasiId)->value('stok') ?? 0);
+    }
+
     public function akunPersediaan(): BelongsTo
     {
         return $this->belongsTo(Akun::class, 'akun_persediaan_id');

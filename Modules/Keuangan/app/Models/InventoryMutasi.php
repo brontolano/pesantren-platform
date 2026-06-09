@@ -16,7 +16,7 @@ class InventoryMutasi extends Model
     protected $table = 'inventory_mutasi';
 
     protected $fillable = [
-        'tenant_id', 'item_id', 'jenis', 'qty', 'harga_satuan',
+        'tenant_id', 'item_id', 'lokasi_id', 'batch_id', 'jenis', 'qty', 'harga_satuan',
         'stok_sesudah', 'ref_type', 'ref_id', 'keterangan', 'dibuat_oleh',
     ];
 

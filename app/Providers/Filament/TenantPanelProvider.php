@@ -23,7 +23,9 @@ use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kelas\KelasResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
 use App\Filament\Resources\Kesehatan\SesiKonselingResource;
+use App\Filament\Resources\Inventory\InventoryBatchResource;
 use App\Filament\Resources\Inventory\InventoryItemResource;
+use App\Filament\Resources\Inventory\InventoryLokasiResource;
 use App\Filament\Resources\Ledger\AkunResource;
 use App\Filament\Resources\Ledger\AnggaranResource;
 use App\Filament\Resources\Ledger\DivisiUnitResource;
@@ -196,6 +198,8 @@ class TenantPanelProvider extends PanelProvider
             // POS / Koperasi
             PosKategoriResource::class,
             InventoryItemResource::class,
+            InventoryLokasiResource::class,
+            InventoryBatchResource::class,
             // Ledger / Baitul Maal (Buku Besar)
             AkunResource::class,
             AnggaranResource::class,
