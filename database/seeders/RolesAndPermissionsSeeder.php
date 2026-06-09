@@ -51,6 +51,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'kelola_approval',
             // F2 — Audit Trail
             'lihat_audit',
+            // F5 — Repositori Dokumen
+            'kelola_dokumen',
         ];
 
         foreach ($permissions as $permission) {
