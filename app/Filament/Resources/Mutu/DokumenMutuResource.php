@@ -5,8 +5,10 @@ namespace App\Filament\Resources\Mutu;
 use App\Filament\Resources\Mutu\Pages\CreateDokumenMutu;
 use App\Filament\Resources\Mutu\Pages\EditDokumenMutu;
 use App\Filament\Resources\Mutu\Pages\ListDokumenMutu;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -16,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Modules\Mutu\Models\DokumenMutu;
+use Modules\Mutu\Services\MutuService;
 
 class DokumenMutuResource extends Resource
 {
@@ -72,12 +75,60 @@ class DokumenMutuResource extends Resource
                 TextColumn::make('status_kelengkapan')->label('Kelengkapan')->badge()
                     ->color(fn (string $s): string => $s === 'lengkap' ? 'success' : 'warning')
                     ->formatStateUsing(fn (string $s): string => $s === 'lengkap' ? 'Lengkap' : 'Belum tersedia'),
+                TextColumn::make('status_approval')->label('Approval')->badge()
+                    ->color(fn (?string $s): string => match ($s) {
+                        'disetujui' => 'success',
+                        'diajukan' => 'warning',
+                        'ditolak' => 'danger',
+                        default => 'gray',
+                    }),
+                TextColumn::make('versi')->label('Versi')->badge()->color('gray'),
             ])
             ->defaultSort('jenis')
             ->filters([
                 SelectFilter::make('status_kelengkapan')->options(['lengkap' => 'Lengkap', 'kurang' => 'Belum']),
+                SelectFilter::make('status_approval')->options([
+                    'draft' => 'Draft', 'diajukan' => 'Diajukan', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak',
+                ]),
             ])
-            ->actions([EditAction::make(), DeleteAction::make()]);
+            ->actions([
+                // Ajukan: draft → diajukan (penyusun, manage_mutu).
+                Action::make('ajukan')
+                    ->label('Ajukan')
+                    ->icon('heroicon-o-paper-airplane')
+                    ->color('primary')
+                    ->requiresConfirmation()
+                    ->visible(fn (DokumenMutu $record): bool => $record->status_approval === 'draft' && (auth()->user()?->can('manage_mutu') ?? false))
+                    ->action(function (DokumenMutu $record): void {
+                        app(MutuService::class)->ajukan($record, (int) auth()->id());
+                        Notification::make()->title('Dokumen diajukan untuk persetujuan')->success()->send();
+                    }),
+                // Setujui: diajukan → disetujui (penyetuju, approve_mutu — segregasi tugas).
+                Action::make('setujui')
+                    ->label('Setujui')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn (DokumenMutu $record): bool => $record->status_approval === 'diajukan' && (auth()->user()?->can('approve_mutu') ?? false))
+                    ->action(function (DokumenMutu $record): void {
+                        app(MutuService::class)->setujui($record, (int) auth()->id());
+                        Notification::make()->title('Dokumen disetujui')->success()->send();
+                    }),
+                // Tolak: diajukan → ditolak (approve_mutu). Alasan rinci = enhancement form.
+                Action::make('tolak')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalDescription('Dokumen dikembalikan sebagai ditolak. Beri alasan rinci via revisi/catatan.')
+                    ->visible(fn (DokumenMutu $record): bool => $record->status_approval === 'diajukan' && (auth()->user()?->can('approve_mutu') ?? false))
+                    ->action(function (DokumenMutu $record): void {
+                        app(MutuService::class)->tolak($record, (int) auth()->id(), 'Ditolak via panel mutu.');
+                        Notification::make()->title('Dokumen ditolak')->warning()->send();
+                    }),
+                EditAction::make(),
+                DeleteAction::make(),
+            ]);
     }
 
     public static function getPages(): array
