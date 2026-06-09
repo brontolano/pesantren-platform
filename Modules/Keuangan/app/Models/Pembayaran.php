@@ -7,11 +7,12 @@ use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Core\Concerns\Approvable;
+use Modules\Core\Concerns\Auditable;
 use Modules\Kesantrian\Models\Santri;
 
 class Pembayaran extends Model
 {
-    use Approvable, BelongsToTenant;
+    use Approvable, Auditable, BelongsToTenant;
 
     protected $table = 'pembayaran';
 

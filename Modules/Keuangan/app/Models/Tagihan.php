@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Core\Concerns\Auditable;
 use Modules\Kesantrian\Models\Santri;
 
 class Tagihan extends Model
 {
-    use BelongsToTenant, SoftDeletes;
+    use Auditable, BelongsToTenant, SoftDeletes;
 
     protected $table = 'tagihan';
 

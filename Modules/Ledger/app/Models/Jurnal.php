@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Core\Concerns\Approvable;
+use Modules\Core\Concerns\Auditable;
 
 class Jurnal extends Model
 {
-    use Approvable, BelongsToTenant;
+    use Approvable, Auditable, BelongsToTenant;
 
     protected $table = 'jurnal';
 

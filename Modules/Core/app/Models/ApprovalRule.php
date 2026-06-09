@@ -5,6 +5,7 @@ namespace Modules\Core\Models;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Concerns\Auditable;
 
 /**
  * Aturan persetujuan: kapan sebuah model butuh approval + siapa penyetujunya.
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ApprovalRule extends Model
 {
-    use BelongsToTenant;
+    use Auditable, BelongsToTenant;
 
     protected $table = 'approval_rule';
 

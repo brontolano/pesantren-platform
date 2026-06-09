@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Core\Concerns\Approvable;
+use Modules\Core\Concerns\Auditable;
 
 class Belanja extends Model
 {
-    use Approvable, BelongsToTenant, SoftDeletes;
+    use Approvable, Auditable, BelongsToTenant, SoftDeletes;
 
     protected $table = 'belanja';
 
