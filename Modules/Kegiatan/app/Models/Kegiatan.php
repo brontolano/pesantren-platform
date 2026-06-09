@@ -17,11 +17,14 @@ class Kegiatan extends Model
     protected $fillable = [
         'tenant_id', 'nama', 'deskripsi', 'jenis',
         'mulai', 'selesai', 'lokasi', 'status', 'penanggung_jawab_id',
+        // G3-19 — penaut template/recurring (additif).
+        'template_id', 'recurring_id', 'tanggal_acuan',
     ];
 
     protected $casts = [
         'mulai'   => 'datetime',
         'selesai' => 'datetime',
+        'tanggal_acuan' => 'date',
     ];
 
     public function penanggungJawab(): BelongsTo
@@ -32,5 +35,15 @@ class Kegiatan extends Model
     public function presensi(): HasMany
     {
         return $this->hasMany(PresensiKegiatan::class, 'kegiatan_id');
+    }
+
+    public function phases(): HasMany
+    {
+        return $this->hasMany(KegiatanPhase::class, 'kegiatan_id')->orderBy('urutan');
+    }
+
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(KegiatanTemplate::class, 'template_id');
     }
 }

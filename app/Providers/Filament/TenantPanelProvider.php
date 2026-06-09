@@ -21,6 +21,8 @@ use App\Filament\Resources\CMS\Profile\ProfileResource;
 use App\Filament\Resources\CMS\WebsiteSetting\WebsiteSettingResource;
 use App\Filament\Resources\Kegiatan\IzinSantriResource;
 use App\Filament\Resources\Kegiatan\KegiatanResource;
+use App\Filament\Resources\Kegiatan\Recurring\KegiatanRecurringResource;
+use App\Filament\Resources\Kegiatan\Template\KegiatanTemplateResource;
 use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kelas\KelasResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
@@ -252,6 +254,8 @@ class TenantPanelProvider extends PanelProvider
             RiwayatKesehatanResource::class,
             SesiKonselingResource::class,
             KegiatanResource::class,
+            KegiatanTemplateResource::class,
+            KegiatanRecurringResource::class,
             IzinSantriResource::class,
             KunjunganWaliResource::class,
             MediaFileResource::class,
