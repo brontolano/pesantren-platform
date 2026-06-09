@@ -239,6 +239,8 @@ class TenantPanelProvider extends PanelProvider
             // Pengaturan / Persetujuan (F1 Approval Workflow)
             \App\Filament\Resources\Approval\ApprovalRequestResource::class,
             \App\Filament\Resources\Approval\ApprovalRuleResource::class,
+            // Jejak Audit (F2)
+            \App\Filament\Resources\Audit\AuditLogResource::class,
         ];
     }
 
