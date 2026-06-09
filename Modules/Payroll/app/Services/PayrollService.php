@@ -23,6 +23,34 @@ class PayrollService
     {
     }
 
+    /**
+     * G2-10 — Buat slip dari STRUKTUR GAJI employee (komponen konfigurabel).
+     * Membaca strukturGaji() (honor_pokok=Σtetap, tunjangan=Σtunjangan) lalu
+     * mendelegasikan ke buatSlip() — math slip TIDAK diubah. Potongan struktur
+     * belum dipotong di sini (BPJS/PPh21 menyusul G2-12).
+     *
+     * @param  array{poin?:int, honor_output?:float, created_by?:?int}  $opsi
+     */
+    public function buatSlipUntukEmployee(\Modules\Payroll\Models\Employee $employee, string $periode, array $opsi = []): SlipGaji
+    {
+        $this->ensureTenantContext();
+        if (! $employee->users_id) {
+            throw new InvalidArgumentException('Employee belum tertaut akun pengguna (users_id) untuk slip gaji.');
+        }
+
+        $struktur = $employee->strukturGaji();
+
+        return $this->buatSlip([
+            'users_id' => $employee->users_id,
+            'periode' => $periode,
+            'honor_pokok' => $struktur['honor_pokok'],
+            'tunjangan' => $struktur['tunjangan'],
+            'poin' => $opsi['poin'] ?? 0,
+            'honor_output' => $opsi['honor_output'] ?? 0,
+            'created_by' => $opsi['created_by'] ?? null,
+        ]);
+    }
+
     /** Buat slip (status draft) dengan perhitungan otomatis. Idempoten per (users_id, periode). */
     public function buatSlip(array $data): SlipGaji
     {
