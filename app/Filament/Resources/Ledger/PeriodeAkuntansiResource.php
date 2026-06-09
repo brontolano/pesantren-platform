@@ -17,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Modules\Ledger\Models\PeriodeAkuntansi;
+use Modules\Ledger\Services\PeriodClosingService;
 use Modules\Ledger\Services\PeriodeService;
 
 class PeriodeAkuntansiResource extends Resource
@@ -104,17 +105,22 @@ class PeriodeAkuntansiResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->modalHeading('Tutup Buku Periode')
-                    ->modalDescription('Setelah ditutup, tidak ada transaksi bertanggal periode ini yang bisa diposting. Koreksi hanya via jurnal pembalik. Lanjutkan?')
+                    ->modalDescription('Memposting jurnal penutup (menol-kan pendapatan/beban ke Aset Neto) lalu mengunci periode. Setelah ditutup, tak ada transaksi bertanggal periode ini yang bisa diposting; koreksi hanya via jurnal pembalik. Lanjutkan?')
                     ->visible(fn (PeriodeAkuntansi $record): bool => ! $record->isClosed() && (auth()->user()?->can('close_period') ?? false))
                     ->action(function (PeriodeAkuntansi $record): void {
-                        app(PeriodeService::class)->tutupBuku($record, auth()->id());
+                        // G1-06: posting jurnal penutup + kunci periode.
+                        $hasil = app(PeriodClosingService::class)->tutupBuku($record, auth()->id());
                         app(AuditLogger::class)->log(
                             action: 'ledger.tutup_buku',
                             user: auth()->user(),
                             subject: $record,
-                            metadata: ['periode' => $record->nama],
+                            metadata: ['periode' => $record->nama, 'surplus_defisit' => $hasil['surplus_defisit']],
                         );
-                        Notification::make()->title('Periode ditutup & dikunci')->success()->send();
+                        $sd = (float) $hasil['surplus_defisit'];
+                        Notification::make()
+                            ->title('Periode ditutup & dikunci')
+                            ->body(($sd >= 0 ? 'Surplus ' : 'Defisit ').'Rp '.number_format(abs($sd), 0, ',', '.').' dipindah ke Aset Neto.')
+                            ->success()->send();
                     }),
                 Action::make('buka_kembali')
                     ->label('Buka Kembali')
