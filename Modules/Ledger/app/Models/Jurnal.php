@@ -7,10 +7,11 @@ use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Core\Concerns\Approvable;
 
 class Jurnal extends Model
 {
-    use BelongsToTenant;
+    use Approvable, BelongsToTenant;
 
     protected $table = 'jurnal';
 
@@ -37,6 +38,15 @@ class Jurnal extends Model
     public function baris(): HasMany
     {
         return $this->hasMany(JurnalBaris::class);
+    }
+
+    /**
+     * G1-01: total debit jurnal — dipakai ApprovalRule (field 'total_debit')
+     * untuk memicu persetujuan jurnal manual di atas ambang nominal.
+     */
+    public function getTotalDebitAttribute(): float
+    {
+        return (float) $this->baris()->sum('debit');
     }
 
     public function periode(): BelongsTo

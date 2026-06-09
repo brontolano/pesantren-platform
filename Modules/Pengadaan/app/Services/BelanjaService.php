@@ -109,6 +109,10 @@ class BelanjaService
         }
 
         return DB::transaction(function () use ($belanja, $approvedBy): Belanja {
+            // G1-01: pagar persetujuan (F1). NO-OP bila tenant tak punya ApprovalRule
+            // wajib terpicu untuk Belanja; melempar bila wajib & belum disetujui.
+            $belanja->pastikanBolehLanjut();
+
             $jurnal = $this->posting($belanja, $approvedBy);
 
             $belanja->update([

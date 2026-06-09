@@ -7,10 +7,11 @@ use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Core\Concerns\Approvable;
 
 class SlipGaji extends Model
 {
-    use BelongsToTenant, SoftDeletes;
+    use Approvable, BelongsToTenant, SoftDeletes;
 
     protected $table = 'slip_gaji';
 
