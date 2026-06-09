@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -83,6 +84,9 @@ class DokumenMutuResource extends Resource
                         default => 'gray',
                     }),
                 TextColumn::make('versi')->label('Versi')->badge()->color('gray'),
+                TextColumn::make('catatan_review')->label('Catatan Review')
+                    ->placeholder('—')->wrap()->toggleable()
+                    ->tooltip(fn (?string $state): ?string => $state),
             ])
             ->defaultSort('jenis')
             ->filters([
@@ -119,11 +123,18 @@ class DokumenMutuResource extends Resource
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->requiresConfirmation()
-                    ->modalDescription('Dokumen dikembalikan sebagai ditolak. Beri alasan rinci via revisi/catatan.')
+                    ->modalDescription('Dokumen dikembalikan sebagai ditolak. Alasan akan terlihat oleh penyusun.')
+                    ->schema([
+                        Textarea::make('alasan')
+                            ->label('Alasan penolakan')
+                            ->required()
+                            ->rows(3)
+                            ->maxLength(1000)
+                            ->placeholder('Jelaskan kekurangan dokumen agar penyusun dapat merevisi.'),
+                    ])
                     ->visible(fn (DokumenMutu $record): bool => $record->status_approval === 'diajukan' && (auth()->user()?->can('approve_mutu') ?? false))
-                    ->action(function (DokumenMutu $record): void {
-                        app(MutuService::class)->tolak($record, (int) auth()->id(), 'Ditolak via panel mutu.');
+                    ->action(function (array $data, DokumenMutu $record): void {
+                        app(MutuService::class)->tolak($record, (int) auth()->id(), $data['alasan']);
                         Notification::make()->title('Dokumen ditolak')->warning()->send();
                     }),
                 EditAction::make(),

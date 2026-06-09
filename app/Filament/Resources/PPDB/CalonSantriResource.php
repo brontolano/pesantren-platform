@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\UserOtp;
 use Modules\PPDB\Services\PesertaAccountService;
+use Modules\PPDB\Services\PpdbAdmissionDecisionService;
+use Throwable;
 
 class CalonSantriResource extends Resource
 {
@@ -185,7 +187,14 @@ class CalonSantriResource extends Resource
                 TextColumn::make('status_pendaftaran')
                     ->label('Status')
                     ->badge()
-                    ->sortable(),
+                    ->sortable()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'lulus' => 'success',
+                        'verifikasi_berkas', 'registrasi_ulang' => 'info',
+                        'pending', 'menunggu_verifikasi', 'cadangan' => 'warning',
+                        'ditolak' => 'danger',
+                        default => 'gray',
+                    }),
                 TextColumn::make('jenis_kelamin')
                     ->label('JK')
                     ->sortable(),
@@ -271,6 +280,69 @@ class CalonSantriResource extends Resource
                             ->title('Pengingat daftar ulang dikirim via WhatsApp')
                             ->success()
                             ->send();
+                    }),
+                // Keputusan seleksi cepat — lewat PpdbAdmissionDecisionService (set status +
+                // pengumuman WA + pagar "butuh hasil ujian"). Disembunyikan untuk Alba Kids
+                // yang memakai alur verifikasi pembayaran tersendiri (tanpa ujian).
+                Action::make('luluskan')
+                    ->label('Luluskan')
+                    ->icon('heroicon-o-academic-cap')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalDescription('Tetapkan peserta LULUS (butuh minimal satu hasil ujian). Pengumuman dikirim via WhatsApp.')
+                    ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
+                        && in_array((string) $record->status_pendaftaran, ['pending', 'menunggu_verifikasi', 'verifikasi_berkas', 'cadangan'], true)
+                        && (Auth::user()?->can('manage_santri') ?? false))
+                    ->action(function (CalonSantri $record): void {
+                        try {
+                            app(PpdbAdmissionDecisionService::class)->decide($record, ['status_pendaftaran' => 'lulus']);
+                            Notification::make()->title('Peserta diluluskan & pengumuman dikirim')->success()->send();
+                        } catch (Throwable $e) {
+                            Notification::make()->title('Tidak dapat meluluskan')->body($e->getMessage())->danger()->send();
+                        }
+                    }),
+                Action::make('jadikanCadangan')
+                    ->label('Cadangan')
+                    ->icon('heroicon-o-clock')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalDescription('Tetapkan peserta sebagai CADANGAN (butuh minimal satu hasil ujian).')
+                    ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
+                        && in_array((string) $record->status_pendaftaran, ['pending', 'menunggu_verifikasi', 'verifikasi_berkas'], true)
+                        && (Auth::user()?->can('manage_santri') ?? false))
+                    ->action(function (CalonSantri $record): void {
+                        try {
+                            app(PpdbAdmissionDecisionService::class)->decide($record, ['status_pendaftaran' => 'cadangan']);
+                            Notification::make()->title('Peserta ditetapkan sebagai cadangan')->success()->send();
+                        } catch (Throwable $e) {
+                            Notification::make()->title('Tidak dapat memproses')->body($e->getMessage())->danger()->send();
+                        }
+                    }),
+                Action::make('tolakPendaftaran')
+                    ->label('Tolak')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->modalDescription('Tolak pendaftaran peserta. Alasan dikirim sebagai catatan keputusan; peserta dikabari via WhatsApp.')
+                    ->schema([
+                        Textarea::make('catatan_keputusan')
+                            ->label('Alasan penolakan')
+                            ->required()
+                            ->rows(3)
+                            ->maxLength(1000),
+                    ])
+                    ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
+                        && ! in_array((string) $record->status_pendaftaran, ['ditolak', 'lulus'], true)
+                        && (Auth::user()?->can('manage_santri') ?? false))
+                    ->action(function (array $data, CalonSantri $record): void {
+                        try {
+                            app(PpdbAdmissionDecisionService::class)->decide($record, [
+                                'status_pendaftaran' => 'ditolak',
+                                'catatan_keputusan' => $data['catatan_keputusan'],
+                            ]);
+                            Notification::make()->title('Pendaftaran ditolak & peserta dikabari')->warning()->send();
+                        } catch (Throwable $e) {
+                            Notification::make()->title('Gagal menolak')->body($e->getMessage())->danger()->send();
+                        }
                     }),
                 DeleteAction::make(),
             ]);
