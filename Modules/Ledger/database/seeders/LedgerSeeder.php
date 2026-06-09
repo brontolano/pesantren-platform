@@ -126,6 +126,8 @@ class LedgerSeeder extends Seeder
             ['1-2100', 'Tanah', 'ASET', '1-2000', false, true, null, false],
             ['1-2200', 'Bangunan', 'ASET', '1-2000', false, true, null, false],
             ['1-2300', 'Peralatan & Inventaris', 'ASET', '1-2000', false, true, null, false],
+            // Akumulasi penyusutan = kontra-aset (G2-13). Posting kredit menurunkan aset.
+            ['1-2900', 'Akumulasi Penyusutan (kontra-aset)', 'ASET', '1-2000', false, true, null, false],
 
             // KEWAJIBAN
             ['2-0000', 'KEWAJIBAN', 'KEWAJIBAN', null, false, false, null, false],
@@ -159,6 +161,7 @@ class LedgerSeeder extends Seeder
             ['4-3000', 'Penerimaan Wakaf', 'PENDAPATAN', '4-0000', false, true, null, false],
             ['4-4000', 'Penerimaan Zakat / Infak', 'PENDAPATAN', '4-0000', false, true, null, false],
             ['4-5000', 'Pendapatan Unit Usaha', 'PENDAPATAN', '4-0000', false, true, null, false],
+            ['4-6000', 'Laba Pelepasan Aset Tetap', 'PENDAPATAN', '4-0000', false, true, null, false], // G2-13 disposal (gain)
 
             // BEBAN
             ['5-0000', 'BEBAN', 'BEBAN', null, false, false, null, false],
@@ -170,6 +173,8 @@ class LedgerSeeder extends Seeder
             // Akun sarana ibadah (halal) — penanda 'ibadah' untuk uji BLACKLIST: dana
             // syubhat DILARANG menyentuh akun ini (pembangunan masjid wajib 100% halal).
             ['5-6000', 'Beban Pembangunan / Sarana Ibadah', 'BEBAN', '5-0000', false, true, 'ibadah', false],
+            ['5-7000', 'Beban Penyusutan Aset Tetap', 'BEBAN', '5-0000', false, true, null, false],   // G2-13 depresiasi
+            ['5-8000', 'Rugi Pelepasan Aset Tetap', 'BEBAN', '5-0000', false, true, null, false],     // G2-13 disposal (loss)
         ];
 
         $idByKode = [];

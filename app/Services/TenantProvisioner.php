@@ -9,6 +9,7 @@ use App\Models\TenantModule;
 use App\Models\TenantStorage;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -69,6 +70,15 @@ class TenantProvisioner
             // (b2) Branding default non-destruktif (tenant DB) — agar tema &
             // jadwal sholat punya nilai sejak lahir (sumber error tema).
             $this->seedBranding($tenant);
+
+            // (b3) Bagan Akun (COA) standar + sumber dana + kebijakan kehalalan.
+            // Idempoten (updateOrCreate by kode) — memastikan akun inti SELALU ada
+            // di tiap tenant (mis. penyusutan 5-7000/1-2900, pelepasan 4-6000/5-8000)
+            // sehingga modul keuangan/aset tidak gagal karena COA belum di-seed.
+            Artisan::call('db:seed', [
+                '--class' => LedgerSeeder::class,
+                '--force' => true,
+            ]);
 
             // (c) User admin super_admin.
             $existing = User::withoutGlobalScopes()->where('email', $adminEmail)->first();

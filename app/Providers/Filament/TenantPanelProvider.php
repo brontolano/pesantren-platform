@@ -36,6 +36,7 @@ use App\Filament\Resources\Ledger\SumberDanaResource;
 use App\Filament\Resources\Pengadaan\BelanjaResource;
 use App\Filament\Resources\Payroll\SlipGajiResource;
 use App\Filament\Resources\Pembiayaan\AsetResource;
+use App\Filament\Resources\Pembiayaan\MutasiAsetResource;
 use App\Filament\Resources\Pembiayaan\PembiayaanResource;
 use App\Filament\Resources\Mutu\DokumenMutuResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
@@ -207,6 +208,7 @@ class TenantPanelProvider extends PanelProvider
             TarifPajakResource::class,
             SlipGajiResource::class,
             AsetResource::class,
+            MutasiAsetResource::class,
             PembiayaanResource::class,
             DokumenMutuResource::class,
             TemplateNotifikasiResource::class,
