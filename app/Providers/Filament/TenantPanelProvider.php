@@ -241,6 +241,8 @@ class TenantPanelProvider extends PanelProvider
             \App\Filament\Resources\Approval\ApprovalRuleResource::class,
             // Jejak Audit (F2)
             \App\Filament\Resources\Audit\AuditLogResource::class,
+            // Repositori Dokumen (F5)
+            \App\Filament\Resources\Document\DocumentResource::class,
         ];
     }
 
