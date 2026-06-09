@@ -169,6 +169,80 @@ class PosKasIntegrasiTest extends TestCase
         $this->assertSame(1, Jurnal::query()->where('ref_type', 'PosTransaksi')->where('ref_id', (string) $tx->id)->count());
     }
 
+    private function akunSelisih(): Akun
+    {
+        return Akun::create([
+            'kode' => '5-9000',
+            'nama' => 'Selisih Kas',
+            'tipe' => 'beban',
+            'saldo_normal' => Akun::SALDO_NORMAL['beban'] ?? 'debit',
+            'is_postable' => true,
+        ]);
+    }
+
+    public function test_tutup_sesi_selisih_kurang_posting_debit_selisih_kredit_kas(): void
+    {
+        $this->boot('posS1');
+        $svc = app(PosKasService::class);
+        $this->akunSelisih();
+
+        $sesi = $svc->bukaSesi(['saldo_awal' => 100000]);
+        // Tutup dengan kas fisik kurang Rp5.000 dari sistem (100.000).
+        $closed = $svc->tutupSesi($sesi, 95000);
+
+        $this->assertEqualsWithDelta(-5000, (float) $closed->selisih, 0.01);
+
+        $jurnal = Jurnal::query()->where('ref_type', 'PosSesiSelisih')->where('ref_id', (string) $sesi->id)->first();
+        $this->assertNotNull($jurnal, 'Selisih kas harus terjurnal saat tutup sesi.');
+        $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->sum('debit'), 0.01);
+        $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->sum('kredit'), 0.01);
+        $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->where('akun_id', $this->akunId('5-9000'))->sum('debit'), 0.01);
+        $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->where('akun_id', $this->akunId('1-1000'))->sum('kredit'), 0.01);
+    }
+
+    public function test_tutup_sesi_selisih_lebih_posting_debit_kas_kredit_selisih(): void
+    {
+        $this->boot('posS2');
+        $svc = app(PosKasService::class);
+        $this->akunSelisih();
+
+        $sesi = $svc->bukaSesi(['saldo_awal' => 50000]);
+        $closed = $svc->tutupSesi($sesi, 53000); // lebih Rp3.000
+
+        $this->assertEqualsWithDelta(3000, (float) $closed->selisih, 0.01);
+
+        $jurnal = Jurnal::query()->where('ref_type', 'PosSesiSelisih')->where('ref_id', (string) $sesi->id)->first();
+        $this->assertNotNull($jurnal);
+        $this->assertEqualsWithDelta(3000, (float) $jurnal->baris()->where('akun_id', $this->akunId('1-1000'))->sum('debit'), 0.01);
+        $this->assertEqualsWithDelta(3000, (float) $jurnal->baris()->where('akun_id', $this->akunId('5-9000'))->sum('kredit'), 0.01);
+    }
+
+    public function test_tutup_sesi_pas_tanpa_jurnal_selisih(): void
+    {
+        $this->boot('posS3');
+        $svc = app(PosKasService::class);
+        $this->akunSelisih();
+
+        $sesi = $svc->bukaSesi(['saldo_awal' => 75000]);
+        $closed = $svc->tutupSesi($sesi, 75000); // pas
+
+        $this->assertEqualsWithDelta(0, (float) $closed->selisih, 0.01);
+        $this->assertSame(0, Jurnal::query()->where('ref_type', 'PosSesiSelisih')->count());
+    }
+
+    public function test_tutup_sesi_tanpa_akun_selisih_menahan_diri(): void
+    {
+        $this->boot('posS4');
+        $svc = app(PosKasService::class);
+        // sengaja TIDAK membuat akun "Selisih Kas".
+
+        $sesi = $svc->bukaSesi(['saldo_awal' => 40000]);
+        $closed = $svc->tutupSesi($sesi, 38000); // kurang 2.000
+
+        $this->assertEqualsWithDelta(-2000, (float) $closed->selisih, 0.01);
+        $this->assertSame(0, Jurnal::query()->where('ref_type', 'PosSesiSelisih')->count(), 'Tanpa akun selisih, posting menahan diri (tutup sesi tetap berhasil).');
+    }
+
     public function test_isolasi_tenant_transaksi_pos(): void
     {
         $this->boot('posA');
