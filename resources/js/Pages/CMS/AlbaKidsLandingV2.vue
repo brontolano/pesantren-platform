@@ -1,6 +1,6 @@
 <script setup>
 import { Head, useForm, usePage } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const props = defineProps({
     tenant: {
@@ -43,12 +43,9 @@ const academicYear = computed(() => admission.value.academicYear || '2026/2027')
  * SEO — target pencarian lokal: preschool/PAUD Islam Montessori Bandung
  * ------------------------------------------------------------------ */
 const SITE_URL = 'https://albakids.pesantren.online'
-const seoTitle = computed(
-    () => seo.value.title || 'Albakids Preschool — Preschool & PAUD Islam Montessori di Bandung',
-)
+const seoTitle = computed(() => 'Albakids Preschool — Preschool & PAUD Islam Montessori di Bandung')
 const seoDescription = computed(
-    () => seo.value.description
-        || 'Albakids Preschool: PAUD & preschool Islam dengan pendekatan Montessori di Margaasih, Bandung. Belajar sambil bermain berlandaskan nilai tauhid & sunnah Nabi Muhammad SAW. Pendaftaran tahun ajaran 2026/2027 telah dibuka.',
+    () => 'Albakids Preschool: PAUD & preschool Islam dengan pendekatan Montessori di Margaasih, Bandung. Belajar sambil bermain berlandaskan nilai tauhid & sunnah Nabi Muhammad SAW. Pendaftaran tahun ajaran 2026/2027 telah dibuka.',
 )
 const seoImage = computed(() => seo.value.imageUrl || `${SITE_URL}/albakids/gal/foto-1.jpg`)
 const seoUrl = computed(() => seo.value.canonicalUrl || `${SITE_URL}/`)
@@ -81,6 +78,15 @@ const localSchema = computed(() => JSON.stringify({
     ],
     audience: { '@type': 'EducationalAudience', audienceType: 'Anak usia 3-5 tahun' },
 }))
+
+/* Suntik JSON-LD structured data ke <head> (Inertia Head tidak merender <script>). */
+onMounted(() => {
+    const el = document.createElement('script')
+    el.type = 'application/ld+json'
+    el.setAttribute('data-seo', 'albakids-localbusiness')
+    el.textContent = localSchema.value
+    document.head.appendChild(el)
+})
 
 /* Galeri foto asli Albakids (dari folder Drive klien) */
 const albaBrochurePages = Array.from({ length: 12 }, (_, index) => ({
@@ -266,7 +272,6 @@ const submitAdmission = () => {
             <meta head-key="twitter:title" name="twitter:title" :content="seoTitle">
             <meta head-key="twitter:description" name="twitter:description" :content="seoDescription">
             <meta head-key="twitter:image" name="twitter:image" :content="seoImage">
-            <script head-key="schema-local" type="application/ld+json" v-text="localSchema" />
         </Head>
 
         <div class="min-h-screen scroll-smooth bg-[#fffdf8] font-sans text-slate-800 antialiased">
