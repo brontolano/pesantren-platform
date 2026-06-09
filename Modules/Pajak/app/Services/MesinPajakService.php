@@ -3,6 +3,7 @@
 namespace Modules\Pajak\Services;
 
 use Modules\Pajak\Models\TarifPajak;
+use Modules\Pajak\Support\KebijakanPajakKehalalan;
 
 /**
  * Mesin pajak otomatis (PMK 59/2022). Membaca tarif dari tabel `tarif_pajak`
@@ -22,15 +23,27 @@ class MesinPajakService
 
     public const DASAR_REGULASI = 'PMK 59/2022';
 
+    public function __construct(
+        private readonly KebijakanPajakKehalalan $kebijakanKehalalan = new KebijakanPajakKehalalan,
+    ) {
+    }
+
     /**
      * Hitung PPN & PPh untuk satu belanja.
      *
      * @param  string  $jenis  'barang' | 'jasa' | 'sewa'
+     * @param  string  $kehalalan  'halal' | 'syubhat' | 'non_halal' (G1-04)
      * @return array{ppn: float, pph_jenis: ?string, pph: float}
      */
-    public function hitung(float $dpp, string $jenis, bool $danaBos, bool $vendorNpwp): array
+    public function hitung(float $dpp, string $jenis, bool $danaBos, bool $vendorNpwp, string $kehalalan = 'halal'): array
     {
         $dpp = round($dpp, 2);
+
+        // G1-04: hak negara atas pajak hanya dari transaksi HALAL. Dana syubhat/
+        // non-halal → tidak dipungut pajak negara.
+        if ($this->kebijakanKehalalan->bebasPajakNegara($kehalalan)) {
+            return ['ppn' => 0.0, 'pph_jenis' => null, 'pph' => 0.0];
+        }
 
         return [
             'ppn' => $this->hitungPpn($dpp),
