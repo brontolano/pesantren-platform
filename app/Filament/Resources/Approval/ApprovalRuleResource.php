@@ -13,6 +13,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -57,13 +59,16 @@ class ApprovalRuleResource extends Resource
                 ->description('Tetapkan kapan sebuah transaksi butuh persetujuan & siapa penyetujunya. Mode "wajib" menahan transaksi sampai disetujui.')
                 ->schema([
                     Select::make('approvable_type')->label('Jenis Transaksi')
-                        ->options(ApprovalRule::APPROVABLE)->required()->native(false),
+                        ->options(ApprovalRule::APPROVABLE)->required()->native(false)
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('field', null)),
                     TextInput::make('nama')->label('Nama Aturan')->required()->maxLength(255),
-                    TextInput::make('field')->label('Field Syarat')->maxLength(60)
-                        ->placeholder('mis. total / nominal')
-                        ->helperText('Kosongkan = semua transaksi jenis ini butuh approval.'),
-                    Select::make('operator')->label('Operator')->default('>=')
-                        ->options(['>' => '>', '>=' => '≥', '=' => '=', '<=' => '≤', '<' => '<']),
+                    Select::make('field')->label('Field Syarat')->native(false)
+                        ->options(fn (Get $get): array => ApprovalRule::FIELD_OPTIONS[$get('approvable_type')] ?? [])
+                        ->placeholder('(selalu — semua transaksi jenis ini)')
+                        ->helperText('Kosongkan = semua transaksi jenis ini butuh approval. Hanya field valid yang dapat dipilih.'),
+                    Select::make('operator')->label('Operator')->default('>=')->native(false)
+                        ->options(ApprovalRule::OPERATORS),
                     TextInput::make('nilai')->label('Ambang (Rp)')->numeric()->default(0)->prefix('Rp'),
                     Select::make('approver_role')->label('Disetujui oleh (peran)')
                         ->options(fn (): array => Role::query()->orderBy('name')->pluck('name', 'name')->all())
