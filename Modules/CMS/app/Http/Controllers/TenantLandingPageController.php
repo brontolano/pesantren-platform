@@ -21,17 +21,6 @@ class TenantLandingPageController extends Controller
         return Inertia::render($component, $this->payload($websiteService));
     }
 
-    /**
-     * Landing AlbaKids VERSI 2 di /v2 — permanen di git (pengganti versi
-     * container-only yang hilang saat rebuild). Hanya untuk tenant AlbaKids.
-     */
-    public function v2(TenantWebsiteService $websiteService): Response
-    {
-        abort_unless(AlbaKidsTenant::isActive(), 404);
-
-        return Inertia::render('CMS/AlbaKidsLandingV2', $this->payload($websiteService));
-    }
-
     /** Props bersama landing (kontrak komponen: tenant, website, blog). */
     private function payload(TenantWebsiteService $websiteService): array
     {

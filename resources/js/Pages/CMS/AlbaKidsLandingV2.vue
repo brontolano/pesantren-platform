@@ -39,6 +39,49 @@ const brandTagline = computed(
 const logoSrc = computed(() => branding.value.logoUrl || branding.value.logo || '/albakids/logo.png')
 const academicYear = computed(() => admission.value.academicYear || '2026/2027')
 
+/* ------------------------------------------------------------------ *
+ * SEO — target pencarian lokal: preschool/PAUD Islam Montessori Bandung
+ * ------------------------------------------------------------------ */
+const SITE_URL = 'https://albakids.pesantren.online'
+const seoTitle = computed(
+    () => seo.value.title || 'Albakids Preschool — Preschool & PAUD Islam Montessori di Bandung',
+)
+const seoDescription = computed(
+    () => seo.value.description
+        || 'Albakids Preschool: PAUD & preschool Islam dengan pendekatan Montessori di Margaasih, Bandung. Belajar sambil bermain berlandaskan nilai tauhid & sunnah Nabi Muhammad SAW. Pendaftaran tahun ajaran 2026/2027 telah dibuka.',
+)
+const seoImage = computed(() => seo.value.imageUrl || `${SITE_URL}/albakids/gal/foto-1.jpg`)
+const seoUrl = computed(() => seo.value.canonicalUrl || `${SITE_URL}/`)
+const seoKeywords = 'preschool bandung, paud bandung, preschool islam bandung, paud islam bandung, montessori bandung, sekolah anak bandung, tk islam bandung, playgroup bandung, preschool margaasih, daycare bandung, albakids, al-basyariyah'
+const localSchema = computed(() => JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': ['Preschool', 'EducationalOrganization', 'LocalBusiness'],
+    name: brandName.value,
+    alternateName: 'Albakids Al-Basyariyah Kinder Preschool',
+    description: seoDescription.value,
+    url: seoUrl.value,
+    logo: `${SITE_URL}/albakids/logo.png`,
+    image: seoImage.value,
+    telephone: websiteContact.value.phone || '+62 822-6090-1399',
+    priceRange: 'Rp',
+    address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Pondok Pesantren Al-Basyariyah 2, Jl. Mahmud, Cigondewah Hilir',
+        addressLocality: 'Margaasih',
+        addressRegion: 'Jawa Barat',
+        addressCountry: 'ID',
+    },
+    areaServed: [
+        { '@type': 'City', name: 'Bandung' },
+        { '@type': 'AdministrativeArea', name: 'Kabupaten Bandung' },
+    ],
+    sameAs: ['https://www.instagram.com/albakids_preschool.bdg/'],
+    openingHoursSpecification: [
+        { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Tuesday', 'Saturday'], opens: '09:00', closes: '10:30' },
+    ],
+    audience: { '@type': 'EducationalAudience', audienceType: 'Anak usia 3-5 tahun' },
+}))
+
 /* Galeri foto asli Albakids (dari folder Drive klien) */
 const albaBrochurePages = Array.from({ length: 12 }, (_, index) => ({
     src: `/albakids/gal/foto-${index + 1}.jpg`,
@@ -201,28 +244,29 @@ const submitAdmission = () => {
 <template>
     <div>
         <Head>
-            <title>{{ seo.title || brandName }}</title>
-            <meta head-key="description" name="description" :content="seo.description || brandTagline">
-            <meta head-key="robots" name="robots" :content="seo.robots || 'index,follow'">
-            <link head-key="canonical" rel="canonical" :href="seo.canonicalUrl || '/'">
-            <link v-if="branding.favicon" head-key="favicon" rel="icon" :href="branding.favicon">
-            <link v-else head-key="favicon" rel="icon" type="image/svg+xml" href="/favicon.ico">
-            <meta head-key="og:title" property="og:title" :content="seo.title || brandName">
-            <meta head-key="og:description" property="og:description" :content="seo.description || brandTagline">
+            <title>{{ seoTitle }}</title>
+            <meta head-key="description" name="description" :content="seoDescription">
+            <meta head-key="keywords" name="keywords" :content="seoKeywords">
+            <meta head-key="robots" name="robots" :content="seo.robots || 'index,follow,max-image-preview:large'">
+            <meta head-key="geo-region" name="geo.region" content="ID-JB">
+            <meta head-key="geo-placename" name="geo.placename" content="Margaasih, Kabupaten Bandung">
+            <meta head-key="theme-color" name="theme-color" content="#F5A623">
+            <meta head-key="author" name="author" :content="brandName">
+            <link head-key="canonical" rel="canonical" :href="seoUrl">
+            <link head-key="favicon" rel="icon" type="image/png" :href="logoSrc">
+            <link head-key="apple-touch-icon" rel="apple-touch-icon" :href="logoSrc">
+            <meta head-key="og:title" property="og:title" :content="seoTitle">
+            <meta head-key="og:description" property="og:description" :content="seoDescription">
             <meta head-key="og:type" property="og:type" content="website">
-            <meta head-key="og:url" property="og:url" :content="seo.canonicalUrl || '/'">
-            <meta head-key="og:site_name" property="og:site_name" :content="seo.siteName || brandName">
-            <meta v-if="seo.imageUrl" head-key="og:image" property="og:image" :content="seo.imageUrl">
+            <meta head-key="og:url" property="og:url" :content="seoUrl">
+            <meta head-key="og:site_name" property="og:site_name" :content="brandName">
+            <meta head-key="og:locale" property="og:locale" content="id_ID">
+            <meta head-key="og:image" property="og:image" :content="seoImage">
             <meta head-key="twitter:card" name="twitter:card" content="summary_large_image">
-            <meta head-key="twitter:title" name="twitter:title" :content="seo.title || brandName">
-            <meta head-key="twitter:description" name="twitter:description" :content="seo.description || brandTagline">
-            <meta v-if="seo.imageUrl" head-key="twitter:image" name="twitter:image" :content="seo.imageUrl">
-            <script
-                v-if="schemaMarkup"
-                head-key="schema"
-                type="application/ld+json"
-                v-text="schemaMarkup"
-            />
+            <meta head-key="twitter:title" name="twitter:title" :content="seoTitle">
+            <meta head-key="twitter:description" name="twitter:description" :content="seoDescription">
+            <meta head-key="twitter:image" name="twitter:image" :content="seoImage">
+            <script head-key="schema-local" type="application/ld+json" v-text="localSchema" />
         </Head>
 
         <div class="min-h-screen scroll-smooth bg-[#fffdf8] font-sans text-slate-800 antialiased">

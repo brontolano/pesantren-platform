@@ -45,9 +45,25 @@ Route::get('/', function () {
     return app()->call([app(TenantLandingPageController::class), '__invoke']);
 })->name('home');
 
-// Landing AlbaKids VERSI 2 (permanen di git) — /v2. Controller v2() meng-abort
-// 404 untuk tenant non-AlbaKids & domain central, jadi aman sebagai route biasa.
-Route::get('/v2', [TenantLandingPageController::class, 'v2'])->name('tenant.landing.v2');
+// robots.txt & sitemap.xml — tenant-aware (host dinamis) untuk indeksasi mesin pencari.
+Route::get('/robots.txt', function () {
+    $host = request()->getSchemeAndHttpHost();
+
+    return response("User-agent: *\nAllow: /\n\nSitemap: {$host}/sitemap.xml\n", 200, [
+        'Content-Type' => 'text/plain; charset=UTF-8',
+    ]);
+})->name('seo.robots');
+
+Route::get('/sitemap.xml', function () {
+    $host = request()->getSchemeAndHttpHost();
+    $now = now()->toAtomString();
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>'
+        .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        ."<url><loc>{$host}/</loc><lastmod>{$now}</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+        .'</urlset>';
+
+    return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+})->name('seo.sitemap');
 
 // Submit formulir landing page tenant-specific (contoh: Alba Kids).
 Route::post('/daftar', [LandingRegistrationController::class, 'store'])
