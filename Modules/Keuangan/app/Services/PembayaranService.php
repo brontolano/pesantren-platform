@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Services;
 
 use Illuminate\Support\Facades\DB;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Events\PembayaranDiverifikasi;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
@@ -11,6 +12,87 @@ use InvalidArgumentException;
 
 class PembayaranService
 {
+    /**
+     * Alokasikan SATU pembayaran ke banyak tagihan (pola Payment Entry ERPNext).
+     *
+     * Wali bayar borongan (mis. 3 bulan SPP sekaligus) → dana dialokasi FIFO
+     * berdasarkan jatuh tempo (atau urutan `tagihan_ids` bila diberikan). Sisa
+     * lebih (uang muka) dititipkan ke Tabungan santri sebagai saldo advance.
+     *
+     * @param  array{created_by?:int, auto_verify?:bool, metode?:string, catatan?:string, tagihan_ids?:int[], titipan_ke_tabungan?:bool}  $opts
+     * @return array{total:float, teralokasi:float, alokasi:array<int,array{tagihan_id:int,nominal:float}>, titipan:float}
+     */
+    public function alokasiPembayaran(Santri|int $santri, float $totalNominal, array $opts = []): array
+    {
+        $this->ensureTenantContext();
+
+        $total = round($totalNominal, 2);
+        if ($total <= 0) {
+            throw new InvalidArgumentException('Nominal alokasi pembayaran harus lebih dari 0.');
+        }
+
+        $santriId = $santri instanceof Santri ? (int) $santri->id : (int) $santri;
+        $userId = $opts['created_by'] ?? null;
+        $autoVerify = $opts['auto_verify'] ?? true;
+
+        $query = Tagihan::query()->where('santri_id', $santriId)->belumLunas();
+        if (! empty($opts['tagihan_ids'])) {
+            $ids = array_values($opts['tagihan_ids']);
+            $tagihanList = $query->whereIn('id', $ids)->get()
+                ->sortBy(fn (Tagihan $t): int => array_search($t->id, $ids, true))->values();
+        } else {
+            $tagihanList = $query->orderBy('jatuh_tempo')->orderBy('id')->get();
+        }
+
+        return DB::transaction(function () use ($tagihanList, $total, $opts, $userId, $autoVerify, $santriId): array {
+            $sisa = $total;
+            $alokasi = [];
+
+            foreach ($tagihanList as $tagihan) {
+                if ($sisa < 0.005) {
+                    break;
+                }
+                $due = round((float) $tagihan->sisa_tagihan, 2);
+                if ($due <= 0) {
+                    continue;
+                }
+                $bayar = round(min($due, $sisa), 2);
+
+                $pembayaran = $this->inputPembayaran($tagihan, [
+                    'nominal' => $bayar,
+                    'metode' => $opts['metode'] ?? 'tunai',
+                    'created_by' => $userId,
+                    'catatan' => $opts['catatan'] ?? 'Alokasi pembayaran borongan',
+                ]);
+                if ($autoVerify && $userId) {
+                    $this->verifikasiPembayaran($pembayaran, (int) $userId);
+                }
+
+                $alokasi[] = ['tagihan_id' => (int) $tagihan->id, 'nominal' => $bayar];
+                $sisa = round($sisa - $bayar, 2);
+            }
+
+            // Sisa lebih → titipan/uang muka ke Tabungan santri (saldo advance).
+            $titipan = 0.0;
+            if ($sisa >= 0.005) {
+                $titipan = $sisa;
+                if ($opts['titipan_ke_tabungan'] ?? true) {
+                    app(TabunganService::class)->setor($santriId, $titipan, [
+                        'keterangan' => 'Titipan/uang muka dari kelebihan pembayaran tagihan',
+                        'created_by' => $userId,
+                    ]);
+                }
+            }
+
+            return [
+                'total' => $total,
+                'teralokasi' => round(array_sum(array_column($alokasi, 'nominal')), 2),
+                'alokasi' => $alokasi,
+                'titipan' => round($titipan, 2),
+            ];
+        });
+    }
+
     /**
      * Input pembayaran manual oleh bendahara (T1.6.4).
      * Mendukung partial payment / cicilan (T1.6.5).
