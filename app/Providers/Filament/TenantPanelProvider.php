@@ -4,6 +4,8 @@ namespace App\Providers\Filament;
 
 use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
 use App\Filament\Resources\Akademik\Nilai\NilaiResource;
+use App\Filament\Resources\Akademik\PresensiSantri\PresensiSantriResource;
+use App\Filament\Resources\Akademik\Rubrik\RubrikKriteriaResource;
 use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
 use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
 use App\Filament\Resources\Akademik\Rapor\RaporResource;
@@ -59,6 +61,7 @@ use App\Filament\Resources\Tabungan\TabunganResource;
 use App\Filament\Resources\TabunganTopup\TabunganTopupResource;
 use App\Filament\Resources\Tagihan\TagihanResource;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource;
+use App\Filament\Resources\Tahfidz\TahfidzTarget\TahfidzTargetResource;
 use App\Filament\Resources\Tahfidz\PenilaianTahfidzResource;
 use App\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource;
 use App\Filament\Resources\Users\UserResource;
@@ -236,12 +239,15 @@ class TenantPanelProvider extends PanelProvider
             PelajaranResource::class,
             JadwalPelajaranResource::class,
             NilaiResource::class,
+            PresensiSantriResource::class,
+            RubrikKriteriaResource::class,
             RaporResource::class,
             BlokAsramaResource::class,
             KamarAsramaResource::class,
             PenempatanAsramaResource::class,
             BiayaAsramaResource::class,
             HafalanTahfidzResource::class,
+            TahfidzTargetResource::class,
             PenilaianTahfidzResource::class,
             RiwayatKesehatanResource::class,
             SesiKonselingResource::class,
