@@ -54,6 +54,10 @@ class TagihanService
             'nominal_akhir' => max($nominal - $diskon, 0),
             'jatuh_tempo' => $payload['jatuh_tempo'],
             'status' => $payload['status'] ?? 'belum_bayar',
+            // G2-15: fund-aware — dimensi sumber dana & divisi kini benar-benar disimpan.
+            'sumber_dana_id' => $payload['sumber_dana_id'] ?? null,
+            'divisi_unit_id' => $payload['divisi_unit_id'] ?? null,
+            'is_dibayar_dimuka' => (bool) ($payload['is_dibayar_dimuka'] ?? false),
             'periode_akademik' => $payload['periode_akademik'] ?? null,
             'bulan_masehi' => $periode['bulan_masehi'],
             'bulan_hijriah' => $periode['bulan_hijriah'],
