@@ -47,6 +47,26 @@ class LandingRegistrationController extends Controller
             'bukti_transfer' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf,webp', 'max:5120'],
         ]);
 
+        // Pastikan semua field opsional selalu hadir sebagai key. Form kustom
+        // (mis. Alba Kids) tidak mengirim sebagian field nullable → tanpa ini
+        // akses `$validated['nama_wali']` dll. melempar "Undefined array key" → 500.
+        $validated = array_merge([
+            'child_order' => null,
+            'kelas_tujuan' => null,
+            'program_diminati' => null,
+            'pekerjaan_ayah' => null,
+            'pekerjaan_ibu' => null,
+            'no_hp_ayah' => null,
+            'no_hp_ibu' => null,
+            'nama_wali' => null,
+            'hubungan_wali' => null,
+            'no_hp_wali' => null,
+            'nama_pengirim_transfer' => null,
+            'bank_pengirim' => null,
+            'nominal_transfer' => null,
+            'tanggal_transfer' => null,
+        ], $validated);
+
         $candidate = DB::transaction(function () use ($validated, $registrationNumberService, $request): CalonSantri {
             $nomorPendaftaran = $registrationNumberService->generate();
             $guardianName = $validated['nama_wali'] ?: $validated['nama_ibu'];

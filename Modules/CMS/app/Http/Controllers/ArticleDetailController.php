@@ -11,7 +11,7 @@ use Modules\CMS\Services\TenantWebsiteService;
 
 class ArticleDetailController extends Controller
 {
-    public function __invoke(Request $request, string $tenant, string $slug, TenantWebsiteService $websiteService): Response
+    public function __invoke(Request $request, string $slug, TenantWebsiteService $websiteService): Response
     {
         $article = Article::query()
             ->where('slug', $slug)
