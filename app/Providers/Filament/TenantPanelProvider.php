@@ -23,8 +23,11 @@ use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kelas\KelasResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
 use App\Filament\Resources\Kesehatan\SesiKonselingResource;
+use App\Filament\Resources\Inventory\InventoryItemResource;
 use App\Filament\Resources\Ledger\AkunResource;
+use App\Filament\Resources\Ledger\AnggaranResource;
 use App\Filament\Resources\Ledger\DivisiUnitResource;
+use App\Filament\Resources\Pos\PosKategoriResource;
 use App\Filament\Resources\Ledger\JurnalResource;
 use App\Filament\Resources\Ledger\KebijakanKehalalanResource;
 use App\Filament\Resources\Pajak\TarifPajakResource;
@@ -189,8 +192,12 @@ class TenantPanelProvider extends PanelProvider
             MetodePembayaranResource::class,
             TabunganTopupResource::class,
             LaporanKeuanganResource::class,
+            // POS / Koperasi
+            PosKategoriResource::class,
+            InventoryItemResource::class,
             // Ledger / Baitul Maal (Buku Besar)
             AkunResource::class,
+            AnggaranResource::class,
             SumberDanaResource::class,
             DivisiUnitResource::class,
             PeriodeAkuntansiResource::class,
