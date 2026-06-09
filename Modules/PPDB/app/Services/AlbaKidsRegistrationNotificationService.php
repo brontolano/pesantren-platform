@@ -2,6 +2,7 @@
 
 namespace Modules\PPDB\Services;
 
+use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
 use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
@@ -29,7 +30,7 @@ class AlbaKidsRegistrationNotificationService
         $adminTemplate = $this->resolveTemplate(
             'albakids_admin_new_registration',
             'Pendaftar baru Alba Kids',
-            'Pendaftar baru Alba Kids masuk. Nama: {{nama_calon}}. Nomor: {{nomor_pendaftaran}}. Wali: {{nama_wali}} ({{no_hp_wali}}). Program: {{program_diminati}}. Segera cek admin untuk verifikasi bukti transfer.'
+            "Pendaftar baru Alba Kids masuk.\nNama: {{nama_calon}}\nNomor: {{nomor_pendaftaran}}\nProgram: {{program_diminati}}\nAyah: {{nama_ayah}} ({{no_hp_ayah}})\nIbu: {{nama_ibu}} ({{no_hp_ibu}})\nAlamat: {{alamat}}\n\nDokumen (klik untuk lihat):\n{{dokumen}}\n\nSegera verifikasi di panel admin."
         );
 
         $this->resolveTemplate(
@@ -74,6 +75,12 @@ class AlbaKidsRegistrationNotificationService
                         'nomor_pendaftaran' => $candidate->nomor_pendaftaran,
                         'program_diminati' => $candidate->program_diminati,
                         'no_hp_wali' => $candidate->no_hp_wali,
+                        'nama_ayah' => $candidate->nama_ayah ?: '-',
+                        'no_hp_ayah' => (string) (data_get($candidate->data_ortu, 'no_hp_ayah') ?: '-'),
+                        'nama_ibu' => $candidate->nama_ibu ?: '-',
+                        'no_hp_ibu' => (string) (data_get($candidate->data_ortu, 'no_hp_ibu') ?: '-'),
+                        'alamat' => (string) ($candidate->alamat ?: '-'),
+                        'dokumen' => $this->buildDocumentLinks($candidate),
                     ],
                 ],
                 'status' => 'draft',
@@ -98,6 +105,12 @@ class AlbaKidsRegistrationNotificationService
                     'nomor_pendaftaran',
                     'program_diminati',
                     'no_hp_wali',
+                    'nama_ayah',
+                    'no_hp_ayah',
+                    'nama_ibu',
+                    'no_hp_ibu',
+                    'alamat',
+                    'dokumen',
                     'pesan_tambahan',
                     'isi_pesan',
                 ],
@@ -105,6 +118,36 @@ class AlbaKidsRegistrationNotificationService
                 'is_active' => true,
             ]
         );
+    }
+
+    /**
+     * Bangun daftar link unduh dokumen (bukti/kk/akta) sebagai signed URL,
+     * untuk dilampirkan pada notifikasi WhatsApp admin.
+     */
+    private function buildDocumentLinks(CalonSantri $candidate): string
+    {
+        $docs = ['bukti' => 'Bukti Transfer'];
+        if (data_get($candidate->data_ortu, 'dokumen.kk')) {
+            $docs['kk'] = 'Kartu Keluarga';
+        }
+        if (data_get($candidate->data_ortu, 'dokumen.akta')) {
+            $docs['akta'] = 'Akta Kelahiran';
+        }
+
+        $lines = [];
+        foreach ($docs as $type => $label) {
+            try {
+                $url = URL::temporarySignedRoute('tenant.ppdb.signed-doc', now()->addDays(30), [
+                    'candidate' => $candidate->getKey(),
+                    'type' => $type,
+                ]);
+                $lines[] = "{$label}: {$url}";
+            } catch (\Throwable $e) {
+                // Route belum tersedia → lewati link, jangan gagalkan notifikasi.
+            }
+        }
+
+        return $lines === [] ? '-' : implode("\n", $lines);
     }
 
     /**

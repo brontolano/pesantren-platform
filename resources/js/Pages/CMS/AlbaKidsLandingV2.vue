@@ -32,17 +32,17 @@ const admission = computed(
 const websiteContact = computed(() => props.website.contact ?? { address: '', phone: '', email: '' })
 const flash = computed(() => usePage().props.flash ?? {})
 
-const brandName = computed(() => branding.value.name || 'Alba Kids Pre-School')
+const brandName = computed(() => branding.value.name || 'Albakids Preschool')
 const brandTagline = computed(
     () => branding.value.tagline || 'Ruang tumbuh yang ceria, hangat, dan penuh imajinasi untuk langkah awal si kecil.',
 )
 const logoSrc = computed(() => branding.value.logoUrl || branding.value.logo || '/albakids/logo.png')
 const academicYear = computed(() => admission.value.academicYear || '2026/2027')
 
-/* Galeri brosur Alba Kids */
-const albaBrochurePages = Array.from({ length: 9 }, (_, index) => ({
-    src: `/albakids-brochure/${index + 1}.jpg`,
-    alt: `Dokumentasi kegiatan Alba Kids ${index + 1}`,
+/* Galeri foto asli Albakids (dari folder Drive klien) */
+const albaBrochurePages = Array.from({ length: 12 }, (_, index) => ({
+    src: `/albakids/gal/foto-${index + 1}.jpg`,
+    alt: `Dokumentasi kegiatan Albakids ${index + 1}`,
 }))
 
 const handleImageError = (event) => {
@@ -78,36 +78,13 @@ const programs = computed(() => {
 
 /* Konten orisinal */
 const advantages = [
-    {
-        icon: 'heart',
-        title: 'Pendampingan Hangat',
-        desc: 'Rasio guru dan anak yang nyaman, sehingga setiap si kecil merasa diperhatikan dan aman.',
-    },
-    {
-        icon: 'sparkles',
-        title: 'Belajar Sambil Bermain',
-        desc: 'Kurikulum bermain terarah yang menumbuhkan motorik, bahasa, dan rasa ingin tahu anak.',
-    },
-    {
-        icon: 'shield',
-        title: 'Lingkungan Aman',
-        desc: 'Ruang belajar yang bersih, ceria, dan diawasi penuh agar orang tua tenang setiap hari.',
-    },
-    {
-        icon: 'palette',
-        title: 'Kreativitas Tanpa Batas',
-        desc: 'Aktivitas seni, musik, dan eksplorasi yang membebaskan imajinasi anak bertumbuh.',
-    },
-    {
-        icon: 'users',
-        title: 'Sosial dan Emosi',
-        desc: 'Anak belajar berbagi, antre, dan berempati melalui kegiatan kelompok yang menyenangkan.',
-    },
-    {
-        icon: 'chat',
-        title: 'Kolaborasi Orang Tua',
-        desc: 'Komunikasi rutin dan terbuka agar perkembangan anak terpantau bersama keluarga.',
-    },
+    { icon: 'sparkles', text: 'Menggunakan metode pendekatan Islamic Montessori-Inspired.' },
+    { icon: 'palette', text: 'Program cooking class di Pabrik Albakery.' },
+    { icon: 'users', text: 'Program olahraga berkeliling di area pesantren.' },
+    { icon: 'heart', text: 'Program outing class.' },
+    { icon: 'shield', text: 'Waktu belajar 2x seminggu mulai pukul 09.00 - 10.30 agar tidak memberatkan anak usia preschool.' },
+    { icon: 'chat', text: 'Mengenalkan anak dengan lingkungan pesantren.' },
+    { icon: 'sparkles', text: 'Lokasi strategis, 5 menit dari Gerbang Tol Margaasih.' },
 ]
 
 const testimonials = [
@@ -137,12 +114,35 @@ const testimonials = [
     },
 ]
 
-const trustBadges = ['Guru bersertifikat PAUD', 'Lingkungan ramah anak', 'Kelas kecil yang nyaman']
+const trustBadges = ['Lead teacher berpengalaman', 'Lingkungan islami', 'Kegiatan stimulasi terprogram']
+
+/* Program Kami — poin kurikulum (instruksi klien) */
+const curriculum = [
+    'Penerapan pemahaman tauhid',
+    'Penerapan Sunnah Nabi Muhammad SAW di kehidupan sehari-hari',
+    'Kegiatan bermain kreatif untuk menstimulasi perkembangan sensorik, motorik halus dan motorik kasar pada anak',
+    'Basic English',
+    'Basic Arabic',
+    'Hafalan surat pendek, sholawat & doa sehari-hari',
+    'Pengenalan membaca dan berhitung dasar',
+]
+
+/* Rincian biaya pendaftaran (instruksi klien — total 1.785.000) */
+const feeItems = [
+    { label: 'Administrasi Pendaftaran', amount: 'Rp 250.000' },
+    { label: 'Infaq Sarana Prasarana', amount: 'Rp 500.000' },
+    { label: 'SPP Bulanan', amount: 'Rp 200.000' },
+    { label: '2 Set Seragam', amount: 'Rp 300.000' },
+    { label: 'Media Pembelajaran untuk 1 Tahun', amount: 'Rp 400.000' },
+    { label: 'Raport untuk 2 Semester', amount: 'Rp 135.000' },
+    { label: 'Program Outing Class / tahun', amount: 'Insidental' },
+]
 
 const navLinks = [
     { href: '#tentang', label: 'Tentang' },
     { href: '#program', label: 'Program' },
     { href: '#keunggulan', label: 'Keunggulan' },
+    { href: '#biaya', label: 'Biaya' },
     { href: '#galeri', label: 'Galeri' },
     { href: '#testimoni', label: 'Testimoni' },
 ]
@@ -174,6 +174,8 @@ const form = useForm({
     no_hp_ibu: '',
     alamat: '',
     bukti_transfer: null,
+    foto_kk: null,
+    foto_akta: null,
 })
 
 const submitAdmission = () => {
@@ -231,10 +233,10 @@ const submitAdmission = () => {
                         <img
                             :src="logoSrc"
                             :alt="`Logo ${brandName}`"
-                            class="h-11 w-11 rounded-full bg-white object-contain p-1 shadow-sm ring-2 ring-[#F5A623]/60"
+                            class="h-12 w-12 shrink-0 object-contain"
                         >
                         <span class="flex flex-col leading-tight">
-                            <span class="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-[#29ABE2]">Pre-School</span>
+                            <span class="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-[#29ABE2]">Preschool</span>
                             <span class="text-lg font-extrabold text-[#F5A623]">{{ brandName }}</span>
                         </span>
                     </a>
@@ -315,7 +317,7 @@ const submitAdmission = () => {
                         <div class="text-center lg:text-left">
                             <span class="inline-flex items-center gap-2 rounded-full bg-[#fff1d6] px-4 py-1.5 text-sm font-bold text-[#df7a17]">
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.6 6.4L21 9l-5 4.3L17.5 21 12 17.3 6.5 21 8 13.3 3 9l6.4-.6L12 2z"/></svg>
-                                Pendaftaran {{ academicYear }} dibuka
+                                Pendaftaran {{ academicYear }} telah dibuka
                             </span>
 
                             <h1 class="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
@@ -328,7 +330,7 @@ const submitAdmission = () => {
                             </h1>
 
                             <p class="mt-6 text-lg leading-relaxed text-slate-600 sm:text-xl">
-                                {{ brandTagline }} Di {{ brandName }}, setiap hari adalah petualangan baru yang aman, hangat, dan penuh tawa.
+                                Ruang tumbuh untuk bermain dan belajar dengan pendekatan montessori yang berlandaskan nilai tauhid dan sunnah Nabi Muhammad SAW.
                             </p>
 
                             <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row lg:items-start lg:justify-start">
@@ -356,33 +358,13 @@ const submitAdmission = () => {
                         <!-- Ilustrasi hero -->
                         <div class="relative mx-auto w-full max-w-md lg:max-w-none">
                             <div class="absolute inset-0 -z-10 rotate-6 rounded-[3rem] bg-gradient-to-br from-[#29ABE2]/20 to-[#EC008C]/20" aria-hidden="true"></div>
-                            <div class="relative overflow-hidden rounded-[3rem] border-4 border-white bg-gradient-to-br from-[#e8f6ff] via-white to-[#fff1d6] p-8 shadow-2xl shadow-[#29ABE2]/15">
-                                <!-- Ilustrasi SVG friendly: anak membaca buku & bintang (on-brand logo) -->
-                                <svg viewBox="0 0 320 280" class="mx-auto h-auto w-full" role="img" :aria-label="`Ilustrasi anak-anak ceria di ${brandName}`">
-                                    <circle cx="160" cy="140" r="120" fill="#F5A623" opacity="0.12" />
-                                    <circle cx="160" cy="140" r="120" fill="none" stroke="#F5A623" stroke-width="6" stroke-dasharray="10 14" opacity="0.5" />
-                                    <!-- Buku terbuka -->
-                                    <path d="M160 210c-26-16-58-16-78-8V120c20-8 52-8 78 8 26-16 58-16 78-8v82c-20-8-52-8-78 8z" fill="#fff" stroke="#cbd5e1" stroke-width="3"/>
-                                    <path d="M160 210V136" stroke="#cbd5e1" stroke-width="3"/>
-                                    <path d="M96 134c14-5 38-5 52 5M96 150c14-5 38-5 52 5M96 166c14-5 38-5 52 5" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
-                                    <path d="M172 139c14-10 38-10 52-5M172 155c14-10 38-10 52-5M172 171c14-10 38-10 52-5" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/>
-                                    <!-- Anak biru -->
-                                    <circle cx="118" cy="96" r="24" fill="#29ABE2"/>
-                                    <circle cx="118" cy="92" r="18" fill="#ffe0c2"/>
-                                    <path d="M100 86a18 18 0 0136 0z" fill="#1f6f9c"/>
-                                    <circle cx="111" cy="92" r="2.4" fill="#1f2937"/>
-                                    <circle cx="125" cy="92" r="2.4" fill="#1f2937"/>
-                                    <path d="M113 100c3 3 7 3 10 0" stroke="#1f2937" stroke-width="2" fill="none" stroke-linecap="round"/>
-                                    <!-- Anak pink -->
-                                    <circle cx="202" cy="96" r="24" fill="#EC008C"/>
-                                    <circle cx="202" cy="92" r="18" fill="#ffe0c2"/>
-                                    <path d="M184 90a18 18 0 0136 0c0-4-6-16-18-16s-18 12-18 16z" fill="#a30463"/>
-                                    <circle cx="195" cy="92" r="2.4" fill="#1f2937"/>
-                                    <circle cx="209" cy="92" r="2.4" fill="#1f2937"/>
-                                    <path d="M197 100c3 3 7 3 10 0" stroke="#1f2937" stroke-width="2" fill="none" stroke-linecap="round"/>
-                                    <!-- Bintang emas -->
-                                    <path d="M160 40l5 11 12 1-9 8 3 12-11-7-11 7 3-12-9-8 12-1z" fill="#F7B500"/>
-                                </svg>
+                            <div class="relative overflow-hidden rounded-[3rem] border-4 border-white bg-gradient-to-br from-[#e8f6ff] via-white to-[#fff1d6] p-3 shadow-2xl shadow-[#29ABE2]/15">
+                                <img
+                                    src="/albakids/gal/foto-13.jpg"
+                                    :alt="`Keceriaan anak-anak di ${brandName}`"
+                                    loading="eager"
+                                    class="aspect-[4/5] w-full rounded-[2.2rem] object-cover"
+                                >
 
                                 <!-- Kartu mengambang -->
                                 <div class="absolute -left-3 top-10 hidden rotate-[-8deg] rounded-2xl bg-white px-3 py-2 shadow-lg sm:block">
@@ -407,12 +389,12 @@ const submitAdmission = () => {
                         <div class="relative order-2 lg:order-1">
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="space-y-4">
-                                    <div class="flex h-40 items-center justify-center rounded-3xl bg-[#e8f6ff] text-6xl shadow-sm" aria-hidden="true">🧸</div>
-                                    <div class="flex h-28 items-center justify-center rounded-3xl bg-[#fff1d6] text-5xl shadow-sm" aria-hidden="true">🖍️</div>
+                                    <img src="/albakids/gal/foto-10.jpg" alt="Anak-anak ceria Albakids" loading="lazy" class="h-40 w-full rounded-3xl object-cover shadow-sm">
+                                    <img src="/albakids/gal/foto-9.jpg" alt="Kegiatan Albakids" loading="lazy" class="h-28 w-full rounded-3xl object-cover shadow-sm">
                                 </div>
                                 <div class="mt-8 space-y-4">
-                                    <div class="flex h-28 items-center justify-center rounded-3xl bg-[#ffe0ef] text-5xl shadow-sm" aria-hidden="true">🎈</div>
-                                    <div class="flex h-40 items-center justify-center rounded-3xl bg-[#e6faf6] text-6xl shadow-sm" aria-hidden="true">🌈</div>
+                                    <img src="/albakids/gal/foto-1.jpg" alt="Kebersamaan Albakids" loading="lazy" class="h-28 w-full rounded-3xl object-cover shadow-sm">
+                                    <img src="/albakids/gal/foto-5.jpg" alt="Outing class Albakids" loading="lazy" class="h-40 w-full rounded-3xl object-cover shadow-sm">
                                 </div>
                             </div>
                         </div>
@@ -422,21 +404,22 @@ const submitAdmission = () => {
                                 Tumbuh, Bermain, dan Berkembang Bersama Kami
                             </h2>
                             <p class="mt-5 text-lg leading-relaxed text-slate-600">
-                                {{ brandName }} adalah pre-school yang ceria di Bandung. Kami percaya masa awal sekolah harus
-                                terasa menyenangkan dan penuh rasa ingin tahu. Setiap kegiatan dirancang untuk menumbuhkan
-                                kepercayaan diri, kreativitas, dan kemandirian si kecil dengan pendampingan yang hangat.
+                                Kami percaya bahwa setiap anak adalah amanah berharga yang memiliki potensi luar biasa untuk
+                                berkembang melalui cinta, stimulasi yang tepat, dan lingkungan yang positif. Oleh karena itu,
+                                ALBAKIDS menggabungkan pembelajaran akademik dasar, pendidikan karakter, kemandirian, kreativitas,
+                                serta pembiasaan adab dan ibadah sejak dini.
                             </p>
                             <div class="mt-8 grid grid-cols-3 gap-4 text-center">
                                 <div class="rounded-2xl bg-[#fffaf0] p-4">
-                                    <p class="text-3xl font-extrabold text-[#F5A623]">Aktif</p>
+                                    <p class="text-3xl font-extrabold text-[#F5A623]">Grow</p>
                                     <p class="mt-1 text-sm font-semibold text-slate-500">Anak ceria</p>
                                 </div>
                                 <div class="rounded-2xl bg-[#f0f9ff] p-4">
-                                    <p class="text-3xl font-extrabold text-[#29ABE2]">Hangat</p>
+                                    <p class="text-3xl font-extrabold text-[#29ABE2]">Fun</p>
                                     <p class="mt-1 text-sm font-semibold text-slate-500">Guru penyayang</p>
                                 </div>
                                 <div class="rounded-2xl bg-[#fdf0f7] p-4">
-                                    <p class="text-3xl font-extrabold text-[#EC008C]">Aman</p>
+                                    <p class="text-3xl font-extrabold text-[#EC008C]">Faith</p>
                                     <p class="mt-1 text-sm font-semibold text-slate-500">Lingkungan</p>
                                 </div>
                             </div>
@@ -450,32 +433,24 @@ const submitAdmission = () => {
                     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                         <div class="mx-auto max-w-2xl text-center">
                             <span class="inline-flex rounded-full bg-[#fff1d6] px-4 py-1.5 text-sm font-bold text-[#df7a17]">Program Kami</span>
-                            <h2 class="mt-4 text-3xl font-extrabold leading-tight text-slate-900 sm:text-4xl">Pilih Kelas Sesuai Usia Si Kecil</h2>
-                            <p class="mt-4 text-lg text-slate-600">Setiap jenjang dirancang khusus untuk tahap tumbuh kembang yang berbeda.</p>
+                            <h2 class="mt-4 text-3xl font-extrabold leading-tight text-slate-900 sm:text-4xl">Yang Anak Bunda Pelajari</h2>
+                            <p class="mt-4 text-lg text-slate-600">Pembelajaran yang memadukan akademik dasar, pendidikan karakter, serta pembiasaan adab &amp; ibadah sejak dini.</p>
                         </div>
 
-                        <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            <article
-                                v-for="(program, index) in programs"
-                                :key="program.name"
-                                class="group relative overflow-hidden rounded-3xl border border-[#ffe8c2] bg-white p-7 shadow-sm transition hover:-translate-y-1.5 hover:shadow-xl"
+                        <div class="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2">
+                            <div
+                                v-for="(item, index) in curriculum"
+                                :key="item"
+                                class="flex items-start gap-4 rounded-2xl border border-[#ffe8c2] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                             >
-                                <div
-                                    class="flex h-16 w-16 items-center justify-center rounded-2xl text-white shadow-md transition group-hover:scale-110"
-                                    :class="['bg-[#29ABE2]', 'bg-[#EC008C]', 'bg-[#F5A623]'][index % 3]"
+                                <span
+                                    class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-white shadow-sm"
+                                    :class="['bg-[#29ABE2]', 'bg-[#EC008C]', 'bg-[#F5A623]', 'bg-[#1f9d8f]'][index % 4]"
                                 >
-                                    <svg v-if="program.icon === 'blocks'" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="8" y="13" width="8" height="8" rx="2"/></svg>
-                                    <svg v-else-if="program.icon === 'crayon'" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.5l4 4L9 19l-5 1 1-5L16.5 3.5z"/><path stroke-linecap="round" d="M13.5 6.5l4 4"/></svg>
-                                    <svg v-else class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l-2 6 6-2m-4-4a13 13 0 019-9c4 0 7 3 7 7a13 13 0 01-9 9l-2-2-3-3z"/><circle cx="14.5" cy="9.5" r="1.5"/></svg>
-                                </div>
-                                <p class="mt-5 inline-flex rounded-full bg-[#f0f9ff] px-3 py-1 text-xs font-bold text-[#29ABE2]">{{ program.age }}</p>
-                                <h3 class="mt-3 text-2xl font-extrabold text-slate-900">{{ program.name }}</h3>
-                                <p class="mt-2 leading-relaxed text-slate-600">{{ program.desc }}</p>
-                                <a href="#daftar" class="mt-5 inline-flex items-center gap-1.5 text-sm font-bold text-[#EC008C] transition group-hover:gap-2.5">
-                                    Daftarkan anak
-                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 12h12"/></svg>
-                                </a>
-                            </article>
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                </span>
+                                <p class="text-base font-semibold leading-relaxed text-slate-700">{{ item }}</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -484,7 +459,7 @@ const submitAdmission = () => {
                 <section id="keunggulan" class="bg-gradient-to-b from-white to-[#f0f9ff] py-16 lg:py-24">
                     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                         <div class="mx-auto max-w-2xl text-center">
-                            <span class="inline-flex rounded-full bg-[#e6faf6] px-4 py-1.5 text-sm font-bold text-[#1f9d8f]">Mengapa Alba Kids</span>
+                            <span class="inline-flex rounded-full bg-[#e6faf6] px-4 py-1.5 text-sm font-bold text-[#1f9d8f]">Mengapa Albakids</span>
                             <h2 class="mt-4 text-3xl font-extrabold leading-tight text-slate-900 sm:text-4xl">Alasan Orang Tua Mempercayakan Kami</h2>
                             <p class="mt-4 text-lg text-slate-600">Kami hadir untuk menemani langkah pertama si kecil dengan sepenuh hati.</p>
                         </div>
@@ -506,8 +481,7 @@ const submitAdmission = () => {
                                     <svg v-else-if="item.icon === 'users'" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 20a6 6 0 0112 0M16 6a3 3 0 010 6M21 20a6 6 0 00-4-5.6"/></svg>
                                     <svg v-else class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a8 8 0 01-11.6 7.1L4 20l1-5.2A8 8 0 1121 12z"/></svg>
                                 </div>
-                                <h3 class="text-xl font-extrabold text-slate-900">{{ item.title }}</h3>
-                                <p class="mt-2 leading-relaxed text-slate-600">{{ item.desc }}</p>
+                                <p class="text-lg font-bold leading-relaxed text-slate-800">{{ item.text }}</p>
                             </div>
                         </div>
                     </div>
@@ -576,6 +550,33 @@ const submitAdmission = () => {
                                 </figcaption>
                             </figure>
                         </div>
+                    </div>
+                </section>
+
+                <!-- ============================== BIAYA ============================== -->
+                <section id="biaya" class="bg-white py-16 lg:py-24">
+                    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+                        <div class="mx-auto max-w-2xl text-center">
+                            <span class="inline-flex rounded-full bg-[#fff1d6] px-4 py-1.5 text-sm font-bold text-[#df7a17]">Biaya {{ academicYear }}</span>
+                            <h2 class="mt-4 text-3xl font-extrabold leading-tight text-slate-900 sm:text-4xl">Rincian Biaya Pendaftaran</h2>
+                        </div>
+                        <div class="mt-10 overflow-hidden rounded-3xl border border-[#ffd9e6] shadow-sm">
+                            <div class="flex items-center justify-between bg-[#f48aa0] px-6 py-4 text-base font-extrabold uppercase tracking-wide text-white">
+                                <span>Kategori</span><span>Biaya</span>
+                            </div>
+                            <div
+                                v-for="(fee, i) in feeItems"
+                                :key="fee.label"
+                                class="flex items-center justify-between gap-4 px-6 py-3.5 text-sm font-semibold text-slate-700"
+                                :class="i % 2 === 0 ? 'bg-[#fde6ec]' : 'bg-[#fff5f8]'"
+                            >
+                                <span>{{ fee.label }}</span><span class="whitespace-nowrap">{{ fee.amount }}</span>
+                            </div>
+                            <div class="flex items-center justify-between bg-[#f48aa0] px-6 py-4 text-lg font-extrabold text-white">
+                                <span>Total</span><span>Rp 1.785.000</span>
+                            </div>
+                        </div>
+                        <p class="mx-auto mt-5 max-w-xl text-center text-sm font-medium text-slate-500">NB: Khusus bagi putra-putri guru/staff Al-Basyariyah berlaku biaya tersendiri. Silakan menghubungi admin.</p>
                     </div>
                 </section>
 
@@ -751,7 +752,7 @@ const submitAdmission = () => {
                                     <fieldset class="space-y-4">
                                         <legend class="flex items-center gap-2 text-base font-extrabold text-slate-900">
                                             <span class="flex h-7 w-7 items-center justify-center rounded-full bg-[#F5A623] text-sm text-white">3</span>
-                                            Alamat &amp; Bukti Transfer
+                                            Alamat &amp; Dokumen
                                         </legend>
                                         <label class="grid gap-1.5 text-sm font-semibold text-slate-700">
                                             <span>Alamat Lengkap <span class="text-rose-500">*</span></span>
@@ -768,8 +769,34 @@ const submitAdmission = () => {
                                                 class="block w-full cursor-pointer rounded-2xl border border-dashed border-[#29ABE2]/50 bg-[#f0f9ff] px-4 py-3 text-sm text-slate-600 transition file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-[#29ABE2] file:px-4 file:py-2 file:font-bold file:text-white hover:bg-[#e1f3ff] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#29ABE2]/30"
                                                 @input="form.bukti_transfer = $event.target.files[0]"
                                             >
-                                            <span class="text-xs font-normal text-slate-400">Format: JPG, JPEG, PNG, PDF, atau WEBP.</span>
+                                            <span class="text-xs font-normal text-slate-400">Sudah transfer Rp 1.785.000 ke Bank Mandiri a.n. Inna Siti Nurhasanah (1300005641850). Format: JPG, JPEG, PNG, PDF, atau WEBP.</span>
                                             <span v-if="form.errors.bukti_transfer" class="alba-error">{{ form.errors.bukti_transfer }}</span>
+                                        </label>
+
+                                        <label class="grid gap-1.5 text-sm font-semibold text-slate-700">
+                                            <span>Foto Kartu Keluarga (KK) <span class="text-rose-500">*</span></span>
+                                            <input
+                                                type="file"
+                                                accept=".jpg,.jpeg,.png,.pdf,.webp"
+                                                required
+                                                class="block w-full cursor-pointer rounded-2xl border border-dashed border-[#29ABE2]/50 bg-[#f0f9ff] px-4 py-3 text-sm text-slate-600 transition file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-[#29ABE2] file:px-4 file:py-2 file:font-bold file:text-white hover:bg-[#e1f3ff] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#29ABE2]/30"
+                                                @input="form.foto_kk = $event.target.files[0]"
+                                            >
+                                            <span class="text-xs font-normal text-slate-400">Format: JPG, JPEG, PNG, PDF, atau WEBP.</span>
+                                            <span v-if="form.errors.foto_kk" class="alba-error">{{ form.errors.foto_kk }}</span>
+                                        </label>
+
+                                        <label class="grid gap-1.5 text-sm font-semibold text-slate-700">
+                                            <span>Foto Akta Kelahiran <span class="text-rose-500">*</span></span>
+                                            <input
+                                                type="file"
+                                                accept=".jpg,.jpeg,.png,.pdf,.webp"
+                                                required
+                                                class="block w-full cursor-pointer rounded-2xl border border-dashed border-[#29ABE2]/50 bg-[#f0f9ff] px-4 py-3 text-sm text-slate-600 transition file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-[#29ABE2] file:px-4 file:py-2 file:font-bold file:text-white hover:bg-[#e1f3ff] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#29ABE2]/30"
+                                                @input="form.foto_akta = $event.target.files[0]"
+                                            >
+                                            <span class="text-xs font-normal text-slate-400">Format: JPG, JPEG, PNG, PDF, atau WEBP.</span>
+                                            <span v-if="form.errors.foto_akta" class="alba-error">{{ form.errors.foto_akta }}</span>
                                         </label>
                                     </fieldset>
 

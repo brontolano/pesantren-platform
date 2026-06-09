@@ -45,6 +45,8 @@ class LandingRegistrationController extends Controller
             'nominal_transfer' => ['nullable', 'numeric', 'min:0'],
             'tanggal_transfer' => ['nullable', 'date'],
             'bukti_transfer' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf,webp', 'max:5120'],
+            'foto_kk' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,webp', 'max:5120'],
+            'foto_akta' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,webp', 'max:5120'],
         ]);
 
         // Pastikan semua field opsional selalu hadir sebagai key. Form kustom
@@ -120,6 +122,22 @@ class LandingRegistrationController extends Controller
                 sprintf('ppdb-bukti/%s/%s', tenant()?->getTenantKey(), $candidate->getKey()),
                 $disk
             );
+
+            // Dokumen tambahan: foto Kartu Keluarga & Akta Kelahiran (opsional di server,
+            // wajib di form V2). Disimpan hanya bila diunggah agar form landing lain tetap jalan.
+            $docDir = sprintf('ppdb-dokumen/%s/%s', tenant()?->getTenantKey(), $candidate->getKey());
+            $dokumen = [];
+            if ($request->hasFile('foto_kk')) {
+                $dokumen['kk'] = $request->file('foto_kk')->store($docDir, $disk);
+            }
+            if ($request->hasFile('foto_akta')) {
+                $dokumen['akta'] = $request->file('foto_akta')->store($docDir, $disk);
+            }
+            if ($dokumen !== []) {
+                $candidate->update([
+                    'data_ortu' => array_merge($candidate->data_ortu ?? [], ['dokumen' => $dokumen]),
+                ]);
+            }
 
             TagihanPpdb::create([
                 'tenant_id' => tenant()?->getTenantKey(),

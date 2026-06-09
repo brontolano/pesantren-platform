@@ -54,6 +54,13 @@ Route::post('/daftar', [LandingRegistrationController::class, 'store'])
     ->middleware('throttle:ppdb-submit')
     ->name('tenant.landing.register');
 
+// Unduh dokumen pendaftaran (bukti/kk/akta) via signed URL — dipakai di notifikasi
+// WhatsApp ke admin agar bisa membuka file langsung tanpa login.
+Route::get('/ppdb/dok/{candidate}/{type}', [\Modules\PPDB\Http\Controllers\PpdbFileController::class, 'signedDoc'])
+    ->middleware('signed')
+    ->whereIn('type', ['bukti', 'kk', 'akta'])
+    ->name('tenant.ppdb.signed-doc');
+
 // PPDB publik — hanya aktif di domain tenant (controller 404 di central)
 Route::get('/ppdb', [TenantWebsiteController::class, 'ppdbForm'])->name('tenant.ppdb.form');
 Route::post('/ppdb', [TenantWebsiteController::class, 'ppdbStore'])->name('tenant.ppdb.store');

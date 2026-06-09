@@ -5,6 +5,7 @@ namespace Modules\PPDB\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\CalonSantriDokumen;
 use Modules\PPDB\Models\TagihanPpdb;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -28,6 +29,33 @@ class PpdbFileController extends Controller
         abort_unless(is_string($doc->file_url) && Storage::disk($disk)->exists($doc->file_url), 404);
 
         return Storage::disk($disk)->download($doc->file_url);
+    }
+
+    /**
+     * Serve dokumen pendaftaran (bukti/kk/akta) via signed URL — dipakai pada
+     * notifikasi WhatsApp ke admin agar bisa membuka file langsung. Akses
+     * dikontrol oleh tanda tangan URL (middleware 'signed'), bukan login.
+     */
+    public function signedDoc(Request $request, int $candidate, string $type): StreamedResponse
+    {
+        abort_unless(in_array($type, ['bukti', 'kk', 'akta'], true), 404);
+
+        $c = CalonSantri::findOrFail($candidate);
+        $disk = config('filesystems.default', 'local');
+
+        if ($type === 'bukti') {
+            $path = TagihanPpdb::query()
+                ->where('calon_santri_id', $c->getKey())
+                ->whereNotNull('bukti_transfer')
+                ->latest('id')
+                ->value('bukti_transfer');
+        } else {
+            $path = data_get($c->data_ortu, "dokumen.{$type}");
+        }
+
+        abort_unless(is_string($path) && $path !== '' && Storage::disk($disk)->exists($path), 404);
+
+        return Storage::disk($disk)->download($path);
     }
 
     public function bukti(Request $request, int $tagihan): StreamedResponse

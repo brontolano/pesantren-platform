@@ -15,7 +15,8 @@ class TenantLandingPageController extends Controller
     {
         // Tenant dengan landing custom dirender komponen sendiri agar LandingPage
         // default tetap bersih & tenant lain tidak terdampak perubahan custom.
-        $component = AlbaKidsTenant::isActive() ? 'CMS/AlbaKidsLanding' : 'CMS/LandingPage';
+        // Landing utama Alba Kids = V2 (dipromosikan dari /v2 menjadi halaman utama).
+        $component = AlbaKidsTenant::isActive() ? 'CMS/AlbaKidsLandingV2' : 'CMS/LandingPage';
 
         return Inertia::render($component, $this->payload($websiteService));
     }
