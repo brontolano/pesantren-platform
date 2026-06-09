@@ -2,10 +2,12 @@
 
 namespace Modules\Pengadaan\Services;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\SumberDana;
+use Modules\Ledger\Services\AnggaranGuardService;
 use Modules\Ledger\Services\JurnalService;
 use Modules\Pajak\Services\MesinPajakService;
 use Modules\Pengadaan\Events\BelanjaDisetujui;
@@ -92,6 +94,18 @@ class BelanjaService
 
         if (in_array($belanja->status_approval, ['ditolak'], true)) {
             throw new InvalidArgumentException('Belanja sudah ditolak.');
+        }
+
+        // Guard anggaran RKAM (adaptasi Budget Control ERPNext). No-op bila tak ada
+        // pagu untuk akun+dimensi+tahun; melempar bila pagu mode 'blokir' terlampaui.
+        if ($belanja->akun_beban_id) {
+            app(AnggaranGuardService::class)->assertBoleh(
+                (int) $belanja->akun_beban_id,
+                $belanja->divisi_id ? (int) $belanja->divisi_id : null,
+                $belanja->sumber_dana_id ? (int) $belanja->sumber_dana_id : null,
+                (string) Carbon::parse($belanja->tanggal)->year,
+                (float) $belanja->total,
+            );
         }
 
         return DB::transaction(function () use ($belanja, $approvedBy): Belanja {
