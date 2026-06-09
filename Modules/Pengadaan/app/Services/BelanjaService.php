@@ -63,8 +63,10 @@ class BelanjaService
 
         $danaBos = $this->isDanaBos($data['sumber_dana_id'] ?? null);
         $vendorNpwp = (bool) ($data['vendor_npwp'] ?? false);
+        $kehalalan = $this->kehalalanSumber($data['sumber_dana_id'] ?? null);
 
-        $pajak = $this->mesinPajak->hitung($dpp, $jenis, $danaBos, $vendorNpwp);
+        // G1-04: dana syubhat/non-halal → pajak negara tidak dipungut.
+        $pajak = $this->mesinPajak->hitung($dpp, $jenis, $danaBos, $vendorNpwp, $kehalalan);
 
         return Belanja::create([
             'client_ref' => $clientRef,
@@ -200,6 +202,16 @@ class BelanjaService
         $sumber = SumberDana::find($sumberDanaId);
 
         return $sumber !== null && $sumber->kategori === 'negara';
+    }
+
+    /** G1-04: klasifikasi kehalalan sumber dana (default 'halal' bila tak ada). */
+    private function kehalalanSumber(?int $sumberDanaId): string
+    {
+        if (! $sumberDanaId) {
+            return 'halal';
+        }
+
+        return SumberDana::find($sumberDanaId)?->kehalalan ?? 'halal';
     }
 
     private function akunKasDefault(): ?Akun
