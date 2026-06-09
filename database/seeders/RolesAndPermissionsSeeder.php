@@ -49,6 +49,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'upload_own_ppdb_docs',
             // F1 — Approval Workflow (lintas-modul)
             'kelola_approval',
+            // F2 — Audit Trail
+            'lihat_audit',
         ];
 
         foreach ($permissions as $permission) {
@@ -72,6 +74,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_akademik',
                 'manage_akademik',
                 'kelola_approval',
+                'lihat_audit',
             ],
             'tu' => [
                 'view_dashboard',
