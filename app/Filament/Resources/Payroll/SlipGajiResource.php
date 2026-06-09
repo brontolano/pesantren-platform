@@ -88,7 +88,7 @@ class SlipGajiResource extends Resource
                 TextColumn::make('pph21_dipotong')->label('PPh21')->money('IDR'),
                 TextColumn::make('neto')->label('Neto')->money('IDR'),
                 TextColumn::make('status')->label('Status')->badge()
-                    ->color(fn (string $s): string => $s === 'final' ? 'success' : 'gray'),
+                    ->color(fn (?string $state): string => $state === 'final' ? 'success' : 'gray'),
             ])
             ->defaultSort('periode', 'desc')
             ->filters([

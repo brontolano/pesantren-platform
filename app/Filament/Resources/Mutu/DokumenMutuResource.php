@@ -74,10 +74,10 @@ class DokumenMutuResource extends Resource
                 TextColumn::make('jenis')->label('Jenis')->badge(),
                 TextColumn::make('regulasi_acuan')->label('Regulasi')->placeholder('—'),
                 TextColumn::make('status_kelengkapan')->label('Kelengkapan')->badge()
-                    ->color(fn (string $s): string => $s === 'lengkap' ? 'success' : 'warning')
-                    ->formatStateUsing(fn (string $s): string => $s === 'lengkap' ? 'Lengkap' : 'Belum tersedia'),
+                    ->color(fn (?string $state): string => $state === 'lengkap' ? 'success' : 'warning')
+                    ->formatStateUsing(fn (?string $state): string => $state === 'lengkap' ? 'Lengkap' : 'Belum tersedia'),
                 TextColumn::make('status_approval')->label('Approval')->badge()
-                    ->color(fn (?string $s): string => match ($s) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'disetujui' => 'success',
                         'diajukan' => 'warning',
                         'ditolak' => 'danger',
