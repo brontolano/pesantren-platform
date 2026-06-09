@@ -133,7 +133,7 @@ class AnggaranResource extends Resource
                     ->formatStateUsing(fn ($state): string => 'Rp '.number_format((float) $state, 0, ',', '.'))
                     ->color(fn ($state): string => (float) $state < 0 ? 'danger' : 'success')->alignEnd(),
                 TextColumn::make('mode')->label('Mode')->badge()
-                    ->color(fn (string $s): string => $s === 'blokir' ? 'danger' : 'warning'),
+                    ->color(fn (?string $state): string => $state === 'blokir' ? 'danger' : 'warning'),
             ])
             ->defaultSort('tahun_anggaran', 'desc')
             ->filters([

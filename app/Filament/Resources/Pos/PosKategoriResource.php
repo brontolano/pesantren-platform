@@ -91,7 +91,7 @@ class PosKategoriResource extends Resource
             ->columns([
                 TextColumn::make('nama')->label('Nama')->searchable(),
                 TextColumn::make('jenis')->label('Jenis')->badge()
-                    ->color(fn (string $s): string => $s === 'pemasukan' ? 'success' : 'danger'),
+                    ->color(fn (?string $state): string => $state === 'pemasukan' ? 'success' : 'danger'),
                 TextColumn::make('handler')->label('Perilaku')->badge()->color('gray'),
                 TextColumn::make('akun.kode')->label('Akun Lawan')->placeholder('— belum diset'),
                 TextColumn::make('aktif')->label('Status')->badge()

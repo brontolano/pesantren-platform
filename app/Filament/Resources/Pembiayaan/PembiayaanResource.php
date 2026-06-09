@@ -78,7 +78,7 @@ class PembiayaanResource extends Resource
                 TextColumn::make('plafon')->label('Plafon')->money('IDR'),
                 TextColumn::make('dscr')->label('DSCR')->numeric(2),
                 TextColumn::make('zona')->label('Zona')->badge()
-                    ->color(fn (?string $s): string => match ($s) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'aman' => 'success', 'waspada' => 'warning', 'bahaya' => 'danger', default => 'gray',
                     }),
                 TextColumn::make('agunan.nama_aset')->label('Agunan')->placeholder('—'),
