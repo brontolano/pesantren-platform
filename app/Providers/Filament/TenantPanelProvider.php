@@ -247,6 +247,9 @@ class TenantPanelProvider extends PanelProvider
             \App\Filament\Resources\Rekonsiliasi\BankStatementResource::class,
             // Skema Biaya / Pricing (G2-16)
             \App\Filament\Resources\SkemaBiaya\SkemaBiayaResource::class,
+            // Procurement (G2-09)
+            \App\Filament\Resources\Pengadaan\Supplier\SupplierResource::class,
+            \App\Filament\Resources\Pengadaan\PurchaseOrder\PurchaseOrderResource::class,
         ];
     }
 

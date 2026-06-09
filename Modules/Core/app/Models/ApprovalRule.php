@@ -20,6 +20,7 @@ class ApprovalRule extends Model
     /** Tipe model yang bisa di-approve (label untuk UI). Tambah di sini saat rollout. */
     public const APPROVABLE = [
         \Modules\Pengadaan\Models\Belanja::class => 'Belanja / Pengadaan',
+        \Modules\Pengadaan\Models\PurchaseOrder::class => 'Purchase Order',
         \Modules\Payroll\Models\SlipGaji::class => 'Slip Gaji',
         \Modules\Keuangan\Models\Pembayaran::class => 'Pembayaran',
         \Modules\Ledger\Models\Jurnal::class => 'Jurnal Manual',
@@ -32,6 +33,7 @@ class ApprovalRule extends Model
      */
     public const FIELD_OPTIONS = [
         \Modules\Pengadaan\Models\Belanja::class => ['total' => 'Total (DPP + PPN)'],
+        \Modules\Pengadaan\Models\PurchaseOrder::class => ['total' => 'Total PO'],
         \Modules\Payroll\Models\SlipGaji::class => ['bruto' => 'Bruto (gaji kotor)'],
         \Modules\Keuangan\Models\Pembayaran::class => ['nominal' => 'Nominal'],
         \Modules\Ledger\Models\Jurnal::class => ['total_debit' => 'Total Debit'],
