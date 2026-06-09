@@ -139,26 +139,26 @@ const advantages = [
 const testimonials = [
     {
         quote:
-            'Anak saya yang tadinya pemalu kini lebih berani bercerita dan senang berangkat sekolah. Gurunya sabar dan penuh kasih.',
-        name: 'Bunda Rani',
-        role: 'Orang tua murid Kelompok Bermain',
-        initial: 'R',
+            'Alhamdulillah selama 2 tahun sekolah di Albakids, anak saya jadi tidak pemalu lagi. Sudah mulai fokus dalam hal apapun. Pembelajarannya pun seru sehingga anak-anak tidak bosen. Apalagi miss-miss-nya yang selalu ceria dan sabar dalam menghadapi anak-anak. Pokoknya recommended banget buat mommy-mommy yang mau masukin anaknya ke Albakids 😍',
+        name: 'Mom Alwafi',
+        role: 'Wali Murid Albakids',
+        initial: 'A',
         color: '#29ABE2',
     },
     {
         quote:
-            'Suasananya ceria dan bersih. Setiap pulang, anak selalu cerita kegiatan barunya. Pendaftarannya juga mudah sekali.',
-        name: 'Ayah Dimas',
-        role: 'Orang tua murid TK A',
-        initial: 'D',
+            'Alhamdulillah kedua anak saya sekolah di sini 🥰. Sangat merekomendasikan Albakids ini! Fasilitas belajarnya nyaman, bersih, dan aman untuk anak-anak. Metode belajarnya sangat seru sampai anak saya tidak pernah absen dan selalu semangat setiap pagi untuk berangkat sekolah. Lingkungannya sangat mendukung untuk tumbuh kembang anak secara positif karena berada di dalam Pondok Pesantren Al-Basyariyah 🥰✨',
+        name: 'Mom Aira',
+        role: 'Wali Murid Albakids',
+        initial: 'A',
         color: '#EC008C',
     },
     {
         quote:
-            'Komunikasi dengan guru sangat baik. Saya merasa dilibatkan dalam tumbuh kembang anak. Sangat direkomendasikan untuk PAUD di Bandung.',
-        name: 'Bunda Sari',
-        role: 'Orang tua murid TK B',
-        initial: 'S',
+            'Alhamdulillah pengalaman yang luar biasa bagi kami, terutama anak kami belajar di Albakids. Yang mulanya anak kami sulit bergaul dengan teman sebayanya, alhamdulillah sekarang menjadi lebih mudah bergaul. Selama pembelajaran bersama Albakids, anak kami merasa senang dan bahagia karena metode yang digunakan sangat menyenangkan. Anak kami pun belajar agama dan menerapkannya secara bertahap sehingga mudah menyerap semua yang diajarkan para guru Albakids. Terima kasih Albakids telah mengajarkan karakter dan ilmu yang jauh lebih baik dari sebelumnya.',
+        name: 'Mom Akash',
+        role: 'Wali Murid Albakids',
+        initial: 'A',
         color: '#F5A623',
     },
 ]
@@ -285,7 +285,7 @@ const submitAdmission = () => {
                             class="h-12 w-12 shrink-0 object-contain"
                         >
                         <span class="flex flex-col leading-tight">
-                            <span class="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-[#29ABE2]">Preschool</span>
+                            <span class="text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#29ABE2]">Welcome to</span>
                             <span class="text-lg font-extrabold text-[#F5A623]">{{ brandName }}</span>
                         </span>
                     </a>
@@ -461,15 +461,15 @@ const submitAdmission = () => {
                             <div class="mt-8 grid grid-cols-3 gap-4 text-center">
                                 <div class="rounded-2xl bg-[#fffaf0] p-4">
                                     <p class="text-3xl font-extrabold text-[#F5A623]">Grow</p>
-                                    <p class="mt-1 text-sm font-semibold text-slate-500">Anak ceria</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-500">Bertumbuh</p>
                                 </div>
                                 <div class="rounded-2xl bg-[#f0f9ff] p-4">
                                     <p class="text-3xl font-extrabold text-[#29ABE2]">Fun</p>
-                                    <p class="mt-1 text-sm font-semibold text-slate-500">Guru penyayang</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-500">menyenangkan</p>
                                 </div>
                                 <div class="rounded-2xl bg-[#fdf0f7] p-4">
                                     <p class="text-3xl font-extrabold text-[#EC008C]">Faith</p>
-                                    <p class="mt-1 text-sm font-semibold text-slate-500">Lingkungan</p>
+                                    <p class="mt-1 text-sm font-semibold text-slate-500">dengan iman</p>
                                 </div>
                             </div>
                         </div>
