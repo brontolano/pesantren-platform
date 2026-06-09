@@ -25,6 +25,9 @@ class PpdbReregistrationServiceTest extends TestCase
         parent::setUp();
 
         $this->truncatePpdbTables([
+            'penempatan_asrama',
+            'kamar_asrama',
+            'blok_asrama',
             'hasil_ujian',
             'santri',
             'calon_santri',
@@ -161,6 +164,90 @@ class PpdbReregistrationServiceTest extends TestCase
         app(PpdbReregistrationService::class)->register(1, [
             'tahun_angkatan' => '2026/2027',
         ]);
+    }
+
+    public function test_register_menempatkan_santri_ke_kamar_asrama(): void
+    {
+        tenancy()->initialize($this->tenantA);
+
+        $blok = \Modules\Asrama\Models\BlokAsrama::create([
+            'tenant_id' => $this->tenantA->getKey(),
+            'nama_blok' => 'Blok A',
+            'is_active' => true,
+        ]);
+
+        $kamar = \Modules\Asrama\Models\KamarAsrama::create([
+            'tenant_id' => $this->tenantA->getKey(),
+            'blok_id' => $blok->id,
+            'nomor_kamar' => 'A-101',
+            'kapasitas' => 2,
+            'is_active' => true,
+        ]);
+
+        $candidate = $this->makeAcceptedCandidate('PPDB-2026-206', 'Yusuf');
+
+        $updated = app(PpdbReregistrationService::class)->register($candidate, [
+            'tahun_angkatan' => '2026/2027',
+            'kamar_asrama_id' => $kamar->id,
+        ]);
+
+        $penempatan = \Modules\Asrama\Models\PenempatanAsrama::query()
+            ->where('santri_id', $updated->santri_id)
+            ->where('is_current', true)
+            ->first();
+
+        $this->assertNotNull($penempatan, 'Santri harus tertempatkan ke kamar saat daftar ulang.');
+        $this->assertSame($kamar->id, (int) $penempatan->kamar_id);
+
+        tenancy()->end();
+    }
+
+    public function test_register_menolak_kamar_penuh(): void
+    {
+        tenancy()->initialize($this->tenantA);
+
+        $blok = \Modules\Asrama\Models\BlokAsrama::create([
+            'tenant_id' => $this->tenantA->getKey(),
+            'nama_blok' => 'Blok B',
+            'is_active' => true,
+        ]);
+        $kamar = \Modules\Asrama\Models\KamarAsrama::create([
+            'tenant_id' => $this->tenantA->getKey(),
+            'blok_id' => $blok->id,
+            'nomor_kamar' => 'B-101',
+            'kapasitas' => 1,
+            'is_active' => true,
+        ]);
+
+        // Isi kamar hingga penuh lewat santri lain.
+        $santriLama = Santri::create([
+            'tenant_id' => $this->tenantA->getKey(),
+            'nis' => 'S20260777',
+            'nama' => 'Santri Penghuni',
+            'tanggal_lahir' => '2010-01-01',
+            'jenis_kelamin' => 'L',
+            'status' => 'aktif',
+        ]);
+        \Modules\Asrama\Models\PenempatanAsrama::create([
+            'tenant_id' => $this->tenantA->getKey(),
+            'santri_id' => $santriLama->id,
+            'kamar_id' => $kamar->id,
+            'tanggal_masuk' => now()->toDateString(),
+            'is_current' => true,
+            'status' => 'aktif',
+        ]);
+
+        $candidate = $this->makeAcceptedCandidate('PPDB-2026-207', 'Idris');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('penuh');
+
+        app(PpdbReregistrationService::class)->register($candidate, [
+            'tahun_angkatan' => '2026/2027',
+            'kamar_asrama_id' => $kamar->id,
+        ]);
+
+        tenancy()->end();
     }
 
     private function makeAcceptedCandidate(string $nomor, string $nama, string $gender = 'L'): CalonSantri
