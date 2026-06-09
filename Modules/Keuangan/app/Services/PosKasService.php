@@ -2,6 +2,7 @@
 
 namespace Modules\Keuangan\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\Keuangan\Models\PosKategori;
@@ -224,16 +225,87 @@ class PosKasService
         $sesi = $this->resolveSesi($sesi);
         $this->ensureBuka($sesi); // tak bisa tutup sesi yang sudah tutup
 
-        $saldoSistem = $this->recomputeSaldoSistem($sesi);
+        return DB::transaction(function () use ($sesi, $saldoFisik): PosSesi {
+            $saldoSistem = $this->recomputeSaldoSistem($sesi);
+            $selisih = round($saldoFisik - $saldoSistem, 2);
 
-        $sesi->update([
-            'saldo_fisik' => round($saldoFisik, 2),
-            'selisih' => round($saldoFisik - $saldoSistem, 2),
-            'status' => 'tutup',
-            'ditutup_pada' => now(),
+            $sesi->update([
+                'saldo_fisik' => round($saldoFisik, 2),
+                'selisih' => $selisih,
+                'status' => 'tutup',
+                'ditutup_pada' => now(),
+            ]);
+
+            // POS Closing Entry (pola ERPNext): selisih kas masuk Buku Besar.
+            $this->postingSelisih($sesi, $selisih);
+
+            return $sesi->fresh();
+        });
+    }
+
+    /**
+     * Posting jurnal selisih kas saat tutup sesi (POS Closing Entry).
+     *   selisih > 0 (kas fisik > sistem / LEBIH): Debit Kas, Kredit Selisih Kas.
+     *   selisih < 0 (KURANG): Debit Selisih Kas, Kredit Kas.
+     * Idempoten via (ref_type=PosSesiSelisih, ref_id=sesi). Menahan diri (null)
+     * bila akun kas / akun selisih belum dikonfigurasi — tak menggagalkan tutup sesi.
+     */
+    private function postingSelisih(PosSesi $sesi, float $selisih): ?Jurnal
+    {
+        if (abs($selisih) < 0.005) {
+            return null; // kas pas → tak perlu jurnal
+        }
+
+        $kas = Akun::kasBank()->where('is_postable', true)->orderBy('kode')->first();
+        $akunSelisih = $this->resolveAkunSelisih();
+
+        if ($kas === null || $akunSelisih === null) {
+            return null;
+        }
+
+        $nominal = abs($selisih);
+        $memo = 'Selisih kas tutup sesi POS #'.$sesi->id;
+
+        $baris = $selisih > 0
+            ? [
+                ['akun_id' => $kas->id, 'debit' => $nominal, 'kredit' => 0, 'memo' => $memo.' (lebih)'],
+                ['akun_id' => $akunSelisih->id, 'debit' => 0, 'kredit' => $nominal, 'memo' => $memo],
+            ]
+            : [
+                ['akun_id' => $akunSelisih->id, 'debit' => $nominal, 'kredit' => 0, 'memo' => $memo],
+                ['akun_id' => $kas->id, 'debit' => 0, 'kredit' => $nominal, 'memo' => $memo.' (kurang)'],
+            ];
+
+        return app(JurnalService::class)->postJurnal([
+            'tanggal' => now(),
+            'deskripsi' => $memo,
+            'tipe_sumber' => 'pos',
+            'ref_type' => 'PosSesiSelisih',
+            'ref_id' => (string) $sesi->id,
+            'dibuat_oleh' => $sesi->kasir_id,
+            'baris' => $baris,
         ]);
+    }
 
-        return $sesi->fresh();
+    /**
+     * Akun lawan selisih kas: dari Setting `pos_akun_selisih_id`, atau fallback
+     * akun postable bernama "Selisih Kas". Null bila belum disiapkan.
+     */
+    private function resolveAkunSelisih(): ?Akun
+    {
+        $id = Setting::getTenantStringValue('pos_akun_selisih_id');
+        if (! empty($id)) {
+            $akun = Akun::query()->where('is_postable', true)->find($id);
+            if ($akun !== null) {
+                return $akun;
+            }
+        }
+
+        return Akun::query()
+            ->where('is_postable', true)
+            ->where('nama', 'like', '%Selisih Kas%')
+            ->orderBy('kode')
+            ->first();
     }
 
     /** Hitung ulang & simpan saldo_sistem dari transaksi sesi. */
