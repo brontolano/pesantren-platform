@@ -192,6 +192,7 @@ return [
         '--path' => [
             database_path('migrations/tenant'),
             // Migrasi modul operasional dijalankan pada DB tiap tenant
+            base_path('Modules/Core/database/migrations'),
             base_path('Modules/Akademik/database/migrations'),
             base_path('Modules/Asrama/database/migrations'),
             base_path('Modules/CMS/database/migrations'),

@@ -236,6 +236,9 @@ class TenantPanelProvider extends PanelProvider
             KunjunganWaliResource::class,
             MediaFileResource::class,
             \App\Filament\Resources\Media\MediaAuditResource::class,
+            // Pengaturan / Persetujuan (F1 Approval Workflow)
+            \App\Filament\Resources\Approval\ApprovalRequestResource::class,
+            \App\Filament\Resources\Approval\ApprovalRuleResource::class,
         ];
     }
 
