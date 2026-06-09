@@ -45,6 +45,10 @@ Route::get('/', function () {
     return app()->call([app(TenantLandingPageController::class), '__invoke']);
 })->name('home');
 
+// Landing AlbaKids VERSI 2 (permanen di git) — /v2. Controller v2() meng-abort
+// 404 untuk tenant non-AlbaKids & domain central, jadi aman sebagai route biasa.
+Route::get('/v2', [TenantLandingPageController::class, 'v2'])->name('tenant.landing.v2');
+
 // Submit formulir landing page tenant-specific (contoh: Alba Kids).
 Route::post('/daftar', [LandingRegistrationController::class, 'store'])
     ->middleware('throttle:ppdb-submit')
