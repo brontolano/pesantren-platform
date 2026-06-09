@@ -26,6 +26,7 @@ class ApprovalRule extends Model
         \Modules\Ledger\Models\Jurnal::class => 'Jurnal Manual',
         \Modules\Payroll\Models\Cuti::class => 'Cuti / Leave',
         \Modules\Pembiayaan\Models\MutasiAset::class => 'Mutasi / Pelepasan Aset',
+        \Modules\Mutu\Models\MutuTemuan::class => 'Temuan Mutu (Non-Conformance)',
     ];
 
     /**
@@ -41,6 +42,7 @@ class ApprovalRule extends Model
         \Modules\Ledger\Models\Jurnal::class => ['total_debit' => 'Total Debit'],
         \Modules\Payroll\Models\Cuti::class => ['jumlah_hari' => 'Jumlah Hari'],
         \Modules\Pembiayaan\Models\MutasiAset::class => ['harga_jual' => 'Harga Jual / Pelepasan'],
+        \Modules\Mutu\Models\MutuTemuan::class => ['severity_level' => 'Tingkat Keparahan (1-3)'],
     ];
 
     /** Operator perbandingan yang didukung engine terpicu(). */
