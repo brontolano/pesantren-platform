@@ -56,6 +56,27 @@ class SertifikatKehalalanPageTest extends TestCase
         tenancy()->end();
     }
 
+    public function test_laporan_tahan_tanpa_akun_dana_kebajikan(): void
+    {
+        // Simulasikan tenant lama yang belum men-seed akun Dana Kebajikan (2-2000).
+        $page = $this->bootPage('skh3');
+        $induk = \Modules\Ledger\Models\Akun::query()->where('kode', '2-2000')->first();
+        if ($induk) {
+            $induk->children()->delete();
+            $induk->delete();
+        }
+
+        // Pelaporan harus tahan banting (saldo 0), tidak melempar 500.
+        $this->assertSame(0.0, app(\Modules\Ledger\Services\KehalalanService::class)->saldoDanaKebajikan());
+
+        $resp = $page->unduhSertifikat();
+        ob_start();
+        $resp->sendContent();
+        $isi = ob_get_clean();
+        $this->assertStringContainsString('SERTIFIKAT KEHALALAN', $isi);
+        tenancy()->end();
+    }
+
     public function test_ekspor_csv_ringkasan(): void
     {
         $page = $this->bootPage('skh2');

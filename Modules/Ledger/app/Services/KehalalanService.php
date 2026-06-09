@@ -86,6 +86,13 @@ class KehalalanService
     /** Saldo Dana Kebajikan berjalan (dari dana syubhat/non-halal). */
     public function saldoDanaKebajikan(): float
     {
+        // Toleran untuk pelaporan: tenant yang belum men-seed akun Dana Kebajikan
+        // (2-2000) cukup dianggap saldo 0 — jangan sampai laporan/sertifikat 500.
+        // Jalur posting (penerimaan/penyaluran) tetap menjaga guard akunnya sendiri.
+        if (! Akun::query()->where('kode', DanaKebajikanService::AKUN_DANA_KEBAJIKAN)->exists()) {
+            return 0.0;
+        }
+
         return $this->danaKebajikan->saldo();
     }
 
