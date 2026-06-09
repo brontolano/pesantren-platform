@@ -40,9 +40,21 @@ trait Auditable
         return $this->morphMany(AuditLog::class, 'auditable');
     }
 
+    /** Cache ketersediaan tabel audit_log, per nama database (aman lintas tenant). */
+    private static array $auditTableTersedia = [];
+
     /** Catat baris audit (juga dipakai untuk aksi domain: approve/post/reverse). */
-    public function tulisAudit(string $aksi, array $before = [], array $after = []): AuditLog
+    public function tulisAudit(string $aksi, array $before = [], array $after = []): ?AuditLog
     {
+        // Audit bersifat side-effect: TIDAK boleh memecah operasi domain bila tabel
+        // audit_log belum ada (mis. skema test parsial). Di produksi audit_log selalu
+        // ada → selalu mencatat. Guard di-cache per-DB agar overhead minimal.
+        $conn = AuditLog::query()->getConnection();
+        $db = $conn->getDatabaseName();
+        if (! (self::$auditTableTersedia[$db] ??= $conn->getSchemaBuilder()->hasTable('audit_log'))) {
+            return null;
+        }
+
         return AuditLog::create([
             'auditable_type' => static::class,
             'auditable_id' => $this->getKey(),

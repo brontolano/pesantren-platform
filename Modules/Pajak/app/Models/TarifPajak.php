@@ -4,10 +4,11 @@ namespace Modules\Pajak\Models;
 
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Core\Concerns\Auditable;
 
 class TarifPajak extends Model
 {
-    use BelongsToTenant;
+    use Auditable, BelongsToTenant;
 
     protected $table = 'tarif_pajak';
 
