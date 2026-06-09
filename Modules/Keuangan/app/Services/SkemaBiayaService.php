@@ -45,22 +45,24 @@ class SkemaBiayaService
             return null;
         }
 
-        $tagihan = app(TagihanService::class)->buatTagihanUntukSantri($santri, [
+        // G2-15: BOS/BOP (dana negara) ditanggung institusi → tak ditagihkan ke wali.
+        if (! app(FundAwareBillingService::class)->bolehDibebankanKeWali($skema->sumber_dana_id)) {
+            return null;
+        }
+
+        return app(TagihanService::class)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => $jenis,
             'nominal' => (float) $skema->nominal,
             'diskon' => (float) ($opsi['diskon'] ?? 0),
+            'sumber_dana_id' => $skema->sumber_dana_id,       // fund-aware (G2-15)
+            'divisi_id' => $opsi['divisi_id'] ?? null,
+            'divisi_unit_id' => $opsi['divisi_id'] ?? null,
+            'is_dibayar_dimuka' => (bool) ($opsi['is_dibayar_dimuka'] ?? false),
             'periode_akademik' => $tahun,
             'jatuh_tempo' => $opsi['jatuh_tempo'] ?? null,
             'bulan_masehi' => $opsi['bulan_masehi'] ?? null,
             'keterangan' => $opsi['keterangan'] ?? $skema->keterangan,
         ]);
-
-        // Dana penanggung dari skema (mis. SPP via swadaya) — sisi penagihan.
-        if ($skema->sumber_dana_id) {
-            $tagihan->update(['sumber_dana_id' => $skema->sumber_dana_id]);
-        }
-
-        return $tagihan->fresh();
     }
 
     private function ensureTenantContext(): void

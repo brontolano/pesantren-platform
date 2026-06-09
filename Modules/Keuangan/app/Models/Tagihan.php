@@ -29,6 +29,7 @@ class Tagihan extends Model
         'nominal_akhir',
         'jatuh_tempo',
         'status',
+        'is_dibayar_dimuka',
         'periode_akademik',
         'bulan_masehi',
         'bulan_hijriah',
@@ -40,6 +41,7 @@ class Tagihan extends Model
         'diskon' => 'decimal:2',
         'nominal_akhir' => 'decimal:2',
         'jatuh_tempo' => 'date',
+        'is_dibayar_dimuka' => 'boolean',
     ];
 
     // --- Relationships ---
