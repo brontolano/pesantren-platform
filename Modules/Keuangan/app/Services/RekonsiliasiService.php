@@ -65,6 +65,65 @@ class RekonsiliasiService
         ];
     }
 
+    /**
+     * Jaring pengaman I-7: deteksi tagihan yang status tersimpannya TIDAK cocok
+     * dengan status hasil hitung-ulang dari pembayaran terverifikasi (status
+     * drift). Drift menandakan state-machine pernah terlewati / data manual —
+     * harus dialarmkan. Mengembalikan daftar anomali (kosong = sehat).
+     *
+     * @return list<array{tagihan_id:int,status_tersimpan:string,status_seharusnya:string,total_verified:float,nominal_akhir:float}>
+     */
+    public function deteksiAnomaliStatus(): array
+    {
+        $this->ensureTenantContext();
+
+        $anomali = [];
+
+        Tagihan::query()
+            ->whereNull('deleted_at')
+            ->where('status', '!=', 'batal')
+            ->chunkById(200, function ($tagihans) use (&$anomali): void {
+                foreach ($tagihans as $tagihan) {
+                    $verified = (float) $tagihan->pembayaran()
+                        ->where('is_verified', true)
+                        ->sum('nominal');
+
+                    $nominalAkhir = (float) $tagihan->nominal_akhir;
+                    $seharusnya = $this->statusDari($verified, $nominalAkhir);
+
+                    if ($seharusnya !== $tagihan->status) {
+                        $anomali[] = [
+                            'tagihan_id' => $tagihan->id,
+                            'status_tersimpan' => $tagihan->status,
+                            'status_seharusnya' => $seharusnya,
+                            'total_verified' => $verified,
+                            'nominal_akhir' => $nominalAkhir,
+                        ];
+                    }
+                }
+            });
+
+        return $anomali;
+    }
+
+    /**
+     * Aturan status kanonik (independen dari PembayaranService) — dipakai untuk
+     * verifikasi-silang. Sengaja diduplikasi agar rekonsiliasi menjadi sumber
+     * kebenaran kedua yang berdiri sendiri.
+     */
+    private function statusDari(float $verified, float $nominalAkhir): string
+    {
+        if ($verified >= $nominalAkhir && $nominalAkhir > 0) {
+            return 'lunas';
+        }
+
+        if ($verified > 0) {
+            return 'sebagian';
+        }
+
+        return 'belum_bayar';
+    }
+
     private function ensureTenantContext(): void
     {
         if (! tenancy()->initialized || tenancy()->tenant === null) {

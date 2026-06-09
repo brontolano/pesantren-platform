@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RolesAndPermissionsSeeder::class);
+        $this->call(ModuleRegistrySeeder::class); // katalog modul CENTRAL (idempotent)
         $this->call(WilayahSeeder::class);
 
         $tenants = Tenant::all();
