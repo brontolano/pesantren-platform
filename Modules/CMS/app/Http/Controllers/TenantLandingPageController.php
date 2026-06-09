@@ -13,15 +13,30 @@ class TenantLandingPageController extends Controller
 {
     public function __invoke(TenantWebsiteService $websiteService): Response
     {
-        $website = $websiteService->buildLandingPagePayload();
-
         // Tenant dengan landing custom dirender komponen sendiri agar LandingPage
         // default tetap bersih & tenant lain tidak terdampak perubahan custom.
         $component = AlbaKidsTenant::isActive() ? 'CMS/AlbaKidsLanding' : 'CMS/LandingPage';
 
-        return Inertia::render($component, [
+        return Inertia::render($component, $this->payload($websiteService));
+    }
+
+    /**
+     * Landing AlbaKids VERSI 2 di /v2 — permanen di git (pengganti versi
+     * container-only yang hilang saat rebuild). Hanya untuk tenant AlbaKids.
+     */
+    public function v2(TenantWebsiteService $websiteService): Response
+    {
+        abort_unless(AlbaKidsTenant::isActive(), 404);
+
+        return Inertia::render('CMS/AlbaKidsLandingV2', $this->payload($websiteService));
+    }
+
+    /** Props bersama landing (kontrak komponen: tenant, website, blog). */
+    private function payload(TenantWebsiteService $websiteService): array
+    {
+        return [
             'tenant' => tenant(),
-            'website' => $website,
+            'website' => $websiteService->buildLandingPagePayload(),
             'blog' => [
                 'indexUrl' => '/#blog',
                 'hasPublishedArticles' => Article::query()
@@ -29,6 +44,6 @@ class TenantLandingPageController extends Controller
                     ->whereNotNull('published_at')
                     ->exists(),
             ],
-        ]);
+        ];
     }
 }
