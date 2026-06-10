@@ -19,6 +19,10 @@ use Throwable;
  * MURNI RULE-BASED, TANPA LLM (Blueprint §4.2 langkah 1): match → respons
  * template + log, SELESAI. Urutan evaluasi pre() MURAH → MAHAL:
  *
+ *   a0. gerbang modul    — T-A012: modul `ai` tidak tampil/aktif untuk tenant
+ *      (ModuleService: development non-demo / released belum diaktifkan di
+ *      tenant_modules) → tolak santun. Halaman Filament sudah digerbangi
+ *      T-A011; gerbang ini menutup jalur API/gateway-nya;
  *   a. gerbang aktivasi  — ada pengaturan aktif (Wizard tuntas; versi aktif
  *      hanya lahir dari provisioning v1 atau lifecycle approval T-A010,
  *      jadi keberadaannya = sudah melewati gerbang approval kyai; saldo
@@ -47,6 +51,23 @@ class PolicyEngine
     {
         if ($tenantId === null) {
             return PolicyDecision::lolos('konteks central — kebijakan tenant tidak berlaku');
+        }
+
+        // (a0) Gerbang modul (T-A012): modul `ai` yang tidak tampil/aktif
+        // untuk tenant ini (development non-demo / released tanpa aktivasi
+        // tenant_modules) ditolak santun SEBELUM cek apa pun — menonaktifkan
+        // modul per tenant mematikan jalur gateway, bukan hanya halaman panel.
+        $modulAktif = app(\App\Services\ModuleService::class)
+            ->isVisibleForTenant('ai', tenancy()->initialized ? tenant() : null);
+
+        if (! $modulAktif) {
+            return $this->blokir(
+                $request,
+                kategori: 'modul_nonaktif',
+                alasan: "modul 'ai' tidak aktif untuk tenant {$tenantId} (module_registry/tenant_modules)",
+                template: $this->template('modul_nonaktif'),
+                eskalasi: false,
+            );
         }
 
         // (a) Gerbang aktivasi: tanpa pengaturan aktif = Wizard belum tuntas.

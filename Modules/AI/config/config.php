@@ -261,6 +261,12 @@ return [
             'fitur_per_peran',
             'consent_ortu',
         ],
+
+        // T-A012: umur tautan bertanda tangan (signed URL) halaman ringkasan
+        // kebijakan untuk kyai/pimpinan. Tautan HANYA menampilkan ringkasan
+        // (baca-saja, tanpa login); persetujuan tetap wajib login + permission
+        // ai.setting.setujui di panel.
+        'tautan_ringkasan_jam' => (int) env('AI_TAUTAN_RINGKASAN_JAM', 72),
     ],
 
     /*
@@ -326,6 +332,10 @@ return [
         // TANPA konten fikih). Tenant bisa override per rule lewat
         // ai_policy_rule.respons_template.
         'pesan' => [
+            // T-A012: modul `ai` tidak tampil/aktif untuk tenant ini
+            // (module_registry status development bukan tenant demo, atau
+            // released tapi belum diaktifkan di tenant_modules).
+            'modul_nonaktif' => 'Mohon maaf, modul asisten AI belum diaktifkan untuk pesantren Anda. Silakan hubungi pengelola platform bila pesantren ingin menggunakannya.',
             'belum_dikonfigurasi' => 'Mohon maaf, modul AI pesantren Anda belum selesai dikonfigurasi. Silakan hubungi admin untuk menuntaskan pengaturan terlebih dahulu.',
             'di_luar_jam' => 'Mohon maaf, layanan asisten sedang di luar jam operasional. Pertanyaan Anda kami catat dan akan ditindaklanjuti pada jam layanan.',
             'fitur_tidak_diizinkan' => 'Mohon maaf, fitur asisten ini tidak tersedia untuk akun Anda. Silakan hubungi admin pesantren bila membutuhkannya.',

@@ -35,7 +35,9 @@ trait InteractsWithPpdbTestDatabase
         Config::set('database.default', 'pgsql');
         Config::set('database.connections.pgsql.host', '127.0.0.1');
         Config::set('database.connections.pgsql.port', '5432');
-        Config::set('database.connections.pgsql.database', 'pesantren_platform_test');
+        // TEST_DB_DATABASE: override utk sesi/worktree paralel — dua sesi yang
+        // berbagi satu DB test saling TRUNCATE/DROP (FK violation acak masif).
+        Config::set('database.connections.pgsql.database', env('TEST_DB_DATABASE', 'pesantren_platform_test'));
         Config::set('database.connections.pgsql.username', 'postgres');
         Config::set('database.connections.pgsql.password', 'secret');
         Config::set('database.connections.tenant', Config::get('database.connections.pgsql'));

@@ -35,6 +35,8 @@ class AiInjectionSuiteTest extends TestCase
 
         $this->ensurePpdbTestingSchemaReady(['ai_model_config', 'ai_audit_log']);
         DB::table('ai_model_config')->truncate();
+        // Baseline gating modul T-A012: registry kosong = modul tampil.
+        DB::table('module_registry')->delete();
         Cache::flush();
     }
 

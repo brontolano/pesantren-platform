@@ -48,6 +48,8 @@ class AiPromptRegistryTest extends TestCase
         // TRUNCATE CASCADE: tenants ikut membersihkan override; ai_agent ikut
         // membersihkan ai_prompt_version (FK cascade).
         $this->truncatePpdbTables(['domains', 'tenants', 'ai_agent']);
+        // Baseline gating modul T-A012: registry kosong = modul tampil.
+        DB::table('module_registry')->delete();
         Cache::flush();
     }
 
