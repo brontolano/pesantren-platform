@@ -126,6 +126,31 @@ class PembayaranInvarianTest extends TestCase
         $svc->tolakPembayaran($bayar->fresh(), $verifier->id, 'coba tolak setelah verifikasi');
     }
 
+    public function test_i3_batalkan_pembayaran_terverifikasi_ditolak_record_tetap_ada(): void
+    {
+        $tagihan = $this->tagihan(300000);
+        $svc = new PembayaranService();
+        $verifier = $this->verifier();
+
+        $bayar = $svc->inputPembayaran($tagihan, ['nominal' => 100000]);
+        $svc->verifikasiPembayaran($bayar, $verifier->id);
+
+        try {
+            $svc->batalkanPembayaran($bayar->fresh());
+            $this->fail('Batalkan pembayaran terverifikasi harus ditolak — jurnal sudah terposting.');
+        } catch (InvalidArgumentException) {
+        }
+
+        // Record TIDAK terhapus & status tagihan utuh.
+        $this->assertNotNull(Pembayaran::query()->find($bayar->id));
+        $this->assertTrue((bool) Pembayaran::query()->find($bayar->id)->is_verified);
+
+        // Pembayaran BELUM terverifikasi tetap bisa dibatalkan (jalur sah).
+        $bayar2 = $svc->inputPembayaran($tagihan->fresh(), ['nominal' => 50000]);
+        $svc->batalkanPembayaran($bayar2);
+        $this->assertNull(Pembayaran::query()->find($bayar2->id));
+    }
+
     // ─── I-4 (#30) Idempotensi operasi uang ────────────────────────────────
 
     public function test_i4_verifikasi_dua_kali_ditolak_tanpa_duplikasi(): void
