@@ -244,14 +244,22 @@ class PembayaranService
     {
         $this->ensureTenantContext();
 
-        $model = $pembayaran instanceof Pembayaran
-            ? $pembayaran
-            : Pembayaran::query()->findOrFail($pembayaran);
+        $pembayaranId = $pembayaran instanceof Pembayaran ? $pembayaran->id : $pembayaran;
 
-        $tagihan = $model->tagihan;
+        // Lock + guard is_verified dalam transaksi — pembatalan tidak boleh
+        // balapan dengan verifikasi: pembayaran terverifikasi sudah terposting
+        // ke jurnal Ledger; menghapusnya membuat buku besar tak sinkron.
+        DB::transaction(function () use ($pembayaranId): void {
+            $locked = Pembayaran::query()->whereKey($pembayaranId)->lockForUpdate()->firstOrFail();
 
-        DB::transaction(function () use ($model, $tagihan): void {
-            $model->delete();
+            if ($locked->is_verified) {
+                throw new InvalidArgumentException(
+                    'Pembayaran sudah diverifikasi, batalkan lewat mekanisme koreksi jurnal.'
+                );
+            }
+
+            $tagihan = $locked->tagihan;
+            $locked->delete();
             $this->updateStatusTagihan($tagihan->fresh());
         });
     }
