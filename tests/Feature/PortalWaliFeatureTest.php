@@ -187,7 +187,9 @@ class PortalWaliFeatureTest extends TestCase
             ->where('summary.sentCount', 1)
             ->where('summary.failedCount', 0)
             ->has('notifications', 1)
-            ->where('navigation.2.active', true)
+            // Notifikasi BUKAN item bottom-nav (redesign 5 tab: Beranda/Tagihan/
+            // Pembayaran/Tabungan/Akun) → tak ada tab yang aktif di halaman ini.
+            ->where('navigation.2.active', false)
         );
 
         $izinResponse = $this
