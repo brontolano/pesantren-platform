@@ -32,4 +32,24 @@ final readonly class AiGenerateRequest
         public ?string $idempotencyKey = null,
         public ?string $ringkasanKonteks = null,
     ) {}
+
+    /**
+     * Salinan request dengan system prompt terisi (dipakai gateway saat
+     * menyuntik hasil PromptRegistry, T-A004) — DTO tetap immutable.
+     */
+    public function withSystem(?string $system): self
+    {
+        return new self(
+            prompt: $this->prompt,
+            system: $system,
+            agent: $this->agent,
+            tier: $this->tier,
+            options: $this->options,
+            timeoutSeconds: $this->timeoutSeconds,
+            channel: $this->channel,
+            userId: $this->userId,
+            idempotencyKey: $this->idempotencyKey,
+            ringkasanKonteks: $this->ringkasanKonteks,
+        );
+    }
 }

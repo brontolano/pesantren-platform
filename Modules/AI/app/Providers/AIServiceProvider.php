@@ -5,6 +5,7 @@ namespace Modules\AI\Providers;
 use Illuminate\Support\ServiceProvider;
 use Modules\AI\Console\AiAnomaliCommand;
 use Modules\AI\Console\AiHealthCommand;
+use Modules\AI\Console\AiPromptCommand;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\CircuitBreaker;
 use Modules\AI\Services\Gateway\ModelRouter;
@@ -37,6 +38,7 @@ class AIServiceProvider extends ServiceProvider
             $this->commands([
                 AiHealthCommand::class,
                 AiAnomaliCommand::class,
+                AiPromptCommand::class,
             ]);
         }
     }
@@ -50,6 +52,7 @@ class AIServiceProvider extends ServiceProvider
         $this->app->singleton(CircuitBreaker::class, fn () => CircuitBreaker::fromConfig());
         $this->app->singleton(ModelRouter::class);
         $this->app->singleton(AiGateway::class);
+        $this->app->singleton(\Modules\AI\Services\Prompts\PromptRegistry::class);
     }
 
     protected function registerConfig(): void

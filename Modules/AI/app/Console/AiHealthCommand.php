@@ -70,9 +70,14 @@ class AiHealthCommand extends Command
 
         // 3. Latensi generate singkat melalui gateway (pintu resmi satu-satunya).
         if ($healthy && ! $this->option('skip-generate')) {
+            // T-A004: pakai agen 'uji-internal' bila terdaftar — uji generate
+            // ikut melewati prompt registry dan mencatat prompt_version_id.
+            $agentUji = app(\Modules\AI\Services\Prompts\PromptRegistry::class)
+                ->agentTerdaftar('uji-internal') ? 'uji-internal' : 'health-check';
+
             $result = $gateway->generate(new AiGenerateRequest(
                 prompt: 'Balas dengan satu kata: siap.',
-                agent: 'health-check',
+                agent: $agentUji,
                 tier: 'ekonomis',
                 options: ['num_predict' => 8],
                 timeoutSeconds: (int) $this->option('generate-timeout'),
