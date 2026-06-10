@@ -82,6 +82,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -131,7 +132,29 @@ class TenantPanelProvider extends PanelProvider
             )
             ->resources($resources)
             ->pages($pages)
-            ->widgets($widgets);
+            ->widgets($widgets)
+            // Urutan & ikon grup navigasi — mengikuti jalur adopsi nyata
+            // (Kesantrian/PPDB/Website dulu; keuangan lanjutan di bawah &
+            // collapsed). Grup yang tak terdaftar di sini tetap muncul di bawah.
+            ->navigationGroups([
+                NavigationGroup::make('Kesantrian')->icon('heroicon-o-user-group'),
+                NavigationGroup::make('PPDB')->icon('heroicon-o-academic-cap'),
+                NavigationGroup::make('Website & CMS')->icon('heroicon-o-globe-alt'),
+                NavigationGroup::make('Asrama')->icon('heroicon-o-home-modern'),
+                NavigationGroup::make('Akademik')->icon('heroicon-o-book-open'),
+                NavigationGroup::make('Tahfidz')->icon('heroicon-o-sparkles'),
+                NavigationGroup::make('Kegiatan & Perizinan')->icon('heroicon-o-calendar-days'),
+                NavigationGroup::make('Kesehatan & Konseling')->icon('heroicon-o-heart'),
+                NavigationGroup::make('Administrasi')->icon('heroicon-o-document-text'),
+                NavigationGroup::make('Keuangan')->icon('heroicon-o-banknotes'),
+                NavigationGroup::make('Buku Besar')->icon('heroicon-o-calculator')->collapsed(),
+                NavigationGroup::make('Pelaporan')->icon('heroicon-o-chart-bar')->collapsed(),
+                NavigationGroup::make('Pembiayaan')->icon('heroicon-o-building-library')->collapsed(),
+                NavigationGroup::make('Mutu / SYAMIL')->icon('heroicon-o-shield-check')->collapsed(),
+                NavigationGroup::make('File Storage')->icon('heroicon-o-folder'),
+                NavigationGroup::make('Notifikasi')->icon('heroicon-o-bell'),
+                NavigationGroup::make('Pengaturan')->icon('heroicon-o-cog-6-tooth')->collapsed(),
+            ]);
 
         if (! $isAlbaKids) {
             $panel->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages');
@@ -141,6 +164,7 @@ class TenantPanelProvider extends PanelProvider
             ->login()
             ->passwordReset()
             ->profile()
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->spa()
             ->viteTheme('resources/css/filament/pesantren/theme.css')
             ->brandLogo(fn () => view('filament.brand', [

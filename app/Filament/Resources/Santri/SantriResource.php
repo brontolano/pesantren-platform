@@ -42,6 +42,26 @@ class SantriResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    /** Pencarian global (Cmd/Ctrl+K): cari santri cepat dgn nama atau NIS. */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nama', 'nis'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) $record->nama;
+    }
+
+    /** @return array<string, string> */
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'NIS' => (string) ($record->nis ?? '—'),
+            'Kelas' => (string) ($record->kelas?->nama_kelas ?? '—'),
+        ];
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;

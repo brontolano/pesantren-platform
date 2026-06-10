@@ -43,6 +43,31 @@ class PembayaranResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    /** Badge: pembayaran menunggu verifikasi (belum diputuskan) — antrean bendahara. */
+    public static function getNavigationBadge(): ?string
+    {
+        try {
+            $n = Pembayaran::query()
+                ->where('is_verified', false)
+                ->whereNull('verified_at')
+                ->count();
+
+            return $n > 0 ? (string) $n : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Menunggu verifikasi';
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);

@@ -40,6 +40,50 @@ class CalonSantriResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    /** Pencarian global (Cmd/Ctrl+K): cari pendaftar dgn nama atau no. pendaftaran. */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nama', 'nomor_pendaftaran'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) $record->nama;
+    }
+
+    /** @return array<string, string> */
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'No. Pendaftaran' => (string) ($record->nomor_pendaftaran ?? '—'),
+            'Status' => (string) ($record->status_pendaftaran ?? '—'),
+        ];
+    }
+
+    /** Badge: pendaftar yang masih dalam proses (perlu ditinjau panitia). */
+    public static function getNavigationBadge(): ?string
+    {
+        try {
+            $n = CalonSantri::query()
+                ->whereNotIn('status_pendaftaran', ['lulus', 'cadangan', 'ditolak', 'registrasi_ulang', 'batal', 'draft'])
+                ->count();
+
+            return $n > 0 ? (string) $n : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'primary';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Pendaftar dalam proses';
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         return static::moduleVisible('ppdb') && (static::canAccess());
