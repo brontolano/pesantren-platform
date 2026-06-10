@@ -128,7 +128,9 @@ class AiRetrievalSitasiTest extends TestCase
                 ]);
             },
             '*/api/generate' => Http::response([
-                'response' => 'Berikut penjelasan berdasarkan dokumen pesantren.',
+                // Jawaban BERAKAR KONTEKS korpus standar — sejak T-A022,
+                // CitationEnforcer memverifikasi overlap jawaban × konteks.
+                'response' => 'Pendaftaran santri baru dibuka bulan Juni melalui formulir pendaftaran daring.',
                 'prompt_eval_count' => 25,
                 'eval_count' => 12,
             ]),
@@ -358,7 +360,11 @@ class AiRetrievalSitasiTest extends TestCase
 
         // Generate benar-benar terpanggil + jawaban model kembali.
         Http::assertSent(static fn ($req): bool => str_contains($req->url(), '/api/generate'));
-        $this->assertSame('Berikut penjelasan berdasarkan dokumen pesantren.', $hasil->text);
+        // Kategori default 'umum' (agen 'uji' tak terpetakan) → tanpa
+        // disclaimer/sumber tambahan: teks model lolos enforcer apa adanya.
+        $this->assertSame('Pendaftaran santri baru dibuka bulan Juni melalui formulir pendaftaran daring.', $hasil->text);
+        $this->assertNotNull($hasil->verdictSitasi);
+        $this->assertTrue($hasil->verdictSitasi->lolos);
         $this->assertFalse($hasil->degraded);
 
         // Konteks ke provider terbungkus delimiter blok DATA (gateway T-A005)

@@ -332,6 +332,57 @@ return [
             'fitur_tidak_dikenali' => 'Mohon maaf, fitur asisten yang Anda tuju tidak dikenali. Silakan hubungi admin pesantren bila membutuhkan bantuan.',
             'blacklist_topik' => 'Mohon maaf, topik ini tidak dapat dijawab oleh asisten. Pertanyaan Anda telah kami teruskan kepada pihak yang berwenang di pesantren.',
             'tanya_ustadz' => 'Mohon maaf, pertanyaan seperti ini sebaiknya dijawab langsung oleh ustadz. Pertanyaan Anda telah kami teruskan ke antrean Tanya Ustadz.',
+            // T-A022: jawaban gagal verifikasi sitasi 2× (asli + regenerasi).
+            'sitasi_gagal' => 'Mohon maaf, asisten tidak dapat menjawab pertanyaan ini dengan rujukan yang memadai. Pertanyaan Anda telah kami teruskan ke antrean Tanya Ustadz agar dijawab langsung oleh pihak pesantren.',
+        ],
+
+        // T-A022: agent_key → kategori jawaban (agama|keuangan|akademik|umum)
+        // untuk CitationEnforcer & DisclaimerInjector. Agen tanpa pemetaan =
+        // 'umum'. Pemanggil boleh override via opsi 'kategori_jawaban'.
+        'kategori_map' => [
+            'tutor_santri' => 'akademik',
+            'generator_soal' => 'akademik',
+            'ringkasan_keuangan' => 'keuangan',
+        ],
+
+        // T-A022: ambang CitationEnforcer (heuristik DETERMINISTIK tanpa LLM).
+        'enforcer' => [
+            // Kalimat dengan overlap token-konten < ambang ini = "di luar konteks".
+            'ambang_overlap_kalimat' => (float) env('AI_ENFORCER_AMBANG_OVERLAP', 0.25),
+            // Proporsi kalimat-luar > ambang ini → jawaban TIDAK lolos.
+            'ambang_proporsi_luar' => (float) env('AI_ENFORCER_AMBANG_LUAR', 0.35),
+            // Jawaban > N× panjang konteks → TIDAK lolos (indikasi mengarang).
+            'rasio_panjang_max' => (float) env('AI_ENFORCER_RASIO_PANJANG', 3.0),
+            // Panjang minimal kata konten (huruf) yang ikut dihitung overlap.
+            'min_kata' => (int) env('AI_ENFORCER_MIN_KATA', 4),
+            // Stopword TEKNIS bahasa Indonesia (kata fungsi/penghubung) —
+            // BUKAN daftar topik/konten keagamaan (Aturan Emas #8).
+            'stopwords' => [
+                'yang', 'untuk', 'dengan', 'dalam', 'pada', 'dari', 'kepada',
+                'adalah', 'akan', 'sudah', 'telah', 'bisa', 'dapat', 'tidak',
+                'bukan', 'juga', 'karena', 'sehingga', 'agar', 'supaya',
+                'namun', 'tetapi', 'jika', 'bila', 'serta', 'antara', 'secara',
+                'oleh', 'sebagai', 'tentang', 'terhadap', 'setelah', 'sebelum',
+                'ketika', 'saat', 'mohon', 'silakan', 'berikut', 'yaitu',
+                'yakni', 'ialah', 'para', 'atau', 'maka', 'lalu', 'kemudian',
+                'hanya', 'masih', 'lebih', 'kurang', 'sangat', 'setiap',
+                'semua', 'seluruh', 'beberapa', 'adapun', 'demikian',
+                'tersebut', 'berdasarkan', 'merupakan', 'seperti', 'sesuai',
+                'maupun', 'bahwa', 'tanpa', 'melalui', 'hingga', 'sampai',
+                'sekitar', 'apabila', 'sebab', 'agaknya', 'tentu',
+            ],
+        ],
+
+        // T-A022: teks disclaimer per kategori (DisclaimerInjector).
+        // 'agama' = teks PRD §7.5 VERBATIM — JANGAN diubah/dikarang; override
+        // per tenant via rule ai_policy_rule tipe 'disclaimer' (seed GATE-3 /
+        // input pesantren). Format polos kompatibel WA (tanpa markdown).
+        'disclaimer' => [
+            'agama' => 'Ini alat bantu belajar, bukan fatwa. Untuk amalan, mohon merujuk kepada Ustadz/Kyai yang sanadnya jelas.',
+            'keuangan' => 'Informasi ini ringkasan alat bantu. Untuk angka resmi, mohon merujuk pada laporan keuangan pesantren.',
+            'akademik' => 'Materi ini alat bantu belajar. Mohon konfirmasikan kepada guru/asatidz pengampu untuk kepastian materi.',
+            // Footer jawaban data/tool (sumber sistem + cap waktu).
+            'footer_data' => 'Sumber: :sumber • per :cap_waktu',
         ],
     ],
 

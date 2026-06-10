@@ -100,15 +100,58 @@ class PolicyEngine
     }
 
     /**
-     * Evaluasi post-response. v1 = pass-through; struktur disiapkan sebagai
-     * hook injeksi disclaimer & penegakan sitasi (T-A022) — JANGAN tambah
-     * logika blokir di sini tanpa memperbarui kontrak audit gateway.
+     * Evaluasi post-response di GATEWAY. Tetap pass-through SENGAJA:
+     * injeksi disclaimer TIDAK boleh terjadi di gateway karena jalur RAG
+     * (RagAnswerer) menyuntik sendiri SETELAH enforcer T-A022 — injeksi
+     * dobel akan menumpuk disclaimer. JANGAN tambah logika blokir di sini
+     * tanpa memperbarui kontrak audit gateway.
      */
     public function post(AiGenerateResult $result, PolicyDecision $pre): PolicyDecision
     {
-        // T-A022: di sinilah rule tipe 'disclaimer' kelak menyuntik teks
-        // disclaimer ke jawaban. v1: keputusan pre diteruskan apa adanya.
+        // T-A022: jalur RAG memakai CitationEnforcer + DisclaimerInjector
+        // langsung di RagAnswerer; jalur NON-RAG memakai postNonRag() di
+        // bawah. Keputusan pre diteruskan apa adanya.
         return $pre;
+    }
+
+    /**
+     * T-A022 — hook post untuk jalur NON-RAG (jawaban tool/template, chatbot
+     * rule-based T-A051 kelak): suntik disclaimer sesuai kategori jawaban.
+     * Jawaban degradasi/tolakan kebijakan dilewatkan apa adanya (pesan
+     * prosedural, bukan klaim yang butuh disclaimer). Footer sumber+cap waktu
+     * untuk jawaban data dipasok pemanggil dari ToolResult.
+     */
+    public function postNonRag(
+        AiGenerateResult $result,
+        string $kategori,
+        ?string $capWaktu = null,
+        ?string $sumber = null,
+    ): AiGenerateResult {
+        if ($result->degraded || $result->ditolakPolicy) {
+            return $result;
+        }
+
+        $text = app(DisclaimerInjector::class)->inject(
+            $result->text,
+            $kategori,
+            $result->sitasi,
+            $capWaktu,
+            $sumber,
+        );
+
+        return new AiGenerateResult(
+            text: $text,
+            provider: $result->provider,
+            model: $result->model,
+            degraded: $result->degraded,
+            promptTokens: $result->promptTokens,
+            completionTokens: $result->completionTokens,
+            latencyMs: $result->latencyMs,
+            raw: $result->raw,
+            ditolakPolicy: $result->ditolakPolicy,
+            sitasi: $result->sitasi,
+            verdictSitasi: $result->verdictSitasi,
+        );
     }
 
     /**
