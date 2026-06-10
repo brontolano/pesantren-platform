@@ -172,7 +172,8 @@ class AlbaKidsRegistrationNotificationService
 
     private function normalizePhone(?string $value, bool $required = true): ?string
     {
-        $phone = preg_replace('/\D+/', '', (string) $value) ?? '';
+        // Delegasi ke sumber kebenaran tunggal (idempoten, anti country-code ganda).
+        $phone = \App\Support\PhoneNumber::normalize($value);
 
         if ($phone === '') {
             if ($required) {
@@ -180,14 +181,6 @@ class AlbaKidsRegistrationNotificationService
             }
 
             return null;
-        }
-
-        if (str_starts_with($phone, '0')) {
-            $phone = '62'.substr($phone, 1);
-        }
-
-        if (! str_starts_with($phone, '62')) {
-            $phone = '62'.$phone;
         }
 
         return $phone;

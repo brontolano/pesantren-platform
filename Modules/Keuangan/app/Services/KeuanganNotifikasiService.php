@@ -126,10 +126,12 @@ class KeuanganNotifikasiService
         });
     }
 
-    /** @return array<int,string> Nomor WA wali (kolom santri.no_hp_wali). */
+    /** @return array<int,string> Nomor WA wali (kolom santri.no_hp_wali), ternormalisasi 62…. */
     private function waliPhones(?object $santri): array
     {
-        return array_values(array_filter([$santri->no_hp_wali ?? null]));
+        $normalized = \App\Support\PhoneNumber::normalize($santri->no_hp_wali ?? null);
+
+        return $normalized === '' ? [] : [$normalized];
     }
 
     private function namaPesantren(): string

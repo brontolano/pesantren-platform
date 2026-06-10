@@ -13,17 +13,8 @@ class PpdbPhone
 {
     public static function normalize(string $raw): string
     {
-        $digits = preg_replace('/[^\d+]/', '', $raw) ?? '';
-        if ($digits === '') {
-            return '';
-        }
-        if (str_starts_with($digits, '+62')) {
-            $digits = '62'.substr($digits, 3);
-        }
-        if (str_starts_with($digits, '0')) {
-            $digits = '62'.substr($digits, 1);
-        }
-
-        return $digits;
+        // Delegasi ke sumber kebenaran tunggal: App\Support\PhoneNumber
+        // (idempoten, menangani +62/62/0 ganda — anti country-code dobel).
+        return \App\Support\PhoneNumber::normalize($raw);
     }
 }
