@@ -1,0 +1,11 @@
+{
+    "name": "AI",
+    "alias": "ai",
+    "description": "Modul AI Khadim Digital — gateway LLM multi-provider, router berjenjang, fallback & degradasi anggun",
+    "keywords": ["ai", "khadim digital", "gateway", "llm", "router"],
+    "priority": 0,
+    "providers": [
+        "Modules\\AI\\Providers\\AIServiceProvider"
+    ],
+    "files": []
+}

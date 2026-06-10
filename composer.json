@@ -66,7 +66,9 @@
             "Modules\\Kesehatan\\": "Modules/Kesehatan/app/",
             "Modules\\Kesehatan\\Database\\Seeders\\": "Modules/Kesehatan/database/seeders/",
             "Modules\\Kegiatan\\": "Modules/Kegiatan/app/",
-            "Modules\\Kegiatan\\Database\\Seeders\\": "Modules/Kegiatan/database/seeders/"
+            "Modules\\Kegiatan\\Database\\Seeders\\": "Modules/Kegiatan/database/seeders/",
+            "Modules\\AI\\": "Modules/AI/app/",
+            "Modules\\AI\\Database\\Seeders\\": "Modules/AI/database/seeders/"
         }
     },
     "autoload-dev": {
