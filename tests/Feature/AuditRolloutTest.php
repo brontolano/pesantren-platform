@@ -75,6 +75,7 @@ class AuditRolloutTest extends TestCase
 
         $jurnal = app(JurnalService::class)->postJurnal([
             'tanggal' => now()->toDateString(), 'deskripsi' => 'Uji audit', 'tipe_sumber' => 'manual',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => (int) Akun::where('kode', '1-1000')->value('id'), 'debit' => 100000, 'kredit' => 0],
                 ['akun_id' => (int) Akun::where('kode', '4-1000')->value('id'), 'debit' => 0, 'kredit' => 100000],

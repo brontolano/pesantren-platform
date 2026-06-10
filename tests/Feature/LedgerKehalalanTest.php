@@ -49,6 +49,7 @@ class LedgerKehalalanTest extends TestCase
     {
         app(JurnalService::class)->postJurnal([
             'deskripsi' => 'uji',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => Akun::where('kode', '1-1000')->value('id'), 'sumber_dana_id' => SumberDana::where('kode_dana', '90')->value('id'), 'debit' => 100000],
                 ['akun_id' => Akun::where('kode', '4-1000')->value('id'), 'sumber_dana_id' => SumberDana::where('kode_dana', '90')->value('id'), 'kredit' => 100000],
@@ -117,6 +118,7 @@ class LedgerKehalalanTest extends TestCase
         $this->expectException(PelanggaranKehalalanException::class);
         app(JurnalService::class)->postJurnal([
             'deskripsi' => 'campur',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => Akun::where('kode', '1-1000')->value('id'), 'sumber_dana_id' => SumberDana::where('kode_dana', '03')->value('id'), 'debit' => 100000], // halal
                 ['akun_id' => Akun::where('kode', '2-2000')->value('id'), 'sumber_dana_id' => SumberDana::where('kode_dana', '90')->value('id'), 'kredit' => 100000], // syubhat

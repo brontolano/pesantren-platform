@@ -23,14 +23,21 @@ class DanaKebajikanService
     {
     }
 
-    /** Terima dana syubhat: Debit Kas, Kredit Dana Kebajikan (bukan pendapatan). */
-    public function terima(float $nominal, string $kodeSumberSyubhat, ?int $dibuatOleh = null, ?string $keterangan = null): \Modules\Ledger\Models\Jurnal
+    /**
+     * Terima dana syubhat: Debit Kas, Kredit Dana Kebajikan (bukan pendapatan).
+     *
+     * @param  ?string  $refId  Penambat idempotensi dari dokumen sumber (mis. id penerimaan
+     *                          atau token form). Bila null, posting diperlakukan boleh-ganda
+     *                          secara EKSPLISIT — pemanggil UI WAJIB mengisi ini agar submit
+     *                          ulang tak menggandakan uang.
+     */
+    public function terima(float $nominal, string $kodeSumberSyubhat, ?int $dibuatOleh = null, ?string $keterangan = null, ?string $refId = null): \Modules\Ledger\Models\Jurnal
     {
         $sumber = $this->sumberSyubhat($kodeSumberSyubhat);
         $kas = $this->akunKas();
         $danaKebajikan = $this->akunDanaKebajikan();
 
-        return $this->jurnalService->postJurnal([
+        return $this->jurnalService->postJurnal($this->dedupKey($refId, 'DanaKebajikan:terima', [
             'deskripsi' => 'Penerimaan dana kebajikan/pembersihan (pelepasan) — ' . ($keterangan ?? $sumber->nama_sumber),
             'tipe_sumber' => 'kebajikan',
             'dibuat_oleh' => $dibuatOleh,
@@ -38,7 +45,7 @@ class DanaKebajikanService
                 ['akun_id' => $kas->id, 'sumber_dana_id' => $sumber->id, 'debit' => $nominal, 'memo' => 'Kas masuk (pelepasan)'],
                 ['akun_id' => $danaKebajikan->id, 'sumber_dana_id' => $sumber->id, 'kredit' => $nominal, 'memo' => 'Titipan dana kebajikan'],
             ],
-        ]);
+        ]));
     }
 
     /**
@@ -47,14 +54,14 @@ class DanaKebajikanService
      * TIDAK menyentuh surplus/defisit. Guard menolak bila tujuan = ibadah/masjid atau
      * peruntukan tidak diizinkan kebijakan tenant.
      */
-    public function salurkan(float $nominal, string $kodeAkunPenyaluran, string $kodeSumberSyubhat, ?int $dibuatOleh = null, ?string $keterangan = null): \Modules\Ledger\Models\Jurnal
+    public function salurkan(float $nominal, string $kodeAkunPenyaluran, string $kodeSumberSyubhat, ?int $dibuatOleh = null, ?string $keterangan = null, ?string $refId = null): \Modules\Ledger\Models\Jurnal
     {
         $sumber = $this->sumberSyubhat($kodeSumberSyubhat);
         $kas = $this->akunKas();
         $tujuan = Akun::where('kode', $kodeAkunPenyaluran)
             ->firstOr(fn () => throw new RuntimeException("Akun penyaluran {$kodeAkunPenyaluran} tidak ditemukan."));
 
-        return $this->jurnalService->postJurnal([
+        return $this->jurnalService->postJurnal($this->dedupKey($refId, 'DanaKebajikan:salurkan', [
             'deskripsi' => 'Penyaluran dana kebajikan — ' . ($keterangan ?? $tujuan->nama),
             'tipe_sumber' => 'kebajikan',
             'dibuat_oleh' => $dibuatOleh,
@@ -62,7 +69,27 @@ class DanaKebajikanService
                 ['akun_id' => $tujuan->id, 'sumber_dana_id' => $sumber->id, 'debit' => $nominal, 'memo' => 'Penyaluran (pelepasan)'],
                 ['akun_id' => $kas->id, 'sumber_dana_id' => $sumber->id, 'kredit' => $nominal, 'memo' => 'Kas keluar'],
             ],
-        ]);
+        ]));
+    }
+
+    /**
+     * Tambatkan kunci idempotensi ke payload postJurnal: bila $refId ada → keyed
+     * (ref_type+ref_id); bila tidak → tandai allow_duplicate=true secara eksplisit
+     * agar guard JurnalService tak menolak, sembari menyuratkan risiko ganda.
+     *
+     * @param  array<string,mixed>  $payload
+     * @return array<string,mixed>
+     */
+    private function dedupKey(?string $refId, string $refType, array $payload): array
+    {
+        if ($refId !== null) {
+            $payload['ref_type'] = $refType;
+            $payload['ref_id'] = $refId;
+        } else {
+            $payload['allow_duplicate'] = true;
+        }
+
+        return $payload;
     }
 
     /**

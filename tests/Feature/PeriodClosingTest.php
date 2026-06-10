@@ -57,6 +57,7 @@ class PeriodClosingTest extends TestCase
     {
         app(JurnalService::class)->postJurnal([
             'tanggal' => $tanggal, 'deskripsi' => 'Uji', 'tipe_sumber' => 'manual',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => $this->akunId($debitKode), 'debit' => $nominal, 'kredit' => 0],
                 ['akun_id' => $this->akunId($kreditKode), 'debit' => 0, 'kredit' => $nominal],
