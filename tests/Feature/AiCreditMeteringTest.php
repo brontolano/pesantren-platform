@@ -17,6 +17,7 @@ use Modules\AI\Services\Gateway\AiGenerateRequest;
 use Modules\AI\Services\Metering\AiBudgetProvisioner;
 use Modules\AI\Services\Metering\BudgetGuard;
 use Modules\AI\Services\Metering\CreditMeter;
+use Modules\AI\Services\Settings\AiSettingProvisioner;
 use Modules\Notifikasi\Models\LogNotifikasi;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -101,6 +102,9 @@ class AiCreditMeteringTest extends TestCase
         app(AiBudgetProvisioner::class)->provision($tenant->id);
         tenancy()->initialize($tenant);
         $this->seedTenantRow($tenant); // FK tenants lokal utk log_notifikasi
+        // T-A020: gerbang aktivasi PolicyEngine butuh setting aktif (paritas
+        // dengan provisioning produksi — TenantProvisioner memanggil ini juga).
+        app(AiSettingProvisioner::class)->provision((string) $tenant->id);
 
         return $tenant;
     }

@@ -18,6 +18,7 @@ use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
 use Modules\AI\Services\Metering\AiBudgetProvisioner;
 use Modules\AI\Services\Prompts\PromptRegistry;
+use Modules\AI\Services\Settings\AiSettingProvisioner;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -70,6 +71,9 @@ class AiPromptRegistryTest extends TestCase
         app(AiBudgetProvisioner::class)->provision($tenant->id);
         tenancy()->initialize($tenant);
         $this->seedTenantRow($tenant);
+        // T-A020: gerbang aktivasi PolicyEngine butuh setting aktif (paritas
+        // dengan provisioning produksi).
+        app(AiSettingProvisioner::class)->provision((string) $tenant->id);
 
         return $tenant;
     }
