@@ -34,7 +34,8 @@ class WaGatewayService
             'context' => $context,
         ];
 
-        if ($url = config('notifikasi.n8n_webhook_url')) {
+        // Webhook per-tenant (Pengaturan Notifikasi) > config/env global.
+        if ($url = NotifikasiSettings::webhookUrl()) {
             $response = $this->client()->post($url, $payload)->throw();
 
             return $response->json() ?: ['status' => 'ok'];

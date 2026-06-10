@@ -21,6 +21,8 @@ class NotifikasiSettings
 
     public const KEY_BROADCAST_INTERVAL = 'notif_broadcast_interval';
 
+    public const KEY_WA_WEBHOOK = 'notif_wa_webhook_url';
+
     /** Notifikasi WhatsApp aktif? Default: aktif. */
     public static function waEnabled(): bool
     {
@@ -31,6 +33,23 @@ class NotifikasiSettings
     public static function emailEnabled(): bool
     {
         return (bool) data_get(Setting::getTenantValue(self::KEY_EMAIL_ENABLED), 'enabled', true);
+    }
+
+    /**
+     * URL webhook n8n per-tenant (opsional). Fallback: config notifikasi.n8n_webhook_url.
+     * Memungkinkan tenant memakai pipa WA/nomor pengirim sendiri tanpa ubah env global.
+     */
+    public static function webhookUrl(): ?string
+    {
+        $value = data_get(Setting::getTenantValue(self::KEY_WA_WEBHOOK), 'url');
+
+        if (is_string($value) && trim($value) !== '') {
+            return trim($value);
+        }
+
+        $fallback = config('notifikasi.n8n_webhook_url');
+
+        return is_string($fallback) && $fallback !== '' ? $fallback : null;
     }
 
     /** Tanda tangan/footer yang ditambahkan ke akhir setiap pesan WA (opsional). */

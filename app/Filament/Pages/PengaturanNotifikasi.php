@@ -59,6 +59,7 @@ class PengaturanNotifikasi extends Page implements HasForms
             'notif_email_enabled' => NotifikasiSettings::emailEnabled(),
             'notif_wa_signature' => NotifikasiSettings::signature(),
             'notif_broadcast_interval' => NotifikasiSettings::broadcastInterval(),
+            'notif_wa_webhook_url' => data_get(Setting::getTenantValue(NotifikasiSettings::KEY_WA_WEBHOOK), 'url'),
         ]);
     }
 
@@ -75,6 +76,12 @@ class PengaturanNotifikasi extends Page implements HasForms
                             ->label('Aktifkan notifikasi WhatsApp')
                             ->default(true)
                             ->helperText('Jika mati: OTP, pemberitahuan, dan broadcast WA tidak dikirim.'),
+                        TextInput::make('notif_wa_webhook_url')
+                            ->label('URL webhook n8n khusus tenant (opsional)')
+                            ->url()
+                            ->maxLength(255)
+                            ->placeholder('http://n8n:5678/webhook/ppdb-wa')
+                            ->helperText('Kosongkan untuk memakai pipa WA bawaan platform. Isi bila tenant ini punya alur n8n/nomor pengirim sendiri.'),
                         Textarea::make('notif_wa_signature')
                             ->label('Tanda tangan / footer pesan')
                             ->rows(2)
@@ -118,6 +125,7 @@ class PengaturanNotifikasi extends Page implements HasForms
             NotifikasiSettings::KEY_EMAIL_ENABLED => ['enabled' => (bool) ($data['notif_email_enabled'] ?? true)],
             NotifikasiSettings::KEY_WA_SIGNATURE => ['text' => $data['notif_wa_signature'] ?? null],
             NotifikasiSettings::KEY_BROADCAST_INTERVAL => ['seconds' => max(0, min(300, (int) ($data['notif_broadcast_interval'] ?? 10)))],
+            NotifikasiSettings::KEY_WA_WEBHOOK => ['url' => filled($data['notif_wa_webhook_url'] ?? null) ? trim($data['notif_wa_webhook_url']) : null],
         ];
 
         foreach ($payloads as $key => $value) {
