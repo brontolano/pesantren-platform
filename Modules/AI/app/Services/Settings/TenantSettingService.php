@@ -5,12 +5,15 @@ namespace Modules\AI\Services\Settings;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use Modules\AI\Models\AiApproval;
 use Modules\AI\Models\AiTenantSetting;
 use Modules\AI\Services\Guardrails\PolicyEngine;
+use Modules\Notifikasi\Models\LogNotifikasi;
+use Throwable;
 
 /**
  * T-A010 — siklus hidup pengaturan AI per tenant (versioned + approval kyai).
@@ -137,7 +140,7 @@ class TenantSettingService
     {
         $this->pastikanBoleh($user, 'ai.setting.kelola');
 
-        return DB::transaction(function () use ($versi): AiTenantSetting {
+        $setting = DB::transaction(function () use ($versi): AiTenantSetting {
             /** @var AiTenantSetting $setting */
             $setting = AiTenantSetting::query()
                 ->where('versi', $versi)
@@ -179,6 +182,58 @@ class TenantSettingService
 
             return $setting->refresh();
         });
+
+        // T-A012: pengajuan sensitif menunggu keputusan → beri tahu kyai/
+        // pimpinan. SETELAH commit (bukan di dalam transaksi) dan best-effort:
+        // kegagalan menulis notifikasi tidak membatalkan pengajuan yang sah.
+        if ($setting->status === AiTenantSetting::STATUS_PENDING_APPROVAL) {
+            $this->kirimNotifikasiPengajuan($setting, $user);
+        }
+
+        return $setting;
+    }
+
+    /**
+     * T-A012 — notifikasi database (pola BudgetGuard/EscalationService,
+     * channel 'database', BUKAN jalur WA baru) kepada setiap pemegang izin
+     * `ai.setting.setujui`: ada pengajuan kebijakan AI menunggu keputusan.
+     * ajukan() hanya bisa terjadi sekali per versi (gerbang status draft),
+     * jadi notifikasi per pengajuan otomatis terkirim sekali.
+     */
+    private function kirimNotifikasiPengajuan(AiTenantSetting $setting, User $pengaju): void
+    {
+        try {
+            $penerima = User::permission('ai.setting.setujui')->get();
+
+            foreach ($penerima as $kyai) {
+                LogNotifikasi::query()->create([
+                    'jenis' => 'ai_pengajuan_setting',
+                    'channel' => 'database',
+                    'target' => 'user:'.$kyai->getKey(),
+                    'status' => 'sent',
+                    'payload' => [
+                        'judul' => 'Pengajuan kebijakan asisten AI menunggu persetujuan',
+                        'pesan' => sprintf(
+                            'Pengaturan asisten AI versi %d diajukan oleh %s dan menyangkut '
+                            .'kebijakan sensitif. Mohon berkenan meninjau Ringkasan Kebijakan '
+                            .'pada halaman "Persetujuan Pimpinan" lalu memberi keputusan. '
+                            .'Jazakumullahu khairan.',
+                            $setting->versi,
+                            $pengaju->name,
+                        ),
+                        'setting_versi' => $setting->versi,
+                        'diajukan_oleh' => $pengaju->getKey(),
+                    ],
+                    'created_at' => now(),
+                ]);
+            }
+        } catch (Throwable $e) {
+            Log::error('TenantSettingService: GAGAL menulis notifikasi pengajuan approval AI.', [
+                'versi' => $setting->versi,
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

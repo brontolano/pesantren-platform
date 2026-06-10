@@ -23,8 +23,10 @@ use Filament\Schemas\Schema;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
+use Modules\AI\Models\AiApproval;
 use Modules\AI\Models\AiTenantSetting;
 use Modules\AI\Services\Settings\AiTenantSettingDefaults;
 use Modules\AI\Services\Settings\RingkasanKebijakan;
@@ -585,5 +587,37 @@ class PengaturanAi extends Page implements HasForms
         $payload = array_replace($this->payloadDasar, (array) $this->data);
 
         return app(RingkasanKebijakan::class)->susun($payload);
+    }
+
+    /**
+     * T-A012 — tautan bertanda tangan (signed URL) halaman ringkasan
+     * kebijakan untuk pengajuan TERBARU yang masih menunggu keputusan.
+     * Disalin admin lalu dikirim manual via WA-nya sendiri (keputusan sadar:
+     * WaNotificationService terikat mesin broadcast + template ber-approval
+     * Meta — bukan pesan satuan; TANPA jalur WA baru, Aturan Emas #5).
+     * Tautan BACA-SAJA: persetujuan tetap wajib login + permission.
+     */
+    public function tautanRingkasanKyai(): ?string
+    {
+        $approval = AiApproval::query()
+            ->where('status', AiApproval::STATUS_MENUNGGU)
+            ->orderByDesc('id')
+            ->first();
+
+        if ($approval === null) {
+            return null;
+        }
+
+        return URL::temporarySignedRoute(
+            'ai.ringkasan.signed',
+            now()->addHours($this->tautanRingkasanJam()),
+            ['approval' => $approval->getKey()],
+        );
+    }
+
+    /** Umur tautan ringkasan (jam) — dipakai blade untuk kalimat penjelas. */
+    public function tautanRingkasanJam(): int
+    {
+        return max(1, (int) config('ai.settings.tautan_ringkasan_jam', 72));
     }
 }
