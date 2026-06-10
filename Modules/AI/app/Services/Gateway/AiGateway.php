@@ -134,9 +134,27 @@ class AiGateway
             'token_keluar' => $result->completionTokens,
             'kredit' => $kredit,
             'degraded' => $result->degraded,
-        ], $request->idempotencyKey ?? 'gen-'.Str::ulid());
+        ], $this->meteringKey($request, $result));
 
-        return ['kredit' => $ledger !== null ? $kredit : 0.0, 'gagal' => $ledger === null];
+        // Pada duplikat, nilai tertagih = baris ledger lama (bukan hitungan
+        // baru) supaya audit selalu rekonsiliasi dengan ledger.
+        return [
+            'kredit' => $ledger !== null ? abs((float) $ledger->jumlah_kredit) : 0.0,
+            'gagal' => $ledger === null,
+        ];
+    }
+
+    /**
+     * Dedup idempotensi hanya boleh berlaku PER-OUTCOME: jalur 0-kredit
+     * (kill-switch/degradasi) memakai namespace kunci sendiri. Tanpa ini,
+     * retry sah atas request yang dulunya ditolak/degradasi ter-dedup
+     * terhadap baris 0 kredit — token provider nyata terbakar tanpa tertagih.
+     */
+    private function meteringKey(AiGenerateRequest $request, AiGenerateResult $result): string
+    {
+        $base = $request->idempotencyKey ?? 'gen-'.Str::ulid();
+
+        return $result->degraded ? 'degraded-'.$base : $base;
     }
 
     /**

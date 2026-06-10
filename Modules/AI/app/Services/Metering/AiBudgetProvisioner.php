@@ -44,18 +44,34 @@ class AiBudgetProvisioner
                 'updated_at' => now(),
             ]);
 
-            // Saldo awal: alokasi 0. Kunci deterministik per tenant → reprovision
-            // berkali-kali tetap 1 baris (ledger append-only, jangan dobel).
-            AiCreditLedger::query()->insertOrIgnore([
-                'tenant_id' => $tenantId,
-                'jenis' => AiCreditLedger::JENIS_ALOKASI,
-                'jumlah_kredit' => 0,
-                'saldo_setelah' => 0,
-                'referensi' => 'provisioning',
-                'idempotency_key' => "alokasi-awal-{$tenantId}",
-                'keterangan' => 'Saldo awal kredit AI (provisioning tenant)',
-                'created_at' => now(),
-            ]);
+            // Saldo awal: alokasi 0 — HANYA bila ledger tenant masih kosong,
+            // dalam transaksi yang menahan lock baris budget (serial terhadap
+            // CreditMeter::catat). Tanpa kedua syarat itu, baris alokasi-0
+            // ber-id tertinggi MERESET rantai saldo_setelah tenant yang sudah
+            // punya riwayat (temuan review adversarial T-A002 #2).
+            AiCreditLedger::query()->getConnection()->transaction(function () use ($tenantId): void {
+                AiTenantBudget::query()
+                    ->where('tenant_id', $tenantId)
+                    ->lockForUpdate()
+                    ->first();
+
+                $sudahAdaRiwayat = AiCreditLedger::query()
+                    ->where('tenant_id', $tenantId)
+                    ->exists();
+
+                if (! $sudahAdaRiwayat) {
+                    AiCreditLedger::query()->insertOrIgnore([
+                        'tenant_id' => $tenantId,
+                        'jenis' => AiCreditLedger::JENIS_ALOKASI,
+                        'jumlah_kredit' => 0,
+                        'saldo_setelah' => 0,
+                        'referensi' => 'provisioning',
+                        'idempotency_key' => "alokasi-awal-{$tenantId}",
+                        'keterangan' => 'Saldo awal kredit AI (provisioning tenant)',
+                        'created_at' => now(),
+                    ]);
+                }
+            });
         } catch (Throwable $e) {
             Log::warning('AiBudgetProvisioner: gagal menyiapkan budget AI — provisioning tenant tetap lanjut.', [
                 'tenant_id' => $tenantId,

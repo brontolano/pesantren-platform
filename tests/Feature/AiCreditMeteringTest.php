@@ -271,7 +271,7 @@ class AiCreditMeteringTest extends TestCase
         $this->assertStringContainsString('anggaran AI bulan ini telah habis', $result->text);
 
         // Pagar #5: penolakan pun TETAP termeter — event 0 kredit tercatat.
-        $event = AiUsageEvent::query()->where('idempotency_key', 'kunci-kill-generate')->first();
+        $event = AiUsageEvent::query()->where('idempotency_key', 'degraded-kunci-kill-generate')->first();
         $this->assertNotNull($event, 'Penolakan kill-switch wajib tetap menghasilkan ai_usage_event');
         $this->assertEqualsWithDelta(0.0, (float) $event->kredit, 0.0001);
         $this->assertTrue($event->degraded);
@@ -372,12 +372,12 @@ class AiCreditMeteringTest extends TestCase
         $result = app(AiGateway::class)->generate($request);
         $this->assertTrue($result->degraded);
 
-        $event = AiUsageEvent::query()->where('idempotency_key', 'kunci-degradasi')->first();
+        $event = AiUsageEvent::query()->where('idempotency_key', 'degraded-kunci-degradasi')->first();
         $this->assertNotNull($event, 'Degradasi wajib tetap termeter (pagar #5)');
         $this->assertEqualsWithDelta(0.0, (float) $event->kredit, 0.0001);
         $this->assertTrue($event->degraded);
 
-        $ledger = AiCreditLedger::query()->where('idempotency_key', 'kunci-degradasi')->first();
+        $ledger = AiCreditLedger::query()->where('idempotency_key', 'degraded-kunci-degradasi')->first();
         $this->assertNotNull($ledger);
         $this->assertEqualsWithDelta(0.0, (float) $ledger->jumlah_kredit, 0.0001);
     }
@@ -404,6 +404,74 @@ class AiCreditMeteringTest extends TestCase
 
         $log = AiAuditLog::query()->where('idempotency_key', 'kunci-generate-sukses')->firstOrFail();
         $this->assertEqualsWithDelta(0.0065, (float) $log->biaya_kredit, 0.00001);
+    }
+
+    // ── Regresi review adversarial #1: dedup per-outcome ─────────────────
+
+    public function test_retry_kunci_sama_setelah_kill_switch_tetap_tertagih(): void
+    {
+        $tenant = $this->tenantSiapMeter('metrk1');
+        AiTenantBudget::query()->where('tenant_id', $tenant->id)
+            ->update(['anggaran_kredit_bulanan' => 5]);
+        $this->meter()->catat($tenant->id, $this->dataPemakaian(['kredit' => 6]), 'kunci-kill-awal');
+
+        // 1) Request kunci K saat kill-switch aktif → termeter 0 di namespace
+        //    degraded- (jalur ini tidak memanggil HTTP sama sekali).
+        $this->fakeOllamaSukses();
+        $request = new AiGenerateRequest(
+            prompt: 'Assalamualaikum',
+            agent: 'uji-retry',
+            tier: 'ekonomis',
+            idempotencyKey: 'kunci-retry-K',
+        );
+        $hasil1 = app(AiGateway::class)->generate($request);
+        $this->assertTrue($hasil1->degraded);
+        Http::assertNothingSent();
+
+        // 2) Admin top-up / anggaran dilonggarkan + kill-switch padam.
+        AiTenantBudget::query()->where('tenant_id', $tenant->id)->update([
+            'anggaran_kredit_bulanan' => null,
+            'kill_switch_aktif' => false,
+            'terpakai_periode' => 0,
+        ]);
+
+        // 3) Retry sah kunci K yang sama → provider nyata terpanggil dan WAJIB tertagih
+        //    (sebelum fix: ter-dedup terhadap baris 0 kredit → token gratis).
+        $hasil2 = app(AiGateway::class)->generate($request);
+        $this->assertFalse($hasil2->degraded);
+
+        $tertagih = AiCreditLedger::query()->where('idempotency_key', 'kunci-retry-K')->first();
+        $this->assertNotNull($tertagih, 'Pemakaian nyata pasca-retry wajib punya baris ledger sendiri');
+        $this->assertLessThan(0.0, (float) $tertagih->jumlah_kredit, 'Pemakaian nyata wajib memotong kredit');
+
+        $gratis = AiCreditLedger::query()->where('idempotency_key', 'degraded-kunci-retry-K')->first();
+        $this->assertNotNull($gratis, 'Jejak penolakan kill-switch tetap ada di namespace degraded-');
+    }
+
+    // ── Regresi review adversarial #2: reprovision tidak mereset saldo ───
+
+    public function test_reprovision_tenant_dengan_riwayat_tidak_mereset_rantai_saldo(): void
+    {
+        // Tenant pra-alokasi: punya riwayat pemakaian TANPA baris alokasi awal
+        // (lockBudgetRow auto-membuat budget; skenario tenant lama pra-T-A002).
+        $tenant = $this->createRuntimeTenant('metrp2', 'Pesantren Reprovision Saldo');
+        tenancy()->initialize($tenant);
+        $this->seedTenantRow($tenant);
+        $this->meter()->catat($tenant->id, $this->dataPemakaian(['kredit' => 1.5]), 'kunci-riwayat-1');
+
+        app(AiBudgetProvisioner::class)->provision($tenant->id);
+
+        $this->assertSame(
+            0,
+            AiCreditLedger::query()->where('tenant_id', $tenant->id)
+                ->where('jenis', AiCreditLedger::JENIS_ALOKASI)->count(),
+            'Tenant dengan riwayat TIDAK boleh disisipi alokasi-0 (mereset rantai saldo)',
+        );
+
+        // Baris terakhir (id tertinggi) tetap pemakaian; catat() berikutnya
+        // melanjutkan rantai dari -1.5, bukan dari 0.
+        $lanjut = $this->meter()->catat($tenant->id, $this->dataPemakaian(['kredit' => 0.5]), 'kunci-riwayat-2');
+        $this->assertEqualsWithDelta(-2.0, (float) $lanjut->saldo_setelah, 0.0001);
     }
 
     // ── (j) Provisioning idempoten ───────────────────────────────────────
