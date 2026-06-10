@@ -172,6 +172,9 @@ class RagAnswerer
      * Eskalasi Tanya Ustadz idempoten (pola PolicyEngine [M2]): firstOrCreate
      * per idempotency_key; pertanyaan disimpan RINGKAS + TERREDAKSI PAKSA.
      * Best-effort — kegagalan tulis tidak menggagalkan respons.
+     *
+     * T-A013: baris eskalasi BARU menambah event riset KATEGORI saja (tanpa
+     * isi pertanyaan) — no-op senyap bila tenant tidak opt-in riset.
      */
     private function tulisEskalasi(AiGenerateRequest $request, string $kategori = 'tanpa_rujukan'): void
     {
@@ -187,13 +190,18 @@ class RagAnswerer
                 'status' => AiEscalation::STATUS_BARU,
             ];
 
-            if ($request->idempotencyKey !== null) {
-                AiEscalation::query()->firstOrCreate(
+            $eskalasi = $request->idempotencyKey !== null
+                ? AiEscalation::query()->firstOrCreate(
                     ['idempotency_key' => $request->idempotencyKey],
                     $atribut,
-                );
-            } else {
-                AiEscalation::query()->create($atribut);
+                )
+                : AiEscalation::query()->create($atribut);
+
+            // T-A013: hanya baris BARU (retry idempoten tidak menggandakan
+            // statistik); ResearchTelemetry sendiri best-effort + opt-in.
+            if ($eskalasi->wasRecentlyCreated && tenancy()->initialized) {
+                app(\Modules\AI\Services\Research\ResearchTelemetry::class)
+                    ->rekamEskalasiKategori((string) tenant()->getKey(), $kategori);
             }
         } catch (\Throwable $e) {
             Log::error('RagAnswerer: gagal menulis eskalasi — respons tetap dilanjutkan.', [

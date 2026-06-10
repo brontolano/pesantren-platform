@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use Modules\AI\Models\AiApproval;
 use Modules\AI\Models\AiTenantSetting;
 use Modules\AI\Services\Guardrails\PolicyEngine;
+use Modules\AI\Services\Research\ResearchTelemetry;
 use Modules\Notifikasi\Models\LogNotifikasi;
 use Throwable;
 
@@ -140,7 +141,9 @@ class TenantSettingService
     {
         $this->pastikanBoleh($user, 'ai.setting.kelola');
 
-        $setting = DB::transaction(function () use ($versi): AiTenantSetting {
+        $payloadAktifLama = null;
+
+        $setting = DB::transaction(function () use ($versi, &$payloadAktifLama): AiTenantSetting {
             /** @var AiTenantSetting $setting */
             $setting = AiTenantSetting::query()
                 ->where('versi', $versi)
@@ -169,6 +172,7 @@ class TenantSettingService
             } else {
                 // Non-sensitif (jam layanan, bahasa/gaya, anggaran, ambang
                 // alert, pesan) → aktifkan langsung, arsipkan aktif lama.
+                $payloadAktifLama = $aktif?->payload;
                 $aktif?->update(['status' => AiTenantSetting::STATUS_ARSIP]);
                 $setting->update(['status' => AiTenantSetting::STATUS_AKTIF]);
 
@@ -188,6 +192,12 @@ class TenantSettingService
         // kegagalan menulis notifikasi tidak membatalkan pengajuan yang sah.
         if ($setting->status === AiTenantSetting::STATUS_PENDING_APPROVAL) {
             $this->kirimNotifikasiPengajuan($setting, $user);
+        }
+
+        // T-A013: versi aktif berganti (jalur non-sensitif) → sinkron
+        // telemetri riset. SETELAH commit dan best-effort.
+        if ($setting->status === AiTenantSetting::STATUS_AKTIF) {
+            $this->sinkronTelemetriRiset($setting, $payloadAktifLama);
         }
 
         return $setting;
@@ -244,7 +254,10 @@ class TenantSettingService
     {
         $this->pastikanBoleh($kyai, 'ai.setting.setujui');
 
-        return DB::transaction(function () use ($approvalId, $kyai, $setuju, $alasan): AiApproval {
+        $payloadAktifLama = null;
+        $settingAktifBaru = null;
+
+        $approval = DB::transaction(function () use ($approvalId, $kyai, $setuju, $alasan, &$payloadAktifLama, &$settingAktifBaru): AiApproval {
             /** @var AiApproval $approval */
             $approval = AiApproval::query()->lockForUpdate()->findOrFail($approvalId);
 
@@ -269,9 +282,10 @@ class TenantSettingService
                     ->where('status', AiTenantSetting::STATUS_AKTIF)
                     ->lockForUpdate()
                     ->get()
-                    ->each(fn (AiTenantSetting $lama) => $lama->update([
-                        'status' => AiTenantSetting::STATUS_ARSIP,
-                    ]));
+                    ->each(function (AiTenantSetting $lama) use (&$payloadAktifLama): void {
+                        $payloadAktifLama = $lama->payload; // T-A013: pembanding opt-in riset
+                        $lama->update(['status' => AiTenantSetting::STATUS_ARSIP]);
+                    });
 
                 $setting->update(['status' => AiTenantSetting::STATUS_AKTIF]);
 
@@ -279,6 +293,8 @@ class TenantSettingService
                 // ai_policy_rule (idempoten).
                 app(PolicyEngine::class)
                     ->syncDariSetting((array) $setting->refresh()->payload);
+
+                $settingAktifBaru = $setting;
             } else {
                 $setting->update(['status' => AiTenantSetting::STATUS_DRAFT]);
             }
@@ -294,6 +310,41 @@ class TenantSettingService
 
             return $approval->refresh();
         });
+
+        // T-A013: versi aktif berganti (disetujui kyai) → sinkron telemetri
+        // riset. SETELAH commit dan best-effort.
+        if ($settingAktifBaru !== null) {
+            $this->sinkronTelemetriRiset($settingAktifBaru, $payloadAktifLama);
+        }
+
+        return $approval;
+    }
+
+    /**
+     * T-A013 — hook lifecycle telemetri riset opt-in: dipanggil SETELAH
+     * commit setiap kali versi setting AKTIF berganti. ResearchTelemetry
+     * yang memutuskan rekam snapshot (opt-in) atau hapus event (cabut izin).
+     * Best-effort: kegagalan telemetri tidak membatalkan aktivasi yang sah.
+     */
+    private function sinkronTelemetriRiset(AiTenantSetting $aktifBaru, ?array $payloadAktifLama): void
+    {
+        if (! tenancy()->initialized) {
+            return;
+        }
+
+        try {
+            app(ResearchTelemetry::class)->onSettingAktif(
+                (string) tenant()->getKey(),
+                (array) $aktifBaru->payload,
+                $payloadAktifLama,
+            );
+        } catch (Throwable $e) {
+            Log::error('TenantSettingService: GAGAL sinkron telemetri riset (T-A013) — aktivasi tetap sah.', [
+                'versi' => $aktifBaru->versi,
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     /** Hash kanonik payload — sidik jari ringkasan kebijakan yang disetujui. */
