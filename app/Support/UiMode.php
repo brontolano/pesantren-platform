@@ -16,9 +16,27 @@ class UiMode
 {
     public static function current(): string
     {
-        $mode = Auth::user()->ui_mode ?? null;
+        $user = Auth::user();
+        $mode = $user->ui_mode ?? null;
 
-        return $mode === 'advanced' ? 'advanced' : 'simple';
+        if ($mode === 'advanced') {
+            return 'advanced';
+        }
+        if ($mode === 'simple') {
+            return 'simple';
+        }
+
+        // Belum memilih: super_admin default Mode Lengkap (lihat semuanya),
+        // user lain default Mode Sederhana.
+        try {
+            if ($user !== null && method_exists($user, 'hasRole') && $user->hasRole('super_admin')) {
+                return 'advanced';
+            }
+        } catch (\Throwable) {
+            // tabel roles belum siap → default simple
+        }
+
+        return 'simple';
     }
 
     public static function simple(): bool

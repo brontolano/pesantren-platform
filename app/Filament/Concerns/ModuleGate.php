@@ -14,6 +14,16 @@ trait ModuleGate
 {
     protected static function moduleVisible(string $key): bool
     {
+        // SUPER ADMIN melihat SEMUA modul (mengelola platform/tenant) —
+        // gerbang aktivasi modul hanya berlaku untuk pengguna biasa.
+        try {
+            if (auth()->user()?->hasRole('super_admin')) {
+                return true;
+            }
+        } catch (\Throwable) {
+            // tabel roles belum siap → lanjut ke gerbang normal
+        }
+
         return app(ModuleService::class)
             ->isVisibleForTenant($key, tenancy()->initialized ? tenant() : null);
     }

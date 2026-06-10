@@ -31,6 +31,17 @@ class AppServiceProvider extends ServiceProvider
     {
         Model::preventLazyLoading(! app()->isProduction());
 
+        // SUPER ADMIN = lolos SEMUA permission check (pola resmi spatie).
+        // Future-proof: permission baru otomatis dimiliki tanpa re-seed.
+        // Return null (bukan false) agar user lain tetap dievaluasi normal.
+        \Illuminate\Support\Facades\Gate::before(function ($user, string $ability) {
+            try {
+                return method_exists($user, 'hasRole') && $user->hasRole('super_admin') ? true : null;
+            } catch (\Throwable) {
+                return null; // tabel roles belum ada (mis. saat migrasi awal)
+            }
+        });
+
         /*
          * Fix: Livewire temporary file upload HARUS pakai disk yang TIDAK masuk
          * tenancy.filesystem.disks. Disk 'local' ada di daftar tenancy → root-nya
