@@ -219,6 +219,9 @@ class CalonSantriResource extends Resource
             ];
 
         return $table
+            ->emptyStateHeading('Belum ada pendaftar')
+            ->emptyStateDescription('Calon santri akan muncul di sini setelah mengisi formulir pendaftaran.')
+            ->emptyStateIcon('heroicon-o-academic-cap')
             ->columns([
                 TextColumn::make('nomor_pendaftaran')
                     ->label('No. Pendaftaran')

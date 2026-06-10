@@ -79,6 +79,9 @@ class HafalanTahfidzResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada setoran hafalan')
+            ->emptyStateDescription('Setoran hafalan santri akan tercatat di sini.')
+            ->emptyStateIcon('heroicon-o-sparkles')
             ->columns([
                 TextColumn::make('santri.nama')->label('Santri')->sortable()->searchable(),
                 TextColumn::make('surah')->label('Surah')->sortable()->searchable(),

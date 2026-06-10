@@ -47,6 +47,9 @@ class SuratResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada surat')
+            ->emptyStateDescription('Catat surat masuk atau surat keluar di sini.')
+            ->emptyStateIcon('heroicon-o-envelope')
             ->columns([
                 TextColumn::make('jenis')
                     ->label('Jenis')

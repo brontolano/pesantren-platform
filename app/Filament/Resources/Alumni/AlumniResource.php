@@ -45,6 +45,9 @@ class AlumniResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada alumni')
+            ->emptyStateDescription('Data alumni akan muncul setelah santri dinyatakan lulus.')
+            ->emptyStateIcon('heroicon-o-academic-cap')
             ->columns([
                 TextColumn::make('santri.nis')
                     ->label('NIS')

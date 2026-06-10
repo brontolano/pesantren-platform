@@ -250,6 +250,9 @@ class GalleryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada galeri')
+            ->emptyStateDescription('Unggah foto kegiatan untuk ditampilkan di website pondok.')
+            ->emptyStateIcon('heroicon-o-photo')
             ->columns([
                 ImageColumn::make('cover_url')
                     ->label('Cover')

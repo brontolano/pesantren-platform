@@ -50,6 +50,9 @@ class TabunganResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada tabungan')
+            ->emptyStateDescription('Saldo tabungan santri akan tampil di sini setelah ada setoran.')
+            ->emptyStateIcon('heroicon-o-wallet')
             ->columns([
                 TextColumn::make('santri.nis')
                     ->label('NIS')

@@ -152,6 +152,9 @@ class TagihanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada tagihan')
+            ->emptyStateDescription('Buat tagihan SPP atau biaya lain untuk santri di sini.')
+            ->emptyStateIcon('heroicon-o-banknotes')
             ->columns([
                 TextColumn::make('santri.nama')
                     ->label('Santri')

@@ -92,6 +92,9 @@ class KelasResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada kelas')
+            ->emptyStateDescription('Tambahkan kelas terlebih dahulu untuk mulai menempatkan santri.')
+            ->emptyStateIcon('heroicon-o-rectangle-stack')
             ->columns([
                 TextColumn::make('nama_kelas')
                     ->label('Nama Kelas')

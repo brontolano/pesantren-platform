@@ -348,6 +348,9 @@ class SantriResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada data santri')
+            ->emptyStateDescription('Mulai dengan mengimpor data dari Excel, atau tambah santri satu per satu.')
+            ->emptyStateIcon('heroicon-o-user-group')
             ->columns([
                 ImageColumn::make('photo_url')
                     ->label('Foto')

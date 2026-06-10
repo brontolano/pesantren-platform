@@ -75,6 +75,9 @@ class KamarAsramaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada kamar')
+            ->emptyStateDescription('Tambahkan kamar asrama untuk mulai menempatkan santri.')
+            ->emptyStateIcon('heroicon-o-home-modern')
             ->columns([
                 TextColumn::make('blok.nama_blok')->label('Blok')->sortable()->searchable(),
                 TextColumn::make('nomor_kamar')->sortable()->searchable(),

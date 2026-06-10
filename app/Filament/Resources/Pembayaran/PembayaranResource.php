@@ -134,6 +134,9 @@ class PembayaranResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada pembayaran')
+            ->emptyStateDescription('Pembayaran dari wali/santri akan masuk ke sini untuk diverifikasi.')
+            ->emptyStateIcon('heroicon-o-credit-card')
             ->columns([
                 TextColumn::make('santri.nama')
                     ->label('Santri')

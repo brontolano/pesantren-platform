@@ -190,6 +190,9 @@ class ArticleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada artikel')
+            ->emptyStateDescription('Tulis artikel atau berita pertama untuk ditampilkan di website pondok.')
+            ->emptyStateIcon('heroicon-o-newspaper')
             ->columns([
                 TextColumn::make('title')
                     ->label('Judul')
