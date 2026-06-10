@@ -32,6 +32,8 @@ use App\Filament\Resources\Inventory\InventoryBatchResource;
 use App\Filament\Resources\Inventory\InventoryItemResource;
 use App\Filament\Resources\Inventory\InventoryLokasiResource;
 use App\Filament\Resources\Ledger\AkunResource;
+use App\Filament\Resources\Ledger\AlokasiBiaya\AlokasiBiayaResource;
+use App\Filament\Resources\Ledger\KursValuta\KursValutaResource;
 use App\Filament\Resources\Ledger\AnggaranResource;
 use App\Filament\Resources\Ledger\DivisiUnitResource;
 use App\Filament\Resources\Pos\PosKategoriResource;
@@ -216,6 +218,8 @@ class TenantPanelProvider extends PanelProvider
             InventoryBatchResource::class,
             // Ledger / Baitul Maal (Buku Besar)
             AkunResource::class,
+            AlokasiBiayaResource::class,
+            KursValutaResource::class,
             AnggaranResource::class,
             SumberDanaResource::class,
             DivisiUnitResource::class,
