@@ -61,11 +61,10 @@ class PpdbPublicApiController extends Controller
         ]);
 
         $participantPhone = PpdbPhone::normalize($data['participant_phone'] ?? $data['guardian_phone'] ?? $data['parent_phone'] ?? '');
-        $nomor = $numbers->generate();
         $token = Str::random(40);
 
-        $calon = CalonSantri::create([
-            'nomor_pendaftaran' => $nomor,
+        // Nomor + insert satu transaksi (race-safe, retry saat tabrakan nomor).
+        $calon = $numbers->createWithNomor([
             'tracking_token' => $token,
             'tracking_token_generated_at' => now(),
             'nama' => $data['student_name'],
@@ -89,6 +88,8 @@ class PpdbPublicApiController extends Controller
                 'notes' => $data['notes'] ?? null,
             ],
         ]);
+
+        $nomor = $calon->nomor_pendaftaran;
 
         // Username = No. HP peserta (identitas login portal). Fallback nomor pendaftaran.
         $username = $participantPhone !== '' ? $participantPhone : $nomor;

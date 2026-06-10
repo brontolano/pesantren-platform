@@ -70,7 +70,6 @@ class LandingRegistrationController extends Controller
         ], $validated);
 
         $candidate = DB::transaction(function () use ($validated, $registrationNumberService, $request): CalonSantri {
-            $nomorPendaftaran = $registrationNumberService->generate();
             $guardianName = $validated['nama_wali'] ?: $validated['nama_ibu'];
             $guardianPhone = $validated['no_hp_wali'] ?: ($validated['no_hp_ibu'] ?: ($validated['no_hp_ayah'] ?: ''));
             $program = $validated['program_diminati'] ?: 'Preschool';
@@ -82,9 +81,10 @@ class LandingRegistrationController extends Controller
             $tanggalTransfer = $validated['tanggal_transfer'] ?? now()->toDateString();
             $namaPengirimTransfer = $validated['nama_pengirim_transfer'] ?: $guardianName;
 
-            $candidate = CalonSantri::create([
+            // Nomor + insert satu transaksi via service (race-safe; transaksi luar
+            // ini menjadikannya savepoint — lock bertahan sampai commit luar).
+            $candidate = $registrationNumberService->createWithNomor([
                 'tenant_id' => tenant()?->getTenantKey(),
-                'nomor_pendaftaran' => $nomorPendaftaran,
                 'nama' => $validated['nama_anak'],
                 'tanggal_lahir' => $validated['tanggal_lahir'],
                 'tempat_lahir' => $validated['tempat_lahir'],

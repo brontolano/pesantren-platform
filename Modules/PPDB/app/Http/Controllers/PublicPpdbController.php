@@ -83,12 +83,11 @@ class PublicPpdbController extends Controller
             ['setuju_kebijakan.accepted' => 'Centang persetujuan Kebijakan Privasi Sistem untuk melanjutkan.'],
         );
 
-        $nomorPendaftaran = $registrationNumberService->generate();
         $jenisKelamin = $validated['jenisKelamin'] === 'Laki-laki' ? 'L' : 'P';
 
-        $calon = CalonSantri::create([
+        // Nomor + insert satu transaksi (race-safe, retry saat tabrakan nomor).
+        $calon = $registrationNumberService->createWithNomor([
             'tenant_id' => tenant()?->getTenantKey(),
-            'nomor_pendaftaran' => $nomorPendaftaran,
             'nama' => $validated['nama'],
             'tanggal_lahir' => $validated['tanggalLahir'],
             'tempat_lahir' => $validated['tempatLahir'] ?? null,
@@ -107,6 +106,8 @@ class PublicPpdbController extends Controller
                 'catatan_tambahan' => $validated['catatanTambahan'] ?? null,
             ],
         ]);
+
+        $nomorPendaftaran = $calon->nomor_pendaftaran;
 
         // AUTH-1 (F1.1.1): terbitkan akun peserta + kirim OTP aktivasi via WA.
         // Kegagalan provisioning TIDAK boleh menggagalkan pendaftaran —
