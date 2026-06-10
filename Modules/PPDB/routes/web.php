@@ -18,8 +18,10 @@ Route::domain('{tenant}.localhost')->middleware([
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
     Route::get('/ppdb', [PublicPpdbController::class, 'create'])
+        ->middleware(\Modules\PPDB\Http\Middleware\FrameAncestorsPpdb::class)
         ->name('tenant.ppdb.public.create');
     Route::post('/ppdb', [PublicPpdbController::class, 'store'])
+        ->middleware(\Modules\PPDB\Http\Middleware\FrameAncestorsPpdb::class)
         ->name('tenant.ppdb.public.store');
 });
 
