@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Auth;
  * (semua menu modul). HANYA mengatur visibilitas navigasi — RBAC tetap
  * pagar keras dan semua fungsi/route tetap jalan di kedua mode.
  *
- * Resolusi: preferensi user (users.ui_mode) → default 'advanced'
- * (perilaku lama dipertahankan; simple = opt-in per user).
+ * Resolusi: preferensi user (users.ui_mode) → default 'simple'
+ * (menu ringkas untuk semua; Mode Lengkap = opt-in via toggle topbar).
  */
 class UiMode
 {
@@ -18,7 +18,7 @@ class UiMode
     {
         $mode = Auth::user()->ui_mode ?? null;
 
-        return $mode === 'simple' ? 'simple' : 'advanced';
+        return $mode === 'advanced' ? 'advanced' : 'simple';
     }
 
     public static function simple(): bool

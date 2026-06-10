@@ -25,7 +25,7 @@ class UiModeToggleTest extends TestCase
         $this->truncatePpdbTables(['domains', 'tenants']);
     }
 
-    public function test_default_advanced_dan_toggle_bolak_balik(): void
+    public function test_default_simple_dan_toggle_bolak_balik(): void
     {
         $tenant = $this->createRuntimeTenant('ui1', 'Pesantren UI');
         tenancy()->initialize($tenant);
@@ -46,18 +46,18 @@ class UiModeToggleTest extends TestCase
         $host = $tenant->id.'.localhost';
         $server = ['HTTP_HOST' => $host, 'SERVER_NAME' => $host];
 
-        // Default = advanced (perilaku lama tak berubah).
+        // Default = simple untuk semua user (Mode Lengkap = opt-in).
         $this->actingAs($user);
-        $this->assertTrue(UiMode::advanced());
+        $this->assertTrue(UiMode::simple());
 
-        // Toggle → simple.
-        $this->post("http://{$host}/ui-mode/toggle", [], $server)->assertRedirect();
-        $this->assertSame('simple', $user->fresh()->ui_mode);
-
-        // Toggle lagi → advanced.
-        $this->actingAs($user->fresh());
+        // Toggle → advanced.
         $this->post("http://{$host}/ui-mode/toggle", [], $server)->assertRedirect();
         $this->assertSame('advanced', $user->fresh()->ui_mode);
+
+        // Toggle lagi → simple.
+        $this->actingAs($user->fresh());
+        $this->post("http://{$host}/ui-mode/toggle", [], $server)->assertRedirect();
+        $this->assertSame('simple', $user->fresh()->ui_mode);
     }
 
     public function test_guest_tidak_bisa_toggle(): void
