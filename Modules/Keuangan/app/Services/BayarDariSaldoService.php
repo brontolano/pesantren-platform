@@ -47,22 +47,24 @@ class BayarDariSaldoService
             throw new InvalidArgumentException('Nominal harus lebih dari 0.');
         }
 
-        $tagihan = $tagihan instanceof Tagihan
-            ? $tagihan
-            : Tagihan::query()->findOrFail($tagihan);
-
-        if (in_array($tagihan->status, ['lunas', 'batal'], true)) {
-            throw new InvalidArgumentException('Tagihan tidak bisa dibayar.');
-        }
-
-        $sisa = $tagihan->sisa_tagihan;
-        if ($nominal > $sisa) {
-            throw new InvalidArgumentException("Nominal melebihi sisa tagihan ({$sisa}).");
-        }
-
+        $tagihanId = $tagihan instanceof Tagihan ? $tagihan->id : $tagihan;
         $santriId = $santri instanceof Santri ? $santri->id : $santri;
 
-        return DB::transaction(function () use ($tagihan, $nominal, $createdBy, $santriId): Pembayaran {
+        return DB::transaction(function () use ($tagihanId, $nominal, $createdBy, $santriId): Pembayaran {
+            // 0. LOCK baris tagihan lalu validasi status & sisa DI DALAM transaksi.
+            //    Validasi di luar transaksi rawan balapan: dua pembayaran bersamaan
+            //    sama-sama lolos cek sisa → total pembayaran MELEBIHI tagihan.
+            $tagihan = Tagihan::query()->whereKey($tagihanId)->lockForUpdate()->firstOrFail();
+
+            if (in_array($tagihan->status, ['lunas', 'batal'], true)) {
+                throw new InvalidArgumentException('Tagihan tidak bisa dibayar.');
+            }
+
+            $sisa = $tagihan->sisa_tagihan;
+            if ($nominal > $sisa) {
+                throw new InvalidArgumentException("Nominal melebihi sisa tagihan ({$sisa}).");
+            }
+
             // 1. LOCK baris tabungan (lockForUpdate) sebelum baca saldo.
             $tabungan = Tabungan::query()
                 ->where('santri_id', $santriId)
