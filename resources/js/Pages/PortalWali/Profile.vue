@@ -1,12 +1,13 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
 
 defineOptions({
     layout: PortalWaliLayout,
 })
 
-defineProps({
+const props = defineProps({
     child: {
         type: Object,
         required: true,
@@ -16,6 +17,16 @@ defineProps({
         default: () => [],
     },
 })
+
+const flashSuccess = computed(() => usePage().props?.flash?.success || '')
+const pinForm = useForm({ pin: '' })
+
+function simpanPin() {
+    pinForm.post(`/wali/santri/${props.child.id}/atur-pin`, {
+        preserveScroll: true,
+        onSuccess: () => pinForm.reset('pin'),
+    })
+}
 </script>
 
 <template>
@@ -51,6 +62,43 @@ defineProps({
                 <p><span class="font-semibold text-slate-900">No HP wali:</span> {{ child.noHpWali || '-' }}</p>
                 <p><span class="font-semibold text-slate-900">Email wali:</span> {{ child.emailWali || '-' }}</p>
             </div>
+        </section>
+
+        <section class="rounded-[1.75rem] border border-emerald-200 bg-emerald-50/60 px-4 py-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+                Login Aplikasi Santri
+            </p>
+            <h3 class="mt-2 font-jost text-lg text-emerald-950">Atur PIN anak</h3>
+            <p class="mt-1 text-sm leading-6 text-emerald-900/70">
+                Santri masuk App Santri dengan <b>NIS {{ child.nis }}</b> + PIN 6 angka.
+                Buat PIN yang mudah diingat anak.
+            </p>
+
+            <p v-if="flashSuccess" class="mt-3 rounded-xl bg-emerald-600/10 px-3 py-2 text-sm font-medium text-emerald-800">
+                {{ flashSuccess }}
+            </p>
+
+            <form class="mt-3 flex flex-wrap items-start gap-3" @submit.prevent="simpanPin">
+                <div>
+                    <input
+                        v-model="pinForm.pin"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="6"
+                        pattern="\d{6}"
+                        placeholder="6 angka"
+                        class="w-32 rounded-xl border border-emerald-300 px-4 py-3 text-center text-lg tracking-[0.4em] tabular-nums"
+                    >
+                    <p v-if="pinForm.errors.pin" class="mt-1 text-xs text-red-600">{{ pinForm.errors.pin }}</p>
+                </div>
+                <button
+                    type="submit"
+                    :disabled="pinForm.processing || !/^\d{6}$/.test(pinForm.pin)"
+                    class="rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                    Simpan PIN
+                </button>
+            </form>
         </section>
 
         <section class="space-y-3">

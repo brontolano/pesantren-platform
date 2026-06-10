@@ -123,6 +123,9 @@ Route::middleware([
         Route::post('/santri/{santri}/tagihan/{tagihan}/bayar', [PortalWaliPembayaranController::class, 'store'])->name('pembayaran.store');
         Route::get('/pembayaran-saya', [PortalWaliPembayaranController::class, 'index'])->name('pembayaran.index');
 
+        // App Santri: wali atur PIN login anaknya
+        Route::post('/santri/{santri}/atur-pin', [\App\Http\Controllers\PortalWali\PortalWaliSantriAkunController::class, 'aturPin'])->name('santri.atur-pin');
+
         // W3 Tabungan
         Route::get('/santri/{santri}/tabungan', [PortalWaliTabunganController::class, 'show'])->name('tabungan.show');
         Route::post('/santri/{santri}/tabungan/topup', [PortalWaliTabunganController::class, 'topup'])->name('tabungan.topup');
