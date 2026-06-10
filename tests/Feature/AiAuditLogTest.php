@@ -35,6 +35,9 @@ class AiAuditLogTest extends TestCase
         $this->ensurePpdbTestingSchemaReady(['ai_model_config', 'ai_audit_log']);
         $this->truncatePpdbTables(['domains', 'tenants']);
         DB::table('ai_model_config')->truncate();
+        // Baseline gating modul T-A012: registry kosong = modul tampil
+        // (pola ModuleService, sama dengan AiWizardPengaturanTest).
+        DB::table('module_registry')->delete();
         Cache::flush();
     }
 

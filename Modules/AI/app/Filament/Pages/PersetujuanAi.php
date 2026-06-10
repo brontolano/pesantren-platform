@@ -56,6 +56,29 @@ class PersetujuanAi extends Page
         return static::canAccess();
     }
 
+    /**
+     * T-A012 — badge navigasi: jumlah pengajuan menunggu keputusan. Hanya
+     * dihitung saat navigasi memang terdaftar (canAccess sudah lolos gerbang
+     * panel tenant + modul + permission).
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        if (! tenancy()->initialized) {
+            return null;
+        }
+
+        $menunggu = AiApproval::query()
+            ->where('status', AiApproval::STATUS_MENUNGGU)
+            ->count();
+
+        return $menunggu > 0 ? (string) $menunggu : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'warning';
+    }
+
     /** Daftar pengajuan yang menunggu keputusan (dipakai blade). */
     public function approvalMenunggu(): Collection
     {

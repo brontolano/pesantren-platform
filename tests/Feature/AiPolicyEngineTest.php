@@ -49,6 +49,8 @@ class AiPolicyEngineTest extends TestCase
             'ai_escalation', 'ai_audit_log', 'ai_model_config', 'ai_credit_ledger',
         ]);
         $this->truncatePpdbTables(['domains', 'tenants', 'ai_credit_ledger', 'ai_tenant_budget']);
+        // Baseline gating modul T-A012: registry kosong = modul tampil.
+        \Illuminate\Support\Facades\DB::table('module_registry')->delete();
         Cache::flush();
     }
 
