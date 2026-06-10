@@ -84,6 +84,10 @@ Route::get('/ppdb', [TenantWebsiteController::class, 'ppdbForm'])
     ->name('tenant.ppdb.form');
 Route::post('/ppdb', [TenantWebsiteController::class, 'ppdbStore'])->name('tenant.ppdb.store');
 
+// Widget <script> embed utk situs eksternal — data publik saja, CORS terbuka.
+Route::get('/embed/widget.js', [\Modules\CMS\Http\Controllers\EmbedWidgetController::class, 'script'])->name('tenant.embed.script');
+Route::get('/embed/data.json', [\Modules\CMS\Http\Controllers\EmbedWidgetController::class, 'data'])->name('tenant.embed.data');
+
 // Fallback login route untuk middleware 'auth' pada route non-panel (mis. export tenant).
 // Pada domain tenant, /admin/login adalah halaman login panel tenant.
 Route::get('/login', fn () => redirect('/admin/login'))->name('login');
