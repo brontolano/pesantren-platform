@@ -101,6 +101,10 @@ class PortalWaliPembayaranController extends Controller
             'created_by' => $wali->id,
         ]);
 
+        // Notif WA admin: ada bukti baru di antrean verifikasi (fire-and-forget).
+        app(\Modules\Keuangan\Services\KeuanganNotifikasiService::class)
+            ->buktiMasuk('Bukti pembayaran tagihan', $child->nama, (float) $validated['nominal']);
+
         return redirect()
             ->route('tenant.portal-wali.pembayaran.index', ['tenant' => tenant('id') ?? $request->route('tenant')])
             ->with('success', 'Bukti pembayaran terkirim. Menunggu verifikasi bendahara.');

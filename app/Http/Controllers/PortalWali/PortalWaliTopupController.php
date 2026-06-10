@@ -93,6 +93,10 @@ class PortalWaliTopupController extends Controller
             'created_by' => $wali->id,
         ]);
 
+        // Notif WA admin: pengajuan topup baru menunggu verifikasi (fire-and-forget).
+        app(\Modules\Keuangan\Services\KeuanganNotifikasiService::class)
+            ->buktiMasuk('Setor saldo tabungan', $child->nama, (float) $validated['nominal']);
+
         return redirect()->route('tenant.portal-wali.topup.instruksi', [
             'tenant' => tenant('id') ?? $request->route('tenant'),
             'santri' => $child->id,

@@ -29,6 +29,13 @@ class NotifDispatcher
         'tagihan_jatuh_tempo' => 'tagihan_jatuh_tempo', // Keuangan: tagihan jatuh tempo
         'stok_expiry' => 'stok_expiry',               // Inventory: batch mendekati kedaluwarsa
         'keputusan_ppdb' => 'keputusan_ppdb',         // PPDB: hasil seleksi
+        // Event uang PWA Wali/Peserta (NOTIF-1, TGH-5, TAB-4) — additive.
+        'pembayaran_diverifikasi' => 'PEMBAYARAN_DIVERIFIKASI', // wali: bukti diterima
+        'pembayaran_ditolak' => 'PEMBAYARAN_DITOLAK',           // wali: bukti ditolak + alasan
+        'topup_diverifikasi' => 'TOPUP_DIVERIFIKASI',           // wali: saldo bertambah
+        'topup_ditolak' => 'TOPUP_DITOLAK',                     // wali: topup ditolak + alasan
+        'bukti_bayar_masuk' => 'BUKTI_BAYAR_MASUK',             // admin: antrean verifikasi baru
+        'berkas_ppdb_masuk' => 'BERKAS_PPDB_MASUK',             // admin: berkas/bukti PPDB baru
     ];
 
     public function __construct(
