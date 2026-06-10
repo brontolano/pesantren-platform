@@ -67,12 +67,27 @@ class SantriAccountService
      */
     public function resetPin(Santri $santri): array
     {
+        return [$this->setPin($santri, str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT)), $this->lastPin];
+    }
+
+    private string $lastPin = '';
+
+    /**
+     * Setel PIN login santri ke nilai TERTENTU (mis. dipilih wali di Portal Wali).
+     * Wajib 6 digit numerik. Akun dibuat bila belum ada (idempoten).
+     */
+    public function setPin(Santri $santri, string $pin): User
+    {
+        if (! preg_match('/^\d{6}$/', $pin)) {
+            throw new \InvalidArgumentException('PIN harus 6 digit angka.');
+        }
+
         $user = $this->provision($santri);
-        $pin = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $user->password = $pin; // cast 'hashed' meng-hash saat di-set
         $user->save();
+        $this->lastPin = $pin;
 
-        return [$user, $pin];
+        return $user;
     }
 
     /**
