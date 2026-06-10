@@ -9,6 +9,7 @@
     <meta name="author" content="PT Rojo Bronto Lano">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://pesantren.online">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
     <meta property="og:title" content="Pesantren Platform — Sistem Administrasi Pesantren Terpadu">
     <meta property="og:description" content="Platform SaaS untuk manajemen pesantren modern. Satu sistem untuk semua kebutuhan pengelolaan.">
     <meta property="og:url" content="https://pesantren.online">
@@ -175,6 +176,7 @@
             <a href="#modul">Modul</a>
             <a href="#keunggulan">Keunggulan</a>
             <a href="https://demo.pesantren.online" target="_blank" rel="noopener">Demo</a>
+            <a href="/dokumentasi/">Panduan</a>
             <a href="{{ route('legal.contact') }}">Kontak</a>
             <a href="/platform" class="btn btn-primary">Masuk</a>
         </div>
@@ -323,6 +325,7 @@
     <div class="footer-inner">
         <div class="footer-copy">Pesantren Platform &copy; {{ date('Y') }} <a href="https://brontolano.com" target="_blank" rel="noopener">PT Rojo Bronto Lano</a></div>
         <div class="footer-links">
+            <a href="/dokumentasi/">Pusat Panduan</a>
             <a href="{{ route('legal.privacy') }}">Kebijakan Privasi</a>
             <a href="{{ route('legal.terms') }}">Syarat Layanan</a>
             <a href="{{ route('legal.disclaimer') }}">Disclaimer</a>
