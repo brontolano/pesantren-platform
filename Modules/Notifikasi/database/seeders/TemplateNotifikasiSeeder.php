@@ -328,6 +328,26 @@ Mohon segera menyelesaikan daftar ulang melalui aplikasi peserta agar kursi tida
 Jazakumullahu khairan.
 MSG,
             ],
+
+            [
+                'kode_template'    => 'KREDENSIAL_SANTRI',
+                'judul'            => 'Akun Aplikasi Santri',
+                'channel'          => 'whatsapp',
+                'variable_dinamis' => ['nama_santri', 'nis', 'username', 'password', 'nama_pesantren'],
+                'isi'              => <<<'MSG'
+🔐 *AKUN APLIKASI SANTRI* — {{nama_pesantren}}
+
+Assalamu'alaikum Bapak/Ibu Wali Santri *{{nama_santri}}* (NIS {{nis}}),
+
+Akun aplikasi santri telah dibuat:
+👤 Username : {{username}}
+🔑 Password sementara : {{password}}
+
+Mohon segera login dan GANTI password. Jaga kerahasiaan kredensial ini.
+
+Jazakumullahu khairan.
+MSG,
+            ],
         ];
 
         $tenantId = tenant('id') ?? throw new \RuntimeException('Seeder harus dijalankan dalam konteks tenant.');
