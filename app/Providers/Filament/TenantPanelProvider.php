@@ -224,6 +224,7 @@ class TenantPanelProvider extends PanelProvider
             SuratResource::class,
             PaketSoalResource::class,
             UjianAttemptResource::class,
+            \App\Filament\Resources\SetorKeliling\SetorKelilingResource::class,
             AlokasiBiayaResource::class,
             KursValutaResource::class,
             AnggaranResource::class,
