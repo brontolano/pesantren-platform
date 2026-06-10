@@ -32,6 +32,7 @@ class ReportExportService
         'register-aset' => 'reports.generic',
         'spt-pph21' => 'reports.generic',
         'quotation-biaya' => 'reports.generic',
+        'id-card-santri' => 'reports.id-card',
     ];
 
     /** Header brand tenant untuk kop laporan. */

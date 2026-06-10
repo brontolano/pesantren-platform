@@ -378,9 +378,45 @@ class SantriResource extends Resource
                     ->options(['L' => 'Laki-laki', 'P' => 'Perempuan']),
             ])
             ->actions([
+                \Filament\Actions\Action::make('id_card')
+                    ->label('ID Card')
+                    ->icon('heroicon-o-identification')
+                    ->action(fn ($record) => static::unduhIdCard(collect([$record]))),
                 EditAction::make(),
                 DeleteAction::make(),
+            ])
+            ->bulkActions([
+                \Filament\Actions\BulkAction::make('id_card_massal')
+                    ->label('Cetak ID Card')
+                    ->icon('heroicon-o-identification')
+                    ->action(fn ($records) => static::unduhIdCard(collect($records)))
+                    ->deselectRecordsAfterCompletion(),
             ]);
+    }
+
+    /**
+     * Unduh ID Card (pola F8): PDF bila dompdf terpasang; fallback HTML
+     * siap-print-browser. QR NIS inline — lihat IdCardService.
+     */
+    public static function unduhIdCard(\Illuminate\Support\Collection $santri)
+    {
+        $svc = app(\Modules\Kesantrian\Services\IdCardService::class);
+
+        try {
+            return app(\Modules\Core\Services\ReportExportService::class)->pdf(
+                'id-card-santri',
+                ['judul' => 'ID Card Santri', 'kartu' => $svc->kartu($santri)],
+                'id-card-santri.pdf',
+            );
+        } catch (\Modules\Core\Exceptions\ReportPdfUnavailableException) {
+            $html = $svc->html($santri);
+
+            return response()->streamDownload(
+                fn () => print($html),
+                'id-card-santri.html',
+                ['Content-Type' => 'text/html; charset=UTF-8'],
+            );
+        }
     }
 
     public static function getEloquentQuery(): Builder
