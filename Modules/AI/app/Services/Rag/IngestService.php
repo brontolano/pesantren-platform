@@ -344,6 +344,13 @@ class IngestService
                 ];
             }
 
+            // Potongan ini sudah mencapai akhir teks → selesai. Tanpa guard
+            // ini, langkah (panjang - overlap) merayap di ekor teks dan
+            // menghasilkan banyak chunk duplikat untuk teks pendek.
+            if ($mulai + mb_strlen($ambil) >= $panjang) {
+                break;
+            }
+
             $langkah = max(1, mb_strlen($ambil) - self::OVERLAP_CHARS);
             $mulai += $langkah;
         }
