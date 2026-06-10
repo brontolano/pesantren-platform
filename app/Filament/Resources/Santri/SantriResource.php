@@ -15,6 +15,8 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Actions as FormActions;
+use Filament\Actions\Action as FormAction;
 use Illuminate\Support\Facades\DB;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -178,55 +180,66 @@ class SantriResource extends Resource
                     ->searchable(),
             ])->columns(2),
 
-            Section::make('Data Wali / Orang Tua')->schema([
+            Section::make('Data Ayah')->schema([
                 TextInput::make('nama_ayah')->label('Nama Ayah')->maxLength(255),
-                TextInput::make('nama_ibu')->label('Nama Ibu')->maxLength(255),
                 TextInput::make('pekerjaan_ayah')->label('Pekerjaan Ayah')->maxLength(255),
+                TextInput::make('no_hp_ayah')->label('No. HP Ayah')->tel()->maxLength(20),
+                Section::make('Alamat Ayah')->schema(
+                    static::alamatPihakFields('ayah')
+                )->columns(2)->columnSpanFull()->collapsible(),
+            ])->columns(2),
+
+            Section::make('Data Ibu')->schema([
+                FormActions::make([
+                    FormAction::make('salinAlamatAyah')
+                        ->label('Salin alamat dari Ayah')
+                        ->icon('heroicon-o-document-duplicate')
+                        ->color('gray')
+                        ->action(function (Get $get, Set $set): void {
+                            foreach (['alamat', 'rt_rw', 'kode_pos', 'provinsi', 'kabupaten_kota', 'kecamatan', 'desa_kelurahan'] as $f) {
+                                $set("{$f}_ibu", $get("{$f}_ayah"));
+                            }
+                        }),
+                ])->columnSpanFull(),
+                TextInput::make('nama_ibu')->label('Nama Ibu')->maxLength(255),
                 TextInput::make('pekerjaan_ibu')->label('Pekerjaan Ibu')->maxLength(255),
-                TextInput::make('no_hp_wali')->label('No. HP Wali')->tel()->maxLength(20),
+                TextInput::make('no_hp_ibu')->label('No. HP Ibu')->tel()->maxLength(20),
+                Section::make('Alamat Ibu')->schema(
+                    static::alamatPihakFields('ibu')
+                )->columns(2)->columnSpanFull()->collapsible(),
+            ])->columns(2),
+
+            Section::make('Akun Wali (untuk Portal Wali & login)')->schema([
+                TextInput::make('no_hp_wali')->label('No. HP Wali Utama')->tel()->maxLength(20)
+                    ->helperText('Nomor ini jadi kunci akun Portal Wali — boleh nomor ayah, ibu, atau wali lain. Anak lain dengan nomor sama akan tergabung ke satu akun.'),
                 TextInput::make('email_wali')->label('Email Wali')->email()->maxLength(255),
 
-                Section::make('Alamat Wali')->schema([
-                    TextInput::make('rt_rw_wali')
-                        ->label('RT/RW')
-                        ->maxLength(255)
-                        ->placeholder('001/002'),
-                    TextInput::make('kode_pos_wali')
-                        ->label('Kode POS')
-                        ->maxLength(255)
-                        ->placeholder('45312'),
-                    Select::make('provinsi_wali')
-                        ->label('Provinsi')
+                Section::make('Alamat Wali / Domisili Keluarga')->schema([
+                    TextInput::make('rt_rw_wali')->label('RT/RW')->maxLength(255)->placeholder('001/002'),
+                    TextInput::make('kode_pos_wali')->label('Kode POS')->maxLength(255)->placeholder('45312'),
+                    Select::make('provinsi_wali')->label('Provinsi')
                         ->options(fn (Get $get) => static::provinsiOptions($get('provinsi_wali')))
-                        ->searchable()
-                        ->live()
+                        ->searchable()->live()
                         ->afterStateUpdated(function (Set $set) {
                             $set('kabupaten_kota_wali', null);
                             $set('kecamatan_wali', null);
                             $set('desa_kelurahan_wali', null);
                         }),
-                    Select::make('kabupaten_kota_wali')
-                        ->label('Kabupaten / Kota')
+                    Select::make('kabupaten_kota_wali')->label('Kabupaten / Kota')
                         ->options(fn (Get $get) => static::kotaOptions($get('provinsi_wali'), $get('kabupaten_kota_wali')))
-                        ->searchable()
-                        ->live()
+                        ->searchable()->live()
                         ->afterStateUpdated(function (Set $set) {
                             $set('kecamatan_wali', null);
                             $set('desa_kelurahan_wali', null);
                         }),
-                    Select::make('kecamatan_wali')
-                        ->label('Kecamatan')
+                    Select::make('kecamatan_wali')->label('Kecamatan')
                         ->options(fn (Get $get) => static::kecamatanOptions($get('kabupaten_kota_wali'), $get('kecamatan_wali')))
-                        ->searchable()
-                        ->live()
-                        ->afterStateUpdated(function (Set $set) {
-                            $set('desa_kelurahan_wali', null);
-                        }),
-                    Select::make('desa_kelurahan_wali')
-                        ->label('Desa / Kelurahan')
+                        ->searchable()->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('desa_kelurahan_wali', null)),
+                    Select::make('desa_kelurahan_wali')->label('Desa / Kelurahan')
                         ->options(fn (Get $get) => static::desaOptions($get('kecamatan_wali'), $get('desa_kelurahan_wali')))
                         ->searchable(),
-                ])->columns(2)->columnSpanFull(),
+                ])->columns(2)->columnSpanFull()->collapsible()->collapsed(),
             ])->columns(2),
 
             Section::make('Akademik')->schema([
@@ -258,6 +271,43 @@ class SantriResource extends Resource
      * Opsi provinsi (nama baku dari tabel wilayah tenant).
      * Selalu menyertakan nilai lama (hasil import) agar tidak terhapus.
      */
+    /**
+     * Field alamat terurai (cascading wilayah) untuk satu pihak: 'ayah' | 'ibu'.
+     * Memakai helper wilayah yang sama dengan alamat santri/wali.
+     *
+     * @return array<int, \Filament\Schemas\Components\Component>
+     */
+    protected static function alamatPihakFields(string $pihak): array
+    {
+        return [
+            Textarea::make("alamat_{$pihak}")->label('Alamat (jalan/dusun)')->rows(2)->columnSpanFull(),
+            TextInput::make("rt_rw_{$pihak}")->label('RT/RW')->maxLength(10)->placeholder('001/002'),
+            TextInput::make("kode_pos_{$pihak}")->label('Kode POS')->maxLength(5)->placeholder('45312'),
+            Select::make("provinsi_{$pihak}")->label('Provinsi')
+                ->options(fn (Get $get) => static::provinsiOptions($get("provinsi_{$pihak}")))
+                ->searchable()->live()
+                ->afterStateUpdated(function (Set $set) use ($pihak) {
+                    $set("kabupaten_kota_{$pihak}", null);
+                    $set("kecamatan_{$pihak}", null);
+                    $set("desa_kelurahan_{$pihak}", null);
+                }),
+            Select::make("kabupaten_kota_{$pihak}")->label('Kabupaten / Kota')
+                ->options(fn (Get $get) => static::kotaOptions($get("provinsi_{$pihak}"), $get("kabupaten_kota_{$pihak}")))
+                ->searchable()->live()
+                ->afterStateUpdated(function (Set $set) use ($pihak) {
+                    $set("kecamatan_{$pihak}", null);
+                    $set("desa_kelurahan_{$pihak}", null);
+                }),
+            Select::make("kecamatan_{$pihak}")->label('Kecamatan')
+                ->options(fn (Get $get) => static::kecamatanOptions($get("kabupaten_kota_{$pihak}"), $get("kecamatan_{$pihak}")))
+                ->searchable()->live()
+                ->afterStateUpdated(fn (Set $set) => $set("desa_kelurahan_{$pihak}", null)),
+            Select::make("desa_kelurahan_{$pihak}")->label('Desa / Kelurahan')
+                ->options(fn (Get $get) => static::desaOptions($get("kecamatan_{$pihak}"), $get("desa_kelurahan_{$pihak}")))
+                ->searchable(),
+        ];
+    }
+
     protected static function provinsiOptions(?string $current): array
     {
         return static::wilayahOptions(
