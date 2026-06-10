@@ -388,6 +388,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Eskalasi "Tanya Ustadz" (T-A023) — SLA, auto-assign, laporan kyai
+    |--------------------------------------------------------------------------
+    | sla_jam_default: dipakai bila setting tenant eskalasi_tujuan.sla_jam
+    | tidak tersedia. auto_assign_menit: eskalasi 'baru' lebih tua dari ini
+    | otomatis ditugaskan ke tujuan default (scheduled ai:eskalasi-pengingat).
+    */
+    'eskalasi' => [
+        'sla_jam_default' => (int) env('AI_ESKALASI_SLA_JAM', 24),
+        'auto_assign_menit' => (int) env('AI_ESKALASI_AUTO_ASSIGN_MENIT', 30),
+        // Maks contoh anonim (pertanyaan_ringkas terredaksi) di laporan kyai.
+        'laporan_contoh_max' => (int) env('AI_ESKALASI_LAPORAN_CONTOH_MAX', 5),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | RAG (T-A031) — retrieval hybrid ber-tenant + sitasi deterministik
     |--------------------------------------------------------------------------
     | top_k: jumlah chunk final yang masuk konteks (Blueprint §7.4: 3–5 saja).

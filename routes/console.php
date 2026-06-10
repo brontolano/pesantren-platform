@@ -25,3 +25,15 @@ Schedule::command('keuangan:rekonsiliasi-harian')
 Schedule::command('ai:anomali')
     ->dailyAt('17:00')
     ->withoutOverlapping();
+
+// T-A023: antrean Tanya Ustadz — auto-assign eskalasi menggantung + pengingat
+// SLA per jam (loop semua tenant; pengingat hanya terkirim SEKALI per tenggat).
+Schedule::command('ai:eskalasi-pengingat')
+    ->hourly()
+    ->withoutOverlapping();
+
+// T-A023: laporan bulanan Tanya Ustadz untuk kyai/pimpinan — tanggal 1 pagi,
+// merangkum bulan sebelumnya (idempoten per tenant+periode).
+Schedule::command('ai:laporan-eskalasi')
+    ->monthlyOn(1, '06:00')
+    ->withoutOverlapping();
