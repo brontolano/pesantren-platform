@@ -13,10 +13,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Asrama\Models\BiayaAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;
+use Modules\Core\Concerns\HasDocuments;
 
 class Santri extends Model
 {
-    use BelongsToTenant, SoftDeletes;
+    use BelongsToTenant, HasDocuments, SoftDeletes;
 
     protected $table = 'santri';
 
