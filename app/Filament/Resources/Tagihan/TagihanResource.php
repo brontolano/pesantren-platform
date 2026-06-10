@@ -38,6 +38,28 @@ class TagihanResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    /** Badge: jumlah tagihan yang belum lunas — sinyal kerja bendahara. */
+    public static function getNavigationBadge(): ?string
+    {
+        try {
+            $n = Tagihan::query()->whereIn('status', ['belum_bayar', 'sebagian'])->count();
+
+            return $n > 0 ? (string) $n : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Tagihan belum lunas';
+    }
+
     public static function shouldRegisterNavigation(): bool
     {
         return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
