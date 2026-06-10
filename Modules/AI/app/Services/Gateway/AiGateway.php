@@ -10,6 +10,8 @@ use Modules\AI\Services\Audit\AuditRecorder;
 use Modules\AI\Services\Audit\StepTimer;
 use Modules\AI\Services\Metering\BudgetGuard;
 use Modules\AI\Services\Metering\CreditMeter;
+use Modules\AI\Services\Privacy\ContentSanitizer;
+use Modules\AI\Services\Privacy\PiiRedactor;
 use Modules\AI\Services\Prompts\PromptRegistry;
 use Throwable;
 
@@ -37,6 +39,8 @@ class AiGateway
         private readonly BudgetGuard $budgetGuard,
         private readonly CreditMeter $meter,
         private readonly PromptRegistry $prompts,
+        private readonly PiiRedactor $redactor,
+        private readonly ContentSanitizer $sanitizer,
     ) {}
 
     public function generate(AiGenerateRequest $request): AiGenerateResult
@@ -103,6 +107,15 @@ class AiGateway
             $request = $request->withSystem($prompt->systemPrompt);
         }
 
+        // T-A005: langkah privasi SETELAH resolusi prompt & SEBELUM provider —
+        // konteks eksternal disanitasi + dibungkus blok DATA, lalu prompt
+        // gabungan diredaksi PII. Hanya versi TERREDAKSI yang menyentuh
+        // provider & audit; peta de-redaksi hidup in-memory request ini saja.
+        [$request, $petaPii, $piiMeta] = $timer->measure(
+            'pii',
+            fn (): array => $this->terapkanPrivasi($request),
+        );
+
         try {
             $selection = $timer->measure(
                 'router',
@@ -117,8 +130,13 @@ class AiGateway
                 ));
 
                 if ($result !== null) {
+                    // T-A005: pulihkan token PII pada jawaban model (de-redaksi)
+                    // — metering & audit terjadi SETELAHNYA, tapi audit hanya
+                    // menyimpan ringkasan terredaksi, bukan teks jawaban.
+                    $result = $this->deredactResult($result, $petaPii);
+
                     $meteran = $tenantId !== null ? $this->meterUsage($tenantId, $request, $result) : null;
-                    $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, promptVersionId: $prompt->promptVersionId);
+                    $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, promptVersionId: $prompt->promptVersionId, pii: $piiMeta);
 
                     return $result;
                 }
@@ -127,16 +145,74 @@ class AiGateway
             // Semua provider nyata gagal/terbuka sirkuitnya → degradasi anggun.
             $result = $this->makeProvider('null')->generate($request, $selection);
             $meteran = $tenantId !== null ? $this->meterUsage($tenantId, $request, $result) : null;
-            $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, promptVersionId: $prompt->promptVersionId);
+            $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, promptVersionId: $prompt->promptVersionId, pii: $piiMeta);
 
             return $result;
         } catch (Throwable $e) {
             // Kesalahan pemakaian (tier tak dikenal, config korup) tetap
             // dilempar — tapi jejaknya tercatat dulu untuk forensik.
-            $this->recordGenerateAudit($request, $timer, null, $e, promptVersionId: $prompt->promptVersionId);
+            $this->recordGenerateAudit($request, $timer, null, $e, promptVersionId: $prompt->promptVersionId, pii: $piiMeta);
 
             throw $e;
         }
+    }
+
+    /**
+     * T-A005: terapkan langkah privasi pada satu request.
+     *
+     *  1. context (bila ada) → ContentSanitizer::sanitize + wrapAsData('konteks'),
+     *     ditempel ke prompt — konten eksternal masuk SELALU sebagai blok DATA;
+     *  2. prompt gabungan → PiiRedactor::redact — hanya versi terredaksi yang
+     *     keluar ke provider;
+     *  3. ringkasanKonteks (kolom audit) ikut diredaksi — jaring pengaman bila
+     *     pemanggil lalai meredaksi di hulu.
+     *
+     * Peta de-redaksi TIDAK dipersist — in-memory selama request ini saja
+     * (TODO enkripsi bila kelak menyeberang proses: lihat PiiRedactor).
+     *
+     * @return array{0: AiGenerateRequest, 1: array<string, string>, 2: array{jumlah_redaksi: int, jenis: list<string>}}
+     */
+    private function terapkanPrivasi(AiGenerateRequest $request): array
+    {
+        $prompt = $request->prompt;
+
+        if ($request->context !== null && trim($request->context) !== '') {
+            $prompt .= "\n\n".$this->sanitizer->wrapAsData(
+                $this->sanitizer->sanitize($request->context),
+                'konteks',
+            );
+        }
+
+        $redaksi = $this->redactor->redact($prompt);
+
+        $ringkasan = $request->ringkasanKonteks !== null
+            ? $this->redactor->redact($request->ringkasanKonteks)->text
+            : null;
+
+        return [
+            $request->withPiiTerredaksi($redaksi->text, $ringkasan),
+            $redaksi->map,
+            ['jumlah_redaksi' => $redaksi->total(), 'jenis' => $redaksi->jenis()],
+        ];
+    }
+
+    /** T-A005: pulihkan token PII pada teks jawaban (field lain apa adanya). */
+    private function deredactResult(AiGenerateResult $result, array $petaPii): AiGenerateResult
+    {
+        if ($petaPii === []) {
+            return $result;
+        }
+
+        return new AiGenerateResult(
+            text: $this->redactor->deredact($result->text, $petaPii),
+            provider: $result->provider,
+            model: $result->model,
+            degraded: $result->degraded,
+            promptTokens: $result->promptTokens,
+            completionTokens: $result->completionTokens,
+            latencyMs: $result->latencyMs,
+            raw: $result->raw,
+        );
     }
 
     /**
@@ -202,12 +278,25 @@ class AiGateway
         ?Throwable $error = null,
         ?array $meteran = null,
         ?int $promptVersionId = null,
+        ?array $pii = null,
     ): void {
         $status = match (true) {
             $error !== null => AiAuditLog::STATUS_GAGAL,
             $result?->degraded === true => AiAuditLog::STATUS_DEGRADASI,
             default => AiAuditLog::STATUS_SUKSES,
         };
+
+        // keputusan_kebijakan (jsonb): gabungan penanda metering gagal (T-A002)
+        // + statistik redaksi PII (T-A005). null bila tak ada keduanya.
+        $kebijakan = [];
+
+        if ($meteran['gagal'] ?? false) {
+            $kebijakan['metering'] = 'gagal';
+        }
+
+        if ($pii !== null) {
+            $kebijakan['pii'] = $pii;
+        }
 
         $this->audit->recordOrLog([
             'user_id' => $request->userId,
@@ -224,7 +313,7 @@ class AiGateway
             'token_keluar' => $result?->completionTokens,
             'biaya_kredit' => $meteran['kredit'] ?? 0, // T-A002 (CreditMeter)
             // Kegagalan metering tercermin di audit (kontrak T-A002).
-            'keputusan_kebijakan' => ($meteran['gagal'] ?? false) ? ['metering' => 'gagal'] : null,
+            'keputusan_kebijakan' => $kebijakan === [] ? null : $kebijakan,
             'latency' => $timer->breakdown(),
             'status' => $status,
             'error_ringkas' => $error !== null

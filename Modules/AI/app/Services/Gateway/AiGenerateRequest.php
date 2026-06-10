@@ -9,8 +9,11 @@ namespace Modules\AI\Services\Gateway;
 final readonly class AiGenerateRequest
 {
     /**
-     * @param  string  $prompt  Prompt utama (sudah melewati redaksi PII di hulu).
+     * @param  string  $prompt  Prompt utama (gateway meredaksi PII sebelum provider, T-A005).
      * @param  string|null  $system  System prompt (dari prompt registry, T-A004).
+     * @param  string|null  $context  Konten eksternal (dokumen/RAG) — gateway mensanitasi
+     *                                & membungkusnya sebagai blok DATA (T-A005), lalu
+     *                                menempelkannya ke prompt sebelum provider.
      * @param  string  $agent  Kunci agen (mis. chatbot_wali, generator_soal).
      * @param  string  $tier  ekonomis|standar|premium — diteruskan ke ModelRouter.
      * @param  array<string, mixed>  $options  Opsi inferensi tambahan (num_predict, temperature, ...).
@@ -23,6 +26,7 @@ final readonly class AiGenerateRequest
     public function __construct(
         public string $prompt,
         public ?string $system = null,
+        public ?string $context = null,
         public string $agent = 'default',
         public string $tier = 'standar',
         public array $options = [],
@@ -39,9 +43,38 @@ final readonly class AiGenerateRequest
      */
     public function withSystem(?string $system): self
     {
+        return $this->salin(system: $system);
+    }
+
+    /**
+     * Salinan request hasil langkah privasi T-A005 (PiiRedactor +
+     * ContentSanitizer di gateway): prompt sudah tergabung konteks-tersanitasi
+     * dan terredaksi PII; context dinolkan (sudah menyatu di prompt);
+     * ringkasanKonteks ikut terredaksi untuk audit. DTO tetap immutable.
+     */
+    public function withPiiTerredaksi(string $prompt, ?string $ringkasanKonteks): self
+    {
+        return $this->salin(
+            prompt: $prompt,
+            context: null,
+            ringkasanKonteks: $ringkasanKonteks,
+            pakaiContextBaru: true,
+            pakaiRingkasanBaru: true,
+        );
+    }
+
+    private function salin(
+        ?string $prompt = null,
+        ?string $system = null,
+        ?string $context = null,
+        ?string $ringkasanKonteks = null,
+        bool $pakaiContextBaru = false,
+        bool $pakaiRingkasanBaru = false,
+    ): self {
         return new self(
-            prompt: $this->prompt,
-            system: $system,
+            prompt: $prompt ?? $this->prompt,
+            system: $system ?? $this->system,
+            context: $pakaiContextBaru ? $context : $this->context,
             agent: $this->agent,
             tier: $this->tier,
             options: $this->options,
@@ -49,7 +82,7 @@ final readonly class AiGenerateRequest
             channel: $this->channel,
             userId: $this->userId,
             idempotencyKey: $this->idempotencyKey,
-            ringkasanKonteks: $this->ringkasanKonteks,
+            ringkasanKonteks: $pakaiRingkasanBaru ? $ringkasanKonteks : $this->ringkasanKonteks,
         );
     }
 }
