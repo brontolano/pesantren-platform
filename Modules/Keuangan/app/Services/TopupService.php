@@ -2,6 +2,7 @@
 
 namespace Modules\Keuangan\Services;
 
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Models\TabunganTopup;
@@ -58,24 +59,32 @@ class TopupService
     {
         $this->ensureTenantContext();
 
-        if ($topup->status !== 'menunggu') {
-            throw new InvalidArgumentException('Topup sudah diproses.');
-        }
+        // RACE GUARD: status WAJIB dicek pada baris ter-LOCK di dalam SATU transaksi
+        // dengan setor + update status. Tanpa ini, dua klik "setujui" bersamaan
+        // sama-sama lolos cek 'menunggu' → setor() jalan dua kali → SALDO NAIK DOBEL.
+        // Transaksi juga menjamin setor & status berubah bersama (tak ada setor yatim).
+        return DB::transaction(function () use ($topup, $verifiedBy): TabunganTopup {
+            $locked = TabunganTopup::query()->whereKey($topup->id)->lockForUpdate()->firstOrFail();
 
-        $tabungan = $topup->tabungan;
+            if ($locked->status !== 'menunggu') {
+                throw new InvalidArgumentException('Topup sudah diproses.');
+            }
 
-        $this->tabunganService->setor($tabungan->santri_id, (float) $topup->nominal, [
-            'keterangan' => "Setor saldo (topup #{$topup->id}) dari {$topup->nama_pengirim}",
-            'created_by' => $verifiedBy,
-        ]);
+            $tabungan = $locked->tabungan;
 
-        $topup->update([
-            'status' => 'disetujui',
-            'verified_by' => $verifiedBy,
-            'verified_at' => now(),
-        ]);
+            $this->tabunganService->setor($tabungan->santri_id, (float) $locked->nominal, [
+                'keterangan' => "Setor saldo (topup #{$locked->id}) dari {$locked->nama_pengirim}",
+                'created_by' => $verifiedBy,
+            ]);
 
-        return $topup->fresh();
+            $locked->update([
+                'status' => 'disetujui',
+                'verified_by' => $verifiedBy,
+                'verified_at' => now(),
+            ]);
+
+            return $locked->fresh();
+        });
     }
 
     /**
@@ -85,18 +94,24 @@ class TopupService
     {
         $this->ensureTenantContext();
 
-        if ($topup->status !== 'menunggu') {
-            throw new InvalidArgumentException('Topup sudah diproses.');
-        }
+        // Lock + cek status di transaksi yang sama — cegah tolak menimpa topup
+        // yang sedang/baru disetujui proses lain (saldo sudah naik).
+        return DB::transaction(function () use ($topup, $verifiedBy, $alasan): TabunganTopup {
+            $locked = TabunganTopup::query()->whereKey($topup->id)->lockForUpdate()->firstOrFail();
 
-        $topup->update([
-            'status' => 'ditolak',
-            'alasan_penolakan' => $alasan,
-            'verified_by' => $verifiedBy,
-            'verified_at' => now(),
-        ]);
+            if ($locked->status !== 'menunggu') {
+                throw new InvalidArgumentException('Topup sudah diproses.');
+            }
 
-        return $topup->fresh();
+            $locked->update([
+                'status' => 'ditolak',
+                'alasan_penolakan' => $alasan,
+                'verified_by' => $verifiedBy,
+                'verified_at' => now(),
+            ]);
+
+            return $locked->fresh();
+        });
     }
 
     private function ensureTenantContext(): void
