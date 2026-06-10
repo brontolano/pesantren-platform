@@ -103,6 +103,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Prompt registry (T-A004) — versi prompt per agen + feature flag tenant
+    |--------------------------------------------------------------------------
+    | Sumber kebenaran: tabel CENTRAL ai_agent / ai_prompt_version /
+    | ai_prompt_tenant_override (cache 60 dtk + invalidasi eksplisit).
+    */
+    'prompts' => [
+        'cache_seconds' => (int) env('AI_PROMPTS_CACHE_SECONDS', 60),
+
+        // Pesan saat feature flag tenant mematikan sebuah agen. Bahasa
+        // Indonesia santun — BERBEDA dari pesan anggaran/degradasi supaya
+        // jelas ini soal fitur belum diaktifkan, bukan gangguan/kuota.
+        'disabled_message' => 'Mohon maaf, fitur asisten ini tidak diaktifkan untuk pesantren Anda. Silakan hubungi admin bila membutuhkannya.',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Metering kredit (T-A002) — tarif per tier, anggaran & kill-switch
     |--------------------------------------------------------------------------
     | Satuan = KREDIT (bukan rupiah) per 1000 token, dipisah token masuk/keluar

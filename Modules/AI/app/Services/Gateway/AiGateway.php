@@ -10,6 +10,7 @@ use Modules\AI\Services\Audit\AuditRecorder;
 use Modules\AI\Services\Audit\StepTimer;
 use Modules\AI\Services\Metering\BudgetGuard;
 use Modules\AI\Services\Metering\CreditMeter;
+use Modules\AI\Services\Prompts\PromptRegistry;
 use Throwable;
 
 /**
@@ -35,6 +36,7 @@ class AiGateway
         private readonly AuditRecorder $audit,
         private readonly BudgetGuard $budgetGuard,
         private readonly CreditMeter $meter,
+        private readonly PromptRegistry $prompts,
     ) {}
 
     public function generate(AiGenerateRequest $request): AiGenerateResult
@@ -70,6 +72,37 @@ class AiGateway
             }
         }
 
+        // T-A004: resolusi prompt registry SEBELUM router. enabled=false untuk
+        // tenant → balasan santun TANPA HTTP (jalur degraded, termeter 0 di
+        // namespace degraded-). systemPrompt diteruskan ke provider; versi
+        // prompt dicatat di ai_audit_log.prompt_version_id.
+        $prompt = $timer->measure(
+            'prompt',
+            fn () => $this->prompts->resolve($request->agent, $tenantId),
+        );
+
+        if (! $prompt->enabled) {
+            $result = new AiGenerateResult(
+                text: (string) config(
+                    'ai.prompts.disabled_message',
+                    'Mohon maaf, fitur asisten ini tidak diaktifkan untuk pesantren Anda. Silakan hubungi admin bila membutuhkannya.',
+                ),
+                provider: 'null',
+                model: 'null',
+                degraded: true,
+            );
+
+            $meteran = $tenantId !== null ? $this->meterUsage($tenantId, $request, $result) : null;
+            $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, promptVersionId: $prompt->promptVersionId);
+
+            return $result;
+        }
+
+        // System prompt eksplisit dari pemanggil menang; selain itu pakai registry.
+        if ($request->system === null && $prompt->systemPrompt !== null) {
+            $request = $request->withSystem($prompt->systemPrompt);
+        }
+
         try {
             $selection = $timer->measure(
                 'router',
@@ -85,7 +118,7 @@ class AiGateway
 
                 if ($result !== null) {
                     $meteran = $tenantId !== null ? $this->meterUsage($tenantId, $request, $result) : null;
-                    $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran);
+                    $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, promptVersionId: $prompt->promptVersionId);
 
                     return $result;
                 }
@@ -94,13 +127,13 @@ class AiGateway
             // Semua provider nyata gagal/terbuka sirkuitnya → degradasi anggun.
             $result = $this->makeProvider('null')->generate($request, $selection);
             $meteran = $tenantId !== null ? $this->meterUsage($tenantId, $request, $result) : null;
-            $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran);
+            $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, promptVersionId: $prompt->promptVersionId);
 
             return $result;
         } catch (Throwable $e) {
             // Kesalahan pemakaian (tier tak dikenal, config korup) tetap
             // dilempar — tapi jejaknya tercatat dulu untuk forensik.
-            $this->recordGenerateAudit($request, $timer, null, $e);
+            $this->recordGenerateAudit($request, $timer, null, $e, promptVersionId: $prompt->promptVersionId);
 
             throw $e;
         }
@@ -168,6 +201,7 @@ class AiGateway
         ?AiGenerateResult $result,
         ?Throwable $error = null,
         ?array $meteran = null,
+        ?int $promptVersionId = null,
     ): void {
         $status = match (true) {
             $error !== null => AiAuditLog::STATUS_GAGAL,
@@ -180,6 +214,8 @@ class AiGateway
             'agent_key' => $request->agent,
             'channel' => $request->channel,
             'ringkasan_konteks' => $request->ringkasanKonteks,
+            'prompt_version_id' => $promptVersionId, // registry T-A004
+
             'provider' => $result->provider ?? 'tidak-terpilih',
             'model' => $result->model ?? 'tidak-terpilih',
             'tier' => $request->tier,
