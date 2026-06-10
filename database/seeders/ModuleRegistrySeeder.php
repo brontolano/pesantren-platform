@@ -60,6 +60,9 @@ class ModuleRegistrySeeder extends Seeder
         // file_storage sengaja 'development' (storage tiering belum dirilis) —
         // mempertahankan keputusan migrasi tenant_storage, bukan mengubahnya.
         ['key' => 'file_storage', 'label' => 'File Storage',         'status' => 'development', 'is_core' => false, 'sort' => 18],
+        // Modul AI "Khadim Digital" — development sampai Gate A lulus
+        // (blueprint modul AI §8): hanya tampil di tenant demo.
+        ['key' => 'ai',           'label' => 'AI Khadim Digital',    'status' => 'development', 'is_core' => false, 'sort' => 19],
     ];
 
     public function run(): void

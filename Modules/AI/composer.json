@@ -1,0 +1,11 @@
+{
+    "name": "modules/ai",
+    "description": "Modul AI Khadim Digital untuk Platform Pesantren",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Modules\\AI\\": "app/",
+            "Modules\\AI\\Database\\Seeders\\": "database/seeders/"
+        }
+    }
+}
