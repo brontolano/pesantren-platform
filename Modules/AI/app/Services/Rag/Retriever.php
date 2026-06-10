@@ -35,7 +35,10 @@ class Retriever
     public function __construct(private readonly AiGateway $gateway) {}
 
     /**
-     * @param  array{kategori?: string|null, topK?: int, minSkor?: float|null}  $opsi
+     * @param  array{kategori?: string|null, topK?: int, minSkor?: float|null, sourceId?: int|null}  $opsi
+     *         sourceId (T-A040): batasi retrieval pada SATU sumber pengetahuan
+     *         pilihan pengguna (Generator Soal) — additive, pemanggil lama
+     *         tidak terpengaruh.
      */
     public function cari(
         string $query,
@@ -59,19 +62,21 @@ class Retriever
         $topK = max(1, (int) ($opsi['topK'] ?? config('ai.rag.top_k', 5)));
         $minSkor = isset($opsi['minSkor']) && $opsi['minSkor'] !== null
             ? (float) $opsi['minSkor'] : null;
+        $sourceId = isset($opsi['sourceId']) && $opsi['sourceId'] !== null
+            ? (int) $opsi['sourceId'] : null;
 
         // Korpus kosong (tidak ada chunk dari sumber aktif+siap dalam filter)
         // → berhenti SEBELUM embed: jalur tanpa-rujukan tidak boleh memicu
         // HTTP apa pun ke provider.
-        if (! $this->dasarQuery($kategori)->exists()) {
+        if (! $this->dasarQuery($kategori, $sourceId)->exists()) {
             return RetrievalResult::kosong();
         }
 
         // Jalur 1: FTS keyword (juga menyuplai kandidat fallback jalur vektor).
-        $peringkatFts = $this->peringkatFts($query, $kategori);
+        $peringkatFts = $this->peringkatFts($query, $kategori, $sourceId);
 
         // Jalur 2: vektor semantik.
-        $peringkatVektor = $this->peringkatVektor($query, $kategori, array_keys($peringkatFts));
+        $peringkatVektor = $this->peringkatVektor($query, $kategori, array_keys($peringkatFts), $sourceId);
 
         $skorFusi = $this->fusiRrf([$peringkatFts, $peringkatVektor]);
 
@@ -124,7 +129,7 @@ class Retriever
      *
      * @return array<int, int> chunk_id => peringkat (0 = terbaik)
      */
-    private function peringkatFts(string $query, ?string $kategori): array
+    private function peringkatFts(string $query, ?string $kategori, ?int $sourceId = null): array
     {
         if (! $this->punyaKolom('konten_fts')) {
             return []; // non-pgsql / kolom belum termigrasi — jalur FTS mati anggun
@@ -137,7 +142,7 @@ class Retriever
         }
 
         try {
-            $rows = $this->dasarQuery($kategori)
+            $rows = $this->dasarQuery($kategori, $sourceId)
                 ->whereRaw("ai_chunk.konten_fts @@ to_tsquery('simple', ?)", [$tsquery])
                 ->orderByRaw("ts_rank(ai_chunk.konten_fts, to_tsquery('simple', ?)) DESC", [$tsquery])
                 ->orderBy('ai_chunk.id')
@@ -165,7 +170,7 @@ class Retriever
      * @param  list<int>  $kandidatFts
      * @return array<int, int> chunk_id => peringkat (0 = terbaik)
      */
-    private function peringkatVektor(string $query, ?string $kategori, array $kandidatFts): array
+    private function peringkatVektor(string $query, ?string $kategori, array $kandidatFts, ?int $sourceId = null): array
     {
         $vektor = $this->gateway->embed($query)[0] ?? null;
 
@@ -174,10 +179,10 @@ class Retriever
         }
 
         if ($this->punyaKolom('embedding')) {
-            return $this->peringkatPgvector($vektor, $kategori);
+            return $this->peringkatPgvector($vektor, $kategori, $sourceId);
         }
 
-        return $this->peringkatCosinePhp($vektor, $kategori, $kandidatFts);
+        return $this->peringkatCosinePhp($vektor, $kategori, $kandidatFts, $sourceId);
     }
 
     /**
@@ -186,12 +191,12 @@ class Retriever
      * @param  list<float>  $vektor
      * @return array<int, int>
      */
-    private function peringkatPgvector(array $vektor, ?string $kategori): array
+    private function peringkatPgvector(array $vektor, ?string $kategori, ?int $sourceId = null): array
     {
         $literal = '['.implode(',', array_map(static fn ($v): float => (float) $v, $vektor)).']';
 
         try {
-            $rows = $this->dasarQuery($kategori)
+            $rows = $this->dasarQuery($kategori, $sourceId)
                 ->whereNotNull('ai_chunk.embedding')
                 ->orderByRaw('ai_chunk.embedding <=> ?::vector', [$literal])
                 ->limit(self::KANDIDAT)
@@ -218,12 +223,12 @@ class Retriever
      * @param  list<int>  $kandidatFts
      * @return array<int, int>
      */
-    private function peringkatCosinePhp(array $vektor, ?string $kategori, array $kandidatFts): array
+    private function peringkatCosinePhp(array $vektor, ?string $kategori, array $kandidatFts, ?int $sourceId = null): array
     {
         $ids = $kandidatFts;
 
         if (count($ids) < self::KANDIDAT) {
-            $tambahan = $this->dasarQuery($kategori)
+            $tambahan = $this->dasarQuery($kategori, $sourceId)
                 ->when($ids !== [], fn ($q) => $q->whereNotIn('ai_chunk.id', $ids))
                 ->orderByDesc('ai_chunk.id')
                 ->limit(self::KANDIDAT - count($ids))
@@ -331,14 +336,15 @@ class Retriever
         return $skor;
     }
 
-    /** Join chunk × sumber AKTIF + siap (+ kategori) — pagar kedua jalur. */
-    private function dasarQuery(?string $kategori)
+    /** Join chunk × sumber AKTIF + siap (+ kategori/sumber) — pagar kedua jalur. */
+    private function dasarQuery(?string $kategori, ?int $sourceId = null)
     {
         return DB::table('ai_chunk')
             ->join('ai_knowledge_source', 'ai_knowledge_source.id', '=', 'ai_chunk.source_id')
             ->where('ai_knowledge_source.aktif', true)
             ->where('ai_knowledge_source.status', 'siap')
             ->when($kategori !== null, fn ($q) => $q->where('ai_knowledge_source.kategori', $kategori))
+            ->when($sourceId !== null, fn ($q) => $q->where('ai_chunk.source_id', $sourceId))
             ->select('ai_chunk.id');
     }
 

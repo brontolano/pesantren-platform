@@ -65,6 +65,9 @@ class RolesAndPermissionsSeeder extends Seeder
             // Modul AI (T-A023) — kelola antrean eskalasi "Tanya Ustadz"
             // (tugaskan, jawab, tutup). Laporan kyai = ai.setting.setujui.
             'ai.eskalasi.kelola',
+            // Modul AI (T-A040) — Generator Soal & Kisi-kisi: buat draf,
+            // edit butir, MENGESAHKAN paket (human-in-the-loop), cetak.
+            'ai.generator.soal',
         ];
 
         foreach ($permissions as $permission) {
@@ -93,6 +96,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'ai.setting.lihat',
                 'ai.pengetahuan.kelola',
                 'ai.eskalasi.kelola',
+                'ai.generator.soal',
             ],
             'santri' => [
                 'view_dashboard',
@@ -163,6 +167,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_dashboard', 'view_slip_sendiri',
                 // T-A023 — ustadz menjawab antrean eskalasi Tanya Ustadz.
                 'ai.eskalasi.kelola',
+                // T-A040 — asatidz menyusun & mengesahkan paket draf soal.
+                'ai.generator.soal',
             ],
             'guru' => [
                 'view_dashboard',

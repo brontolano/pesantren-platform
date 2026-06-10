@@ -293,6 +293,9 @@ return [
             'chatbot_admin' => 'chatbot',
             'tutor_santri' => 'tutor',
             'generator_soal' => 'generator_soal',
+            // T-A040: agen Generator Soal asatidz — gerbang matriks
+            // fitur_per_peran (asatidz/admin) di PolicyEngine ikut berlaku.
+            'asatidz_soal' => 'generator_soal',
             'dokumen_tu' => 'dokumen_tu',
             'ringkasan_keuangan' => 'ringkasan_keuangan',
         ],
@@ -352,6 +355,7 @@ return [
         'kategori_map' => [
             'tutor_santri' => 'akademik',
             'generator_soal' => 'akademik',
+            'asatidz_soal' => 'akademik', // T-A040
             'ringkasan_keuangan' => 'keuangan',
         ],
 
@@ -424,6 +428,31 @@ return [
 
         'pesan' => [
             'tanpa_rujukan' => 'Mohon maaf, kami belum menemukan rujukan dokumen pesantren untuk pertanyaan ini, sehingga asisten tidak dapat menjawabnya. Pertanyaan Anda telah kami teruskan ke antrean Tanya Ustadz agar dijawab langsung oleh pihak pesantren.',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Generator asatidz (T-A040) — Generator Soal & Kisi-kisi
+    |--------------------------------------------------------------------------
+    | Async-by-default (Blueprint §7.3): generator = job queue 'ai'.
+    | batch_size: butir per panggilan LLM — kecil supaya konteks model 3B
+    | tetap ramping (Blueprint §7.4). max_jumlah dibatasi hard cap 30 di
+    | SoalGenerator walau env menyetel lebih besar.
+    */
+    'generator' => [
+        'soal' => [
+            'default_jumlah' => (int) env('AI_SOAL_DEFAULT_JUMLAH', 10),
+            'max_jumlah' => (int) env('AI_SOAL_MAX_JUMLAH', 30),
+            'batch_size' => (int) env('AI_SOAL_BATCH_SIZE', 5),
+
+            // Pesan kegagalan baku (Indonesia santun).
+            'pesan' => [
+                // RAG-only (pagar #2): tanpa korpus TIDAK boleh generate dari
+                // bobot model — draf gagal dengan ajakan unggah materi.
+                'tanpa_korpus' => 'Mohon maaf, belum ada materi kurikulum yang dapat dirujuk untuk menyusun soal. Silakan unggah materi kurikulum terlebih dahulu di menu Sumber Pengetahuan, lalu coba kembali.',
+                'format_invalid' => 'Mohon maaf, asisten tidak menghasilkan format soal yang valid setelah dicoba ulang. Silakan coba beberapa saat lagi.',
+            ],
         ],
     ],
 
