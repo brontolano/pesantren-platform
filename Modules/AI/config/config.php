@@ -578,4 +578,48 @@ return [
         'connection' => env('AI_QUEUE_CONNECTION', 'redis-ai'),
         'name' => env('AI_QUEUE_NAME', 'ai'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | T-A050 — WhatsApp inbound (adaptasi K6: pilot via WAHA+n8n eksisting)
+    |--------------------------------------------------------------------------
+    | BUKAN BSP resmi — keputusan sadar-risiko, volume kecil. Outbound balasan
+    | HANYA lewat Modules/Notifikasi (WaGatewayService) — Aturan Emas #5.
+    |
+    | RESOLUSI TENANT (v1 paling sederhana): satu session WAHA = satu nomor =
+    | SATU tenant pilot. n8n meneruskan payload WAHA apa adanya ke
+    | POST /api/ai/webhook/wa di domain CENTRAL; tenant diresolusi dari:
+    |  1. field 'tenant' pada payload (bila workflow n8n menyertakan); atau
+    |  2. peta session→tenant di 'session_tenant_map' (multi-session); atau
+    |  3. 'tenant_default' (env AI_WA_TENANT) — deployment pilot satu tenant.
+    | Webhook diamankan header X-Webhook-Token (hash_equals) — tanpa auth baru.
+    */
+    'wa' => [
+        // Token rahasia header X-Webhook-Token. Kosong = webhook NONAKTIF (401).
+        'webhook_token' => env('AI_WA_WEBHOOK_TOKEN'),
+
+        // Tenant pilot default (id tenant) bila payload tak membawa 'tenant'
+        // dan session tidak terdaftar di peta.
+        'tenant_default' => env('AI_WA_TENANT'),
+
+        // Peta eksplisit session WAHA → tenant id, contoh:
+        // ['default' => 'albakids']. Diisi via config deployment bila kelak
+        // lebih dari satu session/nomor.
+        'session_tenant_map' => [],
+
+        // Mode uji T-A050: balasan template statis (tanpa LLM). Intent nyata
+        // datang di T-A051 — saat itu mode_uji dimatikan.
+        'mode_uji' => (bool) env('AI_WA_MODE_UJI', true),
+
+        // Kode template Notifikasi untuk balasan chatbot (dibuat idempoten
+        // saat pertama dipakai; tenant boleh menonaktifkan via panel).
+        'template_kode' => 'AI_BALASAN_WA',
+
+        // Teks balasan (Indonesia santun). Kata kunci opt-out/opt-in baku.
+        'balasan_mode_uji' => 'Terima kasih, pesan Anda sudah kami terima. Asisten Khadim Digital akan segera membalas. Ketik BERHENTI bila tidak ingin menerima balasan otomatis.',
+        'balasan_opt_out' => 'Baik, kami tidak akan mengirim balasan otomatis lagi ke nomor ini. Ketik MULAI kapan saja bila ingin mengaktifkannya kembali. Terima kasih.',
+        'balasan_opt_in' => 'Alhamdulillah, balasan otomatis asisten telah aktif kembali untuk nomor ini. Silakan kirim pertanyaan Anda.',
+        'kata_opt_out' => ['STOP', 'BERHENTI'],
+        'kata_opt_in' => ['MULAI'],
+    ],
 ];
