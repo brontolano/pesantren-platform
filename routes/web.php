@@ -78,7 +78,10 @@ Route::get('/ppdb/dok/{candidate}/{type}', [\Modules\PPDB\Http\Controllers\PpdbF
     ->name('tenant.ppdb.signed-doc');
 
 // PPDB publik — hanya aktif di domain tenant (controller 404 di central)
-Route::get('/ppdb', [TenantWebsiteController::class, 'ppdbForm'])->name('tenant.ppdb.form');
+// Iframe-friendly per tenant: CSP frame-ancestors (domain tenant + Setting embed_allowed_origins).
+Route::get('/ppdb', [TenantWebsiteController::class, 'ppdbForm'])
+    ->middleware(\Modules\PPDB\Http\Middleware\FrameAncestorsPpdb::class)
+    ->name('tenant.ppdb.form');
 Route::post('/ppdb', [TenantWebsiteController::class, 'ppdbStore'])->name('tenant.ppdb.store');
 
 // Fallback login route untuk middleware 'auth' pada route non-panel (mis. export tenant).
