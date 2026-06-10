@@ -17,6 +17,11 @@ class PaketSoal extends Model
 
     protected $fillable = ['nama', 'kategori_ujian', 'durasi_menit', 'jumlah_tampil', 'is_active'];
 
+    protected $attributes = [
+        'is_active' => true,
+        'durasi_menit' => 60,
+    ];
+
     protected $casts = [
         'durasi_menit' => 'integer',
         'jumlah_tampil' => 'integer',
