@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bendahara · Panduan Pesantren.online</title>
+<meta name="description" content="Tagihan, pencatatan &amp; verifikasi pembayaran, tabungan santri, dan laporan keuangan.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item active" href="../bendahara/">💰 Bendahara</a><div class="nav-sub"><a href="#1-memahami-alur-uang-baca-2-menit-saja">1. Memahami Alur Uang (baca 2 menit saja)</a><a href="#2-membuat-tagihan-untuk-satu-santri">2. Membuat Tagihan untuk Satu Santri</a><a href="#3-membuat-tagihan-satu-kelas-sekaligus-massal">3. Membuat Tagihan Satu Kelas Sekaligus (Massal)</a><a href="#4-mencatat-pembayaran">4. Mencatat Pembayaran</a><a href="#5-memeriksa-amp-mengesahkan-pembayaran-verifikasi">5. Memeriksa &amp;amp; Mengesahkan Pembayaran (Verifikasi)</a><a href="#6-melihat-siapa-yang-belum-bayar-tunggakan">6. Melihat Siapa yang Belum Bayar (Tunggakan)</a><a href="#7-tabungan-santri-setor-amp-tarik">7. Tabungan Santri: Setor &amp;amp; Tarik</a><a href="#8-mengesahkan-setoran-tabungan-dari-hp-wali-verifikasi-topup">8. Mengesahkan Setoran Tabungan dari HP Wali (Verifikasi Topup)</a><a href="#9-laporan-keuangan-amp-cetak">9. Laporan Keuangan &amp;amp; Cetak</a><a href="#10-larangan-amp-pengingat-penting">10. Larangan &amp;amp; Pengingat Penting</a><a href="#contekan-cepat-bendahara">Contekan Cepat Bendahara</a></div><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">💰</div>
+        <div>
+          
+          <h1>Bendahara</h1>
+          <p class="lead">Tagihan, pencatatan &amp; verifikasi pembayaran, tabungan santri, dan laporan keuangan.</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>.
+Aplikasi ini menggantikan: kartu SPP, buku kas, buku tabungan santri, dan rekap Excel bulanan.
+Semua angka yang Bapak/Ibu catat otomatis masuk pembukuan — tidak perlu menyalin dua kali.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Memahami alur uang dalam aplikasi</li>
+<li>Membuat tagihan untuk satu santri</li>
+<li>Membuat tagihan satu kelas sekaligus</li>
+<li>Mencatat pembayaran</li>
+<li>Memeriksa &amp; mengesahkan pembayaran (verifikasi)</li>
+<li>Melihat siapa yang belum bayar (tunggakan)</li>
+<li>Tabungan santri: setor &amp; tarik</li>
+<li>Mengesahkan setoran tabungan dari HP wali (Verifikasi Topup)</li>
+<li>Laporan keuangan &amp; cetak</li>
+<li>Larangan &amp; pengingat penting</li>
+</ol>
+<hr>
+<h2 id="1-memahami-alur-uang-baca-2-menit-saja">1. Memahami Alur Uang (baca 2 menit saja)<a class="anchor" href="#1-memahami-alur-uang-baca-2-menit-saja" aria-hidden="true">#</a></h2>
+<p>Di dunia kertas, alurnya: tulis tagihan di kartu SPP → terima uang → coret di kartu → salin ke buku kas → rekap akhir bulan.</p>
+<p>Di aplikasi, alurnya jadi:</p>
+<pre><code>TAGIHAN dibuat  →  wali diberi tahu via WA  →  uang diterima
+      →  PEMBAYARAN dicatat  →  diVERIFIKASI  →  laporan &amp; pembukuan OTOMATIS
+</code></pre>
+<p>Bapak/Ibu hanya mengerjakan yang dicetak tebal: <strong>membuat tagihan, mencatat pembayaran, verifikasi</strong>. Sisanya aplikasi yang bekerja.</p>
+<hr>
+<h2 id="2-membuat-tagihan-untuk-satu-santri">2. Membuat Tagihan untuk Satu Santri<a class="anchor" href="#2-membuat-tagihan-untuk-satu-santri" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> tagihan khusus satu anak — misal seragam, daftar ulang, atau denda.</p>
+<p><strong>Siapkan dulu:</strong> nama santri, jenis tagihan, jumlah uangnya, tanggal jatuh tempo.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Keuangan</strong> → <strong>Tagihan</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi formulir:<ul>
+<li><strong>Santri</strong> — ketik sebagian nama, pilih dari daftar.</li>
+<li><strong>Jenis tagihan</strong> — pilih (SPP / Makan / Asrama / Seragam / Infaq / dll.).</li>
+<li><strong>Nominal</strong> — ketik angka TANPA titik. Contoh: seratus lima puluh ribu → <code>150000</code>.</li>
+<li><strong>Jatuh tempo</strong> — ketuk, pilih tanggal dari kalender.</li>
+<li><strong>Periode</strong> — bulan/tahun tagihan ini. Pesantren yang memakai kalender Hijriah bisa memilih nama bulan Hijriah (Muharram, Safar, dst.).</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir tagihan dengan kotak Nominal dilingkari + contoh angka <span class="soon">(gambar menyusul)</span></figcaption></figure>
+✅ **Tanda berhasil:** tagihan muncul di tabel dengan status **belum**. Wali santri menerima pemberitahuan WA otomatis (kalau nomor HP wali terisi dan template WA sudah disetel).
+
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Salah ketik nominal dan sudah tersimpan</em> → ketuk <strong>Edit</strong> di baris tagihan itu, betulkan, Simpan lagi. Boleh dilakukan selama belum ada pembayaran masuk.</li>
+</ul>
+<hr>
+<h2 id="3-membuat-tagihan-satu-kelas-sekaligus-massal">3. Membuat Tagihan Satu Kelas Sekaligus (Massal)<a class="anchor" href="#3-membuat-tagihan-satu-kelas-sekaligus-massal" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> tagihan rutin bulanan (SPP, makan) — tidak perlu mengetik 30 kali untuk 30 santri.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li><strong>Keuangan</strong> → <strong>Tagihan</strong> → <strong>+ Tambah</strong>.</li>
+<li>Pilih cara <strong>Per Kelas</strong>.</li>
+<li>Pilih <strong>kelasnya</strong>.</li>
+<li>Isi jenis tagihan, nominal, jatuh tempo, periode (sama seperti Bagian 2).</li>
+<li>Ketuk <strong>Buat untuk Semua Santri Kelas Ini</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> tabel tagihan bertambah sebanyak jumlah santri aktif di kelas itu, semuanya berstatus <strong>belum</strong>.</p>
+<blockquote>
+<p>💡 Santri berstatus cuti/keluar TIDAK ikut dibuatkan tagihan — hanya yang aktif.</p>
+</blockquote>
+<hr>
+<h2 id="4-mencatat-pembayaran">4. Mencatat Pembayaran<a class="anchor" href="#4-mencatat-pembayaran" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> wali membayar tunai di kantor, atau bukti transfer masuk.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Keuangan</strong> → <strong>Pembayaran</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi formulir:<ul>
+<li><strong>Tagihan</strong> — cari nama santri, pilih tagihan yang dibayar.</li>
+<li><strong>Nominal</strong> — jumlah uang yang DITERIMA hari ini (boleh sebagian).</li>
+<li><strong>Tanggal pembayaran</strong>.</li>
+<li><strong>Metode</strong> — tunai / transfer / lainnya.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong></p>
+<ul>
+<li>Bayar penuh → status tagihan otomatis berubah jadi <strong>lunas</strong>.</li>
+<li>Bayar sebagian (mencicil) → status jadi <strong>sebagian</strong>; sisa kekurangan tetap tercatat.</li>
+</ul>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Wali bayar untuk 2 bulan sekaligus</em> → catat sebagai 2 pembayaran, satu untuk tiap tagihan bulan itu. Jangan digabung jadi satu.</li>
+<li><em>Salah catat nominal</em> → <strong>JANGAN dihapus.</strong> Lapor admin untuk koreksi. Menghapus catatan uang merusak pembukuan.</li>
+</ul>
+<hr>
+<h2 id="5-memeriksa-amp-mengesahkan-pembayaran-verifikasi">5. Memeriksa &amp; Mengesahkan Pembayaran (Verifikasi)<a class="anchor" href="#5-memeriksa-amp-mengesahkan-pembayaran-verifikasi" aria-hidden="true">#</a></h2>
+<p><strong>Mengapa begini?</strong> Verifikasi = tanda tangan bendahara. Pembayaran yang terverifikasi artinya
+&quot;uangnya sudah saya periksa, benar masuk&quot;. Ini yang membuat laporan bisa dipercaya saat diaudit.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li><strong>Keuangan</strong> → <strong>Pembayaran</strong>.</li>
+<li>Lihat kolom <strong>Diverifikasi</strong>: ❌ artinya belum diperiksa.</li>
+<li>Pastikan uang/buktinya benar (hitung uang tunai, atau cocokkan bukti transfer dengan rekening koran).</li>
+<li>Ketuk tombol <strong>Verifikasi</strong> di baris pembayaran itu.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> kolom berubah dari ❌ menjadi ✅.</p>
+<blockquote>
+<p>📌 <strong>Kebiasaan baik:</strong> setiap sore sebelum pulang, buka halaman Pembayaran dan pastikan tidak ada ❌ yang tersisa hari itu.</p>
+</blockquote>
+<hr>
+<h2 id="6-melihat-siapa-yang-belum-bayar-tunggakan">6. Melihat Siapa yang Belum Bayar (Tunggakan)<a class="anchor" href="#6-melihat-siapa-yang-belum-bayar-tunggakan" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Keuangan</strong> → <strong>Tagihan</strong>.</li>
+<li>Ketuk <strong>Filter</strong> (gambar corong).</li>
+<li>Pilih <strong>Status: belum</strong> (atau <strong>sebagian</strong> untuk yang mencicil).</li>
+<li>(Pilihan) Saring juga per kelas atau per periode.</li>
+</ol>
+<p>✅ Hasilnya = daftar penunggak. Bisa langsung di-<strong>Export</strong> ke Excel untuk dibawa rapat.</p>
+<blockquote>
+<p>💡 Untuk menagih halus lewat WA secara massal, ada menu <strong>Notifikasi → Broadcast WA</strong>
+(kirim pengingat ke semua wali yang menunggak sekaligus, memakai template).
+Untuk alumni yang masih punya tunggakan: <strong>Keuangan → Tunggakan Alumni</strong>.</p>
+</blockquote>
+<hr>
+<h2 id="7-tabungan-santri-setor-amp-tarik">7. Tabungan Santri: Setor &amp; Tarik<a class="anchor" href="#7-tabungan-santri-setor-amp-tarik" aria-hidden="true">#</a></h2>
+<p>Seperti buku tabungan di bank mini pesantren. Saldo dihitung otomatis — tidak mungkin salah jumlah.</p>
+<h3 id="setor-uang-masuk">Setor (uang masuk)<a class="anchor" href="#setor-uang-masuk" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>Keuangan</strong> → <strong>Tabungan Santri</strong>.</li>
+<li>Cari nama santri → ketuk barisnya.</li>
+<li>Ketuk <strong>Setor</strong> → ketik nominal → <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ Saldo langsung bertambah.</p>
+<h3 id="tarik-uang-keluar">Tarik (uang keluar)<a class="anchor" href="#tarik-uang-keluar" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>Keuangan</strong> → <strong>Tabungan Santri</strong> → pilih santri.</li>
+<li>Ketuk <strong>Tarik</strong> → ketik nominal → <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ Saldo berkurang. Aplikasi <strong>menolak otomatis</strong> kalau saldo tidak cukup — jadi tidak mungkin minus.</p>
+<hr>
+<h2 id="8-mengesahkan-setoran-tabungan-dari-hp-wali-verifikasi-topup">8. Mengesahkan Setoran Tabungan dari HP Wali (Verifikasi Topup)<a class="anchor" href="#8-mengesahkan-setoran-tabungan-dari-hp-wali-verifikasi-topup" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Wali santri bisa mengisi tabungan anaknya dari HP mereka (transfer bank, lalu unggah bukti).
+Uang itu <strong>belum masuk saldo</strong> sebelum bendahara memeriksa dan mengesahkan.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li><strong>Keuangan</strong> → <strong>Verifikasi Topup</strong>.</li>
+<li>Muncul daftar setoran yang menunggu. Ketuk satu baris untuk melihat <strong>bukti transfer</strong> yang diunggah wali.</li>
+<li>Cocokkan dengan rekening: apakah uang benar-benar masuk, jumlahnya sama?</li>
+<li>Kalau cocok → ketuk <strong>Setujui/Verifikasi</strong>. Kalau tidak cocok → tolak, beri keterangan.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> saldo tabungan anak bertambah, wali menerima pemberitahuan bahwa setoran berhasil.</p>
+<blockquote>
+<p>⚠️ <strong>Jangan menyetujui tanpa melihat rekening sungguhan.</strong> Bukti transfer bisa keliru atau palsu.</p>
+</blockquote>
+<hr>
+<h2 id="9-laporan-keuangan-amp-cetak">9. Laporan Keuangan &amp; Cetak<a class="anchor" href="#9-laporan-keuangan-amp-cetak" aria-hidden="true">#</a></h2>
+<h3 id="rekap-bulanan-untuk-laporan-ke-pimpinan">Rekap bulanan (untuk laporan ke pimpinan)<a class="anchor" href="#rekap-bulanan-untuk-laporan-ke-pimpinan" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>Keuangan</strong> → <strong>Laporan Keuangan</strong>.</li>
+<li>Saring: pilih <strong>periode</strong> (bulan), bisa juga per kelas / per santri / per status.</li>
+<li>Lihat hasil rekap: total tagihan vs total terkumpul.</li>
+</ol>
+<h3 id="menyimpan-mencetak">Menyimpan / mencetak<a class="anchor" href="#menyimpan-mencetak" aria-hidden="true">#</a></h3>
+<ul>
+<li><strong>Export</strong> → file Excel masuk ke folder Download.</li>
+<li><strong>Cetak</strong> → muncul tampilan rapi → tekan <strong>Ctrl+P</strong> → pilih printer, atau <strong>Save as PDF</strong>.</li>
+</ul>
+<blockquote>
+<p>💡 <strong>Untuk laporan pembukuan resmi</strong> (buku kas umum, neraca, laporan dana BOS):
+semuanya sudah dihitung otomatis di grup menu <strong>Buku Besar</strong> dan <strong>Pelaporan</strong>
+(mis. <strong>Buku Kas Umum (BKU)</strong>, <strong>Neraca Saldo</strong>, <strong>L6 — Laporan Keuangan Pokok</strong>).
+Bendahara cukup membuka dan mencetak — tidak perlu menghitung manual.
+Bagian akuntansi lanjutan ini sebaiknya dipelajari bersama admin saat training lanjutan.</p>
+</blockquote>
+<hr>
+<h2 id="10-larangan-amp-pengingat-penting">10. Larangan &amp; Pengingat Penting<a class="anchor" href="#10-larangan-amp-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>⛔ <strong>Jangan pernah menghapus pembayaran atau tagihan yang sudah dibayar.</strong> Salah catat → lapor admin untuk koreksi resmi. Pembukuan harus punya jejak.</li>
+<li>✅ <strong>Verifikasi setiap hari</strong> — jangan menumpuk ❌ berminggu-minggu.</li>
+<li>🔢 <strong>Nominal tanpa titik/koma:</strong> seratus lima puluh ribu = <code>150000</code>.</li>
+<li>💾 <strong>Tidak perlu takut data hilang</strong> — sistem menyimpan cadangan (backup) otomatis setiap hari.</li>
+<li>🔒 <strong>Kata sandi bendahara jangan dipinjamkan</strong> — semua catatan uang tercatat atas nama akun Bapak/Ibu.</li>
+<li>📸 Ada error/angka aneh? <strong>Foto layar → kirim admin.</strong> Jangan mencoba &quot;membetulkan&quot; angka pembukuan sendiri.</li>
+</ol>
+<hr>
+<h2 id="contekan-cepat-bendahara">Contekan Cepat Bendahara<a class="anchor" href="#contekan-cepat-bendahara" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Buat tagihan 1 santri</td>
+<td>Keuangan → Tagihan → + Tambah</td>
+</tr>
+<tr>
+<td>Buat tagihan 1 kelas</td>
+<td>Keuangan → Tagihan → + Tambah → Per Kelas</td>
+</tr>
+<tr>
+<td>Catat pembayaran</td>
+<td>Keuangan → Pembayaran → + Tambah</td>
+</tr>
+<tr>
+<td>Sahkan pembayaran</td>
+<td>Keuangan → Pembayaran → tombol Verifikasi</td>
+</tr>
+<tr>
+<td>Lihat penunggak</td>
+<td>Keuangan → Tagihan → Filter → Status: belum</td>
+</tr>
+<tr>
+<td>Tabungan santri</td>
+<td>Keuangan → Tabungan Santri</td>
+</tr>
+<tr>
+<td>Sahkan isi saldo dari wali</td>
+<td>Keuangan → Verifikasi Topup</td>
+</tr>
+<tr>
+<td>Rekap bulanan</td>
+<td>Keuangan → Laporan Keuangan</td>
+</tr>
+<tr>
+<td>Buku kas resmi</td>
+<td>Buku Besar → Buku Kas Umum (BKU)</td>
+</tr>
+<tr>
+<td>Tagih massal via WA</td>
+<td>Notifikasi → Broadcast WA</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../tata-usaha/"><span>‹ Sebelumnya</span><b>Tata Usaha (TU)</b></a>
+      <a class="pager-link next" href="../guru/"><span>Berikutnya ›</span><b>Guru / Ustadz</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-memahami-alur-uang-baca-2-menit-saja">1. Memahami Alur Uang (baca 2 menit saja)</a><a href="#2-membuat-tagihan-untuk-satu-santri">2. Membuat Tagihan untuk Satu Santri</a><a href="#3-membuat-tagihan-satu-kelas-sekaligus-massal">3. Membuat Tagihan Satu Kelas Sekaligus (Massal)</a><a href="#4-mencatat-pembayaran">4. Mencatat Pembayaran</a><a href="#5-memeriksa-amp-mengesahkan-pembayaran-verifikasi">5. Memeriksa &amp;amp; Mengesahkan Pembayaran (Verifikasi)</a><a href="#6-melihat-siapa-yang-belum-bayar-tunggakan">6. Melihat Siapa yang Belum Bayar (Tunggakan)</a><a href="#7-tabungan-santri-setor-amp-tarik">7. Tabungan Santri: Setor &amp;amp; Tarik</a><a href="#8-mengesahkan-setoran-tabungan-dari-hp-wali-verifikasi-topup">8. Mengesahkan Setoran Tabungan dari HP Wali (Verifikasi Topup)</a><a href="#9-laporan-keuangan-amp-cetak">9. Laporan Keuangan &amp;amp; Cetak</a><a href="#10-larangan-amp-pengingat-penting">10. Larangan &amp;amp; Pengingat Penting</a><a href="#contekan-cepat-bendahara">Contekan Cepat Bendahara</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
