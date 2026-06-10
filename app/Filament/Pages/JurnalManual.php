@@ -15,6 +15,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\DivisiUnit;
 use Modules\Ledger\Models\SumberDana;
@@ -47,6 +48,14 @@ class JurnalManual extends Page implements HasForms
 
     public ?array $data = [];
 
+    /**
+     * Token idempotensi per-render form (anti double-submit). Stabil selama satu
+     * sesi pengisian → double-click / refresh / retry memakai token sama sehingga
+     * postJurnal men-dedup jadi SATU jurnal. Diperbarui tiap form di-reset (mount)
+     * → jurnal yang sengaja identik di sesi berikutnya tetap bisa diposting.
+     */
+    public string $idempotencyToken = '';
+
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
@@ -61,6 +70,10 @@ class JurnalManual extends Page implements HasForms
 
     public function mount(): void
     {
+        // Token baru tiap form di-reset → submit ulang form yang SAMA dedup,
+        // tapi jurnal baru (mount ulang setelah sukses) tetap unik.
+        $this->idempotencyToken = (string) Str::uuid();
+
         $this->form->fill([
             'tanggal' => now()->toDateString(),
             'baris' => [
@@ -109,11 +122,21 @@ class JurnalManual extends Page implements HasForms
     {
         $data = $this->form->getState();
 
+        // Pertahanan: token tak boleh kosong (mount selalu mengisinya, tapi jaga-jaga)
+        // — ref_id kosong akan membuat key 'jurnal_manual:' yang sama untuk SEMUA jurnal
+        // manual → salah-dedup (jurnal berbeda hilang). Pastikan selalu ada token unik.
+        if ($this->idempotencyToken === '') {
+            $this->idempotencyToken = (string) Str::uuid();
+        }
+
         try {
             $jurnal = app(JurnalService::class)->postJurnal([
                 'tanggal' => $data['tanggal'] ?? now(),
                 'deskripsi' => $data['deskripsi'] ?? null,
                 'tipe_sumber' => 'manual',
+                // Idempotensi anti double-submit: token per-render form (lihat properti).
+                'ref_type' => 'jurnal_manual',
+                'ref_id' => $this->idempotencyToken,
                 'dibuat_oleh' => Auth::id(),
                 'baris' => array_map(fn ($b) => [
                     'akun_id' => $b['akun_id'],

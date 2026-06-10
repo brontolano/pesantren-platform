@@ -269,6 +269,7 @@ class ApprovalRolloutTest extends TestCase
     {
         return app(JurnalService::class)->postJurnal([
             'tanggal' => now()->toDateString(), 'deskripsi' => 'Jurnal uji', 'tipe_sumber' => 'manual',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => (int) Akun::where('kode', '1-1000')->value('id'), 'debit' => $nominal, 'kredit' => 0],
                 ['akun_id' => (int) Akun::where('kode', '4-1000')->value('id'), 'debit' => 0, 'kredit' => $nominal],

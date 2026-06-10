@@ -99,6 +99,21 @@ class JurnalService
             ));
         }
 
+        // Gerbang akhir idempotensi (#3): jurnal yang VALID & akan dipersist WAJIB
+        // punya kunci. Tanpa kunci, unique(tenant_id, idempotency_key) tak men-dedup
+        // (di SQL NULL != NULL) → submit ulang menggandakan uang. Ditaruh setelah
+        // semua validasi data agar error struktur/kehalalan/periode tetap muncul lebih
+        // dulu; hanya posting sah-tetapi-tanpa-pelindung yang ditolak di sini. Pemanggil
+        // yang memang sengaja boleh ganda WAJIB set allow_duplicate=true secara eksplisit
+        // (keputusan sadar, bukan kelalaian diam-diam).
+        if ($idempotencyKey === null && ($data['allow_duplicate'] ?? false) !== true) {
+            throw new InvalidArgumentException(
+                'Posting jurnal tanpa kunci idempotensi berisiko ganda. Sertakan ref_type+ref_id '
+                .'(disarankan, ditambatkan ke dokumen sumber) atau idempotency_key; bila memang '
+                .'sengaja boleh ganda, set allow_duplicate=true secara eksplisit.'
+            );
+        }
+
         try {
             return DB::transaction(function () use ($data, $tanggal, $idempotencyKey, $periode, $normalized) {
                 $jurnal = Jurnal::create([

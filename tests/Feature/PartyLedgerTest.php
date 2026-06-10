@@ -63,6 +63,7 @@ class PartyLedgerTest extends TestCase
             'tanggal' => $tanggal ?? now()->toDateString(),
             'deskripsi' => 'Piutang SPP',
             'tipe_sumber' => 'manual',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => $this->akun('1-1000'), 'party_type' => Santri::class, 'party_id' => $s->id, 'debit' => $nominal, 'kredit' => 0],
                 ['akun_id' => $this->akun('4-1000'), 'debit' => 0, 'kredit' => $nominal],
@@ -112,6 +113,7 @@ class PartyLedgerTest extends TestCase
         // Pelunasan: Debit Kas, Kredit Piutang(party=santri) → saldo party 0.
         app(JurnalService::class)->postJurnal([
             'tanggal' => now()->toDateString(), 'deskripsi' => 'Pelunasan', 'tipe_sumber' => 'manual',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => $this->akun('4-1000'), 'debit' => 100000, 'kredit' => 0],
                 ['akun_id' => $this->akun('1-1000'), 'party_type' => Santri::class, 'party_id' => $s->id, 'debit' => 0, 'kredit' => 100000],

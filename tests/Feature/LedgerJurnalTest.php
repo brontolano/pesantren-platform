@@ -46,6 +46,7 @@ class LedgerJurnalTest extends TestCase
             'deskripsi' => 'Uji posting',
             'ref_type' => $ref !== null ? 'Uji' : null,
             'ref_id' => $ref,
+            'allow_duplicate' => $ref === null, // fixture tanpa ref sengaja boleh ganda
             'baris' => [
                 [
                     'akun_id' => Akun::where('kode', '1-1000')->value('id'),

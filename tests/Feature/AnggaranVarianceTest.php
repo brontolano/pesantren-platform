@@ -57,6 +57,7 @@ class AnggaranVarianceTest extends TestCase
     {
         app(JurnalService::class)->postJurnal([
             'tanggal' => now()->toDateString(), 'deskripsi' => 'Beban', 'tipe_sumber' => 'manual',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => $this->akunId($kodeAkun), 'debit' => $nominal, 'kredit' => 0],
                 ['akun_id' => $this->akunId('1-1000'), 'debit' => 0, 'kredit' => $nominal],

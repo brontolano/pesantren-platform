@@ -52,6 +52,7 @@ class BankReconTest extends TestCase
             'tanggal' => $tanggal ?? now()->toDateString(),
             'deskripsi' => 'Donasi via transfer',
             'tipe_sumber' => 'manual',
+            'allow_duplicate' => true,
             'baris' => [
                 ['akun_id' => $this->akunId('1-1100'), 'debit' => $nominal, 'kredit' => 0],
                 ['akun_id' => $this->akunId('4-1000'), 'debit' => 0, 'kredit' => $nominal],
