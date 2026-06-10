@@ -56,6 +56,12 @@ class DaftarUlangService
                     'status' => 'aktif',
                     'tahun_angkatan' => $tahun.'/'.($tahun + 1),
                     'wali_user_id' => $calon->user_id,
+                    // Persetujuan Kebijakan Privasi Sistem (dicentang wali saat
+                    // daftar PPDB) ikut ke record santri — dasar penggunaan
+                    // foto/ttd/sampel tulisan utk pengembangan internal.
+                    'consent_ai_dataset' => $calon->consent_kebijakan_at !== null,
+                    'consented_at' => $calon->consent_kebijakan_at,
+                    'consented_by' => $calon->nama_ayah,
                 ]);
             }
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\AI\Http\Controllers\DrafIkhtisarCetakController;
 use Modules\AI\Http\Controllers\DrafRppCetakController;
 use Modules\AI\Http\Controllers\DrafSoalCetakController;
 use Modules\AI\Http\Controllers\RatingJawabanController;
@@ -58,3 +59,12 @@ Route::get('/ai/draf-rpp/{draf}/unduh', [DrafRppCetakController::class, 'unduh']
     ->middleware('auth')
     ->whereNumber('draf')
     ->name('ai.draf-rpp.unduh');
+
+// T-A042 — handout cetak draf ikhtisar materi kitab / kerangka kultum
+// (print-friendly, dibuka tab baru dari halaman IkhtisarKitab). WAJIB login;
+// permission ai.generator.ikhtisar + gating modul dicek controller; tenancy
+// datang dari middleware web global di domain tenant.
+Route::get('/ai/draf-ikhtisar/{draf}/cetak', DrafIkhtisarCetakController::class)
+    ->middleware('auth')
+    ->whereNumber('draf')
+    ->name('ai.draf-ikhtisar.cetak');
