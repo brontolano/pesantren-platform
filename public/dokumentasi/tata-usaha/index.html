@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tata Usaha (TU) · Panduan Pesantren.online</title>
+<meta name="description" content="Data santri, kelas, mutasi &amp; kenaikan kelas, status santri, dan pendaftaran santri baru (PPDB).">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item active" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><div class="nav-sub"><a href="#1-menambah-santri-baru-satu-per-satu">1. Menambah Santri Baru (Satu per Satu)</a><a href="#2-memasukkan-banyak-santri-sekaligus-import-excel">2. Memasukkan Banyak Santri Sekaligus (Import Excel)</a><a href="#3-membuat-kelas">3. Membuat Kelas</a><a href="#4-menempatkan-santri-ke-kelas">4. Menempatkan Santri ke Kelas</a><a href="#5-memindahkan-santri-ke-kelas-lain-mutasi-naik-kelas">5. Memindahkan Santri ke Kelas Lain (Mutasi / Naik Kelas)</a><a href="#6-mengubah-status-santri-cuti-lulus-keluar">6. Mengubah Status Santri (Cuti, Lulus, Keluar)</a><a href="#7-mencetak-menyimpan-daftar-santri">7. Mencetak / Menyimpan Daftar Santri</a><a href="#8-mengurus-pendaftaran-santri-baru-ppdb">8. Mengurus Pendaftaran Santri Baru (PPDB)</a><a href="#9-larangan-amp-pengingat-penting">9. Larangan &amp;amp; Pengingat Penting</a><a href="#contekan-cepat-tu">Contekan Cepat TU</a></div><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">🗂️</div>
+        <div>
+          
+          <h1>Tata Usaha (TU)</h1>
+          <p class="lead">Data santri, kelas, mutasi &amp; kenaikan kelas, status santri, dan pendaftaran santri baru (PPDB).</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a> (bisa masuk aplikasi dan kenal layar).
+Tugas TU di aplikasi = menggantikan buku induk santri, buku mutasi, dan map pendaftaran.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Menambah santri baru (satu per satu)</li>
+<li>Memasukkan banyak santri sekaligus (dari Excel)</li>
+<li>Membuat kelas</li>
+<li>Menempatkan santri ke kelas</li>
+<li>Memindahkan santri ke kelas lain (mutasi)</li>
+<li>Mengubah status santri (cuti, lulus, keluar)</li>
+<li>Mencetak daftar santri</li>
+<li>Mengurus pendaftaran santri baru (PPDB)</li>
+<li>Larangan &amp; pengingat penting</li>
+</ol>
+<hr>
+<h2 id="1-menambah-santri-baru-satu-per-satu">1. Menambah Santri Baru (Satu per Satu)<a class="anchor" href="#1-menambah-santri-baru-satu-per-satu" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> ada santri baru masuk, atau memindahkan data dari buku induk lama.</p>
+<p><strong>Siapkan dulu:</strong></p>
+<ul>
+<li>Nomor Induk Santri (NIS) — setiap santri harus berbeda, tidak boleh kembar.</li>
+<li>Nama lengkap santri.</li>
+<li>Kalau ada: tanggal lahir, nama ayah/ibu, nomor HP wali, alamat, foto.</li>
+</ul>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Di menu kiri, ketuk <strong>Kesantrian</strong>.</li>
+<li>Ketuk <strong>Santri</strong>. Muncul tabel daftar santri.</li>
+<li>Ketuk tombol <strong>+ Tambah</strong> / <strong>Buat</strong> di pojok kanan atas tabel.</li>
+<li>Muncul formulir. Isi kotak yang bertanda * (wajib):<ul>
+<li><strong>NIS</strong> — ketik nomor induk. Contoh: <code>2026001</code>.</li>
+<li><strong>Nama lengkap</strong> — sesuai akta/ijazah.</li>
+<li><strong>Jenis kelamin</strong> — ketuk, pilih dari daftar.</li>
+<li><strong>Status</strong> — pilih <strong>aktif</strong>.</li>
+</ul>
+</li>
+<li>Isi kotak lain selengkap mungkin (boleh dilengkapi lain hari):
+nomor HP wali penting sekali — dipakai untuk kirim pemberitahuan WA ke orang tua.</li>
+<li>Geser ke bawah, ketuk tombol <strong>Simpan</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> menu Kesantrian → Santri dengan panah ke tombol Tambah <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir santri dengan kotak wajib dilingkari <span class="soon">(gambar menyusul)</span></figcaption></figure>
+✅ **Tanda berhasil:** muncul pemberitahuan hijau, dan nama santri baru terlihat di tabel.
+
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Aplikasi menolak, kotak NIS jadi merah</em> → NIS itu sudah dipakai santri lain. Periksa di kotak Cari 🔍, mungkin santri ini sudah pernah dimasukkan.</li>
+<li><em>Tidak sengaja menutup formulir sebelum Simpan</em> → data belum tersimpan. Ulangi dari langkah 3. Tidak ada yang rusak.</li>
+</ul>
+<hr>
+<h2 id="2-memasukkan-banyak-santri-sekaligus-import-excel">2. Memasukkan Banyak Santri Sekaligus (Import Excel)<a class="anchor" href="#2-memasukkan-banyak-santri-sekaligus-import-excel" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> pindahan awal dari Excel berisi puluhan/ratusan santri.</p>
+<p>Cara ini <strong>tidak dikerjakan sendiri oleh TU</strong> — pemasukan massal dilakukan admin platform memakai file Excel dengan susunan kolom khusus.</p>
+<p><strong>Yang TU lakukan:</strong></p>
+<ol>
+<li>Rapikan file Excel: satu baris = satu santri; kolom minimal NIS dan Nama.</li>
+<li>Pastikan tidak ada NIS kembar di file.</li>
+<li>Kirim file ke admin platform (lewat WA/email).</li>
+<li>Setelah admin selesai, buka <strong>Kesantrian → Santri</strong> dan periksa: jumlah santri sesuai? Nama-nama benar?</li>
+</ol>
+<blockquote>
+<p>📌 Rujukan teknis untuk admin: <code>pesantren-platform/docs/PANDUAN-IMPORT-SANTRI.md</code>.</p>
+</blockquote>
+<hr>
+<h2 id="3-membuat-kelas">3. Membuat Kelas<a class="anchor" href="#3-membuat-kelas" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> awal tahun ajaran, atau ada rombongan belajar baru.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Kesantrian</strong> → <strong>Kelas</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Nama kelas</strong> — contoh: <code>Kelas 1A Putra</code>.</li>
+<li><strong>Tingkat</strong> — contoh: <code>1</code>.</li>
+<li><strong>Kapasitas</strong> — jumlah maksimal santri, contoh: <code>30</code>.</li>
+<li><strong>Wali kelas</strong> — ketuk, pilih nama guru dari daftar (guru harus sudah punya akun).</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> kelas muncul di tabel, kolom <strong>Sisa Kapasitas</strong> menunjukkan slot kosong.</p>
+<hr>
+<h2 id="4-menempatkan-santri-ke-kelas">4. Menempatkan Santri ke Kelas<a class="anchor" href="#4-menempatkan-santri-ke-kelas" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setelah santri ditambahkan, supaya tercatat dia belajar di kelas mana.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Kesantrian</strong> → <strong>Penempatan Kelas</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Santri</strong> — ketik sebagian nama di kotak pilihan, lalu pilih.</li>
+<li><strong>Kelas</strong> — pilih kelas tujuan.</li>
+<li><strong>Semester</strong> dan <strong>Tahun akademik</strong> — sesuai yang berjalan.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> penempatan muncul di tabel dengan status aktif.</p>
+<blockquote>
+<p>💡 <strong>Mengapa begini?</strong> Satu santri hanya boleh punya SATU penempatan aktif.
+Aplikasi otomatis menjadikan penempatan lama sebagai riwayat — Bapak/Ibu tidak perlu menghapus apa pun.</p>
+</blockquote>
+<hr>
+<h2 id="5-memindahkan-santri-ke-kelas-lain-mutasi-naik-kelas">5. Memindahkan Santri ke Kelas Lain (Mutasi / Naik Kelas)<a class="anchor" href="#5-memindahkan-santri-ke-kelas-lain-mutasi-naik-kelas" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> kenaikan kelas, atau pindah rombel di tengah tahun.</p>
+<p><strong>Caranya sama dengan menempatkan santri (Bagian 4)</strong> — buat penempatan BARU untuk santri itu:</p>
+<ol>
+<li><strong>Kesantrian</strong> → <strong>Penempatan Kelas</strong> → <strong>+ Tambah</strong>.</li>
+<li>Pilih santri yang mau dipindah.</li>
+<li>Pilih <strong>kelas barunya</strong>.</li>
+<li>Isi alasan kalau diminta — contoh: <code>Kenaikan kelas</code>.</li>
+<li><strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> penempatan baru aktif; penempatan lama otomatis menjadi riwayat (tidak perlu dihapus).</p>
+<p>⚠️ <em>Salah pilih kelas?</em> Tenang — buat lagi penempatan baru ke kelas yang benar. Yang salah otomatis jadi riwayat.</p>
+<hr>
+<h2 id="6-mengubah-status-santri-cuti-lulus-keluar">6. Mengubah Status Santri (Cuti, Lulus, Keluar)<a class="anchor" href="#6-mengubah-status-santri-cuti-lulus-keluar" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> santri izin lama, lulus, pindah pesantren, atau dikeluarkan.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li><strong>Kesantrian</strong> → <strong>Santri</strong>.</li>
+<li>Cari santrinya lewat kotak Cari 🔍.</li>
+<li>Ketuk tombol <strong>Edit</strong> (gambar pensil) di baris santri itu.</li>
+<li>Cari kotak <strong>Status</strong>, ketuk, lalu pilih:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Pilihan</th>
+<th>Kapan dipakai</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>aktif</strong></td>
+<td>Belajar normal</td>
+</tr>
+<tr>
+<td><strong>cuti</strong></td>
+<td>Izin tidak hadir sementara</td>
+</tr>
+<tr>
+<td><strong>lulus</strong></td>
+<td>Selesai pendidikan — otomatis tercatat sebagai <strong>Alumni</strong></td>
+</tr>
+<tr>
+<td><strong>keluar</strong></td>
+<td>Pindah ke pesantren/sekolah lain</td>
+</tr>
+<tr>
+<td><strong>dikeluarkan</strong></td>
+<td>Diberhentikan karena pelanggaran</td>
+</tr>
+</tbody></table>
+<ol start="5">
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> status di tabel berubah. Untuk yang lulus: namanya muncul di menu <strong>Kesantrian → Alumni</strong>.</p>
+<blockquote>
+<p>⛔ <strong>JANGAN PERNAH menghapus santri.</strong> Santri keluar/lulus tetap dibutuhkan riwayatnya
+(ijazah, tunggakan, data alumni). Hapus = riwayat hilang selamanya. Cukup ganti status.</p>
+</blockquote>
+<hr>
+<h2 id="7-mencetak-menyimpan-daftar-santri">7. Mencetak / Menyimpan Daftar Santri<a class="anchor" href="#7-mencetak-menyimpan-daftar-santri" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> rapat, laporan ke pimpinan, arsip cetak.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li><strong>Kesantrian</strong> → <strong>Santri</strong>.</li>
+<li>(Pilihan) Saring dulu: ketuk <strong>Filter</strong> (gambar corong) → pilih kelas/status yang diinginkan.</li>
+<li>Ketuk tombol <strong>Export</strong> → file Excel terunduh ke HP/komputer; ATAU
+ketuk <strong>Cetak / PDF</strong> → muncul tampilan siap cetak → tekan <strong>Ctrl+P</strong> → pilih printer, atau pilih <strong>Save as PDF</strong> untuk menyimpan sebagai file.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> ada file baru di folder <strong>Download</strong>, atau kertas keluar dari printer.</p>
+<hr>
+<h2 id="8-mengurus-pendaftaran-santri-baru-ppdb">8. Mengurus Pendaftaran Santri Baru (PPDB)<a class="anchor" href="#8-mengurus-pendaftaran-santri-baru-ppdb" aria-hidden="true">#</a></h2>
+<p>Calon santri mendaftar sendiri lewat <strong>website pesantren</strong> (tanpa akun staf). Data mereka otomatis masuk ke aplikasi. Tugas TU: memeriksa, menilai, memutuskan, dan meresmikan.</p>
+<h3 id="8a-melihat-siapa-saja-yang-mendaftar">8a. Melihat siapa saja yang mendaftar<a class="anchor" href="#8a-melihat-siapa-saja-yang-mendaftar" aria-hidden="true">#</a></h3>
+<ol>
+<li>Menu kiri → <strong>PPDB</strong> → <strong>Calon Santri</strong>.</li>
+<li>Muncul tabel semua pendaftar. Gunakan <strong>Filter</strong> untuk melihat per status:
+<code>menunggu</code> → <code>lulus_ujian</code> → <code>diterima</code> / <code>ditolak</code> → <code>registrasi_ulang</code>.</li>
+</ol>
+<h3 id="8b-memasukkan-hasil-ujian-tes">8b. Memasukkan hasil ujian/tes<a class="anchor" href="#8b-memasukkan-hasil-ujian-tes" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>PPDB</strong> → <strong>Calon Santri</strong> → ketuk <strong>Edit</strong> di baris calon santri.</li>
+<li>Buka bagian <strong>Hasil Ujian</strong>.</li>
+<li>Pilih jenis tes (tulis / baca Al-Qur&#39;an / wawancara), ketik nilainya.</li>
+<li><strong>Simpan</strong>.</li>
+</ol>
+<blockquote>
+<p>💡 Kalau pesantren memakai <strong>ujian online</strong>: soal disiapkan di <strong>PPDB → Bank Soal</strong>,
+jadwalnya di <strong>PPDB → Jadwal Ujian</strong>, dan nilai masuk otomatis ke <strong>PPDB → Hasil Ujian</strong>
+setelah calon santri selesai mengerjakan dari rumah.</p>
+</blockquote>
+<h3 id="8c-memutuskan-diterima-ditolak">8c. Memutuskan diterima / ditolak<a class="anchor" href="#8c-memutuskan-diterima-ditolak" aria-hidden="true">#</a></h3>
+<ol>
+<li><strong>PPDB</strong> → <strong>Calon Santri</strong> → <strong>Edit</strong>.</li>
+<li>Ubah kotak <strong>Status</strong> menjadi <strong>diterima</strong> atau <strong>ditolak</strong>.</li>
+<li><strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> aplikasi otomatis mengirim kabar lewat WA ke wali calon santri. Tidak perlu mengetik WA satu-satu.</p>
+<h3 id="8d-registrasi-ulang-calon-resmi-jadi-santri">8d. Registrasi ulang (calon resmi jadi santri)<a class="anchor" href="#8d-registrasi-ulang-calon-resmi-jadi-santri" aria-hidden="true">#</a></h3>
+<ol>
+<li>Buka calon santri yang statusnya <strong>diterima</strong>.</li>
+<li>Ketuk tombol <strong>Registrasi Ulang</strong>.</li>
+<li>Ikuti formulir sampai selesai → <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> nama anak itu sekarang muncul di <strong>Kesantrian → Santri</strong> sebagai santri aktif. Lanjutkan dengan menempatkannya ke kelas (Bagian 4).</p>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> tabel Calon Santri dengan kolom status diwarnai <span class="soon">(gambar menyusul)</span></figcaption></figure>
+---
+
+<h2 id="9-larangan-amp-pengingat-penting">9. Larangan &amp; Pengingat Penting<a class="anchor" href="#9-larangan-amp-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>⛔ <strong>Jangan hapus data santri</strong> — ganti status saja (Bagian 6).</li>
+<li>🔢 <strong>NIS tidak boleh kembar.</strong> Kalau aplikasi menolak NIS, cari dulu — jangan dipaksakan dengan NIS asal.</li>
+<li>📱 <strong>Nomor HP wali harus benar</strong> — semua pemberitahuan WA otomatis bergantung pada nomor ini. Tulis dengan awalan 08, tanpa spasi dan tanda hubung.</li>
+<li>🚪 <strong>Keluar (logout) dari aplikasi</strong> kalau memakai komputer bersama.</li>
+<li>📸 <strong>Ada error? Foto layar, kirim ke admin.</strong> Jangan diulang-ulang sampai 10 kali — cukup 2 kali coba, lalu lapor.</li>
+</ol>
+<hr>
+<h2 id="contekan-cepat-tu">Contekan Cepat TU<a class="anchor" href="#contekan-cepat-tu" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tambah santri</td>
+<td>Kesantrian → Santri → + Tambah</td>
+</tr>
+<tr>
+<td>Cari santri</td>
+<td>Kesantrian → Santri → kotak Cari 🔍</td>
+</tr>
+<tr>
+<td>Naik kelas / mutasi</td>
+<td>Kesantrian → Penempatan Kelas → + Tambah</td>
+</tr>
+<tr>
+<td>Santri lulus/keluar</td>
+<td>Kesantrian → Santri → Edit → Status</td>
+</tr>
+<tr>
+<td>Lihat alumni</td>
+<td>Kesantrian → Alumni</td>
+</tr>
+<tr>
+<td>Cetak daftar santri</td>
+<td>Kesantrian → Santri → Export / Cetak</td>
+</tr>
+<tr>
+<td>Lihat pendaftar baru</td>
+<td>PPDB → Calon Santri</td>
+</tr>
+<tr>
+<td>Hasil tes calon santri</td>
+<td>PPDB → Hasil Ujian</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../panduan-dasar/"><span>‹ Sebelumnya</span><b>Panduan Dasar</b></a>
+      <a class="pager-link next" href="../bendahara/"><span>Berikutnya ›</span><b>Bendahara</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-menambah-santri-baru-satu-per-satu">1. Menambah Santri Baru (Satu per Satu)</a><a href="#2-memasukkan-banyak-santri-sekaligus-import-excel">2. Memasukkan Banyak Santri Sekaligus (Import Excel)</a><a href="#3-membuat-kelas">3. Membuat Kelas</a><a href="#4-menempatkan-santri-ke-kelas">4. Menempatkan Santri ke Kelas</a><a href="#5-memindahkan-santri-ke-kelas-lain-mutasi-naik-kelas">5. Memindahkan Santri ke Kelas Lain (Mutasi / Naik Kelas)</a><a href="#6-mengubah-status-santri-cuti-lulus-keluar">6. Mengubah Status Santri (Cuti, Lulus, Keluar)</a><a href="#7-mencetak-menyimpan-daftar-santri">7. Mencetak / Menyimpan Daftar Santri</a><a href="#8-mengurus-pendaftaran-santri-baru-ppdb">8. Mengurus Pendaftaran Santri Baru (PPDB)</a><a href="#9-larangan-amp-pengingat-penting">9. Larangan &amp;amp; Pengingat Penting</a><a href="#contekan-cepat-tu">Contekan Cepat TU</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

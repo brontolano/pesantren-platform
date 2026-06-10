@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prinsip Penulisan · Panduan Pesantren.online</title>
+<meta name="description" content="Aturan menulis panduan untuk pengguna gagap teknologi, lengkap dengan sumber risetnya.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item active" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a><div class="nav-sub"><a href="#1-kenali-pembacanya-dulu">1. Kenali Pembacanya Dulu</a><a href="#2-sepuluh-aturan-bahasa">2. Sepuluh Aturan Bahasa</a><a href="#3-struktur-resep-template-wajib-tiap-tugas">3. Struktur Resep (template wajib tiap tugas)</a><a href="#4-aturan-visual">4. Aturan Visual</a><a href="#5-kerangka-dokumentasi-adaptasi-diátaxis">5. Kerangka Dokumentasi (adaptasi Diátaxis)</a><a href="#6-uji-coba-wajib-sebelum-dianggap-selesai">6. Uji Coba (wajib sebelum dianggap selesai)</a><a href="#7-sumber-riset">7. Sumber Riset</a></div></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">✍️</div>
+        <div>
+          
+          <h1>Prinsip Penulisan</h1>
+          <p class="lead">Aturan menulis panduan untuk pengguna gagap teknologi, lengkap dengan sumber risetnya.</p>
+        </div>
+      </div>
+      <blockquote>
+<p>Hasil riset online 11 Juni 2026. Dipakai sebagai &quot;aturan rumah&quot; setiap kali menulis/merevisi panduan,
+naskah video, atau teks bantuan di aplikasi pesantren.online.</p>
+</blockquote>
+<hr>
+<h2 id="1-kenali-pembacanya-dulu">1. Kenali Pembacanya Dulu<a class="anchor" href="#1-kenali-pembacanya-dulu" aria-hidden="true">#</a></h2>
+<p>Riset Nielsen Norman Group tentang pengguna literasi rendah menemukan perilaku yang berbeda dari pengguna mahir:</p>
+<ul>
+<li>Mereka <strong>membaca kata per kata</strong> (tidak memindai/skimming). Teks panjang = beban berat.</li>
+<li><strong>Pandangan menyempit</strong>: elemen di pinggir layar sering tidak terlihat. Maka panduan harus menyebut LOKASI tombol (&quot;di pojok kanan atas&quot;).</li>
+<li>Mereka <strong>takut salah</strong>. Satu pesan error bisa membuat berhenti total. Maka setiap prosedur wajib punya bagian &quot;kalau ada masalah&quot; yang menenangkan.</li>
+<li>Kabar baiknya: teks yang ditulis untuk pembaca lemah <strong>juga lebih disukai pembaca mahir</strong>. Tidak ada ruginya menyederhanakan.</li>
+</ul>
+<p>Pembaca kita: staf pesantren yang terbiasa kerja kertas/Excel, sebagian baru pertama pakai aplikasi web, mengakses dari HP Android atau komputer warnet/kantor.</p>
+<hr>
+<h2 id="2-sepuluh-aturan-bahasa">2. Sepuluh Aturan Bahasa<a class="anchor" href="#2-sepuluh-aturan-bahasa" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Tingkat baca anak SMP.</strong> Kalau anak kelas 1 SMP tidak paham kalimatnya, tulis ulang. (Anjuran NN/g: kelas 6–8.)</li>
+<li><strong>Kalimat pendek.</strong> Maksimal ±15 kata. Satu kalimat satu ide.</li>
+<li><strong>Kalimat aktif &amp; langsung.</strong> &quot;Klik tombol Simpan&quot; — bukan &quot;Tombol Simpan dapat diklik untuk menyimpan&quot;.</li>
+<li><strong>Tanpa jargon.</strong> Dilarang: <em>submit, input, field, browse, upload, export</em> tanpa penjelasan. Pakai padanan: kirim, isi, kolom isian, buka, unggah, unduh ke Excel.</li>
+<li><strong>Konsisten satu istilah.</strong> Sudah pilih &quot;masuk&quot; untuk login? Pakai itu terus. Jangan sesekali &quot;sign in&quot;.</li>
+<li><strong>Sapaan hormat &amp; hangat.</strong> &quot;Bapak/Ibu&quot; — bukan &quot;user&quot; atau &quot;Anda&quot; yang dingin.</li>
+<li><strong>Angka &amp; contoh nyata.</strong> &quot;Isi nominal, contoh: 150000 (seratus lima puluh ribu, tanpa titik)&quot; lebih jelas dari &quot;isi nominal yang sesuai&quot;.</li>
+<li><strong>Jelaskan istilah teknis sekali di Kamus Istilah</strong>, lalu pakai dengan percaya diri.</li>
+<li><strong>Hindari singkatan</strong> kecuali sudah umum di pesantren (SPP, TU, NIS — boleh; CRUD, CSV — jelaskan).</li>
+<li><strong>Analogi dunia kertas.</strong> &quot;Filter itu seperti memilah tumpukan map: hanya map kelas 1A yang diambil.&quot;</li>
+</ol>
+<hr>
+<h2 id="3-struktur-resep-template-wajib-tiap-tugas">3. Struktur Resep (template wajib tiap tugas)<a class="anchor" href="#3-struktur-resep-template-wajib-tiap-tugas" aria-hidden="true">#</a></h2>
+<p>Setiap tugas ditulis seperti resep masakan, dengan urutan tetap:</p>
+<pre><code class="language-markdown">## Judul = kalimat tugas (&quot;Menambah Santri Baru&quot;)
+
+**Kapan dipakai:** 1 kalimat situasi nyata.
+**Siapkan dulu:** daftar bahan (data/berkas yang harus ada di tangan).
+
+**Langkahnya:**
+1. Satu aksi saja per nomor.
+2. Sebut lokasi + tampilan tombol: &quot;klik tombol biru **Simpan** di kanan bawah&quot;.
+3. Sertakan apa yang AKAN TERLIHAT setelah aksi (&quot;layar berganti ke daftar santri&quot;).
+
+&lt;figure class=&quot;shot&quot;&gt;&lt;div class=&quot;shot-frame&quot;&gt;📷&lt;/div&gt;&lt;figcaption&gt;&lt;b&gt;Cuplikan layar:&lt;/b&gt; layar X dengan panah ke tombol Y &lt;span class=&quot;soon&quot;&gt;(gambar menyusul)&lt;/span&gt;&lt;/figcaption&gt;&lt;/figure&gt;
+✅ **Tanda berhasil:** apa yang terlihat kalau sukses.
+⚠️ **Kalau ada masalah:** 2–3 kesalahan umum + cara keluar + kalimat penenang
+   (&quot;Data tidak akan rusak. Tutup saja, lalu ulangi dari langkah 1.&quot;).
+</code></pre>
+<p>Mengapa begitu (ringkasan riset):</p>
+<ul>
+<li><strong>Langkah bernomor urut sesuai urutan kerja</strong> — standar semua pedoman user manual.</li>
+<li><strong>&quot;Tanda berhasil&quot;</strong> = <em>expected result</em>; pedoman menyarankan selalu tampilkan hasil yang diharapkan tiap langkah/tugas.</li>
+<li><strong>Mulai dari &quot;Kapan dipakai&quot;</strong> karena pengguna mencari berdasarkan masalah (&quot;wali tanya tunggakan&quot;), bukan nama fitur.</li>
+</ul>
+<hr>
+<h2 id="4-aturan-visual">4. Aturan Visual<a class="anchor" href="#4-aturan-visual" aria-hidden="true">#</a></h2>
+<ul>
+<li><strong>Otak memproses gambar jauh lebih cepat daripada teks.</strong> Setiap langkah yang melibatkan layar baru/tombol penting wajib ada screenshot.</li>
+<li>Screenshot diberi <strong>panah/lingkaran merah</strong> ke satu hal saja. Satu gambar satu pesan.</li>
+<li>Gambar diletakkan <strong>tepat setelah</strong> langkah yang dijelaskan, bukan dikumpulkan di akhir.</li>
+<li>Untuk dibagikan via WA: ekspor PDF dengan ukuran huruf besar (min. 12pt), karena banyak yang membaca di layar HP.</li>
+<li><strong>Video pendek (1–3 menit) per tugas</strong> sangat efektif untuk segmen gaptek Indonesia — praktik umum di sekolah: video tutorial dibagikan lewat grup WhatsApp. Naskahnya di <a href="../naskah-video/">🎬 Naskah Video Tutorial</a>.</li>
+</ul>
+<hr>
+<h2 id="5-kerangka-dokumentasi-adaptasi-diátaxis">5. Kerangka Dokumentasi (adaptasi Diátaxis)<a class="anchor" href="#5-kerangka-dokumentasi-adaptasi-diátaxis" aria-hidden="true">#</a></h2>
+<p>Kerangka Diátaxis membagi dokumentasi jadi 4 jenis — mencampurnya adalah penyebab utama dokumentasi membingungkan:</p>
+<table>
+<thead>
+<tr>
+<th>Jenis</th>
+<th>Bentuk di paket kita</th>
+<th>Kapan dipakai pembaca</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Tutorial</strong> (belajar)</td>
+<td><a href="../panduan-dasar/">🌱 Panduan Dasar</a> + sesi training + video</td>
+<td>Pertama kali kenal aplikasi</td>
+</tr>
+<tr>
+<td><strong>How-to / resep</strong> (kerja)</td>
+<td>Panduan per peran (<code>02</code>–<code>06</code>)</td>
+<td>Sedang mengerjakan tugas</td>
+</tr>
+<tr>
+<td><strong>Referensi</strong> (mencari fakta)</td>
+<td><a href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a> + tabel status/istilah</td>
+<td>Lupa &quot;di menu mana ya?&quot;</td>
+</tr>
+<tr>
+<td><strong>Penjelasan</strong> (paham)</td>
+<td>Kotak &quot;Mengapa begini?&quot; singkat di dalam panduan</td>
+<td>Penasaran/ragu</td>
+</tr>
+</tbody></table>
+<p>Untuk segmen gaptek, porsi terbesar = <strong>tutorial + resep</strong>. Penjelasan teori dibuat sesingkat mungkin dan tidak menghalangi langkah.</p>
+<hr>
+<h2 id="6-uji-coba-wajib-sebelum-dianggap-selesai">6. Uji Coba (wajib sebelum dianggap selesai)<a class="anchor" href="#6-uji-coba-wajib-sebelum-dianggap-selesai" aria-hidden="true">#</a></h2>
+<p>Pedoman penulisan manual sepakat: manual harus <strong>diuji ke orang yang belum pernah pakai aplikasinya</strong>.</p>
+<p>Cara murah untuk kita:</p>
+<ol>
+<li>Pilih 1 staf paling gaptek.</li>
+<li>Beri dia panduan + 1 tugas nyata (&quot;tambahkan santri bernama X&quot;).</li>
+<li><strong>Dilarang membantu.</strong> Hanya amati dan catat di mana dia berhenti/bingung.</li>
+<li>Setiap titik macet = bagian panduan yang harus diperbaiki (bukan orangnya yang bodoh).</li>
+<li>Ulangi sampai tugas selesai tanpa bantuan.</li>
+</ol>
+<hr>
+<h2 id="7-sumber-riset">7. Sumber Riset<a class="anchor" href="#7-sumber-riset" aria-hidden="true">#</a></h2>
+<ul>
+<li>Nielsen Norman Group — <a href="https://www.nngroup.com/videos/plain-language-for-experts/" target="_blank" rel="noopener">Plain Language for Everyone, Even Experts</a> dan <a href="https://www.nngroup.com/articles/ux-writing-faqs/" target="_blank" rel="noopener">UX Writing FAQs</a> (tingkat baca kelas 6–8, bahasa percakapan).</li>
+<li>Readability Guidelines — <a href="https://readabilityguidelines.co.uk/clear-language/low-literacy-users/" target="_blank" rel="noopener">Low literacy users</a> dan <a href="https://readabilityguidelines.co.uk/clear-language/plain-english/" target="_blank" rel="noopener">Plain English</a> (perilaku baca pengguna literasi rendah).</li>
+<li>TechSmith — <a href="https://www.techsmith.com/blog/user-documentation/" target="_blank" rel="noopener">The Ultimate Guide to Writing User Manuals</a> (visual, quick start, daftar isi).</li>
+<li>UserFocus — <a href="https://www.userfocus.co.uk/articles/usermanuals.html" target="_blank" rel="noopener">Tips for writing user manuals</a> (uji coba ke pengguna baru, hasil yang diharapkan tiap langkah).</li>
+<li>Instructional Solutions — <a href="https://www.instructionalsolutions.com/blog/how-to-write-user-manual" target="_blank" rel="noopener">How to Write a User Manual</a> (langkah berurutan, glosarium, asumsikan pembaca tidak tahu apa-apa).</li>
+<li>Helpjuice — <a href="https://helpjuice.com/blog/user-documentation" target="_blank" rel="noopener">8 Tips For Writing Better User Documentation</a> (bahasa sederhana, struktur step-by-step).</li>
+<li>Diátaxis — <a href="https://diataxis.fr/" target="_blank" rel="noopener">diataxis.fr</a> (4 jenis dokumentasi: tutorial, how-to, referensi, penjelasan).</li>
+<li>Konteks Indonesia: <a href="https://www.quipper.com/id/blog/info-guru/solusi-gaptek/" target="_blank" rel="noopener">Quipper — Solusi Gaptek</a> dan praktik <a href="https://ayoguruberbagi.kemdikbud.go.id/artikel/belajar-dari-rumah-bagi-siswa-gaptek-di-pedesaan/" target="_blank" rel="noopener">Guru Berbagi Kemdikbud</a> (video tutorial via grup WA paling efektif); contoh format manual operator sekolah: <a href="https://sipensekdik.banjarmasinkota.go.id/doc/manual_app_sipensekdik_operator_sekolah.pdf" target="_blank" rel="noopener">SIPENSEKDIK Banjarmasin (PDF)</a>.</li>
+</ul>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../naskah-video/"><span>‹ Sebelumnya</span><b>Naskah Video Tutorial</b></a>
+      <span></span>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-kenali-pembacanya-dulu">1. Kenali Pembacanya Dulu</a><a href="#2-sepuluh-aturan-bahasa">2. Sepuluh Aturan Bahasa</a><a href="#3-struktur-resep-template-wajib-tiap-tugas">3. Struktur Resep (template wajib tiap tugas)</a><a href="#4-aturan-visual">4. Aturan Visual</a><a href="#5-kerangka-dokumentasi-adaptasi-diátaxis">5. Kerangka Dokumentasi (adaptasi Diátaxis)</a><a href="#6-uji-coba-wajib-sebelum-dianggap-selesai">6. Uji Coba (wajib sebelum dianggap selesai)</a><a href="#7-sumber-riset">7. Sumber Riset</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

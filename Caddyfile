@@ -44,6 +44,15 @@ http://asy-syifaa.com, http://www.asy-syifaa.com {
 :80 {
 	root * /app/public
 	encode zstd br gzip
+
+	# Pusat Panduan statis (public/dokumentasi) — route eksplisit agar URL
+	# direktori (mis. /dokumentasi/bendahara/) dilayani index.html oleh
+	# file_server, bukan jatuh ke index.php Laravel (404).
+	@dokumentasi path /dokumentasi /dokumentasi/*
+	route @dokumentasi {
+		file_server
+	}
+
 	php_server
 }
 
@@ -54,5 +63,12 @@ http://asy-syifaa.com, http://www.asy-syifaa.com {
 	}
 	root * /app/public
 	encode zstd br gzip
+
+	# Pusat Panduan statis — lihat catatan di blok :80
+	@dokumentasi path /dokumentasi /dokumentasi/*
+	route @dokumentasi {
+		file_server
+	}
+
 	php_server
 }
