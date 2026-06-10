@@ -14,6 +14,12 @@ class KesantrianServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Modules\Kesantrian\Console\ProvisionAkunSantriCommand::class,
+            ]);
+        }
     }
 
     public function register(): void

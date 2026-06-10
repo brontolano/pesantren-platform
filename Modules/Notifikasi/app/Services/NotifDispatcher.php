@@ -37,6 +37,7 @@ class NotifDispatcher
         'bukti_bayar_masuk' => 'BUKTI_BAYAR_MASUK',             // admin: antrean verifikasi baru
         'berkas_ppdb_masuk' => 'BERKAS_PPDB_MASUK',             // admin: berkas/bukti PPDB baru
         'pengingat_daftar_ulang' => 'PENGINGAT_DAFTAR_ULANG',   // wali/peserta: lulus tapi belum daftar ulang
+        'kredensial_santri' => 'KREDENSIAL_SANTRI',             // wali: kredensial sementara akun santri
     ];
 
     public function __construct(

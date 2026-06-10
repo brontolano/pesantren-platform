@@ -78,6 +78,34 @@ class SantriAccountServiceTest extends TestCase
         tenancy()->end();
     }
 
+    public function test_command_provision_massal_dan_kirim_wa(): void
+    {
+        $santri = $this->boot('akn3'); // 1 aktif tanpa akun, no_hp_wali terisi
+        Santri::create([
+            'nis' => 'AKN3-99', 'nama' => 'Sudah Punya', 'tanggal_lahir' => '2012-01-01',
+            'jenis_kelamin' => 'L', 'status' => 'aktif',
+        ]);
+        $tenantId = tenant('id');
+        // Beri akun ke santri kedua agar dilewati command (idempoten).
+        app(SantriAccountService::class)->provision(Santri::where('nis', 'AKN3-99')->first());
+        tenancy()->end();
+
+        $spy = \Mockery::spy(\Modules\Notifikasi\Services\NotifDispatcher::class);
+        $this->app->instance(\Modules\Notifikasi\Services\NotifDispatcher::class, $spy);
+
+        $this->artisan('santri:provision-akun', ['tenant' => $tenantId, '--kirim-wa' => true])
+            ->assertSuccessful();
+
+        tenancy()->initialize(\App\Models\Tenant::find($tenantId));
+        $this->assertNotNull($santri->fresh()->user_id, 'Santri tanpa akun harus dibuatkan.');
+        tenancy()->end();
+
+        // Kredensial WA hanya utk santri yang BARU dibuatkan (1x).
+        $spy->shouldHaveReceived('kirim')
+            ->with('kredensial_santri', \Mockery::on(fn ($p) => in_array('0899000111', $p['wa'] ?? [], true)))
+            ->once();
+    }
+
     private function seedTenantRow(Tenant $tenant): void
     {
         DB::connection('tenant')->table('tenants')->updateOrInsert(
