@@ -121,6 +121,15 @@ Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'sett
 Route::post('/api/v1/spmb/register', [PpdbPublicApiController::class, 'register'])
     ->middleware('throttle:ppdb-submit');
 
+// API direktori publik — kompatibel kontrak legacy api.asy-syifaa.com
+// (hasil-seleksi.php, direktori-santri/alumni/pengajar.php). Data publik saja.
+Route::middleware('throttle:public-api')->group(function () {
+    Route::get('/api/v1/ppdb/selection-results', [\App\Http\Controllers\Api\PublicDirectoryApiController::class, 'selectionResults']);
+    Route::get('/api/public/students', [\App\Http\Controllers\Api\PublicDirectoryApiController::class, 'students']);
+    Route::get('/api/public/staff', [\App\Http\Controllers\Api\PublicDirectoryApiController::class, 'staff']);
+    Route::get('/api/public/guardians', [\App\Http\Controllers\Api\PublicDirectoryApiController::class, 'guardians']);
+});
+
 // API publik headless TERPROTEKSI (X-Api-Key per tenant + rate-limit). Kontrak:
 // docs/INTEGRASI-API.md. Aditif — tak mengubah endpoint publik di atas.
 Route::middleware(['api.key', 'throttle:public-api'])->prefix('api/v1')->group(function () {
