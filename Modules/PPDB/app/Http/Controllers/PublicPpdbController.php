@@ -79,6 +79,8 @@ class PublicPpdbController extends Controller
     {
         $validated = $request->validate(
             $this->buildValidationRules($fieldConfigurationService->getConfiguration())
+            + ['setuju_kebijakan' => ['accepted']],
+            ['setuju_kebijakan.accepted' => 'Centang persetujuan Kebijakan Privasi Sistem untuk melanjutkan.'],
         );
 
         $nomorPendaftaran = $registrationNumberService->generate();
@@ -97,6 +99,7 @@ class PublicPpdbController extends Controller
             'no_hp_wali' => $validated['noHpWali'],
             'email_wali' => $validated['emailWali'] ?? null,
             'status_pendaftaran' => 'pending',
+            'consent_kebijakan_at' => now(), // persetujuan Kebijakan Privasi Sistem (UU PDP)
             'data_ortu' => [
                 'nik' => $validated['nik'] ?? null,
                 'jenjang_asal' => $validated['jenjangAsal'] ?? null,

@@ -103,8 +103,18 @@ Route::get('/portal/{any?}', fn () => redirect('/spmb/login'))
     ->where('any', '.*')
     ->name('portal.legacy.redirect');
 
-// Halaman legal — central domain
-Route::get('/kebijakan-privasi', fn () => view('legal.privacy-policy'))->name('legal.privacy');
+// Halaman legal — central domain; di DOMAIN TENANT menampilkan Kebijakan
+// Privasi Sistem Pondok (redaksi default platform, bisa diedit pesantren).
+Route::get('/kebijakan-privasi', function () {
+    if (tenancy()->initialized && tenant() !== null) {
+        return view('tenant.kebijakan-privasi', [
+            'nama' => \App\Support\TenantBranding::name(tenant('name') ?? 'Pesantren'),
+            'isi' => \App\Support\KebijakanPrivasiSistem::isi(),
+        ]);
+    }
+
+    return view('legal.privacy-policy');
+})->name('legal.privacy');
 Route::get('/syarat-layanan', fn () => view('legal.terms-of-service'))->name('legal.terms');
 Route::get('/disclaimer', fn () => view('legal.disclaimer'))->name('legal.disclaimer');
 Route::get('/cookie-policy', fn () => view('legal.cookie-policy'))->name('legal.cookies');
