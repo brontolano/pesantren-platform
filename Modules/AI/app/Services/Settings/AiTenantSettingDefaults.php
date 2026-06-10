@@ -48,7 +48,7 @@ class AiTenantSettingDefaults
 
             // Matriks fitur per peran — fitur santri default OFF (PRD §6.3).
             'fitur_per_peran' => [
-                'asatidz' => ['generator_soal' => false, 'chatbot' => false],
+                'asatidz' => ['generator_soal' => false, 'generator_rpp' => false, 'chatbot' => false],
                 'admin' => ['chatbot' => false, 'dokumen_tu' => false],
                 'bendahara' => ['ringkasan_keuangan' => false],
                 'wali' => ['chatbot' => false],

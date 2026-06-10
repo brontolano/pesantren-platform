@@ -27,6 +27,7 @@ class RingkasanKebijakan
     private const LABEL_FITUR = [
         'asatidz' => [
             'generator_soal' => 'membantu Asatidz menyusun draf soal latihan',
+            'generator_rpp' => 'membantu Asatidz menyusun draf RPP/modul ajar',
             'chatbot' => 'melayani tanya-jawab Asatidz',
         ],
         'admin' => [

@@ -68,6 +68,13 @@ class RolesAndPermissionsSeeder extends Seeder
             // Modul AI (T-A040) — Generator Soal & Kisi-kisi: buat draf,
             // edit butir, MENGESAHKAN paket (human-in-the-loop), cetak.
             'ai.generator.soal',
+            // Modul AI (T-A041) — Generator RPP / Modul Ajar: buat draf,
+            // edit isi seksi, MENGESAHKAN dokumen (human-in-the-loop),
+            // cetak/unduh. Kelola template = ai.template.kelola.
+            'ai.generator.rpp',
+            // Modul AI (T-A041) — kelola template RPP (Wakakurikulum/admin):
+            // buat/ubah/nonaktifkan struktur seksi dokumen milik tenant.
+            'ai.template.kelola',
         ];
 
         foreach ($permissions as $permission) {
@@ -97,6 +104,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'ai.pengetahuan.kelola',
                 'ai.eskalasi.kelola',
                 'ai.generator.soal',
+                'ai.generator.rpp',
+                'ai.template.kelola',
             ],
             'santri' => [
                 'view_dashboard',
@@ -169,6 +178,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 'ai.eskalasi.kelola',
                 // T-A040 — asatidz menyusun & mengesahkan paket draf soal.
                 'ai.generator.soal',
+                // T-A041 — asatidz menyusun & mengesahkan draf RPP/modul ajar
+                // (kelola template TIDAK ikut — itu ai.template.kelola).
+                'ai.generator.rpp',
             ],
             'guru' => [
                 'view_dashboard',

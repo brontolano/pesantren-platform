@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\AI\Http\Controllers\DrafRppCetakController;
 use Modules\AI\Http\Controllers\DrafSoalCetakController;
 use Modules\AI\Http\Controllers\RatingJawabanController;
 use Modules\AI\Http\Controllers\RingkasanKebijakanController;
@@ -43,3 +44,17 @@ Route::get('/ai/draf-soal/{draf}/cetak', DrafSoalCetakController::class)
     ->middleware('auth')
     ->whereNumber('draf')
     ->name('ai.draf-soal.cetak');
+
+// T-A041 — lembar cetak & unduhan dokumen draf RPP Generator RPP. WAJIB
+// login; permission ai.generator.rpp + gating modul dicek controller;
+// tenancy datang dari middleware web global di domain tenant. Unduhan =
+// HTML ber-MIME Word (tanpa dependency phpword — lihat docblock controller).
+Route::get('/ai/draf-rpp/{draf}/cetak', [DrafRppCetakController::class, 'cetak'])
+    ->middleware('auth')
+    ->whereNumber('draf')
+    ->name('ai.draf-rpp.cetak');
+
+Route::get('/ai/draf-rpp/{draf}/unduh', [DrafRppCetakController::class, 'unduh'])
+    ->middleware('auth')
+    ->whereNumber('draf')
+    ->name('ai.draf-rpp.unduh');
