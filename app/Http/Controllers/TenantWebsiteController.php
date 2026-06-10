@@ -108,13 +108,10 @@ class TenantWebsiteController extends Controller
             'no_hp_wali' => 'nomor HP wali',
         ]);
 
-        $year = date('Y');
-        $count = DB::table('calon_santri')->where('tenant_id', $tenant->id)->count() + 1;
-        $nomor = sprintf('PPDB-%s-%04d', $year, $count);
-
-        DB::table('calon_santri')->insert([
+        // Nomor + insert satu transaksi via service (race-safe, retry saat tabrakan).
+        // Menggantikan count()+1 lama yang bisa duplikat (race & baris terhapus).
+        $calon = app(\Modules\PPDB\Services\PpdbRegistrationNumberService::class)->createWithNomor([
             'tenant_id' => $tenant->id,
-            'nomor_pendaftaran' => $nomor,
             'tracking_token' => Str::random(40),
             'tracking_token_generated_at' => now(),
             'nama' => $data['nama'],
@@ -130,12 +127,10 @@ class TenantWebsiteController extends Controller
             'program_diminati' => $data['program_diminati'],
             'status_pendaftaran' => 'pending',
             'consent_kebijakan_at' => now(), // persetujuan Kebijakan Privasi Sistem (UU PDP)
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
         return redirect()->route('tenant.ppdb.form')->with('ppdb_success', [
-            'nomor' => $nomor,
+            'nomor' => $calon->nomor_pendaftaran,
             'nama' => $data['nama'],
         ]);
     }
