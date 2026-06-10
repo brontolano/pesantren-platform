@@ -63,7 +63,7 @@ class TopupService
         // dengan setor + update status. Tanpa ini, dua klik "setujui" bersamaan
         // sama-sama lolos cek 'menunggu' → setor() jalan dua kali → SALDO NAIK DOBEL.
         // Transaksi juga menjamin setor & status berubah bersama (tak ada setor yatim).
-        return DB::transaction(function () use ($topup, $verifiedBy): TabunganTopup {
+        $hasil = DB::transaction(function () use ($topup, $verifiedBy): TabunganTopup {
             $locked = TabunganTopup::query()->whereKey($topup->id)->lockForUpdate()->firstOrFail();
 
             if ($locked->status !== 'menunggu') {
@@ -85,6 +85,11 @@ class TopupService
 
             return $locked->fresh();
         });
+
+        // Notif WA ke wali (TAB-4) — fire-and-forget SETELAH commit.
+        app(KeuanganNotifikasiService::class)->topupDisetujui($hasil);
+
+        return $hasil;
     }
 
     /**
@@ -96,7 +101,7 @@ class TopupService
 
         // Lock + cek status di transaksi yang sama — cegah tolak menimpa topup
         // yang sedang/baru disetujui proses lain (saldo sudah naik).
-        return DB::transaction(function () use ($topup, $verifiedBy, $alasan): TabunganTopup {
+        $hasil = DB::transaction(function () use ($topup, $verifiedBy, $alasan): TabunganTopup {
             $locked = TabunganTopup::query()->whereKey($topup->id)->lockForUpdate()->firstOrFail();
 
             if ($locked->status !== 'menunggu') {
@@ -112,6 +117,11 @@ class TopupService
 
             return $locked->fresh();
         });
+
+        // Notif WA ke wali (TAB-4) — fire-and-forget SETELAH commit.
+        app(KeuanganNotifikasiService::class)->topupDitolak($hasil, $alasan);
+
+        return $hasil;
     }
 
     private function ensureTenantContext(): void

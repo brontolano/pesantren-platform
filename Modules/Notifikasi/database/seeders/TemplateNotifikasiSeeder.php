@@ -211,6 +211,105 @@ MSG,
 Terima kasih atas perhatiannya.
 MSG,
             ],
+
+            // ── Event uang PWA Wali/Peserta (NOTIF-1, TGH-5, TAB-4) ─────────
+            [
+                'kode_template'    => 'PEMBAYARAN_DIVERIFIKASI',
+                'judul'            => 'Pembayaran Diterima',
+                'channel'          => 'whatsapp',
+                'variable_dinamis' => ['nama_santri', 'jenis_tagihan', 'nominal', 'status_tagihan', 'nama_pesantren'],
+                'isi'              => <<<'MSG'
+✅ *PEMBAYARAN DITERIMA*
+
+Yth. Wali Santri {{nama_santri}},
+
+Pembayaran *{{jenis_tagihan}}* sebesar *Rp {{nominal}}* telah kami VERIFIKASI.
+Status tagihan saat ini: *{{status_tagihan}}*.
+
+Jazakumullahu khairan — {{nama_pesantren}}.
+MSG,
+            ],
+
+            [
+                'kode_template'    => 'PEMBAYARAN_DITOLAK',
+                'judul'            => 'Bukti Pembayaran Ditolak',
+                'channel'          => 'whatsapp',
+                'variable_dinamis' => ['nama_santri', 'jenis_tagihan', 'nominal', 'alasan', 'nama_pesantren'],
+                'isi'              => <<<'MSG'
+⚠️ *BUKTI PEMBAYARAN DITOLAK*
+
+Yth. Wali Santri {{nama_santri}},
+
+Mohon maaf, bukti pembayaran *{{jenis_tagihan}}* sebesar *Rp {{nominal}}* belum dapat kami terima.
+Alasan: {{alasan}}
+
+Silakan unggah ulang bukti yang benar melalui aplikasi, atau hubungi bendahara {{nama_pesantren}}.
+MSG,
+            ],
+
+            [
+                'kode_template'    => 'TOPUP_DIVERIFIKASI',
+                'judul'            => 'Setoran Saldo Berhasil',
+                'channel'          => 'whatsapp',
+                'variable_dinamis' => ['nama_santri', 'nominal', 'saldo', 'nama_pesantren'],
+                'isi'              => <<<'MSG'
+💰 *SETORAN SALDO BERHASIL*
+
+Yth. Wali Santri {{nama_santri}},
+
+Setoran saldo tabungan sebesar *Rp {{nominal}}* telah kami verifikasi.
+Saldo tabungan saat ini: *Rp {{saldo}}*.
+
+Jazakumullahu khairan — {{nama_pesantren}}.
+MSG,
+            ],
+
+            [
+                'kode_template'    => 'TOPUP_DITOLAK',
+                'judul'            => 'Setoran Saldo Ditolak',
+                'channel'          => 'whatsapp',
+                'variable_dinamis' => ['nama_santri', 'nominal', 'alasan', 'nama_pesantren'],
+                'isi'              => <<<'MSG'
+⚠️ *SETORAN SALDO DITOLAK*
+
+Yth. Wali Santri {{nama_santri}},
+
+Mohon maaf, pengajuan setor saldo sebesar *Rp {{nominal}}* belum dapat kami terima.
+Alasan: {{alasan}}
+
+Silakan ajukan ulang dengan bukti transfer yang benar — {{nama_pesantren}}.
+MSG,
+            ],
+
+            [
+                'kode_template'    => 'BUKTI_BAYAR_MASUK',
+                'judul'            => 'Antrean Verifikasi Baru',
+                'channel'          => 'whatsapp',
+                'variable_dinamis' => ['jenis', 'nama_santri', 'nominal', 'nama_pesantren'],
+                'isi'              => <<<'MSG'
+🔔 *ANTRIAN VERIFIKASI BARU* — {{nama_pesantren}}
+
+Jenis: {{jenis}}
+Santri: {{nama_santri}}
+Nominal: Rp {{nominal}}
+
+Mohon segera diverifikasi melalui panel admin.
+MSG,
+            ],
+
+            [
+                'kode_template'    => 'BERKAS_PPDB_MASUK',
+                'judul'            => 'Berkas/Bukti PPDB Baru',
+                'channel'          => 'whatsapp',
+                'variable_dinamis' => ['jenis', 'nama_calon', 'nama_pesantren'],
+                'isi'              => <<<'MSG'
+🔔 *BERKAS PPDB BARU* — {{nama_pesantren}}
+
+{{jenis}} dari calon santri *{{nama_calon}}* baru diunggah dan menunggu verifikasi panitia.
+
+Mohon diperiksa melalui panel admin.
+MSG,
+            ],
         ];
 
         $tenantId = tenant('id') ?? throw new \RuntimeException('Seeder harus dijalankan dalam konteks tenant.');

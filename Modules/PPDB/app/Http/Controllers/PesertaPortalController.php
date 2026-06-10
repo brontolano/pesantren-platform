@@ -123,6 +123,16 @@ class PesertaPortalController extends Controller
             return back()->withErrors(['file' => $e->getMessage()]);
         }
 
+        // Notif WA admin (NOTIF-1): berkas baru menunggu verifikasi. Fire-and-forget.
+        app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('berkas_ppdb_masuk', [
+            'wa' => array_filter([\App\Models\Setting::getTenantStringValue('admission_admin_whatsapp')]),
+            'data' => [
+                'jenis' => 'Dokumen '.PpdbDocumentTypes::label($validated['jenis_dokumen']),
+                'nama_calon' => $calon->nama_lengkap ?? $calon->nama ?? '-',
+                'nama_pesantren' => \App\Models\Setting::getTenantStringValue('branding_name') ?? (tenant('name') ?? 'Pesantren'),
+            ],
+        ]);
+
         return back()->with('success', 'Dokumen '.PpdbDocumentTypes::label($validated['jenis_dokumen']).' berhasil diunggah.');
     }
 
@@ -214,6 +224,16 @@ class PesertaPortalController extends Controller
             'bukti_transfer' => $path,
             'bukti_diunggah_at' => now(),
             'status' => 'menunggu_verifikasi',
+        ]);
+
+        // Notif WA admin (NOTIF-1/BILL-3): bukti tagihan PPDB baru. Fire-and-forget.
+        app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('berkas_ppdb_masuk', [
+            'wa' => array_filter([\App\Models\Setting::getTenantStringValue('admission_admin_whatsapp')]),
+            'data' => [
+                'jenis' => 'Bukti pembayaran tagihan PPDB',
+                'nama_calon' => $calon->nama_lengkap ?? $calon->nama ?? '-',
+                'nama_pesantren' => \App\Models\Setting::getTenantStringValue('branding_name') ?? (tenant('name') ?? 'Pesantren'),
+            ],
         ]);
 
         return back()->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi panitia.');

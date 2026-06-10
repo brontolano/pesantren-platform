@@ -196,6 +196,9 @@ class PembayaranService
         // Di luar transaksi (perilaku semula); jurnal idempoten by ref Pembayaran:id.
         PembayaranDiverifikasi::dispatch($model->fresh(), $verifiedBy);
 
+        // Notif WA ke wali (TGH-5) — fire-and-forget SETELAH commit, tak pernah throw.
+        app(KeuanganNotifikasiService::class)->pembayaranDiverifikasi($model->fresh());
+
         return $model->fresh();
     }
 
@@ -210,7 +213,7 @@ class PembayaranService
 
         // Lock + cek is_verified dalam transaksi — cegah tolak menimpa pembayaran
         // yang baru saja diverifikasi proses lain (jurnal sudah terposting).
-        return DB::transaction(function () use ($pembayaranId, $verifiedBy, $alasan): Pembayaran {
+        $model = DB::transaction(function () use ($pembayaranId, $verifiedBy, $alasan): Pembayaran {
             $locked = Pembayaran::query()->whereKey($pembayaranId)->lockForUpdate()->firstOrFail();
 
             if ($locked->is_verified) {
@@ -227,6 +230,11 @@ class PembayaranService
 
             return $locked->fresh();
         });
+
+        // Notif WA ke wali (TGH-5) — fire-and-forget SETELAH commit.
+        app(KeuanganNotifikasiService::class)->pembayaranDitolak($model, $alasan);
+
+        return $model;
     }
 
     /**
