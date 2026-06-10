@@ -33,11 +33,20 @@ class PromptRegistry
     {
         $ttl = (int) config('ai.prompts.cache_seconds', 60);
 
-        return CentralCache::repository()->remember(
-            $this->cacheKey($agentKey, $tenantId),
+        $key = $this->cacheKey($agentKey, $tenantId);
+        $cached = CentralCache::repository()->remember(
+            $key,
             $ttl,
-            fn (): PromptSelection => $this->lookup($agentKey, $tenantId),
+            fn (): array => $this->lookup($agentKey, $tenantId)->toArray(),
         );
+
+        // Entri lama/korup = cache-miss (lihat ModelSelection::toArray).
+        if (! is_array($cached)) {
+            CentralCache::repository()->forget($key);
+            $cached = $this->lookup($agentKey, $tenantId)->toArray();
+        }
+
+        return PromptSelection::fromArray($cached);
     }
 
     /** Hapus cache satu kombinasi agen+tenant (dipakai saat override berubah). */

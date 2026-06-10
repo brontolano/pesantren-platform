@@ -19,4 +19,31 @@ final readonly class PromptSelection
         public bool $enabled = true,
         public string $source = 'fallback',
     ) {}
+
+    /**
+     * Bentuk cache = ARRAY PRIMITIF (lihat ModelSelection::toArray — objek
+     * dari cache Redis menjadi __PHP_Incomplete_Class).
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'systemPrompt' => $this->systemPrompt,
+            'promptVersionId' => $this->promptVersionId,
+            'enabled' => $this->enabled,
+            'source' => $this->source,
+        ];
+    }
+
+    /** @param  array<string, mixed>  $data */
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            systemPrompt: isset($data['systemPrompt']) ? (string) $data['systemPrompt'] : null,
+            promptVersionId: isset($data['promptVersionId']) ? (int) $data['promptVersionId'] : null,
+            enabled: (bool) ($data['enabled'] ?? true),
+            source: (string) ($data['source'] ?? 'fallback'),
+        );
+    }
 }
