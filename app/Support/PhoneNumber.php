@@ -16,23 +16,40 @@ namespace App\Support;
  */
 class PhoneNumber
 {
-    /** Format kanonik `62…` (kosong bila tak ada digit). */
+    /** Format kanonik `62…` (kosong bila tak ada digit / tak masuk akal). */
     public static function normalize(?string $raw): string
     {
-        $digits = preg_replace('/\D/', '', (string) $raw) ?? '';
+        $raw = trim((string) $raw);
+        if ($raw === '') {
+            return '';
+        }
+
+        // Sebagian data lama menyimpan BEBERAPA nomor dalam satu field
+        // (dipisah '/', ',', ';', '|', 'atau', 'dan', baris baru) — ambil
+        // nomor PERTAMA. Spasi/strip tunggal di dalam satu nomor TIDAK memisah.
+        $first = preg_split('#\s*(?:/|,|;|\||\bdan\b|\batau\b|\r?\n)\s*#i', $raw)[0] ?? $raw;
+
+        $digits = preg_replace('/\D/', '', $first) ?? '';
         if ($digits === '') {
             return '';
         }
 
         // Buang prefiks internasional/lokal di depan secara berulang:
-        // 0062, 62, dan 0 (termasuk ganda) — sampai tersisa bagian nasional.
-        $national = preg_replace('/^(?:00)?(?:62|0)+/', '', $digits) ?? '';
-
+        // 62, dan 0 (termasuk 0062 & pengulangan) — sampai tersisa bagian nasional.
+        $national = preg_replace('/^(?:62|0)+/', '', $digits) ?? '';
         if ($national === '') {
             return '';
         }
 
-        return '62'.$national;
+        $result = '62'.$national;
+
+        // Tolak hasil tak masuk akal (mis. dua nomor menyatu tanpa pemisah).
+        // Nomor Indonesia valid: 62 + 9–12 digit = 11–14 karakter.
+        if (strlen($result) > 15) {
+            return '';
+        }
+
+        return $result;
     }
 
     /** True bila menghasilkan nomor yang masuk akal (panjang wajar). */
