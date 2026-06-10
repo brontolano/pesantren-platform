@@ -353,6 +353,60 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Tools data resmi (T-A033) — registry tool READ-ONLY (Blueprint §6)
+    |--------------------------------------------------------------------------
+    | scope_map: tool → kunci scope_data Wizard (null = tanpa dimensi scope,
+    | mis. status PPDB milik pemohon sendiri / profil anak tertaut wali yang
+    | pagar utamanya AccessWali). peran_map: tool → role spatie yang boleh
+    | memanggil. Keduanya OVERRIDE default ToolDefinition — kebijakan hidup di
+    | konfigurasi, bukan kode (Aturan Emas #11).
+    */
+    'tools' => [
+        'scope_map' => [
+            'getTagihan' => 'tagihan',
+            'getStatusBayar' => 'tagihan',
+            'getRingkasanKeuangan' => 'keuangan',
+            'getJadwal' => 'jadwal',
+            'getNilai' => 'nilai',
+            // Tahfidz = capaian belajar santri → ikut gerbang scope 'nilai'
+            // (scope_data Wizard tidak punya kunci tahfidz tersendiri).
+            'getTahfidz' => 'nilai',
+            'getKehadiran' => 'kehadiran',
+            'getIzin' => 'kehadiran',
+            'getStatusPPDB' => null,
+            'getSantri' => null,
+        ],
+
+        'peran_map' => [
+            'getTagihan' => ['admin_pesantren', 'tu', 'keuangan', 'bendahara', 'bendahara_pusat', 'kepala', 'wali'],
+            'getStatusBayar' => ['admin_pesantren', 'tu', 'keuangan', 'bendahara', 'bendahara_pusat', 'kepala', 'wali'],
+            'getRingkasanKeuangan' => ['admin_pesantren', 'keuangan', 'bendahara', 'bendahara_pusat', 'kepala_keuangan', 'kepala', 'dewan_pembina'],
+            'getJadwal' => ['admin_pesantren', 'tu', 'guru', 'asatidz', 'kepala', 'wali', 'santri'],
+            'getNilai' => ['admin_pesantren', 'tu', 'guru', 'kepala', 'wali'],
+            'getTahfidz' => ['admin_pesantren', 'guru_tahfidz', 'guru', 'kepala', 'wali'],
+            'getKehadiran' => ['admin_pesantren', 'tu', 'pengelola_asrama', 'kepala', 'wali'],
+            'getIzin' => ['admin_pesantren', 'tu', 'pengelola_asrama', 'kepala', 'wali'],
+            'getStatusPPDB' => ['admin_pesantren', 'tu', 'kepala', 'peserta'],
+            'getSantri' => ['wali'],
+        ],
+
+        // Pesan kegagalan baku (Indonesia santun, netral-prosedural).
+        'pesan' => [
+            'tidak_dikenal' => 'Mohon maaf, jenis data yang diminta tidak dikenali oleh asisten.',
+            'tanpa_identitas' => 'Mohon maaf, permintaan data memerlukan identitas pengguna yang sah. Silakan masuk terlebih dahulu.',
+            'belum_dikonfigurasi' => 'Mohon maaf, modul AI pesantren Anda belum selesai dikonfigurasi. Silakan hubungi admin untuk menuntaskan pengaturan terlebih dahulu.',
+            'scope_nonaktif' => 'Mohon maaf, akses data jenis ini belum diaktifkan oleh pesantren. Silakan hubungi admin pesantren bila membutuhkannya.',
+            'peran_tidak_diizinkan' => 'Mohon maaf, akun Anda tidak memiliki akses untuk melihat data ini.',
+            'bukan_anak_tertaut' => 'Mohon maaf, Anda hanya dapat melihat data putra/putri yang tertaut dengan akun Anda. Silakan hubungi admin pesantren bila ada tautan yang belum terdaftar.',
+            'args_invalid' => 'Mohon maaf, parameter permintaan data tidak lengkap atau tidak sesuai.',
+            'data_tidak_ditemukan' => 'Mohon maaf, data yang dimaksud tidak ditemukan.',
+            'modul_tidak_aktif' => 'Mohon maaf, modul sumber data ini belum aktif di pesantren Anda.',
+            'gagal_internal' => 'Mohon maaf, terjadi kendala saat mengambil data. Silakan coba beberapa saat lagi atau hubungi admin pesantren.',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue khusus AI (worker-ai, koneksi redis-ai — lihat config/queue.php)
     |--------------------------------------------------------------------------
     */

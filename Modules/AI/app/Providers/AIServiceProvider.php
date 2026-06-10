@@ -57,6 +57,11 @@ class AIServiceProvider extends ServiceProvider
         $this->app->singleton(AiGateway::class);
         $this->app->singleton(\Modules\AI\Services\Prompts\PromptRegistry::class);
 
+        // T-A033 — registry tools data resmi (read-only). Singleton aman:
+        // definisi tool stateless; scope/peran dibaca config per panggilan,
+        // setting tenant diresolusi FRESH di dalam call().
+        $this->app->singleton(\Modules\AI\Services\Tools\ToolRegistry::class);
+
         $this->registerHalamanPanelTenant();
     }
 
