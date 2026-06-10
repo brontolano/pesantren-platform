@@ -103,6 +103,29 @@ class TabunganService
                 );
             }
 
+            // Kontrol rekening (TAB-5, dicek pada baris ter-lock — race-safe):
+            // tabungan dibekukan menolak SEMUA penarikan; limit_harian membatasi
+            // total tarik per hari kalender (setoran tidak dibatasi).
+            if ($tipe === 'tarik') {
+                if ($tabungan->is_frozen) {
+                    throw new InvalidArgumentException('Tabungan dibekukan — penarikan ditolak.');
+                }
+
+                $limit = (float) ($tabungan->limit_harian ?? 0);
+                if ($limit > 0) {
+                    $tarikHariIni = (float) TabunganTransaksi::query()
+                        ->where('tabungan_id', $tabungan->id)
+                        ->where('tipe', 'tarik')
+                        ->whereDate('tanggal', $options['tanggal'] ?? now()->toDateString())
+                        ->sum('nominal');
+                    if ($tarikHariIni + $nominal > $limit + 0.001) {
+                        throw new InvalidArgumentException(
+                            "Melebihi limit penarikan harian ({$limit}). Sudah ditarik hari ini: {$tarikHariIni}."
+                        );
+                    }
+                }
+            }
+
             $saldoSesudah = $tipe === 'setor'
                 ? $saldoSebelum + $nominal
                 : $saldoSebelum - $nominal;

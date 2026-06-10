@@ -63,6 +63,18 @@ class TabunganResource extends Resource
                     ->label('Saldo')
                     ->money('IDR')
                     ->sortable(),
+                TextColumn::make('limit_harian')
+                    ->label('Limit Tarik/Hari')
+                    ->money('IDR')
+                    ->placeholder('Tanpa limit')
+                    ->sortable(),
+                \Filament\Tables\Columns\IconColumn::make('is_frozen')
+                    ->label('Dibekukan')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-lock-closed')
+                    ->falseIcon('heroicon-o-lock-open')
+                    ->trueColor('danger')
+                    ->falseColor('success'),
                 TextColumn::make('updated_at')
                     ->label('Terakhir Diperbarui')
                     ->dateTime('d M Y H:i')
@@ -121,6 +133,33 @@ class TabunganResource extends Resource
                                 'created_by' => auth()->id(),
                             ]
                         );
+                    }),
+                Action::make('pengaturan')
+                    ->label('Limit / Bekukan')
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->color('gray')
+                    ->visible(fn () => auth()->user()?->can('manage_keuangan'))
+                    ->form([
+                        TextInput::make('limit_harian')
+                            ->label('Limit penarikan per hari')
+                            ->numeric()
+                            ->prefix('Rp')
+                            ->minValue(0)
+                            ->helperText('Kosongkan / 0 = tanpa limit. Berlaku utk tarik tunai & bayar dari saldo.'),
+                        \Filament\Forms\Components\Toggle::make('is_frozen')
+                            ->label('Bekukan tabungan')
+                            ->helperText('Saat dibekukan: penarikan & pembayaran dari saldo ditolak; setoran tetap boleh.'),
+                    ])
+                    ->fillForm(fn (Tabungan $record): array => [
+                        'limit_harian' => $record->limit_harian,
+                        'is_frozen' => (bool) $record->is_frozen,
+                    ])
+                    ->action(function (Tabungan $record, array $data): void {
+                        $record->update([
+                            'limit_harian' => filled($data['limit_harian'] ?? null) && (float) $data['limit_harian'] > 0
+                                ? (float) $data['limit_harian'] : null,
+                            'is_frozen' => (bool) ($data['is_frozen'] ?? false),
+                        ]);
                     }),
             ]);
     }
