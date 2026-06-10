@@ -151,29 +151,49 @@ class PembayaranService
     {
         $this->ensureTenantContext();
 
-        $model = $pembayaran instanceof Pembayaran
-            ? $pembayaran
-            : Pembayaran::query()->findOrFail($pembayaran);
+        $pembayaranId = $pembayaran instanceof Pembayaran ? $pembayaran->id : $pembayaran;
 
-        if ($model->is_verified) {
-            throw new InvalidArgumentException('Pembayaran sudah diverifikasi.');
-        }
+        // RACE GUARD: gerbang is_verified + cek sisa tagihan WAJIB pada baris
+        // ter-LOCK dalam SATU transaksi. Tanpa ini: (a) dua admin memverifikasi
+        // pembayaran yang sama bersamaan → dua-duanya lolos (double-verify);
+        // (b) dua bukti bayar bernilai penuh diverifikasi semua → total verified
+        // MELEBIHI tagihan (overshoot lintas-jalur dgn BayarDariSaldoService).
+        $model = DB::transaction(function () use ($pembayaranId, $verifiedBy): Pembayaran {
+            $locked = Pembayaran::query()->whereKey($pembayaranId)->lockForUpdate()->firstOrFail();
 
-        // G1-01: pagar persetujuan (F1). DEFAULT no-op (tak ada ApprovalRule wajib
-        // 'Pembayaran' ter-seed) → alur uang LIVE tidak terblokir. Aktif hanya bila
-        // tenant sengaja membuat rule (mis. nominal besar).
-        $model->pastikanBolehLanjut();
+            if ($locked->is_verified) {
+                throw new InvalidArgumentException('Pembayaran sudah diverifikasi.');
+            }
 
-        $model->update([
-            'is_verified' => true,
-            'verified_by' => $verifiedBy,
-            'verified_at' => now(),
-        ]);
+            // Lock tagihan (urutan konsisten dgn BayarDariSaldo: Tagihan → lain-lain);
+            // sisa dihitung dari pembayaran verified ter-commit SETELAH lock.
+            $tagihan = Tagihan::query()->whereKey($locked->tagihan_id)->lockForUpdate()->firstOrFail();
+            $sisa = $tagihan->sisa_tagihan;
+            if ((float) $locked->nominal > $sisa + 0.001) {
+                throw new InvalidArgumentException(
+                    "Nominal pembayaran melebihi sisa tagihan ({$sisa}). Tolak/koreksi pembayaran ini."
+                );
+            }
 
-        // Re-evaluate status tagihan setelah verifikasi
-        $this->updateStatusTagihan($model->tagihan);
+            // G1-01: pagar persetujuan (F1). DEFAULT no-op (tak ada ApprovalRule wajib
+            // 'Pembayaran' ter-seed) → alur uang LIVE tidak terblokir. Aktif hanya bila
+            // tenant sengaja membuat rule (mis. nominal besar).
+            $locked->pastikanBolehLanjut();
+
+            $locked->update([
+                'is_verified' => true,
+                'verified_by' => $verifiedBy,
+                'verified_at' => now(),
+            ]);
+
+            // Re-evaluate status tagihan setelah verifikasi
+            $this->updateStatusTagihan($tagihan->fresh());
+
+            return $locked;
+        });
 
         // Pancarkan event auto-jurnal (didengarkan modul Ledger bila aktif).
+        // Di luar transaksi (perilaku semula); jurnal idempoten by ref Pembayaran:id.
         PembayaranDiverifikasi::dispatch($model->fresh(), $verifiedBy);
 
         return $model->fresh();
@@ -186,23 +206,27 @@ class PembayaranService
     {
         $this->ensureTenantContext();
 
-        $model = $pembayaran instanceof Pembayaran
-            ? $pembayaran
-            : Pembayaran::query()->findOrFail($pembayaran);
+        $pembayaranId = $pembayaran instanceof Pembayaran ? $pembayaran->id : $pembayaran;
 
-        if ($model->is_verified) {
-            throw new InvalidArgumentException('Pembayaran sudah diverifikasi, tidak bisa ditolak.');
-        }
+        // Lock + cek is_verified dalam transaksi — cegah tolak menimpa pembayaran
+        // yang baru saja diverifikasi proses lain (jurnal sudah terposting).
+        return DB::transaction(function () use ($pembayaranId, $verifiedBy, $alasan): Pembayaran {
+            $locked = Pembayaran::query()->whereKey($pembayaranId)->lockForUpdate()->firstOrFail();
 
-        $model->update([
-            'alasan_penolakan' => $alasan,
-            'verified_by' => $verifiedBy,
-            'verified_at' => now(),
-        ]);
+            if ($locked->is_verified) {
+                throw new InvalidArgumentException('Pembayaran sudah diverifikasi, tidak bisa ditolak.');
+            }
 
-        $this->updateStatusTagihan($model->tagihan);
+            $locked->update([
+                'alasan_penolakan' => $alasan,
+                'verified_by' => $verifiedBy,
+                'verified_at' => now(),
+            ]);
 
-        return $model->fresh();
+            $this->updateStatusTagihan($locked->tagihan);
+
+            return $locked->fresh();
+        });
     }
 
     /**
