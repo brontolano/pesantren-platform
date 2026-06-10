@@ -75,6 +75,22 @@ class BayarDariSaldoService
                 throw new InvalidArgumentException('Tabungan dibekukan.');
             }
 
+            // Limit harian (TAB-5) berlaku juga utk pembayaran dari saldo —
+            // konsisten dgn TabunganService (dicek pada baris ter-lock).
+            $limit = (float) ($tabungan->limit_harian ?? 0);
+            if ($limit > 0) {
+                $tarikHariIni = (float) TabunganTransaksi::query()
+                    ->where('tabungan_id', $tabungan->id)
+                    ->where('tipe', 'tarik')
+                    ->whereDate('tanggal', now()->toDateString())
+                    ->sum('nominal');
+                if ($tarikHariIni + $nominal > $limit + 0.001) {
+                    throw new InvalidArgumentException(
+                        "Melebihi limit penarikan harian ({$limit})."
+                    );
+                }
+            }
+
             $saldoSebelum = (float) $tabungan->saldo;
             if ($saldoSebelum < $nominal) {
                 throw new InvalidArgumentException('Saldo tidak cukup.');

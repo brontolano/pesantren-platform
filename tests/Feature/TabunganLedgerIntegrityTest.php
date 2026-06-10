@@ -250,6 +250,33 @@ class TabunganLedgerIntegrityTest extends TestCase
         tenancy()->end();
     }
 
+    public function test_frozen_dan_limit_harian_menolak_tarik(): void
+    {
+        [$santri, $tabungan] = $this->boot('tli10', 500000);
+        $svc = app(\Modules\Keuangan\Services\TabunganService::class);
+
+        // Limit harian 100rb: tarik 80rb OK, tarik 30rb lagi DITOLAK (total > limit).
+        $tabungan->update(['limit_harian' => 100000]);
+        $svc->tarik($santri, 80000, ['created_by' => $this->userId]);
+        try {
+            $svc->tarik($santri, 30000, ['created_by' => $this->userId]);
+            $this->fail('Melebihi limit harian harus ditolak.');
+        } catch (InvalidArgumentException) {
+        }
+        $this->assertEqualsWithDelta(420000, (float) $tabungan->fresh()->saldo, 0.01);
+
+        // Dibekukan: tarik DITOLAK meski saldo & limit cukup; setor tetap boleh.
+        $tabungan->update(['is_frozen' => true, 'limit_harian' => null]);
+        try {
+            $svc->tarik($santri, 10000, ['created_by' => $this->userId]);
+            $this->fail('Tarik saat dibekukan harus ditolak.');
+        } catch (InvalidArgumentException) {
+        }
+        $svc->setor($santri, 5000, ['created_by' => $this->userId]); // setor boleh
+        $this->assertEqualsWithDelta(425000, (float) $tabungan->fresh()->saldo, 0.01);
+        tenancy()->end();
+    }
+
     public function test_tabungan_dibekukan_menolak_pembayaran(): void
     {
         [$santri, $tabungan] = $this->boot('tli6', 100000);
