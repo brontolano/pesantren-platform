@@ -20,7 +20,7 @@ class PosSesi extends Model
     protected $table = 'pos_sesi';
 
     protected $fillable = [
-        'tenant_id', 'kasir_id', 'pos_jenis',
+        'tenant_id', 'kasir_id', 'pos_jenis', 'profil_id',
         'saldo_awal', 'saldo_sistem', 'saldo_fisik', 'selisih',
         'status', 'dibuka_pada', 'ditutup_pada', 'catatan',
     ];
