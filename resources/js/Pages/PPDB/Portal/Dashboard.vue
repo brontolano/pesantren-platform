@@ -19,6 +19,10 @@ const props = defineProps({
         type: Array,
         required: true,
     },
+    timeline: {
+        type: Array,
+        default: () => [],
+    },
     checklist: {
         type: Array,
         required: true,
@@ -336,6 +340,23 @@ const submit = () => {
                                 </div>
                             </article>
                         </div>
+                    </section>
+
+                    <section v-if="timeline.length" class="rounded-[2rem] border border-stone-200 bg-white px-5 py-5 shadow-sm">
+                        <h2 class="text-lg font-semibold text-stone-950">Riwayat aktivitas</h2>
+                        <ol class="mt-4 space-y-3">
+                            <li
+                                v-for="(item, idx) in timeline"
+                                :key="idx"
+                                class="flex items-start gap-3"
+                            >
+                                <div class="mt-1 h-2.5 w-2.5 flex-none rounded-full" :class="idx === 0 ? 'bg-emerald-500' : 'bg-stone-300'" />
+                                <div>
+                                    <div class="text-sm font-semibold text-stone-900">{{ item.label }}</div>
+                                    <div class="text-xs text-stone-500">{{ item.tanggal }}</div>
+                                </div>
+                            </li>
+                        </ol>
                     </section>
 
                     <section class="rounded-[2rem] border border-stone-200 bg-stone-950 px-5 py-5 text-stone-100 shadow-sm">

@@ -310,6 +310,24 @@ MSG,
 Mohon diperiksa melalui panel admin.
 MSG,
             ],
+
+            [
+                'kode_template'    => 'PENGINGAT_DAFTAR_ULANG',
+                'judul'            => 'Pengingat Daftar Ulang',
+                'channel'          => 'whatsapp',
+                'variable_dinamis' => ['nama_calon', 'nomor_pendaftaran', 'nama_pesantren'],
+                'isi'              => <<<'MSG'
+🎉 *PENGINGAT DAFTAR ULANG*
+
+Assalamu'alaikum Bapak/Ibu,
+
+Calon santri *{{nama_calon}}* (No. Daftar {{nomor_pendaftaran}}) telah *LULUS* seleksi {{nama_pesantren}} namun *belum melakukan daftar ulang*.
+
+Mohon segera menyelesaikan daftar ulang melalui aplikasi peserta agar kursi tidak hangus.
+
+Jazakumullahu khairan.
+MSG,
+            ],
         ];
 
         $tenantId = tenant('id') ?? throw new \RuntimeException('Seeder harus dijalankan dalam konteks tenant.');

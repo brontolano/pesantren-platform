@@ -49,7 +49,53 @@ class PesertaPortalController extends Controller
                 'token' => $tracking['tracking_token'],
             ],
             'bolehDaftarUlang' => (string) $calon->status_pendaftaran === 'lulus',
+            'timeline' => $this->buildTimeline($calon),
         ]);
+    }
+
+    /**
+     * DASH-3 — timeline riwayat aktivitas peserta (event nyata bertanggal,
+     * urut terbaru dulu). Melengkapi stepper (status) dengan jejak aksi.
+     *
+     * @return array<int, array{tanggal:string, label:string}>
+     */
+    private function buildTimeline(CalonSantri $calon): array
+    {
+        $items = collect([[
+            'tanggal' => $calon->created_at,
+            'label' => 'Pendaftaran diterima sistem',
+        ]]);
+
+        foreach ($calon->dokumen()->get() as $doc) {
+            $label = PpdbDocumentTypes::label((string) $doc->jenis_dokumen);
+            $items->push(['tanggal' => $doc->created_at, 'label' => "Unggah dokumen: {$label}"]);
+            if ($doc->verified_at) {
+                $items->push(['tanggal' => $doc->verified_at, 'label' => "Dokumen {$label} diverifikasi"]);
+            }
+        }
+
+        foreach ($calon->tagihanPpdb()->get() as $tagihan) {
+            if ($tagihan->bukti_diunggah_at) {
+                $items->push(['tanggal' => $tagihan->bukti_diunggah_at, 'label' => 'Unggah bukti pembayaran']);
+            }
+            if ((string) $tagihan->status === 'lunas') {
+                $items->push(['tanggal' => $tagihan->updated_at, 'label' => 'Pembayaran terverifikasi (lunas)']);
+            }
+        }
+
+        if ($calon->tanggal_registrasi_ulang) {
+            $items->push(['tanggal' => $calon->tanggal_registrasi_ulang, 'label' => 'Daftar ulang selesai']);
+        }
+
+        return $items
+            ->filter(fn (array $i) => $i['tanggal'] !== null)
+            ->sortByDesc('tanggal')
+            ->map(fn (array $i) => [
+                'tanggal' => $i['tanggal']->timezone(config('app.timezone'))->format('d M Y H:i'),
+                'label' => $i['label'],
+            ])
+            ->values()
+            ->all();
     }
 
     /**

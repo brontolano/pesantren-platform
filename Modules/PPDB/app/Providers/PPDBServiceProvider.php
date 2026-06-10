@@ -27,7 +27,9 @@ class PPDBServiceProvider extends ModuleServiceProvider
      *
      * @var string[]
      */
-    // protected array $commands = [];
+    protected array $commands = [
+        \Modules\PPDB\Console\IngatkanDaftarUlangCommand::class,
+    ];
 
     /**
      * Provider classes to register.
