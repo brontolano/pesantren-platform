@@ -41,7 +41,7 @@ class KebijakanKehalalanResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('ledger')
+        return \App\Support\UiMode::advanced() && static::moduleVisible('ledger')
             && FiturKeuangan::pemisahanKehalalanAktif()
             && (auth()->user()?->can('manage_dana_kebajikan') ?? false);
     }

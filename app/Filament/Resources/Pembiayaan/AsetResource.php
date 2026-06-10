@@ -45,7 +45,7 @@ class AsetResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('pembiayaan') && (auth()->user()?->can('manage_pembiayaan') ?? false);
+        return \App\Support\UiMode::advanced() && static::moduleVisible('pembiayaan') && (auth()->user()?->can('manage_pembiayaan') ?? false);
     }
 
     public static function canAccess(): bool

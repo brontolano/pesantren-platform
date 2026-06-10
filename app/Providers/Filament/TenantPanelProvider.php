@@ -125,6 +125,10 @@ class TenantPanelProvider extends PanelProvider
         $panel = $panel
             ->id('tenant')
             ->path('admin')
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): \Illuminate\Contracts\View\View => view('filament.ui-mode-toggle'),
+            )
             ->resources($resources)
             ->pages($pages)
             ->widgets($widgets);

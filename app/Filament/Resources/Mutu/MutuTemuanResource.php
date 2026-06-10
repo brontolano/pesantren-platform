@@ -43,7 +43,7 @@ class MutuTemuanResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
+        return \App\Support\UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
     }
 
     public static function canAccess(): bool
