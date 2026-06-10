@@ -171,13 +171,16 @@ class PosKasIntegrasiTest extends TestCase
 
     private function akunSelisih(): Akun
     {
-        return Akun::create([
-            'kode' => '5-9000',
-            'nama' => 'Selisih Kas',
-            'tipe' => 'beban',
-            'saldo_normal' => Akun::SALDO_NORMAL['beban'] ?? 'debit',
-            'is_postable' => true,
-        ]);
+        // 5-9100 "Selisih Kas" di-seed LedgerSeeder (G3-21). firstOrCreate aman.
+        return Akun::firstOrCreate(
+            ['kode' => '5-9100'],
+            [
+                'nama' => 'Selisih Kas',
+                'tipe' => 'beban',
+                'saldo_normal' => Akun::SALDO_NORMAL['beban'] ?? 'debit',
+                'is_postable' => true,
+            ],
+        );
     }
 
     public function test_tutup_sesi_selisih_kurang_posting_debit_selisih_kredit_kas(): void
@@ -196,7 +199,7 @@ class PosKasIntegrasiTest extends TestCase
         $this->assertNotNull($jurnal, 'Selisih kas harus terjurnal saat tutup sesi.');
         $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->sum('debit'), 0.01);
         $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->sum('kredit'), 0.01);
-        $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->where('akun_id', $this->akunId('5-9000'))->sum('debit'), 0.01);
+        $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->where('akun_id', $this->akunId('5-9100'))->sum('debit'), 0.01);
         $this->assertEqualsWithDelta(5000, (float) $jurnal->baris()->where('akun_id', $this->akunId('1-1000'))->sum('kredit'), 0.01);
     }
 
@@ -214,7 +217,7 @@ class PosKasIntegrasiTest extends TestCase
         $jurnal = Jurnal::query()->where('ref_type', 'PosSesiSelisih')->where('ref_id', (string) $sesi->id)->first();
         $this->assertNotNull($jurnal);
         $this->assertEqualsWithDelta(3000, (float) $jurnal->baris()->where('akun_id', $this->akunId('1-1000'))->sum('debit'), 0.01);
-        $this->assertEqualsWithDelta(3000, (float) $jurnal->baris()->where('akun_id', $this->akunId('5-9000'))->sum('kredit'), 0.01);
+        $this->assertEqualsWithDelta(3000, (float) $jurnal->baris()->where('akun_id', $this->akunId('5-9100'))->sum('kredit'), 0.01);
     }
 
     public function test_tutup_sesi_pas_tanpa_jurnal_selisih(): void
@@ -234,7 +237,9 @@ class PosKasIntegrasiTest extends TestCase
     {
         $this->boot('posS4');
         $svc = app(PosKasService::class);
-        // sengaja TIDAK membuat akun "Selisih Kas".
+        // Hapus akun "Selisih Kas" (di-seed LedgerSeeder) untuk menguji fallback
+        // "menahan diri" saat akun selisih tak tersedia.
+        Akun::query()->where('nama', 'like', '%Selisih Kas%')->delete();
 
         $sesi = $svc->bukaSesi(['saldo_awal' => 40000]);
         $closed = $svc->tutupSesi($sesi, 38000); // kurang 2.000

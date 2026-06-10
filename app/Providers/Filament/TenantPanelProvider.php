@@ -34,6 +34,7 @@ use App\Filament\Resources\Ledger\AkunResource;
 use App\Filament\Resources\Ledger\AnggaranResource;
 use App\Filament\Resources\Ledger\DivisiUnitResource;
 use App\Filament\Resources\Pos\PosKategoriResource;
+use App\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use App\Filament\Resources\Ledger\JurnalResource;
 use App\Filament\Resources\Ledger\KebijakanKehalalanResource;
 use App\Filament\Resources\Pajak\TarifPajakResource;
@@ -208,6 +209,7 @@ class TenantPanelProvider extends PanelProvider
             CrmPenawaranResource::class,
             // POS / Koperasi
             PosKategoriResource::class,
+            PosProfilResource::class,
             InventoryItemResource::class,
             InventoryLokasiResource::class,
             InventoryBatchResource::class,

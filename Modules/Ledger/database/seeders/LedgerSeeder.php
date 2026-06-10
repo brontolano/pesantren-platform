@@ -176,6 +176,7 @@ class LedgerSeeder extends Seeder
             ['5-7000', 'Beban Penyusutan Aset Tetap', 'BEBAN', '5-0000', false, true, null, false],   // G2-13 depresiasi
             ['5-8000', 'Rugi Pelepasan Aset Tetap', 'BEBAN', '5-0000', false, true, null, false],     // G2-13 disposal (loss)
             ['5-9000', 'Beban Selisih / Penyusutan Persediaan', 'BEBAN', '5-0000', false, true, null, false], // G2-14 opname
+            ['5-9100', 'Selisih Kas', 'BEBAN', '5-0000', false, true, null, false],                   // G3-21 POS closing (selisih kas)
         ];
 
         $idByKode = [];
