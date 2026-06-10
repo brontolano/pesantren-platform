@@ -299,6 +299,13 @@ return [
             // T-A041: agen Generator RPP / Modul Ajar asatidz.
             'generator_rpp' => 'generator_rpp',
             'asatidz_rpp' => 'generator_rpp',
+            // T-A042: ikhtisar materi kitab (asatidz/admin) & generator
+            // kultum (asatidz, OPT-IN — default OFF di AiTenantSettingDefaults,
+            // rekomendasi Q8 PRD belum dikonfirmasi owner).
+            'ikhtisar_kitab' => 'ikhtisar_kitab',
+            'asatidz_ikhtisar' => 'ikhtisar_kitab',
+            'generator_kultum' => 'generator_kultum',
+            'asatidz_kultum' => 'generator_kultum',
             'dokumen_tu' => 'dokumen_tu',
             'ringkasan_keuangan' => 'ringkasan_keuangan',
         ],
@@ -361,6 +368,10 @@ return [
             'asatidz_soal' => 'akademik', // T-A040
             'generator_rpp' => 'akademik',
             'asatidz_rpp' => 'akademik', // T-A041
+            'asatidz_ikhtisar' => 'akademik', // T-A042
+            // T-A042: kerangka kultum = materi keagamaan — disclaimer
+            // kategori 'agama' (PRD §7.5 verbatim) dipakai IkhtisarGenerator.
+            'asatidz_kultum' => 'agama',
             'ringkasan_keuangan' => 'keuangan',
         ],
 
@@ -473,6 +484,33 @@ return [
                 // bobot model — draf gagal dengan ajakan unggah materi.
                 'tanpa_korpus' => 'Mohon maaf, belum ada materi kurikulum yang dapat dirujuk untuk menyusun RPP. Silakan unggah materi kurikulum terlebih dahulu di menu Sumber Pengetahuan, lalu coba kembali.',
                 'konten_kosong' => 'Mohon maaf, asisten tidak menghasilkan isi untuk salah satu seksi RPP. Silakan coba beberapa saat lagi.',
+            ],
+        ],
+
+        // T-A042 — Ikhtisar materi kitab bersitasi & generator kultum.
+        // ADAPTASI SADAR: sumber v1 = Sumber Pengetahuan TENANT
+        // (ai_knowledge_source) karena whitelist kitab GATE-3 belum terisi;
+        // kultum OPT-IN (default OFF di AiTenantSettingDefaults — rekomendasi
+        // Q8 PRD, belum dikonfirmasi owner) & output SELALU draf berdisclaimer.
+        'ikhtisar' => [
+            'top_k' => (int) env('AI_IKHTISAR_TOP_K', 5),
+            // Jepit durasi kultum (menit) ke rentang masuk akal.
+            'durasi_min' => (int) env('AI_KULTUM_DURASI_MIN', 3),
+            'durasi_max' => (int) env('AI_KULTUM_DURASI_MAX', 60),
+
+            // Disclaimer TAMBAHAN kerangka kultum (melengkapi disclaimer
+            // kategori 'agama' PRD §7.5 dari DisclaimerInjector). Teks
+            // PROSEDURAL netral — bukan konten fikih.
+            'disclaimer_kultum' => 'Kerangka ini wajib diperiksa dan dilengkapi dalil oleh Ustadz sebelum disampaikan.',
+
+            // Pesan kegagalan/penolakan baku (Indonesia santun).
+            'pesan' => [
+                // RAG-only (pagar #2): tanpa korpus TIDAK boleh menyusun dari
+                // bobot model — draf gagal dengan ajakan unggah materi.
+                'tanpa_korpus' => 'Mohon maaf, belum ada materi yang dapat dirujuk untuk menyusun dokumen ini. Silakan unggah materi kitab terlebih dahulu di menu Sumber Pengetahuan, lalu coba kembali.',
+                'format_invalid' => 'Mohon maaf, asisten tidak menghasilkan format dokumen yang valid setelah dicoba ulang. Silakan coba beberapa saat lagi.',
+                // Fitur kultum OPT-IN belum diaktifkan pesantren (Wizard).
+                'kultum_nonaktif' => 'Mohon maaf, fitur kerangka kultum belum diaktifkan untuk pesantren Anda. Silakan hubungi admin untuk mengaktifkannya melalui Pengaturan AI bila dibutuhkan.',
             ],
         ],
     ],

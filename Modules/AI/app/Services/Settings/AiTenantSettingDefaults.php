@@ -47,9 +47,18 @@ class AiTenantSettingDefaults
             ],
 
             // Matriks fitur per peran — fitur santri default OFF (PRD §6.3).
+            // T-A042: ikhtisar_kitab (asatidz/admin) & generator_kultum
+            // (asatidz) — KEDUANYA default OFF; khusus kultum OPT-IN
+            // disengaja (rekomendasi Q8 PRD, belum dikonfirmasi owner).
             'fitur_per_peran' => [
-                'asatidz' => ['generator_soal' => false, 'generator_rpp' => false, 'chatbot' => false],
-                'admin' => ['chatbot' => false, 'dokumen_tu' => false],
+                'asatidz' => [
+                    'generator_soal' => false,
+                    'generator_rpp' => false,
+                    'ikhtisar_kitab' => false,
+                    'generator_kultum' => false,
+                    'chatbot' => false,
+                ],
+                'admin' => ['chatbot' => false, 'dokumen_tu' => false, 'ikhtisar_kitab' => false],
                 'bendahara' => ['ringkasan_keuangan' => false],
                 'wali' => ['chatbot' => false],
                 'santri' => ['tutor' => false], // WAJIB false (konservatif)

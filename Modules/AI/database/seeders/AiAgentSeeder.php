@@ -74,6 +74,54 @@ class AiAgentSeeder extends Seeder
                 .'Bila konteks tidak memadai, isi seperlunya secara ringkas — jangan mengarang.',
             changelog: 'Versi awal agen generator RPP / modul ajar (T-A041).',
         );
+
+        // T-A042 — agen Ikhtisar Materi Kitab untuk asatidz/admin. Prompt
+        // TEKNIS NETRAL (tanpa muatan keagamaan): rangkum HANYA konteks blok
+        // DATA menjadi poin pembelajaran + istilah kunci + pertanyaan diskusi,
+        // JSON ketat. Sumber = Sumber Pengetahuan tenant (adaptasi sadar —
+        // whitelist kitab GATE-3 belum terisi). Sitasi TIDAK diminta dari
+        // model — sitasi deterministik dilampirkan pipeline (Blueprint §7.2).
+        $this->seedAgen(
+            key: 'asatidz_ikhtisar',
+            nama: 'Ikhtisar Kitab Asatidz',
+            deskripsi: 'Agen perangkum materi kitab/materi tenant menjadi ikhtisar pembelajaran (T-A042). Output draf — pengesahan oleh ustadz.',
+            tier: 'standar',
+            systemPrompt: 'Anda asisten teknis perangkum materi pembelajaran untuk guru. '
+                .'Rangkum HANYA materi pada blok DATA konteks yang diberikan — '
+                .'jangan menambahkan fakta, nama, angka, atau materi dari luar konteks. '
+                .'Jawab selalu dalam bahasa Indonesia yang baku dan santun. '
+                .'Keluarkan HANYA JSON objek valid tanpa teks pembuka maupun penutup, dengan kunci: '
+                .'"poin" (array string poin pembelajaran utama dari konteks), '
+                .'"istilah" (array objek {"istilah","arti"} berisi istilah kunci yang muncul di konteks beserta artinya menurut konteks), '
+                .'"pertanyaan_diskusi" (array string pertanyaan diskusi untuk memperdalam pemahaman materi). '
+                .'Bila konteks tidak memadai, hasilkan butir lebih sedikit — jangan mengarang.',
+            changelog: 'Versi awal agen ikhtisar materi kitab (T-A042).',
+        );
+
+        // T-A042 — agen Generator Kultum untuk asatidz (fitur OPT-IN, default
+        // OFF). Prompt NETRAL-PROSEDURAL: susun KERANGKA (struktur) kultum
+        // dari konteks tema yang diberikan; tiap pernyataan yang memerlukan
+        // dalil ditandai [PERIKSA DALIL]; model DILARANG menulis teks
+        // ayat/hadits/terjemahnya — rujukan dikosongkan untuk diisi ustadz
+        // (pipeline juga memaksa rujukan kosong, defense-in-depth). JSON ketat.
+        $this->seedAgen(
+            key: 'asatidz_kultum',
+            nama: 'Generator Kerangka Kultum Asatidz',
+            deskripsi: 'Agen penyusun KERANGKA kultum dari materi tenant (T-A042) — struktur saja, dalil dilengkapi ustadz. Output draf — pengesahan oleh ustadz.',
+            tier: 'standar',
+            systemPrompt: 'Anda asisten teknis penyusun KERANGKA (struktur garis besar) ceramah singkat untuk guru. '
+                .'Susun kerangka HANYA dari materi pada blok DATA konteks yang diberikan — '
+                .'jangan menambahkan fakta atau materi dari luar konteks. '
+                .'JANGAN menuliskan teks ayat, teks hadits, maupun terjemahnya; '
+                .'untuk setiap pernyataan yang memerlukan rujukan, tandai dengan penanda [PERIKSA DALIL] '
+                .'dan biarkan kolom rujukan berupa string kosong agar dilengkapi guru. '
+                .'Jawab selalu dalam bahasa Indonesia yang baku dan santun. '
+                .'Keluarkan HANYA JSON objek valid tanpa teks pembuka maupun penutup, dengan kunci: '
+                .'"kerangka" (array string urutan bagian: pembuka, poin-poin isi, penutup), '
+                .'"pengingat_dalil" (array objek {"klaim","rujukan"} — "klaim" berisi pernyataan yang harus diperiksa berawalan [PERIKSA DALIL], "rujukan" selalu string kosong). '
+                .'Bila konteks tidak memadai, susun kerangka lebih ringkas — jangan mengarang.',
+            changelog: 'Versi awal agen generator kerangka kultum (T-A042).',
+        );
     }
 
     /**
