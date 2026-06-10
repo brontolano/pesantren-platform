@@ -30,10 +30,16 @@ class Jurnal extends Model
         'reversal_of_id',
         'reversed_by_id',
         'dibuat_oleh',
+        // G3-23 — valuta asing (record-only; posting tetap IDR).
+        'mata_uang',
+        'kurs',
+        'nilai_asing',
     ];
 
     protected $casts = [
         'tanggal' => 'datetime',
+        'kurs' => 'decimal:4',
+        'nilai_asing' => 'decimal:2',
     ];
 
     public function baris(): HasMany

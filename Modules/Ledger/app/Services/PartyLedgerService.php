@@ -76,6 +76,32 @@ class PartyLedgerService
         return array_map(fn ($v) => round($v, 2), $bucket);
     }
 
+    /**
+     * G3-23 — Mutasi (buku pembantu) satu pihak: daftar baris jurnal posted
+     * dengan info jurnal, terurut tanggal. Saldo berjalan dihitung pemanggil.
+     *
+     * @return \Illuminate\Support\Collection<int, array{tanggal:?string, nomor:?string, deskripsi:?string, debit:float, kredit:float, mutasi:float}>
+     */
+    public function mutasi(string $partyType, int $partyId, ?string $from = null, ?string $to = null): \Illuminate\Support\Collection
+    {
+        return JurnalBaris::query()
+            ->where('party_type', $partyType)
+            ->where('party_id', $partyId)
+            ->whereHas('jurnal', fn ($j) => $this->scopePosted($j, $from, $to))
+            ->with('jurnal:id,nomor,tanggal,deskripsi')
+            ->get()
+            ->sortBy(fn (JurnalBaris $b) => $b->jurnal?->tanggal)
+            ->map(fn (JurnalBaris $b): array => [
+                'tanggal' => $b->jurnal?->tanggal ? (string) $b->jurnal->tanggal : null,
+                'nomor' => $b->jurnal?->nomor,
+                'deskripsi' => $b->jurnal?->deskripsi,
+                'debit' => round((float) $b->debit, 2),
+                'kredit' => round((float) $b->kredit, 2),
+                'mutasi' => round((float) $b->debit - (float) $b->kredit, 2),
+            ])
+            ->values();
+    }
+
     private function scopePosted($j, ?string $from, ?string $to): void
     {
         $j->where('status', 'posted');
