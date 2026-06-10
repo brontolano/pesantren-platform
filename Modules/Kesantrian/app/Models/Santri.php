@@ -56,6 +56,7 @@ class Santri extends Model
         'kelas_id',
         'photo_url',
         'wali_user_id',
+        'user_id',
     ];
 
     protected $casts = [
@@ -65,6 +66,11 @@ class Santri extends Model
     public function kelas(): BelongsTo
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function waliUser(): BelongsTo

@@ -60,6 +60,16 @@ class PpdbReregistrationService
             // ditegakkan. Hanya dijalankan bila kamar dipilih (modul asrama aktif).
             $this->tempatkanAsrama($santri, $payload);
 
+            // App Santri: konversi LULUS -> akun login santri + tautan akun wali.
+            // Best-effort (tak menggagalkan daftar ulang bila pembuatan akun gagal).
+            try {
+                $akun = app(\Modules\Kesantrian\Services\SantriAccountService::class);
+                $akun->provision($santri->fresh());
+                $akun->tautkanWali($santri->fresh());
+            } catch (\Throwable $e) {
+                report($e);
+            }
+
             return $candidate->fresh()->load('santri');
         });
     }

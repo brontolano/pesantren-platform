@@ -78,6 +78,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 'kelola_approval',
                 'lihat_audit',
             ],
+            'santri' => [
+                'view_dashboard',
+            ],
             'tu' => [
                 'view_dashboard',
                 'manage_users',
