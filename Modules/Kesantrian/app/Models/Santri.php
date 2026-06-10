@@ -93,6 +93,16 @@ class Santri extends Model
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
+    public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SantriEnrollment::class, 'santri_id');
+    }
+
+    public function handwritingSamples(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(HandwritingSample::class, 'santri_id');
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
