@@ -711,6 +711,14 @@ class DevRoadmapSeeder extends Seeder
                 'InitializeTenancyForWebRequests redirect www.<apex> 301 ke apex (pertahankan path+query) + bootstrap/app.php withExceptions dontReport+render 404 untuk TenantCouldNotBeIdentifiedOnDomain (IP mentah/subdomain scanner). 4 feature test (HostResolutionTest) hijau. PR #7.',
                 'SELESAI & live. www→301, IP→404, 0 error TenantCouldNot ter-log pasca-deploy.',
                 'done', 'low', 100, 'S', 8],
+            ['Hardening Idempotensi', 'Fix double-post Jurnal Manual + guard JurnalService',
+                'Bug PRE-EXISTING: JurnalManual posting tanpa ref → idempotency_key NULL → unique(tenant_id,idempotency_key) tak men-dedup NULL (di SQL NULL!=NULL) → submit ulang (double-click/refresh/retry) MENGGANDAKAN uang. Fix: gerbang akhir idempotensi di JurnalService (tolak posting valid-tanpa-kunci kecuali allow_duplicate eksplisit; math/balance teruji TAK diubah) + token UUID per-render form JurnalManual (dedup double-submit, regen setelah sukses, +tombol disabled saat proses) + DanaKebajikan optional refId. JurnalManualIdempotencyTest 6/6, regresi uang/ledger 175 hijau, adversarial-verify GO, smoke prod OK.',
+                'SELESAI & live (PR #49). Klik-ganda/refresh/retry tak menggandakan jurnal lagi.',
+                'done', 'critical', 100, 'M', 9],
+            ['Amankan Aset AlbaKids', 'Commit landing.blade.php + galeri AlbaKids ke git',
+                'Kustomisasi AlbaKids (resources/views/albakids/landing.blade.php + public/albakids/g1-6.jpg) hidup di VPS lewat baked image tapi BELUM ada di origin/main → risiko hilang bila VPS di-rebuild (git reset --hard origin/main). Diverifikasi checksum lokal IDENTIK dengan live, lalu di-commit ke main agar deploy berikutnya membawanya. Branch snapshot redundan (vps-snapshot, fix/albakids-landing-assets) dibersihkan.',
+                'SELESAI & live. AlbaKids kini aman di git; rebuild tak lagi menghilangkan kustomisasi.',
+                'done', 'high', 100, 'S', 10],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
