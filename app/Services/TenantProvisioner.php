@@ -49,6 +49,12 @@ class TenantProvisioner
         $this->seedModules($tenant);
 
         return $tenant->run(function () use ($tenant, $adminEmail): array {
+            // (a0) Extension pgvector untuk Modul AI (RAG/embeddings).
+            // Idempoten; toleran bila server PG belum menyediakan extension
+            // (mis. dev lokal tanpa pgvector) — provisioning tidak boleh gagal
+            // karena fitur add-on.
+            $this->ensurePgvectorExtension();
+
             // (a) Roles & permissions untuk DB tenant ini.
             Artisan::call('db:seed', [
                 '--class' => RolesAndPermissionsSeeder::class,
@@ -100,6 +106,26 @@ class TenantProvisioner
 
             return ['email' => $adminEmail, 'password' => $password];
         });
+    }
+
+    /**
+     * CREATE EXTENSION vector di DB tenant aktif (konteks $tenant->run()).
+     * Dipisah agar bisa dipanggil ulang oleh tenant:reprovision untuk
+     * tenant eksisting setelah image postgres diganti ke pgvector.
+     */
+    private function ensurePgvectorExtension(): void
+    {
+        if (DB::connection()->getDriverName() !== 'pgsql') {
+            return;
+        }
+
+        try {
+            DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
+        } catch (\Throwable $e) {
+            logger()->warning('pgvector belum tersedia di server PostgreSQL — fitur AI butuh image pgvector/pgvector:pg16.', [
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     /**

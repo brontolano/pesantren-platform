@@ -73,6 +73,18 @@ return [
             'after_commit' => false,
         ],
 
+        // Koneksi khusus job AI (Ollama). retry_after WAJIB > --timeout worker-ai
+        // (600 dtk): dengan retry_after 90 bawaan, job yang masih berjalan
+        // dilepas ulang ke antrean dan diproses dobel (kredit terpotong dobel).
+        'redis-ai' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => 'ai',
+            'retry_after' => (int) env('REDIS_AI_QUEUE_RETRY_AFTER', 660),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
         'deferred' => [
             'driver' => 'deferred',
         ],

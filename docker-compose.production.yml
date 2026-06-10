@@ -77,8 +77,55 @@ services:
     networks:
       - internal
 
+  # ── Queue worker KHUSUS job AI (queue 'ai', koneksi 'redis-ai') ──
+  # Job Ollama bisa berjalan sampai 600 dtk; koneksi redis-ai punya
+  # retry_after=660 (> timeout) agar job berjalan TIDAK dilepas ulang &
+  # diproses dobel (jebakan retry_after Blueprint AI §4.3).
+  # SATU proses = konkurensi 1 → antrian alami untuk Ollama 2 vCPU.
+  worker-ai:
+    image: pesantren-platform-app:latest
+    container_name: pesantren-worker-ai
+    restart: unless-stopped
+    command: php artisan queue:work redis-ai --queue=ai --sleep=3 --tries=2 --timeout=600
+    healthcheck:
+      disable: true
+    env_file:
+      - .env
+    volumes:
+      - app_storage:/app/storage
+      - ./.env:/app/.env:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  # ── LLM lokal (Ollama) untuk Modul AI "Khadim Digital" ──
+  # TIDAK diekspos keluar VPS; satu-satunya pemanggil = AiGateway (Modules/AI).
+  # mem_limit/cpus dipakai (bukan deploy.resources — tak dijamin di compose non-swarm)
+  # agar platform inti tidak kelaparan RAM/CPU.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: pesantren-ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_MAX_LOADED_MODELS=2
+      - OLLAMA_KEEP_ALIVE=24h
+    volumes:
+      - ollama_models:/root/.ollama
+    mem_limit: 4g
+    cpus: 1.5
+    networks:
+      - internal
+
   postgres:
-    image: postgres:16-alpine
+    # pgvector/pgvector:pg16 = postgres:16 resmi + extension vector (Modul AI).
+    # Data dir kompatibel (PG major sama). Pasca-ganti image WAJIB REINDEX
+    # (alpine/musl -> debian/glibc bisa beda collation urutan teks).
+    image: pgvector/pgvector:pg16
     container_name: pesantren-postgres
     restart: unless-stopped
     environment:
@@ -202,6 +249,7 @@ services:
 
 volumes:
   postgres_data:
+  ollama_models:
   redis_data:
   app_storage:
   caddy_data:
