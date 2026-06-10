@@ -18,9 +18,9 @@ class AIServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
 
-        // Migrasi TENANT (tabel ai_* per pesantren) — saat tabel tenant pertama
-        // dibuat (T-A002+), path ini WAJIB ikut didaftarkan di
-        // config/tenancy.php 'migration_parameters' agar jalan di tenants:migrate.
+        // Migrasi TENANT (tabel ai_* per pesantren — mulai T-A003: ai_audit_log).
+        // Path ini SUDAH terdaftar di config/tenancy.php 'migration_parameters'
+        // sehingga ikut jalan di tenants:migrate.
         // CATATAN (pola platform, sama dgn Modules/Ledger): karena terdaftar ke
         // migrator biasa, migrasi tenant di sini JUGA ikut jalan saat `php artisan
         // migrate` di DB central — tabel ai_* tenant ikut tercipta di central.

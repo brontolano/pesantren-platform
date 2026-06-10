@@ -209,6 +209,10 @@ return [
             base_path('Modules/Notifikasi/database/migrations'),
             base_path('Modules/PPDB/database/migrations'),
             base_path('Modules/Tahfidz/database/migrations'),
+            // Modul AI: HANYA dir akar (tabel ai_* tenant, mis. ai_audit_log).
+            // Subdir central/ TIDAK ikut (loader path non-rekursif) — tabel
+            // central ai_* tetap hanya di DB central.
+            base_path('Modules/AI/database/migrations'),
         ],
         '--realpath' => true,
     ],

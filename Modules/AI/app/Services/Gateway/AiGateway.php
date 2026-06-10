@@ -4,6 +4,9 @@ namespace Modules\AI\Services\Gateway;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Log;
+use Modules\AI\Models\AiAuditLog;
+use Modules\AI\Services\Audit\AuditRecorder;
+use Modules\AI\Services\Audit\StepTimer;
 use Throwable;
 
 /**
@@ -26,26 +29,84 @@ class AiGateway
     public function __construct(
         private readonly ModelRouter $router,
         private readonly CircuitBreaker $breaker,
+        private readonly AuditRecorder $audit,
     ) {}
 
     public function generate(AiGenerateRequest $request): AiGenerateResult
     {
-        $selection = $this->router->resolve($request->agent, $request->tier);
+        // T-A003: setiap panggilan generate menulis tepat 1 baris ai_audit_log
+        // (sukses / degradasi / gagal) dengan breakdown latensi per langkah.
+        $timer = new StepTimer;
 
-        foreach ($this->chainFor($selection) as $name) {
-            $result = $this->attempt(
-                $name,
-                fn (LlmProvider $provider, ModelSelection $sel): AiGenerateResult => $provider->generate($request, $sel),
-                $selection,
+        try {
+            $selection = $timer->measure(
+                'router',
+                fn (): ModelSelection => $this->router->resolve($request->agent, $request->tier),
             );
 
-            if ($result !== null) {
-                return $result;
-            }
-        }
+            foreach ($this->chainFor($selection) as $name) {
+                $result = $timer->measure('provider', fn (): ?AiGenerateResult => $this->attempt(
+                    $name,
+                    fn (LlmProvider $provider, ModelSelection $sel): AiGenerateResult => $provider->generate($request, $sel),
+                    $selection,
+                ));
 
-        // Semua provider nyata gagal/terbuka sirkuitnya → degradasi anggun.
-        return $this->makeProvider('null')->generate($request, $selection);
+                if ($result !== null) {
+                    $this->recordGenerateAudit($request, $timer, $result);
+
+                    return $result;
+                }
+            }
+
+            // Semua provider nyata gagal/terbuka sirkuitnya → degradasi anggun.
+            $result = $this->makeProvider('null')->generate($request, $selection);
+            $this->recordGenerateAudit($request, $timer, $result);
+
+            return $result;
+        } catch (Throwable $e) {
+            // Kesalahan pemakaian (tier tak dikenal, config korup) tetap
+            // dilempar — tapi jejaknya tercatat dulu untuk forensik.
+            $this->recordGenerateAudit($request, $timer, null, $e);
+
+            throw $e;
+        }
+    }
+
+    /**
+     * Tulis baris audit T-A003. recordOrLog: kegagalan tulis audit TIDAK
+     * menggagalkan permintaan utama (hanya log error keras).
+     */
+    private function recordGenerateAudit(
+        AiGenerateRequest $request,
+        StepTimer $timer,
+        ?AiGenerateResult $result,
+        ?Throwable $error = null,
+    ): void {
+        $status = match (true) {
+            $error !== null => AiAuditLog::STATUS_GAGAL,
+            $result?->degraded === true => AiAuditLog::STATUS_DEGRADASI,
+            default => AiAuditLog::STATUS_SUKSES,
+        };
+
+        $this->audit->recordOrLog([
+            'user_id' => $request->userId,
+            'agent_key' => $request->agent,
+            'channel' => $request->channel,
+            'ringkasan_konteks' => $request->ringkasanKonteks,
+            'provider' => $result->provider ?? 'tidak-terpilih',
+            'model' => $result->model ?? 'tidak-terpilih',
+            'tier' => $request->tier,
+            'degraded' => $result->degraded ?? false,
+            'token_masuk' => $result?->promptTokens,
+            'token_keluar' => $result?->completionTokens,
+            'biaya_kredit' => 0, // metering kredit = T-A002 (CreditMeter)
+            'latency' => $timer->breakdown(),
+            'status' => $status,
+            'error_ringkas' => $error !== null
+                ? mb_substr($error::class.': '.$error->getMessage(), 0, 500)
+                : null,
+            'idempotency_key' => $request->idempotencyKey,
+        ]);
     }
 
     /**

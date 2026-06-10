@@ -15,6 +15,10 @@ final readonly class AiGenerateRequest
      * @param  string  $tier  ekonomis|standar|premium — diteruskan ke ModelRouter.
      * @param  array<string, mixed>  $options  Opsi inferensi tambahan (num_predict, temperature, ...).
      * @param  int|null  $timeoutSeconds  Override timeout chat (null = config).
+     * @param  string  $channel  Kanal asal (web/wa/internal/cli) — kolom audit T-A003.
+     * @param  int|null  $userId  Pengguna pemicu (null = sistem/CLI) — kolom audit.
+     * @param  string|null  $idempotencyKey  Kunci idempotensi baris audit (unik; null = tanpa dedup).
+     * @param  string|null  $ringkasanKonteks  Ringkasan konteks TERREDAKSI untuk audit (jangan kirim PII mentah).
      */
     public function __construct(
         public string $prompt,
@@ -23,5 +27,9 @@ final readonly class AiGenerateRequest
         public string $tier = 'standar',
         public array $options = [],
         public ?int $timeoutSeconds = null,
+        public string $channel = 'internal',
+        public ?int $userId = null,
+        public ?string $idempotencyKey = null,
+        public ?string $ringkasanKonteks = null,
     ) {}
 }

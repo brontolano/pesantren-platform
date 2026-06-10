@@ -2,8 +2,10 @@
 
 namespace Modules\AI\Console;
 
+use App\Models\Tenant;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
+use Modules\AI\Models\AiAuditLog;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
 use Throwable;
@@ -19,9 +21,10 @@ class AiHealthCommand extends Command
 {
     protected $signature = 'ai:health
         {--skip-generate : Lewati uji latensi generate (hanya cek konektivitas)}
-        {--generate-timeout=30 : Timeout (detik) untuk uji latensi generate}';
+        {--generate-timeout=30 : Timeout (detik) untuk uji latensi generate}
+        {--tenant= : Tampilkan juga ringkasan ai_audit_log hari ini untuk tenant ini (T-A003)}';
 
-    protected $description = 'Cek kesehatan gateway AI: provider, model, latensi, antrian queue ai, circuit breaker';
+    protected $description = 'Cek kesehatan gateway AI: provider, model, latensi, antrian queue ai, circuit breaker, ringkasan audit tenant';
 
     public function handle(AiGateway $gateway): int
     {
@@ -88,6 +91,12 @@ class AiHealthCommand extends Command
         // 4. Kedalaman antrian queue 'ai' di Redis.
         $rows[] = $this->queueDepthRow();
 
+        // 5. Ringkasan audit hari ini DI TENANT KONTEKS — hanya bila --tenant=
+        // diberikan; tanpa flag = perilaku lama (central-only, bagian ini lewat).
+        if (($tenantId = (string) $this->option('tenant')) !== '') {
+            $rows[] = $this->tenantAuditRow($tenantId);
+        }
+
         $this->table(['Komponen', 'Status', 'Detail'], $rows);
 
         if (! $healthy) {
@@ -132,6 +141,51 @@ class AiHealthCommand extends Command
             ];
         } catch (Throwable $e) {
             return ["Antrian '{$queue}'", 'TAK TERJANGKAU', $e->getMessage()];
+        }
+    }
+
+    /**
+     * T-A003: ringkasan ai_audit_log HARI INI di DB tenant terkait.
+     * Toleran — tenant tak ada / DB tak terjangkau tidak menggugurkan laporan.
+     *
+     * @return array{0: string, 1: string, 2: string}
+     */
+    private function tenantAuditRow(string $tenantId): array
+    {
+        $label = "Audit '{$tenantId}'";
+
+        try {
+            $tenant = Tenant::query()->find($tenantId);
+
+            if ($tenant === null) {
+                return [$label, 'TIDAK DITEMUKAN', "Tenant '{$tenantId}' tidak terdaftar."];
+            }
+
+            tenancy()->initialize($tenant);
+
+            try {
+                $today = AiAuditLog::query()->whereDate('created_at', now()->toDateString());
+
+                $total = (clone $today)->count();
+                $perStatus = (clone $today)
+                    ->selectRaw('status, count(*) as jumlah')
+                    ->groupBy('status')
+                    ->pluck('jumlah', 'status');
+
+                $detail = $total === 0
+                    ? 'Belum ada panggilan AI hari ini.'
+                    : sprintf(
+                        '%d panggilan hari ini (%s)',
+                        $total,
+                        $perStatus->map(fn ($n, $s) => "{$s}: {$n}")->implode(', '),
+                    );
+
+                return [$label, 'OK', $detail];
+            } finally {
+                tenancy()->end();
+            }
+        } catch (Throwable $e) {
+            return [$label, 'TAK TERJANGKAU', $e->getMessage()];
         }
     }
 }
