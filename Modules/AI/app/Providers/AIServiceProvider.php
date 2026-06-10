@@ -20,6 +20,9 @@ class AIServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
 
+        // Views modul (Wizard Wawancara Digital, ringkasan kebijakan, dst).
+        $this->loadViewsFrom(module_path($this->moduleName, 'resources/views'), $this->moduleNameLower);
+
         // Migrasi TENANT (tabel ai_* per pesantren — mulai T-A003: ai_audit_log).
         // Path ini SUDAH terdaftar di config/tenancy.php 'migration_parameters'
         // sehingga ikut jalan di tenants:migrate.
@@ -53,6 +56,36 @@ class AIServiceProvider extends ServiceProvider
         $this->app->singleton(ModelRouter::class);
         $this->app->singleton(AiGateway::class);
         $this->app->singleton(\Modules\AI\Services\Prompts\PromptRegistry::class);
+
+        $this->registerHalamanPanelTenant();
+    }
+
+    /**
+     * T-A011 — daftarkan halaman Filament modul ke panel TENANT tanpa
+     * menyentuh TenantPanelProvider (Aturan Emas: file hanya Modules/AI).
+     *
+     * Panel Filament v5 dibangun malas (lazy) saat PanelRegistry di-resolve
+     * lewat callback `resolving` (lihat Filament\Facades\Filament::registerPanel).
+     * Kita menumpang `afterResolving` — DIJAMIN berjalan setelah seluruh
+     * callback `resolving` selesai, sehingga panel 'tenant' pasti sudah ada,
+     * apa pun urutan registrasi provider modul vs provider panel aplikasi.
+     */
+    protected function registerHalamanPanelTenant(): void
+    {
+        $daftarkan = function (\Filament\PanelRegistry $registry): void {
+            $registry->get('tenant')?->pages([
+                \Modules\AI\Filament\Pages\PengaturanAi::class,
+                \Modules\AI\Filament\Pages\PersetujuanAi::class,
+            ]);
+        };
+
+        if ($this->app->resolved(\Filament\PanelRegistry::class)) {
+            $daftarkan($this->app->make(\Filament\PanelRegistry::class));
+
+            return;
+        }
+
+        $this->app->afterResolving(\Filament\PanelRegistry::class, $daftarkan);
     }
 
     protected function registerConfig(): void
