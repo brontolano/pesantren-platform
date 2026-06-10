@@ -277,6 +277,7 @@ class PengaturanAi extends Page implements HasForms
 
         $labelFitur = [
             'generator_soal' => 'Pembuat draf soal latihan',
+            'generator_rpp' => 'Pembuat draf RPP / modul ajar',
             'chatbot' => 'Tanya-jawab (chatbot)',
             'dokumen_tu' => 'Draf dokumen administrasi',
             'ringkasan_keuangan' => 'Ringkasan laporan keuangan',

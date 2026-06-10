@@ -296,6 +296,9 @@ return [
             // T-A040: agen Generator Soal asatidz — gerbang matriks
             // fitur_per_peran (asatidz/admin) di PolicyEngine ikut berlaku.
             'asatidz_soal' => 'generator_soal',
+            // T-A041: agen Generator RPP / Modul Ajar asatidz.
+            'generator_rpp' => 'generator_rpp',
+            'asatidz_rpp' => 'generator_rpp',
             'dokumen_tu' => 'dokumen_tu',
             'ringkasan_keuangan' => 'ringkasan_keuangan',
         ],
@@ -356,6 +359,8 @@ return [
             'tutor_santri' => 'akademik',
             'generator_soal' => 'akademik',
             'asatidz_soal' => 'akademik', // T-A040
+            'generator_rpp' => 'akademik',
+            'asatidz_rpp' => 'akademik', // T-A041
             'ringkasan_keuangan' => 'keuangan',
         ],
 
@@ -452,6 +457,22 @@ return [
                 // bobot model — draf gagal dengan ajakan unggah materi.
                 'tanpa_korpus' => 'Mohon maaf, belum ada materi kurikulum yang dapat dirujuk untuk menyusun soal. Silakan unggah materi kurikulum terlebih dahulu di menu Sumber Pengetahuan, lalu coba kembali.',
                 'format_invalid' => 'Mohon maaf, asisten tidak menghasilkan format soal yang valid setelah dicoba ulang. Silakan coba beberapa saat lagi.',
+            ],
+        ],
+
+        // T-A041 — Generator RPP / Modul Ajar. Per SEKSI template satu
+        // panggilan LLM; top_k retrieval ramping (konteks per seksi kecil,
+        // Blueprint §7.4). Struktur dokumen = ai_template_rpp MILIK TENANT
+        // (Aturan Emas #11: tanpa taksonomi regulasi di kode).
+        'rpp' => [
+            'top_k' => (int) env('AI_RPP_TOP_K', 3),
+
+            // Pesan kegagalan baku (Indonesia santun).
+            'pesan' => [
+                // RAG-only (pagar #2): tanpa korpus TIDAK boleh mengisi dari
+                // bobot model — draf gagal dengan ajakan unggah materi.
+                'tanpa_korpus' => 'Mohon maaf, belum ada materi kurikulum yang dapat dirujuk untuk menyusun RPP. Silakan unggah materi kurikulum terlebih dahulu di menu Sumber Pengetahuan, lalu coba kembali.',
+                'konten_kosong' => 'Mohon maaf, asisten tidak menghasilkan isi untuk salah satu seksi RPP. Silakan coba beberapa saat lagi.',
             ],
         ],
     ],

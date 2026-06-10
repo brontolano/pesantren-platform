@@ -22,6 +22,12 @@ class AiSettingProvisioner
 {
     public function provision(string $tenantId): void
     {
+        $this->seedPengaturan($tenantId);
+        $this->seedTemplateRpp($tenantId);
+    }
+
+    private function seedPengaturan(string $tenantId): void
+    {
         try {
             if (! Schema::hasTable('ai_tenant_setting')) {
                 Log::warning('AiSettingProvisioner: tabel ai_tenant_setting belum termigrasi — dilewati.', [
@@ -46,6 +52,23 @@ class AiSettingProvisioner
             ]);
         } catch (Throwable $e) {
             Log::warning('AiSettingProvisioner: gagal seed pengaturan AI default — provisioning tenant tetap lanjut.', [
+                'tenant_id' => $tenantId,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * T-A041 — template RPP default generik netral (idempoten: tenant yang
+     * sudah punya template apa pun tidak disentuh). Ikut jalur provisioning
+     * yang sama supaya tenant:reprovision juga menyembuhkan tenant lama.
+     */
+    private function seedTemplateRpp(string $tenantId): void
+    {
+        try {
+            \Modules\AI\Database\Seeders\AiTemplateRppSeeder::seedDefault();
+        } catch (Throwable $e) {
+            Log::warning('AiSettingProvisioner: gagal seed template RPP default — provisioning tenant tetap lanjut.', [
                 'tenant_id' => $tenantId,
                 'message' => $e->getMessage(),
             ]);

@@ -52,6 +52,28 @@ class AiAgentSeeder extends Seeder
                 .'Bila konteks tidak memadai, hasilkan butir lebih sedikit — jangan mengarang.',
             changelog: 'Versi awal agen generator soal & kisi-kisi (T-A040).',
         );
+
+        // T-A041 — agen Generator RPP / Modul Ajar untuk asatidz. Prompt
+        // TEKNIS-PEDAGOGIS NETRAL (tanpa muatan keagamaan/regulasi — struktur
+        // dokumen datang dari template milik tenant): isi SATU seksi RPP per
+        // permintaan dari konteks blok DATA + petunjuk seksi + catatan guru,
+        // bahasa Indonesia formal, teks polos. Sitasi TIDAK diminta dari
+        // model — sitasi deterministik dilampirkan pipeline (Blueprint §7.2).
+        $this->seedAgen(
+            key: 'asatidz_rpp',
+            nama: 'Generator RPP Asatidz',
+            deskripsi: 'Agen pengisi seksi dokumen RPP/modul ajar dari materi kurikulum tenant (T-A041). Output draf — pengesahan oleh guru.',
+            tier: 'standar',
+            systemPrompt: 'Anda asisten teknis penyusun perangkat pembelajaran (RPP/modul ajar) untuk guru. '
+                .'Tugas Anda mengisi SATU seksi dokumen per permintaan, HANYA dari materi pada blok DATA '
+                .'konteks yang diberikan, sesuai petunjuk pengisian seksi dan catatan awal guru bila ada — '
+                .'jangan menambahkan fakta, nama, angka, atau materi dari luar konteks. '
+                .'Jawab selalu dalam bahasa Indonesia yang baku, formal, dan santun. '
+                .'Keluarkan teks polos tanpa format markdown yang rumit, tanpa kalimat pembuka maupun '
+                .'penutup — langsung tuliskan isi seksinya. '
+                .'Bila konteks tidak memadai, isi seperlunya secara ringkas — jangan mengarang.',
+            changelog: 'Versi awal agen generator RPP / modul ajar (T-A041).',
+        );
     }
 
     /**
