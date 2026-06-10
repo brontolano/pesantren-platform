@@ -128,4 +128,28 @@ class NotifDispatcherTest extends TestCase
         $this->assertNull(app(NotifDispatcher::class)->resolveTemplate('keputusan_ppdb'));
         tenancy()->end();
     }
+
+    public function test_webhook_url_per_tenant_menimpa_config_global(): void
+    {
+        $this->boot('wh1');
+        config(['notifikasi.n8n_webhook_url' => 'http://n8n:5678/webhook/global']);
+
+        // Tanpa setting → fallback config global.
+        $this->assertSame('http://n8n:5678/webhook/global', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+
+        // Dengan setting tenant → override.
+        \App\Models\Setting::updateOrCreate(
+            ['key' => \Modules\Notifikasi\Support\NotifikasiSettings::KEY_WA_WEBHOOK],
+            ['value' => ['url' => 'http://n8n:5678/webhook/tenant-khusus']]
+        );
+        $this->assertSame('http://n8n:5678/webhook/tenant-khusus', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+
+        // Setting kosong → kembali fallback.
+        \App\Models\Setting::updateOrCreate(
+            ['key' => \Modules\Notifikasi\Support\NotifikasiSettings::KEY_WA_WEBHOOK],
+            ['value' => ['url' => '  ']]
+        );
+        $this->assertSame('http://n8n:5678/webhook/global', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+        tenancy()->end();
+    }
 }
