@@ -34,11 +34,21 @@ class ModelRouter
 
         // CentralCache (bukan facade Cache): keputusan router bersumber tabel
         // CENTRAL — jangan ter-fragmentasi per tenant oleh CacheTenancyBootstrapper.
-        return CentralCache::repository()->remember(
-            self::CACHE_PREFIX.$agent.':'.$tier,
+        $key = self::CACHE_PREFIX.$agent.':'.$tier;
+        $cached = CentralCache::repository()->remember(
+            $key,
             (int) config('ai.router.cache_seconds', 60),
-            fn (): ModelSelection => $this->lookup($agent, $tier),
+            fn (): array => $this->lookup($agent, $tier)->toArray(),
         );
+
+        // Entri lama/korup (mis. objek ter-serialize versi sebelumnya) =
+        // cache-miss, bukan error.
+        if (! is_array($cached)) {
+            CentralCache::repository()->forget($key);
+            $cached = $this->lookup($agent, $tier)->toArray();
+        }
+
+        return ModelSelection::fromArray($cached);
     }
 
     /** Pintasan untuk tier embedding. */
