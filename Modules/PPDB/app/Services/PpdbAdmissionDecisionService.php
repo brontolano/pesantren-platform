@@ -25,6 +25,13 @@ class PpdbAdmissionDecisionService
 
         $status = $this->normalizeStatus((string) ($payload['status_pendaftaran'] ?? ''));
 
+        // KUNCI STATUS (F3): calon yang sudah daftar ulang (Santri sudah dibuat)
+        // tak boleh diputus ulang — mencegah keadaan janggal "santri aktif tapi
+        // calon ditolak". Koreksi pasca-daftar-ulang lewat alur kesantrian.
+        if ((string) $candidate->status_pendaftaran === 'registrasi_ulang' || $candidate->santri_id !== null) {
+            throw new InvalidArgumentException('Calon sudah daftar ulang — keputusan terkunci.');
+        }
+
         if (in_array($status, ['lulus', 'cadangan'], true) && ! $candidate->hasilUjian()->exists()) {
             throw new InvalidArgumentException('Keputusan lulus atau cadangan membutuhkan minimal satu hasil ujian.');
         }
