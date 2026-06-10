@@ -63,6 +63,18 @@ Route::middleware([
 
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
+
+    // App Santri (/app) — login NIS + dashboard ringkas (tahap 1; lanjut: WebAuthn).
+    Route::prefix('app')->name('tenant.app-santri.')->group(function () {
+        Route::get('/login', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'showLogin'])->name('login');
+        Route::post('/login', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'login'])
+            ->middleware('throttle:10,1')->name('login.attempt');
+        Route::middleware('auth')->group(function () {
+            Route::get('/', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'home'])->name('home');
+            Route::post('/logout', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'logout'])->name('logout');
+        });
+    });
+
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {
         Route::get('/manifest.json', [PortalWaliPwaController::class, 'manifest'])->name('manifest');
         Route::get('/icon.svg', [PortalWaliPwaController::class, 'icon'])->name('icon');
