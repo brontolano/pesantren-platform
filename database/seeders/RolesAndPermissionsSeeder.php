@@ -59,6 +59,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'ai.setting.kelola',
             'ai.setting.setujui',
             'ai.setting.lihat',
+            // Modul AI (T-A030) — kelola sumber pengetahuan RAG (upload,
+            // re-ingest, hapus tuntas) Khadim Digital.
+            'ai.pengetahuan.kelola',
         ];
 
         foreach ($permissions as $permission) {
@@ -85,6 +88,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'lihat_audit',
                 'ai.setting.kelola',
                 'ai.setting.lihat',
+                'ai.pengetahuan.kelola',
             ],
             'santri' => [
                 'view_dashboard',

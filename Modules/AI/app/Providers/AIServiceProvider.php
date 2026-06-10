@@ -76,6 +76,7 @@ class AIServiceProvider extends ServiceProvider
             $registry->get('tenant')?->pages([
                 \Modules\AI\Filament\Pages\PengaturanAi::class,
                 \Modules\AI\Filament\Pages\PersetujuanAi::class,
+                \Modules\AI\Filament\Pages\SumberPengetahuan::class,
             ]);
         };
 
