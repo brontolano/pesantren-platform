@@ -133,27 +133,29 @@ class TenantPanelProvider extends PanelProvider
             ->resources($resources)
             ->pages($pages)
             ->widgets($widgets)
-            // Urutan & ikon grup navigasi — mengikuti jalur adopsi nyata
+            // Urutan grup navigasi — mengikuti jalur adopsi nyata
             // (Kesantrian/PPDB/Website dulu; keuangan lanjutan di bawah &
-            // collapsed). Grup yang tak terdaftar di sini tetap muncul di bawah.
+            // collapsed). Grup TANPA ikon: Filament v5 melarang grup berikon
+            // sekaligus item berikon (item resource sudah punya ikon).
+            // Grup yang tak terdaftar di sini tetap muncul di bawah.
             ->navigationGroups([
-                NavigationGroup::make('Kesantrian')->icon('heroicon-o-user-group'),
-                NavigationGroup::make('PPDB')->icon('heroicon-o-academic-cap'),
-                NavigationGroup::make('Website & CMS')->icon('heroicon-o-globe-alt'),
-                NavigationGroup::make('Asrama')->icon('heroicon-o-home-modern'),
-                NavigationGroup::make('Akademik')->icon('heroicon-o-book-open'),
-                NavigationGroup::make('Tahfidz')->icon('heroicon-o-sparkles'),
-                NavigationGroup::make('Kegiatan & Perizinan')->icon('heroicon-o-calendar-days'),
-                NavigationGroup::make('Kesehatan & Konseling')->icon('heroicon-o-heart'),
-                NavigationGroup::make('Administrasi')->icon('heroicon-o-document-text'),
-                NavigationGroup::make('Keuangan')->icon('heroicon-o-banknotes'),
-                NavigationGroup::make('Buku Besar')->icon('heroicon-o-calculator')->collapsed(),
-                NavigationGroup::make('Pelaporan')->icon('heroicon-o-chart-bar')->collapsed(),
-                NavigationGroup::make('Pembiayaan')->icon('heroicon-o-building-library')->collapsed(),
-                NavigationGroup::make('Mutu / SYAMIL')->icon('heroicon-o-shield-check')->collapsed(),
-                NavigationGroup::make('File Storage')->icon('heroicon-o-folder'),
-                NavigationGroup::make('Notifikasi')->icon('heroicon-o-bell'),
-                NavigationGroup::make('Pengaturan')->icon('heroicon-o-cog-6-tooth')->collapsed(),
+                NavigationGroup::make('Kesantrian'),
+                NavigationGroup::make('PPDB'),
+                NavigationGroup::make('Website & CMS'),
+                NavigationGroup::make('Asrama'),
+                NavigationGroup::make('Akademik'),
+                NavigationGroup::make('Tahfidz'),
+                NavigationGroup::make('Kegiatan & Perizinan'),
+                NavigationGroup::make('Kesehatan & Konseling'),
+                NavigationGroup::make('Administrasi'),
+                NavigationGroup::make('Keuangan'),
+                NavigationGroup::make('Buku Besar')->collapsed(),
+                NavigationGroup::make('Pelaporan')->collapsed(),
+                NavigationGroup::make('Pembiayaan')->collapsed(),
+                NavigationGroup::make('Mutu / SYAMIL')->collapsed(),
+                NavigationGroup::make('File Storage'),
+                NavigationGroup::make('Notifikasi'),
+                NavigationGroup::make('Pengaturan')->collapsed(),
             ]);
 
         if (! $isAlbaKids) {
