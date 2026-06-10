@@ -75,6 +75,10 @@ class RolesAndPermissionsSeeder extends Seeder
             // Modul AI (T-A041) — kelola template RPP (Wakakurikulum/admin):
             // buat/ubah/nonaktifkan struktur seksi dokumen milik tenant.
             'ai.template.kelola',
+            // Modul AI (T-A042) — Ikhtisar materi kitab & kerangka kultum:
+            // buat draf, edit isi, MENGESAHKAN (human-in-the-loop), cetak.
+            // Kultum tetap digerbang feature flag opt-in (generator_kultum).
+            'ai.generator.ikhtisar',
         ];
 
         foreach ($permissions as $permission) {
@@ -106,6 +110,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'ai.generator.soal',
                 'ai.generator.rpp',
                 'ai.template.kelola',
+                'ai.generator.ikhtisar',
             ],
             'santri' => [
                 'view_dashboard',
@@ -181,6 +186,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 // T-A041 — asatidz menyusun & mengesahkan draf RPP/modul ajar
                 // (kelola template TIDAK ikut — itu ai.template.kelola).
                 'ai.generator.rpp',
+                // T-A042 — asatidz menyusun & mengesahkan ikhtisar kitab
+                // (dan kerangka kultum bila fitur opt-in diaktifkan tenant).
+                'ai.generator.ikhtisar',
             ],
             'guru' => [
                 'view_dashboard',
