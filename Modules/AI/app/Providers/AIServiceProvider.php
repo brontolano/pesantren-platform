@@ -4,6 +4,7 @@ namespace Modules\AI\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Modules\AI\Console\AiAnomaliCommand;
+use Modules\AI\Console\AiBersihkanPercakapanCommand;
 use Modules\AI\Console\AiEskalasiPengingatCommand;
 use Modules\AI\Console\AiHealthCommand;
 use Modules\AI\Console\AiLaporanEskalasiCommand;
@@ -57,6 +58,7 @@ class AIServiceProvider extends ServiceProvider
                 AiPromptCommand::class,
                 AiEskalasiPengingatCommand::class,
                 AiLaporanEskalasiCommand::class,
+                AiBersihkanPercakapanCommand::class,
             ]);
         }
     }

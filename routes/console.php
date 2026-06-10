@@ -37,3 +37,9 @@ Schedule::command('ai:eskalasi-pengingat')
 Schedule::command('ai:laporan-eskalasi')
     ->monthlyOn(1, '06:00')
     ->withoutOverlapping();
+
+// T-A050: retensi percakapan WA chatbot — hapus ai_message lebih tua dari
+// retensi_hari setting tenant (default 90), tiap dini hari per tenant.
+Schedule::command('ai:bersihkan-percakapan')
+    ->dailyAt('02:30')
+    ->withoutOverlapping();
