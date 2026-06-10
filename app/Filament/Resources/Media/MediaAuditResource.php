@@ -37,7 +37,7 @@ class MediaAuditResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return \App\Support\UiMode::advanced() && static::canAccess();
     }
 
     public static function canCreate(): bool

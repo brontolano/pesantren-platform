@@ -33,7 +33,7 @@ class BiayaAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false);
+        return \App\Support\UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false);
     }
 
     public static function canAccess(): bool

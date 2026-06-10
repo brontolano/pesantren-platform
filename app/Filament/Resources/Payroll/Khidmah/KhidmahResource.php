@@ -39,7 +39,7 @@ class KhidmahResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
+        return \App\Support\UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
     }
 
     public static function canAccess(): bool

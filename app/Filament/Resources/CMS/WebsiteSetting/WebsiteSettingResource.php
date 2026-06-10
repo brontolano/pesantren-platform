@@ -32,7 +32,7 @@ class WebsiteSettingResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::builtInWebsiteEnabled()
+        return \App\Support\UiMode::advanced() && static::builtInWebsiteEnabled()
             && static::moduleVisible('cms')
             && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }

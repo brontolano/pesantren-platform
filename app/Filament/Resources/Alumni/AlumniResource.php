@@ -29,7 +29,7 @@ class AlumniResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return \App\Support\UiMode::advanced() && auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
     }
 
     public static function canAccess(): bool

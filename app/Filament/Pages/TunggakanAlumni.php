@@ -46,7 +46,7 @@ class TunggakanAlumni extends Page implements HasTable
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return \App\Support\UiMode::advanced() && static::canAccess();
     }
 
     public function getSubheading(): ?string

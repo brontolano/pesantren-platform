@@ -33,7 +33,7 @@ class CrmPenawaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_laporan_pimpinan', 'manage_keuangan']) ?? false);
+        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_laporan_pimpinan', 'manage_keuangan']) ?? false);
     }
 
     public static function canAccess(): bool

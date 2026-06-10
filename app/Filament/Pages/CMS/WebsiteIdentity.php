@@ -43,7 +43,7 @@ class WebsiteIdentity extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return \App\Support\UiMode::advanced() && static::canAccess();
     }
 
     public function mount(): void

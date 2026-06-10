@@ -50,7 +50,7 @@ class InventoryItemResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
+        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
     }
 
     public static function canAccess(): bool
