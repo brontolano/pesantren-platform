@@ -365,4 +365,18 @@ class AiIngestRagTest extends TestCase
         $this->actingAs($dengan);
         $this->assertTrue(SumberPengetahuan::canAccess());
     }
+
+    // Regresi: chunker tidak boleh merayap di ekor teks (teks pendek = 1 chunk).
+    public function test_teks_pendek_menghasilkan_satu_chunk(): void
+    {
+        $svc = app(\Modules\AI\Services\Rag\IngestService::class);
+        $m = new \ReflectionMethod($svc, 'chunk');
+
+        $pendek = $m->invoke($svc, str_repeat('Kalimat uji pendek. ', 12)); // ~240 char
+        $this->assertCount(1, $pendek, 'Teks < ukuran chunk wajib persis 1 chunk');
+
+        $panjang = $m->invoke($svc, str_repeat('Kalimat penjang sekali untuk uji pembagian potongan dokumen. ', 80)); // ~4900 char
+        $this->assertGreaterThanOrEqual(2, count($panjang));
+        $this->assertLessThanOrEqual(5, count($panjang), 'Jumlah chunk wajar, tidak meledak');
+    }
 }

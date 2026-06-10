@@ -47,6 +47,37 @@ final readonly class AiGenerateRequest
     }
 
     /**
+     * Salinan request dengan context terisi (T-A031: RagAnswerer menempelkan
+     * gabungan chunk retrieval di sini; gateway yang mensanitasi ulang +
+     * membungkusnya sebagai blok DATA berdelimiter, T-A005). Immutable.
+     */
+    public function withContext(?string $context): self
+    {
+        return $this->salin(context: $context, pakaiContextBaru: true);
+    }
+
+    /**
+     * Salinan request dengan idempotencyKey terisi (T-A031: RagAnswerer butuh
+     * kunci pasti untuk menautkan ai_citation → baris ai_audit_log gateway).
+     */
+    public function withIdempotencyKey(string $idempotencyKey): self
+    {
+        return new self(
+            prompt: $this->prompt,
+            system: $this->system,
+            context: $this->context,
+            agent: $this->agent,
+            tier: $this->tier,
+            options: $this->options,
+            timeoutSeconds: $this->timeoutSeconds,
+            channel: $this->channel,
+            userId: $this->userId,
+            idempotencyKey: $idempotencyKey,
+            ringkasanKonteks: $this->ringkasanKonteks,
+        );
+    }
+
+    /**
      * Salinan request hasil langkah privasi T-A005 (PiiRedactor +
      * ContentSanitizer di gateway): prompt sudah tergabung konteks-tersanitasi
      * dan terredaksi PII; context dinolkan (sudah menyatu di prompt);
