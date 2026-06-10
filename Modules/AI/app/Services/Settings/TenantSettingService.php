@@ -89,6 +89,44 @@ class TenantSettingService
     }
 
     /**
+     * T-A011 — perbarui payload sebuah versi yang MASIH draft (autosave
+     * Wizard antar-langkah). Sengaja meng-update baris yang sama, BUKAN
+     * membuat versi baru per langkah: jejak audit yang harus utuh adalah
+     * versi yang pernah diajukan/aktif, bukan coretan draf di tengah jalan.
+     *
+     * @param  array<string, mixed>  $payload
+     *
+     * @throws AuthorizationException|ValidationException
+     */
+    public function updateDraf(int $versi, array $payload, User $user): AiTenantSetting
+    {
+        $this->pastikanBoleh($user, 'ai.setting.kelola');
+
+        $payload = $this->validasi($payload);
+
+        return DB::transaction(function () use ($versi, $payload): AiTenantSetting {
+            /** @var AiTenantSetting $setting */
+            $setting = AiTenantSetting::query()
+                ->where('versi', $versi)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($setting->status !== AiTenantSetting::STATUS_DRAFT) {
+                throw new InvalidArgumentException(
+                    "Versi {$versi} berstatus '{$setting->status}' — hanya draft yang dapat diperbarui."
+                );
+            }
+
+            $setting->update([
+                'payload' => $payload,
+                'ringkasan_perubahan' => $this->ringkasanPerubahan($payload),
+            ]);
+
+            return $setting->refresh();
+        });
+    }
+
+    /**
      * Ajukan sebuah versi draft:
      *  - menyentuh field SENSITIF → pending_approval + baris ai_approval
      *    'menunggu' (hash ringkasan); versi aktif lama TETAP berlaku;
