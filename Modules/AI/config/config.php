@@ -152,6 +152,98 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Privasi (T-A005) — redaksi PII pra-provider + sanitasi anti-injection
+    |--------------------------------------------------------------------------
+    | Berlaku walau provider v1 lokal (jaga log & konteks minimal-PII; pagar
+    | sudah terpasang saat provider eksternal diaktifkan, keputusan K4).
+    | Tiap pola bisa dimatikan per jenis; pola tambahan via *_tambahan TANPA
+    | mengubah kelas (PiiRedactor / ContentSanitizer).
+    | CATATAN: alamat sengaja TIDAK diredaksi — false positive regex terlalu
+    | tinggi (lihat docblock PiiRedactor).
+    */
+    'privacy' => [
+        'redaksi' => [
+            'enabled' => (bool) env('AI_PII_REDAKSI_ENABLED', true),
+
+            // URUTAN PENTING: pola berkata-kunci/lebih spesifik lebih dulu
+            // (email → rekening → nik → hp → nisn) supaya deretan digit tidak
+            // salah klaim oleh pola yang lebih generik.
+            'pola' => [
+                'email' => [
+                    'aktif' => true,
+                    'regex' => '/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/u',
+                ],
+                // Nomor rekening HANYA dengan kata kunci konteks (rekening/
+                // norek/no. rek) — deret 9-16 digit telanjang terlalu ambigu.
+                'rekening' => [
+                    'aktif' => true,
+                    'regex' => '/\b(?:no(?:mor)?\.?\s*rek(?:ening)?|norek|rekening)\b[^0-9\r\n]{0,20}\K\d{9,16}(?!\d)/iu',
+                ],
+                'nik' => [
+                    'aktif' => true,
+                    'regex' => '/(?<!\d)\d{16}(?!\d)/u',
+                ],
+                'hp' => [
+                    'aktif' => true,
+                    // +62 / 62 / 08xx, total 9-13 digit, boleh pemisah - atau spasi.
+                    'regex' => '/(?<![\d.])(?:\+?62|0)8\d{1,2}(?:[\s-]?\d{3,4}){2,3}(?!\d)/u',
+                ],
+                'nisn' => [
+                    'aktif' => true,
+                    'regex' => '/(?<!\d)\d{10}(?!\d)/u',
+                ],
+            ],
+
+            // Pola operator tambahan: ['jenis' => '/regex/'].
+            'pola_tambahan' => [],
+        ],
+
+        'sanitasi' => [
+            'enabled' => (bool) env('AI_SANITASI_ENABLED', true),
+
+            // Token peran/template chat + delimiter blok data — DI-DEFANG
+            // karakternya (anti tokenizer-special & anti delimiter-escape).
+            'pola_token' => [
+                '/<\|[\w\/-]+\|>/u',
+                '/<<\s*\/?\s*SYS\s*>>/iu',
+                '/\[\/?INST\]/iu',
+                '/<\/?(?:s|system|assistant|user|tool)\s*>/iu',
+                '/<<<\s*(?:DATA\s*:[^>\r\n]*|AKHIR-DATA)\s*>>>/iu',
+            ],
+
+            // Frasa instruksi-meta ID+EN — DIBUNGKUS «dikutip-sebagai-data: ...».
+            'pola_frasa' => [
+                '/^[ \t]*(?:system|assistant|developer|tool)\s*:/imu',
+                '/\babaikan\s+(?:semua\s+|seluruh\s+)?(?:instruksi|aturan|perintah)[^\n.!?«]{0,80}/iu',
+                '/\bjangan\s+hiraukan\s+[^\n.!?«]{0,80}/iu',
+                '/\blupakan\s+(?:semua\s+)?(?:instruksi|aturan|perintah|peranmu)[^\n.!?«]{0,80}/iu',
+                '/\bignore\s+(?:all\s+)?(?:previous|prior|above|earlier|the)\s+[^\n.!?«]{0,80}/iu',
+                '/\bdisregard\s+(?:all\s+|the\s+|any\s+)?[^\n.!?«]{0,40}(?:instructions?|rules?|prompts?)[^\n.!?«]{0,40}/iu',
+                '/\bforget\s+(?:all\s+|your\s+)?(?:previous\s+)?(?:instructions?|rules?|training)[^\n.!?«]{0,80}/iu',
+                '/\b(?:kamu|anda|engkau)\s+sekarang\s+(?:adalah|menjadi|bukan)\s+[^\n.!?«]{0,80}/iu',
+                '/\byou\s+are\s+now\s+[^\n.!?«]{0,80}/iu',
+                '/\bpretend\s+(?:to\s+be|you\s+are|that)\s+[^\n.!?«]{0,80}/iu',
+                '/\bact\s+as\s+(?:if\s+|an?\s+|the\s+)[^\n.!?«]{0,80}/iu',
+                '/\b(?:bocorkan|kirim(?:kan)?|tampilkan|tunjukkan|sebutkan)\b[^\n.!?«]{0,40}(?:data|kredensial|password|kata\s+sandi|rahasia|system\s+prompt|prompt\s+sistem)[^\n.!?«]{0,60}/iu',
+                '/\breveal\b[^\n.!?«]{0,40}(?:system\s+prompt|instructions?|secrets?|credentials?)[^\n.!?«]{0,60}/iu',
+                '/\b(?:instruksi|perintah|aturan)\s+baru\s*:[^\n«]{0,120}/iu',
+                '/\bnew\s+(?:instructions?|system\s+prompt|rules?)\s*:[^\n«]{0,120}/iu',
+                '/\b(?:developer|debug|god)\s+mode\b[^\n.!?«]{0,80}/iu',
+                '/\bmode\s+pengembang\b[^\n.!?«]{0,80}/iu',
+                '/\bDAN\s+mode\b[^\n.!?«]{0,60}/u',
+                '/\bjailbreak\b[^\n.!?«]{0,80}/iu',
+                '/\boverride\b[^\n.!?«]{0,30}(?:safety|security|system|aturan|keamanan)[^\n.!?«]{0,60}/iu',
+                // Markdown image exfiltration: gambar ber-URL eksternal di dokumen.
+                '/!\[[^\]\r\n]{0,100}\]\((?:https?:)?\/\/[^)\s]{1,300}\)/iu',
+            ],
+
+            // Pola frasa tambahan operator (list regex).
+            'pola_tambahan' => [],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue khusus AI (worker-ai, koneksi redis-ai — lihat config/queue.php)
     |--------------------------------------------------------------------------
     */
