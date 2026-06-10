@@ -319,3 +319,34 @@
     padding-bottom: 0.5rem !important;
     font-size: 0.75rem !important;
 }
+
+/* ===================================================================
+   KETERBACAAN — kontras teks redup (aksesibilitas AA) + target sentuh
+   HP (tanpa mengubah kerapatan desktop yang sudah compact).
+   =================================================================== */
+
+/* Teks redup default Filament (gray-400) kurang kontras di latar putih untuk
+   ustadz lansia / HP di bawah matahari. Naikkan ke gray-500/400 (AA). */
+.fi-color-gray.fi-text-color-400,
+.fi-ta-text-item-label.fi-color-gray {
+    color: rgb(100 116 139) !important; /* slate-500 */
+}
+.dark .fi-color-gray.fi-text-color-400 {
+    color: rgb(148 163 184) !important; /* slate-400 di gelap */
+}
+
+/* Di layar HP: target sentuh tombol & item menu minimal 44px (pedoman a11y),
+   serta teks tabel sedikit lebih besar agar terbaca. Desktop tak terpengaruh. */
+@media (max-width: 768px) {
+    .fi-btn {
+        min-height: 2.75rem; /* 44px */
+        font-size: 0.9375rem !important; /* 15px */
+    }
+    .fi-ta-cell,
+    .fi-ta-text-item-label {
+        font-size: 0.9375rem !important; /* 15px */
+    }
+    .fi-sidebar-item-button {
+        min-height: 2.75rem;
+    }
+}
