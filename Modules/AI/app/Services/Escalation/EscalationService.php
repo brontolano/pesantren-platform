@@ -27,6 +27,9 @@ use Throwable;
  */
 class EscalationService
 {
+    /** T-A090 — kategori eskalasi yang dibuat manual oleh pengguna dari UI. */
+    public const KATEGORI_MANUAL = 'manual';
+
     /**
      * Tugaskan eskalasi ke seorang pengguna. $userId null = ambil tujuan
      * default dari setting aktif `eskalasi_tujuan.penerima` (entri pertama
@@ -74,6 +77,55 @@ class EscalationService
 
             return $eskalasi->refresh();
         });
+    }
+
+    /**
+     * T-A090 — eskalasi MANUAL dari tombol "Tanya Ustadz" di UI (komponen
+     * <x-ai::tombol-tanya-ustadz>). Berbeda dari jalur PolicyEngine/RagAnswerer
+     * (eskalasi otomatis karena blokir/gagal sitasi): di sini PENGGUNA sendiri
+     * yang memilih bertanya kepada manusia.
+     *
+     * Pagar (pola PolicyEngine [M1][M2]):
+     *  - pertanyaan diredaksi PII PAKSA + dipangkas sebelum disimpan;
+     *  - IDEMPOTEN per (user, hash pertanyaan ternormalisasi) — klik ganda /
+     *    kirim ulang form tidak menggandakan antrean ustadz;
+     *  - baris BARU menambah event riset kategori saja (T-A013, no-op senyap
+     *    tanpa opt-in).
+     */
+    public function buatManual(User $penanya, string $pertanyaan, string $kanal = 'web'): AiEscalation
+    {
+        $pertanyaan = trim($pertanyaan);
+
+        if ($pertanyaan === '') {
+            throw new InvalidArgumentException('Pertanyaan tidak boleh kosong.');
+        }
+
+        $maks = (int) config('ai.guardrails.eskalasi_ringkas_max', 300);
+        $terredaksi = app(\Modules\AI\Services\Privacy\PiiRedactor::class)
+            ->redactPaksa($pertanyaan)->text;
+
+        // Normalisasi sebelum hash: huruf kecil + spasi rapat — variasi
+        // ketik ulang yang sama secara substansi tetap satu antrean.
+        $normal = mb_strtolower(trim((string) preg_replace('/\s+/u', ' ', $pertanyaan)));
+        $kunci = sprintf('manual:%d:%s', $penanya->getKey(), hash('sha256', $normal));
+
+        $eskalasi = AiEscalation::query()->firstOrCreate(
+            ['idempotency_key' => $kunci],
+            [
+                'conversation_ref' => $kunci,
+                'kanal' => $kanal,
+                'pertanyaan_ringkas' => mb_substr($terredaksi, 0, $maks),
+                'kategori' => self::KATEGORI_MANUAL,
+                'status' => AiEscalation::STATUS_BARU,
+            ],
+        );
+
+        if ($eskalasi->wasRecentlyCreated && tenancy()->initialized) {
+            app(\Modules\AI\Services\Research\ResearchTelemetry::class)
+                ->rekamEskalasiKategori((string) tenant()->getKey(), self::KATEGORI_MANUAL);
+        }
+
+        return $eskalasi;
     }
 
     /**
