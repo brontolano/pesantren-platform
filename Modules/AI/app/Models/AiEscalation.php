@@ -24,6 +24,7 @@ class AiEscalation extends Model
 
     protected $fillable = [
         'conversation_ref',
+        'idempotency_key',
         'kanal',
         'pertanyaan_ringkas',
         'kategori',

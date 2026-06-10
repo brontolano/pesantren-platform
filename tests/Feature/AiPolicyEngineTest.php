@@ -374,6 +374,198 @@ class AiPolicyEngineTest extends TestCase
     }
 
     // ------------------------------------------------------------------
+    // [K1] Context ikut dipindai rule konten (anti context-bypass)
+    // ------------------------------------------------------------------
+
+    public function test_keyword_blacklist_di_context_tetap_diblokir_tanpa_http(): void
+    {
+        $this->siapkanTenant('aipk1');
+        $this->terapkanSetting(['blacklist_topik' => ['topik-uji-terlarang']]);
+
+        Http::fake();
+
+        $result = $this->gateway()->generate(new AiGenerateRequest(
+            prompt: 'Tolong ringkas dokumen berikut ya.',
+            context: 'Dokumen ini membahas topik-uji-terlarang secara mendalam.',
+            agent: 'uji',
+            tier: 'ekonomis',
+        ));
+
+        $this->assertTrue($result->ditolakPolicy, 'Keyword blacklist di context HARUS terblokir');
+        $this->assertSame('blacklist_topik', AiAuditLog::query()
+            ->where('status', AiAuditLog::STATUS_DITOLAK_POLICY)
+            ->firstOrFail()->keputusan_kebijakan['policy']['kategori']);
+        Http::assertNothingSent();
+    }
+
+    public function test_pola_hukum_di_context_tetap_dialihkan_saat_edukatif_only(): void
+    {
+        $this->siapkanTenant('aipk1f'); // default edukatif_only
+
+        Http::fake();
+
+        $result = $this->gateway()->generate(new AiGenerateRequest(
+            prompt: 'Tolong jawab pertanyaan pada dokumen berikut.',
+            context: 'Pertanyaan wali: apa hukumnya melakukan kegiatan X?',
+            agent: 'uji',
+            tier: 'ekonomis',
+        ));
+
+        $this->assertTrue($result->ditolakPolicy, 'Pola hukum di context HARUS dialihkan');
+        $this->assertSame((string) config('ai.guardrails.pesan.tanya_ustadz'), $result->text);
+        Http::assertNothingSent();
+    }
+
+    // ------------------------------------------------------------------
+    // [K3] Agen tak terpetakan: fail-closed di kanal eksternal
+    // ------------------------------------------------------------------
+
+    public function test_kanal_eksternal_agen_tak_terpetakan_diblokir_kanal_internal_bebas(): void
+    {
+        $this->siapkanTenant('aipk3');
+
+        $this->fakeOllamaSukses();
+
+        // Kanal wa + agent asal-asalan → blokir santun "fitur tidak dikenali".
+        $resultWa = $this->gateway()->generate($this->request(
+            'Berapa tagihan saya?', agent: 'asal-asalan', channel: 'wa',
+        ));
+        $this->assertTrue($resultWa->ditolakPolicy);
+        $this->assertSame((string) config('ai.guardrails.pesan.fitur_tidak_dikenali'), $resultWa->text);
+        Http::assertNothingSent();
+
+        $audit = AiAuditLog::query()->where('status', AiAuditLog::STATUS_DITOLAK_POLICY)->firstOrFail();
+        $this->assertSame('fitur_tidak_dikenali', $audit->keputusan_kebijakan['policy']['kategori']);
+
+        // Kanal web (internal) + agen uji tak terpetakan → tetap lolos.
+        $resultWeb = $this->gateway()->generate($this->request('Berapa tagihan saya?', agent: 'uji', channel: 'web'));
+        $this->assertFalse($resultWeb->ditolakPolicy);
+        Http::assertSentCount(1);
+    }
+
+    // ------------------------------------------------------------------
+    // [K2] embed() berpagar blacklist — match = kosong TANPA HTTP
+    // ------------------------------------------------------------------
+
+    public function test_embed_input_ber_keyword_blacklist_kembali_kosong_tanpa_http(): void
+    {
+        $this->siapkanTenant('aipk2');
+        $this->terapkanSetting(['blacklist_topik' => ['topik-uji-terlarang']]);
+
+        Http::fake();
+
+        $vektor = $this->gateway()->embed([
+            'Materi pelajaran biasa.',
+            'Bab khusus tentang topik-uji-terlarang.',
+        ]);
+
+        $this->assertSame([], $vektor, 'Input embed ber-blacklist HARUS kembali kosong');
+        Http::assertNothingSent();
+    }
+
+    // ------------------------------------------------------------------
+    // [T1] Regex rule: validasi saat simpan + fail-closed saat evaluasi
+    // ------------------------------------------------------------------
+
+    public function test_simpan_rule_regex_invalid_ditolak_logic_exception(): void
+    {
+        $this->siapkanTenant('aipt1a');
+
+        $policy = AiPolicy::query()->firstOrCreate(
+            ['nama' => AiPolicy::NAMA_KEBIJAKAN_PESANTREN, 'sumber' => AiPolicy::SUMBER_TENANT],
+            ['aktif' => true],
+        );
+
+        $this->expectException(\LogicException::class);
+
+        AiPolicyRule::query()->create([
+            'policy_id' => $policy->id,
+            'tipe' => AiPolicyRule::TIPE_BLACKLIST_TOPIK,
+            'pola' => ['keyword' => [], 'regex' => ['/tak-tertutup(/iu']],
+            'prioritas' => 10,
+            'aktif' => true,
+        ]);
+    }
+
+    public function test_rule_regex_gagal_dievaluasi_fail_closed_memblokir(): void
+    {
+        $this->siapkanTenant('aipt1b');
+
+        $policy = AiPolicy::query()->firstOrCreate(
+            ['nama' => AiPolicy::NAMA_KEBIJAKAN_PESANTREN, 'sumber' => AiPolicy::SUMBER_TENANT],
+            ['aktif' => true],
+        );
+
+        // Simulasi rule korup yang lolos masuk DB (bypass model event) —
+        // mis. data lama / tulisan manual. Evaluasi HARUS fail-closed.
+        \Illuminate\Support\Facades\DB::table('ai_policy_rule')->insert([
+            'policy_id' => $policy->id,
+            'tipe' => AiPolicyRule::TIPE_BLACKLIST_TOPIK,
+            'pola' => json_encode(['keyword' => [], 'regex' => ['/rusak(/iu']]),
+            'prioritas' => 10,
+            'aktif' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Http::fake();
+
+        $result = $this->gateway()->generate($this->request('Pertanyaan netral biasa saja.'));
+
+        $this->assertTrue($result->ditolakPolicy, 'Rule regex rusak HARUS fail-closed (blokir)');
+        Http::assertNothingSent();
+    }
+
+    // ------------------------------------------------------------------
+    // [M1] Eskalasi tetap terredaksi walau redaksi global dimatikan
+    // ------------------------------------------------------------------
+
+    public function test_eskalasi_tetap_terredaksi_saat_redaksi_global_off(): void
+    {
+        $this->siapkanTenant('aipm1');
+        $this->terapkanSetting(['blacklist_topik' => ['topik-uji-terlarang']]);
+
+        config(['ai.privacy.redaksi.enabled' => false]);
+        Http::fake();
+
+        $result = $this->gateway()->generate($this->request(
+            'Bahas topik-uji-terlarang, hubungi saya di 081234567890.',
+        ));
+
+        $this->assertTrue($result->ditolakPolicy);
+
+        $eskalasi = AiEscalation::query()->where('kategori', 'blacklist_topik')->firstOrFail();
+        $this->assertStringNotContainsString('081234567890', $eskalasi->pertanyaan_ringkas, 'PII bocor ke eskalasi saat redaksi global off');
+        $this->assertStringContainsString('[PII:HP', $eskalasi->pertanyaan_ringkas);
+    }
+
+    // ------------------------------------------------------------------
+    // [M2] Eskalasi idempoten per idempotency_key request
+    // ------------------------------------------------------------------
+
+    public function test_eskalasi_dedup_per_idempotency_key(): void
+    {
+        $this->siapkanTenant('aipm2');
+        $this->terapkanSetting(['blacklist_topik' => ['topik-uji-terlarang']]);
+
+        Http::fake();
+
+        $this->gateway()->generate($this->request('bahas topik-uji-terlarang', key: 'kunci-esk-1'));
+        $this->gateway()->generate($this->request('bahas topik-uji-terlarang', key: 'kunci-esk-1'));
+
+        $this->assertSame(
+            1,
+            AiEscalation::query()->where('idempotency_key', 'kunci-esk-1')->count(),
+            'Dua generate kunci sama HARUS 1 baris eskalasi',
+        );
+
+        // Kunci berbeda tetap baris baru (bukan dedup global).
+        $this->gateway()->generate($this->request('bahas topik-uji-terlarang', key: 'kunci-esk-2'));
+        $this->assertSame(2, AiEscalation::query()->count());
+        Http::assertNothingSent();
+    }
+
+    // ------------------------------------------------------------------
     // (8) Suite kasus teknis-linguistik dari policy_cases.json (≥40 kasus)
     // ------------------------------------------------------------------
 

@@ -273,8 +273,15 @@ return [
     | boleh masuk dari berkas seed tinjauan ustadz (GATE-3, PRD §12.2).
     */
     'guardrails' => [
+        // [K3] Kanal yang dianggap EKSTERNAL (datang dari luar staf/dev).
+        // Agen yang TIDAK terpetakan di agent_feature_map di kanal ini
+        // di-FAIL-CLOSED ("fitur tidak dikenali"); kanal internal (web/cli/
+        // internal) tetap bebas untuk agen uji/dev.
+        'kanal_eksternal' => ['wa', 'chat'],
+
         // agent_key → nama fitur di matriks setting fitur_per_peran.
-        // Agen TANPA pemetaan (mis. agen uji/internal) bebas dari gerbang ini.
+        // Agen TANPA pemetaan: bebas HANYA di kanal internal (lihat
+        // kanal_eksternal di atas — kanal eksternal fail-closed).
         'agent_feature_map' => [
             'chatbot_wali' => 'chatbot',
             'chatbot_admin' => 'chatbot',
@@ -322,6 +329,7 @@ return [
             'belum_dikonfigurasi' => 'Mohon maaf, modul AI pesantren Anda belum selesai dikonfigurasi. Silakan hubungi admin untuk menuntaskan pengaturan terlebih dahulu.',
             'di_luar_jam' => 'Mohon maaf, layanan asisten sedang di luar jam operasional. Pertanyaan Anda kami catat dan akan ditindaklanjuti pada jam layanan.',
             'fitur_tidak_diizinkan' => 'Mohon maaf, fitur asisten ini tidak tersedia untuk akun Anda. Silakan hubungi admin pesantren bila membutuhkannya.',
+            'fitur_tidak_dikenali' => 'Mohon maaf, fitur asisten yang Anda tuju tidak dikenali. Silakan hubungi admin pesantren bila membutuhkan bantuan.',
             'blacklist_topik' => 'Mohon maaf, topik ini tidak dapat dijawab oleh asisten. Pertanyaan Anda telah kami teruskan kepada pihak yang berwenang di pesantren.',
             'tanya_ustadz' => 'Mohon maaf, pertanyaan seperti ini sebaiknya dijawab langsung oleh ustadz. Pertanyaan Anda telah kami teruskan ke antrean Tanya Ustadz.',
         ],

@@ -75,19 +75,24 @@ class PolicyEngine
         }
 
         // (c) Scope kanal/peran: agent_key → fitur (peta config); agen tanpa
-        // pemetaan (uji/internal) bebas.
+        // pemetaan: kanal internal bebas (uji/dev), kanal EKSTERNAL fail-closed.
         if ($keputusan = $this->cekFiturPerPeran($request, $payload)) {
             return $keputusan;
         }
 
+        // [K1] Teks yang diperiksa rule konten = prompt + context: context
+        // (dokumen/RAG) ikut masuk ke provider, jadi WAJIB ikut dipindai —
+        // tanpa ini keyword blacklist bisa diselundupkan lewat context.
+        $teksPeriksa = $this->teksPeriksa($request);
+
         // (d) Blacklist topik: rule data (mirror setting + preset GATE-3).
-        if ($keputusan = $this->cekBlacklist($request)) {
+        if ($keputusan = $this->cekBlacklist($request, $teksPeriksa)) {
             return $keputusan;
         }
 
         // (e) Level fatwa: edukatif_only → pertanyaan berpola hukum dialihkan
         // ke Tanya Ustadz. informatif/khilafiyah lolos pre (sitasi = T-A022).
-        if ($keputusan = $this->cekLevelFatwa($request, $payload)) {
+        if ($keputusan = $this->cekLevelFatwa($request, $payload, $teksPeriksa)) {
             return $keputusan;
         }
 
@@ -187,8 +192,23 @@ class PolicyEngine
         $fitur = config("ai.guardrails.agent_feature_map.{$request->agent}");
 
         if (! is_string($fitur)) {
-            // Agen tanpa pemetaan fitur (uji/internal) — bebas.
-            return null;
+            // [K3] Agen tanpa pemetaan fitur: kanal INTERNAL (web/cli/null)
+            // bebas — agen uji/dev. Kanal EKSTERNAL fail-closed: agent key
+            // asal-asalan dari WA/chat tidak boleh lolos gerbang fitur/peran.
+            $kanalEksternal = (array) config('ai.guardrails.kanal_eksternal', ['wa', 'chat']);
+
+            if (! in_array($request->channel, $kanalEksternal, true)) {
+                return null;
+            }
+
+            return $this->blokir(
+                $request,
+                kategori: 'fitur_tidak_dikenali',
+                alasan: "agen '{$request->agent}' tidak terpetakan di agent_feature_map"
+                    ." (kanal eksternal {$request->channel} = fail-closed)",
+                template: $this->template('fitur_tidak_dikenali'),
+                eskalasi: false,
+            );
         }
 
         $matriks = (array) ($payload['fitur_per_peran'] ?? []);
@@ -212,22 +232,14 @@ class PolicyEngine
         );
     }
 
-    private function cekBlacklist(AiGenerateRequest $request): ?PolicyDecision
+    private function cekBlacklist(AiGenerateRequest $request, string $teksPeriksa): ?PolicyDecision
     {
-        $rules = AiPolicyRule::query()
-            ->where('tipe', AiPolicyRule::TIPE_BLACKLIST_TOPIK)
-            ->where('aktif', true)
-            ->whereHas('policy', fn ($q) => $q->where('aktif', true))
-            ->orderBy('prioritas')
-            ->orderBy('id')
-            ->get();
-
-        foreach ($rules as $rule) {
-            if ($this->rulePolaCocok($rule, $request->prompt)) {
+        foreach ($this->ruleBlacklistAktif() as $rule) {
+            if ($this->rulePolaCocok($rule, $teksPeriksa)) {
                 return $this->blokir(
                     $request,
                     kategori: 'blacklist_topik',
-                    alasan: "prompt cocok rule blacklist #{$rule->getKey()}",
+                    alasan: "prompt/context cocok rule blacklist #{$rule->getKey()}",
                     template: $rule->respons_template ?? $this->template('blacklist_topik'),
                     eskalasi: true,
                     ruleId: (int) $rule->getKey(),
@@ -239,16 +251,16 @@ class PolicyEngine
     }
 
     /** @param  array<string, mixed>  $payload */
-    private function cekLevelFatwa(AiGenerateRequest $request, array $payload): ?PolicyDecision
+    private function cekLevelFatwa(AiGenerateRequest $request, array $payload, string $teksPeriksa): ?PolicyDecision
     {
         if (($payload['level_fatwa'] ?? null) !== 'edukatif_only') {
             return null;
         }
 
         // Pola TEKNIS-LINGUISTIK pertanyaan hukum (config) — bukan daftar
-        // topik agama (Aturan Emas #8).
+        // topik agama (Aturan Emas #8). [K1] context ikut dipindai.
         foreach ((array) config('ai.guardrails.pola_hukum', []) as $regex) {
-            if (@preg_match((string) $regex, $request->prompt) === 1) {
+            if (@preg_match((string) $regex, $teksPeriksa) === 1) {
                 return $this->blokir(
                     $request,
                     kategori: 'level_fatwa',
@@ -265,6 +277,59 @@ class PolicyEngine
     // ------------------------------------------------------------------
     // Pendukung
     // ------------------------------------------------------------------
+
+    /**
+     * [K2] Pagar blacklist untuk jalur embed(). embed bukan jawaban kepada
+     * pengguna — TIDAK ada disclaimer/level fatwa/eskalasi di sini; satu-
+     * satunya rule yang relevan = blacklist topik (jangan pernah meng-index
+     * konten terlarang ke vektor). true = pemanggil WAJIB berhenti TANPA HTTP.
+     *
+     * @param  list<string>  $inputs
+     */
+    public function embedDiblokir(array $inputs, ?string $tenantId): bool
+    {
+        if ($tenantId === null) {
+            return false; // konteks central (ai:health CLI) — tanpa rule tenant
+        }
+
+        $teks = implode("\n", array_map(static fn ($i): string => (string) $i, $inputs));
+
+        foreach ($this->ruleBlacklistAktif() as $rule) {
+            if ($this->rulePolaCocok($rule, $teks)) {
+                Log::warning('PolicyEngine: input embed cocok rule blacklist — embedding DIBATALKAN (tanpa HTTP).', [
+                    'rule_id' => $rule->getKey(),
+                    'jumlah_input' => count($inputs),
+                ]);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * [K1] Teks yang dipindai rule konten: prompt + context digabung —
+     * keduanya sama-sama mengalir ke provider.
+     */
+    private function teksPeriksa(AiGenerateRequest $request): string
+    {
+        $context = $request->context !== null ? trim($request->context) : '';
+
+        return $context === '' ? $request->prompt : $request->prompt."\n".$context;
+    }
+
+    /** @return \Illuminate\Database\Eloquent\Collection<int, AiPolicyRule> */
+    private function ruleBlacklistAktif()
+    {
+        return AiPolicyRule::query()
+            ->where('tipe', AiPolicyRule::TIPE_BLACKLIST_TOPIK)
+            ->where('aktif', true)
+            ->whereHas('policy', fn ($q) => $q->where('aktif', true))
+            ->orderBy('prioritas')
+            ->orderBy('id')
+            ->get();
+    }
 
     private function rulePolaCocok(AiPolicyRule $rule, string $prompt): bool
     {
@@ -286,7 +351,23 @@ class PolicyEngine
         }
 
         foreach ((array) ($pola['regex'] ?? []) as $regex) {
-            if (@preg_match((string) $regex, $prompt) === 1) {
+            $hasil = @preg_match((string) $regex, $prompt);
+
+            if ($hasil === 1) {
+                return true;
+            }
+
+            // [T1] FAIL-CLOSED: regex rule blacklist yang GAGAL dievaluasi
+            // (invalid / backtrack limit ReDoS) diperlakukan sebagai MATCH
+            // konservatif — rule pengaman yang rusak tidak boleh diam-diam
+            // jadi celah. Validasi saat simpan ada di AiPolicyRule::booted.
+            if ($hasil === false) {
+                Log::error('PolicyEngine: regex rule blacklist GAGAL dievaluasi — fail-closed (dianggap match). Perbaiki/nonaktifkan rule ini.', [
+                    'rule_id' => $rule->getKey(),
+                    'regex' => (string) $regex,
+                    'preg_error' => preg_last_error_msg(),
+                ]);
+
                 return true;
             }
         }
@@ -346,20 +427,37 @@ class PolicyEngine
      * Antrean Tanya Ustadz dasar: pertanyaan disimpan RINGKAS + TERREDAKSI
      * PII. Best-effort — kegagalan tulis tidak menggagalkan respons blokir
      * (keputusan blokirnya sendiri tetap tercatat di ai_audit_log).
+     *
+     * [M1] Redaksi di sini PAKSA (redactPaksa, abaikan flag global
+     * ai.privacy.redaksi.enabled): operator boleh mematikan redaksi jalur
+     * provider (LLM lokal), tapi baris eskalasi dibaca manusia & berumur
+     * panjang — komentar migrasi "SUDAH TERREDAKSI PII" wajib selalu benar.
+     *
+     * [M2] Idempoten per idempotency_key request (firstOrCreate): retry sah
+     * atas request terblokir yang sama tidak menggandakan antrean ustadz.
      */
     private function tulisEskalasi(AiGenerateRequest $request, string $kategori): void
     {
         try {
             $maks = (int) config('ai.guardrails.eskalasi_ringkas_max', 300);
-            $terredaksi = $this->redactor->redact($request->prompt)->text;
+            $terredaksi = $this->redactor->redactPaksa($request->prompt)->text;
 
-            AiEscalation::query()->create([
+            $atribut = [
                 'conversation_ref' => $request->idempotencyKey,
                 'kanal' => $request->channel,
                 'pertanyaan_ringkas' => mb_substr($terredaksi, 0, $maks),
                 'kategori' => $kategori,
                 'status' => AiEscalation::STATUS_BARU,
-            ]);
+            ];
+
+            if ($request->idempotencyKey !== null) {
+                AiEscalation::query()->firstOrCreate(
+                    ['idempotency_key' => $request->idempotencyKey],
+                    $atribut,
+                );
+            } else {
+                AiEscalation::query()->create($atribut);
+            }
         } catch (Throwable $e) {
             Log::error('PolicyEngine: GAGAL menulis ai_escalation (Tanya Ustadz).', [
                 'kategori' => $kategori,

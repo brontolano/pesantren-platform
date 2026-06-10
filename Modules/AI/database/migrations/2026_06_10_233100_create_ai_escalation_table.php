@@ -19,6 +19,9 @@ return new class extends Migration
         Schema::create('ai_escalation', function (Blueprint $table) {
             $table->id();
             $table->string('conversation_ref')->nullable();
+            // [M2] Dedup eskalasi per idempotency_key request (firstOrCreate
+            // di PolicyEngine) — retry sah tidak menggandakan antrean ustadz.
+            $table->string('idempotency_key')->nullable()->index();
             $table->string('kanal', 24);
             // TERREDAKSI via PiiRedactor + dipangkas (config eskalasi_ringkas_max).
             $table->text('pertanyaan_ringkas');

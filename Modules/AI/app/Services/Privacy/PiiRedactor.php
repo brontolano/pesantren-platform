@@ -33,7 +33,22 @@ class PiiRedactor
      */
     public function redact(string $text): RedactionResult
     {
-        if ($text === '' || ! (bool) config('ai.privacy.redaksi.enabled', true)) {
+        if (! (bool) config('ai.privacy.redaksi.enabled', true)) {
+            return new RedactionResult($text, [], []);
+        }
+
+        return $this->redactPaksa($text);
+    }
+
+    /**
+     * Redaksi PAKSA — MENGABAIKAN flag global ai.privacy.redaksi.enabled,
+     * tetap memakai pola aktif config. Dipakai jalur yang TIDAK boleh pernah
+     * menyimpan PII mentah (mis. ai_escalation.pertanyaan_ringkas) walau
+     * operator mematikan redaksi jalur provider.
+     */
+    public function redactPaksa(string $text): RedactionResult
+    {
+        if ($text === '') {
             return new RedactionResult($text, [], []);
         }
 

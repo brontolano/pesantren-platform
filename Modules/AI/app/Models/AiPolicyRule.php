@@ -4,6 +4,7 @@ namespace Modules\AI\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use LogicException;
 
 /**
  * T-A020 — satu aturan guardrails (tabel TENANT).
@@ -44,6 +45,26 @@ class AiPolicyRule extends Model
         'prioritas' => 'integer',
         'aktif' => 'boolean',
     ];
+
+    /**
+     * [T1] Tolak regex rusak SEBELUM tersimpan: smoke test preg_match tiap
+     * pola regex. Regex yang invalid akan fail-closed di PolicyEngine
+     * (memblokir SEMUA prompt) — lebih baik gagal keras saat input rule.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (self $rule): void {
+            foreach ((array) (((array) $rule->pola)['regex'] ?? []) as $regex) {
+                if (! is_string($regex) || @preg_match($regex, 'uji-smoke-test') === false) {
+                    throw new LogicException(sprintf(
+                        'AiPolicyRule: pola regex tidak valid dan ditolak disimpan: %s (%s)',
+                        is_string($regex) ? $regex : gettype($regex),
+                        preg_last_error_msg(),
+                    ));
+                }
+            }
+        });
+    }
 
     public function policy(): BelongsTo
     {

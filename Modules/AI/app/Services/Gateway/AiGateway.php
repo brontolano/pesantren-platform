@@ -381,8 +381,15 @@ class AiGateway
     }
 
     /**
+     * [T-A020/K2] Input embed dalam konteks tenant dipindai rule blacklist
+     * yang sama dengan generate(): match = kembali KOSONG + log keras, TANPA
+     * HTTP ke provider (konten terlarang tidak boleh ter-index ke vektor).
+     * embed BUKAN jawaban kepada pengguna — TIDAK ada injeksi disclaimer /
+     * gerbang level fatwa / eskalasi di jalur ini.
+     *
      * @param  string|list<string>  $input
-     * @return list<list<float>> Kosong = degradasi (tidak ada provider embedding sehat).
+     * @return list<list<float>> Kosong = degradasi (tidak ada provider embedding sehat)
+     *                           ATAU input diblokir kebijakan blacklist tenant.
      */
     public function embed(string|array $input, string $agent = 'default'): array
     {
@@ -390,6 +397,12 @@ class AiGateway
 
         if ($inputs === []) {
             return [];
+        }
+
+        $tenantId = tenancy()->initialized ? (string) tenant()?->getTenantKey() : null;
+
+        if ($this->policy->embedDiblokir($inputs, $tenantId)) {
+            return []; // [K2] blokir kebijakan — NOL HTTP ke provider
         }
 
         $selection = $this->router->resolveEmbedding($agent);
