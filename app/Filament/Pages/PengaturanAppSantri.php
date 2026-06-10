@@ -46,7 +46,9 @@ class PengaturanAppSantri extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        // Tampil di KEDUA mode (Sederhana & Lengkap) — pengaturan login santri
+        // adalah keputusan operasional pesantren, jangan tersembunyi.
+        return static::canAccess();
     }
 
     public function mount(): void
