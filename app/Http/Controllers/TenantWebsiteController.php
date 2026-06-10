@@ -95,7 +95,10 @@ class TenantWebsiteController extends Controller
             'no_hp_wali' => ['required', 'string', 'max:30'],
             'email_wali' => ['nullable', 'email', 'max:255'],
             'alamat' => ['required', 'string', 'max:1000'],
-        ], [], [
+            'setuju_kebijakan' => ['accepted'],
+        ], [
+            'setuju_kebijakan.accepted' => 'Centang persetujuan Kebijakan Privasi Sistem untuk melanjutkan.',
+        ], [
             'nama' => 'nama lengkap',
             'jenis_kelamin' => 'jenis kelamin',
             'tempat_lahir' => 'tempat lahir',
@@ -126,6 +129,7 @@ class TenantWebsiteController extends Controller
             'asal_sekolah' => $data['asal_sekolah'] ?? null,
             'program_diminati' => $data['program_diminati'],
             'status_pendaftaran' => 'pending',
+            'consent_kebijakan_at' => now(), // persetujuan Kebijakan Privasi Sistem (UU PDP)
             'created_at' => now(),
             'updated_at' => now(),
         ]);

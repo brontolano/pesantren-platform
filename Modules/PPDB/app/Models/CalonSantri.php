@@ -17,6 +17,7 @@ class CalonSantri extends Model
     protected $table = 'calon_santri';
 
     protected $fillable = [
+        'consent_kebijakan_at',
         'tenant_id',
         'santri_id',
         'user_id',

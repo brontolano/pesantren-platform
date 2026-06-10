@@ -161,8 +161,18 @@
                 <textarea name="alamat" required placeholder="Alamat tempat tinggal lengkap">{{ old('alamat') }}</textarea>
             </div>
 
+            <div class="field" style="display:flex;gap:10px;align-items:flex-start">
+                <input type="checkbox" name="setuju_kebijakan" id="setuju_kebijakan" value="1"
+                    style="margin-top:4px;width:18px;height:18px" {{ old('setuju_kebijakan') ? 'checked' : '' }} required>
+                <label for="setuju_kebijakan" style="font-weight:normal;font-size:.9rem;line-height:1.5">
+                    Saya (orang tua/wali) telah membaca dan menyetujui
+                    <a href="{{ url('/kebijakan-privasi') }}" target="_blank" rel="noopener" style="color:#047857;text-decoration:underline">Kebijakan Privasi Sistem</a>
+                    — termasuk penggunaan data, foto, dan contoh tulisan anak untuk keperluan pendidikan internal pesantren. <span class="req">*</span>
+                </label>
+            </div>
+            @error('setuju_kebijakan')<p class="note" style="color:#b91c1c">{{ $message }}</p>@enderror
+
             <button type="submit" class="btn-submit">Kirim Pendaftaran</button>
-            <p class="note">Dengan mendaftar, Anda menyetujui data digunakan untuk keperluan administrasi pendaftaran.</p>
         </form>
     </div>
 @endif

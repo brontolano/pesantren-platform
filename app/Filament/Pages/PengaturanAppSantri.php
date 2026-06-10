@@ -55,6 +55,8 @@ class PengaturanAppSantri extends Page implements HasForms
     {
         $this->form->fill([
             'metode' => SantriLoginMethod::enabled(),
+            'kebijakan' => \App\Models\Setting::getTenantStringValue(\App\Support\KebijakanPrivasiSistem::SETTING_KEY)
+                ?? \App\Support\KebijakanPrivasiSistem::default(),
         ]);
     }
 
@@ -82,6 +84,17 @@ class PengaturanAppSantri extends Page implements HasForms
                             ->columns(1)
                             ->default(['nis_pin']),
                     ]),
+
+                Section::make('Kebijakan Privasi Sistem')
+                    ->description('Dipublikasikan di /kebijakan-privasi dan disetujui wali (checkbox) saat mendaftar PPDB. Redaksi default disediakan platform — sesuaikan bila perlu.')
+                    ->icon('heroicon-o-shield-check')
+                    ->collapsed()
+                    ->schema([
+                        \Filament\Forms\Components\Textarea::make('kebijakan')
+                            ->label('')
+                            ->rows(16)
+                            ->helperText('Wajib tetap menyebut: data yang dikumpulkan, tujuan (termasuk contoh tulisan utk teknologi internal), hak wali menarik persetujuan.'),
+                    ]),
             ]);
     }
 
@@ -92,6 +105,14 @@ class PengaturanAppSantri extends Page implements HasForms
         $metode = array_values(array_unique(array_merge(['nis_pin'], array_intersect($metode, array_keys(SantriLoginMethod::METODE)))));
 
         Setting::updateOrCreate(['key' => SantriLoginMethod::SETTING_KEY], ['value' => $metode]);
+
+        $kebijakan = trim((string) ($this->form->getState()['kebijakan'] ?? ''));
+        if ($kebijakan !== '') {
+            Setting::updateOrCreate(
+                ['key' => \App\Support\KebijakanPrivasiSistem::SETTING_KEY],
+                ['value' => ['text' => $kebijakan]],
+            );
+        }
 
         Notification::make()->title('Pengaturan App Santri disimpan')->success()->send();
     }

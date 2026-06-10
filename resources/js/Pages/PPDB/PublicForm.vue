@@ -34,6 +34,7 @@ const form = useForm({
     emailWali: '',
     programDiminati: '',
     catatanTambahan: '',
+    setuju_kebijakan: false,
 });
 
 const fieldMode = (field) => props.fieldConfiguration[field]?.mode ?? 'optional';
@@ -226,6 +227,15 @@ const submit = () => {
                                 </p>
                             </div>
 
+                            <label class="flex items-start gap-3 text-sm text-stone-600">
+                                <input v-model="form.setuju_kebijakan" type="checkbox" class="mt-1 h-4 w-4 rounded border-stone-300" required>
+                                <span>
+                                    Saya (orang tua/wali) menyetujui
+                                    <a href="/kebijakan-privasi" target="_blank" rel="noopener" class="font-semibold text-emerald-700 underline">Kebijakan Privasi Sistem</a>
+                                    — termasuk penggunaan data, foto, dan contoh tulisan anak untuk keperluan pendidikan internal pesantren. *
+                                </span>
+                            </label>
+                            <p v-if="form.errors.setuju_kebijakan" class="text-sm text-red-600">{{ form.errors.setuju_kebijakan }}</p>
                             <button type="submit" :disabled="form.processing" class="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white disabled:opacity-60">
                                 {{ form.processing ? 'Mengirim...' : 'Kirim Pendaftaran' }}
                             </button>
