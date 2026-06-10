@@ -111,6 +111,7 @@ class TenantPanelProvider extends PanelProvider
             ]
             : [
                 \App\Filament\Widgets\GreetingBanner::class,
+                \App\Filament\Widgets\OnboardingChecklist::class,
                 \App\Filament\Widgets\StatsPesantren::class,
                 \App\Filament\Widgets\KeuanganAreaChart::class,
                 \App\Filament\Widgets\KategoriPengeluaranChart::class,
