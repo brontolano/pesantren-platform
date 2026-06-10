@@ -66,3 +66,11 @@ Dimulai 3-6 bulan setelah Fase 2 mengumpulkan sampel â‰¥50-100 santri; semua
 - LEMBAR PERSETUJUAN WALI (WAJIB UU PDP 27/2022 â€” biometrik + data anak = data pribadi spesifik): siapa menyusun redaksinya? Harus eksplisit menyebut penggunaan sampel tulisan untuk pengembangan AI internal, ada jalur tarik-persetujuan (hapus dari dataset), dan dataset TIDAK dipakai lintas-tenant tanpa izin terpisah.
 - KEBIJAKAN CLOUD OCR (untuk Fase AI kelak): boleh kirim gambar tulisan santri ke Azure/Google (~Rp25rb per 1000 halaman) sebagai pembanding & bootstrap label, atau wajib full lokal? Jika boleh, masukkan klausulnya ke lembar persetujuan sekarang agar tak perlu minta ulang.
 - KEBIJAKAN KARTU vs UANG: tegaskan aturan â€” NFC/QR UID-only cukup untuk identifikasi (absensi, panggil profil), tapi semua transaksi uang (kantin/tabungan) WAJIB UID + PIN karena kartu MIFARE mudah dikloning. Ini kebijakan operasional yang perlu disosialisasikan ke petugas.
+
+## KEPUTUSAN OWNER (2026-06-11) — mengunci arah build
+
+1. **Sidik jari ≠ passkey HP.** Dipakai untuk AKTIVITAS PONDOK: absensi & pembayaran di loket — kartu NFC mengidentifikasi, jari MEMVERIFIKASI (1:1 match terhadap template tersimpan), wajib/tidaknya per kebijakan pesantren. Konsekuensi: Fase 4 berubah → scanner fingerprint di loket + verifikasi server-side (SourceAFIS 1:1; agent kecil di PC loket karena browser tak bisa akses scanner USB) ATAU perangkat absensi standalone yang sync API. Simpan template di server per santri (fingerprint_template, terenkripsi).
+2. **Format NIS: standar Kemenag/nasional** sebagai default — template `{NSP}{TA:2}{URUT:4}` bila NSP diisi, fallback `{TA}.{URUT:4}`; configurable per tenant.
+3. **Persetujuan wali = Kebijakan Privasi Sistem Pondok** yang dipublikasikan (halaman publik tenant) dan DISETUJUI saat/sebelum daftar (checkbox di alur PPDB) — bukan lembar fisik per anak. Redaksi default disediakan platform, bisa diedit pesantren.
+4. **OCR full LOKAL via VPS** (Ollama/worker-ai). Tidak pakai cloud.
+5. **Sampel tulisan: 1-5 paragraf saja.** Tujuan UTAMA = HTR (sistem MEMBACA tulisan santri — Arab & Indonesia) untuk bantu penilaian; writer-identification = versi lanjut saat data sudah banyak. Ground-truth tetap per-baris (teks formulir diketahui).
