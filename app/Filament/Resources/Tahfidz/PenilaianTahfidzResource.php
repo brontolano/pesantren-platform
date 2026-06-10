@@ -26,7 +26,7 @@ class PenilaianTahfidzResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('tahfidz');
+        return \App\Support\UiMode::advanced() && static::moduleVisible('tahfidz');
     }
 
     public static function canAccess(): bool

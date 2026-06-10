@@ -38,7 +38,7 @@ class WebsiteBuilder extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::builtInWebsiteEnabled()
+        return \App\Support\UiMode::advanced() && static::builtInWebsiteEnabled()
             && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 

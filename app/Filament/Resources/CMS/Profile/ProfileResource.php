@@ -39,7 +39,7 @@ class ProfileResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('cms') && (static::canAccess());
+        return \App\Support\UiMode::advanced() && static::moduleVisible('cms') && (static::canAccess());
     }
 
     public static function canAccess(): bool

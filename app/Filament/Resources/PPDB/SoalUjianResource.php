@@ -34,7 +34,7 @@ class SoalUjianResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
-    protected static ?string $navigationLabel = 'Bank Soal';
+    protected static ?string $navigationLabel = 'Bank Soal (Offline)';
 
     protected static ?string $modelLabel = 'Soal Ujian';
 
@@ -48,7 +48,7 @@ class SoalUjianResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('ppdb') && static::canAccess();
+        return \App\Support\UiMode::advanced() && static::moduleVisible('ppdb') && static::canAccess();
     }
 
     public static function canAccess(): bool

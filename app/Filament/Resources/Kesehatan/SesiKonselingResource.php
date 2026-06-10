@@ -21,6 +21,12 @@ use Modules\Kesehatan\Models\SesiKonseling;
 
 class SesiKonselingResource extends Resource
 {
+    /** Mode simple: menu lanjutan disembunyikan (fungsi & route tetap aktif). */
+    public static function shouldRegisterNavigation(): bool
+    {
+        return \App\Support\UiMode::advanced();
+    }
+
     use \App\Filament\Concerns\ModuleGate;
     protected static ?string $model = SesiKonseling::class;
 

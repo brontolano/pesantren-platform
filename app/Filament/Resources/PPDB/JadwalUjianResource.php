@@ -45,7 +45,7 @@ class JadwalUjianResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('ppdb') && static::canAccess();
+        return \App\Support\UiMode::advanced() && static::moduleVisible('ppdb') && static::canAccess();
     }
 
     public static function canAccess(): bool

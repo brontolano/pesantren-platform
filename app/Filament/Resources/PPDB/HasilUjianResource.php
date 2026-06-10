@@ -28,7 +28,7 @@ class HasilUjianResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
-    protected static ?string $navigationLabel = 'Hasil Ujian';
+    protected static ?string $navigationLabel = 'Hasil Ujian (Input Manual)';
 
     protected static ?string $modelLabel = 'Hasil Ujian';
 
@@ -42,7 +42,7 @@ class HasilUjianResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('ppdb') && (static::canAccess());
+        return \App\Support\UiMode::advanced() && static::moduleVisible('ppdb') && (static::canAccess());
     }
 
     public static function canAccess(): bool
