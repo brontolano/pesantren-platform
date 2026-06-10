@@ -38,15 +38,16 @@ return new class extends Migration
             $table->id();
             $table->string('jenis', 16); // ikhtisar|kultum
             $table->string('judul');
-            // restrictOnDelete (spesifikasi T-A042): sumber yang sudah jadi
-            // rujukan ikhtisar tidak boleh hilang diam-diam — sitasi dokumen
-            // harus tetap tertelusur; nonaktifkan sumber bila tak dipakai.
+            // nullOnDelete (pola ai_draf_rpp): right-to-erasure T-A030 menang —
+            // hapus tuntas sumber tidak boleh terblokir draf yang merujuknya.
+            // Draf tetap utuh: teks sitasi tersimpan di kolom jsonb `sitasi`,
+            // hanya tautan FK yang hilang.
             // nullable: draf kultum boleh tanpa sumber spesifik (seluruh
             // korpus tenant).
             $table->foreignId('source_id')
                 ->nullable()
                 ->constrained('ai_knowledge_source')
-                ->restrictOnDelete();
+                ->nullOnDelete();
             $table->string('bab', 150)->nullable(); // ikhtisar: bab/bagian kitab
             $table->string('tema', 150)->nullable(); // kultum: tema kerangka
             $table->unsignedSmallInteger('durasi_menit')->nullable(); // kultum
