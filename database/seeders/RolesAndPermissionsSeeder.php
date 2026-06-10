@@ -53,6 +53,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'lihat_audit',
             // F5 — Repositori Dokumen
             'kelola_dokumen',
+            // Modul AI (T-A010) — pengaturan Khadim Digital:
+            // kelola = admin mengisi/mengajukan Wizard; setujui = kyai/pimpinan;
+            // lihat = baca pengaturan & agregat (operator/pembina).
+            'ai.setting.kelola',
+            'ai.setting.setujui',
+            'ai.setting.lihat',
         ];
 
         foreach ($permissions as $permission) {
@@ -77,6 +83,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'manage_akademik',
                 'kelola_approval',
                 'lihat_audit',
+                'ai.setting.kelola',
+                'ai.setting.lihat',
             ],
             'santri' => [
                 'view_dashboard',
@@ -178,6 +186,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_notifikasi',
                 'view_akademik',
                 'manage_tenant_settings',
+                // Kyai/pimpinan — menyetujui kebijakan AI (T-A010).
+                'ai.setting.setujui',
+                'ai.setting.lihat',
             ],
             'wali' => [
                 'view_own_children',

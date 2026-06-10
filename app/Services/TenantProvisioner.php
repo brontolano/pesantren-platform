@@ -91,6 +91,12 @@ class TenantProvisioner
                 '--force' => true,
             ]);
 
+            // (b4) T-A010: pengaturan AI default konservatif versi 1 'aktif'
+            // (tabel TENANT — wajib di dalam $tenant->run()). Idempoten:
+            // tenant yang sudah punya versi apa pun tidak disentuh.
+            app(\Modules\AI\Services\Settings\AiSettingProvisioner::class)
+                ->provision((string) $tenant->getKey());
+
             // (c) User admin super_admin.
             $existing = User::withoutGlobalScopes()->where('email', $adminEmail)->first();
             if ($existing) {
