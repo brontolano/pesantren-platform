@@ -17,6 +17,11 @@ final readonly class AiGenerateResult
      *                               (BUKAN degradasi — metering pakai namespace 'policy-'
      *                               dan audit berstatus ditolak_policy; jangan dicampur
      *                               dengan degraded supaya keduanya bisa dibedakan).
+     * @param  list<array{judul: string, bab: string|null, halaman: int|null, label: string}>  $sitasi
+     *                               T-A031: daftar sumber DETERMINISTIK yang dipakai jawaban —
+     *                               dilampirkan RagAnswerer dari chunk retrieval terpakai (model
+     *                               TIDAK pernah diminta menulis sitasi). label = format readable
+     *                               "Judul — bab/halaman" untuk UI (T-A090) & enforcer (T-A022).
      */
     public function __construct(
         public string $text,
@@ -28,5 +33,6 @@ final readonly class AiGenerateResult
         public ?int $latencyMs = null,
         public array $raw = [],
         public bool $ditolakPolicy = false,
+        public array $sitasi = [],
     ) {}
 }

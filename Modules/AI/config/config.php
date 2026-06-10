@@ -337,6 +337,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | RAG (T-A031) — retrieval hybrid ber-tenant + sitasi deterministik
+    |--------------------------------------------------------------------------
+    | top_k: jumlah chunk final yang masuk konteks (Blueprint §7.4: 3–5 saja).
+    | rrf_k: konstanta Reciprocal Rank Fusion (60 = standar literatur).
+    */
+    'rag' => [
+        'top_k' => (int) env('AI_RAG_TOP_K', 5),
+        'rrf_k' => (int) env('AI_RAG_RRF_K', 60),
+
+        'pesan' => [
+            'tanpa_rujukan' => 'Mohon maaf, kami belum menemukan rujukan dokumen pesantren untuk pertanyaan ini, sehingga asisten tidak dapat menjawabnya. Pertanyaan Anda telah kami teruskan ke antrean Tanya Ustadz agar dijawab langsung oleh pihak pesantren.',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue khusus AI (worker-ai, koneksi redis-ai — lihat config/queue.php)
     |--------------------------------------------------------------------------
     */
