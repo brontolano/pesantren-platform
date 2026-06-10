@@ -1,0 +1,95 @@
+<?php
+
+namespace Modules\Kesantrian\Services;
+
+use App\Models\User;
+use App\Services\PortalWali\WaliAccountService;
+use Illuminate\Support\Str;
+use Modules\Kesantrian\Models\Santri;
+use RuntimeException;
+use Throwable;
+
+/**
+ * App Santri — konversi santri AKTIF (hasil daftar ulang/LULUS) menjadi akun
+ * login santri + tautan akun wali.
+ *
+ *  - provision(): buat User ber-role 'santri' (idempoten by santri.user_id;
+ *    email sintetis unik dari NIS, password acak — kredensial dikirim staf
+ *    via aksi "Kirim Kredensial"/reset, BUKAN dipulangkan ke UI).
+ *  - tautkanWali(): pakai WaliAccountService::provisionByIdentifier(no_hp_wali)
+ *    — akun wali dibuat/ditemukan + akses santri ter-attach; isi wali_user_id.
+ */
+class SantriAccountService
+{
+    public function __construct(private readonly WaliAccountService $waliAccounts)
+    {
+    }
+
+    /** Buat/ambil akun login untuk santri. Idempoten. */
+    public function provision(Santri $santri): User
+    {
+        $this->ensureTenantContext();
+
+        if ($santri->user_id) {
+            return User::withoutGlobalScopes()->findOrFail($santri->user_id);
+        }
+
+        $nis = trim((string) $santri->nis);
+        if ($nis === '') {
+            throw new RuntimeException('Santri belum punya NIS — akun tidak bisa dibuat.');
+        }
+
+        $email = Str::lower($nis).'@'.tenant('id').'.santri.localhost';
+
+        $user = User::withoutGlobalScopes()->firstOrCreate(
+            ['email' => $email, 'tenant_id' => tenant('id')],
+            [
+                'name' => (string) $santri->nama,
+                'password' => Str::password(24), // di-hash cast; reset via staf/OTP
+            ],
+        );
+
+        if (! $user->hasRole('santri')) {
+            $user->assignRole('santri');
+        }
+
+        $santri->update(['user_id' => $user->id]);
+
+        return $user;
+    }
+
+    /**
+     * Tautkan akun WALI (buat bila belum ada) berdasarkan no_hp_wali santri.
+     * Best-effort: kegagalan (mis. nomor kosong/tak valid) TIDAK melempar.
+     */
+    public function tautkanWali(Santri $santri): ?User
+    {
+        $this->ensureTenantContext();
+
+        $phone = trim((string) ($santri->no_hp_wali ?? ''));
+        if ($phone === '') {
+            return null;
+        }
+
+        try {
+            [$wali] = $this->waliAccounts->provisionByIdentifier($phone);
+
+            if ($santri->wali_user_id === null) {
+                $santri->update(['wali_user_id' => $wali->id]);
+            }
+
+            return $wali;
+        } catch (Throwable $e) {
+            report($e);
+
+            return null;
+        }
+    }
+
+    private function ensureTenantContext(): void
+    {
+        if (! tenancy()->initialized || tenancy()->tenant === null) {
+            throw new RuntimeException('Tenant context belum aktif.');
+        }
+    }
+}
