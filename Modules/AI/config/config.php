@@ -244,6 +244,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Pengaturan tenant (T-A010) — ai_tenant_setting versioned + approval kyai
+    |--------------------------------------------------------------------------
+    | sensitive_fields: perubahan field ini WAJIB persetujuan kyai/pimpinan
+    | (status pending_approval; agen memakai versi lama sampai disetujui).
+    | Field di luar daftar (jam_layanan, bahasa/gaya, anggaran, ambang alert,
+    | pesan) boleh langsung aktif. Daftar hidup di config — kebijakan di
+    | data/konfigurasi, bukan hard-code (Aturan Emas #11).
+    */
+    'settings' => [
+        'sensitive_fields' => [
+            'level_fatwa',
+            'blacklist_topik',
+            'mode_akses_santri',
+            'scope_data',
+            'fitur_per_peran',
+            'consent_ortu',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue khusus AI (worker-ai, koneksi redis-ai — lihat config/queue.php)
     |--------------------------------------------------------------------------
     */
