@@ -49,6 +49,7 @@ use App\Filament\Resources\Mutu\MutuInspeksiResource;
 use App\Filament\Resources\Mutu\MutuSasaranResource;
 use App\Filament\Resources\Mutu\MutuSkmResource;
 use App\Filament\Resources\Mutu\MutuTemuanResource;
+use App\Filament\Resources\Crm\CrmPenawaranResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
 use App\Filament\Resources\Media\MediaFileResource;
 use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
@@ -204,6 +205,7 @@ class TenantPanelProvider extends PanelProvider
             MetodePembayaranResource::class,
             TabunganTopupResource::class,
             LaporanKeuanganResource::class,
+            CrmPenawaranResource::class,
             // POS / Koperasi
             PosKategoriResource::class,
             InventoryItemResource::class,
