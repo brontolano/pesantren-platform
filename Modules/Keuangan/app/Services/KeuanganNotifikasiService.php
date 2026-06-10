@@ -91,6 +91,24 @@ class KeuanganNotifikasiService
         });
     }
 
+    /** Wali: setoran via petugas keliling disetujui (pakai template TOPUP_DIVERIFIKASI). */
+    public function setorKelilingDisetujui(\Modules\Keuangan\Models\SetorKelilingItem $item): void
+    {
+        $this->safe(function () use ($item): void {
+            $santri = $item->santri;
+            $saldo = app(TabunganService::class)->getSaldo($item->santri_id);
+            $this->dispatcher->kirim('topup_diverifikasi', [
+                'wa' => $this->waliPhones($santri),
+                'data' => [
+                    'nama_santri' => $santri?->nama ?? '-',
+                    'nominal' => number_format((float) $item->nominal, 0, ',', '.'),
+                    'saldo' => number_format($saldo, 0, ',', '.'),
+                    'nama_pesantren' => $this->namaPesantren(),
+                ],
+            ]);
+        });
+    }
+
     /** Admin/bendahara: ada bukti bayar/topup baru masuk antrean verifikasi. */
     public function buktiMasuk(string $jenis, string $namaSantri, float $nominal): void
     {
