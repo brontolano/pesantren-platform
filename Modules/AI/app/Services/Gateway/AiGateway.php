@@ -14,8 +14,12 @@ use Throwable;
  *  - timeout (config), retry idempoten 1x HANYA untuk kegagalan KONEKSI
  *    (bukan timeout — hindari beban inferensi dobel di CPU 2 core);
  *  - circuit breaker per provider (Cache): sirkuit terbuka → langsung fallback;
- *  - fallback berantai ke provider berikutnya, lalu NullProvider — pemanggil
- *    TIDAK pernah menerima exception dari generate(), hanya degraded=true.
+ *  - fallback berantai ke provider berikutnya, lalu NullProvider — kegagalan
+ *    PROVIDER tidak pernah menjadi exception bagi pemanggil, hanya degraded=true.
+ *
+ * Catatan kontrak: kesalahan PEMAKAIAN tetap melempar (fail-fast programmer
+ * error) — tier tak dikenal (InvalidArgumentException dari ModelRouter) dan
+ * config router/providers korup (RuntimeException/AiProviderException).
  */
 class AiGateway
 {
@@ -123,8 +127,15 @@ class AiGateway
             return null;
         }
 
-        $provider = $this->makeProvider($name);
         $sel = $this->selectionFor($name, $selection);
+
+        if ($sel === null) {
+            Log::warning("AiGateway: provider fallback '{$name}' dilewati — tidak ada model default miliknya untuk tier '{$selection->tier}'.");
+
+            return null;
+        }
+
+        $provider = $this->makeProvider($name);
 
         try {
             $result = $this->callWithConnectionRetry(fn () => $call($provider, $sel), $name);
@@ -132,6 +143,18 @@ class AiGateway
 
             return $result;
         } catch (Throwable $e) {
+            if ($this->isClientError($e)) {
+                // HTTP 4xx = kesalahan konfigurasi/permintaan (mis. model belum
+                // di-pull), BUKAN provider sakit — jangan racuni circuit breaker,
+                // cukup log keras lalu lanjut fallback.
+                Log::error("AiGateway: provider '{$name}' menolak permintaan (4xx) — periksa konfigurasi model.", [
+                    'exception' => $e::class,
+                    'message' => $e->getMessage(),
+                ]);
+
+                return null;
+            }
+
             $this->breaker->recordFailure($breakerKey);
             Log::warning("AiGateway: provider '{$name}' gagal — fallback ke berikutnya.", [
                 'exception' => $e::class,
@@ -140,6 +163,14 @@ class AiGateway
 
             return null;
         }
+    }
+
+    private function isClientError(Throwable $e): bool
+    {
+        return $e instanceof AiProviderException
+            && $e->statusCode !== null
+            && $e->statusCode >= 400
+            && $e->statusCode < 500;
     }
 
     /**
@@ -173,10 +204,16 @@ class AiGateway
             return false;
         }
 
-        // Kegagalan koneksi murni: refused, DNS, reset, SSL handshake.
+        // HANYA kegagalan PRA-KIRIM yang aman di-retry: refused, DNS, SSL
+        // handshake (cURL 6/7/35) — request belum sampai ke server, inferensi
+        // pasti belum dimulai. Connection reset / empty reply / recv failure
+        // (cURL 52/56) terjadi SETELAH request terkirim: inferensi mungkin
+        // masih berjalan di server, retry = beban inferensi dobel → JANGAN.
+        // Klasifikasi berbasis pesan memang rapuh terhadap variasi cURL/locale;
+        // default saat tak dikenali = TIDAK retry (fail-safe).
         return (bool) preg_match(
             '/connection refused|failed to connect|could not resolve|couldn\'?t connect|'
-            .'couldn\'?t resolve|connection reset|empty reply|cURL error (6|7|35|56)\b/i',
+            .'couldn\'?t resolve|cURL error (6|7|35)\b/i',
             $message,
         );
     }
@@ -202,22 +239,35 @@ class AiGateway
     }
 
     /**
-     * Model yang dipakai saat fallback ke provider lain: bila default config
-     * tier terkait memang milik provider itu, pakai; selain itu pertahankan
-     * model pilihan router dengan provider diganti.
+     * Model yang dipakai saat fallback ke provider LAIN: ambil model default
+     * config tier terkait MILIK provider fallback itu. Model provider A tidak
+     * boleh dikirim ke provider B (mis. baris config 'openai/gpt-4o' jatuh ke
+     * Ollama → 404 model not found → breaker Ollama teracuni padahal sehat).
+     * Tidak ada model milik provider fallback → null = provider dilewati.
      */
-    private function selectionFor(string $providerName, ModelSelection $selection): ModelSelection
+    private function selectionFor(string $providerName, ModelSelection $selection): ?ModelSelection
     {
         if ($providerName === $selection->provider) {
             return $selection;
         }
 
+        $default = config("ai.router.defaults.{$selection->tier}");
+
+        if (
+            ! is_array($default)
+            || ($default['provider'] ?? null) !== $providerName
+            || ! isset($default['model'])
+        ) {
+            return null;
+        }
+
         return new ModelSelection(
             provider: $providerName,
-            model: $selection->model,
-            maxContextTokens: $selection->maxContextTokens,
-            options: $selection->options,
-            source: $selection->source,
+            model: (string) $default['model'],
+            maxContextTokens: (int) ($default['max_context_tokens'] ?? 4096),
+            options: (array) ($default['options'] ?? []),
+            source: 'fallback-default',
+            tier: $selection->tier,
         );
     }
 

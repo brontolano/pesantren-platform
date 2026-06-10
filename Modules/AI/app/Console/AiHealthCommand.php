@@ -105,10 +105,19 @@ class AiHealthCommand extends Command
     private function queueDepthRow(): array
     {
         $queue = (string) config('ai.queue.name', 'ai');
-        $connection = (string) config(
-            'queue.connections.'.config('ai.queue.connection', 'redis-ai').'.connection',
-            'default',
-        );
+        $queueConnection = (string) config('ai.queue.connection', 'redis-ai');
+
+        if (! is_array(config("queue.connections.{$queueConnection}"))) {
+            // Jangan diam-diam jatuh ke koneksi Redis default — itu melaporkan
+            // kedalaman antrian dari Redis DB yang salah sebagai "OK".
+            return [
+                "Antrian '{$queue}'",
+                'TAK TERKONFIGURASI',
+                "Koneksi queue '{$queueConnection}' tidak ada di config/queue.php",
+            ];
+        }
+
+        $connection = (string) config("queue.connections.{$queueConnection}.connection", 'default');
 
         try {
             $redis = Redis::connection($connection);

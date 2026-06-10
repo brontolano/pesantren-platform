@@ -3,10 +3,14 @@
 namespace Modules\AI\Services\Gateway;
 
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Support\Facades\Cache;
 
 /**
- * Circuit breaker sederhana berbasis Cache, per kunci (per provider).
+ * Circuit breaker sederhana berbasis cache, per kunci (per provider).
+ *
+ * State disimpan via CentralCache (BUKAN facade Cache) agar GLOBAL lintas
+ * tenant: provider AI satu untuk semua pesantren, jadi penghitung kegagalan
+ * dan status sirkuit harus sama dilihat dari konteks tenant maupun central
+ * (ai:health). Lihat penjelasan lengkap di CentralCache.
  *
  * Status:
  *  - closed    : normal, permintaan diizinkan.
@@ -79,6 +83,13 @@ class CircuitBreaker
         $cache->add($failureKey, 0, $this->windowSeconds);
         $failures = (int) $cache->increment($failureKey);
 
+        if ($failures === 1) {
+            // Tutup celah race: bila kunci kadaluarsa tepat di antara add() dan
+            // increment(), increment membuat ulang kunci TANPA TTL (kunci abadi).
+            // Hasil 1 = kunci baru → tegaskan ulang TTL jendela.
+            $cache->put($failureKey, 1, $this->windowSeconds);
+        }
+
         if ($failures >= $this->failureThreshold) {
             // Buka sirkuit selama cooldown; setelah kadaluarsa otomatis half-open.
             $cache->put($this->openKey($key), true, $this->cooldownSeconds);
@@ -102,6 +113,8 @@ class CircuitBreaker
 
     private function cache(): Repository
     {
-        return Cache::store($this->store);
+        // CentralCache (bukan facade Cache): kebal tag per-tenant dari
+        // CacheTenancyBootstrapper — state breaker global lintas tenant.
+        return CentralCache::repository($this->store);
     }
 }

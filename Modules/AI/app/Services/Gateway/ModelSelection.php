@@ -18,5 +18,8 @@ final readonly class ModelSelection
         public int $maxContextTokens = 4096,
         public array $options = [],
         public string $source = 'default',
+        /** Tier asal keputusan — dipakai gateway untuk memilih model default
+         *  milik provider fallback saat fallback lintas-provider. */
+        public string $tier = '',
     ) {}
 }

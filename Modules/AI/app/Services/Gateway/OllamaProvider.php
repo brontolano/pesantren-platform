@@ -42,8 +42,18 @@ class OllamaProvider implements LlmProvider
 
         $json = (array) $response->json();
 
+        if (! array_key_exists('response', $json) || ! is_string($json['response'])) {
+            // HTTP 200 tanpa field 'response' (model masih loading / body tak
+            // terduga) = kegagalan provider, bukan "sukses kosong" — biarkan
+            // breaker mencatat gagal dan rantai fallback bekerja.
+            throw new AiProviderException(
+                'Respons generate Ollama tidak memuat field response.',
+                provider: $this->name(),
+            );
+        }
+
         return new AiGenerateResult(
-            text: (string) ($json['response'] ?? ''),
+            text: $json['response'],
             provider: $this->name(),
             model: $selection->model,
             degraded: false,

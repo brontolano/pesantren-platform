@@ -11,8 +11,9 @@ use Tests\TestCase;
  * Lint Aturan Emas #4 (blueprint modul AI §3.1): DILARANG memanggil/menyebut
  * Ollama di luar kelas provider gateway. Satu-satunya pintu LLM = AiGateway.
  *
- * Scan seluruh source (Modules + app): string '11434' atau 'ollama' hanya
- * boleh muncul di Modules/AI/Services/Gateway/* dan direktori config modul.
+ * Scan source (Modules, app, routes, database, config, resources): string
+ * '11434' atau 'ollama' hanya boleh muncul di Modules/AI/Services/Gateway/*,
+ * direktori config modul AI, dan komentar config/queue.php (whitelist).
  */
 class AiArchitectureLintTest extends TestCase
 {
@@ -22,6 +23,8 @@ class AiArchitectureLintTest extends TestCase
     private const ALLOWED_FRAGMENTS = [
         'Modules/AI/app/Services/Gateway/',
         'Modules/AI/config/',
+        // Komentar penjelas koneksi redis-ai (bukan panggilan HTTP LLM).
+        'config/queue.php',
     ];
 
     private const SCANNED_EXTENSIONS = ['php', 'json', 'js', 'ts', 'vue', 'yml', 'yaml', 'blade.php'];
@@ -30,7 +33,16 @@ class AiArchitectureLintTest extends TestCase
     {
         $pelanggaran = [];
 
-        foreach ([base_path('Modules'), base_path('app')] as $root) {
+        $roots = array_filter([
+            base_path('Modules'),
+            base_path('app'),
+            base_path('routes'),
+            base_path('database'),
+            base_path('config'),
+            base_path('resources/js'),
+        ], 'is_dir');
+
+        foreach ($roots as $root) {
             $iterator = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS),
             );

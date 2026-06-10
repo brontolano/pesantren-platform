@@ -3,7 +3,6 @@
 namespace Modules\AI\Services\Gateway;
 
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Cache;
 use InvalidArgumentException;
 use Modules\AI\Models\AiModelConfig;
 use RuntimeException;
@@ -33,7 +32,9 @@ class ModelRouter
             ));
         }
 
-        return Cache::remember(
+        // CentralCache (bukan facade Cache): keputusan router bersumber tabel
+        // CENTRAL — jangan ter-fragmentasi per tenant oleh CacheTenancyBootstrapper.
+        return CentralCache::repository()->remember(
             self::CACHE_PREFIX.$agent.':'.$tier,
             (int) config('ai.router.cache_seconds', 60),
             fn (): ModelSelection => $this->lookup($agent, $tier),
@@ -49,7 +50,7 @@ class ModelRouter
     /** Hapus cache keputusan satu kombinasi (dipakai test/panel operator). */
     public function forget(string $agent, string $tier): void
     {
-        Cache::forget(self::CACHE_PREFIX.$agent.':'.$tier);
+        CentralCache::repository()->forget(self::CACHE_PREFIX.$agent.':'.$tier);
     }
 
     private function lookup(string $agent, string $tier): ModelSelection
@@ -76,6 +77,7 @@ class ModelRouter
                 maxContextTokens: (int) $row->max_context_tokens,
                 options: (array) ($row->options ?? []),
                 source: 'db',
+                tier: $tier,
             );
         }
 
@@ -94,6 +96,7 @@ class ModelRouter
             maxContextTokens: (int) ($default['max_context_tokens'] ?? 4096),
             options: (array) ($default['options'] ?? []),
             source: 'default',
+            tier: $tier,
         );
     }
 }
