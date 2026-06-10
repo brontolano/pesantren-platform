@@ -121,6 +121,16 @@ Route::middleware([
             ->name('pengumuman');
         Route::get('/kartu-ujian', [PesertaPortalController::class, 'kartuUjian'])
             ->name('kartu-ujian');
+        Route::get('/ujian', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'index'])
+            ->name('ujian.index');
+        Route::post('/ujian/{paket}/mulai', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'mulai'])
+            ->name('ujian.mulai');
+        Route::get('/ujian/{paket}', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'kerjakan'])
+            ->name('ujian.kerjakan');
+        Route::post('/ujian/{paket}/jawab', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'jawab'])
+            ->name('ujian.jawab');
+        Route::post('/ujian/{paket}/selesai', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'selesai'])
+            ->name('ujian.selesai');
         Route::get('/daftar-ulang', [PesertaPortalController::class, 'daftarUlang'])
             ->name('daftar-ulang');
         Route::post('/daftar-ulang', [PesertaPortalController::class, 'prosesDaftarUlang'])

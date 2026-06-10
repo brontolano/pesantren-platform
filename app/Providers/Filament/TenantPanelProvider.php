@@ -34,6 +34,7 @@ use App\Filament\Resources\Inventory\InventoryLokasiResource;
 use App\Filament\Resources\Ledger\AkunResource;
 use App\Filament\Resources\Surat\SuratResource;
 use App\Filament\Resources\PPDB\PaketSoal\PaketSoalResource;
+use App\Filament\Resources\PPDB\UjianAttempt\UjianAttemptResource;
 use App\Filament\Resources\Ledger\AlokasiBiaya\AlokasiBiayaResource;
 use App\Filament\Resources\Ledger\KursValuta\KursValutaResource;
 use App\Filament\Resources\Ledger\AnggaranResource;
@@ -222,6 +223,7 @@ class TenantPanelProvider extends PanelProvider
             AkunResource::class,
             SuratResource::class,
             PaketSoalResource::class,
+            UjianAttemptResource::class,
             AlokasiBiayaResource::class,
             KursValutaResource::class,
             AnggaranResource::class,
