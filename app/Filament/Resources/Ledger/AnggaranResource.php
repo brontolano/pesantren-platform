@@ -46,7 +46,7 @@ class AnggaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
+        return \App\Support\UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
     }
 
     public static function canAccess(): bool

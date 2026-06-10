@@ -64,6 +64,17 @@ Route::middleware([
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
 
+    // Switch mode tampilan panel (simple <-> advanced) — preferensi per user.
+    Route::post('/ui-mode/toggle', function () {
+        $user = auth()->user();
+        abort_unless($user !== null, 403);
+        $user->forceFill([
+            'ui_mode' => \App\Support\UiMode::simple() ? 'advanced' : 'simple',
+        ])->save();
+
+        return back();
+    })->middleware('auth')->name('tenant.ui-mode.toggle');
+
     // App Santri (/app) — login NIS + dashboard ringkas (tahap 1; lanjut: WebAuthn).
     Route::prefix('app')->name('tenant.app-santri.')->group(function () {
         Route::get('/login', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'showLogin'])->name('login');

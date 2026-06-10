@@ -40,7 +40,7 @@ class BukuPembantuPihak extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return \App\Support\UiMode::advanced() && static::canAccess();
     }
 
     protected function getViewData(): array
