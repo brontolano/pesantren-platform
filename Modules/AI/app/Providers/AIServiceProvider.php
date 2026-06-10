@@ -66,20 +66,26 @@ class AIServiceProvider extends ServiceProvider
         // setting tenant diresolusi FRESH di dalam call().
         $this->app->singleton(\Modules\AI\Services\Tools\ToolRegistry::class);
 
-        $this->registerHalamanPanelTenant();
+        // T-A013 — telemetri riset opt-in. SCOPED (bukan singleton): memo
+        // status opt-in benar-benar per request/job — tidak nyangkut basi
+        // antar job di queue worker berumur panjang.
+        $this->app->scoped(\Modules\AI\Services\Research\ResearchTelemetry::class);
+
+        $this->registerHalamanPanel();
     }
 
     /**
-     * T-A011 — daftarkan halaman Filament modul ke panel TENANT tanpa
-     * menyentuh TenantPanelProvider (Aturan Emas: file hanya Modules/AI).
+     * T-A011 — daftarkan halaman Filament modul ke panel TENANT (dan sejak
+     * T-A013 juga ke panel PLATFORM 'admin') tanpa menyentuh PanelProvider
+     * aplikasi (Aturan Emas: file hanya Modules/AI).
      *
      * Panel Filament v5 dibangun malas (lazy) saat PanelRegistry di-resolve
      * lewat callback `resolving` (lihat Filament\Facades\Filament::registerPanel).
      * Kita menumpang `afterResolving` — DIJAMIN berjalan setelah seluruh
-     * callback `resolving` selesai, sehingga panel 'tenant' pasti sudah ada,
+     * callback `resolving` selesai, sehingga panel pasti sudah ada,
      * apa pun urutan registrasi provider modul vs provider panel aplikasi.
      */
-    protected function registerHalamanPanelTenant(): void
+    protected function registerHalamanPanel(): void
     {
         $daftarkan = function (\Filament\PanelRegistry $registry): void {
             $registry->get('tenant')?->pages([
@@ -87,6 +93,12 @@ class AIServiceProvider extends ServiceProvider
                 \Modules\AI\Filament\Pages\PersetujuanAi::class,
                 \Modules\AI\Filament\Pages\SumberPengetahuan::class,
                 \Modules\AI\Filament\Pages\EskalasiTanyaUstadz::class,
+            ]);
+
+            // T-A013 — dashboard internal "Suara Pasar" di panel PLATFORM
+            // (central, super_admin only — BUKAN panel tenant).
+            $registry->get('admin')?->pages([
+                \Modules\AI\Filament\Pages\SuaraPasar::class,
             ]);
         };
 

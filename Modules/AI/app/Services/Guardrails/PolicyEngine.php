@@ -499,6 +499,9 @@ class PolicyEngine
      *
      * [M2] Idempoten per idempotency_key request (firstOrCreate): retry sah
      * atas request terblokir yang sama tidak menggandakan antrean ustadz.
+     *
+     * T-A013: baris eskalasi BARU menambah event riset KATEGORI saja (tanpa
+     * isi pertanyaan) — no-op senyap bila tenant tidak opt-in riset.
      */
     private function tulisEskalasi(AiGenerateRequest $request, string $kategori): void
     {
@@ -514,13 +517,18 @@ class PolicyEngine
                 'status' => AiEscalation::STATUS_BARU,
             ];
 
-            if ($request->idempotencyKey !== null) {
-                AiEscalation::query()->firstOrCreate(
+            $eskalasi = $request->idempotencyKey !== null
+                ? AiEscalation::query()->firstOrCreate(
                     ['idempotency_key' => $request->idempotencyKey],
                     $atribut,
-                );
-            } else {
-                AiEscalation::query()->create($atribut);
+                )
+                : AiEscalation::query()->create($atribut);
+
+            // T-A013: hanya baris BARU (retry idempoten tidak menggandakan
+            // statistik); ResearchTelemetry sendiri best-effort + opt-in.
+            if ($eskalasi->wasRecentlyCreated && tenancy()->initialized) {
+                app(\Modules\AI\Services\Research\ResearchTelemetry::class)
+                    ->rekamEskalasiKategori((string) tenant()->getKey(), $kategori);
             }
         } catch (Throwable $e) {
             Log::error('PolicyEngine: GAGAL menulis ai_escalation (Tanya Ustadz).', [
