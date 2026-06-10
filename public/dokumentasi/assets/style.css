@@ -48,6 +48,14 @@ a:hover { text-decoration: underline; }
   display: none; font-size: 1.35rem; background: none; border: 1px solid var(--line);
   border-radius: 8px; padding: 2px 10px; cursor: pointer; color: var(--ink);
 }
+.site-link {
+  white-space: nowrap; font-size: .88rem; font-weight: 600; color: var(--ink-soft);
+  padding: 7px 14px; border: 1.5px solid var(--line); border-radius: 10px;
+}
+.site-link:hover {
+  border-color: var(--accent); color: var(--accent);
+  background: var(--accent-soft); text-decoration: none;
+}
 
 /* ---------- Pencarian ---------- */
 .search { position: relative; margin-left: auto; width: min(440px, 46vw); }
@@ -77,6 +85,14 @@ a:hover { text-decoration: underline; }
   position: sticky; top: var(--topbar-h); align-self: start;
   height: calc(100vh - var(--topbar-h)); overflow-y: auto;
   padding: 26px 14px 40px 2px; border-right: 1px solid var(--line);
+}
+.nav-back {
+  display: block; margin: 0 0 16px; padding: 8px 10px; border-radius: 8px;
+  font-size: .86rem; font-weight: 600; color: var(--ink-soft); border: 1.5px dashed var(--line);
+}
+.nav-back:hover {
+  color: var(--accent); border-color: var(--accent-line);
+  background: var(--accent-soft); text-decoration: none;
 }
 .nav-group { margin-bottom: 20px; }
 .nav-group-title {
@@ -214,6 +230,11 @@ article img { max-width: 100%; border-radius: var(--radius); border: 1px solid v
 .card:hover .card-arrow { color: var(--accent); }
 .home-foot { text-align: center; margin-top: 60px; color: var(--ink-soft); }
 .home-foot .muted { color: var(--muted); font-size: .85rem; }
+.foot-back {
+  display: inline-block; font-weight: 600; padding: 9px 20px; border-radius: 999px;
+  border: 1.5px solid var(--line); color: var(--ink-soft);
+}
+.foot-back:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); text-decoration: none; }
 
 /* ---------- HP & tablet ---------- */
 @media (max-width: 1100px) { .toc { display: none; } .layout { grid-template-columns: 260px minmax(0, 1fr); } }
@@ -229,6 +250,7 @@ article img { max-width: 100%; border-radius: var(--radius); border: 1px solid v
   .search { width: min(300px, 52vw); }
   .brand-tag { display: none; } /* sembunyikan label "Panduan" di layar sempit */
   .brand { font-size: 1rem; }
+  .site-link { display: none; } /* di HP: tautan kembali ada di menu ☰ (sidebar) & footer beranda */
   .page-head { flex-direction: column; gap: 10px; }
   .hero h1 { font-size: 1.7rem; }
   .pager { flex-direction: column; } .pager-link { max-width: 100%; text-align: left !important; }
