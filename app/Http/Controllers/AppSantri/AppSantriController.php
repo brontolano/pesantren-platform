@@ -24,7 +24,9 @@ class AppSantriController extends Controller
             return Inertia::render('AppSantri/Home', $this->homeProps())->toResponse(request());
         }
 
-        return Inertia::render('AppSantri/Login');
+        return Inertia::render('AppSantri/Login', [
+            'metodeLogin' => \App\Support\SantriLoginMethod::forLogin(),
+        ]);
     }
 
     public function login(Request $request): RedirectResponse
