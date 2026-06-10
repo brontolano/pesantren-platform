@@ -12,6 +12,9 @@ use Modules\AI\Models\AiKnowledgeSource;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
 use Modules\AI\Services\Gateway\AiGenerateResult;
+use Modules\AI\Services\Guardrails\CitationEnforcer;
+use Modules\AI\Services\Guardrails\DisclaimerInjector;
+use Modules\AI\Services\Guardrails\EnforcementVerdict;
 use Modules\AI\Services\Privacy\PiiRedactor;
 
 /**
@@ -41,10 +44,14 @@ class RagAnswerer
         private readonly Retriever $retriever,
         private readonly AiGateway $gateway,
         private readonly PiiRedactor $redactor,
+        private readonly CitationEnforcer $enforcer,
+        private readonly DisclaimerInjector $injector,
     ) {}
 
     /**
-     * @param  array{kategori?: string|null, topK?: int, minSkor?: float|null}  $opsi
+     * @param  array{kategori?: string|null, topK?: int, minSkor?: float|null, kategori_jawaban?: string|null}  $opsi
+     *         kategori_jawaban (T-A022): agama|keuangan|akademik|umum —
+     *         default dari config ai.guardrails.kategori_map[agent] → 'umum'.
      */
     public function jawab(AiGenerateRequest $request, array $opsi = []): AiGenerateResult
     {
@@ -54,6 +61,9 @@ class RagAnswerer
             return $this->jawabTanpaRujukan($request);
         }
 
+        $kategori = (string) ($opsi['kategori_jawaban']
+            ?? config("ai.guardrails.kategori_map.{$request->agent}", 'umum'));
+
         // Kunci idempotensi pasti — penaut deterministik sitasi → baris audit
         // gateway (AuditRecorder tidak mengembalikan id ke pemanggil gateway).
         $key = $request->idempotencyKey ?? 'rag-'.Str::ulid();
@@ -61,20 +71,46 @@ class RagAnswerer
             ? $request->withIdempotencyKey($key)
             : $request;
 
-        $hasil = $this->gateway->generate(
-            $request->withContext($this->susunKonteks($retrieval)),
-        );
+        $requestKonteks = $request->withContext($this->susunKonteks($retrieval));
+
+        $hasil = $this->gateway->generate($requestKonteks);
 
         // Jawaban degradasi/tolakan kebijakan TIDAK memakai chunk apa pun —
-        // melampirkan sitasi di situ menyesatkan pembaca & enforcer T-A022.
+        // melampirkan sitasi/disclaimer di situ menyesatkan pembaca.
         if ($hasil->degraded || $hasil->ditolakPolicy) {
             return $hasil;
         }
 
-        $sitasi = $this->lampirkanSitasi($retrieval, $key);
+        $keyTerpakai = $key;
+
+        // T-A022: verifikasi jawaban tidak keluar konteks (heuristik
+        // deterministik, TANPA LLM). Gagal → regenerasi 1× dengan suffix
+        // '-regen' (kunci baru supaya metering/audit TIDAK ter-dedup keliru)
+        // → masih gagal → penolakan santun + eskalasi; jawaban gagal-verifikasi
+        // TIDAK PERNAH dikirim ke pemanggil.
+        $verdict = $this->enforcer->verifikasi($hasil, $retrieval, $kategori);
+
+        if (! $verdict->lolos) {
+            $keyTerpakai = $key.'-regen';
+            $hasil = $this->gateway->generate(
+                $requestKonteks->withIdempotencyKey($keyTerpakai),
+            );
+
+            if ($hasil->degraded || $hasil->ditolakPolicy) {
+                return $hasil;
+            }
+
+            $verdict = $this->enforcer->verifikasi($hasil, $retrieval, $kategori);
+
+            if (! $verdict->lolos) {
+                return $this->jawabSitasiGagal($request, $verdict);
+            }
+        }
+
+        $sitasi = $this->lampirkanSitasi($retrieval, $keyTerpakai);
 
         return new AiGenerateResult(
-            text: $hasil->text,
+            text: $this->injector->inject($hasil->text, $kategori, $sitasi),
             provider: $hasil->provider,
             model: $hasil->model,
             degraded: $hasil->degraded,
@@ -84,6 +120,30 @@ class RagAnswerer
             raw: $hasil->raw,
             ditolakPolicy: $hasil->ditolakPolicy,
             sitasi: $sitasi,
+            verdictSitasi: $verdict,
+        );
+    }
+
+    /**
+     * T-A022: jawaban (asli + regenerasi) gagal verifikasi sitasi —
+     * penolakan santun + tawaran Tanya Ustadz + eskalasi idempoten
+     * (pola sama dengan tanpa-rujukan, kategori 'sitasi_gagal').
+     */
+    private function jawabSitasiGagal(AiGenerateRequest $request, EnforcementVerdict $verdict): AiGenerateResult
+    {
+        $this->tulisEskalasi($request, 'sitasi_gagal');
+
+        return new AiGenerateResult(
+            text: (string) config(
+                'ai.guardrails.pesan.sitasi_gagal',
+                'Mohon maaf, asisten tidak dapat menjawab pertanyaan ini dengan rujukan yang memadai. '
+                .'Pertanyaan Anda telah kami teruskan ke antrean Tanya Ustadz agar dijawab langsung '
+                .'oleh pihak pesantren.',
+            ),
+            provider: 'null',
+            model: 'null',
+            degraded: false, // bukan degradasi provider — keputusan enforcer T-A022
+            verdictSitasi: $verdict,
         );
     }
 
@@ -113,7 +173,7 @@ class RagAnswerer
      * per idempotency_key; pertanyaan disimpan RINGKAS + TERREDAKSI PAKSA.
      * Best-effort — kegagalan tulis tidak menggagalkan respons.
      */
-    private function tulisEskalasi(AiGenerateRequest $request): void
+    private function tulisEskalasi(AiGenerateRequest $request, string $kategori = 'tanpa_rujukan'): void
     {
         try {
             $maks = (int) config('ai.guardrails.eskalasi_ringkas_max', 300);
@@ -123,7 +183,7 @@ class RagAnswerer
                 'conversation_ref' => $request->idempotencyKey,
                 'kanal' => $request->channel,
                 'pertanyaan_ringkas' => mb_substr($terredaksi, 0, $maks),
-                'kategori' => 'tanpa_rujukan',
+                'kategori' => $kategori,
                 'status' => AiEscalation::STATUS_BARU,
             ];
 
@@ -136,7 +196,8 @@ class RagAnswerer
                 AiEscalation::query()->create($atribut);
             }
         } catch (\Throwable $e) {
-            Log::error('RagAnswerer: gagal menulis eskalasi tanpa-rujukan — respons tetap dilanjutkan.', [
+            Log::error('RagAnswerer: gagal menulis eskalasi — respons tetap dilanjutkan.', [
+                'kategori' => $kategori,
                 'exception' => $e::class,
                 'message' => $e->getMessage(),
             ]);
