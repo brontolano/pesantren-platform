@@ -24,6 +24,8 @@ class DevRoadmapSeeder extends Seeder
         $this->seedPolishUiSesi();
         $this->seedModulKeuangan();
         $this->seedStabilisasiHardening();
+        $this->seedAdaptasiErpnext();
+        $this->seedMigrasiAsySyifaa();
 
         $this->normalizeProjectStatus();
     }
@@ -719,6 +721,116 @@ class DevRoadmapSeeder extends Seeder
                 'Kustomisasi AlbaKids (resources/views/albakids/landing.blade.php + public/albakids/g1-6.jpg) hidup di VPS lewat baked image tapi BELUM ada di origin/main → risiko hilang bila VPS di-rebuild (git reset --hard origin/main). Diverifikasi checksum lokal IDENTIK dengan live, lalu di-commit ke main agar deploy berikutnya membawanya. Branch snapshot redundan (vps-snapshot, fix/albakids-landing-assets) dibersihkan.',
                 'SELESAI & live. AlbaKids kini aman di git; rebuild tak lagi menghilangkan kustomisasi.',
                 'done', 'high', 100, 'S', 10],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Program "Adaptasi ERPNext" — eksekusi BLUEPRINT-ADAPTASI-ERPNEXT-MENYELURUH §6
+     * (build loop otonom 2026-06-09..10). Idempotent: updateOrCreate by slug + title.
+     */
+    private function seedAdaptasiErpnext(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'adaptasi-erpnext'],
+            [
+                'name' => 'Adaptasi ERPNext — Fondasi & 3 Gelombang',
+                'description' => 'Eksekusi penuh BLUEPRINT-ADAPTASI-ERPNEXT-MENYELURUH §6: 8 fondasi lintas-modul + 23 work-package dalam 3 gelombang = 31 langkah menampung 164 adaptasi konsep ERPNext ke platform pesantren. Metode: build loop otonom 1 WP per siklus, tiap WP = PR kecil + test foreground + adversarial-verify (wajib untuk WP uang) + deploy + QC produksi. Semua posting uang lewat JurnalService (balance, period-lock, kehalalan, idempoten); math teruji tak pernah diubah. SELURUH §6 TUNTAS 31/31 — LIVE per 2026-06-10.',
+                'status' => 'done',
+                'color' => 'success',
+                'icon' => 'heroicon-o-cube-transparent',
+                'sort' => 10,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            ['Fondasi', 'F1–F8: 8 fondasi lintas-modul',
+                'F1 Approval Workflow Engine (Approvable + ApprovalRule + ajukanPersetujuan), F2 Audit Trail (Auditable tahan-banting), F3 Lapisan Kehalalan + laporan + sertifikat, F4 Party Ledger (buku pembantu per pihak), F5 Document Repository (HasDocuments + versioning), F6 Reconciliation Engine (bank rekon + auto-match idempoten), F7 Notification Hooks (NotifDispatcher), F8 Report & Export Service (html/csv/pdf). Semua di Modules/Core + Modules/Ledger, additif & tenant-safe.',
+                'SELESAI & LIVE 8/8 (2026-06-09).',
+                'done', 'high', 100, 'XL', 1],
+            ['Gelombang 1', 'Tata kelola & diferensiator syariah (8 WP)',
+                'G1-01 Approval rollout ke model uang/payroll, G1-02 Audit rollout 8 model inti, G1-03 Laporan+Sertifikat Kehalalan (ekspor F8), G1-04 Tax policy halal/syubhat (Modules/Pajak), G1-05 Tax config UI + kalkulator PPh21 (gate review penasihat pajak), G1-06 Period closing + jurnal penutup, G1-07 Bank rekon (=F6), G1-08 Budget vs actual variance dashboard.',
+                'SELESAI & LIVE 8/8 (2026-06-09).',
+                'done', 'high', 100, 'XL', 2],
+            ['Gelombang 2', 'Compliance operasional & procurement (8 WP)',
+                'G2-09 Procurement chain (Supplier→PO→GRN→Belanja), G2-10 Employee master + salary structure, G2-11 Attendance + khidmah + leave, G2-12 BPJS + PPh21 tiered + SPT, G2-13 Fixed asset + depresiasi + disposal (lockForUpdate anti pelepasan ganda), G2-14 Inventory multi-lokasi + batch/FEFO + opname, G2-15 Fund-aware billing, G2-16 Pricing rule (SkemaBiaya). Adversarial-verify menangkap blocker COA-seeding & batch-expiry sebelum rilis.',
+                'SELESAI & LIVE 8/8 (2026-06-10, PR #39-41).',
+                'done', 'high', 100, 'XL', 3],
+            ['Gelombang 3', 'Mutu, pendidikan lanjut & engagement (7 WP)',
+                'G3-17 SPMI/Mutu KPI, G3-18 Daily attendance santri + rubric + Tahfidz KPI, G3-19 Kegiatan template + milestone + Gantt + recurring idempoten, G3-20 CRM ringan (funnel + churn + campaign), G3-21 POS enrichment (profil loket, diskon netto, loyalty, tutup sesi tunai), G3-22 Program formalization + transkrip via F5 + penempatan asrama otomatis (gender hard-constraint + partial unique index), G3-23 Pematangan akuntansi: alokasi biaya per divisi (Σ share = nominal persis), multi-currency donor (posting selalu IDR), COA wizard, subsidiary detail.',
+                'SELESAI & LIVE 7/7 (2026-06-10, PR #42-48). Menutup §6: 31/31.',
+                'done', 'high', 100, 'XL', 4],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Program "Migrasi Data Asy-Syifaa" — impor data nyata via Excel, bertahap.
+     * Idempotent: updateOrCreate by slug + title.
+     */
+    private function seedMigrasiAsySyifaa(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'migrasi-data-asy-syifaa'],
+            [
+                'name' => 'Migrasi Data Asy-Syifaa (Excel → Platform)',
+                'description' => 'Migrasi data nyata pesantren Asy-Syifaa dari berkas Excel ke platform, bertahap per domain data. Command artisan idempoten (re-run aman), validasi baris + laporan tolak, preparasi berkas di _PESANTREN/migrasi-asy-syifaa/.',
+                'status' => 'in_progress',
+                'color' => 'info',
+                'icon' => 'heroicon-o-arrow-down-on-square-stack',
+                'sort' => 11,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            ['Tooling', 'Command santri:import (Excel → Santri, idempoten)',
+                'Impor santri dari Excel: pemetaan kolom, validasi NIS/nama/tanggal lahir, patch alamat (santri:patch-address), re-run aman (update by NIS).',
+                'SELESAI (siap pakai). Berkas prep di _PESANTREN/migrasi-asy-syifaa/.',
+                'done', 'high', 100, 'M', 1],
+            ['Tooling', 'Command wali:import + tautan ke santri',
+                'Impor wali dari Excel + penautan otomatis ke santri (relasi wali-anak), idempoten.',
+                'SELESAI (siap pakai).',
+                'done', 'high', 100, 'M', 2],
+            ['Tooling', 'Importer domain data lain (kelas, asrama, tagihan, pembayaran)',
+                'Command impor untuk domain selain santri/wali: penempatan kelas & asrama, saldo awal tagihan/pembayaran (posting via JurnalService).',
+                'BELUM. Menunggu prioritas + sampel berkas dari TU Asy-Syifaa.',
+                'todo', 'medium', 0, 'L', 3],
+            ['Eksekusi', 'Import data nyata bertahap di produksi + QC',
+                'Jalankan importer di tenant asy-syifaa produksi per gelombang data, QC jumlah baris vs sumber, laporan ke TU.',
+                'BELUM dimulai (menunggu berkas final dari pesantren).',
+                'todo', 'high', 0, 'M', 4],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
