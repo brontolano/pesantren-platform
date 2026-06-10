@@ -181,6 +181,75 @@ class TabunganLedgerIntegrityTest extends TestCase
         tenancy()->end();
     }
 
+    public function test_tarik_melebihi_saldo_ditolak_di_dalam_lock(): void
+    {
+        [$santri, $tabungan] = $this->boot('tli7', 100000);
+        $svc = app(\Modules\Keuangan\Services\TabunganService::class);
+
+        $svc->tarik($santri, 80000, ['created_by' => $this->userId]);
+        $this->assertEqualsWithDelta(20000, (float) $tabungan->fresh()->saldo, 0.01);
+
+        // Penarikan kedua melebihi sisa — WAJIB ditolak oleh validasi ulang pada
+        // baris ter-lock (guard overdraft), saldo tak boleh negatif.
+        try {
+            $svc->tarik($santri, 80000, ['created_by' => $this->userId]);
+            $this->fail('Tarik melebihi saldo harus ditolak.');
+        } catch (InvalidArgumentException) {
+        }
+        $this->assertEqualsWithDelta(20000, (float) $tabungan->fresh()->saldo, 0.01, 'Saldo tak boleh negatif.');
+        $this->assertSame(1, TabunganTransaksi::where('tabungan_id', $tabungan->id)->where('tipe', 'tarik')->count());
+        tenancy()->end();
+    }
+
+    public function test_verifikasi_pembayaran_dua_kali_ditolak(): void
+    {
+        [$santri, ] = $this->boot('tli8');
+        $tagihan = $this->tagihan($santri, 100000);
+        $bayar = \Modules\Keuangan\Models\Pembayaran::create([
+            'tagihan_id' => $tagihan->id, 'santri_id' => $santri->id, 'nominal' => 100000,
+            'metode' => 'transfer', 'tanggal_pembayaran' => now()->toDateString(), 'is_verified' => false,
+        ]);
+        $svc = app(\Modules\Keuangan\Services\PembayaranService::class);
+
+        $svc->verifikasiPembayaran($bayar, $this->userId);
+        $this->assertSame('lunas', $tagihan->fresh()->status);
+
+        try {
+            $svc->verifikasiPembayaran($bayar->fresh(), $this->userId); // double-verify
+            $this->fail('Verifikasi kedua harus ditolak.');
+        } catch (InvalidArgumentException) {
+        }
+        tenancy()->end();
+    }
+
+    public function test_verifikasi_overshoot_lintas_bukti_ditolak(): void
+    {
+        [$santri, ] = $this->boot('tli9');
+        $tagihan = $this->tagihan($santri, 100000);
+        // Wali tak sengaja unggah DUA bukti bernilai penuh → dua pembayaran pending.
+        $b1 = \Modules\Keuangan\Models\Pembayaran::create([
+            'tagihan_id' => $tagihan->id, 'santri_id' => $santri->id, 'nominal' => 100000,
+            'metode' => 'transfer', 'tanggal_pembayaran' => now()->toDateString(), 'is_verified' => false,
+        ]);
+        $b2 = \Modules\Keuangan\Models\Pembayaran::create([
+            'tagihan_id' => $tagihan->id, 'santri_id' => $santri->id, 'nominal' => 100000,
+            'metode' => 'transfer', 'tanggal_pembayaran' => now()->toDateString(), 'is_verified' => false,
+        ]);
+        $svc = app(\Modules\Keuangan\Services\PembayaranService::class);
+
+        $svc->verifikasiPembayaran($b1, $this->userId); // lunas
+        // Verifikasi bukti kedua WAJIB ditolak: total verified akan MELEBIHI tagihan.
+        try {
+            $svc->verifikasiPembayaran($b2, $this->userId);
+            $this->fail('Verifikasi overshoot harus ditolak.');
+        } catch (InvalidArgumentException) {
+        }
+        $totalVerified = (float) \Modules\Keuangan\Models\Pembayaran::where('tagihan_id', $tagihan->id)
+            ->where('is_verified', true)->sum('nominal');
+        $this->assertEqualsWithDelta(100000, $totalVerified, 0.01, 'Total verified tak boleh melebihi tagihan.');
+        tenancy()->end();
+    }
+
     public function test_tabungan_dibekukan_menolak_pembayaran(): void
     {
         [$santri, $tabungan] = $this->boot('tli6', 100000);

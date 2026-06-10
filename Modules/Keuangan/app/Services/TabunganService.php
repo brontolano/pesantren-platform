@@ -92,6 +92,17 @@ class TabunganService
             $tabungan = Tabungan::query()->lockForUpdate()->find($tabungan->id);
 
             $saldoSebelum = (float) $tabungan->saldo;
+
+            // RACE GUARD overdraft: cek saldo di tarik() memakai baca TANPA lock —
+            // dua penarikan bersamaan bisa sama-sama lolos lalu serial di lock ini
+            // dan keduanya mengurangi saldo → SALDO NEGATIF. Validasi ulang pada
+            // saldo baris ter-LOCK adalah satu-satunya cek yang race-safe.
+            if ($tipe === 'tarik' && $saldoSebelum < $nominal) {
+                throw new InvalidArgumentException(
+                    "Saldo tidak cukup. Saldo saat ini: {$saldoSebelum}, penarikan: {$nominal}"
+                );
+            }
+
             $saldoSesudah = $tipe === 'setor'
                 ? $saldoSebelum + $nominal
                 : $saldoSebelum - $nominal;
