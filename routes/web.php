@@ -45,6 +45,10 @@ Route::get('/', function () {
     return app()->call([app(TenantLandingPageController::class), '__invoke']);
 })->name('home');
 
+// URL lama /v2 (preview desain AlbaKids) sudah dipromosikan ke root — jaga
+// tautan/bookmark lama tetap hidup.
+Route::get('/v2', fn () => redirect('/', 301))->name('home.v2-legacy');
+
 // robots.txt & sitemap.xml — tenant-aware (host dinamis) untuk indeksasi mesin pencari.
 Route::get('/robots.txt', function () {
     $host = request()->getSchemeAndHttpHost();

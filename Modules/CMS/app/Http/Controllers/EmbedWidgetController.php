@@ -39,7 +39,7 @@ class EmbedWidgetController extends Controller
                 ->get()
                 ->map(fn (Article $a): array => [
                     'judul' => (string) $a->title,
-                    'url' => url('/berita/'.$a->slug),
+                    'url' => url('/artikel/'.$a->slug), // route publik artikel = /artikel/{slug}
                     'tanggal' => $a->published_at?->translatedFormat('d M Y'),
                 ])
                 ->all();

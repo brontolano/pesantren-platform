@@ -80,7 +80,16 @@ class SantriExportController extends Controller
     {
         $kelasId = (int) $request->integer('kelas_id');
 
-        return Kelas::query()->findOrFail($kelasId);
+        // Tanpa kelas_id valid (mis. URL diakses langsung tanpa lewat tombol
+        // export), kembalikan ke daftar santri dengan pesan ramah — bukan 404
+        // mentah. Alur normal selalu mengirim kelas_id (field required).
+        $kelas = $kelasId > 0 ? Kelas::query()->find($kelasId) : null;
+        if ($kelas === null) {
+            abort(redirect()->back(303, [], '/admin/santri/santris')
+                ->with('error', 'Pilih kelas terlebih dahulu untuk mengekspor data santri.'));
+        }
+
+        return $kelas;
     }
 
     private function getSantriQuery(int $kelasId, string $status)
