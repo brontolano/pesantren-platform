@@ -103,6 +103,39 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Metering kredit (T-A002) — tarif per tier, anggaran & kill-switch
+    |--------------------------------------------------------------------------
+    | Satuan = KREDIT (bukan rupiah) per 1000 token, dipisah token masuk/keluar
+    | (pagar #2 blueprint: pola pemakaian terukur & siap dimonetisasi).
+    | Degradasi (NullProvider) = 0 kredit tapi TETAP termeter (pagar #5).
+    */
+    'metering' => [
+        // Tarif kredit per 1000 token. 'masuk' = prompt, 'keluar' = completion.
+        'tarif' => [
+            'ekonomis' => ['masuk' => 0.25, 'keluar' => 0.5],
+            'standar' => ['masuk' => 0.5, 'keluar' => 1.0],
+            'premium' => ['masuk' => 2.0, 'keluar' => 4.0],
+            'embedding' => ['masuk' => 0.05, 'keluar' => 0.0],
+        ],
+
+        // Ambang alert default (persen anggaran bulanan) untuk tenant baru.
+        'ambang_alert_persen' => (int) env('AI_METERING_AMBANG_ALERT', 80),
+
+        // Pesan kill-switch (anggaran habis). Bahasa Indonesia santun —
+        // BERBEDA dari degraded_message supaya pemanggil/pengguna tahu ini
+        // soal anggaran, bukan gangguan teknis.
+        'kill_switch_message' => 'Mohon maaf, anggaran AI bulan ini telah habis. Silakan hubungi admin untuk top-up kredit.',
+
+        // Alarm anomali biaya (ai:anomali): hari ini > faktor × rata-rata 7
+        // hari terakhir DAN melebihi ambang minimum kredit absolut.
+        'anomali' => [
+            'faktor' => (float) env('AI_ANOMALI_FAKTOR', 3.0),
+            'minimum_kredit' => (float) env('AI_ANOMALI_MIN_KREDIT', 100),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue khusus AI (worker-ai, koneksi redis-ai — lihat config/queue.php)
     |--------------------------------------------------------------------------
     */

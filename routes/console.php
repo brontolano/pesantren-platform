@@ -19,3 +19,9 @@ Schedule::command('ppdb:ingatkan-daftar-ulang')
 Schedule::command('keuangan:rekonsiliasi-harian')
     ->dailyAt('01:30')
     ->withoutOverlapping();
+
+// T-A002: alarm anomali biaya kredit AI per tenant (hari ini vs rata-rata
+// 7 hari) — sore hari agar pemakaian harian sudah cukup terkumpul.
+Schedule::command('ai:anomali')
+    ->dailyAt('17:00')
+    ->withoutOverlapping();

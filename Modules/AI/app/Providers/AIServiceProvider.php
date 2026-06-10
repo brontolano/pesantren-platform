@@ -3,6 +3,7 @@
 namespace Modules\AI\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\AI\Console\AiAnomaliCommand;
 use Modules\AI\Console\AiHealthCommand;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\CircuitBreaker;
@@ -35,6 +36,7 @@ class AIServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 AiHealthCommand::class,
+                AiAnomaliCommand::class,
             ]);
         }
     }

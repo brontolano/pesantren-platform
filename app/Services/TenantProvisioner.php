@@ -48,6 +48,11 @@ class TenantProvisioner
         // tampil tanpa setup manual — menutup error "modul tak tampil".
         $this->seedModules($tenant);
 
+        // T-A002: budget AI default (anggaran tanpa batas, alert 80%) + saldo
+        // awal ledger alokasi 0 (CENTRAL). Idempoten — aman tenant:reprovision.
+        app(\Modules\AI\Services\Metering\AiBudgetProvisioner::class)
+            ->provision((string) $tenant->getKey());
+
         return $tenant->run(function () use ($tenant, $adminEmail): array {
             // (a0) Extension pgvector untuk Modul AI (RAG/embeddings).
             // Idempoten; toleran bila server PG belum menyediakan extension
