@@ -6,8 +6,10 @@ use App\Models\Tenant;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
 use Modules\AI\Models\AiAuditLog;
+use Modules\AI\Models\AiTenantBudget;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
+use Modules\AI\Services\Metering\BudgetGuard;
 use Throwable;
 
 /**
@@ -95,6 +97,7 @@ class AiHealthCommand extends Command
         // diberikan; tanpa flag = perilaku lama (central-only, bagian ini lewat).
         if (($tenantId = (string) $this->option('tenant')) !== '') {
             $rows[] = $this->tenantAuditRow($tenantId);
+            $rows[] = $this->tenantBudgetRow($tenantId);
         }
 
         $this->table(['Komponen', 'Status', 'Detail'], $rows);
@@ -141,6 +144,47 @@ class AiHealthCommand extends Command
             ];
         } catch (Throwable $e) {
             return ["Antrian '{$queue}'", 'TAK TERJANGKAU', $e->getMessage()];
+        }
+    }
+
+    /**
+     * T-A002: status anggaran kredit AI tenant (tabel CENTRAL ai_tenant_budget).
+     * Toleran — kegagalan baca tidak menggugurkan laporan.
+     *
+     * @return array{0: string, 1: string, 2: string}
+     */
+    private function tenantBudgetRow(string $tenantId): array
+    {
+        $label = "Anggaran '{$tenantId}'";
+
+        try {
+            $status = app(BudgetGuard::class)->cek($tenantId);
+            $budget = AiTenantBudget::query()->where('tenant_id', $tenantId)->first();
+
+            if ($budget === null) {
+                return [$label, 'BELUM ADA', 'Baris ai_tenant_budget belum diprovision (jalankan tenant:reprovision).'];
+            }
+
+            if ($status->killSwitch) {
+                return [$label, 'KILL-SWITCH', sprintf(
+                    'Anggaran bulan ini habis (terpakai %s%%) — panggilan AI dijawab pesan top-up.',
+                    number_format($status->persenTerpakai, 1, ',', '.'),
+                )];
+            }
+
+            $detail = $budget->anggaran_kredit_bulanan === null
+                ? sprintf('Tanpa batas anggaran — terpakai %s kredit periode ini.', $budget->terpakai_periode)
+                : sprintf(
+                    'Terpakai %s dari %s kredit (%s%%), alert di %d%%.',
+                    $budget->terpakai_periode,
+                    $budget->anggaran_kredit_bulanan,
+                    number_format($status->persenTerpakai, 1, ',', '.'),
+                    $budget->ambang_alert_persen,
+                );
+
+            return [$label, 'OK', $detail];
+        } catch (Throwable $e) {
+            return [$label, 'TAK TERJANGKAU', $e->getMessage()];
         }
     }
 

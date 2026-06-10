@@ -4,9 +4,12 @@ namespace Modules\AI\Services\Gateway;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Modules\AI\Models\AiAuditLog;
 use Modules\AI\Services\Audit\AuditRecorder;
 use Modules\AI\Services\Audit\StepTimer;
+use Modules\AI\Services\Metering\BudgetGuard;
+use Modules\AI\Services\Metering\CreditMeter;
 use Throwable;
 
 /**
@@ -30,6 +33,8 @@ class AiGateway
         private readonly ModelRouter $router,
         private readonly CircuitBreaker $breaker,
         private readonly AuditRecorder $audit,
+        private readonly BudgetGuard $budgetGuard,
+        private readonly CreditMeter $meter,
     ) {}
 
     public function generate(AiGenerateRequest $request): AiGenerateResult
@@ -37,6 +42,33 @@ class AiGateway
         // T-A003: setiap panggilan generate menulis tepat 1 baris ai_audit_log
         // (sukses / degradasi / gagal) dengan breakdown latensi per langkah.
         $timer = new StepTimer;
+
+        // T-A002 pre-check anggaran: kill-switch aktif → balas santun "anggaran
+        // habis" TANPA menyentuh provider (nol HTTP ke Ollama). Hanya berlaku
+        // dalam konteks tenant — panggilan central (ai:health CLI) tak dimeter.
+        $tenantId = tenancy()->initialized ? (string) tenant()?->getTenantKey() : null;
+
+        if ($tenantId !== null) {
+            $status = $timer->measure('budget', fn () => $this->budgetGuard->cekOrLog($tenantId));
+
+            if ($status->killSwitch) {
+                $result = new AiGenerateResult(
+                    text: (string) config(
+                        'ai.metering.kill_switch_message',
+                        'Mohon maaf, anggaran AI bulan ini telah habis. Silakan hubungi admin untuk top-up kredit.',
+                    ),
+                    provider: 'null',
+                    model: 'null',
+                    degraded: true,
+                );
+
+                // Pagar #5: penolakan anggaran pun TETAP termeter (0 kredit).
+                $meteran = $this->meterUsage($tenantId, $request, $result);
+                $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran);
+
+                return $result;
+            }
+        }
 
         try {
             $selection = $timer->measure(
@@ -52,7 +84,8 @@ class AiGateway
                 ));
 
                 if ($result !== null) {
-                    $this->recordGenerateAudit($request, $timer, $result);
+                    $meteran = $tenantId !== null ? $this->meterUsage($tenantId, $request, $result) : null;
+                    $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran);
 
                     return $result;
                 }
@@ -60,7 +93,8 @@ class AiGateway
 
             // Semua provider nyata gagal/terbuka sirkuitnya → degradasi anggun.
             $result = $this->makeProvider('null')->generate($request, $selection);
-            $this->recordGenerateAudit($request, $timer, $result);
+            $meteran = $tenantId !== null ? $this->meterUsage($tenantId, $request, $result) : null;
+            $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran);
 
             return $result;
         } catch (Throwable $e) {
@@ -73,14 +107,49 @@ class AiGateway
     }
 
     /**
+     * T-A002: meter satu pemakaian via CreditMeter (semua termeter — pagar #5;
+     * degradasi = 0 kredit tapi tetap tercatat). Kunci idempotensi deterministik:
+     * kunci request bila ada, fallback ULID unik per panggilan. Kegagalan
+     * metering TIDAK menggagalkan permintaan utama (catatOrLog → log keras)
+     * dan tercermin di audit (biaya 0 + penanda metering gagal).
+     *
+     * @return array{kredit: float, gagal: bool}
+     */
+    private function meterUsage(string $tenantId, AiGenerateRequest $request, AiGenerateResult $result): array
+    {
+        $kredit = $this->meter->hitungKredit(
+            $request->tier,
+            $result->promptTokens,
+            $result->completionTokens,
+            $result->degraded,
+        );
+
+        $ledger = $this->meter->catatOrLog($tenantId, [
+            'agent_key' => $request->agent,
+            'channel' => $request->channel,
+            'provider' => $result->provider,
+            'model' => $result->model,
+            'tier' => $request->tier,
+            'token_masuk' => $result->promptTokens,
+            'token_keluar' => $result->completionTokens,
+            'kredit' => $kredit,
+            'degraded' => $result->degraded,
+        ], $request->idempotencyKey ?? 'gen-'.Str::ulid());
+
+        return ['kredit' => $ledger !== null ? $kredit : 0.0, 'gagal' => $ledger === null];
+    }
+
+    /**
      * Tulis baris audit T-A003. recordOrLog: kegagalan tulis audit TIDAK
      * menggagalkan permintaan utama (hanya log error keras).
      */
+    /** @param  array{kredit: float, gagal: bool}|null  $meteran  Hasil meterUsage (T-A002). */
     private function recordGenerateAudit(
         AiGenerateRequest $request,
         StepTimer $timer,
         ?AiGenerateResult $result,
         ?Throwable $error = null,
+        ?array $meteran = null,
     ): void {
         $status = match (true) {
             $error !== null => AiAuditLog::STATUS_GAGAL,
@@ -99,7 +168,9 @@ class AiGateway
             'degraded' => $result->degraded ?? false,
             'token_masuk' => $result?->promptTokens,
             'token_keluar' => $result?->completionTokens,
-            'biaya_kredit' => 0, // metering kredit = T-A002 (CreditMeter)
+            'biaya_kredit' => $meteran['kredit'] ?? 0, // T-A002 (CreditMeter)
+            // Kegagalan metering tercermin di audit (kontrak T-A002).
+            'keputusan_kebijakan' => ($meteran['gagal'] ?? false) ? ['metering' => 'gagal'] : null,
             'latency' => $timer->breakdown(),
             'status' => $status,
             'error_ringkas' => $error !== null
