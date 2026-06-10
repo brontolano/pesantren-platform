@@ -25,6 +25,17 @@ class AIServiceProvider extends ServiceProvider
         // Views modul (Wizard Wawancara Digital, ringkasan kebijakan, dst).
         $this->loadViewsFrom(module_path($this->moduleName, 'resources/views'), $this->moduleNameLower);
 
+        // T-A090 — komponen Blade UI AI standar (anonim, namespace 'ai'):
+        // <x-ai::badge-ai>, <x-ai::blok-sitasi>, <x-ai::editor-draf>,
+        // <x-ai::indikator-kredit>, <x-ai::tombol-tanya-ustadz>,
+        // <x-ai::panel-asisten>, <x-ai::rating-jawaban>.
+        // Registrasi EKSPLISIT (tidak hanya menumpang loadViewsFrom) supaya
+        // resolusi komponen tidak bergantung urutan namespace view lain.
+        \Illuminate\Support\Facades\Blade::anonymousComponentPath(
+            module_path($this->moduleName, 'resources/views/components'),
+            $this->moduleNameLower,
+        );
+
         // Migrasi TENANT (tabel ai_* per pesantren — mulai T-A003: ai_audit_log).
         // Path ini SUDAH terdaftar di config/tenancy.php 'migration_parameters'
         // sehingga ikut jalan di tenants:migrate.

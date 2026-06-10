@@ -24,11 +24,13 @@ use Illuminate\Database\Eloquent\Model;
  *      buatan tenant bisa mengidentifikasi pesantren tertentu.
  *
  *  jenis = 'eskalasi_kategori' — direkam saat baris ai_escalation BARU lahir
- *  (PolicyEngine/RagAnswerer); HANYA kategori sistem, BUKAN isi pertanyaan:
+ *  (PolicyEngine/RagAnswerer/EscalationService::buatManual T-A090); HANYA
+ *  kategori sistem, BUKAN isi pertanyaan:
  *      { "kategori": string }  (mis. blacklist_topik, level_fatwa,
- *                               tanpa_rujukan, sitasi_gagal)
+ *                               tanpa_rujukan, sitasi_gagal, manual)
  *
- *  jenis = 'rating_jawaban' — API ResearchTelemetry::rekamRating (UI T-A090):
+ *  jenis = 'rating_jawaban' — API ResearchTelemetry::rekamRating
+ *  (UI: <x-ai::rating-jawaban> via route ai.rating-jawaban, T-A090):
  *      { "agent": string, "rating": int 1..5 }
  *
  * PAGAR PRIVASI (PRD §6.4 + ADR-6):
