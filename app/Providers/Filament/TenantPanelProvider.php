@@ -7,6 +7,7 @@ use App\Filament\Resources\Akademik\Nilai\NilaiResource;
 use App\Filament\Resources\Akademik\PresensiSantri\PresensiSantriResource;
 use App\Filament\Resources\Akademik\Rubrik\RubrikKriteriaResource;
 use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
+use App\Filament\Resources\Akademik\Program\ProgramStudiResource;
 use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
 use App\Filament\Resources\Akademik\Rapor\RaporResource;
 use App\Filament\Resources\Alumni\AlumniResource;
@@ -243,6 +244,7 @@ class TenantPanelProvider extends PanelProvider
             WebsiteSettingResource::class,
             PeriodeAkademikResource::class,
             PelajaranResource::class,
+            ProgramStudiResource::class,
             JadwalPelajaranResource::class,
             NilaiResource::class,
             PresensiSantriResource::class,

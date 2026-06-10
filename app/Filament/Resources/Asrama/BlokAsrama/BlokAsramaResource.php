@@ -7,6 +7,7 @@ use App\Filament\Resources\Asrama\BlokAsrama\Pages\EditBlokAsrama;
 use App\Filament\Resources\Asrama\BlokAsrama\Pages\ListBlokAsrama;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -53,6 +54,9 @@ class BlokAsramaResource extends Resource
     {
         return $schema->components([
             TextInput::make('nama_blok')->required()->maxLength(255),
+            Select::make('gender')->label('Peruntukan Gender')->native(false)
+                ->options(['putra' => 'Putra', 'putri' => 'Putri', 'campur' => 'Campur'])
+                ->helperText('Kosong/Campur = tanpa batasan penempatan otomatis.'),
             TextInput::make('lokasi')->maxLength(255),
             TextInput::make('jumlah_kamar')->numeric()->required()->minValue(0),
             Toggle::make('is_active')->default(true),

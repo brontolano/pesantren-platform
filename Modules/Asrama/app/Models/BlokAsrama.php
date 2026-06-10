@@ -15,6 +15,7 @@ class BlokAsrama extends Model
     protected $fillable = [
         'tenant_id',
         'nama_blok',
+        'gender', // G3-22: putra|putri|campur|null (penempatan otomatis)
         'lokasi',
         'jumlah_kamar',
         'is_active',
