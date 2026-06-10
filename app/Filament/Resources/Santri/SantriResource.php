@@ -455,6 +455,32 @@ class SantriResource extends Resource
                     ->label('ID Card')
                     ->icon('heroicon-o-identification')
                     ->action(fn ($record) => static::unduhIdCard(collect([$record]))),
+                \Filament\Actions\Action::make('kirim_kredensial')
+                    ->label('Kirim Kredensial')
+                    ->icon('heroicon-o-key')
+                    ->color('warning')
+                    ->visible(fn (): bool => auth()->user()?->can('manage_santri') ?? false)
+                    ->modalHeading('Kirim Info Login App Santri')
+                    ->modalDescription('Akun santri dibuat (bila belum), PIN baru 6 digit di-generate, lalu dikirim via WhatsApp ke nomor wali di bawah. Santri login pakai NIS + PIN. Periksa nomornya baik-baik.')
+                    ->modalSubmitActionLabel('Buat PIN & Kirim')
+                    ->form([
+                        TextInput::make('no_hp')
+                            ->label('Nomor WhatsApp Wali Tujuan')
+                            ->tel()
+                            ->required()
+                            ->default(fn (Santri $record): ?string => $record->no_hp_wali ?: ($record->no_hp_ayah ?: $record->no_hp_ibu))
+                            ->helperText('Default = No. HP Wali Utama. Bisa diubah ke nomor ayah/ibu.'),
+                    ])
+                    ->action(function (Santri $record, array $data): void {
+                        $terkirim = static::kirimKredensialSantri($record, (string) $data['no_hp']);
+                        \Filament\Notifications\Notification::make()
+                            ->title($terkirim ? 'Kredensial terkirim' : 'PIN dibuat, tapi WA gagal/template nonaktif')
+                            ->body($terkirim
+                                ? "Info login (NIS {$record->nis} + PIN baru) dikirim ke {$data['no_hp']}."
+                                : 'PIN baru sudah dibuat. Aktifkan template KREDENSIAL_SANTRI / cek nomor WA.')
+                            ->{$terkirim ? 'success' : 'warning'}()
+                            ->send();
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -464,7 +490,65 @@ class SantriResource extends Resource
                     ->icon('heroicon-o-identification')
                     ->action(fn ($records) => static::unduhIdCard(collect($records)))
                     ->deselectRecordsAfterCompletion(),
+                \Filament\Actions\BulkAction::make('kirim_kredensial_massal')
+                    ->label('Kirim Kredensial')
+                    ->icon('heroicon-o-key')
+                    ->color('warning')
+                    ->visible(fn (): bool => auth()->user()?->can('manage_santri') ?? false)
+                    ->requiresConfirmation()
+                    ->modalDescription('Buat PIN baru & kirim info login ke nomor WALI UTAMA masing-masing santri terpilih. Santri tanpa nomor wali dilewati.')
+                    ->action(function ($records): void {
+                        $ok = 0;
+                        $lewat = 0;
+                        foreach ($records as $record) {
+                            $phone = $record->no_hp_wali ?: ($record->no_hp_ayah ?: $record->no_hp_ibu);
+                            if (! $phone) {
+                                $lewat++;
+
+                                continue;
+                            }
+                            if (static::kirimKredensialSantri($record, (string) $phone)) {
+                                $ok++;
+                            }
+                        }
+                        \Filament\Notifications\Notification::make()
+                            ->title("Kredensial terkirim: {$ok}")
+                            ->body($lewat > 0 ? "{$lewat} santri dilewati (tanpa nomor wali)." : 'Selesai.')
+                            ->success()->send();
+                    })
+                    ->deselectRecordsAfterCompletion(),
             ]);
+    }
+
+    /**
+     * Buat akun santri (idempoten) + PIN baru, kirim ke WA wali via template
+     * KREDENSIAL_SANTRI. Return true bila WA terkirim. Tak melempar.
+     */
+    protected static function kirimKredensialSantri(Santri $record, string $phone): bool
+    {
+        try {
+            /** @var \Modules\Kesantrian\Services\SantriAccountService $svc */
+            $svc = app(\Modules\Kesantrian\Services\SantriAccountService::class);
+            [, $pin] = $svc->resetPin($record);
+            $svc->tautkanWali($record->fresh());
+
+            $hasil = app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('kredensial_santri', [
+                'wa' => [$phone],
+                'data' => [
+                    'nama_santri' => (string) $record->nama,
+                    'nis' => (string) $record->nis,
+                    'username' => (string) $record->nis, // login App Santri = NIS
+                    'password' => $pin,
+                    'nama_pesantren' => \App\Models\Setting::getTenantStringValue('branding_name') ?? (tenant('name') ?? 'Pesantren'),
+                ],
+            ]);
+
+            return (int) ($hasil['terkirim'] ?? 0) > 0;
+        } catch (\Throwable $e) {
+            report($e);
+
+            return false;
+        }
     }
 
     /**

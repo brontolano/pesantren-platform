@@ -59,6 +59,23 @@ class SantriAccountService
     }
 
     /**
+     * Setel ulang PIN login App Santri (6 digit numerik, mudah dihafal anak).
+     * Kembalikan [User, pin-plaintext] — PIN dipakai SEKALI untuk dikirim ke
+     * wali; JANGAN di-log/simpan plaintext.
+     *
+     * @return array{0: User, 1: string}
+     */
+    public function resetPin(Santri $santri): array
+    {
+        $user = $this->provision($santri);
+        $pin = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $user->password = $pin; // cast 'hashed' meng-hash saat di-set
+        $user->save();
+
+        return [$user, $pin];
+    }
+
+    /**
      * Tautkan akun WALI (buat bila belum ada) berdasarkan no_hp_wali santri.
      * Best-effort: kegagalan (mis. nomor kosong/tak valid) TIDAK melempar.
      */
