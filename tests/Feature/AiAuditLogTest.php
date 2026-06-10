@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Schema;
 use Modules\AI\Models\AiAuditLog;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
+use Modules\AI\Services\Settings\AiSettingProvisioner;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -57,6 +58,16 @@ class AiAuditLogTest extends TestCase
         ]);
     }
 
+    /**
+     * T-A020: gerbang aktivasi PolicyEngine butuh setting AI aktif —
+     * paritas dengan provisioning produksi (TenantProvisioner).
+     */
+    private function provisionSettingAi($tenant): void
+    {
+        app(AiSettingProvisioner::class)
+            ->provision((string) $tenant->id);
+    }
+
     private function request(): AiGenerateRequest
     {
         return new AiGenerateRequest(
@@ -76,6 +87,7 @@ class AiAuditLogTest extends TestCase
 
         $tenant = $this->createRuntimeTenant('audita', 'Pesantren Audit A');
         tenancy()->initialize($tenant);
+        $this->provisionSettingAi($tenant);
 
         $request = $this->request();
         $result = app(AiGateway::class)->generate($request);
@@ -117,6 +129,7 @@ class AiAuditLogTest extends TestCase
 
         $tenant = $this->createRuntimeTenant('auditd', 'Pesantren Audit Degradasi');
         tenancy()->initialize($tenant);
+        $this->provisionSettingAi($tenant);
 
         $request = $this->request();
         $result = app(AiGateway::class)->generate($request);
@@ -137,6 +150,7 @@ class AiAuditLogTest extends TestCase
 
         $tenant = $this->createRuntimeTenant('auditt', 'Pesantren Audit Trigger');
         tenancy()->initialize($tenant);
+        $this->provisionSettingAi($tenant);
 
         app(AiGateway::class)->generate($this->request());
         $id = AiAuditLog::query()->value('id');
@@ -175,6 +189,7 @@ class AiAuditLogTest extends TestCase
         $tenantB = $this->createRuntimeTenant('audisb', 'Pesantren Isolasi B');
 
         tenancy()->initialize($tenantA);
+        $this->provisionSettingAi($tenantA);
         $request = $this->request();
         app(AiGateway::class)->generate($request);
         $this->assertSame(1, AiAuditLog::query()->count());
@@ -194,6 +209,7 @@ class AiAuditLogTest extends TestCase
 
         $tenant = $this->createRuntimeTenant('auditf', 'Pesantren Audit Gagal');
         tenancy()->initialize($tenant);
+        $this->provisionSettingAi($tenant);
 
         // Sabotase: hilangkan tabel audit di DB tenant → penulisan audit pasti gagal.
         Schema::connection('tenant')->drop('ai_audit_log');
@@ -232,6 +248,7 @@ class AiAuditLogTest extends TestCase
 
         $tenant = $this->createRuntimeTenant('audith', 'Pesantren Audit Health');
         tenancy()->initialize($tenant);
+        $this->provisionSettingAi($tenant);
         app(AiGateway::class)->generate($this->request());
         tenancy()->end();
 

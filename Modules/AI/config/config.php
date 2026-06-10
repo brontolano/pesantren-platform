@@ -265,6 +265,70 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Guardrails (T-A020) — PolicyEngine pre-prompt & post-response
+    |--------------------------------------------------------------------------
+    | RULE-BASED MURNI, TANPA LLM. Aturan Emas #8: bagian ini HANYA memuat
+    | rule TEKNIS netral (pola linguistik, pemetaan fitur, pesan prosedural).
+    | Konten keagamaan (preset blacklist per manhaj, daftar topik, dst.) HANYA
+    | boleh masuk dari berkas seed tinjauan ustadz (GATE-3, PRD §12.2).
+    */
+    'guardrails' => [
+        // agent_key → nama fitur di matriks setting fitur_per_peran.
+        // Agen TANPA pemetaan (mis. agen uji/internal) bebas dari gerbang ini.
+        'agent_feature_map' => [
+            'chatbot_wali' => 'chatbot',
+            'chatbot_admin' => 'chatbot',
+            'tutor_santri' => 'tutor',
+            'generator_soal' => 'generator_soal',
+            'dokumen_tu' => 'dokumen_tu',
+            'ringkasan_keuangan' => 'ringkasan_keuangan',
+        ],
+
+        // Role spatie → kunci peran matriks fitur_per_peran. Role yang tidak
+        // terdaftar dipakai apa adanya (asatidz, bendahara, wali, santri).
+        'role_map' => [
+            'admin_pesantren' => 'admin',
+            'kepala' => 'admin',
+        ],
+
+        // Kanal yang terikat jam layanan (eksternal). Kanal lain (web staf,
+        // internal, cli) dilayani kapan pun.
+        'jam_layanan_channels' => ['wa', 'chat'],
+
+        // Pola TEKNIS-LINGUISTIK pertanyaan hukum (level_fatwa=edukatif_only
+        // → dialihkan ke Tanya Ustadz). Ini pola BENTUK kalimat, BUKAN daftar
+        // topik agama — isi topik menunggu seed GATE-3.
+        'pola_hukum' => [
+            '/\bapa\s+hukum(?:nya)?\b/iu',
+            '/\bbagaimana(?:kah)?\s+hukum(?:nya)?\b/iu',
+            '/\bhukum(?:nya)?\s+(?:apa|bagaimana)\b/iu',
+            '/\bboleh\s*kah\b/iu',
+            '/\bharam\s*kah\b/iu',
+            '/\bhalal\s*kah\b/iu',
+            '/\bwajib\s*kah\b/iu',
+            '/\bmakruh\s*kah\b/iu',
+            '/\bsunnah\s*kah\b/iu',
+            '/\bapakah\s+(?:boleh|haram|halal|wajib|makruh|sunnah|sah)\b/iu',
+            '/\bsah\s*kah\b/iu',
+        ],
+
+        // Panjang maksimal pertanyaan_ringkas pada ai_escalation (terredaksi).
+        'eskalasi_ringkas_max' => (int) env('AI_ESKALASI_RINGKAS_MAX', 300),
+
+        // Template respons default (Indonesia santun, netral-prosedural,
+        // TANPA konten fikih). Tenant bisa override per rule lewat
+        // ai_policy_rule.respons_template.
+        'pesan' => [
+            'belum_dikonfigurasi' => 'Mohon maaf, modul AI pesantren Anda belum selesai dikonfigurasi. Silakan hubungi admin untuk menuntaskan pengaturan terlebih dahulu.',
+            'di_luar_jam' => 'Mohon maaf, layanan asisten sedang di luar jam operasional. Pertanyaan Anda kami catat dan akan ditindaklanjuti pada jam layanan.',
+            'fitur_tidak_diizinkan' => 'Mohon maaf, fitur asisten ini tidak tersedia untuk akun Anda. Silakan hubungi admin pesantren bila membutuhkannya.',
+            'blacklist_topik' => 'Mohon maaf, topik ini tidak dapat dijawab oleh asisten. Pertanyaan Anda telah kami teruskan kepada pihak yang berwenang di pesantren.',
+            'tanya_ustadz' => 'Mohon maaf, pertanyaan seperti ini sebaiknya dijawab langsung oleh ustadz. Pertanyaan Anda telah kami teruskan ke antrean Tanya Ustadz.',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue khusus AI (worker-ai, koneksi redis-ai — lihat config/queue.php)
     |--------------------------------------------------------------------------
     */

@@ -13,6 +13,10 @@ final readonly class AiGenerateResult
 {
     /**
      * @param  array<string, mixed>  $raw  Payload mentah provider (untuk audit/debug).
+     * @param  bool  $ditolakPolicy  T-A020: true = diblokir PolicyEngine SEBELUM provider
+     *                               (BUKAN degradasi — metering pakai namespace 'policy-'
+     *                               dan audit berstatus ditolak_policy; jangan dicampur
+     *                               dengan degraded supaya keduanya bisa dibedakan).
      */
     public function __construct(
         public string $text,
@@ -23,5 +27,6 @@ final readonly class AiGenerateResult
         public ?int $completionTokens = null,
         public ?int $latencyMs = null,
         public array $raw = [],
+        public bool $ditolakPolicy = false,
     ) {}
 }

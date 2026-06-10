@@ -10,6 +10,7 @@ use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use Modules\AI\Models\AiApproval;
 use Modules\AI\Models\AiTenantSetting;
+use Modules\AI\Services\Guardrails\PolicyEngine;
 
 /**
  * T-A010 — siklus hidup pengaturan AI per tenant (versioned + approval kyai).
@@ -167,6 +168,11 @@ class TenantSettingService
                 // alert, pesan) → aktifkan langsung, arsipkan aktif lama.
                 $aktif?->update(['status' => AiTenantSetting::STATUS_ARSIP]);
                 $setting->update(['status' => AiTenantSetting::STATUS_AKTIF]);
+
+                // T-A020: mirror blacklist_topik versi aktif → ai_policy_rule
+                // (idempoten; PolicyEngine::syncDariSetting).
+                app(PolicyEngine::class)
+                    ->syncDariSetting((array) $setting->refresh()->payload);
             }
 
             $this->memo = null;
@@ -213,6 +219,11 @@ class TenantSettingService
                     ]));
 
                 $setting->update(['status' => AiTenantSetting::STATUS_AKTIF]);
+
+                // T-A020: versi aktif berubah → mirror blacklist_topik ke
+                // ai_policy_rule (idempoten).
+                app(PolicyEngine::class)
+                    ->syncDariSetting((array) $setting->refresh()->payload);
             } else {
                 $setting->update(['status' => AiTenantSetting::STATUS_DRAFT]);
             }

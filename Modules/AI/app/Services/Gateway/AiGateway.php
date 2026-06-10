@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use Modules\AI\Models\AiAuditLog;
 use Modules\AI\Services\Audit\AuditRecorder;
 use Modules\AI\Services\Audit\StepTimer;
+use Modules\AI\Services\Guardrails\PolicyDecision;
+use Modules\AI\Services\Guardrails\PolicyEngine;
 use Modules\AI\Services\Metering\BudgetGuard;
 use Modules\AI\Services\Metering\CreditMeter;
 use Modules\AI\Services\Privacy\ContentSanitizer;
@@ -41,6 +43,7 @@ class AiGateway
         private readonly PromptRegistry $prompts,
         private readonly PiiRedactor $redactor,
         private readonly ContentSanitizer $sanitizer,
+        private readonly PolicyEngine $policy,
     ) {}
 
     public function generate(AiGenerateRequest $request): AiGenerateResult
@@ -53,6 +56,8 @@ class AiGateway
         // habis" TANPA menyentuh provider (nol HTTP ke Ollama). Hanya berlaku
         // dalam konteks tenant — panggilan central (ai:health CLI) tak dimeter.
         $tenantId = tenancy()->initialized ? (string) tenant()?->getTenantKey() : null;
+
+        $policyDecision = null;
 
         if ($tenantId !== null) {
             $status = $timer->measure('budget', fn () => $this->budgetGuard->cekOrLog($tenantId));
@@ -71,6 +76,31 @@ class AiGateway
                 // Pagar #5: penolakan anggaran pun TETAP termeter (0 kredit).
                 $meteran = $this->meterUsage($tenantId, $request, $result);
                 $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran);
+
+                return $result;
+            }
+
+            // T-A020: PolicyEngine pre — SETELAH budget, SEBELUM prompt
+            // registry/pii/provider. Rule-based murni TANPA LLM; blokir =
+            // respons template santun TANPA HTTP ke provider (AC utama),
+            // termeter 0 kredit di namespace 'policy-', audit ditolak_policy.
+            $policyDecision = $timer->measure(
+                'policy',
+                fn (): PolicyDecision => $this->policy->pre($request, $tenantId),
+            );
+
+            if (! $policyDecision->boleh) {
+                $result = new AiGenerateResult(
+                    text: $policyDecision->responsTemplate
+                        ?? (string) config('ai.guardrails.pesan.blacklist_topik'),
+                    provider: 'null',
+                    model: 'null',
+                    degraded: false, // BUKAN degradasi — penolakan kebijakan.
+                    ditolakPolicy: true,
+                );
+
+                $meteran = $this->meterUsage($tenantId, $request, $result);
+                $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, policy: $policyDecision);
 
                 return $result;
             }
@@ -134,6 +164,12 @@ class AiGateway
                     // — metering & audit terjadi SETELAHNYA, tapi audit hanya
                     // menyimpan ringkasan terredaksi, bukan teks jawaban.
                     $result = $this->deredactResult($result, $petaPii);
+
+                    // T-A020: hook post-response (v1 pass-through; injeksi
+                    // disclaimer & penegakan sitasi = T-A022).
+                    if ($policyDecision !== null) {
+                        $this->policy->post($result, $policyDecision);
+                    }
 
                     $meteran = $tenantId !== null ? $this->meterUsage($tenantId, $request, $result) : null;
                     $this->recordGenerateAudit($request, $timer, $result, meteran: $meteran, promptVersionId: $prompt->promptVersionId, pii: $piiMeta);
@@ -212,6 +248,7 @@ class AiGateway
             completionTokens: $result->completionTokens,
             latencyMs: $result->latencyMs,
             raw: $result->raw,
+            ditolakPolicy: $result->ditolakPolicy,
         );
     }
 
@@ -226,11 +263,13 @@ class AiGateway
      */
     private function meterUsage(string $tenantId, AiGenerateRequest $request, AiGenerateResult $result): array
     {
+        // Penolakan kebijakan (T-A020) = 0 kredit, sama seperti degradasi —
+        // tapi TETAP termeter (pagar #5) dengan namespace kunci sendiri.
         $kredit = $this->meter->hitungKredit(
             $request->tier,
             $result->promptTokens,
             $result->completionTokens,
-            $result->degraded,
+            $result->degraded || $result->ditolakPolicy,
         );
 
         $ledger = $this->meter->catatOrLog($tenantId, [
@@ -263,7 +302,13 @@ class AiGateway
     {
         $base = $request->idempotencyKey ?? 'gen-'.Str::ulid();
 
-        return $result->degraded ? 'degraded-'.$base : $base;
+        return match (true) {
+            // T-A020: penolakan kebijakan punya namespace sendiri — retry sah
+            // setelah kebijakan berubah TIDAK boleh ter-dedup ke baris 0 kredit.
+            $result->ditolakPolicy => 'policy-'.$base,
+            $result->degraded => 'degraded-'.$base,
+            default => $base,
+        };
     }
 
     /**
@@ -279,9 +324,11 @@ class AiGateway
         ?array $meteran = null,
         ?int $promptVersionId = null,
         ?array $pii = null,
+        ?PolicyDecision $policy = null,
     ): void {
         $status = match (true) {
             $error !== null => AiAuditLog::STATUS_GAGAL,
+            $result?->ditolakPolicy === true => AiAuditLog::STATUS_DITOLAK_POLICY, // T-A020
             $result?->degraded === true => AiAuditLog::STATUS_DEGRADASI,
             default => AiAuditLog::STATUS_SUKSES,
         };
@@ -296,6 +343,16 @@ class AiGateway
 
         if ($pii !== null) {
             $kebijakan['pii'] = $pii;
+        }
+
+        // T-A020: keputusan PolicyEngine (rule yang menyala) — blokir maupun
+        // info rule pada keputusan lolos, untuk forensik kebijakan.
+        if ($policy !== null && (! $policy->boleh || $policy->ruleId !== null)) {
+            $kebijakan['policy'] = [
+                'rule_id' => $policy->ruleId,
+                'kategori' => $policy->kategori,
+                'alasan' => $policy->alasan,
+            ];
         }
 
         $this->audit->recordOrLog([
