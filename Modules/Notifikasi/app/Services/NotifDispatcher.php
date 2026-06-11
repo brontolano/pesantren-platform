@@ -41,6 +41,10 @@ class NotifDispatcher
         // WP-09 Disiplin — additive.
         'disiplin_pelanggaran' => 'DISIPLIN_PELANGGARAN',       // wali: kejadian terverifikasi (kebijakan semua/berat)
         'disiplin_eskalasi' => 'DISIPLIN_ESKALASI',             // wali: ambang poin terlampaui (SP1/SP2)
+        // WP-26 Izin Pulang — additive.
+        'izin_diajukan' => 'IZIN_DIAJUKAN',                     // musyrif: pengajuan izin baru
+        'izin_disetujui' => 'IZIN_DISETUJUI',                   // wali: izin disetujui
+        'izin_ditolak' => 'IZIN_DITOLAK',                       // wali: izin ditolak + alasan
     ];
 
     public function __construct(
