@@ -19,7 +19,7 @@ class SlipGaji extends Model
     protected $fillable = [
         'tenant_id', 'users_id', 'periode',
         'honor_pokok', 'tunjangan', 'poin', 'tarif_poin', 'honor_poin', 'honor_output',
-        'bruto', 'pph21_dipotong', 'bpjs_dipotong', 'neto', 'jurnal_id', 'status', 'created_by',
+        'bruto', 'pph21_dipotong', 'bpjs_dipotong', 'potongan_cuti', 'neto', 'jurnal_id', 'status', 'created_by',
     ];
 
     protected $casts = [
@@ -31,6 +31,7 @@ class SlipGaji extends Model
         'bruto' => 'decimal:2',
         'pph21_dipotong' => 'decimal:2',
         'bpjs_dipotong' => 'decimal:2',
+        'potongan_cuti' => 'decimal:2',
         'neto' => 'decimal:2',
     ];
 

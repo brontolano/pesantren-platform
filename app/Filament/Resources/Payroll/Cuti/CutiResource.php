@@ -2,19 +2,24 @@
 
 namespace App\Filament\Resources\Payroll\Cuti;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Payroll\Cuti\Pages\CreateCuti;
 use App\Filament\Resources\Payroll\Cuti\Pages\ListCuti;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Payroll\Models\Cuti;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Services\CutiService;
@@ -24,7 +29,7 @@ use Modules\Payroll\Services\CutiService;
  */
 class CutiResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Cuti::class;
 
@@ -42,7 +47,7 @@ class CutiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
+        return UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
     }
 
     public static function canAccess(): bool
@@ -55,7 +60,7 @@ class CutiResource extends Resource
         return auth()->user()?->can('run_payroll') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return false; // koreksi via ajukan ulang
     }
@@ -69,6 +74,9 @@ class CutiResource extends Resource
                 Select::make('jenis')->label('Jenis')->native(false)->default('tahunan')
                     ->options(['tahunan' => 'Tahunan', 'sakit' => 'Sakit', 'penting' => 'Penting',
                         'melahirkan' => 'Melahirkan', 'lainnya' => 'Lainnya']),
+                Toggle::make('is_berbayar')->label('Cuti Berbayar')
+                    ->helperText('Nonaktifkan utk cuti tak berbayar (memotong gaji per hari efektif).')
+                    ->default(fn (): bool => CutiService::defaultBerbayar()),
                 DatePicker::make('tanggal_mulai')->label('Mulai')->required(),
                 DatePicker::make('tanggal_selesai')->label('Selesai')->required(),
                 Textarea::make('alasan')->label('Alasan')->rows(2)->columnSpanFull(),
@@ -82,6 +90,7 @@ class CutiResource extends Resource
             ->columns([
                 TextColumn::make('employee.nama')->label('Pegawai')->searchable(),
                 TextColumn::make('jenis')->label('Jenis')->badge(),
+                IconColumn::make('is_berbayar')->label('Berbayar')->boolean(),
                 TextColumn::make('tanggal_mulai')->label('Mulai')->date('d M Y')->sortable(),
                 TextColumn::make('tanggal_selesai')->label('Selesai')->date('d M Y'),
                 TextColumn::make('jumlah_hari')->label('Hari')->badge()->color('gray'),
