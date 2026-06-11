@@ -43,6 +43,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'view_akademik',
             'manage_akademik',
             'view_own_children',
+            // F1-PWA — gerbang masuk PWA Guru (/guru): guru mapel, guru
+            // tahfidz/musyrif, asatidz, dan kepala (pemantauan).
+            'akses_pwa_guru',
             // PPDB — portal peserta (akun calon santri ber-role `peserta`)
             'view_own_ppdb_status',
             'complete_own_ppdb',
@@ -197,18 +200,22 @@ class RolesAndPermissionsSeeder extends Seeder
                 // T-A042 — asatidz menyusun & mengesahkan ikhtisar kitab
                 // (dan kerangka kultum bila fitur opt-in diaktifkan tenant).
                 'ai.generator.ikhtisar',
+                // F1-PWA — asatidz juga pengajar lapangan.
+                'akses_pwa_guru',
             ],
             'guru' => [
                 'view_dashboard',
                 'view_santri',
                 'view_akademik',
                 'manage_akademik',
+                'akses_pwa_guru',
             ],
             'guru_tahfidz' => [
                 'view_dashboard',
                 'view_santri',
                 'view_akademik',
                 'manage_akademik',
+                'akses_pwa_guru',
             ],
             'konselor' => [
                 'view_dashboard',
@@ -233,6 +240,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 // Kyai/pimpinan — menyetujui kebijakan AI (T-A010).
                 'ai.setting.setujui',
                 'ai.setting.lihat',
+                // F1-PWA — kepala memantau lewat PWA Guru.
+                'akses_pwa_guru',
             ],
             'wali' => [
                 'view_own_children',

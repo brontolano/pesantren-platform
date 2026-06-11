@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\AkademikExportController;
+use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
+use App\Http\Controllers\PortalGuru\PortalGuruPresensiController;
+use App\Http\Controllers\PortalGuru\PortalGuruPwaController;
+use App\Http\Controllers\PortalGuru\PortalGuruSetoranController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
 use App\Http\Controllers\PortalWali\PortalWaliAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
@@ -84,6 +88,23 @@ Route::middleware([
             Route::get('/', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'home'])->name('home');
             Route::post('/logout', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'logout'])->name('logout');
         });
+    });
+
+    // F1-PWA — PWA Guru (/guru): aset PWA publik (manifest/SW/ikon, pola
+    // PortalWaliPwaController) + layar inti di balik auth + can:akses_pwa_guru.
+    Route::prefix('guru')->name('tenant.portal-guru.pwa.')->group(function () {
+        Route::get('/manifest.json', [PortalGuruPwaController::class, 'manifest'])->name('manifest');
+        Route::get('/icon.svg', [PortalGuruPwaController::class, 'icon'])->name('icon');
+        Route::get('/sw.js', [PortalGuruPwaController::class, 'serviceWorker'])->name('service-worker');
+    });
+
+    Route::middleware(['auth', 'can:akses_pwa_guru'])->prefix('guru')->name('tenant.portal-guru.')->group(function () {
+        Route::get('/', PortalGuruBerandaController::class)->name('beranda');
+        Route::get('/presensi/{jadwal}', [PortalGuruPresensiController::class, 'show'])->name('presensi.show');
+        Route::post('/presensi/{jadwal}', [PortalGuruPresensiController::class, 'store'])->name('presensi.store');
+        Route::get('/setoran', [PortalGuruSetoranController::class, 'index'])->name('setoran.index');
+        Route::get('/setoran/{halaqah}', [PortalGuruSetoranController::class, 'form'])->name('setoran.form');
+        Route::post('/setoran', [PortalGuruSetoranController::class, 'store'])->name('setoran.store');
     });
 
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {
