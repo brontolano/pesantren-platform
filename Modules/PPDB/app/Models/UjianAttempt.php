@@ -4,6 +4,8 @@ namespace Modules\PPDB\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Akademik\Models\SesiUjianAkademik;
+use Modules\Kesantrian\Models\Santri;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 /** Attempt ujian online satu calon pada satu paket (timer server-side). */
@@ -14,7 +16,8 @@ class UjianAttempt extends Model
     protected $table = 'ujian_attempt';
 
     protected $fillable = [
-        'calon_santri_id', 'paket_soal_id', 'soal_tampil', 'jawaban',
+        'calon_santri_id', 'santri_id', 'sesi_ujian_akademik_id',
+        'paket_soal_id', 'soal_tampil', 'jawaban',
         'mulai_at', 'deadline_at', 'selesai_at',
         'nilai_pg', 'nilai_essay', 'nilai_final', 'status',
     ];
@@ -33,6 +36,16 @@ class UjianAttempt extends Model
     public function calonSantri(): BelongsTo
     {
         return $this->belongsTo(CalonSantri::class);
+    }
+
+    public function santri(): BelongsTo
+    {
+        return $this->belongsTo(Santri::class, 'santri_id');
+    }
+
+    public function sesiAkademik(): BelongsTo
+    {
+        return $this->belongsTo(SesiUjianAkademik::class, 'sesi_ujian_akademik_id');
     }
 
     public function paket(): BelongsTo

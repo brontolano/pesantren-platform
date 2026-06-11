@@ -3,7 +3,9 @@
 namespace Modules\PPDB\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Akademik\Models\Pelajaran;
 use Modules\Core\Concerns\Auditable;
 use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
@@ -15,7 +17,11 @@ class PaketSoal extends Model
 
     protected $table = 'paket_soal';
 
-    protected $fillable = ['nama', 'kategori_ujian', 'durasi_menit', 'jumlah_tampil', 'is_active'];
+    protected $fillable = [
+        'nama', 'kategori_ujian', 'durasi_menit', 'jumlah_tampil', 'is_active',
+        // F4 — konteks akademik (NULL semua = mode PPDB, perilaku lama utuh).
+        'pelajaran_id', 'created_by', 'is_bank_lembaga',
+    ];
 
     protected $attributes = [
         'is_active' => true,
@@ -26,7 +32,19 @@ class PaketSoal extends Model
         'durasi_menit' => 'integer',
         'jumlah_tampil' => 'integer',
         'is_active' => 'boolean',
+        'is_bank_lembaga' => 'boolean',
     ];
+
+    /** Mode akademik (F4)? NULL = paket PPDB. */
+    public function isAkademik(): bool
+    {
+        return $this->pelajaran_id !== null;
+    }
+
+    public function pelajaran(): BelongsTo
+    {
+        return $this->belongsTo(Pelajaran::class, 'pelajaran_id');
+    }
 
     public function soal(): HasMany
     {

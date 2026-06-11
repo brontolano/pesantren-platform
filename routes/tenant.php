@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\AppSantri\AppSantriController;
+use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\EmisExportController;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\PortalGuru\PortalGuruPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruSetoranController;
 use App\Http\Controllers\PortalGuru\PortalGuruSlipController;
 use App\Http\Controllers\PortalGuru\PortalGuruTahfidzLanjutanController;
+use App\Http\Controllers\PortalGuru\PortalGuruUjianController;
 use App\Http\Controllers\PortalGuru\PortalGuruWaliKelasController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
 use App\Http\Controllers\PortalWali\PortalWaliAuthController;
@@ -121,6 +123,13 @@ Route::middleware([
         Route::middleware('auth')->group(function () {
             Route::get('/', [AppSantriController::class, 'home'])->name('home');
             Route::post('/logout', [AppSantriController::class, 'logout'])->name('logout');
+
+            // F4-PWA — Ujian Semester Online (timer server-side, satu attempt/sesi).
+            Route::get('/ujian', [AppSantriUjianController::class, 'index'])->name('ujian.index');
+            Route::post('/ujian/{sesi}/mulai', [AppSantriUjianController::class, 'mulai'])->name('ujian.mulai');
+            Route::get('/ujian/{sesi}', [AppSantriUjianController::class, 'kerjakan'])->name('ujian.kerjakan');
+            Route::post('/ujian/{sesi}/jawab', [AppSantriUjianController::class, 'jawab'])->name('ujian.jawab');
+            Route::post('/ujian/{sesi}/selesai', [AppSantriUjianController::class, 'selesai'])->name('ujian.selesai');
         });
     });
 
@@ -199,6 +208,15 @@ Route::middleware([
 
         // F3-PWA — Slip gaji milik sendiri (cetak reuse tenant.payroll.slip.print)
         Route::get('/slip-saya', [PortalGuruSlipController::class, 'index'])->name('slip.index');
+
+        // F4-PWA — Ujian: daftar sesi, mode pengawas (polling), koreksi essay,
+        // tarik nilai final → komponen nilai (idempoten).
+        Route::get('/ujian', [PortalGuruUjianController::class, 'index'])->name('ujian.index');
+        Route::get('/ujian/koreksi', [PortalGuruUjianController::class, 'koreksi'])->name('ujian.koreksi');
+        Route::post('/ujian/koreksi/{attempt}', [PortalGuruUjianController::class, 'koreksiSimpan'])->name('ujian.koreksi.simpan');
+        Route::get('/ujian/{sesi}/pengawas', [PortalGuruUjianController::class, 'pengawas'])->name('ujian.pengawas');
+        Route::get('/ujian/{sesi}/pengawas/data', [PortalGuruUjianController::class, 'pengawasData'])->name('ujian.pengawas.data');
+        Route::post('/ujian/{sesi}/tarik-nilai', [PortalGuruUjianController::class, 'tarikNilai'])->name('ujian.tarik-nilai');
     });
 
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {

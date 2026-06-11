@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\Soal;
 use Modules\PPDB\Models\UjianAttempt;
@@ -95,9 +96,13 @@ class UjianAttemptResource extends Resource
             ]);
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['calonSantri', 'paket']);
+        // Hanya attempt PPDB (calon santri) — attempt akademik (santri_id,
+        // calon_santri_id NULL) punya jalur sendiri di modul Akademik.
+        return parent::getEloquentQuery()
+            ->whereNotNull('calon_santri_id')
+            ->with(['calonSantri', 'paket']);
     }
 
     public static function getPages(): array

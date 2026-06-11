@@ -22,6 +22,7 @@ use App\Filament\Resources\Akademik\Kitab\KitabResource;
 use App\Filament\Resources\Akademik\Kurikulum\KurikulumResource;
 use App\Filament\Resources\Akademik\Lembaga\LembagaResource;
 use App\Filament\Resources\Akademik\Nilai\NilaiResource;
+use App\Filament\Resources\Akademik\PaketSoalAkademik\PaketSoalAkademikResource;
 use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
 use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
 use App\Filament\Resources\Akademik\PresensiSantri\PresensiSantriResource;
@@ -29,6 +30,7 @@ use App\Filament\Resources\Akademik\Program\ProgramStudiResource;
 use App\Filament\Resources\Akademik\Rapor\RaporResource;
 use App\Filament\Resources\Akademik\RaporDiniyah\RaporDiniyahResource;
 use App\Filament\Resources\Akademik\Rubrik\RubrikKriteriaResource;
+use App\Filament\Resources\Akademik\SesiUjianAkademik\SesiUjianAkademikResource;
 use App\Filament\Resources\Alumni\AlumniResource;
 use App\Filament\Resources\Approval\ApprovalRequestResource;
 use App\Filament\Resources\Approval\ApprovalRuleResource;
@@ -393,6 +395,8 @@ class TenantPanelProvider extends PanelProvider
             ProgramStudiResource::class,
             JadwalPelajaranResource::class,
             NilaiResource::class,
+            PaketSoalAkademikResource::class, // F4 — Bank Soal Akademik
+            SesiUjianAkademikResource::class, // F4 — Sesi Ujian Online per rombel
             PresensiSantriResource::class,
             RubrikKriteriaResource::class,
             RaporResource::class,
