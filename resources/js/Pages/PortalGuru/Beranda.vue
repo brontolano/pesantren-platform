@@ -82,5 +82,24 @@ defineProps({
                 </Link>
             </article>
         </section>
+
+        <!-- F2-PWA — pintasan modul guru -->
+        <section class="space-y-3">
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Menu Guru</h3>
+            <div class="grid grid-cols-3 gap-2">
+                <Link href="/guru/nilai" class="rounded-2xl bg-white px-3 py-4 text-center shadow-sm">
+                    <p class="text-sm font-semibold text-slate-900">Nilai</p>
+                    <p class="mt-1 text-xs text-slate-400">Grid massal</p>
+                </Link>
+                <Link href="/guru/kitab" class="rounded-2xl bg-white px-3 py-4 text-center shadow-sm">
+                    <p class="text-sm font-semibold text-slate-900">Kitab</p>
+                    <p class="mt-1 text-xs text-slate-400">Capaian kajian</p>
+                </Link>
+                <Link href="/guru/wali-kelas" class="rounded-2xl bg-white px-3 py-4 text-center shadow-sm">
+                    <p class="text-sm font-semibold text-slate-900">Wali Kelas</p>
+                    <p class="mt-1 text-xs text-slate-400">Rekap binaan</p>
+                </Link>
+            </div>
+        </section>
     </div>
 </template>

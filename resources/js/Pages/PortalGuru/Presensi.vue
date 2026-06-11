@@ -12,6 +12,8 @@ const props = defineProps({
     tanggal: { type: String, required: true },
     santri: { type: Array, default: () => [] },
     statusOptions: { type: Array, default: () => ['hadir', 'izin', 'sakit', 'alpa'] },
+    jurnal: { type: Object, default: null },
+    jurnal_url: { type: String, default: null },
 })
 
 const statusMap = ref(Object.fromEntries(props.santri.map((s) => [s.id, s.status || 'hadir'])))
@@ -77,6 +79,45 @@ function submit(attempt = 0) {
         },
     })
 }
+
+// ---------------------------------------------------------------
+// F2-PWA — Jurnal KBM 30-detik: form mini muncul SETELAH presensi
+// tersimpan (atau bila jurnal hari ini sudah ada). Upsert server per
+// (guru, jadwal, tanggal) — retry aman. jumlah_hadir dihitung server
+// dari presensi tersimpan, bukan dikirim klien.
+// ---------------------------------------------------------------
+const jurnalForm = ref({
+    materi: props.jurnal?.materi || '',
+    metode: props.jurnal?.metode || '',
+    status: props.jurnal?.status || 'terlaksana',
+})
+const jurnalSaving = ref(false)
+const jurnalSavedAt = ref(null)
+const jurnalError = ref(null)
+const showJurnal = computed(() => Boolean(savedAt.value || props.jurnal))
+
+function submitJurnal() {
+    jurnalSaving.value = true
+    jurnalError.value = null
+
+    router.post(props.jurnal_url || `/guru/jurnal/${props.sesi.id}`, {
+        tanggal: props.tanggal,
+        materi: jurnalForm.value.materi || null,
+        metode: jurnalForm.value.metode || null,
+        status: jurnalForm.value.status,
+    }, {
+        preserveScroll: true,
+        onSuccess: () => {
+            jurnalSavedAt.value = new Date().toLocaleTimeString()
+        },
+        onError: (errors) => {
+            jurnalError.value = Object.values(errors)[0] || 'Jurnal tidak valid.'
+        },
+        onFinish: () => {
+            jurnalSaving.value = false
+        },
+    })
+}
 </script>
 
 <template>
@@ -139,6 +180,55 @@ function submit(attempt = 0) {
                 @click="submit()"
             >
                 {{ saving ? 'Menyimpan…' : 'Simpan Presensi' }}
+            </button>
+        </section>
+
+        <!-- F2-PWA — Jurnal KBM 30-detik -->
+        <section v-if="showJurnal" class="space-y-3 rounded-[1.5rem] bg-white px-5 py-5 shadow">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Jurnal KBM</p>
+                <p class="mt-1 text-sm text-slate-500">30 detik saja: materi & status sesi. Hadir otomatis {{ ringkasan.hadir }} santri.</p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <button
+                    v-for="opsi in ['terlaksana', 'kosong', 'diganti']"
+                    :key="opsi"
+                    type="button"
+                    class="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition"
+                    :class="jurnalForm.status === opsi ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600'"
+                    @click="jurnalForm.status = opsi"
+                >
+                    {{ opsi }}
+                </button>
+            </div>
+
+            <textarea
+                v-model="jurnalForm.materi"
+                rows="2"
+                placeholder="Materi yang diajarkan (wajib bila terlaksana)"
+                class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
+            ></textarea>
+
+            <input
+                v-model="jurnalForm.metode"
+                type="text"
+                placeholder="Metode (opsional: ceramah, hafalan, praktik…)"
+                class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
+            />
+
+            <p v-if="jurnalError" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ jurnalError }}</p>
+            <p v-if="jurnalSavedAt" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
+                Jurnal tersimpan {{ jurnalSavedAt }}.
+            </p>
+
+            <button
+                type="button"
+                class="w-full rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white disabled:opacity-60"
+                :disabled="jurnalSaving"
+                @click="submitJurnal()"
+            >
+                {{ jurnalSaving ? 'Menyimpan…' : 'Simpan Jurnal KBM' }}
             </button>
         </section>
     </div>

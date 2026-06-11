@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Akademik\Models\JadwalPelajaran;
+use Modules\Akademik\Models\JurnalMengajar;
 use Modules\Akademik\Models\PresensiSantri;
 use Modules\Akademik\Services\PresensiService;
 use Modules\Kesantrian\Models\Santri;
@@ -26,8 +27,7 @@ class PortalGuruPresensiController extends Controller
 
     public function __construct(
         private readonly PresensiService $presensiService,
-    ) {
-    }
+    ) {}
 
     public function show(Request $request, int $jadwal): Response
     {
@@ -63,6 +63,10 @@ class PortalGuruPresensiController extends Controller
             'tanggal' => $tanggal,
             'santri' => $santri,
             'statusOptions' => PresensiSantri::STATUS,
+            // F2-PWA — Jurnal KBM 30-detik menempel di layar presensi:
+            // muat jurnal hari ini bila sudah ada (form mini pre-filled).
+            'jurnal' => $this->jurnalHariIni($sesi->id, $guru->id, $tanggal),
+            'jurnal_url' => "/guru/jurnal/{$sesi->id}",
         ]);
     }
 
@@ -94,6 +98,28 @@ class PortalGuruPresensiController extends Controller
         );
 
         return back()->with('success', 'Presensi tersimpan.');
+    }
+
+    /** @return array<string, mixed>|null */
+    private function jurnalHariIni(int $jadwalId, int $guruId, string $tanggal): ?array
+    {
+        $jurnal = JurnalMengajar::query()
+            ->where('guru_id', $guruId)
+            ->where('jadwal_pelajaran_id', $jadwalId)
+            ->whereDate('tanggal', $tanggal)
+            ->first();
+
+        if ($jurnal === null) {
+            return null;
+        }
+
+        return [
+            'materi' => $jurnal->materi,
+            'metode' => $jurnal->metode,
+            'status' => $jurnal->status,
+            'pengganti_id' => $jurnal->pengganti_id,
+            'jumlah_hadir' => $jurnal->jumlah_hadir,
+        ];
     }
 
     /** Sesi hanya boleh diakses guru pengampu pelajarannya — selain itu 403. */
