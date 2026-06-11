@@ -13,6 +13,7 @@ use App\Http\Controllers\PembiayaanExportController;
 use App\Http\Controllers\PengadaanExportController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
+use App\Http\Controllers\PortalGuru\PortalGuruIzinController;
 use App\Http\Controllers\PortalGuru\PortalGuruPresensiController;
 use App\Http\Controllers\PortalGuru\PortalGuruPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruSetoranController;
@@ -73,7 +74,7 @@ Route::middleware([
 
         // Direktori dokumen sensitif (arsip HR/kesantrian) WAJIB login —
         // sisanya (logo, galeri landing) tetap publik.
-        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin'];
+        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi'];
         $segmenPertama = explode('/', $path, 2)[0];
         if (in_array($segmenPertama, $direktoriSensitif, true)) {
             abort_unless(auth()->check(), 403);
@@ -132,6 +133,12 @@ Route::middleware([
         Route::get('/disiplin/daftar', [PortalGuruDisiplinController::class, 'daftarPelanggaran'])->name('disiplin.daftar');
         Route::get('/disiplin/catat', [PortalGuruDisiplinController::class, 'formCatatPelanggaran'])->name('disiplin.catat');
         Route::get('/disiplin/poin', [PortalGuruDisiplinController::class, 'poinView'])->name('disiplin.poin');
+
+        // WP-17 — Izin Pegawai Harian (ajukan + antrean approver)
+        Route::get('/izin', [PortalGuruIzinController::class, 'index'])->name('izin.index');
+        Route::post('/izin', [PortalGuruIzinController::class, 'store'])->name('izin.store');
+        Route::post('/izin/{cuti}/setujui', [PortalGuruIzinController::class, 'setujui'])->name('izin.setujui');
+        Route::post('/izin/{cuti}/tolak', [PortalGuruIzinController::class, 'tolak'])->name('izin.tolak');
     });
 
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {

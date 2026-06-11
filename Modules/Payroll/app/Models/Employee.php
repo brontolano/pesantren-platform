@@ -81,6 +81,12 @@ class Employee extends Model
         return $this->hasMany(PenugasanPegawai::class, 'employee_id');
     }
 
+    /** WP-18 — Arsip sertifikasi (TPG/Inpassing/GBPNS/PPG). */
+    public function sertifikasi(): HasMany
+    {
+        return $this->hasMany(SertifikasiPegawai::class, 'employee_id');
+    }
+
     /**
      * Jabatan aktif untuk tampilan: prioritas penugasan is_primary aktif,
      * fallback penugasan aktif termuda. NULL bila belum ada penugasan.

@@ -2,13 +2,17 @@
 
 namespace App\Filament\Resources\Payroll\Employee;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Payroll\Employee\Pages\CreateEmployee;
 use App\Filament\Resources\Payroll\Employee\Pages\EditEmployee;
 use App\Filament\Resources\Payroll\Employee\Pages\ListEmployee;
 use App\Models\User;
+use App\Services\StorageQuotaService;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -19,14 +23,19 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Payroll\Models\Employee;
+use Modules\Payroll\Models\SertifikasiPegawai;
 
 /**
  * G2-10 — Master Pegawai + Struktur Gaji.
+ * WP-18 — Section Arsip Sertifikasi (TPG/Inpassing/GBPNS/PPG): upload arsip
+ * acceptedFileTypes WAJIB pdf/jpg/png (pelajaran stored-XSS WP-08); file
+ * diserve via /_tenant-storage, direktori 'sertifikasi' masuk daftar sensitif.
  */
 class EmployeeResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Employee::class;
 
@@ -42,9 +51,12 @@ class EmployeeResource extends Resource
 
     protected static ?int $navigationSort = 24;
 
+    /** WP-18 — Tipe file arsip sertifikasi yang diizinkan. JANGAN dilonggarkan (WP-08). */
+    public const SERTIFIKASI_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
+        return UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
     }
 
     public static function canAccess(): bool
@@ -57,7 +69,7 @@ class EmployeeResource extends Resource
         return auth()->user()?->can('run_payroll') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('run_payroll') ?? false;
     }
@@ -112,6 +124,28 @@ class EmployeeResource extends Resource
                 Toggle::make('is_mukim')->label('Mukim (tinggal di pondok)')->inline(false),
                 Toggle::make('asal_alumni')->label('Alumni pesantren ini')->inline(false),
             ])->columns(2)->collapsible(),
+            // WP-18 — Arsip Sertifikasi: CRUD via Repeater relationship (pola
+            // komponenGaji). Data queryable utk rekap kesiapan EMIS (WP-12).
+            Section::make('Arsip Sertifikasi (EMIS)')->schema([
+                Repeater::make('sertifikasi')->label('Sertifikasi')->relationship('sertifikasi')
+                    ->schema([
+                        Select::make('jenis')->label('Jenis')->native(false)->required()
+                            ->options(SertifikasiPegawai::JENIS),
+                        TextInput::make('nrg')->label('NRG')->maxLength(255),
+                        TextInput::make('nomor_sk')->label('Nomor SK')->required()->maxLength(255),
+                        TextInput::make('nominal')->label('Nominal')->numeric()->prefix('Rp'),
+                        DatePicker::make('berlaku_mulai')->label('Berlaku Mulai'),
+                        DatePicker::make('berlaku_selesai')->label('Berlaku Selesai')
+                            ->afterOrEqual('berlaku_mulai'),
+                        FileUpload::make('file')
+                            ->label('Arsip (PDF/JPG/PNG)')
+                            ->disk(StorageQuotaService::diskName())
+                            ->directory('sertifikasi')
+                            ->acceptedFileTypes(self::SERTIFIKASI_FILE_TYPES) // WAJIB — WP-08
+                            ->maxSize(5120)
+                            ->columnSpanFull(),
+                    ])->columns(3)->defaultItems(0)->addActionLabel('Tambah Sertifikasi'),
+            ])->collapsible()->collapsed(),
             Section::make('Struktur Gaji')->schema([
                 Repeater::make('komponenGaji')->label('Komponen Gaji')->relationship('komponenGaji')
                     ->schema([

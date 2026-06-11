@@ -19,7 +19,7 @@ class CutiService
     public const SETTING_CUTI_DEFAULT_BERBAYAR = 'payroll.cuti_default_berbayar';
 
     /** Ajukan cuti: hitung jumlah hari (inklusif) + buat 'diajukan' + F1 ajukanPersetujuan. */
-    public function ajukan(int $employeeId, string $jenis, string $mulai, string $selesai, ?string $alasan = null, ?int $userId = null, ?bool $isBerbayar = null): Cuti
+    public function ajukan(int $employeeId, string $jenis, string $mulai, string $selesai, ?string $alasan = null, ?int $userId = null, ?bool $isBerbayar = null, ?string $clientRef = null): Cuti
     {
         $this->ensureTenantContext();
 
@@ -30,6 +30,8 @@ class CutiService
         }
         $jumlahHari = $tglMulai->diffInDays($tglSelesai) + 1; // inklusif
 
+        // client_ref ikut di INSERT (bukan forceFill susulan) — double-submit
+        // paralel pecah di unique DB tanpa meninggalkan baris yatim.
         $cuti = Cuti::create([
             'employee_id' => $employeeId,
             'jenis' => $jenis,
@@ -40,6 +42,7 @@ class CutiService
             'alasan' => $alasan,
             'status' => 'diajukan',
             'diajukan_oleh' => $userId,
+            'client_ref' => $clientRef,
         ]);
 
         $cuti->ajukanPersetujuan($userId); // F1: buat request bila ada rule wajib
@@ -62,7 +65,12 @@ class CutiService
             app(ApprovalService::class)->setujui($req, (int) ($userId ?? 0));
         }
 
-        $cuti->update(['status' => 'disetujui', 'disetujui_oleh' => $userId, 'disetujui_pada' => now()]);
+        // Conditional update: dua keputusan paralel — hanya satu yang menang.
+        $diubah = Cuti::query()->whereKey($cuti->id)->where('status', 'diajukan')
+            ->update(['status' => 'disetujui', 'disetujui_oleh' => $userId, 'disetujui_pada' => now()]);
+        if ($diubah === 0) {
+            throw new InvalidArgumentException('Status cuti sudah berubah — muat ulang.');
+        }
 
         return $cuti->fresh();
     }
@@ -79,7 +87,11 @@ class CutiService
             app(ApprovalService::class)->tolak($req, (int) ($userId ?? 0), $alasan ?? 'Ditolak');
         }
 
-        $cuti->update(['status' => 'ditolak', 'disetujui_oleh' => $userId, 'disetujui_pada' => now()]);
+        $diubah = Cuti::query()->whereKey($cuti->id)->where('status', 'diajukan')
+            ->update(['status' => 'ditolak', 'disetujui_oleh' => $userId, 'disetujui_pada' => now()]);
+        if ($diubah === 0) {
+            throw new InvalidArgumentException('Status cuti sudah berubah — muat ulang.');
+        }
 
         return $cuti->fresh();
     }
