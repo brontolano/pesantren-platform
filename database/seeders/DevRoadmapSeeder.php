@@ -26,6 +26,11 @@ class DevRoadmapSeeder extends Seeder
         $this->seedStabilisasiHardening();
         $this->seedAdaptasiErpnext();
         $this->seedMigrasiAsySyifaa();
+        $this->seedPwaGuru();
+        $this->seedModulAkademikPesantren();
+        $this->seedModulSdmHrd();
+        $this->seedOperasionalLapangan();
+        $this->seedMutuEkosistem();
 
         $this->normalizeProjectStatus();
     }
@@ -831,6 +836,369 @@ class DevRoadmapSeeder extends Seeder
                 'Jalankan importer di tenant asy-syifaa produksi per gelombang data, QC jumlah baris vs sumber, laporan ke TU.',
                 'BELUM dimulai (menunggu berkas final dari pesantren).',
                 'todo', 'high', 0, 'M', 4],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Program "PWA Guru / Khidmat" — BLUEPRINT-PWA-GURU.md (2026-06-11).
+     * Satu PWA modular untuk semua pengajar & petugas lapangan; menu digerbang ganda ModuleRegistry x permission.
+     */
+    private function seedPwaGuru(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'pwa-guru-khidmat'],
+            [
+                'name' => 'PWA Guru / Khidmat',
+                'description' => 'Satu PWA /guru untuk semua pengajar & petugas lapangan (ustadz mapel, muhaffizh, musyrif, mustahiq, keamanan) — BLUEPRINT-PWA-GURU.md. Pola teknis tiru PWA Wali (Inertia+Vue, manifest dinamis ber-branding tenant); endpoint tulis idempoten tahan sinyal jelek; satu service per domain dipakai PWA dan Filament. Prinsip: disusun per momen kerja, alur scan QR ID card -> aksi. E-learning penuh tetap out-of-scope.',
+                'status' => 'planning',
+                'color' => 'warning',
+                'icon' => 'heroicon-o-device-phone-mobile',
+                'sort' => 12,
+            ]
+        );
+
+        // [phase, title, detail, current_state, status, priority, progress, effort, sort]
+        $tasks = [
+            ['Gelombang 1 — Jangkar', 'F0: Fondasi data — Halaqah, JurnalMengajar, Kitab, komponen nilai',
+                'Migrasi halaqah + pivot halaqah_santri (soft-close left_at), jurnal_mengajar (jadwal XOR halaqah, unique guru+jadwal+tanggal, status terlaksana/kosong/diganti), domain kitab (kitab, kajian_kitab sorogan/bandongan/wetonan, capaian_kitab — santri NULL = posisi kelompok bandongan), komponen_nilai konfigurabel (seeder default 40/30/30, kolom Nilai lama JANGAN drop) + NilaiService satu-satunya rumus nilai akhir.',
+                'Belum mulai. Tanpa ini pesantren salafiyah (kitab kuning) tidak terwakili sama sekali di platform.',
+                'todo', 'critical', 0, 'M', 1],
+            ['Gelombang 2 — Lapangan', 'F1: PWA Guru inti — jadwal pribadi + presensi kelas + setoran tahfidz',
+                'Rute /guru (pola PortalWali), manifest+SW+ikon dinamis salin PortalWaliPwaController. Layar Hari Ini (JadwalPelajaran per guru_pengampu_id + halaqah), presensi kelas sekali-ketuk default hadir (endpoint idempoten kelas+tanggal+santri), setoran tahfidz scan QR (jenis ziyadah/muraja\'ah). PresensiService & TahfidzService dipakai juga Filament. Permission akses_pwa_guru.',
+                'Belum mulai. Jadwal per guru belum pernah di-query (terindex per kelas); presensi & setoran sekarang hanya via panel desktop.',
+                'todo', 'critical', 0, 'L', 2],
+            ['Gelombang 3A — Akademik', 'F2: Grid nilai massal + jurnal KBM + capaian kitab + wali kelas',
+                'Grid nilai per kelas x pelajaran x komponen autosave per-baris (dua pintu: PWA + halaman Filament, SATU NilaiService); form jurnal KBM 30-detik menempel di layar presensi + rekap bulanan; layar sorogan per santri & bandongan per kelompok; layar wali kelas (rekap anak binaan + catatan rapor + rubrik ubudiyah).',
+                'Belum mulai. Gap efisiensi terbesar: input nilai sekarang harus keluar-masuk form per santri.',
+                'todo', 'high', 0, 'L', 3],
+            ['Gelombang 3B — SDM (uang)', 'F3: Pesan guru->wali + slip gaji sendiri',
+                'Tabel pesan_wali (jenis apresiasi/perhatian/info) SEARAH dengan template per tenant + saklar moderasi pengasuh; masuk notifikasi Portal Wali + opsional WA. Guru lihat slip gaji miliknya di PWA (gate per-user, route print reuse). Guru hanya bisa kirim ke santri binaannya.',
+                'Belum mulai. Jalur komunikasi guru->wali per santri belum ada (Notifikasi hanya broadcast sistem).',
+                'todo', 'medium', 0, 'M', 4],
+            ['Gelombang 5 — Per permintaan', 'F4: Ujian semester online (generalisasi mesin PPDB)',
+                'Refactor EXTRACT PaketSoal/Soal/SesiUjian/UjianAttempt/UjianScoringService ke modul bersama TANPA mengubah perilaku PPDB (semua test PPDB tetap hijau tanpa diubah); kolom konteks akademik (pelajaran/kelas/periode, NULL = mode PPDB); permission pembuat soal per-pelajaran; mode pengawas + koreksi essay di PWA; nilai final -> komponen nilai via NilaiService; halaman ujian di App Santri.',
+                'TERBLOKIR keputusan owner: jenjang mana ujian online vs kertas. Mesin ujian PPDB sudah matang produksi (timer server, randomisasi, auto-skor PG).',
+                'blocked', 'medium', 0, 'L', 5],
+            ['Gelombang 5 — Per permintaan', 'WP-21: Mode pengurus-santri (qism) di PWA',
+                'Permission khusus pada akun santri (login NIS+PIN sudah live) — gerbang ganda santri AND pengurus; menu terbatas: catat pelanggaran (status dicatat, menunggu verifikasi ustadz) + presensi kegiatan domain qism-nya; masa jabatan ber-periode, habis -> permission dicabut otomatis.',
+                'Menunggu WP-09 (modul disiplin) + F1 live.',
+                'todo', 'medium', 0, 'M', 6],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Program "Modul Akademik Pesantren" — BLUEPRINT-AKADEMIK-SDM.md Bagian I (2026-06-11).
+     * Jangkar Lembaga + dua kalender + kurikulum + kenaikan kelas + raport ganda + disiplin.
+     */
+    private function seedModulAkademikPesantren(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'modul-akademik-pesantren'],
+            [
+                'name' => 'Modul Akademik Pesantren (Lembaga, Kurikulum, Raport Ganda)',
+                'description' => 'Perincian modul Akademik untuk semua tipe pesantren — BLUEPRINT-AKADEMIK-SDM.md Bagian I. Jangkar: model Lembaga (unit ber-NSM/NSPP, tertaut DivisiUnit Ledger). Dua kalender paralel Masehi/Hijriyah; kurikulum per tingkat ber-kitab; kenaikan kelas = rekomendasi sistem + sidang musyawarah guru (bukan otomatis); raport formal vs raport diniyah terpisah; disiplin poin verifikasi 2-lapis; EMIS arsip-dulu-ekspor-nanti. Prinsip policy-first: semua ambang via Setting per tenant.',
+                'status' => 'planning',
+                'color' => 'info',
+                'icon' => 'heroicon-o-academic-cap',
+                'sort' => 13,
+            ]
+        );
+
+        $tasks = [
+            ['Gelombang 1 — Jangkar', 'WP-01: Model Lembaga + tautan DivisiUnit Ledger',
+                'Tabel lembaga (jenis formal/diniyah/tahfidz/pondok, jenjang, NSM/NSPP, IJOP, kepala_id, divisi_unit_id FK Ledger); seeder 1 lembaga Pondok per tenant + hook TenantProvisioner; ALTER kelas + lembaga_id (backfill ke default); ALTER periode_akademik + lembaga_id + kalender masehi/hijriyah + tahun_hijriyah, unique -> tenant+lembaga+tahun+semester (periode aktif ganda beda lembaga sah).',
+                'Belum mulai. Tenant lama wajib tak berubah perilaku (test eksplisit).',
+                'todo', 'critical', 0, 'M', 1],
+            ['Gelombang 1 — Jangkar', 'WP-02: Kalender akademik + hari efektif',
+                'Tabel kalender_akademik (lembaga NULL = semua; jenis libur_nasional/libur_pondok/ramadhan/ujian/pasaran/kegiatan); KalenderService::isHariEfektif + hariEfektifDalamRentang; seeder libur nasional; tampilan kalender bulanan. Dipakai presensi, rekap kehadiran, potongan cuti. Tanggal Hijriyah = label manual, JANGAN bangun konversi otomatis.',
+                'Belum mulai.',
+                'todo', 'high', 0, 'S', 2],
+            ['Gelombang 1 — Jangkar', 'WP-05: Observer sinkron PenempatanKelas -> Santri.kelas_id',
+                'Observer: is_current berubah -> penempatan lain santri di-false-kan + Santri.kelas_id sinkron; command audit satu-kali menampilkan santri yang kelas_id != penempatan aktif (JANGAN auto-fix data produksi).',
+                'Belum mulai. RISK DATA NYATA ditemukan audit: sekarang sinkron manual, nilai bisa tercatat ke kelas lama.',
+                'todo', 'critical', 0, 'S', 3],
+            ['Gelombang 3A — Akademik', 'WP-06: Kurikulum per tingkat',
+                'Tabel kurikulum + kurikulum_mapel (mapel x tingkat x kitab, jam/minggu, wajib, urutan); validasi LUNAK di form jadwal (warning bukan blokir); aksi Buka Periode auto-generate baris Nilai kosong (idempoten); cetak struktur kurikulum PDF.',
+                'Belum mulai. Pelajaran sekarang flat tanpa ikatan tingkat.',
+                'todo', 'high', 0, 'M', 4],
+            ['Gelombang 3A — Akademik', 'WP-07: Kenaikan kelas + layar sidang musyawarah',
+                'KenaikanKelasService::evaluasi (nilai rata + % kehadiran hari-efektif + poin disiplin + capaian tahfidz/kitab bila disyaratkan; SEMUA ambang via Setting per lembaga) -> REKOMENDASI; halaman Sidang Kenaikan pola LoketKas (default = rekomendasi, override per santri tercatat Auditable); finalisasi batch PenempatanKelas SATU transaksi; mode mu\'adalah (tingkat bebas) via Setting.',
+                'Belum mulai. Keputusan kenaikan di pesantren = musyawarah; sistem hanya menyiapkan data.',
+                'todo', 'high', 0, 'L', 5],
+            ['Gelombang 3A — Akademik', 'WP-08: Kelulusan, syahadah & mutasi',
+                'Lulus -> tabel alumni (sudah ada) + status santri; syahadah internal PDF per lembaga (nomor seri counter race-safe pola SuratService); arsip nomor ijazah negara; mutasi keluar/masuk pondok (jalur pindahan di PPDB).',
+                'Belum mulai.',
+                'todo', 'medium', 0, 'M', 6],
+            ['Gelombang 3A — Akademik', 'WP-10: Raport diniyah (raport kedua)',
+                'Tabel rapor_diniyah + RaporDiniyahService: nilai imtihan + capaian kitab + hafalan/sima\'an + ubudiyah-akhlak (reuse RubrikKriteria/RubrikSkor) + kehadiran kegiatan + poin disiplin + catatan mustahiq/pengasuh; blok yang tampil = Setting per lembaga; kop tanggal Hijriyah; tab Raport Diniyah + unduh PDF di Portal Wali.',
+                'Belum mulai. Dua raport terpisah adalah norma pesantren (formal RDM vs diniyah).',
+                'todo', 'high', 0, 'L', 7],
+            ['Gelombang 3A — Akademik', 'WP-11: Sima\'an, munaqasyah, wisuda tahfidz, pasaran',
+                'Tabel sima_an + munaqasyah (hasil lulus/mengulang) + penanda wisuda per periode; layar di PWA Guru mode muhaffizh; kegiatan pasaran/kilatan Ramadhan via modul Kegiatan yang ada + kolom peserta_luar JSON (santri luar, tidak menyentuh tabel santri).',
+                'Belum mulai.',
+                'todo', 'medium', 0, 'M', 8],
+            ['Gelombang 3A — Akademik', 'WP-12: Rekap kesiapan EMIS',
+                'Halaman rekap % santri ber-NIK/NISN, % pegawai ber-NIK/NUPTK, lembaga tanpa NSPP/IJOP + tautan ke daftar yang kurang; audit kolom santri (nik/nisn/mukim, tambah bila belum). EMIS = prasyarat semua bantuan Kemenag (BOP, insentif ustadz).',
+                'Belum mulai. Ekspor Excel EMIS menyusul terpisah (WP-22) saat ada tenant yang minta.',
+                'todo', 'medium', 0, 'S', 9],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Program "Modul SDM/HRD" — BLUEPRINT-AKADEMIK-SDM.md Bagian II (2026-06-11).
+     * Jangkar PenugasanPegawai multi-peran; loop bisyaroh dari sesi mengajar nyata.
+     */
+    private function seedModulSdmHrd(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'modul-sdm-hrd'],
+            [
+                'name' => 'Modul SDM/HRD Pesantren (Penugasan, Bisyaroh, Kontrak)',
+                'description' => 'SDM khas pesantren — BLUEPRINT-AKADEMIK-SDM.md Bagian II. Jangkar: penugasan_pegawai many-to-many (pegawai x jabatan x lembaga x periode + SK) karena rangkap jabatan adalah norma. Loop bisyaroh: JurnalMengajar/PresensiStaf -> KhidmahAggregator -> staging khidmah -> SlipGaji.poin (mesin slip & posting JurnalService TIDAK diubah; semua WP uang adversarial 3 lensa). Status kepegawaian lengkap (GTY/GTT/PNS-DPK/PPPK/pengabdian); arsip sertifikasi TPG/inpassing; alur guru pengabdian. Diferensiasi vs pesaing yang dangkal di sini.',
+                'status' => 'planning',
+                'color' => 'warning',
+                'icon' => 'heroicon-o-identification',
+                'sort' => 14,
+            ]
+        );
+
+        $tasks = [
+            ['Gelombang 1 — Jangkar', 'WP-03: Master jabatan + penugasan multi-peran + SK',
+                'Tabel jabatan (kategori + mapping role_spatie, seeder 15 jabatan dari riset: mudir, mustahiq, musyrif, muhaffizh, lurah pondok, qism, dst) + penugasan_pegawai (employee x jabatan x lembaga x periode, nomor/file SK, is_primary); observer assign/revoke role Spatie (revoke hanya bila tak ada penugasan lain ber-role sama); Employee.jabatan string jadi deprecated read-only; cetak SK via SuratTemplate.',
+                'Belum mulai. JANTUNG modul — satu orang = guru pagi + musyrif malam + pengurus qism.',
+                'todo', 'critical', 0, 'L', 1],
+            ['Gelombang 1 — Jangkar', 'WP-04: Perluasan data pegawai (EMIS-ready)',
+                'ALTER employees: nik, nuptk, nrg, status_kepegawaian enum baru (gty/gtt_honorer/pns_dpk/pppk/pengabdian/kontrak — migrasi map dari enum lama), is_mukim, tanggal_selesai, pendidikan_terakhir, asal_alumni; tab Identitas & Kepegawaian di form; PayrollService tetap jalan semua status.',
+                'Belum mulai.',
+                'todo', 'high', 0, 'S', 2],
+            ['Gelombang 3B — SDM (uang)', 'WP-13: Loop bisyaroh — tarif khidmah + aggregator + pratinjau',
+                'Tabel tarif_khidmah per tenant (jabatan/jenis_sesi -> poin); KhidmahAggregatorService per periode: JurnalMengajar terlaksana + PresensiStaf + penugasan aktif -> baris khidmah per pegawai per sumber (tertelusur sumber_type/id; idempoten; baris manual tak disentuh); layar pratinjau bendahara SEBELUM slip massal (koreksi di sumber, bukan edit slip); buatSlip baca Sigma khidmah -> SlipGaji.poin.',
+                'Belum mulai. UANG — adversarial 3 lensa wajib: sesi diganti (poin ke pengganti, tak dobel), guru 2 lembaga 2 tarif, agregasi ulang setelah slip final DITOLAK. Mesin slip+posting yang teruji TIDAK diubah.',
+                'todo', 'critical', 0, 'L', 3],
+            ['Gelombang 3B — SDM (uang)', 'WP-14: Potongan cuti tak berbayar',
+                'Jenis cuti berbayar/tidak di master; hitung di terapkanPotongan(): hari x (honor_pokok / hari_kerja_periode dari KalenderService); cuti beririsan Ramadhan/libur pondok TIDAK memotong; cuti lintas dua periode terpotong proporsional.',
+                'Belum mulai. UANG — snapshot test: math PPh21/BPJS lama tak berubah satu rupiah pun.',
+                'todo', 'high', 0, 'S', 4],
+            ['Gelombang 3B — SDM (uang)', 'WP-15: THR / bingkisan hari raya',
+                'SlipGaji tipe thr (unique per pegawai per tahun); formula via Setting (nominal tetap / kali honor pokok / manual); generate massal + pratinjau; posting JurnalService idempotency_key SlipGaji:thr:{id} — jalur posting SAMA.',
+                'Belum mulai. UANG.',
+                'todo', 'medium', 0, 'S', 5],
+            ['Gelombang 3B — SDM', 'WP-16: Kontrak/SK + alur guru pengabdian',
+                'Tabel kontrak_kerja (jenis sk_gty/kontrak/sk_pengabdian/sk_dpk, arsip file, status); khusus pengabdian: periode_khidmat + lembaga_pengirim + tanggal_purna + laporan angkatan; widget + notifikasi kontrak habis <=60 hari (ambang Setting); perpanjangan = baris baru bertaut; purna -> tawaran GTY/GTT = penugasan baru.',
+                'Belum mulai. Guru pengabdian (alumni khidmat 1-2 th) = kekhasan pesantren yang tak dimiliki aplikasi pesaing.',
+                'todo', 'medium', 0, 'M', 6],
+            ['Gelombang 3B — SDM', 'WP-17: Izin pegawai harian',
+                'Jenis izin baru di tabel cuti yang ada (pulang_kampung, keperluan_keluarga, dinas — JANGAN tabel baru); approval = kepala lembaga dari penugasan is_primary (fallback admin); pengajuan & status dari PWA Guru.',
+                'Belum mulai.',
+                'todo', 'medium', 0, 'S', 7],
+            ['Gelombang 3B — SDM', 'WP-18: Arsip sertifikasi (TPG/inpassing/GBPNS)',
+                'Tabel sertifikasi_pegawai (jenis, NRG, SK, nominal, masa berlaku, file) — ARSIP untuk syarat & pelaporan SIMPATIKA, bukan mesin hitung; tab di EmployeeResource + masuk rekap kesiapan EMIS.',
+                'Belum mulai.',
+                'todo', 'low', 0, 'S', 8],
+            ['Gelombang 5 — Per permintaan', 'WP-19: Rekrutmen ringan ala pesantren',
+                'Tabel pelamar (asal, alumni?, berkas, tahap lamaran/tes_baca_kitab/microteaching/wawancara/diterima/ditolak, catatan penilai per tahap) — satu resource + aksi "jadikan pegawai" (-> Employee + penugasan). BUKAN ATS korporat.',
+                'Menunggu kebutuhan nyata tenant.',
+                'todo', 'low', 0, 'S', 9],
+            ['Gelombang 5 — Per permintaan', 'WP-20: Rapor ustadz tahunan',
+                'Rekap otomatis per pegawai (% kehadiran sesi vs jadwal, % jurnal terisi, ketepatan input nilai) + penilaian kualitatif mudir via RubrikKriteria + cetak PDF — bahan pertimbangan SK tahun berikutnya.',
+                'Menunggu WP-13 berjalan minimal 1 periode.',
+                'todo', 'low', 0, 'M', 10],
+            ['Gelombang 5 — Per keputusan', 'WP-23: Kasbon pegawai + potong cicilan',
+                'Tabel pinjaman_pegawai (approval via ApprovalRule, cicilan_bulanan, sisa_pokok); potongan cicilan otomatis di terapkanPotongan() berhenti saat lunas; pencairan = jurnal piutang pegawai; total cicilan = pokok persis tanpa selisih pembulatan.',
+                'TERBLOKIR kebijakan owner: plafon & aturan potong. UANG — adversarial 3 lensa (resign sisa utang, cicilan > gaji, pembulatan akhir).',
+                'blocked', 'medium', 0, 'M', 11],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Program "Operasional Lapangan per Fungsi" — BREAKDOWN-TUGAS-DEVELOPER.md (2026-06-11).
+     * Kedisiplinan, kepengasuhan, kesehatan, keamanan, sarpras — panel + mode lapangan PWA + tombol kebijakan.
+     */
+    private function seedOperasionalLapangan(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'operasional-lapangan'],
+            [
+                'name' => 'Operasional Lapangan per Fungsi (Disiplin, Pengasuhan, UKS, Gerbang)',
+                'description' => 'Bedah per fungsi staf — BREAKDOWN-TUGAS-DEVELOPER.md. Tiap fungsi 3 lapis: ruang kerja panel + mode lapangan di PWA + tombol kebijakan via Setting (PRINSIP POLICY-FIRST: sistem ikut kebijakan pesantren, bukan sebaliknya — tak ada aturan hardcode, master di-seed tapi bebas ubah, saklar workflow, label istilah per tenant). DoD tiap tugas wajib membuktikan dua kebijakan berbeda -> perilaku berbeda.',
+                'status' => 'planning',
+                'color' => 'danger',
+                'icon' => 'heroicon-o-shield-check',
+                'sort' => 15,
+            ]
+        );
+
+        $tasks = [
+            ['Gelombang 1 — Jangkar', 'WP-31: Label istilah per tenant',
+                'Setting label.istilah (JSON map musyrif/mustahiq/takzir/halaqah/bisyaroh -> label tenant) + helper istilah() dipakai navigasi & form (sapu bertahap mulai modul baru) + halaman edit. Pesantren beda istilah bukan beda fitur.',
+                'Belum mulai.',
+                'todo', 'medium', 0, 'S', 1],
+            ['Gelombang 1 — Jangkar', 'WP-32: Setor Keliling masuk PWA Keuangan',
+                'Layar di /admin/keuangan/pwa: kamar/blok -> santri -> setoran (atau scan QR); pakai SetorKelilingService yang SUDAH ada; endpoint idempoten; antrean offline IndexedDB pola camera-gps.js + badge belum-tersinkron.',
+                'Belum mulai. Backend + test SetorKelilingTest sudah ada sejak loop PM (PR Setor Keliling) — tinggal layar PWA.',
+                'todo', 'high', 0, 'S', 2],
+            ['Gelombang 2 — Lapangan', 'WP-09: Modul disiplin/ta\'zir berbasis poin',
+                'Master jenis_pelanggaran (kategori, poin, sanksi_default, seeder contoh); pelanggaran_santri (kronologi, foto bukti, status dicatat/diverifikasi/sanksi_dijalankan/selesai/dibatalkan — pelanggaran catatan pengurus santri WAJIB verifikasi ustadz bila saklar ON); sanksi_santri; akumulasi poin = QUERY per periode (bukan kolom); ambang eskalasi Setting -> SP otomatis + surat + notifikasi wali ber-kebijakan; poin positif/prestasi (saklar); panel Kedisiplinan (antrean verifikasi, rekap, tren).',
+                'Belum mulai. Riset: poin berjenjang (50=SP1+panggil wali, 100=SP2) dengan pencatat berlapis qism->mahkamah adalah norma.',
+                'todo', 'critical', 0, 'L', 3],
+            ['Gelombang 2 — Lapangan', 'WP-24: Disiplin di PWA (catat-verifikasi-eksekusi)',
+                'Form catat kilat scan QR -> jenis -> foto -> kirim; antrean verifikasi ustadz/pengasuhan di PWA; ceklis eksekusi sanksi + bukti; pencatat tak bisa memverifikasi catatannya sendiri.',
+                'Menunggu WP-09 + F1 PWA Guru.',
+                'todo', 'high', 0, 'S', 4],
+            ['Gelombang 2 — Lapangan', 'WP-25: Presensi kamar & sholat per-kelompok',
+                'Master slot presensi pondok via Setting (subuh/maghrib/isya/malam dst aktif per tenant); layar kamar/halaqah -> grid santri x slot default hadir; simpan ke PresensiKegiatan reuse (jenis=slot, JANGAN tabel baru); rekap per kamar/slot di panel Kepengasuhan.',
+                'Menunggu F1 PWA Guru. Beda dari presensi kelas: satuan kamar & slot waktu, bukan rombel & mapel.',
+                'todo', 'high', 0, 'M', 5],
+            ['Gelombang 2 — Lapangan', 'WP-26: Alur izin pulang lintas-aplikasi',
+                'PWA Wali ajukan -> antrean musyrif di PWA Guru (cek kuota bulanan Setting) -> surat izin PDF ber-QR (SuratTemplate + chillerlan) -> tandai sudah-kembali + alarm keterlambatan -> notifikasi WA wali saat disetujui & jatuh tempo. Kebijakan: maks izin/bulan, H-pengajuan, siapa boleh mengajukan, approval berlapis ON/OFF. IzinSantri sudah ada — yang baru alur antar-aplikasinya.',
+                'Menunggu F1 PWA Guru. Query izin-valid disiapkan untuk pos gerbang (WP-29).',
+                'todo', 'high', 0, 'M', 6],
+            ['Gelombang 2 — Lapangan', 'WP-27: Register UKS + istirahat->presensi',
+                'PWA mode kesehatan: scan QR -> kunjungan (keluhan, tindakan, obat, status pulang/istirahat/rujuk); status istirahat -> PresensiSantri otomatis sakit (observer, berhenti saat pulih); rujukan keluar: biaya + penanggung via Setting (pondok/wali/dana_kebajikan) -> draft tagihan/pengeluaran jalur Keuangan yang ada; notifikasi wali ber-kebijakan (semua/menular/rawat).',
+                'Menunggu F1 PWA Guru. RiwayatKesehatan reuse.',
+                'todo', 'high', 0, 'M', 7],
+            ['Gelombang 4 — Gerbang & wali', 'WP-29: Pos gerbang scan + verifikasi foto',
+                'Layar pos (tablet/HP): scan QR/NFC autofocus (pola keyboard-wedge Stasiun) -> FOTO SANTRI BESAR + status izin (anti kartu pinjam); log gerbang keluar/masuk (tanpa izin valid = merah + notifikasi pengasuhan); tandai kembali langsung dari pos; cache offline daftar izin aktif hari ini.',
+                'Menunggu WP-26 + kartu QR/NFC dari Stasiun Pendaftaran F1/F3.',
+                'todo', 'high', 0, 'M', 8],
+            ['Gelombang 4 — Gerbang & wali', 'WP-30: Penjengukan terjadwal',
+                'Jadwal penjengukan per tenant (hari/jam/kuota slot via Setting); PWA Wali ajukan slot (konfirmasi otomatis/manual via saklar); registrasi tamu di pos cocok dengan pengajuan + wali terdaftar; walk-in via saklar; KunjunganWali reuse + kolom slot & pengajuan_id.',
+                'Belum mulai. Bisa paralel.',
+                'todo', 'medium', 0, 'M', 9],
+            ['Gelombang 5 — Per permintaan', 'WP-28: Stok obat UKS (modul-flag)',
+                'Tabel obat + stok masuk/keluar (keluar otomatis dari register UKS); peringatan stok menipis; TANPA batch-expiry rumit (pelajaran G2-14); stok tak bisa minus.',
+                'Menunggu WP-27 + tenant yang butuh.',
+                'todo', 'low', 0, 'S', 10],
+            ['Gelombang 5 — Per permintaan', 'WP-33: Lapor kerusakan & piket',
+                'Tabel laporan_kerusakan (pelapor user/pengurus-santri, lokasi, foto /_tenant-storage, status masuk/dikerjakan/selesai, biaya -> draft pengeluaran jalur Keuangan); ceklis piket area ber-QR lokasi (master area per tenant).',
+                'Prioritas rendah — setelah fungsi inti.',
+                'todo', 'low', 0, 'M', 11],
+        ];
+
+        foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => $current,
+                    'status' => $status,
+                    'priority' => $priority,
+                    'progress' => $progress,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Program "Dasbor Mutu & Ekosistem" — PETA-EKOSISTEM-DIGITAL-PESANTREN.md (2026-06-11).
+     * Tolok ukur 3 tujuan: bisnis sehat, mutu santri, maslahat keluarga besar.
+     */
+    private function seedMutuEkosistem(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'mutu-ekosistem'],
+            [
+                'name' => 'Dasbor Mutu & Ekosistem (Kebijakan, Pimpinan, Kantin, Baitul Maal)',
+                'description' => 'Lapisan integrasi di atas modul inti — PETA-EKOSISTEM-DIGITAL-PESANTREN.md. Tolok ukur semua modul: (1) bisnis sehat, (2) mutu santri terjaga (penjaminan mutu UU 18/2019), (3) maslahat keluarga besar. Dasbor Mutu = agregat lintas 6 modul + lampu kuning otomatis (alat jual terkuat); halaman Pengaturan Kebijakan Pesantren = bukti janji policy-first yang TERLIHAT pembeli; POS kantin via saldo tabungan; Baitul Maal digital (dimensi SumberDana+kehalalan+wakaf SUDAH ada di Ledger sejak modul Keuangan — tinggal pintunya).',
+                'status' => 'planning',
+                'color' => 'success',
+                'icon' => 'heroicon-o-sparkles',
+                'sort' => 16,
+            ]
+        );
+
+        $tasks = [
+            ['Gelombang 4 — Pemoles', '2a: Dasbor Mutu Santri terpadu + lampu kuning',
+                'MutuService::profil agregat: nilai rata, laju hafalan per pekan, capaian kitab, % kehadiran per jenis, poin disiplin, kunjungan UKS — semua QUERY ke tabel yang ada, tanpa tabel data baru; aturan lampu kuning via Setting (default: hafalan macet >=3 pekan, alpa >=3/bulan, poin >=75% ambang SP, nilai turun >=15); layar per-santri/per-kelas heatmap/per-lembaga; lampu -> notifikasi mustahiq + wali (saklar per jenis); job harian (queue), bukan real-time berat.',
+                'Menunggu data lapangan mengalir (F1/F2 PWA Guru + WP-09/25/27). Wujud digital penjaminan mutu dewan masyayikh.',
+                'todo', 'critical', 0, 'M', 1],
+            ['Gelombang 4 — Pemoles', 'WP-35: Dasbor & approval pimpinan di PWA',
+                'Mode pimpinan: kas hari ini (reuse dasbor PWA Keuangan), kehadiran santri/guru, lampu kuning mutu, antrean approval (ApprovalRequest + izin + SP) dengan aksi approve/tolak dari HP — baca-saja selain approval.',
+                'Menunggu Dasbor Mutu 2a.',
+                'todo', 'medium', 0, 'S', 2],
+            ['Gelombang 4 — Pemoles', 'WP-34: Halaman Pengaturan Kebijakan Pesantren',
+                'Registry kebijakan (tiap WP mendaftarkan key Setting + label awam + default + kelompok disiplin/izin/kesehatan/akademik/keuangan/istilah); SATU halaman terkelompok + pencarian + kembalikan-ke-bawaan per item & kelompok; audit trail perubahan (siapa, kapan, dari->ke); ekspor/impor profil kebijakan antar tenant (preset "salafiyah kecil" / "modern multi-lembaga" — onboarding tinggal impor).',
+                'Dikerjakan TERAKHIR di gelombang 4 — mengumpulkan semua tombol kebijakan yang sudah dibuka WP-WP sebelumnya.',
+                'todo', 'high', 0, 'M', 3],
+            ['Gelombang 5 — Per permintaan', 'WP-22: Ekspor Excel EMIS',
+                'Ekspor per kategori (lembaga/santri/pegawai) sesuai kolom EMIS 4.0 — format diverifikasi terhadap template EMIS terbaru SAAT dikerjakan (sering berubah, jangan kunci sekarang); data kurang -> daftar peringatan, bukan gagal. JANGAN bangun integrasi API EMIS (tak ada API publik stabil).',
+                'Menunggu tenant yang minta + WP-12 rekap kesiapan.',
+                'todo', 'low', 0, 'S', 4],
+            ['Gelombang 5 — Ekosistem', '2b: POS kantin/koperasi via saldo tabungan',
+                'Layar kasir pola LoketKas: scan kartu -> UID+PIN (aturan uang kartu dari blueprint Stasiun) -> potong saldo tabungan; batas belanja harian per santri (wali bisa atur dari PWA Wali); posting per unit usaha (DivisiUnit) jalur JurnalService; saldo tak bisa minus; wali lihat riwayat belanja anak.',
+                'TERBLOKIR kartu NFC/QR Stasiun F3 + keputusan owner unit usaha. UANG — adversarial 3 lensa (saldo race 2 kasir, refund, rekonsiliasi harian).',
+                'blocked', 'high', 0, 'L', 5],
+            ['Gelombang 5 — Ekosistem', '2c: Baitul Maal digital (donasi, beasiswa, transparansi)',
+                'Halaman donasi publik di website tenant (program, konfirmasi transfer manual dulu — payment gateway menunggu keputusan owner); pencatatan muzakki/munfiq + kuitansi PDF; dana masuk -> SumberDana sesuai (dimensi zakat/infaq/wakaf SUDAH ada); beasiswa santri -> potongan otomatis tagihan SPP dari dana kebajikan (jalur piutang yang ada, adversarial); laporan penyaluran publik per program; KehalalanGuard: dana wakaf tak terpakai program non-wakaf.',
+                'Menunggu gelombang inti live. UANG — diferensiasi syar\'i terkuat vs pesaing.',
+                'blocked', 'high', 0, 'L', 6],
         ];
 
         foreach ($tasks as [$phase, $title, $detail, $current, $status, $priority, $progress, $effort, $sort]) {
