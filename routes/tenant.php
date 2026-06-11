@@ -14,10 +14,14 @@ use App\Http\Controllers\PengadaanExportController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
 use App\Http\Controllers\PortalGuru\PortalGuruIzinController;
+use App\Http\Controllers\PortalGuru\PortalGuruJurnalController;
+use App\Http\Controllers\PortalGuru\PortalGuruKitabController;
+use App\Http\Controllers\PortalGuru\PortalGuruNilaiController;
 use App\Http\Controllers\PortalGuru\PortalGuruPresensiController;
 use App\Http\Controllers\PortalGuru\PortalGuruPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruSetoranController;
 use App\Http\Controllers\PortalGuru\PortalGuruTahfidzLanjutanController;
+use App\Http\Controllers\PortalGuru\PortalGuruWaliKelasController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
 use App\Http\Controllers\PortalWali\PortalWaliAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
@@ -147,6 +151,24 @@ Route::middleware([
         Route::post('/izin', [PortalGuruIzinController::class, 'store'])->name('izin.store');
         Route::post('/izin/{cuti}/setujui', [PortalGuruIzinController::class, 'setujui'])->name('izin.setujui');
         Route::post('/izin/{cuti}/tolak', [PortalGuruIzinController::class, 'tolak'])->name('izin.tolak');
+
+        // F2-PWA — Grid nilai massal (autosave per baris, idempoten upsert)
+        Route::get('/nilai', [PortalGuruNilaiController::class, 'index'])->name('nilai.index');
+        Route::get('/nilai/{kelas}/{pelajaran}', [PortalGuruNilaiController::class, 'grid'])->name('nilai.grid');
+        Route::post('/nilai/{kelas}/{pelajaran}', [PortalGuruNilaiController::class, 'simpanBaris'])->name('nilai.simpan');
+
+        // F2-PWA — Jurnal KBM 30-detik (menempel layar presensi)
+        Route::post('/jurnal/{jadwal}', [PortalGuruJurnalController::class, 'store'])->name('jurnal.store');
+
+        // F2-PWA — Capaian kitab (sorogan per santri / bandongan kelompok)
+        Route::get('/kitab', [PortalGuruKitabController::class, 'index'])->name('kitab.index');
+        Route::get('/kitab/{kajian}', [PortalGuruKitabController::class, 'form'])->name('kitab.form');
+        Route::post('/kitab/{kajian}', [PortalGuruKitabController::class, 'store'])->name('kitab.store');
+
+        // F2-PWA — Layar wali kelas (rekap binaan + catatan rapor)
+        Route::get('/wali-kelas', [PortalGuruWaliKelasController::class, 'index'])->name('wali-kelas.index');
+        Route::get('/wali-kelas/{kelas}', [PortalGuruWaliKelasController::class, 'show'])->name('wali-kelas.show');
+        Route::post('/wali-kelas/{kelas}/catatan', [PortalGuruWaliKelasController::class, 'simpanCatatan'])->name('wali-kelas.catatan');
     });
 
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {
