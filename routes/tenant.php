@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
+use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
 use App\Http\Controllers\PortalGuru\PortalGuruPresensiController;
 use App\Http\Controllers\PortalGuru\PortalGuruPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruSetoranController;
@@ -105,6 +106,11 @@ Route::middleware([
         Route::get('/setoran', [PortalGuruSetoranController::class, 'index'])->name('setoran.index');
         Route::get('/setoran/{halaqah}', [PortalGuruSetoranController::class, 'form'])->name('setoran.form');
         Route::post('/setoran', [PortalGuruSetoranController::class, 'store'])->name('setoran.store');
+
+        // WP-24 — PWA Guru Disiplin (kepengasuhan mode)
+        Route::get('/disiplin/daftar', [PortalGuruDisiplinController::class, 'daftarPelanggaran'])->name('disiplin.daftar');
+        Route::get('/disiplin/catat', [PortalGuruDisiplinController::class, 'formCatatPelanggaran'])->name('disiplin.catat');
+        Route::get('/disiplin/poin', [PortalGuruDisiplinController::class, 'poinView'])->name('disiplin.poin');
     });
 
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {
