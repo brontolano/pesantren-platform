@@ -24,9 +24,9 @@ class PanelTheme
 
     /**
      * Registry TEMA (layout/gaya). 'topNav' memindah menu utama ke bilah atas;
-     * 'bodyClass' mengaktifkan blok CSS `.tema-…` di theme.css; 'primary'
-     * (opsional) = palet Filament bila preset warna masih bawaan; 'vars'
-     * (opsional) = variabel CSS bawaan tema (preset warna menimpanya).
+     * 'bodyClass' mengaktifkan blok CSS `.tema-…` di theme.css; 'primary' +
+     * 'vars' (opsional) = palet bawaan tema yang MENGIKAT — tema berpalet
+     * penuh selalu memakai paletnya sendiri, preset warna diabaikan.
      */
     public const THEMES = [
         'bawaan' => [
@@ -133,13 +133,15 @@ class PanelTheme
     }
 
     /**
-     * Hex warna primer Filament: preset warna menang; bila preset masih
-     * bawaan, tema boleh membawa primer sendiri; null = bawaan panel.
+     * Hex warna primer Filament. Tema berpalet penuh (mis. Baitul Maal —
+     * punya 'primary' sendiri) MENGIKAT: paletnya selalu ikut tema agar
+     * identitas desain utuh. Preset warna hanya berlaku utk tema tanpa
+     * palet bawaan; null = bawaan panel.
      */
     public static function primaryHex(): ?string
     {
-        return self::COLORS[self::color()]['primary']
-            ?? (self::THEMES[self::theme()]['primary'] ?? null);
+        return self::THEMES[self::theme()]['primary']
+            ?? self::COLORS[self::color()]['primary'];
     }
 
     /** Tema aktif memakai navigasi atas? */
@@ -156,13 +158,14 @@ class PanelTheme
 
     /**
      * Deklarasi variabel CSS aktif ('' bila semuanya bawaan).
-     * Var bawaan tema dahulu, lalu DITIMPA preset warna pilihan pengguna.
+     * Preset warna dahulu, lalu DITIMPA var tema — tema berpalet penuh
+     * mengikat paletnya sendiri (identitas desain tidak boleh tercampur).
      */
     public static function cssVars(): string
     {
         $vars = array_merge(
-            self::THEMES[self::theme()]['vars'] ?? [],
             self::COLORS[self::color()]['vars'],
+            self::THEMES[self::theme()]['vars'] ?? [],
         );
 
         return implode('', array_map(
