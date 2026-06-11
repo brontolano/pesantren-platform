@@ -4,7 +4,8 @@ namespace App\Filament\Resources\Tagihan\Pages;
 
 use App\Filament\Resources\Tagihan\TagihanResource;
 use Filament\Resources\Pages\CreateRecord;
-use Modules\Keuangan\Services\TagihanService;
+use Modules\Keuangan\Models\Tagihan;
+use Modules\Keuangan\Services\BeasiswaService;
 
 class CreateTagihan extends CreateRecord
 {
@@ -19,5 +20,13 @@ class CreateTagihan extends CreateRecord
 
         return $data;
     }
-}
 
+    protected function afterCreate(): void
+    {
+        // 2c — beasiswa potong SPP: terapkan potongan dana sosial pada tagihan
+        // SPP yang baru dibuat (idempoten; no-op untuk non-SPP/non-penerima).
+        if ($this->record instanceof Tagihan) {
+            app(BeasiswaService::class)->terapkanPada($this->record);
+        }
+    }
+}

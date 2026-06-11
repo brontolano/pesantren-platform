@@ -41,6 +41,9 @@ use App\Filament\Resources\Asrama\BlokAsrama\BlokAsramaResource;
 use App\Filament\Resources\Asrama\KamarAsrama\KamarAsramaResource;
 use App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource;
 use App\Filament\Resources\Audit\AuditLogResource;
+use App\Filament\Resources\BaitulMaal\BeasiswaResource;
+use App\Filament\Resources\BaitulMaal\DonasiResource;
+use App\Filament\Resources\BaitulMaal\ProgramDonasiResource;
 use App\Filament\Resources\BroadcastWa\BroadcastWaResource;
 use App\Filament\Resources\CMS\Article\ArticleResource;
 use App\Filament\Resources\CMS\Gallery\GalleryResource;
@@ -348,6 +351,10 @@ class TenantPanelProvider extends PanelProvider
             MetodePembayaranResource::class,
             TabunganTopupResource::class,
             LaporanKeuanganResource::class,
+            // 2c — Baitul Maal Digital (donasi publik + beasiswa potong SPP)
+            ProgramDonasiResource::class,
+            DonasiResource::class,
+            BeasiswaResource::class,
             CrmPenawaranResource::class,
             // POS / Koperasi
             PosKategoriResource::class,
