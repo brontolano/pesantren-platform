@@ -90,7 +90,7 @@ class PengaturanTampilan extends Page implements HasForms
                     ]),
 
                 Section::make('Preset Warna')
-                    ->description('Palet warna panel (header, menu aktif, tombol). Bisa dipadukan dengan tema mana pun.')
+                    ->description('Palet warna panel (header, menu aktif, tombol). Catatan: tema yang membawa palet sendiri (mis. Baitul Maal) selalu memakai palet temanya — pilihan di sini diabaikan.')
                     ->icon('heroicon-o-swatch')
                     ->schema([
                         Radio::make('warna')

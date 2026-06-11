@@ -81,8 +81,15 @@ class PanelThemeTest extends TestCase
         $this->assertStringContainsString('--tema-sidebar-header:#06351F;', PanelTheme::cssVars());
         $this->assertStringContainsString('--tema-active-fg:#ffffff;', PanelTheme::cssVars());
 
-        // Pengguna pilih preset warna → preset MENIMPA var & primer tema.
+        // Palet tema MENGIKAT: preset warna apa pun TIDAK menimpa palet
+        // tema berpalet penuh — identitas Baitul Maal tetap utuh.
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'senja']]);
+        $this->assertSame('#0A5C36', PanelTheme::primaryHex());
+        $this->assertStringContainsString('--tema-active-bg:rgba(238, 220, 154, 0.15);', PanelTheme::cssVars());
+        $this->assertStringContainsString('--tema-sidebar-header:#06351F;', PanelTheme::cssVars());
+
+        // Tema tanpa palet sendiri: preset warna tetap berlaku normal.
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'kompak']]);
         $this->assertSame('#ea580c', PanelTheme::primaryHex());
         $this->assertStringContainsString('--tema-active-bg:#ffedd5;', PanelTheme::cssVars());
 
