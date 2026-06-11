@@ -102,6 +102,7 @@ use App\Filament\Resources\TabunganTopup\TabunganTopupResource;
 use App\Filament\Resources\Tagihan\TagihanResource;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource;
 use App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource;
+use App\Filament\Resources\Tahfidz\Munaqasyah\MunaqasyahResource;
 use App\Filament\Resources\Tahfidz\PenilaianTahfidzResource;
 use App\Filament\Resources\Tahfidz\TahfidzTarget\TahfidzTargetResource;
 use App\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource;
@@ -397,6 +398,8 @@ class TenantPanelProvider extends PanelProvider
             KitabResource::class,
             TahfidzTargetResource::class,
             PenilaianTahfidzResource::class,
+            // WP-11 — munaqasyah + daftar wisuda
+            MunaqasyahResource::class,
             RiwayatKesehatanResource::class,
             SesiKonselingResource::class,
             KegiatanResource::class,
