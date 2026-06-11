@@ -9,14 +9,18 @@ use App\Filament\Resources\Payroll\Employee\Pages\ListEmployee;
 use App\Models\User;
 use App\Services\StorageQuotaService;
 use App\Support\UiMode;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -27,7 +31,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Payroll\Models\Employee;
+use Modules\Payroll\Models\PenilaianUstadz;
 use Modules\Payroll\Models\SertifikasiPegawai;
+use Modules\Payroll\Services\RaporUstadzService;
 
 /**
  * G2-10 — Master Pegawai + Struktur Gaji.
@@ -190,7 +196,50 @@ class EmployeeResource extends Resource
                     ->label('Tanpa Sertifikasi Terdata')
                     ->query(fn (Builder $query): Builder => $query->whereDoesntHave('sertifikasi')),
             ])
-            ->actions([EditAction::make(), DeleteAction::make()]);
+            ->actions([
+                EditAction::make(),
+                // WP-20 — Penilaian kualitatif mudir (penilaian_ustadz, per tahun).
+                // Gate ganda: visible + service simpanPenilaian (403 di service).
+                Action::make('nilai_ustadz')->label('Nilai Ustadz')
+                    ->icon('heroicon-o-star')->color('warning')
+                    ->visible(fn (): bool => auth()->user()?->canAny(['manage_payroll', 'run_payroll']) ?? false)
+                    ->schema(function (Employee $r): array {
+                        $tahun = (int) now()->year;
+                        $ada = PenilaianUstadz::query()
+                            ->where('employee_id', $r->id)->where('tahun', $tahun)->first();
+
+                        return [
+                            TextInput::make('tahun')->label('Tahun')->numeric()->required()
+                                ->default($tahun)->minValue(2000)->maxValue(2100),
+                            KeyValue::make('skor')->label('Skor per Kriteria (0–100)')
+                                ->keyLabel('Kriteria')->valueLabel('Skor')
+                                ->default($ada?->skor ?? ['Keteladanan' => '', 'Kedisiplinan' => '', 'Penguasaan Materi' => ''])
+                                ->helperText('Kriteria bebas sesuai kebijakan pesantren (policy-first).'),
+                            Textarea::make('catatan')->label('Catatan Mudir')->rows(3)
+                                ->default($ada?->catatan),
+                        ];
+                    })
+                    ->action(function (Employee $r, array $data): void {
+                        try {
+                            $skor = collect($data['skor'] ?? [])
+                                ->filter(fn ($v) => $v !== null && $v !== '')
+                                ->map(fn ($v) => max(0, min(100, (float) $v)))
+                                ->all();
+                            app(RaporUstadzService::class)->simpanPenilaian(
+                                $r, (int) $data['tahun'], $skor, $data['catatan'] ?? null, auth()->user(),
+                            );
+                            Notification::make()->title('Penilaian tersimpan')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Gagal menyimpan penilaian')->body($e->getMessage())->danger()->send();
+                        }
+                    }),
+                // WP-20 — Cetak rapor tahunan (print blade). Pegawai ybs juga
+                // boleh membuka URL yang sama — gate di route tenant.php.
+                Action::make('rapor_ustadz')->label('Rapor Ustadz')
+                    ->icon('heroicon-o-document-chart-bar')->color('info')
+                    ->url(fn (Employee $r): string => url('/payroll/rapor-ustadz/'.$r->id.'/'.now()->year), true),
+                DeleteAction::make(),
+            ]);
     }
 
     public static function getPages(): array
