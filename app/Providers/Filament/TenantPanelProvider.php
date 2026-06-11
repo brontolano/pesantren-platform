@@ -137,6 +137,24 @@ class TenantPanelProvider extends PanelProvider
                 \Filament\View\PanelsRenderHook::BODY_START,
                 fn (): \Illuminate\Contracts\View\View => view('filament.theme-vars'),
             )
+            // Elemen LAYOUT tema Baitul Maal — tiap view self-guard (kosong
+            // bila tema lain aktif): font, badge periode, kartu tenant, footer.
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::HEAD_END,
+                fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-head'),
+            )
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::TOPBAR_END,
+                fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-topbar'),
+            )
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::SIDEBAR_FOOTER,
+                fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-sidebar-footer'),
+            )
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::FOOTER,
+                fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-footer'),
+            )
             ->resources($resources)
             ->pages($pages)
             ->widgets($widgets)
