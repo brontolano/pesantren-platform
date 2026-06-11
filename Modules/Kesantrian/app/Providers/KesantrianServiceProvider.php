@@ -18,6 +18,7 @@ class KesantrianServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \Modules\Kesantrian\Console\ProvisionAkunSantriCommand::class,
+                \Modules\Kesantrian\Console\AuditPenempatanCommand::class,
             ]);
         }
     }
