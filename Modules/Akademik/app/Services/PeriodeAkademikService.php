@@ -14,7 +14,20 @@ class PeriodeAkademikService
 
         return DB::transaction(function () use ($data, $periode): PeriodeAkademik {
             if (($data['is_active'] ?? false) === true) {
-                PeriodeAkademik::query()->update(['is_active' => false]);
+                // WP-01: "hanya satu periode aktif" berlaku PER LEMBAGA —
+                // mengaktifkan periode MTs tidak boleh mematikan periode
+                // Madin. NULL = lembaga default (perilaku lama tetap utuh).
+                $lembagaId = array_key_exists('lembaga_id', $data)
+                    ? $data['lembaga_id']
+                    : $periode?->lembaga_id;
+
+                PeriodeAkademik::query()
+                    ->when(
+                        $lembagaId === null,
+                        fn ($q) => $q->whereNull('lembaga_id'),
+                        fn ($q) => $q->where('lembaga_id', $lembagaId),
+                    )
+                    ->update(['is_active' => false]);
             }
 
             if ($periode instanceof PeriodeAkademik) {

@@ -21,6 +21,7 @@ class Kelas extends Model
         'jurusan',
         'capacity',
         'wali_kelas_id',
+        'lembaga_id',
         'is_active',
     ];
 
@@ -28,6 +29,12 @@ class Kelas extends Model
         'capacity' => 'integer',
         'is_active' => 'boolean',
     ];
+
+    /** WP-01: NULL = lembaga default tenant (data lama tetap sah). */
+    public function lembaga(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Akademik\Models\Lembaga::class, 'lembaga_id');
+    }
 
     public function waliKelas(): BelongsTo
     {

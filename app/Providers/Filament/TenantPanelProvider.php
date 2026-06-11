@@ -319,6 +319,7 @@ class TenantPanelProvider extends PanelProvider
             GalleryResource::class,
             ProfileResource::class,
             WebsiteSettingResource::class,
+            \App\Filament\Resources\Akademik\Lembaga\LembagaResource::class, // WP-01
             PeriodeAkademikResource::class,
             PelajaranResource::class,
             ProgramStudiResource::class,

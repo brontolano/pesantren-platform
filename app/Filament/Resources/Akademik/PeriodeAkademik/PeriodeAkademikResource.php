@@ -85,6 +85,21 @@ class PeriodeAkademikResource extends Resource
                     ->required(),
                 DatePicker::make('tanggal_akhir')
                     ->required(),
+                Select::make('lembaga_id')
+                    ->label('Lembaga (opsional)')
+                    ->helperText('Kosong = berlaku untuk lembaga default tenant.')
+                    ->options(fn () => \Modules\Akademik\Models\Lembaga::query()->where('aktif', true)->pluck('nama', 'id'))
+                    ->searchable()
+                    ->nullable(),
+                Select::make('kalender')
+                    ->label('Kalender')
+                    ->options(['masehi' => 'Masehi', 'hijriyah' => 'Hijriyah'])
+                    ->default('masehi')
+                    ->required(),
+                TextInput::make('tahun_hijriyah')
+                    ->label('Tahun Hijriyah (label)')
+                    ->placeholder('1448/1449')
+                    ->maxLength(20),
                 Select::make('is_active')
                     ->label('Status Aktif')
                     ->options([1 => 'Aktif', 0 => 'Nonaktif'])
