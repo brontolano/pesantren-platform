@@ -8,19 +8,6 @@
         <div class="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10 blur-2xl"></div>
         <div class="pointer-events-none absolute right-32 -bottom-6 h-24 w-24 rounded-full bg-white/5 blur-xl"></div>
 
-        {{-- Siluet masjid dekoratif (latar, samar) — ilustrasi khas pesantren --}}
-        <svg class="pointer-events-none absolute -bottom-1 left-1/2 hidden h-20 w-auto -translate-x-1/2 text-white/[0.07] sm:block lg:left-[38%]"
-             viewBox="0 0 320 110" fill="currentColor" aria-hidden="true">
-            {{-- Menara kiri & kanan + bulan sabit --}}
-            <path d="M40 110V46a8 8 0 0 1 16 0v64H40Zm8-72a6 6 0 1 1 0-12 9 9 0 1 0 0 12Z" />
-            <path d="M264 110V46a8 8 0 0 1 16 0v64h-16Zm8-72a6 6 0 1 1 0-12 9 9 0 1 0 0 12Z" />
-            {{-- Bangunan utama + kubah besar + dua kubah kecil --}}
-            <path d="M72 110V72c0-26 19-47 44-52a4 4 0 0 1 0-1 44 44 0 0 1 88 0 4 4 0 0 1 0 1c25 5 44 26 44 52v38H72Z" opacity="0.85" />
-            <path d="M160 18a44 44 0 0 1 44 44h-88a44 44 0 0 1 44-44Zm0-14a6 6 0 1 1 0-12 9 9 0 1 0 0 12Z" />
-            {{-- Pintu lengkung tengah --}}
-            <path d="M148 110V92a12 12 0 0 1 24 0v18h-24Z" fill="#004a38" opacity="0.5" />
-        </svg>
-
         <div class="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             {{-- Kiri: sambutan --}}
             <div class="max-w-xl">
