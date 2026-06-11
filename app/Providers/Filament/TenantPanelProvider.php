@@ -150,6 +150,12 @@ class TenantPanelProvider extends PanelProvider
                 \Filament\View\PanelsRenderHook::TOPBAR_END,
                 fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-topbar'),
             )
+            // Tema topNav: bar prioritas + waffle "Semua Menu" (mega-panel)
+            // menggantikan deretan grup bawaan yang tak muat (self-guard).
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::TOPBAR_LOGO_AFTER,
+                fn (): \Illuminate\Contracts\View\View => view('filament.tema.topnav-megamenu'),
+            )
             ->renderHook(
                 \Filament\View\PanelsRenderHook::SIDEBAR_FOOTER,
                 fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-sidebar-footer'),

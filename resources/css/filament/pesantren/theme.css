@@ -1000,6 +1000,148 @@ body.tema-hijau-malam .fi-topbar .fi-user-menu-trigger {
     border-radius: 9999px !important;
 }
 
+/* ===================================================================
+   NAV HIBRIDA TOPNAV: bar prioritas + waffle "Semua Menu" (mega-panel).
+   Deretan grup bawaan Filament DISEMBUNYIKAN utk tema topNav — diganti
+   ul.tema-nav-utama dari render hook TOPBAR_LOGO_AFTER (semua menu
+   tetap terjangkau: prioritas 1-klik, sisanya di mega-panel grid).
+   =================================================================== */
+body.tema-navigasi-atas .fi-topbar-nav-groups,
+body.tema-pimpinan-biru .fi-topbar-nav-groups,
+body.tema-hijau-malam .fi-topbar-nav-groups {
+    display: none !important;
+}
+
+/* Zona start memuat logo + nav kita: biarkan tumbuh mengisi tengah. */
+body.tema-navigasi-atas .fi-topbar-start,
+body.tema-pimpinan-biru .fi-topbar-start,
+body.tema-hijau-malam .fi-topbar-start {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+.tema-nav-utama {
+    display: none; /* tampil hanya di tema topnav (di bawah) + desktop */
+    list-style: none;
+    margin: 0 0 0 1rem;
+    padding: 0;
+    align-items: center;
+    gap: 0.125rem;
+    min-width: 0;
+}
+@media (min-width: 1024px) {
+    body.tema-navigasi-atas .tema-nav-utama,
+    body.tema-pimpinan-biru .tema-nav-utama,
+    body.tema-hijau-malam .tema-nav-utama {
+        display: flex;
+    }
+}
+.tema-nav-utama .fi-topbar-item {
+    position: relative;
+}
+.tema-nav-utama .fi-topbar-item-btn {
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+}
+
+/* Dropdown grup prioritas */
+.tema-nav-dropdown {
+    position: absolute;
+    top: calc(100% - 0.25rem);
+    inset-inline-start: 0;
+    z-index: 50;
+    min-width: 14rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -2px rgba(16, 24, 40, 0.05), 0 12px 24px -6px rgba(16, 24, 40, 0.18);
+    padding: 0.375rem;
+}
+.dark .tema-nav-dropdown {
+    background: #18181b;
+    border-color: #3f3f46;
+}
+
+/* Item di dropdown & mega-panel */
+.tema-nav-dd-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4375rem 0.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.tema-nav-dd-item:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+.tema-nav-dd-item.aktif {
+    font-weight: 600;
+    color: var(--tema-active-fg, #008069);
+    background: var(--tema-active-bg, #E7F7EE);
+}
+.dark .tema-nav-dd-item { color: rgba(255, 255, 255, 0.75); }
+.dark .tema-nav-dd-item:hover { background: rgba(255, 255, 255, 0.07); color: #ffffff; }
+.tema-nav-dd-icon { width: 1rem; height: 1rem; flex-shrink: 0; opacity: 0.75; }
+
+/* Mega-panel "Semua Menu": lebar penuh di bawah topbar */
+.tema-nav-mega {
+    position: fixed;
+    top: 3.5rem;
+    inset-inline: 0;
+    z-index: 50;
+    max-height: calc(100vh - 4.5rem);
+    overflow-y: auto;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 24px 48px -12px rgba(16, 24, 40, 0.25);
+    padding: 1.25rem max(1.5rem, calc((100% - 1400px) / 2)) 1rem;
+}
+.dark .tema-nav-mega {
+    background: #18181b;
+    border-bottom-color: #3f3f46;
+}
+.tema-nav-mega-grid {
+    columns: 4 16rem;
+    column-gap: 1.5rem;
+}
+.tema-nav-mega-grup {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+}
+.tema-nav-mega-judul {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9ca3af;
+    padding: 0 0.625rem 0.25rem;
+    margin: 0;
+}
+.tema-nav-mega-hint {
+    margin: 0.5rem 0 0;
+    padding-top: 0.625rem;
+    border-top: 1px solid #f3f4f6;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+.dark .tema-nav-mega-hint { border-top-color: #27272a; }
+.tema-nav-mega-hint kbd {
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    padding: 0 0.3rem;
+    font-size: 0.7rem;
+}
+
+[x-cloak] { display: none !important; }
+
 /* <1024px: topNavigation kembali memakai sidebar mobile (hamburger).
    Pastikan target sentuh >=44px. */
 @media (max-width: 1024px) {
