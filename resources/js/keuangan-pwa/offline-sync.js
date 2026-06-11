@@ -46,6 +46,13 @@ export async function flush(csrfToken) {
             if (res.ok) {
                 item.status = 'synced';
                 await tx(db, 'readwrite', (s) => s.put(item));
+            } else if ([400, 404, 409, 422].includes(res.status)) {
+                // Ditolak permanen oleh server (validasi/data tak ada) — JANGAN
+                // retry selamanya; tandai gagal + simpan alasan. 401/403/419/429
+                // tetap pending (bisa pulih setelah login ulang / rate-limit lewat).
+                item.status = 'gagal';
+                item.error = (await res.json().catch(() => null))?.message || `HTTP ${res.status}`;
+                await tx(db, 'readwrite', (s) => s.put(item));
             }
         } catch (e) {
             // tetap pending → retry saat online berikutnya
@@ -57,6 +64,13 @@ export async function pendingCount() {
     const db = await openDb();
     const items = await tx(db, 'readonly', (s) => reqAll(s));
     return items.filter((i) => i.status === 'pending').length;
+}
+
+/** Item yang ditolak permanen server (status gagal) — untuk ditampilkan ke petugas. */
+export async function gagalItems() {
+    const db = await openDb();
+    const items = await tx(db, 'readonly', (s) => reqAll(s));
+    return items.filter((i) => i.status === 'gagal');
 }
 
 function tx(db, mode, fn) {

@@ -14,7 +14,7 @@ class SetorKelilingItem extends Model
     protected $table = 'setor_keliling_item';
 
     protected $fillable = [
-        'tenant_id', 'sesi_id', 'santri_id', 'nominal', 'catatan', 'tabungan_transaksi_id',
+        'tenant_id', 'sesi_id', 'santri_id', 'nominal', 'catatan', 'tabungan_transaksi_id', 'client_ref',
     ];
 
     protected $casts = ['nominal' => 'decimal:2'];

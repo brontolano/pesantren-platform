@@ -174,6 +174,7 @@ Route::middleware([
         Route::get('/catat-pemasukan', [\App\Http\Controllers\KeuanganPwaController::class, 'catatPemasukan'])->name('pemasukan');
         Route::get('/dasbor', [\App\Http\Controllers\KeuanganPwaController::class, 'dasbor'])->name('dasbor');
         Route::get('/slip-saya', [\App\Http\Controllers\KeuanganPwaController::class, 'slipSaya'])->name('slip');
+        Route::get('/setor-keliling', [\App\Http\Controllers\KeuanganPwaController::class, 'setorKeliling'])->name('setor-keliling');
     });
 
     Route::middleware('auth')->prefix('admin/pembiayaan')->name('tenant.pembiayaan.')->group(function () {
@@ -187,5 +188,11 @@ Route::middleware([
         Route::get('/saldo', [\App\Http\Controllers\KeuanganApiController::class, 'saldo'])->name('saldo');
         Route::get('/dashboard-pimpinan', [\App\Http\Controllers\KeuanganApiController::class, 'dashboardPimpinan'])->name('dashboard');
         Route::get('/slip-saya', [\App\Http\Controllers\KeuanganApiController::class, 'slipSaya'])->name('slip');
+        // WP-32: Setor Keliling di PWA (gate setor_tabungan di controller).
+        Route::get('/setor-keliling/kamar', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingKamar'])->name('setor-keliling.kamar');
+        Route::get('/setor-keliling/kamar/{kamar}/santri', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingSantri'])->name('setor-keliling.santri');
+        Route::post('/setor-keliling/setoran', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingSetoran'])->name('setor-keliling.setoran');
+        Route::get('/setor-keliling/sesi', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingSesi'])->name('setor-keliling.sesi');
+        Route::post('/setor-keliling/ajukan', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingAjukan'])->name('setor-keliling.ajukan');
     });
 });

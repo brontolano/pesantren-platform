@@ -59,4 +59,12 @@ class KeuanganPwaController extends Controller
     {
         return Inertia::render('KeuanganPwa/SlipSaya');
     }
+
+    /** WP-32: Setor Keliling — pilih kamar → santri → setoran draf (offline-ready). */
+    public function setorKeliling()
+    {
+        abort_unless(Auth::user()?->can('setor_tabungan') ?? false, 403);
+
+        return Inertia::render('KeuanganPwa/SetorKeliling');
+    }
 }

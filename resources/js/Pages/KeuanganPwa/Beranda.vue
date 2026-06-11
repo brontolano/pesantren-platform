@@ -24,6 +24,9 @@ const base = '/admin/keuangan/pwa'
             <a v-if="can.setor_tabungan" :href="`${base}/catat-pemasukan`" class="rounded-xl bg-white border p-4 text-center shadow-sm">
                 <div class="text-2xl">💰</div><div class="mt-1 font-medium">Catat Pemasukan</div>
             </a>
+            <a v-if="can.setor_tabungan" :href="`${base}/setor-keliling`" class="rounded-xl bg-white border p-4 text-center shadow-sm">
+                <div class="text-2xl">🚶</div><div class="mt-1 font-medium">Setor Keliling</div>
+            </a>
             <a v-if="can.view_laporan_pimpinan" :href="`${base}/dasbor`" class="rounded-xl bg-white border p-4 text-center shadow-sm">
                 <div class="text-2xl">📊</div><div class="mt-1 font-medium">Dasbor Pimpinan</div>
             </a>
