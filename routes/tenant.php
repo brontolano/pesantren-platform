@@ -70,6 +70,15 @@ Route::middleware([
         $disk = Storage::disk('public');
         // Sanitasi path — cegah directory traversal
         $path = ltrim(str_replace('..', '', $path), '/');
+
+        // Direktori dokumen sensitif (arsip HR/kesantrian) WAJIB login —
+        // sisanya (logo, galeri landing) tetap publik.
+        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin'];
+        $segmenPertama = explode('/', $path, 2)[0];
+        if (in_array($segmenPertama, $direktoriSensitif, true)) {
+            abort_unless(auth()->check(), 403);
+        }
+
         abort_unless($disk->exists($path), 404);
 
         return response()->file(

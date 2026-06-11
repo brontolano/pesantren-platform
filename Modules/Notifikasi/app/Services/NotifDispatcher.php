@@ -41,6 +41,8 @@ class NotifDispatcher
         // WP-09 Disiplin — additive.
         'disiplin_pelanggaran' => 'DISIPLIN_PELANGGARAN',       // wali: kejadian terverifikasi (kebijakan semua/berat)
         'disiplin_eskalasi' => 'DISIPLIN_ESKALASI',             // wali: ambang poin terlampaui (SP1/SP2)
+        // WP-16 Kontrak & SK — additive.
+        'kontrak_akan_habis' => 'KONTRAK_AKAN_HABIS',           // admin SDM: kontrak/SK mendekati habis
         // WP-26 Izin Pulang — additive.
         'izin_diajukan' => 'IZIN_DIAJUKAN',                     // musyrif: pengajuan izin baru
         'izin_disetujui' => 'IZIN_DISETUJUI',                   // wali: izin disetujui

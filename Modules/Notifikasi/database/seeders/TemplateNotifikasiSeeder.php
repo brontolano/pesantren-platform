@@ -212,6 +212,28 @@ Terima kasih atas perhatiannya.
 MSG,
             ],
 
+            // ── WP-16 Kontrak & SK ──────────────────────────────────────────
+            [
+                'kode_template' => 'KONTRAK_AKAN_HABIS',
+                'judul' => 'Kontrak/SK Pegawai Akan Habis',
+                'channel' => 'whatsapp',
+                'variable_dinamis' => ['nama_pegawai', 'jenis', 'nomor', 'tanggal_selesai', 'sisa_hari', 'nama_pesantren'],
+                'isi' => <<<'MSG'
+⏰ *KONTRAK/SK AKAN HABIS*
+
+Masa berlaku dokumen berikut segera berakhir:
+
+👤 Pegawai : {{nama_pegawai}}
+📄 Jenis   : {{jenis}}
+🔢 Nomor   : {{nomor}}
+📅 Berakhir: {{tanggal_selesai}} ({{sisa_hari}} hari lagi)
+
+Mohon segera proses perpanjangan atau penyesuaian status di menu Kontrak & SK.
+
+— {{nama_pesantren}}
+MSG,
+            ],
+
             // ── Event uang PWA Wali/Peserta (NOTIF-1, TGH-5, TAB-4) ─────────
             [
                 'kode_template' => 'PEMBAYARAN_DIVERIFIKASI',
