@@ -2,8 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\AkademikExportController;
+use App\Http\Controllers\AppSantri\AppSantriController;
+use App\Http\Controllers\EmisExportController;
+use App\Http\Controllers\KeuanganApiController;
+use App\Http\Controllers\KeuanganExportController;
+use App\Http\Controllers\KeuanganPwaController;
+use App\Http\Controllers\PayrollExportController;
+use App\Http\Controllers\PembiayaanExportController;
+use App\Http\Controllers\PengadaanExportController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
 use App\Http\Controllers\PortalGuru\PortalGuruPresensiController;
@@ -14,18 +21,21 @@ use App\Http\Controllers\PortalWali\PortalWaliAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
 use App\Http\Controllers\PortalWali\PortalWaliFinancialController;
 use App\Http\Controllers\PortalWali\PortalWaliHafalanController;
+use App\Http\Controllers\PortalWali\PortalWaliIzinController;
 use App\Http\Controllers\PortalWali\PortalWaliKegiatanController;
 use App\Http\Controllers\PortalWali\PortalWaliKesehatanController;
-use App\Http\Controllers\PortalWali\PortalWaliIzinController;
 use App\Http\Controllers\PortalWali\PortalWaliNotificationController;
 use App\Http\Controllers\PortalWali\PortalWaliPembayaranController;
-use App\Http\Controllers\PortalWali\PortalWaliPwaController;
 use App\Http\Controllers\PortalWali\PortalWaliProfileController;
+use App\Http\Controllers\PortalWali\PortalWaliPwaController;
 use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
+use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
 use App\Http\Controllers\SantriExportController;
+use App\Support\UiMode;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
 use Modules\CMS\Http\Controllers\SitemapController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -56,10 +66,11 @@ Route::middleware([
      * Fallback: 404 jika file tidak ada.
      */
     Route::get('/_tenant-storage/{path}', function (string $path) {
-        $disk = \Illuminate\Support\Facades\Storage::disk('public');
+        $disk = Storage::disk('public');
         // Sanitasi path — cegah directory traversal
         $path = ltrim(str_replace('..', '', $path), '/');
         abort_unless($disk->exists($path), 404);
+
         return response()->file(
             $disk->path($path),
             ['Content-Type' => $disk->mimeType($path) ?: 'application/octet-stream'],
@@ -74,7 +85,7 @@ Route::middleware([
         $user = auth()->user();
         abort_unless($user !== null, 403);
         $user->forceFill([
-            'ui_mode' => \App\Support\UiMode::simple() ? 'advanced' : 'simple',
+            'ui_mode' => UiMode::simple() ? 'advanced' : 'simple',
         ])->save();
 
         return back();
@@ -82,12 +93,12 @@ Route::middleware([
 
     // App Santri (/app) — login NIS + dashboard ringkas (tahap 1; lanjut: WebAuthn).
     Route::prefix('app')->name('tenant.app-santri.')->group(function () {
-        Route::get('/login', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'showLogin'])->name('login');
-        Route::post('/login', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'login'])
+        Route::get('/login', [AppSantriController::class, 'showLogin'])->name('login');
+        Route::post('/login', [AppSantriController::class, 'login'])
             ->middleware('throttle:10,1')->name('login.attempt');
         Route::middleware('auth')->group(function () {
-            Route::get('/', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'home'])->name('home');
-            Route::post('/logout', [\App\Http\Controllers\AppSantri\AppSantriController::class, 'logout'])->name('logout');
+            Route::get('/', [AppSantriController::class, 'home'])->name('home');
+            Route::post('/logout', [AppSantriController::class, 'logout'])->name('logout');
         });
     });
 
@@ -151,7 +162,7 @@ Route::middleware([
         Route::get('/pembayaran-saya', [PortalWaliPembayaranController::class, 'index'])->name('pembayaran.index');
 
         // App Santri: wali atur PIN login anaknya
-        Route::post('/santri/{santri}/atur-pin', [\App\Http\Controllers\PortalWali\PortalWaliSantriAkunController::class, 'aturPin'])->name('santri.atur-pin');
+        Route::post('/santri/{santri}/atur-pin', [PortalWaliSantriAkunController::class, 'aturPin'])->name('santri.atur-pin');
 
         // W3 Tabungan
         Route::get('/santri/{santri}/tabungan', [PortalWaliTabunganController::class, 'show'])->name('tabungan.show');
@@ -173,6 +184,8 @@ Route::middleware([
 
     Route::middleware('auth')->prefix('admin/akademik/export')->name('tenant.akademik.export.')->group(function () {
         Route::get('/rapor/{rapor}/print', [AkademikExportController::class, 'raporPrint'])->name('rapor.print');
+        // WP-08 — cetak syahadah (sertifikat internal) per alumni.
+        Route::get('/syahadah/{alumni}/print', [AkademikExportController::class, 'syahadahPrint'])->name('syahadah.print');
     });
 
     Route::middleware('auth')->prefix('admin/keuangan/export')->name('tenant.keuangan.export.')->group(function () {
@@ -183,45 +196,45 @@ Route::middleware([
     });
 
     Route::middleware('auth')->prefix('admin/pengadaan')->name('tenant.pengadaan.')->group(function () {
-        Route::get('/bkk/{belanja}/print', [\App\Http\Controllers\PengadaanExportController::class, 'bkkPrint'])->name('bkk.print');
+        Route::get('/bkk/{belanja}/print', [PengadaanExportController::class, 'bkkPrint'])->name('bkk.print');
     });
 
     Route::middleware('auth')->prefix('admin/payroll')->name('tenant.payroll.')->group(function () {
-        Route::get('/slip/{slip}/print', [\App\Http\Controllers\PayrollExportController::class, 'slipPrint'])->name('slip.print');
+        Route::get('/slip/{slip}/print', [PayrollExportController::class, 'slipPrint'])->name('slip.print');
         // WP-03 — Cetak SK penugasan dari template ber-placeholder.
-        Route::get('/penugasan/{penugasan}/sk', [\App\Http\Controllers\PayrollExportController::class, 'skPenugasan'])->name('penugasan.sk');
+        Route::get('/penugasan/{penugasan}/sk', [PayrollExportController::class, 'skPenugasan'])->name('penugasan.sk');
     });
 
     Route::middleware('auth')->prefix('admin/emis')->name('tenant.emis.')->group(function () {
-        Route::get('/export/csv', [\App\Http\Controllers\EmisExportController::class, 'csv'])->name('export.csv');
+        Route::get('/export/csv', [EmisExportController::class, 'csv'])->name('export.csv');
     });
 
     // PWA Keuangan Lapangan (Vue/Inertia). Memakai API api/keuangan/* yang sudah ada.
     Route::middleware('auth')->prefix('admin/keuangan/pwa')->name('tenant.keuangan.pwa.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\KeuanganPwaController::class, 'beranda'])->name('beranda');
-        Route::get('/catat-belanja', [\App\Http\Controllers\KeuanganPwaController::class, 'catatBelanja'])->name('belanja');
-        Route::get('/catat-pemasukan', [\App\Http\Controllers\KeuanganPwaController::class, 'catatPemasukan'])->name('pemasukan');
-        Route::get('/dasbor', [\App\Http\Controllers\KeuanganPwaController::class, 'dasbor'])->name('dasbor');
-        Route::get('/slip-saya', [\App\Http\Controllers\KeuanganPwaController::class, 'slipSaya'])->name('slip');
-        Route::get('/setor-keliling', [\App\Http\Controllers\KeuanganPwaController::class, 'setorKeliling'])->name('setor-keliling');
+        Route::get('/', [KeuanganPwaController::class, 'beranda'])->name('beranda');
+        Route::get('/catat-belanja', [KeuanganPwaController::class, 'catatBelanja'])->name('belanja');
+        Route::get('/catat-pemasukan', [KeuanganPwaController::class, 'catatPemasukan'])->name('pemasukan');
+        Route::get('/dasbor', [KeuanganPwaController::class, 'dasbor'])->name('dasbor');
+        Route::get('/slip-saya', [KeuanganPwaController::class, 'slipSaya'])->name('slip');
+        Route::get('/setor-keliling', [KeuanganPwaController::class, 'setorKeliling'])->name('setor-keliling');
     });
 
     Route::middleware('auth')->prefix('admin/pembiayaan')->name('tenant.pembiayaan.')->group(function () {
-        Route::get('/{pengajuan}/paket-kredit/print', [\App\Http\Controllers\PembiayaanExportController::class, 'paketKreditPrint'])->name('paket.print');
+        Route::get('/{pengajuan}/paket-kredit/print', [PembiayaanExportController::class, 'paketKreditPrint'])->name('paket.print');
     });
 
     // API PWA Keuangan Lapangan (staf). Tenant di-resolve via web group; auth Sanctum.
     Route::middleware(['auth:sanctum'])->prefix('api/keuangan')->name('tenant.api.keuangan.')->group(function () {
-        Route::post('/belanja', [\App\Http\Controllers\KeuanganApiController::class, 'belanja'])->name('belanja');
-        Route::post('/pemasukan', [\App\Http\Controllers\KeuanganApiController::class, 'pemasukan'])->name('pemasukan');
-        Route::get('/saldo', [\App\Http\Controllers\KeuanganApiController::class, 'saldo'])->name('saldo');
-        Route::get('/dashboard-pimpinan', [\App\Http\Controllers\KeuanganApiController::class, 'dashboardPimpinan'])->name('dashboard');
-        Route::get('/slip-saya', [\App\Http\Controllers\KeuanganApiController::class, 'slipSaya'])->name('slip');
+        Route::post('/belanja', [KeuanganApiController::class, 'belanja'])->name('belanja');
+        Route::post('/pemasukan', [KeuanganApiController::class, 'pemasukan'])->name('pemasukan');
+        Route::get('/saldo', [KeuanganApiController::class, 'saldo'])->name('saldo');
+        Route::get('/dashboard-pimpinan', [KeuanganApiController::class, 'dashboardPimpinan'])->name('dashboard');
+        Route::get('/slip-saya', [KeuanganApiController::class, 'slipSaya'])->name('slip');
         // WP-32: Setor Keliling di PWA (gate setor_tabungan di controller).
-        Route::get('/setor-keliling/kamar', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingKamar'])->name('setor-keliling.kamar');
-        Route::get('/setor-keliling/kamar/{kamar}/santri', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingSantri'])->name('setor-keliling.santri');
-        Route::post('/setor-keliling/setoran', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingSetoran'])->name('setor-keliling.setoran');
-        Route::get('/setor-keliling/sesi', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingSesi'])->name('setor-keliling.sesi');
-        Route::post('/setor-keliling/ajukan', [\App\Http\Controllers\KeuanganApiController::class, 'setorKelilingAjukan'])->name('setor-keliling.ajukan');
+        Route::get('/setor-keliling/kamar', [KeuanganApiController::class, 'setorKelilingKamar'])->name('setor-keliling.kamar');
+        Route::get('/setor-keliling/kamar/{kamar}/santri', [KeuanganApiController::class, 'setorKelilingSantri'])->name('setor-keliling.santri');
+        Route::post('/setor-keliling/setoran', [KeuanganApiController::class, 'setorKelilingSetoran'])->name('setor-keliling.setoran');
+        Route::get('/setor-keliling/sesi', [KeuanganApiController::class, 'setorKelilingSesi'])->name('setor-keliling.sesi');
+        Route::post('/setor-keliling/ajukan', [KeuanganApiController::class, 'setorKelilingAjukan'])->name('setor-keliling.ajukan');
     });
 });

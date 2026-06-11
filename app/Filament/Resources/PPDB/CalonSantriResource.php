@@ -2,35 +2,39 @@
 
 namespace App\Filament\Resources\PPDB;
 
-use App\Support\AlbaKidsTenant;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\PPDB\CalonSantri\Pages\CreateCalonSantri;
 use App\Filament\Resources\PPDB\CalonSantri\Pages\EditCalonSantri;
 use App\Filament\Resources\PPDB\CalonSantri\Pages\ListCalonSantri;
+use App\Support\AlbaKidsTenant;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Actions\Action;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\UserOtp;
 use Modules\PPDB\Services\PesertaAccountService;
 use Modules\PPDB\Services\PpdbAdmissionDecisionService;
+use Modules\PPDB\Services\PpdbWhatsappNotifier;
 use Throwable;
 
 class CalonSantriResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = CalonSantri::class;
 
@@ -46,13 +50,13 @@ class CalonSantriResource extends Resource
         return ['nama', 'nomor_pendaftaran'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return (string) $record->nama;
     }
 
     /** @return array<string, string> */
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
             'No. Pendaftaran' => (string) ($record->nomor_pendaftaran ?? '—'),
@@ -69,7 +73,7 @@ class CalonSantriResource extends Resource
                 ->count();
 
             return $n > 0 ? (string) $n : null;
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return null;
         }
     }
@@ -103,12 +107,12 @@ class CalonSantriResource extends Resource
         return Auth::user()?->can('manage_santri') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return Auth::user()?->can('manage_santri') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return Auth::user()?->can('manage_santri') ?? false;
     }
@@ -166,6 +170,17 @@ class CalonSantriResource extends Resource
                     ->label('Program Diminati')
                     ->options($programOptions)
                     ->required(),
+                // WP-08 — mutasi masuk: jalur pindahan + pondok asal.
+                Select::make('jalur')
+                    ->label('Jalur Pendaftaran')
+                    ->options(['reguler' => 'Reguler', 'pindahan' => 'Pindahan (Mutasi Masuk)'])
+                    ->default('reguler')
+                    ->live()
+                    ->nullable(),
+                TextInput::make('asal_pondok')
+                    ->label('Asal Pondok (jalur pindahan)')
+                    ->maxLength(255)
+                    ->visible(fn (Get $get): bool => $get('jalur') === 'pindahan'),
             ])->columns(2),
 
             Section::make('Data Wali / Orang Tua')->schema([
@@ -317,7 +332,7 @@ class CalonSantriResource extends Resource
                     ->visible(fn (CalonSantri $record): bool => (string) $record->status_pendaftaran === 'lulus' && (Auth::user()?->can('manage_santri') ?? false))
                     ->action(function (CalonSantri $record): void {
                         if ($record->no_hp_wali) {
-                            app(\Modules\PPDB\Services\PpdbWhatsappNotifier::class)->sendPengingatDaftarUlang(
+                            app(PpdbWhatsappNotifier::class)->sendPengingatDaftarUlang(
                                 (string) $record->no_hp_wali,
                                 (string) $record->nama,
                                 (string) $record->nomor_pendaftaran,
