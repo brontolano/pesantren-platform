@@ -91,7 +91,7 @@ Route::middleware([
         // sisanya (logo, galeri landing) tetap publik.
         // 'donasi' = bukti transfer unggahan publik — hanya admin yang perlu
         // melihat balik (anti stored-XSS / anti enumerasi bukti orang lain).
-        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi', 'donasi'];
+        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi', 'donasi', 'kerusakan'];
         $segmenPertama = explode('/', $path, 2)[0];
         if (in_array($segmenPertama, $direktoriSensitif, true)) {
             abort_unless(auth()->check(), 403);
