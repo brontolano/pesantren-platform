@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\PratinjauKhidmah;
 use App\Filament\Pages\TenantDashboard;
 use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
 use App\Filament\Resources\Akademik\KalenderAkademik\KalenderAkademikResource;
@@ -33,12 +34,12 @@ use App\Filament\Resources\Inventory\InventoryBatchResource;
 use App\Filament\Resources\Inventory\InventoryItemResource;
 use App\Filament\Resources\Inventory\InventoryLokasiResource;
 use App\Filament\Resources\Kegiatan\IzinSantriResource;
-use App\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use App\Filament\Resources\Kegiatan\KegiatanResource;
 use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kegiatan\Recurring\KegiatanRecurringResource;
 use App\Filament\Resources\Kegiatan\Template\KegiatanTemplateResource;
 use App\Filament\Resources\Kelas\KelasResource;
+use App\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use App\Filament\Resources\Kesantrian\JenisPelanggaran\JenisPelanggaranResource;
 use App\Filament\Resources\Kesantrian\PelanggaranSantri\PelanggaranSantriResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
@@ -142,7 +143,9 @@ class TenantPanelProvider extends PanelProvider
     {
         $isAlbaKids = AlbaKidsTenant::isActive();
         $resources = $isAlbaKids ? $this->albaKidsResources() : $this->defaultResources();
-        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class];
+        // WP-13: PratinjauKhidmah didaftar EKSPLISIT (aturan WP uang) — aman
+        // dobel dengan discoverPages karena getPages() = array_unique.
+        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class];
         $widgets = $isAlbaKids
             ? [
                 GreetingBanner::class,
