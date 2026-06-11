@@ -22,7 +22,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\SertifikasiPegawai;
@@ -172,6 +174,22 @@ class EmployeeResource extends Resource
                 IconColumn::make('aktif')->label('Aktif')->boolean(),
             ])
             ->defaultSort('nama')
+            // WP-12 Kesiapan EMIS — daftar pegawai yang datanya kurang.
+            ->filters([
+                Filter::make('tanpa_nik')
+                    ->label('Tanpa NIK')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('nik')->orWhere('nik', ''),
+                    )),
+                Filter::make('tanpa_nuptk')
+                    ->label('Tanpa NUPTK')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('nuptk')->orWhere('nuptk', ''),
+                    )),
+                Filter::make('tanpa_sertifikasi')
+                    ->label('Tanpa Sertifikasi Terdata')
+                    ->query(fn (Builder $query): Builder => $query->whereDoesntHave('sertifikasi')),
+            ])
             ->actions([EditAction::make(), DeleteAction::make()]);
     }
 

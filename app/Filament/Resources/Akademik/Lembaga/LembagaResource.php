@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Akademik\Lembaga;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\Lembaga\Pages\CreateLembaga;
 use App\Filament\Resources\Akademik\Lembaga\Pages\EditLembaga;
 use App\Filament\Resources\Akademik\Lembaga\Pages\ListLembaga;
 use App\Models\User;
+use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -18,15 +20,17 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\Lembaga;
 use Modules\Ledger\Models\DivisiUnit;
 use UnitEnum;
 
 class LembagaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Lembaga::class;
 
@@ -53,7 +57,7 @@ class LembagaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -66,12 +70,12 @@ class LembagaResource extends Resource
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
@@ -134,6 +138,16 @@ class LembagaResource extends Resource
                 IconColumn::make('aktif')->boolean()->label('Aktif'),
             ])
             ->defaultSort('nama')
+            // WP-12 Kesiapan EMIS — lembaga tanpa NSM/NSPP atau izin operasional.
+            ->filters([
+                Filter::make('tanpa_legalitas')
+                    ->label('Tanpa NSM/NSPP atau IJOP')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q
+                            ->whereNull('nomor_statistik')->orWhere('nomor_statistik', '')
+                            ->orWhereNull('izin_operasional')->orWhere('izin_operasional', ''),
+                    )),
+            ])
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
