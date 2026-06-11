@@ -47,6 +47,9 @@ class RolesAndPermissionsSeeder extends Seeder
             // F1-PWA — gerbang masuk PWA Guru (/guru): guru mapel, guru
             // tahfidz/musyrif, asatidz, dan kepala (pemantauan).
             'akses_pwa_guru',
+            // WP-35 — gerbang Dasbor & Approval Pimpinan dari HP (/pimpinan):
+            // kepala/kyai (dan super_admin). Deploy: butuh tenant:reprovision.
+            'akses_pimpinan',
             // PPDB — portal peserta (akun calon santri ber-role `peserta`)
             'view_own_ppdb_status',
             'complete_own_ppdb',
@@ -247,6 +250,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'ai.setting.lihat',
                 // F1-PWA — kepala memantau lewat PWA Guru.
                 'akses_pwa_guru',
+                // WP-35 — dasbor & approval pimpinan dari HP.
+                'akses_pimpinan',
             ],
             'wali' => [
                 'view_own_children',
