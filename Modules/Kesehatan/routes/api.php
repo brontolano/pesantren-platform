@@ -10,6 +10,7 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
 
 // PWA Guru UKS — Register kunjungan santri (WP-27)
 Route::middleware(['auth:sanctum'])->prefix('pwa/guru')->name('pwa.guru.')->group(function () {
+    Route::get('uks/obat', [PwaGuruUksController::class, 'daftarObat'])->name('uks.obat'); // WP-28
     Route::get('uks/istirahat', [PwaGuruUksController::class, 'daftarIstirahat'])->name('uks.istirahat');
     Route::get('uks/rujukan-terbuka', [PwaGuruUksController::class, 'daftarRujukanTerbuka'])->name('uks.rujukan-terbuka');
     Route::post('uks/catat-kunjungan', [PwaGuruUksController::class, 'catatKunjungan'])->name('uks.catat-kunjungan');

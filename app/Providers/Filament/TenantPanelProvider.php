@@ -12,6 +12,7 @@ use App\Filament\Pages\ModerasiPesanWali;
 use App\Filament\Pages\MutuKelas;
 use App\Filament\Pages\MutuLembaga;
 use App\Filament\Pages\PengajuanJengukPanel;
+use App\Filament\Pages\PiketHariIni;
 use App\Filament\Pages\PratinjauKhidmah;
 use App\Filament\Pages\ProfilMutuSantri;
 use App\Filament\Pages\RekapJurnalKbm;
@@ -60,6 +61,7 @@ use App\Filament\Resources\Kelas\KelasResource;
 use App\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use App\Filament\Resources\Kesantrian\JenisPelanggaran\JenisPelanggaranResource;
 use App\Filament\Resources\Kesantrian\PelanggaranSantri\PelanggaranSantriResource;
+use App\Filament\Resources\Kesehatan\ObatResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
 use App\Filament\Resources\Kesehatan\SesiKonselingResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
@@ -108,6 +110,8 @@ use App\Filament\Resources\PPDB\UjianAttempt\UjianAttemptResource;
 use App\Filament\Resources\Rekonsiliasi\BankStatementResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Santri\SantriResource;
+use App\Filament\Resources\Sarpras\AreaPiketResource;
+use App\Filament\Resources\Sarpras\LaporanKerusakanResource;
 use App\Filament\Resources\SetorKeliling\SetorKelilingResource;
 use App\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
 use App\Filament\Resources\Surat\SuratResource;
@@ -167,7 +171,7 @@ class TenantPanelProvider extends PanelProvider
         // WP-13: PratinjauKhidmah didaftar EKSPLISIT (aturan WP uang) — aman
         // dobel dengan discoverPages karena getPages() = array_unique.
         // WP-07: SidangKenaikan didaftar eksplisit (pola layar kerja).
-        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class, GridNilai::class, RekapJurnalKbm::class, KesiapanEmis::class, LogGerbangPanel::class, PengajuanJengukPanel::class, ModerasiPesanWali::class, KebijakanPesantren::class, ProfilMutuSantri::class, MutuKelas::class, MutuLembaga::class, KasirKantin::class, RekonKantin::class];
+        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class, GridNilai::class, RekapJurnalKbm::class, KesiapanEmis::class, LogGerbangPanel::class, PengajuanJengukPanel::class, ModerasiPesanWali::class, KebijakanPesantren::class, ProfilMutuSantri::class, MutuKelas::class, MutuLembaga::class, KasirKantin::class, RekonKantin::class, PiketHariIni::class];
         $widgets = $isAlbaKids
             ? [
                 GreetingBanner::class,
@@ -248,6 +252,7 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Kepengasuhan'),
                 NavigationGroup::make('Kegiatan & Perizinan'),
                 NavigationGroup::make('Kesehatan & Konseling'),
+                NavigationGroup::make('Sarpras & Umum')->collapsed(),
                 NavigationGroup::make('Administrasi'),
                 NavigationGroup::make('Keuangan'),
                 NavigationGroup::make('Buku Besar')->collapsed(),
@@ -418,6 +423,9 @@ class TenantPanelProvider extends PanelProvider
             MunaqasyahResource::class,
             RiwayatKesehatanResource::class,
             SesiKonselingResource::class,
+            ObatResource::class, // WP-28 — Stok Obat UKS
+            LaporanKerusakanResource::class, // WP-33 — Sarpras
+            AreaPiketResource::class, // WP-33 — Sarpras
             KegiatanResource::class,
             KegiatanTemplateResource::class,
             KegiatanRecurringResource::class,
