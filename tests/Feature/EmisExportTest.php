@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\EmisExportService;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -40,7 +40,9 @@ class EmisExportTest extends TestCase
 
         $rows = app(EmisExportService::class)->barisSantri();
 
-        $this->assertCount(8, EmisExportService::HEADER);
+        // WP-22: 8 kolom lama tetap di depan (urutan TIDAK berubah), kolom EMIS 4.0 di-append.
+        $this->assertCount(13, EmisExportService::HEADER);
+        $this->assertSame(['NISN', 'NIS', 'NAMA', 'JENIS_KELAMIN', 'TAHUN_ANGKATAN', 'STATUS_SANTRI', 'STATUS_SPP', 'TUNGGAKAN'], array_slice(EmisExportService::HEADER, 0, 8));
         $this->assertCount(1, $rows);
         $this->assertSame('Ahmad', $rows[0][2]);          // NAMA
         $this->assertSame('MENUNGGAK', $rows[0][6]);      // STATUS_SPP

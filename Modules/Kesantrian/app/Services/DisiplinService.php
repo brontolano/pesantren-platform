@@ -63,9 +63,14 @@ class DisiplinService
      * wajib_verifikasi true → 'dicatat' (menunggu ustadz); false → langsung
      * 'diverifikasi' (pencatat = verifikator, hook eskalasi langsung jalan).
      *
+     * WP-21: $paksaVerifikasiManual=true MEMAKSA status 'dicatat' walau
+     * Setting wajib_verifikasi=false — dipakai pencatat non-ustadz (pengurus
+     * santri) yang SELALU butuh verifikasi ustadz (anti penyalahgunaan
+     * sesama santri). Default false → perilaku lama TIDAK berubah.
+     *
      * @param  array{waktu_kejadian?:mixed, lokasi?:?string, kronologi:string, foto_bukti?:?string}  $data
      */
-    public function catat(Santri $santri, JenisPelanggaran $jenis, User $pencatat, array $data): PelanggaranSantri
+    public function catat(Santri $santri, JenisPelanggaran $jenis, User $pencatat, array $data, bool $paksaVerifikasiManual = false): PelanggaranSantri
     {
         if (! $jenis->aktif) {
             throw new InvalidArgumentException('Jenis pelanggaran tidak aktif.');
@@ -75,7 +80,7 @@ class DisiplinService
             throw new InvalidArgumentException('Pencatatan poin positif/prestasi dimatikan oleh kebijakan pesantren.');
         }
 
-        $wajibVerifikasi = $this->wajibVerifikasi();
+        $wajibVerifikasi = $paksaVerifikasiManual || $this->wajibVerifikasi();
 
         $pelanggaran = PelanggaranSantri::create([
             'santri_id' => $santri->id,
