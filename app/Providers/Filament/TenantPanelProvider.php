@@ -17,6 +17,7 @@ use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
 use App\Filament\Resources\Akademik\PresensiSantri\PresensiSantriResource;
 use App\Filament\Resources\Akademik\Program\ProgramStudiResource;
 use App\Filament\Resources\Akademik\Rapor\RaporResource;
+use App\Filament\Resources\Akademik\RaporDiniyah\RaporDiniyahResource;
 use App\Filament\Resources\Akademik\Rubrik\RubrikKriteriaResource;
 use App\Filament\Resources\Alumni\AlumniResource;
 use App\Filament\Resources\Approval\ApprovalRequestResource;
@@ -380,6 +381,8 @@ class TenantPanelProvider extends PanelProvider
             PresensiSantriResource::class,
             RubrikKriteriaResource::class,
             RaporResource::class,
+            RaporDiniyahResource::class, // WP-10
+
             BlokAsramaResource::class,
             KamarAsramaResource::class,
             PenempatanAsramaResource::class,
