@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Asrama\Models\BiayaAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;
 use Modules\Core\Concerns\HasDocuments;
+use Modules\Keuangan\Models\Tagihan;
 
 class Santri extends Model
 {
@@ -77,6 +78,7 @@ class Santri extends Model
         'consented_at',
         'consented_by',
         'status',
+        'is_mukim',
         'tahun_angkatan',
         'kelas_id',
         'photo_url',
@@ -86,6 +88,7 @@ class Santri extends Model
 
     protected $casts = [
         'tanggal_lahir' => 'date',
+        'is_mukim' => 'boolean',
     ];
 
     public function kelas(): BelongsTo
@@ -93,12 +96,12 @@ class Santri extends Model
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
-    public function enrollments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function enrollments(): HasMany
     {
         return $this->hasMany(SantriEnrollment::class, 'santri_id');
     }
 
-    public function handwritingSamples(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function handwritingSamples(): HasMany
     {
         return $this->hasMany(HandwritingSample::class, 'santri_id');
     }
@@ -166,7 +169,7 @@ class Santri extends Model
 
     public function tagihan(): HasMany
     {
-        return $this->hasMany(\Modules\Keuangan\Models\Tagihan::class, 'santri_id');
+        return $this->hasMany(Tagihan::class, 'santri_id');
     }
 
     public function isAktif(): bool

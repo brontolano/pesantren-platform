@@ -27,6 +27,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -463,6 +464,17 @@ class SantriResource extends Resource
                     ->options(fn () => Kelas::pluck('nama_kelas', 'id')),
                 SelectFilter::make('jenis_kelamin')
                     ->options(['L' => 'Laki-laki', 'P' => 'Perempuan']),
+                // WP-12 Kesiapan EMIS — daftar santri yang datanya kurang.
+                Filter::make('tanpa_nik')
+                    ->label('Tanpa NIK')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('nik')->orWhere('nik', ''),
+                    )),
+                Filter::make('tanpa_nisn')
+                    ->label('Tanpa NISN')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('nisn')->orWhere('nisn', ''),
+                    )),
             ])
             ->actions([
                 Action::make('id_card')
