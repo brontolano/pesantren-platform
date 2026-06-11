@@ -15,6 +15,10 @@ defineProps({
         type: Object,
         default: null,
     },
+    raporDiniyah: {
+        type: Object,
+        default: null,
+    },
     grades: {
         type: Array,
         default: () => [],
@@ -95,6 +99,30 @@ defineProps({
             </div>
             <p class="mt-3 text-sm text-slate-600">
                 {{ latestRapor?.catatanWaliKelas || 'Catatan wali kelas belum tersedia.' }}
+            </p>
+        </section>
+
+        <!-- WP-10 — Raport Diniyah: unduh/print rapor diniyah anak sendiri. -->
+        <section class="rounded-[1.75rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                        Raport Diniyah
+                    </p>
+                    <h3 class="mt-1 font-jost text-2xl text-slate-900">
+                        {{ raporDiniyah?.periode || 'Belum ada raport diniyah' }}
+                    </h3>
+                </div>
+                <Link
+                    v-if="raporDiniyah"
+                    :href="`/wali/santri/${child.id}/rapor-diniyah/${raporDiniyah.id}/download`"
+                    class="rounded-full bg-emerald-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700"
+                >
+                    Unduh / Print PDF
+                </Link>
+            </div>
+            <p class="mt-3 text-sm text-slate-600">
+                {{ raporDiniyah?.catatanMustahiq || raporDiniyah?.catatanPengasuh || 'Catatan mustahiq belum tersedia.' }}
             </p>
         </section>
 
