@@ -16,6 +16,8 @@ class Kegiatan extends Model
 
     protected $fillable = [
         'tenant_id', 'nama', 'deskripsi', 'jenis',
+        // WP-21 — domain pengurus-santri (null = bukan domain pengurus).
+        'qism',
         'mulai', 'selesai', 'lokasi', 'status', 'penanggung_jawab_id',
         // G3-19 — penaut template/recurring (additif).
         'template_id', 'recurring_id', 'tanggal_acuan',

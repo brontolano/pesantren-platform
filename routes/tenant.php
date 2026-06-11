@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\AppSantri\AppSantriController;
+use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\EmisExportController;
 use App\Http\Controllers\KeuanganApiController;
@@ -157,6 +158,14 @@ Route::middleware([
             Route::get('/ujian/{sesi}', [AppSantriUjianController::class, 'kerjakan'])->name('ujian.kerjakan');
             Route::post('/ujian/{sesi}/jawab', [AppSantriUjianController::class, 'jawab'])->name('ujian.jawab');
             Route::post('/ujian/{sesi}/selesai', [AppSantriUjianController::class, 'selesai'])->name('ujian.selesai');
+
+            // WP-21 — Mode Pengurus-Santri: gerbang ganda dicek per-request di
+            // controller (baris pengurus_santri BERLAKU hari ini; habis = 403).
+            Route::get('/pengurus', [AppSantriPengurusController::class, 'home'])->name('pengurus.home');
+            Route::get('/pengurus/pelanggaran', [AppSantriPengurusController::class, 'formPelanggaran'])->name('pengurus.pelanggaran.form');
+            Route::post('/pengurus/pelanggaran', [AppSantriPengurusController::class, 'simpanPelanggaran'])->name('pengurus.pelanggaran.simpan');
+            Route::get('/pengurus/kegiatan', [AppSantriPengurusController::class, 'kegiatan'])->name('pengurus.kegiatan');
+            Route::post('/pengurus/kegiatan/{kegiatan}/presensi', [AppSantriPengurusController::class, 'simpanPresensi'])->name('pengurus.presensi.simpan');
         });
     });
 
