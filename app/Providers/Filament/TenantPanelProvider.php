@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\GenerateThr;
 use App\Filament\Pages\GridNilai;
+use App\Filament\Pages\KasirKantin;
 use App\Filament\Pages\KebijakanPesantren;
 use App\Filament\Pages\KesiapanEmis;
 use App\Filament\Pages\LogGerbangPanel;
@@ -14,6 +15,7 @@ use App\Filament\Pages\PengajuanJengukPanel;
 use App\Filament\Pages\PratinjauKhidmah;
 use App\Filament\Pages\ProfilMutuSantri;
 use App\Filament\Pages\RekapJurnalKbm;
+use App\Filament\Pages\RekonKantin;
 use App\Filament\Pages\SidangKenaikan;
 use App\Filament\Pages\TenantDashboard;
 use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
@@ -165,7 +167,7 @@ class TenantPanelProvider extends PanelProvider
         // WP-13: PratinjauKhidmah didaftar EKSPLISIT (aturan WP uang) — aman
         // dobel dengan discoverPages karena getPages() = array_unique.
         // WP-07: SidangKenaikan didaftar eksplisit (pola layar kerja).
-        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class, GridNilai::class, RekapJurnalKbm::class, KesiapanEmis::class, LogGerbangPanel::class, PengajuanJengukPanel::class, ModerasiPesanWali::class, KebijakanPesantren::class, ProfilMutuSantri::class, MutuKelas::class, MutuLembaga::class];
+        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class, GridNilai::class, RekapJurnalKbm::class, KesiapanEmis::class, LogGerbangPanel::class, PengajuanJengukPanel::class, ModerasiPesanWali::class, KebijakanPesantren::class, ProfilMutuSantri::class, MutuKelas::class, MutuLembaga::class, KasirKantin::class, RekonKantin::class];
         $widgets = $isAlbaKids
             ? [
                 GreetingBanner::class,

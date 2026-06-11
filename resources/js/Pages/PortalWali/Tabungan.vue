@@ -46,6 +46,14 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    batasBelanja: {
+        type: Number,
+        default: null,
+    },
+    batasBelanjaDefault: {
+        type: Number,
+        default: null,
+    },
 })
 
 const rupiah = (value) =>
@@ -57,6 +65,26 @@ const rupiah = (value) =>
     }).format(Number(value || 0))
 
 const saldo = computed(() => Number(props.savings?.saldo || 0))
+
+// Mutasi kredit (menambah saldo): setor & refund kantin.
+const isKredit = (trx) => ['setor', 'refund_kantin'].includes(trx.tipe)
+const labelTipe = (trx) =>
+    ({
+        setor: 'Setoran saldo',
+        tarik: 'Penarikan saldo',
+        belanja_kantin: 'Belanja kantin',
+        refund_kantin: 'Refund kantin',
+    })[trx.tipe] || trx.tipe
+
+// --- Batas belanja kantin harian (diatur wali, policy-first) ---
+const batasForm = useForm({
+    batas: props.batasBelanja === null ? '' : String(props.batasBelanja),
+})
+function submitBatas() {
+    batasForm
+        .transform((data) => ({ batas: data.batas === '' ? null : Number(data.batas) }))
+        .post(`/wali/santri/${props.child.id}/tabungan/batas-belanja`, { preserveScroll: true })
+}
 const transactions = computed(() => props.savings?.transactions ?? [])
 const hasSaldo = computed(() => saldo.value > 0)
 
@@ -148,21 +176,21 @@ const bayarSheetOpen = computed({
                 <ListRow
                     v-for="trx in transactions"
                     :key="trx.id"
-                    :title="trx.keterangan || (trx.tipe === 'setor' ? 'Setoran saldo' : 'Penarikan saldo')"
+                    :title="trx.keterangan || labelTipe(trx)"
                     :subtitle="trx.tanggal || '-'"
                 >
                     <template #leading>
                         <IconCircle
-                            :icon="trx.tipe === 'setor' ? 'arrow-down-left' : 'arrow-up-right'"
-                            :tone="trx.tipe === 'setor' ? 'emerald' : 'rose'"
+                            :icon="isKredit(trx) ? 'arrow-down-left' : 'arrow-up-right'"
+                            :tone="isKredit(trx) ? 'emerald' : 'rose'"
                             size="md"
                         />
                     </template>
                     <template #trailing>
                         <MoneyText
                             :amount="trx.nominal"
-                            :sign="trx.tipe === 'setor' ? 'plus' : 'minus'"
-                            :tone="trx.tipe === 'setor' ? 'emerald' : 'rose'"
+                            :sign="isKredit(trx) ? 'plus' : 'minus'"
+                            :tone="isKredit(trx) ? 'emerald' : 'rose'"
                         />
                         <p class="mt-0.5 text-[11px] font-medium text-slate-400">
                             Saldo: {{ rupiah(trx.saldoSesudah) }}
@@ -204,6 +232,34 @@ const bayarSheetOpen = computed({
                     Top Up Saldo
                 </UiButton>
             </div>
+        </SectionCard>
+
+        <!-- BATAS BELANJA KANTIN -->
+        <SectionCard kicker="Kantin" title="Batas Belanja Harian">
+            <form class="space-y-3" @submit.prevent="submitBatas">
+                <p class="text-sm leading-6 text-slate-500">
+                    Batasi total belanja kantin anak per hari. Kosongkan untuk ikut
+                    aturan pesantren{{ batasBelanjaDefault !== null ? ` (${rupiah(batasBelanjaDefault)}/hari)` : '' }},
+                    isi 0 untuk memblokir belanja kantin.
+                </p>
+                <UiField label="Batas per hari (Rp)" :error="batasForm.errors.batas">
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="batasForm.batas"
+                            type="number"
+                            min="0"
+                            step="500"
+                            placeholder="Ikut aturan pesantren"
+                            :aria-describedby="describedby"
+                            :invalid="invalid"
+                        />
+                    </template>
+                </UiField>
+                <UiButton type="submit" variant="primary" block :loading="batasForm.processing">
+                    Simpan Batas Belanja
+                </UiButton>
+            </form>
         </SectionCard>
 
         <!-- BAYAR DARI SALDO -->
