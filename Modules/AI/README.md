@@ -143,6 +143,52 @@ riset; respons UI selalu sama (status opt-in tidak bocor).
 <x-ai::rating-jawaban agent="chatbot_wali" />
 ```
 
+## Gate Eval Rilis (T-A024, Blueprint K7 + §10)
+
+Gate eval **bukan CI** (test.yml selalu merah karena DB-per-tenant): jalankan
+**sebelum rilis** terhadap model produksi sebenarnya, di VPS:
+
+```bash
+php artisan ai:eval --suite=syariah    # ambang ≥ 98%
+php artisan ai:eval --suite=faktual    # ambang ≥ 97%
+php artisan ai:eval --suite=injection  # ambang 100% (memanggil Ollama nyata)
+php artisan ai:eval --riwayat          # 10 run terakhir
+```
+
+Exit code ≠ 0 = gate gagal = **fitur terkait tidak dirilis** (bukan
+dilonggarkan). Hasil tercatat di tabel central `ai_eval_run` lengkap dengan
+**model + versi prompt aktif** — ganti model/prompt berarti wajib eval ulang
+(bandingkan kolom antar run). Bank kasus hidup di `ai_eval_case`, diimpor
+idempoten oleh `AiEvalCaseSeeder` dari berkas `database/seeders/data/`
+(otomatis saat suite kosong; ulang manual: `php artisan db:seed
+--class="Modules\AI\Database\Seeders\AiEvalCaseSeeder"`).
+
+Catatan operasional:
+
+- Tanpa `--tenant`, harness memakai **tenant sandbox khusus eval**
+  (`ai.eval.tenant_id`, default `eval-khadim`; dibuat sekali lalu dipakai
+  ulang) — di sanalah harness boleh menyetel konteks kebijakan (level fatwa +
+  blacklist teknis via alur approval resmi) dan menanam data minimal kasus
+  tool.
+- `--tenant=demo` menjalankan eval pada tenant itu **apa adanya** (setting
+  tidak diubah, data tidak ditanam; kasus ber-setup dilewati & tercatat).
+  Diperlukan selama modul `ai` masih berstatus `development` di
+  `module_registry` (hanya tampil untuk tenant developer — gerbang a0
+  PolicyEngine menolak tenant eval) dan untuk kasus kurasi GATE-3 yang butuh
+  korpus pengetahuan nyata. Konsekuensi praktis hari ini: suite syariah/
+  faktual teknis ber-setup dijalankan penuh di **QC lokal** (worktree, sesuai
+  metode gate platform); kasus kurasi GATE-3 (tanpa setup) kelak berjalan
+  penuh di `--tenant=demo`; harness sudah mendaftarkan `tenant_modules` untuk
+  tenant eval sehingga sandbox langsung terpakai begitu modul `released`.
+- **Kasus syariah tidak pernah dikarang** (Aturan Emas #8): saat ini suite
+  syariah berisi kasus PERILAKU teknis-linguistik (mirror `policy_cases.json`,
+  sumber `teknis`). Begitu berkas kurasi GATE-3 disalin ke
+  `database/seeders/data/kasus-eval-syariah.json`, seeder otomatis memuatnya
+  dengan label sumber jujur (`kurasi_ustadz` bila `_peninjau` terisi, selain
+  itu `prd_verbatim`); jenis harapan majemuk yang belum didukung runner
+  dilewati dengan log, tidak ditafsir ulang.
+- `--dry` menjalankan eval tanpa menulis `ai_eval_run` (uji coba lokal).
+
 ## Menjalankan test modul (worktree wt-ai)
 
 ```bash

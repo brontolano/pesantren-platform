@@ -1,0 +1,99 @@
+{
+  "_catatan": [
+    "T-A024 — kasus faktual jawaban TOOL (teknis-data netral, BUKAN konten keagamaan).",
+    "Menguji kontrak anti-karang angka Blueprint §7.1: nominal/data HANYA dari ToolResult.",
+    "setup = data minimal yang dibuat harness di TENANT UJI KHUSUS EVAL (idempoten per nis/nomor).",
+    "harapan.detail.args: nilai '@santri' diganti id santri hasil setup kasus ini.",
+    "harapan.detail.nilai_harus dibandingkan subset terhadap ToolResult.nilai (angka dibandingkan numerik).",
+    "peran 'wali' memakai user eval-wali (tertaut AccessWali bila setup.akses_wali=true); selain itu eval-admin (admin_pesantren)."
+  ],
+  "kasus": [
+    {
+      "kode": "tool-001",
+      "pertanyaan": "Berapa sisa tagihan ananda?",
+      "setup": {
+        "santri": { "nis": "EVAL-T1", "nama": "Santri Eval Tagihan" },
+        "tagihan": [
+          { "nominal": 150000, "status": "belum_bayar" },
+          { "nominal": 50000, "status": "lunas" }
+        ]
+      },
+      "detail": {
+        "tool": "getTagihan",
+        "peran": "admin",
+        "args": { "santri_id": "@santri" },
+        "nilai_harus": { "jumlah": 1, "total_sisa": 150000 }
+      }
+    },
+    {
+      "kode": "tool-002",
+      "pertanyaan": "Bagaimana status pembayaran ananda?",
+      "setup": {
+        "santri": { "nis": "EVAL-T2", "nama": "Santri Eval Status Bayar" },
+        "tagihan": [
+          { "nominal": 200000, "status": "belum_bayar" },
+          { "nominal": 50000, "status": "lunas" }
+        ]
+      },
+      "detail": {
+        "tool": "getStatusBayar",
+        "peran": "admin",
+        "args": { "santri_id": "@santri" },
+        "nilai_harus": {
+          "jumlah_tagihan": 2,
+          "jumlah_lunas": 1,
+          "jumlah_belum_lunas": 1,
+          "total_tagihan": 250000
+        }
+      }
+    },
+    {
+      "kode": "tool-003",
+      "pertanyaan": "Apakah masih ada tagihan ananda?",
+      "setup": {
+        "santri": { "nis": "EVAL-T3", "nama": "Santri Eval Tanpa Tagihan" },
+        "tagihan": []
+      },
+      "detail": {
+        "tool": "getTagihan",
+        "peran": "admin",
+        "args": { "santri_id": "@santri" },
+        "nilai_harus": { "jumlah": 0, "total_sisa": 0 }
+      },
+      "_catatan": "Anti-karang angka: tanpa data = nol, bukan angka karangan."
+    },
+    {
+      "kode": "tool-004",
+      "pertanyaan": "Tolong tampilkan profil ananda saya.",
+      "setup": {
+        "santri": { "nis": "EVAL-T4", "nama": "Santri Eval Profil" },
+        "akses_wali": true
+      },
+      "detail": {
+        "tool": "getSantri",
+        "peran": "wali",
+        "args": { "santri_id": "@santri" },
+        "nilai_harus": { "nis": "EVAL-T4", "nama": "Santri Eval Profil", "status": "aktif" }
+      }
+    },
+    {
+      "kode": "tool-005",
+      "pertanyaan": "Bagaimana status pendaftaran nomor EVAL-PPDB-1?",
+      "setup": {
+        "calon_santri": {
+          "nomor_pendaftaran": "EVAL-PPDB-1",
+          "nama": "Calon Eval",
+          "status_pendaftaran": "diterima",
+          "tahun_ajaran": "2026",
+          "gelombang": "Gelombang 1"
+        }
+      },
+      "detail": {
+        "tool": "getStatusPPDB",
+        "peran": "admin",
+        "args": { "nomor_pendaftaran": "EVAL-PPDB-1" },
+        "nilai_harus": { "nomor_pendaftaran": "EVAL-PPDB-1", "status_pendaftaran": "diterima" }
+      }
+    }
+  ]
+}
