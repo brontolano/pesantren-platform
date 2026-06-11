@@ -75,15 +75,43 @@ class EmployeeResource extends Resource
                 TextInput::make('jabatan')->label('Jabatan (lama — gunakan Penugasan)')
                     ->disabled()->dehydrated(false)
                     ->helperText('Kolom lama (read-only). Kelola jabatan via menu Penugasan Pegawai.'),
-                Select::make('status_kepegawaian')->label('Status')->native(false)->default('honorer')
-                    ->options(['tetap' => 'Tetap', 'honorer' => 'Honorer', 'kontrak' => 'Kontrak']),
+                // WP-04: opsi dari SATU sumber kebenaran — konstanta model.
+                // Nilai legacy tak dikenal (mis. 'magang') IKUT jadi opsi di
+                // record itu — tanpa ini edit form kosong + validasi `in`
+                // memblokir simpan (data lama rusak/macet diam-diam).
+                Select::make('status_kepegawaian')->label('Status Kepegawaian')->native(false)
+                    ->default('gtt_honorer')
+                    ->options(function (?Employee $record): array {
+                        $opts = Employee::STATUS_KEPEGAWAIAN;
+                        $lama = $record?->status_kepegawaian;
+                        if ($lama !== null && $lama !== '' && ! isset($opts[$lama])) {
+                            $opts[$lama] = $lama.' (nilai lama — mohon perbarui)';
+                        }
+
+                        return $opts;
+                    })
+                    ->in(fn (Select $component): array => array_keys($component->getOptions())),
                 TextInput::make('npwp')->label('NPWP')->maxLength(30),
                 Select::make('ptkp_status')->label('Status PTKP (PPh21)')->native(false)->default('TK0')
                     ->options(['TK0' => 'TK/0', 'TK1' => 'TK/1', 'TK2' => 'TK/2', 'TK3' => 'TK/3',
                         'K0' => 'K/0', 'K1' => 'K/1', 'K2' => 'K/2', 'K3' => 'K/3']),
                 DatePicker::make('tanggal_masuk')->label('Tanggal Masuk'),
+                DatePicker::make('tanggal_selesai')->label('Tanggal Selesai (resign/purna)')
+                    ->helperText('Mengisi tanggal ini otomatis menonaktifkan pegawai.'),
                 Toggle::make('aktif')->label('Aktif')->default(true)->inline(false),
             ])->columns(2),
+            // WP-04 — Identitas EMIS (S-0.3).
+            Section::make('Identitas (EMIS)')->schema([
+                TextInput::make('nik')->label('NIK (KTP)')->maxLength(20)
+                    ->unique(ignoreRecord: true)
+                    ->validationMessages(['unique' => 'NIK ini sudah dipakai pegawai lain.']),
+                TextInput::make('nuptk')->label('NUPTK')->maxLength(20),
+                TextInput::make('nrg')->label('NRG (sertifikasi)')->maxLength(20),
+                TextInput::make('pendidikan_terakhir')->label('Pendidikan Terakhir')
+                    ->placeholder('mis. S1 PAI, MA, Pesantren')->maxLength(255),
+                Toggle::make('is_mukim')->label('Mukim (tinggal di pondok)')->inline(false),
+                Toggle::make('asal_alumni')->label('Alumni pesantren ini')->inline(false),
+            ])->columns(2)->collapsible(),
             Section::make('Struktur Gaji')->schema([
                 Repeater::make('komponenGaji')->label('Komponen Gaji')->relationship('komponenGaji')
                     ->schema([
@@ -104,7 +132,8 @@ class EmployeeResource extends Resource
                 TextColumn::make('nama')->label('Nama')->searchable()->sortable(),
                 TextColumn::make('nip')->label('NIP')->placeholder('—'),
                 TextColumn::make('jabatan')->label('Jabatan')->placeholder('—'),
-                TextColumn::make('status_kepegawaian')->label('Status')->badge(),
+                TextColumn::make('status_kepegawaian')->label('Status')->badge()
+                    ->formatStateUsing(fn (?string $state) => Employee::labelStatusKepegawaian($state)),
                 TextColumn::make('ptkp_status')->label('PTKP')->toggleable(),
                 IconColumn::make('aktif')->label('Aktif')->boolean(),
             ])

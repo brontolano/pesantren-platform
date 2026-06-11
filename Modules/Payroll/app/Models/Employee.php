@@ -23,14 +23,43 @@ class Employee extends Model
 
     protected $table = 'employee';
 
+    /**
+     * WP-04 — Satu-satunya sumber kebenaran daftar status kepegawaian
+     * (EMIS-ready). Kolom DB string bebas (tanpa CHECK) — validasi app-level:
+     * form & filter WAJIB membaca konstanta ini, jangan hardcode.
+     *
+     * Map nilai lama (migrasi 2026_06_25_100000): tetap→gty,
+     * honorer→gtt_honorer, kontrak→kontrak.
+     *
+     * @var array<string, string> nilai => label tampilan
+     */
+    public const STATUS_KEPEGAWAIAN = [
+        'gty' => 'GTY (Guru Tetap Yayasan)',
+        'gtt_honorer' => 'GTT / Honorer',
+        'pns_dpk' => 'PNS DPK',
+        'pppk' => 'PPPK',
+        'pengabdian' => 'Pengabdian',
+        'kontrak' => 'Kontrak',
+    ];
+
+    /** Label tampilan status; nilai tak dikenal (data lama) tampil apa adanya. */
+    public static function labelStatusKepegawaian(?string $status): string
+    {
+        return self::STATUS_KEPEGAWAIAN[$status] ?? (string) $status;
+    }
+
     protected $fillable = [
         'tenant_id', 'users_id', 'nip', 'nama', 'jabatan', 'status_kepegawaian',
         'npwp', 'ptkp_status', 'tanggal_masuk', 'aktif',
+        'nik', 'nuptk', 'nrg', 'is_mukim', 'tanggal_selesai', 'pendidikan_terakhir', 'asal_alumni',
     ];
 
     protected $casts = [
         'tanggal_masuk' => 'date',
+        'tanggal_selesai' => 'date',
         'aktif' => 'boolean',
+        'is_mukim' => 'boolean',
+        'asal_alumni' => 'boolean',
     ];
 
     public function user(): BelongsTo
