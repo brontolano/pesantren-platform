@@ -116,6 +116,9 @@ class TenantPanelProvider extends PanelProvider
                 \App\Filament\Widgets\KeuanganAreaChart::class,
                 \App\Filament\Widgets\KategoriPengeluaranChart::class,
                 \App\Filament\Widgets\TransaksiTerbaru::class,
+                // Penekanan keuangan tema Baitul Maal (canView = tema aktif saja)
+                \App\Filament\Widgets\KasOverviewWidget::class,
+                \App\Filament\Widgets\PengajuanTerbaru::class,
                 \App\Filament\Widgets\AgendaPengumuman::class,
                 \App\Filament\Widgets\QuickAccessWidget::class,
             ];

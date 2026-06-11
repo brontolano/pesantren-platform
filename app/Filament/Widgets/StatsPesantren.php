@@ -101,11 +101,21 @@ class StatsPesantren extends StatsOverviewWidget
 
     private function statKasKeluar(): Stat
     {
-        // Modul kas keluar / pengeluaran belum ada (lihat papan PM #9). Jujur: 0.
-        return Stat::make('Kas Keluar (Bulan Ini)', 'Rp 0')
-            ->description('Modul pengeluaran belum aktif')
+        $total = 0.0;
+
+        if (class_exists(\Modules\Pengadaan\Models\Belanja::class)) {
+            // Belanja yang sudah terposting ke buku (punya jurnal) bulan ini.
+            $total = (float) \Modules\Pengadaan\Models\Belanja::query()
+                ->whereNotNull('jurnal_id')
+                ->whereYear('tanggal', now()->year)
+                ->whereMonth('tanggal', now()->month)
+                ->sum('total');
+        }
+
+        return Stat::make('Kas Keluar (Bulan Ini)', 'Rp '.number_format($total, 0, ',', '.'))
+            ->description('Belanja terposting')
             ->descriptionIcon('heroicon-m-arrow-up-right')
-            ->color('gray');
+            ->color($total > 0 ? 'danger' : 'gray');
     }
 
     private function statTagihan(): Stat
