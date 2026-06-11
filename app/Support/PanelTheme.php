@@ -106,9 +106,11 @@ class PanelTheme
     ];
 
     /**
-     * Registry PRESET WARNA. 'primary' = palet tombol/badge Filament;
-     * 'vars' = variabel CSS yang dibaca theme.css (header sidebar, item aktif).
-     * 'bawaan' sengaja kosong → fallback hex lama di theme.css yang berlaku.
+     * Registry PRESET WARNA — DIKUNCI: diturunkan dari kombinasi palet
+     * tema-tema terkunci (bukan warna bebas), agar identitas visual
+     * platform konsisten. Berlaku untuk tema TANPA palet bawaan
+     * (Klasik Sidebar / Navigasi Atas / Kompak); nilai disesuaikan
+     * untuk konteks sidebar terang tema bawaan.
      */
     public const COLORS = [
         'bawaan' => [
@@ -116,48 +118,48 @@ class PanelTheme
             'primary' => null,
             'vars' => [],
         ],
-        'laut' => [
-            'label' => 'Biru Laut',
-            'primary' => '#0284c7',
+        'baitul-maal' => [
+            'label' => 'Palet Baitul Maal (Hijau–Emas)',
+            'primary' => '#0A5C36',
             'vars' => [
-                '--tema-sidebar-header' => '#075985',
-                '--tema-sidebar-header-border' => '#0c4a6e',
-                '--tema-active-bg' => '#e0f2fe',
-                '--tema-active-fg' => '#0369a1',
-                '--tema-active-dark' => 'linear-gradient(90deg, #0284c7 0%, #0369a1 100%)',
+                '--tema-sidebar-header' => '#06351F',
+                '--tema-sidebar-header-border' => '#04281A',
+                '--tema-active-bg' => '#F6ECC8',
+                '--tema-active-fg' => '#0A5C36',
+                '--tema-active-dark' => 'linear-gradient(90deg, #157A4C 0%, #0A5C36 100%)',
             ],
         ],
-        'senja' => [
-            'label' => 'Jingga Senja',
-            'primary' => '#ea580c',
+        'pimpinan-biru' => [
+            'label' => 'Palet Pimpinan Biru (Navy)',
+            'primary' => '#1d4ed8',
             'vars' => [
-                '--tema-sidebar-header' => '#9a3412',
-                '--tema-sidebar-header-border' => '#7c2d12',
-                '--tema-active-bg' => '#ffedd5',
-                '--tema-active-fg' => '#c2410c',
-                '--tema-active-dark' => 'linear-gradient(90deg, #ea580c 0%, #c2410c 100%)',
+                '--tema-sidebar-header' => '#0f2a4a',
+                '--tema-sidebar-header-border' => '#0b2038',
+                '--tema-active-bg' => '#dbeafe',
+                '--tema-active-fg' => '#1d4ed8',
+                '--tema-active-dark' => 'linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%)',
             ],
         ],
-        'royal' => [
-            'label' => 'Ungu Royal',
-            'primary' => '#7c3aed',
+        'merah-putih' => [
+            'label' => 'Palet Merah Putih',
+            'primary' => '#dc2626',
             'vars' => [
-                '--tema-sidebar-header' => '#5b21b6',
-                '--tema-sidebar-header-border' => '#4c1d95',
-                '--tema-active-bg' => '#ede9fe',
-                '--tema-active-fg' => '#6d28d9',
-                '--tema-active-dark' => 'linear-gradient(90deg, #7c3aed 0%, #6d28d9 100%)',
+                '--tema-sidebar-header' => '#7f1d1d',
+                '--tema-sidebar-header-border' => '#601414',
+                '--tema-active-bg' => '#fee2e2',
+                '--tema-active-fg' => '#b91c1c',
+                '--tema-active-dark' => 'linear-gradient(90deg, #dc2626 0%, #b91c1c 100%)',
             ],
         ],
-        'klasik' => [
-            'label' => 'Hijau Klasik Kitab',
-            'primary' => '#15803d',
+        'hijau-malam' => [
+            'label' => 'Palet Hijau Malam (Emas)',
+            'primary' => '#10b981',
             'vars' => [
-                '--tema-sidebar-header' => '#14532d',
-                '--tema-sidebar-header-border' => '#0f3d21',
-                '--tema-active-bg' => '#dcfce7',
-                '--tema-active-fg' => '#166534',
-                '--tema-active-dark' => 'linear-gradient(90deg, #16a34a 0%, #15803d 100%)',
+                '--tema-sidebar-header' => '#0f2419',
+                '--tema-sidebar-header-border' => '#0a1a12',
+                '--tema-active-bg' => '#F6ECC8',
+                '--tema-active-fg' => '#0f5132',
+                '--tema-active-dark' => 'linear-gradient(90deg, #10b981 0%, #047857 100%)',
             ],
         ],
     ];
