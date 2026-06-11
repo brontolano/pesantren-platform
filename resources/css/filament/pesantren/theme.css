@@ -438,10 +438,41 @@ body.tema-baitul-maal .fi-sidebar .fi-icon-btn:hover {
     color: #ffffff !important;
     background-color: rgba(255, 255, 255, 0.1) !important;
 }
-/* Mode gelap: sidebar sudah gelap — samakan latar konten dgn dark bawaan */
+/* ---- Baitul Maal MODE GELAP: varian dark milik tema sendiri ----------
+   Dark bawaan Filament (hitam TikTok #121212/#1C1C24) TIDAK boleh ikut —
+   identitas hijau hutan + emas dipertahankan dengan permukaan hijau pekat. */
 .dark body.tema-baitul-maal .fi-body,
 body.tema-baitul-maal.dark .fi-body {
-    background-color: #121212;
+    background-color: #0A1410 !important; /* hijau-hitam pekat, bukan #121212 */
+}
+.dark body.tema-baitul-maal .fi-topbar,
+.dark body.tema-baitul-maal .fi-header,
+body.tema-baitul-maal.dark .fi-topbar,
+body.tema-baitul-maal.dark .fi-header {
+    background: #0E1A15 !important;
+    border-bottom: 1px solid #23392E !important;
+}
+.dark body.tema-baitul-maal .fi-section,
+.dark body.tema-baitul-maal .fi-wi-stats-overview-stat,
+.dark body.tema-baitul-maal .fi-ta-ctn,
+.dark body.tema-baitul-maal [class*="fi-card"],
+.dark body.tema-baitul-maal .fi-widget-container > div,
+body.tema-baitul-maal.dark .fi-section,
+body.tema-baitul-maal.dark .fi-wi-stats-overview-stat,
+body.tema-baitul-maal.dark .fi-ta-ctn {
+    background-color: #11201A !important;
+    border-color: #23392E !important;
+}
+/* Sidebar dark: gradien diperdalam + garis pemisah hijau */
+.dark body.tema-baitul-maal .fi-sidebar,
+body.tema-baitul-maal.dark .fi-sidebar {
+    background: linear-gradient(180deg, #04281A 0%, #031B12 100%) !important;
+    border-inline-end: 1px solid #1E3329 !important;
+}
+.dark body.tema-baitul-maal .fi-sidebar-header,
+body.tema-baitul-maal.dark .fi-sidebar-header {
+    background: #04281A !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 /* ---- Baitul Maal LAYOUT (bukan hanya warna) ------------------------- */
@@ -469,8 +500,8 @@ body.tema-baitul-maal .fi-topbar {
 }
 .dark body.tema-baitul-maal .fi-topbar,
 body.tema-baitul-maal.dark .fi-topbar {
-    background: #161823 !important;
-    border-bottom: 1px solid #2A2A35 !important;
+    background: #0E1A15 !important; /* dark milik tema (hijau pekat) */
+    border-bottom: 1px solid #23392E !important;
     box-shadow: 0 1px 0 rgba(212, 175, 55, 0.25) !important;
 }
 
@@ -489,8 +520,9 @@ body.tema-baitul-maal .fi-ta-ctn {
 body.tema-baitul-maal.dark .fi-section,
 body.tema-baitul-maal.dark .fi-wi-stats-overview-stat,
 body.tema-baitul-maal.dark .fi-ta-ctn {
-    border: 1px solid #2A2A35 !important;
-    background-color: #1C1C24;
+    /* Dark milik tema: permukaan hijau pekat (selaras blok varian dark) */
+    border: 1px solid #23392E !important;
+    background-color: #11201A !important;
 }
 
 /* Konten: lebar maksimum 1480px terpusat (main shell desain) */
@@ -556,8 +588,8 @@ body.tema-baitul-maal .tema-bm-footer b { color: #0A5C36; }
 body.tema-baitul-maal .tema-bm-footer-gold { color: #9C7A1E; font-weight: 500; }
 .dark body.tema-baitul-maal .tema-bm-footer,
 body.tema-baitul-maal.dark .tema-bm-footer {
-    background: #161823;
-    border-top: 1px solid #2A2A35;
+    background: #0E1A15;
+    border-top: 1px solid #23392E;
     color: rgba(255, 255, 255, 0.55);
 }
 .dark body.tema-baitul-maal .tema-bm-footer b,
