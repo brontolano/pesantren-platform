@@ -19,6 +19,7 @@ use Modules\Akademik\Database\Seeders\KalenderLiburNasionalSeeder;
 use Modules\Akademik\Database\Seeders\KomponenNilaiSeeder;
 use Modules\Akademik\Database\Seeders\LembagaSeeder;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
+use Modules\Payroll\Database\Seeders\JabatanSeeder;
 use Spatie\Permission\PermissionRegistrar;
 
 /**
@@ -115,6 +116,14 @@ class TenantProvisioner
             // +keterangan) — entri yang diedit tenant TIDAK ditimpa.
             Artisan::call('db:seed', [
                 '--class' => KalenderLiburNasionalSeeder::class,
+                '--force' => true,
+            ]);
+
+            // (b3e) WP-03: master jabatan ±15 entri riset (mapping role_spatie
+            // hanya ke role eksisting). Idempoten (firstOrCreate by nama) —
+            // jabatan yang diubah/ditambah tenant TIDAK ditimpa.
+            Artisan::call('db:seed', [
+                '--class' => JabatanSeeder::class,
                 '--force' => true,
             ]);
 

@@ -61,7 +61,9 @@ use App\Filament\Resources\Mutu\MutuTemuanResource;
 use App\Filament\Resources\Pajak\TarifPajakResource;
 use App\Filament\Resources\Payroll\Cuti\CutiResource;
 use App\Filament\Resources\Payroll\Employee\EmployeeResource;
+use App\Filament\Resources\Payroll\Jabatan\JabatanResource;
 use App\Filament\Resources\Payroll\Khidmah\KhidmahResource;
+use App\Filament\Resources\Payroll\Penugasan\PenugasanPegawaiResource;
 use App\Filament\Resources\Payroll\PresensiStaf\PresensiStafResource;
 use App\Filament\Resources\Payroll\SlipGajiResource;
 use App\Filament\Resources\Pembayaran\PembayaranResource;
@@ -398,6 +400,9 @@ class TenantPanelProvider extends PanelProvider
             PurchaseOrderResource::class,
             // Pegawai + Struktur Gaji (G2-10)
             EmployeeResource::class,
+            // WP-03 — Master Jabatan + Penugasan multi-peran (jantung SDM)
+            JabatanResource::class,
+            PenugasanPegawaiResource::class,
             // Presensi + Khidmah + Cuti (G2-11)
             PresensiStafResource::class,
             KhidmahResource::class,
