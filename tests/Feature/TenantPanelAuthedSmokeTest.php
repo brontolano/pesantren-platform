@@ -41,7 +41,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => true, 'data' => json_encode([]),
-             'created_at' => now(), 'updated_at' => now()],
+                'created_at' => now(), 'updated_at' => now()],
         );
 
         // Provisioning seeder lengkap (role + permission) agar user bisa lihat semua menu.
@@ -60,7 +60,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $host = $tenant->id.'.localhost';
         $kernel = app(Kernel::class);
 
-        $paths = ['admin', 'admin/santri/santris', 'admin/tagihan/tagihans', 'admin/tahfidz/halaqah/halaqahs', 'admin/akademik/kitab/kitabs', 'admin/akademik/lembaga/lembagas'];
+        $paths = ['admin', 'admin/santri/santris', 'admin/tagihan/tagihans', 'admin/tahfidz/halaqah/halaqahs', 'admin/akademik/kitab/kitabs', 'admin/akademik/lembaga/lembagas', 'admin/akademik/kalender-akademik/kalender-akademiks'];
         foreach ($paths as $path) {
             $req = Request::create("http://{$host}/{$path}", 'GET');
             $req->headers->set('Host', $host);
