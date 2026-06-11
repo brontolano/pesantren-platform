@@ -19,6 +19,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\PaketSoal;
 
@@ -41,6 +42,15 @@ class PaketSoalResource extends Resource
     public static function canAccess(): bool
     {
         return Auth::user()?->can('manage_santri') ?? false;
+    }
+
+    /**
+     * F4: paket akademik (pelajaran_id terisi) dikelola di resource
+     * Akademik — resource PPDB ini tetap HANYA melihat paket PPDB.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->whereNull('pelajaran_id');
     }
 
     public static function form(Schema $schema): Schema
