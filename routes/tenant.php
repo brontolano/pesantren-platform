@@ -55,6 +55,9 @@ use Illuminate\Support\Facades\Storage;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
 use Modules\CMS\Http\Controllers\SitemapController;
 use Modules\Keuangan\Models\Donasi;
+use Modules\Payroll\Models\Employee;
+use Modules\Payroll\Models\KontrakKerja;
+use Modules\Payroll\Services\RaporUstadzService;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -91,10 +94,19 @@ Route::middleware([
         // sisanya (logo, galeri landing) tetap publik.
         // 'donasi' = bukti transfer unggahan publik — hanya admin yang perlu
         // melihat balik (anti stored-XSS / anti enumerasi bukti orang lain).
-        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi', 'donasi', 'kerusakan'];
+        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi', 'donasi', 'kerusakan', 'pelamar'];
         $segmenPertama = explode('/', $path, 2)[0];
         if (in_array($segmenPertama, $direktoriSensitif, true)) {
             abort_unless(auth()->check(), 403);
+        }
+
+        // Berkas HR (CV/ijazah pelamar, kontrak/SK) lebih ketat: akun santri/
+        // wali ikut "login" — wajib hak payroll/keuangan, bukan sekadar authed.
+        if (in_array($segmenPertama, ['pelamar', 'kontrak-kerja'], true)) {
+            abort_unless(
+                auth()->user()?->canAny(['run_payroll', 'manage_payroll', 'manage_keuangan']) ?? false,
+                403,
+            );
         }
 
         abort_unless($disk->exists($path), 404);
@@ -127,6 +139,29 @@ Route::middleware([
             'namaPesantren' => TenantBranding::name(tenant('name') ?? 'Pesantren'),
         ]);
     })->middleware('auth')->name('tenant.donasi.kuitansi');
+
+    // WP-20 — Rapor Ustadz Tahunan (pola print blade). Gate: mudir/atasan
+    // (manage_payroll/run_payroll) ATAU pegawai ybs (lihat rapornya sendiri,
+    // read-only). Selain itu 403 — rapor memuat penilaian & rekap kinerja.
+    Route::get('/payroll/rapor-ustadz/{employee}/{tahun}', function (int $employee, int $tahun) {
+        abort_unless($tahun >= 2000 && $tahun <= 2100, 404);
+
+        $record = Employee::query()->findOrFail($employee);
+        $user = auth()->user();
+
+        abort_unless($user !== null && app(RaporUstadzService::class)->bolehLihat($record, $user), 403);
+
+        return view('exports.rapor-ustadz-print', [
+            'employee' => $record,
+            'rekap' => app(RaporUstadzService::class)->rekap($record, $tahun),
+            // Tautan arsip kontrak/SK (WP-16) — konteks masa kerja.
+            'kontrak' => KontrakKerja::query()
+                ->where('employee_id', $record->id)
+                ->orderByDesc('mulai')
+                ->get(),
+            'namaPesantren' => TenantBranding::name(tenant('name') ?? 'Pesantren'),
+        ]);
+    })->middleware('auth')->name('tenant.payroll.rapor-ustadz');
 
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
