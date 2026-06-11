@@ -51,6 +51,8 @@ class NotifDispatcher
         'gerbang_tanpa_izin' => 'GERBANG_TANPA_IZIN',           // pengasuhan: santri keluar tanpa izin
         // F3-PWA Pesan Wali — additive.
         'pesan_wali_baru' => 'PESAN_WALI_BARU',                 // wali: pesan baru dari guru
+        // 2a Dasbor Mutu — additive.
+        'mutu_lampu_kuning' => 'MUTU_LAMPU_KUNING',             // mustahiq/wali: lampu kuning mutu santri
     ];
 
     public function __construct(
