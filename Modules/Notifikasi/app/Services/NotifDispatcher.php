@@ -47,6 +47,8 @@ class NotifDispatcher
         'izin_diajukan' => 'IZIN_DIAJUKAN',                     // musyrif: pengajuan izin baru
         'izin_disetujui' => 'IZIN_DISETUJUI',                   // wali: izin disetujui
         'izin_ditolak' => 'IZIN_DITOLAK',                       // wali: izin ditolak + alasan
+        // F3-PWA Pesan Wali — additive.
+        'pesan_wali_baru' => 'PESAN_WALI_BARU',                 // wali: pesan baru dari guru
     ];
 
     public function __construct(

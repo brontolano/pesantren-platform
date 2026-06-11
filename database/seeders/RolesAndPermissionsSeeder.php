@@ -5,12 +5,13 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $permissions = [
             'view_dashboard',
@@ -209,6 +210,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_akademik',
                 'manage_akademik',
                 'akses_pwa_guru',
+                // F3-PWA — Slip Saya: guru melihat/cetak slip MILIKNYA sendiri.
+                'view_slip_sendiri',
             ],
             'guru_tahfidz' => [
                 'view_dashboard',
@@ -216,6 +219,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_akademik',
                 'manage_akademik',
                 'akses_pwa_guru',
+                // F3-PWA — Slip Saya: guru melihat/cetak slip MILIKNYA sendiri.
+                'view_slip_sendiri',
             ],
             'konselor' => [
                 'view_dashboard',
