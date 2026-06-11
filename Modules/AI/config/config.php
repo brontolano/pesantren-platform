@@ -703,6 +703,35 @@ return [
             'izin' => ['tool' => 'getIzin', 'kategori' => 'umum'],
         ],
 
+        /*
+        |----------------------------------------------------------------------
+        | T-A052 — handoff manusia & Kotak Masuk WA (PRD §8.2)
+        |----------------------------------------------------------------------
+        | Tiga pemicu status percakapan 'handoff':
+        |  (a) wali terverifikasi minta dilayani manusia (pola di bawah);
+        |  (b) jawaban free-form degraded/tanpa-rujukan beruntun mencapai
+        |      maks_gagal_beruntun → bot menawarkan handoff otomatis;
+        |  (c) admin Ambil Alih manual dari halaman Kotak Masuk WA.
+        | Saat handoff: bot DIAM total (pesan masuk tetap tersimpan + admin
+        | diberi tahu via LogNotifikasi), KECUALI STOP/MULAI (opt-out/opt-in
+        | tetap dihormati). Balasan manual admin lewat jalur outbound resmi
+        | (WaBalasanService → WaGatewayService, Aturan Emas #5).
+        */
+        'handoff' => [
+            // Keyword wali minta manusia (regex, kebijakan di config —
+            // Aturan Emas #11). Hanya berlaku untuk wali TERVERIFIKASI;
+            // nomor asing tetap dilayani template info publik.
+            'pola_minta_manusia' => [
+                '/\b(?:admin|operator)\b/iu',
+                '/\bmanusia\b/iu',
+                '/\bbicara\s+(?:dengan\s+|sama\s+|ke\s+)?orang\b/iu',
+            ],
+
+            // Ambang jawaban gagal (degraded/tanpa-rujukan) BERTURUT dalam
+            // sesi sebelum bot menawarkan handoff otomatis.
+            'maks_gagal_beruntun' => (int) env('AI_WA_HANDOFF_MAKS_GAGAL', 2),
+        ],
+
         // ------------------------------------------------------------------
         // Template balasan T-A051 (Indonesia santun, polos kompatibel WA).
         // ------------------------------------------------------------------
@@ -719,5 +748,11 @@ return [
         'balasan_ganti_anak_pilihan' => "Putra/putri yang tertaut dengan nomor Anda:\n:daftar\nKetik: GANTI ANAK diikuti nama, contoh: GANTI ANAK Ahmad.",
         'balasan_tanpa_anak' => 'Mohon maaf, belum ada data santri yang tertaut dengan akun wali Anda. Silakan hubungi admin pesantren untuk menautkan data ananda.',
         'balasan_kelas_belum_ada' => 'Mohon maaf, data kelas ananda :nama belum terdaftar sehingga jadwal belum dapat ditampilkan. Silakan hubungi admin pesantren.',
+
+        // ------------------------------------------------------------------
+        // Template balasan T-A052 (handoff manusia).
+        // ------------------------------------------------------------------
+        'balasan_handoff_diminta' => 'Baik, permintaan Anda kami teruskan kepada admin pesantren. Mohon berkenan menunggu, admin akan membalas melalui nomor ini pada jam layanan. Jazakumullahu khairan.',
+        'balasan_handoff_otomatis' => 'Kami mohon maaf asisten belum dapat membantu dengan baik. Percakapan ini kami teruskan kepada admin pesantren — mohon berkenan menunggu balasan admin melalui nomor ini.',
     ],
 ];

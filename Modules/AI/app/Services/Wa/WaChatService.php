@@ -33,7 +33,12 @@ use Modules\Kesantrian\Models\Santri;
  *  - IDEMPOTEN per wa_message_id: balasan ditandai meta.balasan_untuk; retry
  *    job yang sudah terbalas berhenti diam-diam (kiriman & metering tak dobel);
  *  - SEMUA balasan via WaBalasanService (jalur outbound resmi Notifikasi,
- *    Aturan Emas #5) — tercatat ai_message keluar TERREDAKSI.
+ *    Aturan Emas #5) — tercatat ai_message keluar TERREDAKSI;
+ *  - T-A052 HANDOFF MANUSIA (PRD §8.2): wali terverifikasi minta manusia
+ *    (keyword config) → konfirmasi + status handoff; jawaban free-form
+ *    degraded/tanpa-rujukan beruntun (ai_conversation.gagal_beruntun)
+ *    mencapai ambang → tawarkan handoff otomatis. Saat status=handoff,
+ *    kelas ini TIDAK pernah dipanggil (ProsesPesanWaJob mendiamkan bot).
  */
 class WaChatService
 {
@@ -44,6 +49,7 @@ class WaChatService
         private readonly ToolRegistry $tools,
         private readonly PolicyEngine $policy,
         private readonly RagAnswerer $rag,
+        private readonly WaHandoffService $handoff,
     ) {}
 
     public function proses(AiConversation $conversation, AiMessage $masuk, string $isi): void
@@ -60,6 +66,19 @@ class WaChatService
 
         if ($wali === null) {
             $this->prosesBelumTerverifikasi($conversation, $masuk, $isi);
+
+            return;
+        }
+
+        // ------------------------------------------------------------------
+        // 1b. T-A052 — wali minta dilayani MANUSIA (keyword config): set
+        //     handoff DULU (admin pasti ternotifikasi walau kirim konfirmasi
+        //     gagal), lalu konfirmasi santun. Permintaan meta ini sengaja
+        //     SEBELUM PolicyEngine — minta admin bukan trafik AI.
+        // ------------------------------------------------------------------
+        if ($this->handoff->mintaManusia($isi)) {
+            $this->handoff->mulaiHandoff($conversation, WaHandoffService::PEMICU_DIMINTA_WALI);
+            $this->balas($conversation, $masuk, $this->template('balasan_handoff_diminta'), ['jenis' => 'handoff_diminta']);
 
             return;
         }
@@ -296,6 +315,9 @@ class WaChatService
             $hasil->sumber,
         );
 
+        // T-A052: jawaban data sukses memutus rentetan gagal free-form.
+        $this->resetGagalBeruntun($conversation);
+
         $this->balas($conversation, $masuk, $dirakit->text, [
             'jenis' => 'intent_tool',
             'intent' => $intent,
@@ -344,11 +366,44 @@ class WaChatService
         // dan pertanyaan uang sudah dipaksa ke tool oleh IntentRouter.
         $hasil = $this->rag->jawab($request, ['kategori_jawaban' => 'umum']);
 
-        $this->balas($conversation, $masuk, $hasil->text, [
+        // T-A052 — jawaban GAGAL = degradasi provider ATAU tanpa-rujukan/
+        // gagal-sitasi (RagAnswerer mengembalikan provider 'null' untuk
+        // keduanya). Tolakan kebijakan BUKAN kegagalan menjawab.
+        $gagal = $hasil->degraded
+            || ($hasil->provider === 'null' && ! $hasil->ditolakPolicy);
+
+        $meta = [
             'jenis' => 'rag',
             'degraded' => $hasil->degraded,
             'ditolak_policy' => $hasil->ditolakPolicy,
-        ]);
+        ];
+
+        if (! $gagal) {
+            $this->resetGagalBeruntun($conversation);
+            $this->balas($conversation, $masuk, $hasil->text, $meta);
+
+            return;
+        }
+
+        $beruntun = (int) $conversation->gagal_beruntun + 1;
+        $conversation->update(['gagal_beruntun' => $beruntun]);
+
+        if ($beruntun < max(1, (int) config('ai.wa.handoff.maks_gagal_beruntun', 2))) {
+            $this->balas($conversation, $masuk, $hasil->text, $meta + ['gagal_beruntun' => $beruntun]);
+
+            return;
+        }
+
+        // Ambang tercapai → tawarkan handoff otomatis + status handoff
+        // (handoff DULU supaya admin pasti ternotifikasi; lihat 1b).
+        $this->handoff->mulaiHandoff($conversation, WaHandoffService::PEMICU_GAGAL_BERUNTUN);
+
+        $this->balas(
+            $conversation,
+            $masuk,
+            $hasil->text."\n\n".$this->template('balasan_handoff_otomatis'),
+            ['jenis' => 'handoff_otomatis', 'gagal_beruntun' => $beruntun] + $meta,
+        );
     }
 
     // ------------------------------------------------------------------
@@ -470,6 +525,14 @@ class WaChatService
         }
 
         return $this->template('balasan_info_ppdb', [':jam_layanan' => $jam]);
+    }
+
+    /** T-A052: jawaban sukses memutus rentetan gagal degraded/tanpa-rujukan. */
+    private function resetGagalBeruntun(AiConversation $conversation): void
+    {
+        if ((int) $conversation->gagal_beruntun !== 0) {
+            $conversation->update(['gagal_beruntun' => 0]);
+        }
     }
 
     private function kunciIdempotensi(AiMessage $masuk): string

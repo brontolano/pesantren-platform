@@ -79,6 +79,11 @@ class RolesAndPermissionsSeeder extends Seeder
             // buat draf, edit isi, MENGESAHKAN (human-in-the-loop), cetak.
             // Kultum tetap digerbang feature flag opt-in (generator_kultum).
             'ai.generator.ikhtisar',
+            // Modul AI (T-A052) — Kotak Masuk WA chatbot (admin/TU):
+            // lihat percakapan (nomor tersamar), ambil alih (handoff),
+            // balas manual via jalur outbound resmi, kembalikan ke bot,
+            // tutup; juga penerima notifikasi handoff baru.
+            'ai.chat.kelola',
         ];
 
         foreach ($permissions as $permission) {
@@ -111,6 +116,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'ai.generator.rpp',
                 'ai.template.kelola',
                 'ai.generator.ikhtisar',
+                'ai.chat.kelola',
             ],
             'santri' => [
                 'view_dashboard',
@@ -121,6 +127,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_santri',
                 'manage_santri',
                 'view_akademik',
+                // T-A052 — TU ikut melayani Kotak Masuk WA chatbot.
+                'ai.chat.kelola',
             ],
             'keuangan' => [
                 'view_dashboard',

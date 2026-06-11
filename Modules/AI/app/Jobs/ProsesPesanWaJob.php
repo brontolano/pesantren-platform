@@ -13,6 +13,7 @@ use Modules\AI\Models\AiConversation;
 use Modules\AI\Models\AiMessage;
 use Modules\AI\Services\Wa\WaBalasanService;
 use Modules\AI\Services\Wa\WaChatService;
+use Modules\AI\Services\Wa\WaHandoffService;
 
 /**
  * T-A050/T-A051 — pemrosesan asinkron pesan WA masuk (queue 'ai', worker-ai).
@@ -21,6 +22,8 @@ use Modules\AI\Services\Wa\WaChatService;
  *  1. opt-out (STOP/BERHENTI) → set flag + konfirmasi santun SEKALI, tanpa LLM;
  *  2. opt-in (MULAI)          → buka flag + konfirmasi;
  *  3. opt_out aktif           → DIAM total (penghormatan seketika);
+ *  3b. status handoff (T-A052)→ bot DIAM (pesan tersimpan + notifikasi admin
+ *      Kotak Masuk WA); 'ditutup' dibuka kembali oleh pesan baru;
  *  4. mode_uji=true (T-A050)  → balasan template statis TANPA LLM;
  *  5. mode_uji=false (T-A051) → pipeline WaChatService:
  *     verifikasi wali → intent rule-based → tool/template → free-form RAG.
@@ -84,6 +87,22 @@ class ProsesPesanWaJob implements ShouldQueue
         // 3. Sudah opt-out → DIAM total.
         if ($conversation->opt_out) {
             return;
+        }
+
+        // 3b. T-A052 — status handoff: bot DIAM total (admin yang melayani
+        //     lewat Kotak Masuk WA). Pesan masuk SUDAH tersimpan oleh
+        //     webhook; di sini cukup beri tahu admin ada pesan menunggu.
+        //     STOP/MULAI tetap dihormati (sudah ditangani di atas).
+        if ($conversation->status === AiConversation::STATUS_HANDOFF) {
+            app(WaHandoffService::class)->notifikasiPesanMasuk($conversation);
+
+            return;
+        }
+
+        // 3c. Percakapan 'ditutup' hidup kembali saat wali menyapa lagi —
+        //     status Kotak Masuk tetap bermakna tanpa menghalangi layanan.
+        if ($conversation->status === AiConversation::STATUS_DITUTUP) {
+            $conversation->update(['status' => AiConversation::STATUS_AKTIF]);
         }
 
         // 4. T-A050 mode uji: balasan statis tanpa LLM.
