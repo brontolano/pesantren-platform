@@ -18,9 +18,35 @@ class Cuti extends Model
 
     protected $table = 'cuti';
 
+    /**
+     * WP-17 — Satu-satunya sumber kebenaran daftar jenis. Kolom DB string(20)
+     * bebas tanpa CHECK — validasi app-level (form & service WAJIB baca ini).
+     *
+     * @var array<string, string> nilai => label tampilan
+     */
+    public const JENIS = [
+        'tahunan' => 'Cuti Tahunan',
+        'sakit' => 'Sakit',
+        'penting' => 'Keperluan Penting',
+        'melahirkan' => 'Melahirkan',
+        'pulang_kampung' => 'Izin Pulang Kampung',
+        'keperluan_keluarga' => 'Izin Keperluan Keluarga',
+        'dinas' => 'Izin Dinas',
+        'lainnya' => 'Lainnya',
+    ];
+
+    /**
+     * WP-17 — Jenis izin harian: default is_berbayar TRUE (tak memotong gaji,
+     * jalur potongan WP-14 hanya untuk cuti tak berbayar).
+     *
+     * @var list<string>
+     */
+    public const JENIS_IZIN_HARIAN = ['pulang_kampung', 'keperluan_keluarga', 'dinas'];
+
     protected $fillable = [
         'tenant_id', 'employee_id', 'jenis', 'is_berbayar', 'tanggal_mulai', 'tanggal_selesai',
         'jumlah_hari', 'alasan', 'status', 'disetujui_oleh', 'disetujui_pada', 'diajukan_oleh',
+        'client_ref',
     ];
 
     protected $casts = [
