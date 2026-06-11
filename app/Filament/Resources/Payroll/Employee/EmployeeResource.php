@@ -71,7 +71,10 @@ class EmployeeResource extends Resource
                     ->options(fn () => User::query()->orderBy('name')->pluck('name', 'id'))
                     ->helperText('Wajib untuk generate slip gaji.'),
                 TextInput::make('nip')->label('NIP')->maxLength(40),
-                TextInput::make('jabatan')->label('Jabatan')->maxLength(255),
+                // WP-03: kolom string deprecated — sumber kebenaran kini Penugasan Pegawai.
+                TextInput::make('jabatan')->label('Jabatan (lama — gunakan Penugasan)')
+                    ->disabled()->dehydrated(false)
+                    ->helperText('Kolom lama (read-only). Kelola jabatan via menu Penugasan Pegawai.'),
                 Select::make('status_kepegawaian')->label('Status')->native(false)->default('honorer')
                     ->options(['tetap' => 'Tetap', 'honorer' => 'Honorer', 'kontrak' => 'Kontrak']),
                 TextInput::make('npwp')->label('NPWP')->maxLength(30),

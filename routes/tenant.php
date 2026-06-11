@@ -161,6 +161,8 @@ Route::middleware([
 
     Route::middleware('auth')->prefix('admin/payroll')->name('tenant.payroll.')->group(function () {
         Route::get('/slip/{slip}/print', [\App\Http\Controllers\PayrollExportController::class, 'slipPrint'])->name('slip.print');
+        // WP-03 — Cetak SK penugasan dari template ber-placeholder.
+        Route::get('/penugasan/{penugasan}/sk', [\App\Http\Controllers\PayrollExportController::class, 'skPenugasan'])->name('penugasan.sk');
     });
 
     Route::middleware('auth')->prefix('admin/emis')->name('tenant.emis.')->group(function () {

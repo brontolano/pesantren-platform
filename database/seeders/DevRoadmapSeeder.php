@@ -1013,8 +1013,8 @@ class DevRoadmapSeeder extends Seeder
         $tasks = [
             ['Gelombang 1 — Jangkar', 'WP-03: Master jabatan + penugasan multi-peran + SK',
                 'Tabel jabatan (kategori + mapping role_spatie, seeder 15 jabatan dari riset: mudir, mustahiq, musyrif, muhaffizh, lurah pondok, qism, dst) + penugasan_pegawai (employee x jabatan x lembaga x periode, nomor/file SK, is_primary); observer assign/revoke role Spatie (revoke hanya bila tak ada penugasan lain ber-role sama); Employee.jabatan string jadi deprecated read-only; cetak SK via SuratTemplate.',
-                'Belum mulai. JANTUNG modul — satu orang = guru pagi + musyrif malam + pengurus qism.',
-                'todo', 'critical', 0, 'L', 1],
+                'SELESAI (2026-06-11): jabatan (15 seed, mapping HANYA ke role eksisting; lurah pondok+qism NULL by design) + penugasan_pegawai (partial unique primary aktif, auto-demote) + 3 observer role-sync (Penugasan/Jabatan/Employee — pindah pegawai/jabatan/user semua memindahkan role, tak ada orphan) + cetak SK via Setting payroll.template_sk (SuratTemplate tak ada di repo; siap WP-34) + guarded delete jabatan. Adversarial fix 5 MAJOR. 16 test hijau + payroll lama 22/22 utuh. Catatan: mass-update query builder bypass observer (didokumentasikan).',
+                'done', 'critical', 100, 'L', 1],
             ['Gelombang 1 — Jangkar', 'WP-04: Perluasan data pegawai (EMIS-ready)',
                 'ALTER employees: nik, nuptk, nrg, status_kepegawaian enum baru (gty/gtt_honorer/pns_dpk/pppk/pengabdian/kontrak — migrasi map dari enum lama), is_mukim, tanggal_selesai, pendidikan_terakhir, asal_alumni; tab Identitas & Kepegawaian di form; PayrollService tetap jalan semua status.',
                 'Belum mulai.',
