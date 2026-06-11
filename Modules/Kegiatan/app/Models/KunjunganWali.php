@@ -16,6 +16,7 @@ class KunjunganWali extends Model
     protected $fillable = [
         'tenant_id', 'santri_id', 'nama_pengunjung', 'hubungan',
         'tanggal', 'jam_datang', 'jam_pulang', 'keperluan', 'status',
+        'pengajuan_id', 'slot',
     ];
 
     protected $casts = [

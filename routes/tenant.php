@@ -13,6 +13,7 @@ use App\Http\Controllers\PembiayaanExportController;
 use App\Http\Controllers\PengadaanExportController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
+use App\Http\Controllers\PortalGuru\PortalGuruGerbangController;
 use App\Http\Controllers\PortalGuru\PortalGuruIzinController;
 use App\Http\Controllers\PortalGuru\PortalGuruJurnalController;
 use App\Http\Controllers\PortalGuru\PortalGuruKitabController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
 use App\Http\Controllers\PortalWali\PortalWaliFinancialController;
 use App\Http\Controllers\PortalWali\PortalWaliHafalanController;
 use App\Http\Controllers\PortalWali\PortalWaliIzinController;
+use App\Http\Controllers\PortalWali\PortalWaliJengukController;
 use App\Http\Controllers\PortalWali\PortalWaliKegiatanController;
 use App\Http\Controllers\PortalWali\PortalWaliKesehatanController;
 use App\Http\Controllers\PortalWali\PortalWaliNotificationController;
@@ -169,6 +171,14 @@ Route::middleware([
         Route::get('/wali-kelas', [PortalGuruWaliKelasController::class, 'index'])->name('wali-kelas.index');
         Route::get('/wali-kelas/{kelas}', [PortalGuruWaliKelasController::class, 'show'])->name('wali-kelas.show');
         Route::post('/wali-kelas/{kelas}/catatan', [PortalGuruWaliKelasController::class, 'simpanCatatan'])->name('wali-kelas.catatan');
+
+        // WP-29/30 — Pos Gerbang (mode keamanan): scan NIS, catat keluar/
+        // masuk, cache izin aktif, registrasi tamu penjengukan.
+        Route::get('/gerbang', [PortalGuruGerbangController::class, 'index'])->name('gerbang.index');
+        Route::post('/gerbang/catat', [PortalGuruGerbangController::class, 'catat'])->name('gerbang.catat');
+        Route::get('/gerbang/izin-aktif', [PortalGuruGerbangController::class, 'izinAktif'])->name('gerbang.izin-aktif');
+        Route::post('/gerbang/jenguk/{pengajuan}/hadir', [PortalGuruGerbangController::class, 'jengukHadir'])->name('gerbang.jenguk.hadir');
+        Route::post('/gerbang/jenguk/walk-in', [PortalGuruGerbangController::class, 'jengukWalkIn'])->name('gerbang.jenguk.walk-in');
     });
 
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {
@@ -198,6 +208,11 @@ Route::middleware([
         Route::get('/notifikasi', PortalWaliNotificationController::class)->name('notifications');
         Route::get('/izin', [PortalWaliIzinController::class, 'index'])->name('izin');
         Route::post('/izin', [PortalWaliIzinController::class, 'store'])->name('izin.store');
+
+        // WP-30 — ajukan slot jenguk + lihat status (anak sendiri saja).
+        Route::get('/jenguk', [PortalWaliJengukController::class, 'index'])->name('jenguk');
+        Route::post('/jenguk', [PortalWaliJengukController::class, 'store'])->name('jenguk.store');
+        Route::post('/jenguk/{pengajuan}/batal', [PortalWaliJengukController::class, 'batal'])->name('jenguk.batal');
         Route::get('/santri/{santri}/rapor/{rapor}/download', PortalWaliRaporDownloadController::class)->name('rapor.download');
         // WP-10 — unduh/cetak rapor diniyah anak sendiri (403 untuk anak orang lain).
         Route::get('/santri/{santri}/rapor-diniyah/{raporDiniyah}/download', PortalWaliRaporDiniyahDownloadController::class)->name('rapor-diniyah.download');
