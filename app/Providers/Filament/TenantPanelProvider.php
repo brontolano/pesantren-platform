@@ -38,6 +38,8 @@ use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kegiatan\Recurring\KegiatanRecurringResource;
 use App\Filament\Resources\Kegiatan\Template\KegiatanTemplateResource;
 use App\Filament\Resources\Kelas\KelasResource;
+use App\Filament\Resources\Kesantrian\JenisPelanggaran\JenisPelanggaranResource;
+use App\Filament\Resources\Kesantrian\PelanggaranSantri\PelanggaranSantriResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
 use App\Filament\Resources\Kesehatan\SesiKonselingResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
@@ -308,6 +310,9 @@ class TenantPanelProvider extends PanelProvider
             KelasResource::class,
             PenempatanKelasResource::class,
             AlumniResource::class,
+            // WP-09 — Disiplin/ta'zir berbasis poin
+            JenisPelanggaranResource::class,
+            PelanggaranSantriResource::class,
             TagihanResource::class,
             PembayaranResource::class,
             TabunganResource::class,
