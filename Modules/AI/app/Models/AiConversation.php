@@ -19,6 +19,13 @@ class AiConversation extends Model
 
     public const STATUS_DITUTUP = 'ditutup';
 
+    // T-A051 — verifikasi ringan wali sesi pertama (PRD §8.2).
+    public const VERIFIKASI_BELUM = 'belum';
+
+    public const VERIFIKASI_MENUNGGU_TGL_LAHIR = 'menunggu_tgl_lahir';
+
+    public const VERIFIKASI_TERVERIFIKASI = 'terverifikasi';
+
     protected $table = 'ai_conversation';
 
     protected $fillable = [
@@ -30,6 +37,9 @@ class AiConversation extends Model
         'status',
         'terakhir_aktif',
         'opt_out',
+        'verifikasi_status',
+        'verifikasi_percobaan',
+        'verifikasi_terkunci_sampai',
     ];
 
     protected function casts(): array
@@ -37,6 +47,8 @@ class AiConversation extends Model
         return [
             'terakhir_aktif' => 'datetime',
             'opt_out' => 'boolean',
+            'verifikasi_percobaan' => 'integer',
+            'verifikasi_terkunci_sampai' => 'datetime',
         ];
     }
 

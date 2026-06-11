@@ -65,8 +65,13 @@ final class ToolResult
     /**
      * Render ringkas Indonesia santun per tool — string template sederhana,
      * TANPA LLM. Gagal → kembalikan pesan santun apa adanya.
+     *
+     * @param  bool  $denganFooter  false = tanpa baris "(Sumber: …, per …)" —
+     *                              dipakai chatbot WA T-A051 yang memasang
+     *                              footer sumber+cap waktu lewat
+     *                              DisclaimerInjector (hindari footer dobel).
      */
-    public function keTeks(): string
+    public function keTeks(bool $denganFooter = true): string
     {
         if (! $this->sukses) {
             return (string) ($this->pesan ?? 'Mohon maaf, permintaan tidak dapat diproses.');
@@ -86,7 +91,9 @@ final class ToolResult
             default => $this->teksGenerik(),
         };
 
-        return $teks."\n(Sumber: {$this->sumber}, per {$this->capWaktu})";
+        return $denganFooter
+            ? $teks."\n(Sumber: {$this->sumber}, per {$this->capWaktu})"
+            : $teks;
     }
 
     private static function rupiah(float|int|string|null $n): string

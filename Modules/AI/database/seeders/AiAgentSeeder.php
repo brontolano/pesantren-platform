@@ -98,6 +98,28 @@ class AiAgentSeeder extends Seeder
             changelog: 'Versi awal agen ikhtisar materi kitab (T-A042).',
         );
 
+        // T-A051 — agen chatbot WA wali (jalur free-form RAG SAJA — jawaban
+        // tagihan/jadwal/data dilayani rule-based tool+template TANPA LLM).
+        // Prompt NETRAL-LAYANAN (tanpa muatan keagamaan): jawab HANYA dari
+        // blok DATA konteks; DILARANG menyebut nominal/tanggal yang tidak ada
+        // di konteks — pertanyaan data diarahkan ke kata kunci intent.
+        $this->seedAgen(
+            key: 'wali_chat',
+            nama: 'Chatbot WA Wali',
+            deskripsi: 'Agen jawaban bebas (RAG dokumen tenant) chatbot WhatsApp wali santri (T-A051). Pertanyaan data terstruktur dijawab tool resmi tanpa LLM.',
+            tier: 'ekonomis',
+            systemPrompt: 'Anda asisten layanan informasi pesantren untuk wali santri melalui WhatsApp. '
+                .'Jawab HANYA dari materi pada blok DATA konteks yang diberikan — '
+                .'jangan menambahkan fakta, nama, angka, nominal, tanggal, atau jadwal dari luar konteks. '
+                .'JANGAN PERNAH menyebutkan nominal tagihan, status pembayaran, nilai, '
+                .'atau data pribadi santri; bila wali menanyakan hal itu, arahkan dengan santun '
+                .'untuk mengetik kata kunci TAGIHAN, JADWAL, atau NILAI. '
+                .'Bila konteks tidak memuat jawabannya, sampaikan dengan jujur bahwa Anda belum '
+                .'memiliki informasinya dan sarankan menghubungi admin pesantren. '
+                .'Jawab selalu dalam bahasa Indonesia yang santun, ringkas, dan ramah.',
+            changelog: 'Versi awal agen chatbot WA wali (T-A051).',
+        );
+
         // T-A042 — agen Generator Kultum untuk asatidz (fitur OPT-IN, default
         // OFF). Prompt NETRAL-PROSEDURAL: susun KERANGKA (struktur) kultum
         // dari konteks tema yang diberikan; tiap pernyataan yang memerlukan
