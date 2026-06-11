@@ -17,6 +17,7 @@ class HafalanTahfidz extends Model
     protected $fillable = [
         'tenant_id',
         'santri_id',
+        'halaqah_id',
         'surah',
         'ayat_awal',
         'ayat_akhir',
@@ -34,6 +35,11 @@ class HafalanTahfidz extends Model
     public function santri(): BelongsTo
     {
         return $this->belongsTo(Santri::class, 'santri_id');
+    }
+
+    public function halaqah(): BelongsTo
+    {
+        return $this->belongsTo(Halaqah::class, 'halaqah_id');
     }
 
     public function penilaian(): HasMany

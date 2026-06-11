@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\Akademik\Models\JadwalPelajaran;
+use Modules\Akademik\Models\KomponenNilai;
 use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Kesantrian\Models\Santri;
@@ -30,6 +31,8 @@ class NilaiService
             'nilai_uts' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'nilai_uas' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'nilai_akhir' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'nilai_komponen' => ['nullable', 'array'],
+            'nilai_komponen.*' => ['numeric', 'min:0', 'max:100'],
             'catatan' => ['nullable', 'string'],
         ])->validate();
 
@@ -43,6 +46,7 @@ class NilaiService
         }
 
         $this->assertActorCanInputNilai($actor, $pelajaran, (int) $data['kelas_id']);
+        $this->assertNilaiKomponenValid($data);
 
         $payload = $data;
         $payload['nilai_akhir'] = $payload['nilai_akhir'] ?? $this->hitungNilaiAkhir($payload);
@@ -62,8 +66,37 @@ class NilaiService
         ], $payload);
     }
 
+    /**
+     * SATU-SATUNYA tempat rumus nilai akhir (dipakai Filament & PWA Guru).
+     *
+     * Jalur baru (F0-PWA): bila ada `nilai_komponen` (map id komponen → nilai)
+     * DAN tenant punya baris komponen_nilai, hitung rata-rata terbobot.
+     * Komponen tanpa nilai dihitung 0 (konsisten perilaku lama). Selain itu
+     * fallback ke rumus lama (Setting `akademik_grade_weights`) — tenant lama
+     * TIDAK berubah perilaku.
+     */
     public function hitungNilaiAkhir(array $nilai): float
     {
+        $nilaiKomponen = $nilai['nilai_komponen'] ?? null;
+
+        if (is_array($nilaiKomponen) && $nilaiKomponen !== []) {
+            $komponen = $this->komponenUntukPelajaran(
+                isset($nilai['pelajaran_id']) ? (int) $nilai['pelajaran_id'] : null,
+            );
+
+            $totalBobot = (int) $komponen->sum('bobot');
+
+            if ($komponen->isNotEmpty() && $totalBobot > 0) {
+                $total = 0.0;
+                foreach ($komponen as $k) {
+                    $skor = (float) ($nilaiKomponen[(string) $k->id] ?? $nilaiKomponen[$k->id] ?? 0);
+                    $total += $skor * $k->bobot;
+                }
+
+                return round($total / $totalBobot, 2);
+            }
+        }
+
         $weights = $this->getGradeWeights();
 
         $harian = (float) ($nilai['nilai_harian'] ?? 0);
@@ -73,6 +106,67 @@ class NilaiService
         $total = ($harian * $weights['harian']) + ($uts * $weights['uts']) + ($uas * $weights['uas']);
 
         return round($total / 100, 2);
+    }
+
+    /**
+     * Tolak nilai_komponen yang menunjuk id komponen di luar daftar komponen
+     * yang berlaku untuk pelajaran ini (id usang, komponen pelajaran lain,
+     * atau id liar dari klien PWA). Tanpa penjagaan ini skor untuk id tak
+     * dikenal DIABAIKAN diam-diam → nilai_akhir tersimpan mendekati 0.
+     *
+     * Tenant tanpa baris komponen_nilai dilewati (jalur fallback rumus lama).
+     *
+     * @throws ValidationException
+     */
+    private function assertNilaiKomponenValid(array $data): void
+    {
+        $nilaiKomponen = $data['nilai_komponen'] ?? null;
+
+        if (! is_array($nilaiKomponen) || $nilaiKomponen === []) {
+            return;
+        }
+
+        $komponen = $this->komponenUntukPelajaran(
+            isset($data['pelajaran_id']) ? (int) $data['pelajaran_id'] : null,
+        );
+
+        if ($komponen->isEmpty()) {
+            return; // fallback rumus lama — id pada payload tidak dipakai.
+        }
+
+        $validIds = $komponen->pluck('id')->map(fn ($id): string => (string) $id)->all();
+        $unknown = array_diff(array_map('strval', array_keys($nilaiKomponen)), $validIds);
+
+        if ($unknown !== []) {
+            throw ValidationException::withMessages([
+                'nilai_komponen' => 'Komponen nilai tidak dikenal untuk pelajaran ini: '.implode(', ', $unknown).'. Muat ulang daftar komponen.',
+            ]);
+        }
+    }
+
+    /**
+     * Komponen nilai berlaku untuk satu pelajaran: baris spesifik pelajaran
+     * bila ada, kalau tidak default tenant (pelajaran_id NULL).
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, KomponenNilai>
+     */
+    public function komponenUntukPelajaran(?int $pelajaranId): \Illuminate\Database\Eloquent\Collection
+    {
+        if ($pelajaranId !== null) {
+            $spesifik = KomponenNilai::query()
+                ->where('pelajaran_id', $pelajaranId)
+                ->orderBy('urutan')
+                ->get();
+
+            if ($spesifik->isNotEmpty()) {
+                return $spesifik;
+            }
+        }
+
+        return KomponenNilai::query()
+            ->whereNull('pelajaran_id')
+            ->orderBy('urutan')
+            ->get();
     }
 
     /**

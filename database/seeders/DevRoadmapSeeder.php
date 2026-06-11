@@ -877,8 +877,8 @@ class DevRoadmapSeeder extends Seeder
         $tasks = [
             ['Gelombang 1 — Jangkar', 'F0: Fondasi data — Halaqah, JurnalMengajar, Kitab, komponen nilai',
                 'Migrasi halaqah + pivot halaqah_santri (soft-close left_at), jurnal_mengajar (jadwal XOR halaqah, unique guru+jadwal+tanggal, status terlaksana/kosong/diganti), domain kitab (kitab, kajian_kitab sorogan/bandongan/wetonan, capaian_kitab — santri NULL = posisi kelompok bandongan), komponen_nilai konfigurabel (seeder default 40/30/30, kolom Nilai lama JANGAN drop) + NilaiService satu-satunya rumus nilai akhir.',
-                'Belum mulai. Tanpa ini pesantren salafiyah (kitab kuning) tidak terwakili sama sekali di platform.',
-                'todo', 'critical', 0, 'M', 1],
+                'SELESAI (2026-06-11): 7 tabel baru + NilaiService jalur komponen terbobot (fallback rumus lama utuh) + resource Halaqah/Kitab terdaftar di panel. 13 test hijau + smoke panel + provisioning regression 7/7. Adversarial menangkap & memperbaiki: resource tak terdaftar (BLOCKER), guard id komponen liar (MAJOR), filter select musyrif. Catatan: seed komponen firstOrCreate by nama — tandai seeded sebelum ada UI kelola komponen.',
+                'done', 'critical', 100, 'M', 1],
             ['Gelombang 2 — Lapangan', 'F1: PWA Guru inti — jadwal pribadi + presensi kelas + setoran tahfidz',
                 'Rute /guru (pola PortalWali), manifest+SW+ikon dinamis salin PortalWaliPwaController. Layar Hari Ini (JadwalPelajaran per guru_pengampu_id + halaqah), presensi kelas sekali-ketuk default hadir (endpoint idempoten kelas+tanggal+santri), setoran tahfidz scan QR (jenis ziyadah/muraja\'ah). PresensiService & TahfidzService dipakai juga Filament. Permission akses_pwa_guru.',
                 'Belum mulai. Jadwal per guru belum pernah di-query (terindex per kelas); presensi & setoran sekarang hanya via panel desktop.',

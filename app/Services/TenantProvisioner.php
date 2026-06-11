@@ -91,6 +91,14 @@ class TenantProvisioner
                 '--force' => true,
             ]);
 
+            // (b3b) F0-PWA: komponen nilai default (Harian 40/UTS 30/UAS 30).
+            // Idempoten (firstOrCreate by nama) — tenant yang sudah mengubah
+            // bobotnya tidak ditimpa.
+            Artisan::call('db:seed', [
+                '--class' => \Modules\Akademik\Database\Seeders\KomponenNilaiSeeder::class,
+                '--force' => true,
+            ]);
+
             // (b4) T-A010: pengaturan AI default konservatif versi 1 'aktif'
             // (tabel TENANT — wajib di dalam $tenant->run()). Idempoten:
             // tenant yang sudah punya versi apa pun tidak disentuh.
