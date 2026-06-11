@@ -7,6 +7,7 @@ use Modules\AI\Console\AiAnomaliCommand;
 use Modules\AI\Console\AiBersihkanPercakapanCommand;
 use Modules\AI\Console\AiEskalasiPengingatCommand;
 use Modules\AI\Console\AiEvalCommand;
+use Modules\AI\Console\AiFaqMiningCommand;
 use Modules\AI\Console\AiHealthCommand;
 use Modules\AI\Console\AiLaporanEskalasiCommand;
 use Modules\AI\Console\AiPromptCommand;
@@ -61,6 +62,7 @@ class AIServiceProvider extends ServiceProvider
                 AiLaporanEskalasiCommand::class,
                 AiBersihkanPercakapanCommand::class,
                 AiEvalCommand::class,
+                AiFaqMiningCommand::class,
             ]);
         }
     }
@@ -112,6 +114,7 @@ class AIServiceProvider extends ServiceProvider
                 \Modules\AI\Filament\Pages\GeneratorRpp::class,
                 \Modules\AI\Filament\Pages\IkhtisarKitab::class,
                 \Modules\AI\Filament\Pages\KotakMasukWa::class,
+                \Modules\AI\Filament\Pages\UsulanFaq::class,
             ]);
 
             // T-A013 — dashboard internal "Suara Pasar" di panel PLATFORM

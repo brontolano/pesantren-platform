@@ -43,3 +43,10 @@ Schedule::command('ai:laporan-eskalasi')
 Schedule::command('ai:bersihkan-percakapan')
     ->dailyAt('02:30')
     ->withoutOverlapping();
+
+// FAQ-Mining: tambang pertanyaan berulang → usulan FAQ per tenant, MINGGUAN
+// (Senin pagi). Human-in-the-loop: hanya mengusulkan + notifikasi pengelola;
+// masuk RAG hanya setelah disahkan manusia di halaman Usulan FAQ.
+Schedule::command('ai:faq-mining')
+    ->weeklyOn(1, '05:30')
+    ->withoutOverlapping();

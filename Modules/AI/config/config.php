@@ -611,6 +611,60 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | FAQ-Mining (permintaan owner 2026-06-11) — tambang pertanyaan berulang
+    |--------------------------------------------------------------------------
+    | Chatbot "belajar dari kebiasaan pengguna" secara HUMAN-IN-THE-LOOP:
+    | pertanyaan yang sering muncul (eskalasi + percakapan, SEMUA sudah
+    | terredaksi) di-cluster TEKNIK KLASIK LOKAL (token-set Jaccard /
+    | kandungan kata kunci — TANPA LLM, TANPA training) menjadi usulan FAQ.
+    | Hanya setelah admin/ustadz MENGESAHKAN (isi jawaban) teksnya diingest
+    | ke Sumber Pengetahuan kategori 'faq' sehingga terjawab via RAG.
+    |
+    | kategori_skip: kategori eskalasi yang TIDAK ditambang — pertanyaan
+    | hukum/blacklist adalah wilayah ustadz, bukan bahan FAQ otomatis.
+    | stopwords: kata fungsi/partikel percakapan ID TEKNIS-NETRAL (bukan
+    | daftar topik keagamaan — Aturan Emas #8).
+    */
+    'faq_mining' => [
+        // Jendela penambangan (hari ke belakang).
+        'periode_hari' => (int) env('AI_FAQ_PERIODE_HARI', 30),
+        // Minimal kemunculan pertanyaan serupa agar jadi usulan.
+        'min_frekuensi' => (int) env('AI_FAQ_MIN_FREKUENSI', 3),
+        // Ambang kesamaan token-set Jaccard (0–1).
+        'ambang_jaccard' => (float) env('AI_FAQ_AMBANG_JACCARD', 0.6),
+        // ATAU: irisan kata kunci utama — overlap/min(|A|,|B|) ≥ ambang ini
+        // dengan minimal 2 token sama (pertanyaan pendek ⊂ panjang tetap
+        // satu kelompok walau Jaccard rendah).
+        'ambang_kandungan' => (float) env('AI_FAQ_AMBANG_KANDUNGAN', 0.8),
+        // Maks variasi pertanyaan serupa yang disimpan per usulan.
+        'maks_variasi' => (int) env('AI_FAQ_MAKS_VARIASI', 10),
+        // Pagar memori/CPU: maks pertanyaan per sumber per run.
+        'maks_pertanyaan' => (int) env('AI_FAQ_MAKS_PERTANYAAN', 2000),
+
+        // Kategori eskalasi SENSITIF yang dilewati penambang (wilayah ustadz).
+        'kategori_skip' => ['blacklist_topik', 'level_fatwa'],
+
+        // Stopword ID ringan + partikel percakapan/sapaan (teknis-netral).
+        // 'pii' = sisa token redaksi [PII:...]; token < 3 huruf otomatis gugur.
+        'stopwords' => [
+            'yang', 'untuk', 'dengan', 'dalam', 'pada', 'dari', 'kepada',
+            'adalah', 'akan', 'sudah', 'telah', 'bisa', 'dapat', 'tidak',
+            'bukan', 'juga', 'karena', 'jika', 'bila', 'atau', 'dan',
+            'itu', 'ini', 'ada', 'apa', 'apakah', 'bagaimana', 'gimana',
+            'berapa', 'kapan', 'dimana', 'mana', 'siapa', 'kenapa',
+            'mengapa', 'mohon', 'tolong', 'silakan', 'terima', 'kasih',
+            'assalamualaikum', 'assalamu', 'alaikum', 'wassalam', 'salam',
+            'pak', 'ibu', 'bapak', 'kak', 'mas', 'mbak', 'min', 'admin',
+            'iya', 'dong', 'sih', 'deh', 'nya', 'kah', 'lah', 'kok',
+            'mau', 'ingin', 'tanya', 'bertanya', 'nanya', 'menanyakan',
+            'info', 'informasi', 'tentang', 'soal', 'perihal', 'terkait',
+            'saya', 'kami', 'kita', 'anda', 'beliau', 'anak', 'ananda',
+            'pii',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue khusus AI (worker-ai, koneksi redis-ai — lihat config/queue.php)
     |--------------------------------------------------------------------------
     */
