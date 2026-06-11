@@ -290,6 +290,10 @@ return [
         // kanal_eksternal di atas — kanal eksternal fail-closed).
         'agent_feature_map' => [
             'chatbot_wali' => 'chatbot',
+            // T-A051: agen chatbot WA wali (free-form RAG) — satu fitur
+            // 'chatbot' dengan chatbot_wali; aktivasi pilot via Wizard
+            // (default konservatif wali.chatbot = OFF).
+            'wali_chat' => 'chatbot',
             'chatbot_admin' => 'chatbot',
             'tutor_santri' => 'tutor',
             'generator_soal' => 'generator_soal',
@@ -621,5 +625,99 @@ return [
         'balasan_opt_in' => 'Alhamdulillah, balasan otomatis asisten telah aktif kembali untuk nomor ini. Silakan kirim pertanyaan Anda.',
         'kata_opt_out' => ['STOP', 'BERHENTI'],
         'kata_opt_in' => ['MULAI'],
+
+        /*
+        |----------------------------------------------------------------------
+        | T-A051 — verifikasi wali & intent inti (PRD §8.2, Blueprint §7.1)
+        |----------------------------------------------------------------------
+        */
+
+        // Agen chatbot wali untuk jalur free-form RAG (seed AiAgentSeeder).
+        'agent_key' => 'wali_chat',
+
+        // Verifikasi ringan sesi pertama: tanggal lahir anak. Salah beruntun
+        // maks_percobaan kali → kunci kunci_jam jam + saran hubungi admin.
+        'verifikasi' => [
+            'maks_percobaan' => (int) env('AI_WA_VERIFIKASI_MAKS', 3),
+            'kunci_jam' => (int) env('AI_WA_VERIFIKASI_KUNCI_JAM', 24),
+        ],
+
+        // Router intent RULE-BASED murni (TANPA LLM) — peta TERURUT intent →
+        // daftar regex; pola pertama yang cocok menang. Kebijakan di config,
+        // bukan kode (Aturan Emas #11). Urutan PENTING: intent spesifik
+        // (tagihan/jadwal/...) sebelum 'ppdb' (kata "daftar" generik) dan
+        // 'bantuan' (sapaan) supaya tidak saling mencuri.
+        'intents' => [
+            'ganti_anak' => [
+                '/\bganti\s+(?:anak|santri|ananda)\b/iu',
+                '/\bpindah\s+ke\s+anak\b/iu',
+            ],
+            'tagihan' => [
+                '/\b(?:tagihan|tunggakan|spp|syahriah|syahriyah|bayar(?:an|nya)?|membayar|pembayaran|cicilan|pelunasan|melunasi|lunas|iuran|angsuran)\b/iu',
+            ],
+            'jadwal' => [
+                '/\b(?:jadwal(?:nya)?|pelajaran|mapel)\b/iu',
+                '/\bjam\s+(?:belajar|pelajaran|ngaji|ngaos)\b/iu',
+            ],
+            'nilai' => [
+                '/\b(?:nilai|rapor|raport|rapot)\b/iu',
+                '/\bhasil\s+(?:ujian|ulangan)\b/iu',
+            ],
+            'tahfidz' => [
+                '/\b(?:hafalan|tahfidz|tahfiz|setoran|murajaah|murojaah|muroja\'ah|juz)\b/iu',
+            ],
+            'izin' => [
+                '/\b(?:izin|ijin|sakit)\b/iu',
+            ],
+            'kehadiran' => [
+                '/\b(?:kehadiran|absen(?:si)?|presensi|alpa|bolos|hadir)\b/iu',
+            ],
+            'ppdb' => [
+                '/\b(?:ppdb|spmb|pendaftaran|daftar|mendaftar\w*|gelombang)\b/iu',
+                '/\bsantri\s+baru\b/iu',
+            ],
+            'bantuan' => [
+                '/\b(?:bantuan|menu|help)\b/iu',
+                '/\bbisa\s+(?:apa|bantu)\b/iu',
+                // Sapaan TANPA isi pertanyaan → balas menu (template-first,
+                // hemat LLM). Sapaan + pertanyaan tetap dirouting isinya.
+                '/^\s*(?:ass?alamu[\w\'’]*|salam|halo|hai|selamat\s+(?:pagi|siang|sore|malam))\s*(?:wr\.?\s*wb\.?)?\s*$/iu',
+            ],
+        ],
+
+        // GUARD ANTI-KARANG ANGKA: teks bernada uang yang lolos semua intent
+        // (kalimat panjang) dipaksa ke intent 'tagihan' SEBELUM free-form RAG
+        // — nominal hanya boleh datang dari ToolResult, bukan LLM.
+        'pola_uang' => [
+            '/\b(?:uang|biaya|nominal|rupiah|rp\.?|dana|keuangan|utang|hutang|tarif)\b/iu',
+        ],
+
+        // Intent ber-tool → tool resmi T-A033 + kategori disclaimer
+        // DisclaimerInjector untuk footer jawaban data.
+        'intent_tool_map' => [
+            'tagihan' => ['tool' => 'getTagihan', 'kategori' => 'keuangan'],
+            'jadwal' => ['tool' => 'getJadwal', 'kategori' => 'akademik'],
+            'nilai' => ['tool' => 'getNilai', 'kategori' => 'akademik'],
+            'tahfidz' => ['tool' => 'getTahfidz', 'kategori' => 'akademik'],
+            'kehadiran' => ['tool' => 'getKehadiran', 'kategori' => 'umum'],
+            'izin' => ['tool' => 'getIzin', 'kategori' => 'umum'],
+        ],
+
+        // ------------------------------------------------------------------
+        // Template balasan T-A051 (Indonesia santun, polos kompatibel WA).
+        // ------------------------------------------------------------------
+        'balasan_minta_tgl_lahir' => 'Assalamu\'alaikum. Nomor Anda terdaftar sebagai wali santri. Demi keamanan data, mohon balas dengan tanggal lahir salah satu putra/putri Anda (contoh: 05-03-2014).',
+        'balasan_bukan_tanggal' => 'Mohon balas dengan tanggal lahir putra/putri Anda untuk verifikasi (contoh: 05-03-2014). Untuk informasi umum pendaftaran, ketik PPDB.',
+        'balasan_tgl_salah' => 'Mohon maaf, tanggal lahir belum cocok dengan data kami (percobaan :percobaan dari :maks). Silakan coba kembali, contoh format: 05-03-2014.',
+        'balasan_terkunci' => 'Mohon maaf, verifikasi gagal beberapa kali. Demi keamanan data, layanan informasi untuk nomor ini dinonaktifkan sementara selama 24 jam. Silakan hubungi admin pesantren untuk bantuan.',
+        'balasan_terverifikasi' => 'Alhamdulillah, verifikasi berhasil. Anda terhubung dengan data ananda :nama. Ketik MENU untuk melihat layanan, atau langsung ketik TAGIHAN / JADWAL / PPDB.',
+        'balasan_tidak_dikenal' => 'Mohon maaf, nomor Anda belum terdaftar sebagai wali santri di pesantren kami. Kami hanya dapat melayani informasi umum: ketik PPDB untuk info pendaftaran santri baru. Untuk bantuan lain, silakan hubungi admin pesantren.',
+        'balasan_info_ppdb' => 'Informasi pendaftaran santri baru (PPDB) dapat dilihat pada laman PPDB website pesantren. Untuk pertanyaan lebih lanjut (jadwal gelombang, syarat, biaya pendaftaran), silakan hubungi admin pesantren.:jam_layanan',
+        'balasan_menu' => "Layanan asisten Khadim Digital:\n- TAGIHAN — tagihan & status pembayaran ananda\n- JADWAL — jadwal pelajaran kelas ananda\n- NILAI — nilai akademik ananda\n- HAFALAN — perkembangan tahfidz ananda\n- KEHADIRAN / IZIN — rekap kehadiran & izin ananda\n- PPDB — info pendaftaran santri baru\n- GANTI ANAK <nama> — pindah konteks putra/putri lain\nKetik BERHENTI bila tidak ingin menerima balasan otomatis.",
+        'balasan_menu_publik' => "Layanan informasi umum:\n- PPDB — info pendaftaran santri baru\nUntuk layanan data santri, nomor Anda harus terdaftar sebagai wali. Silakan hubungi admin pesantren bila perlu bantuan.",
+        'balasan_ganti_anak_sukses' => 'Baik, sekarang menampilkan data ananda :nama.',
+        'balasan_ganti_anak_pilihan' => "Putra/putri yang tertaut dengan nomor Anda:\n:daftar\nKetik: GANTI ANAK diikuti nama, contoh: GANTI ANAK Ahmad.",
+        'balasan_tanpa_anak' => 'Mohon maaf, belum ada data santri yang tertaut dengan akun wali Anda. Silakan hubungi admin pesantren untuk menautkan data ananda.',
+        'balasan_kelas_belum_ada' => 'Mohon maaf, data kelas ananda :nama belum terdaftar sehingga jadwal belum dapat ditampilkan. Silakan hubungi admin pesantren.',
     ],
 ];

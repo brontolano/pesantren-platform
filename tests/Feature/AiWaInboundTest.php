@@ -280,17 +280,20 @@ class AiWaInboundTest extends TestCase
         $this->assertSame('mode_uji', $keluar->meta['jenis'] ?? null);
     }
 
-    public function test_di_luar_mode_uji_tidak_ada_balasan(): void
+    public function test_di_luar_mode_uji_alur_intent_nyata_membalas(): void
     {
+        // Semantik berubah sejak T-A051: di luar mode_uji, WaChatService
+        // (verifikasi/intent/RAG) yang membalas — nomor asing tetap mendapat
+        // balasan info publik yang santun, tanpa menyentuh Ollama.
         Config::set('ai.wa.mode_uji', false);
-        Http::fake();
+        Http::fake(['http://waha.test:3000/*' => Http::response(['status' => 'ok'])]);
         $tenant = $this->siapkanTenant('wain');
 
         $this->postWebhook($this->payloadWa($tenant->id))->assertOk();
 
-        Http::assertNothingSent(); // intent nyata = T-A051, belum ada balasan.
+        Http::assertSentCount(1); // hanya WAHA sendText — NOL panggilan Ollama.
         tenancy()->initialize($tenant);
-        $this->assertSame(0, AiMessage::query()->where('arah', AiMessage::ARAH_KELUAR)->count());
+        $this->assertSame(1, AiMessage::query()->where('arah', AiMessage::ARAH_KELUAR)->count());
         $this->assertSame(1, AiMessage::query()->where('arah', AiMessage::ARAH_MASUK)->count());
     }
 

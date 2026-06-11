@@ -10,18 +10,20 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Modules\AI\Models\AiConversation;
+use Modules\AI\Models\AiMessage;
 use Modules\AI\Services\Wa\WaBalasanService;
+use Modules\AI\Services\Wa\WaChatService;
 
 /**
- * T-A050 — pemrosesan asinkron pesan WA masuk (queue 'ai', worker-ai).
+ * T-A050/T-A051 — pemrosesan asinkron pesan WA masuk (queue 'ai', worker-ai).
  *
  * Webhook sudah meng-ack <5 detik; job ini yang memutuskan balasan:
  *  1. opt-out (STOP/BERHENTI) → set flag + konfirmasi santun SEKALI, tanpa LLM;
  *  2. opt-in (MULAI)          → buka flag + konfirmasi;
  *  3. opt_out aktif           → DIAM total (penghormatan seketika);
- *  4. mode_uji (T-A050)       → balasan template statis TANPA LLM.
- * Intent nyata (klasifikasi + jawaban LLM) datang di T-A051 — SENGAJA tidak
- * dibangun di sini; saat T-A051 cabang (4) diganti pipeline AiGateway.
+ *  4. mode_uji=true (T-A050)  → balasan template statis TANPA LLM;
+ *  5. mode_uji=false (T-A051) → pipeline WaChatService:
+ *     verifikasi wali → intent rule-based → tool/template → free-form RAG.
  *
  * PRIVASI: teks asli menyeberang proses TERENKRIPSI (Crypt) di payload job —
  * tidak pernah polos di Redis/DB/log. Outbound HANYA via WaBalasanService
@@ -84,11 +86,22 @@ class ProsesPesanWaJob implements ShouldQueue
             return;
         }
 
-        // 4. T-A050 mode uji: balasan statis tanpa LLM. Di luar mode uji
-        //    belum ada pipeline intent (T-A051) → diam, tercatat saja.
+        // 4. T-A050 mode uji: balasan statis tanpa LLM.
         if ((bool) config('ai.wa.mode_uji', true)) {
             $balasan->balas($conversation, (string) config('ai.wa.balasan_mode_uji'), ['jenis' => 'mode_uji']);
+
+            return;
         }
+
+        // 5. T-A051 — pipeline chatbot wali: verifikasi → intent →
+        //    tool/template → free-form RAG (idempoten per wa_message_id).
+        $masuk = AiMessage::query()->find($this->messageId);
+
+        if ($masuk === null) {
+            return; // pesan sudah dibersihkan retensi — tidak ada yang dibalas.
+        }
+
+        app(WaChatService::class)->proses($conversation, $masuk, $isi);
     }
 
     public function failed(?\Throwable $e): void
