@@ -52,16 +52,16 @@ class PanelThemeTest extends TestCase
         $this->boot('tema');
 
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'navigasi-atas']]);
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'laut']]);
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'pimpinan-biru']]);
 
         $this->assertSame('navigasi-atas', PanelTheme::theme());
         $this->assertTrue(PanelTheme::topNavigation());
         $this->assertSame('tema-navigasi-atas', PanelTheme::bodyClass());
 
-        $this->assertSame('laut', PanelTheme::color());
-        $this->assertSame('#0284c7', PanelTheme::primaryHex());
-        $this->assertStringContainsString('--tema-sidebar-header:#075985;', PanelTheme::cssVars());
-        $this->assertStringContainsString('--tema-active-bg:#e0f2fe;', PanelTheme::cssVars());
+        $this->assertSame('pimpinan-biru', PanelTheme::color());
+        $this->assertSame('#1d4ed8', PanelTheme::primaryHex());
+        $this->assertStringContainsString('--tema-sidebar-header:#0f2a4a;', PanelTheme::cssVars());
+        $this->assertStringContainsString('--tema-active-bg:#dbeafe;', PanelTheme::cssVars());
 
         tenancy()->end();
     }
@@ -83,15 +83,15 @@ class PanelThemeTest extends TestCase
 
         // Palet tema MENGIKAT: preset warna apa pun TIDAK menimpa palet
         // tema berpalet penuh — identitas Baitul Maal tetap utuh.
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'senja']]);
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'merah-putih']]);
         $this->assertSame('#0A5C36', PanelTheme::primaryHex());
         $this->assertStringContainsString('--tema-active-bg:rgba(238, 220, 154, 0.15);', PanelTheme::cssVars());
         $this->assertStringContainsString('--tema-sidebar-header:#06351F;', PanelTheme::cssVars());
 
         // Tema tanpa palet sendiri: preset warna tetap berlaku normal.
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'kompak']]);
-        $this->assertSame('#ea580c', PanelTheme::primaryHex());
-        $this->assertStringContainsString('--tema-active-bg:#ffedd5;', PanelTheme::cssVars());
+        $this->assertSame('#dc2626', PanelTheme::primaryHex());
+        $this->assertStringContainsString('--tema-active-bg:#fee2e2;', PanelTheme::cssVars());
 
         tenancy()->end();
     }
