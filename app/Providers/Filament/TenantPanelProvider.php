@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\PratinjauKhidmah;
 use App\Filament\Pages\TenantDashboard;
 use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
 use App\Filament\Resources\Akademik\KalenderAkademik\KalenderAkademikResource;
@@ -143,7 +144,9 @@ class TenantPanelProvider extends PanelProvider
     {
         $isAlbaKids = AlbaKidsTenant::isActive();
         $resources = $isAlbaKids ? $this->albaKidsResources() : $this->defaultResources();
-        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class];
+        // WP-13: PratinjauKhidmah didaftar EKSPLISIT (aturan WP uang) — aman
+        // dobel dengan discoverPages karena getPages() = array_unique.
+        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class];
         $widgets = $isAlbaKids
             ? [
                 GreetingBanner::class,
