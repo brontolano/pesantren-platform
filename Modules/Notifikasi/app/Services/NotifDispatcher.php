@@ -47,6 +47,8 @@ class NotifDispatcher
         'izin_diajukan' => 'IZIN_DIAJUKAN',                     // musyrif: pengajuan izin baru
         'izin_disetujui' => 'IZIN_DISETUJUI',                   // wali: izin disetujui
         'izin_ditolak' => 'IZIN_DITOLAK',                       // wali: izin ditolak + alasan
+        // WP-29 Pos Gerbang — additive.
+        'gerbang_tanpa_izin' => 'GERBANG_TANPA_IZIN',           // pengasuhan: santri keluar tanpa izin
         // F3-PWA Pesan Wali — additive.
         'pesan_wali_baru' => 'PESAN_WALI_BARU',                 // wali: pesan baru dari guru
     ];

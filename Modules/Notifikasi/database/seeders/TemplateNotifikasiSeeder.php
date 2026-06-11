@@ -195,6 +195,25 @@ Mohon santri kembali tepat waktu sesuai izin yang diberikan.
 MSG,
             ],
 
+            // WP-29 — Pos Gerbang: santri keluar tanpa izin (notif pengasuhan).
+            [
+                'kode_template' => 'GERBANG_TANPA_IZIN',
+                'judul' => 'Santri Keluar Tanpa Izin',
+                'channel' => 'whatsapp',
+                'variable_dinamis' => ['nama_santri', 'nis', 'waktu', 'petugas'],
+                'isi' => <<<'MSG'
+🚨 *SANTRI KELUAR TANPA IZIN*
+
+Tercatat di pos gerbang:
+
+👤 Santri  : {{nama_santri}} (NIS {{nis}})
+🕐 Waktu   : {{waktu}}
+🛡️ Petugas : {{petugas}}
+
+Mohon segera ditindaklanjuti oleh pengasuhan.
+MSG,
+            ],
+
             [
                 'kode_template' => 'PENGUMUMAN_UMUM',
                 'judul' => 'Pengumuman dari Pesantren',
