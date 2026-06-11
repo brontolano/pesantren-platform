@@ -38,14 +38,16 @@ class NotifDispatcher
         'berkas_ppdb_masuk' => 'BERKAS_PPDB_MASUK',             // admin: berkas/bukti PPDB baru
         'pengingat_daftar_ulang' => 'PENGINGAT_DAFTAR_ULANG',   // wali/peserta: lulus tapi belum daftar ulang
         'kredensial_santri' => 'KREDENSIAL_SANTRI',             // wali: kredensial sementara akun santri
+        // WP-09 Disiplin — additive.
+        'disiplin_pelanggaran' => 'DISIPLIN_PELANGGARAN',       // wali: kejadian terverifikasi (kebijakan semua/berat)
+        'disiplin_eskalasi' => 'DISIPLIN_ESKALASI',             // wali: ambang poin terlampaui (SP1/SP2)
     ];
 
     public function __construct(
         private readonly WaNotificationService $waService,
         private readonly EmailNotificationService $emailService,
         private readonly RecipientResolver $resolver,
-    ) {
-    }
+    ) {}
 
     /** Daftar event yang terdaftar. */
     public function eventTerdaftar(): array

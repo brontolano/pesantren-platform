@@ -18,6 +18,7 @@ use Modules\AI\Services\Settings\AiSettingProvisioner;
 use Modules\Akademik\Database\Seeders\KalenderLiburNasionalSeeder;
 use Modules\Akademik\Database\Seeders\KomponenNilaiSeeder;
 use Modules\Akademik\Database\Seeders\LembagaSeeder;
+use Modules\Kesantrian\Database\Seeders\JenisPelanggaranSeeder;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Payroll\Database\Seeders\JabatanSeeder;
 use Spatie\Permission\PermissionRegistrar;
@@ -124,6 +125,14 @@ class TenantProvisioner
             // jabatan yang diubah/ditambah tenant TIDAK ditimpa.
             Artisan::call('db:seed', [
                 '--class' => JabatanSeeder::class,
+                '--force' => true,
+            ]);
+
+            // (b3f) WP-09: master jenis pelanggaran ±12 contoh (poin contoh,
+            // tenant bebas ubah; prestasi berpoin negatif). Idempoten
+            // (firstOrCreate by nama) — editan tenant TIDAK ditimpa.
+            Artisan::call('db:seed', [
+                '--class' => JenisPelanggaranSeeder::class,
                 '--force' => true,
             ]);
 
