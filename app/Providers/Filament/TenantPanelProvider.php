@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\GenerateThr;
 use App\Filament\Pages\PratinjauKhidmah;
 use App\Filament\Pages\SidangKenaikan;
 use App\Filament\Pages\TenantDashboard;
@@ -148,7 +149,7 @@ class TenantPanelProvider extends PanelProvider
         // WP-13: PratinjauKhidmah didaftar EKSPLISIT (aturan WP uang) — aman
         // dobel dengan discoverPages karena getPages() = array_unique.
         // WP-07: SidangKenaikan didaftar eksplisit (pola layar kerja).
-        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class];
+        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class];
         $widgets = $isAlbaKids
             ? [
                 GreetingBanner::class,
