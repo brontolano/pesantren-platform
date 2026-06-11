@@ -33,6 +33,7 @@ use App\Filament\Resources\Inventory\InventoryBatchResource;
 use App\Filament\Resources\Inventory\InventoryItemResource;
 use App\Filament\Resources\Inventory\InventoryLokasiResource;
 use App\Filament\Resources\Kegiatan\IzinSantriResource;
+use App\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use App\Filament\Resources\Kegiatan\KegiatanResource;
 use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kegiatan\Recurring\KegiatanRecurringResource;
@@ -217,6 +218,7 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Asrama'),
                 NavigationGroup::make('Akademik'),
                 NavigationGroup::make('Tahfidz'),
+                NavigationGroup::make('Kepengasuhan'),
                 NavigationGroup::make('Kegiatan & Perizinan'),
                 NavigationGroup::make('Kesehatan & Konseling'),
                 NavigationGroup::make('Administrasi'),
@@ -387,6 +389,8 @@ class TenantPanelProvider extends PanelProvider
             KegiatanRecurringResource::class,
             IzinSantriResource::class,
             KunjunganWaliResource::class,
+            // WP-25 — Presensi Kamar & Sholat (Kepengasuhan)
+            PresensiAsramaResource::class,
             MediaFileResource::class,
             MediaAuditResource::class,
             // Pengaturan / Persetujuan (F1 Approval Workflow)
