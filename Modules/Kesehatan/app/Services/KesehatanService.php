@@ -2,6 +2,9 @@
 
 namespace Modules\Kesehatan\Services;
 
+use InvalidArgumentException;
+use Modules\Akademik\Models\PresensiSantri;
+use Modules\Kesehatan\Models\KunjunganUks;
 use Modules\Kesehatan\Models\RiwayatKesehatan;
 use Modules\Kesehatan\Models\SesiKonseling;
 use Modules\Kesantrian\Models\Santri;
@@ -75,6 +78,102 @@ class KesehatanService
             ->where('santri_id', $santri->getKey())
             ->with('konselor')
             ->orderByDesc('tanggal')
+            ->get();
+    }
+
+    // ── Kunjungan UKS (WP-27) ───────────────────────────────────────────────
+
+    /**
+     * Catat kunjungan santri ke UKS.
+     * Idempoten per (santri, tanggal) — catat ulang meng-update kunjungan hari itu.
+     * Saat status='istirahat' → PresensiSantri otomatis di-update (observer).
+     *
+     * @throws InvalidArgumentException jika status tidak valid
+     */
+    public function catatKunjungan(
+        Santri $santri,
+        string $tanggal,
+        string $status,
+        array $opts = []
+    ): KunjunganUks {
+        if (! in_array($status, KunjunganUks::STATUS, true)) {
+            throw new InvalidArgumentException("Status kunjungan UKS tidak valid: {$status}");
+        }
+
+        return KunjunganUks::updateOrCreate(
+            ['santri_id' => $santri->id, 'tanggal' => $tanggal],
+            [
+                'tenant_id' => $santri->tenant_id,
+                'jam_masuk' => $opts['jam_masuk'] ?? now()->format('H:i:s'),
+                'keluhan' => $opts['keluhan'] ?? null,
+                'tindakan' => $opts['tindakan'] ?? null,
+                'obat' => $opts['obat'] ?? null,
+                'status' => $status,
+                'rujukan_ke' => $opts['rujukan_ke'] ?? null,
+                'rujukan_biaya' => $opts['rujukan_biaya'] ?? null,
+                'pencatat_id' => $opts['pencatat_id'] ?? null,
+            ]
+        );
+    }
+
+    /**
+     * Tandai jam keluar kunjungan UKS.
+     */
+    public function tutupKunjungan(KunjunganUks $kunjungan, string $jamKeluar = null): KunjunganUks
+    {
+        $kunjungan->update([
+            'jam_keluar' => $jamKeluar ?? now()->format('H:i:s'),
+        ]);
+
+        return $kunjungan->fresh();
+    }
+
+    /**
+     * Dapatkan daftar kunjungan UKS santri pada rentang tanggal.
+     */
+    public function getDaftarKunjungan(Santri $santri, string $dari, string $sampai): Collection
+    {
+        return KunjunganUks::where('santri_id', $santri->getKey())
+            ->whereBetween('tanggal', [$dari, $sampai])
+            ->with('pencatat')
+            ->orderByDesc('tanggal')
+            ->get();
+    }
+
+    /**
+     * Dapatkan kunjungan UKS santri hari ini (jika ada).
+     */
+    public function getKunjunganHariIni(Santri $santri): ?KunjunganUks
+    {
+        return KunjunganUks::where('santri_id', $santri->getKey())
+            ->whereDate('tanggal', now()->toDateString())
+            ->first();
+    }
+
+    /**
+     * Dapatkan daftar santri yang sedang istirahat hari ini.
+     */
+    public function getDaftarIstirahat(): Collection
+    {
+        return KunjunganUks::where('tenant_id', tenant('id'))
+            ->where('status', 'istirahat')
+            ->whereDate('tanggal', now()->toDateString())
+            ->whereNull('jam_keluar')
+            ->with(['santri', 'pencatat'])
+            ->orderByDesc('jam_masuk')
+            ->get();
+    }
+
+    /**
+     * Dapatkan daftar rujukan yang belum ditangani (status=rujuk, jam_keluar=NULL).
+     */
+    public function getDaftarRujukanTerbuka(): Collection
+    {
+        return KunjunganUks::where('tenant_id', tenant('id'))
+            ->where('status', 'rujuk')
+            ->whereNull('jam_keluar')
+            ->with(['santri', 'pencatat'])
+            ->orderByDesc('created_at')
             ->get();
     }
 }
