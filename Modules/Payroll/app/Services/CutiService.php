@@ -2,6 +2,7 @@
 
 namespace Modules\Payroll\Services;
 
+use App\Models\Setting;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Modules\Core\Services\ApprovalService;
@@ -14,8 +15,11 @@ use RuntimeException;
  */
 class CutiService
 {
+    /** WP-14 — kebijakan default berbayar/tidak utk jenis cuti baru (per tenant). */
+    public const SETTING_CUTI_DEFAULT_BERBAYAR = 'payroll.cuti_default_berbayar';
+
     /** Ajukan cuti: hitung jumlah hari (inklusif) + buat 'diajukan' + F1 ajukanPersetujuan. */
-    public function ajukan(int $employeeId, string $jenis, string $mulai, string $selesai, ?string $alasan = null, ?int $userId = null): Cuti
+    public function ajukan(int $employeeId, string $jenis, string $mulai, string $selesai, ?string $alasan = null, ?int $userId = null, ?bool $isBerbayar = null): Cuti
     {
         $this->ensureTenantContext();
 
@@ -29,6 +33,7 @@ class CutiService
         $cuti = Cuti::create([
             'employee_id' => $employeeId,
             'jenis' => $jenis,
+            'is_berbayar' => $isBerbayar ?? self::defaultBerbayar(),
             'tanggal_mulai' => $tglMulai->toDateString(),
             'tanggal_selesai' => $tglSelesai->toDateString(),
             'jumlah_hari' => $jumlahHari,
@@ -77,6 +82,17 @@ class CutiService
         $cuti->update(['status' => 'ditolak', 'disetujui_oleh' => $userId, 'disetujui_pada' => now()]);
 
         return $cuti->fresh();
+    }
+
+    /** WP-14 — default is_berbayar dari Setting tenant (default TRUE = berbayar, konservatif). */
+    public static function defaultBerbayar(): bool
+    {
+        $nilai = Setting::getTenantValue(self::SETTING_CUTI_DEFAULT_BERBAYAR, true);
+        if (is_array($nilai)) {
+            $nilai = $nilai['value'] ?? true;
+        }
+
+        return filter_var($nilai, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? true;
     }
 
     private function ensureTenantContext(): void
