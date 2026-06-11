@@ -2,12 +2,19 @@
 
 use App\Http\Controllers\Api\CmsPublicApiController;
 use App\Http\Controllers\Api\PpdbPublicApiController;
+use App\Http\Controllers\Api\PublicDirectoryApiController;
 use App\Http\Controllers\Api\TenantApiController;
+use App\Http\Controllers\DonasiPublikController;
 use App\Http\Controllers\TenantWebsiteController;
+use App\Support\KebijakanPrivasiSistem;
+use App\Support\TenantBranding;
 use Illuminate\Support\Facades\Route;
-use Stancl\Tenancy\Database\Models\Domain;
+use Modules\CMS\Http\Controllers\EmbedWidgetController;
 use Modules\CMS\Http\Controllers\TenantLandingPageController;
 use Modules\PPDB\Http\Controllers\LandingRegistrationController;
+use Modules\PPDB\Http\Controllers\PpdbFileController;
+use Modules\PPDB\Http\Middleware\FrameAncestorsPpdb;
+use Stancl\Tenancy\Database\Models\Domain;
 
 // Caddy on-demand TLS "ask" endpoint — izinkan terbitkan sertifikat hanya
 // untuk central domain atau domain tenant yang terdaftar. Mencegah penyalahgunaan.
@@ -20,6 +27,7 @@ Route::get('/caddy/ssl-check', function () {
         return response('ok');
     }
     abort_unless(Domain::where('domain', $domain)->exists(), 403);
+
     return response('ok');
 })->name('caddy.ssl-check');
 
@@ -37,8 +45,8 @@ Route::get('/', function () {
 
     if ($domainType === 'sistem') {
         return view('tenant.launcher', [
-            'pesantren' => \App\Support\TenantBranding::name(tenant()?->name ?? 'Portal Pesantren'),
-            'logoUrl' => \App\Support\TenantBranding::logoUrl(),
+            'pesantren' => TenantBranding::name(tenant()?->name ?? 'Portal Pesantren'),
+            'logoUrl' => TenantBranding::logoUrl(),
         ]);
     }
 
@@ -76,7 +84,7 @@ Route::post('/daftar', [LandingRegistrationController::class, 'store'])
 
 // Unduh dokumen pendaftaran (bukti/kk/akta) via signed URL — dipakai di notifikasi
 // WhatsApp ke admin agar bisa membuka file langsung tanpa login.
-Route::get('/ppdb/dok/{candidate}/{type}', [\Modules\PPDB\Http\Controllers\PpdbFileController::class, 'signedDoc'])
+Route::get('/ppdb/dok/{candidate}/{type}', [PpdbFileController::class, 'signedDoc'])
     ->middleware('signed')
     ->whereIn('type', ['bukti', 'kk', 'akta'])
     ->name('tenant.ppdb.signed-doc');
@@ -84,13 +92,27 @@ Route::get('/ppdb/dok/{candidate}/{type}', [\Modules\PPDB\Http\Controllers\PpdbF
 // PPDB publik — hanya aktif di domain tenant (controller 404 di central)
 // Iframe-friendly per tenant: CSP frame-ancestors (domain tenant + Setting embed_allowed_origins).
 Route::get('/ppdb', [TenantWebsiteController::class, 'ppdbForm'])
-    ->middleware(\Modules\PPDB\Http\Middleware\FrameAncestorsPpdb::class)
+    ->middleware(FrameAncestorsPpdb::class)
     ->name('tenant.ppdb.form');
 Route::post('/ppdb', [TenantWebsiteController::class, 'ppdbStore'])->name('tenant.ppdb.store');
 
+// 2c Baitul Maal — halaman donasi publik website tenant (konfirmasi transfer
+// MANUAL; payment gateway menunggu owner). Form & upload bukti dithrottle
+// (anti-spam, per tenant+IP); bukti hanya pdf/jpg/png (anti stored-XSS).
+Route::get('/donasi', [DonasiPublikController::class, 'index'])
+    ->name('tenant.donasi.index');
+Route::post('/donasi', [DonasiPublikController::class, 'store'])
+    ->middleware('throttle:ppdb-submit')
+    ->name('tenant.donasi.store');
+Route::get('/donasi/terima-kasih/{ref}', [DonasiPublikController::class, 'terimaKasih'])
+    ->name('tenant.donasi.terima-kasih');
+Route::post('/donasi/{ref}/bukti', [DonasiPublikController::class, 'uploadBukti'])
+    ->middleware('throttle:ppdb-submit')
+    ->name('tenant.donasi.bukti');
+
 // Widget <script> embed utk situs eksternal — data publik saja, CORS terbuka.
-Route::get('/embed/widget.js', [\Modules\CMS\Http\Controllers\EmbedWidgetController::class, 'script'])->name('tenant.embed.script');
-Route::get('/embed/data.json', [\Modules\CMS\Http\Controllers\EmbedWidgetController::class, 'data'])->name('tenant.embed.data');
+Route::get('/embed/widget.js', [EmbedWidgetController::class, 'script'])->name('tenant.embed.script');
+Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('tenant.embed.data');
 
 // Fallback login route untuk middleware 'auth' pada route non-panel (mis. export tenant).
 // Pada domain tenant, /admin/login adalah halaman login panel tenant.
@@ -108,8 +130,8 @@ Route::get('/portal/{any?}', fn () => redirect('/spmb/login'))
 Route::get('/kebijakan-privasi', function () {
     if (tenancy()->initialized && tenant() !== null) {
         return view('tenant.kebijakan-privasi', [
-            'nama' => \App\Support\TenantBranding::name(tenant('name') ?? 'Pesantren'),
-            'isi' => \App\Support\KebijakanPrivasiSistem::isi(),
+            'nama' => TenantBranding::name(tenant('name') ?? 'Pesantren'),
+            'isi' => KebijakanPrivasiSistem::isi(),
         ]);
     }
 
@@ -138,10 +160,10 @@ Route::post('/api/v1/spmb/register', [PpdbPublicApiController::class, 'register'
 // API direktori publik — kompatibel kontrak legacy api.asy-syifaa.com
 // (hasil-seleksi.php, direktori-santri/alumni/pengajar.php). Data publik saja.
 Route::middleware('throttle:public-api')->group(function () {
-    Route::get('/api/v1/ppdb/selection-results', [\App\Http\Controllers\Api\PublicDirectoryApiController::class, 'selectionResults']);
-    Route::get('/api/public/students', [\App\Http\Controllers\Api\PublicDirectoryApiController::class, 'students']);
-    Route::get('/api/public/staff', [\App\Http\Controllers\Api\PublicDirectoryApiController::class, 'staff']);
-    Route::get('/api/public/guardians', [\App\Http\Controllers\Api\PublicDirectoryApiController::class, 'guardians']);
+    Route::get('/api/v1/ppdb/selection-results', [PublicDirectoryApiController::class, 'selectionResults']);
+    Route::get('/api/public/students', [PublicDirectoryApiController::class, 'students']);
+    Route::get('/api/public/staff', [PublicDirectoryApiController::class, 'staff']);
+    Route::get('/api/public/guardians', [PublicDirectoryApiController::class, 'guardians']);
 });
 
 // API publik headless TERPROTEKSI (X-Api-Key per tenant + rate-limit). Kontrak:

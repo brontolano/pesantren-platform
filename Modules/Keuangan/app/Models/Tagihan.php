@@ -26,6 +26,7 @@ class Tagihan extends Model
         'keterangan',
         'nominal',
         'diskon',
+        'diskon_beasiswa',
         'nominal_akhir',
         'jatuh_tempo',
         'status',
@@ -39,6 +40,7 @@ class Tagihan extends Model
     protected $casts = [
         'nominal' => 'decimal:2',
         'diskon' => 'decimal:2',
+        'diskon_beasiswa' => 'decimal:2',
         'nominal_akhir' => 'decimal:2',
         'jatuh_tempo' => 'date',
         'is_dibayar_dimuka' => 'boolean',

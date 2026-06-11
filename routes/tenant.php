@@ -48,11 +48,13 @@ use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
 use App\Http\Controllers\SantriExportController;
 use App\Http\Controllers\TahfidzExportController;
+use App\Support\TenantBranding;
 use App\Support\UiMode;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
 use Modules\CMS\Http\Controllers\SitemapController;
+use Modules\Keuangan\Models\Donasi;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -87,7 +89,9 @@ Route::middleware([
 
         // Direktori dokumen sensitif (arsip HR/kesantrian) WAJIB login —
         // sisanya (logo, galeri landing) tetap publik.
-        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi', 'kerusakan'];
+        // 'donasi' = bukti transfer unggahan publik — hanya admin yang perlu
+        // melihat balik (anti stored-XSS / anti enumerasi bukti orang lain).
+        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi', 'donasi', 'kerusakan'];
         $segmenPertama = explode('/', $path, 2)[0];
         if (in_array($segmenPertama, $direktoriSensitif, true)) {
             abort_unless(auth()->check(), 403);
@@ -100,6 +104,29 @@ Route::middleware([
             ['Content-Type' => $disk->mimeType($path) ?: 'application/octet-stream'],
         );
     })->where('path', '.*')->name('tenant.storage.file');
+
+    // 2c Baitul Maal — kuitansi donasi (pola print blade). HANYA donasi yang
+    // sudah dikonfirmasi bendahara; akses wajib login (dipanggil dari panel).
+    Route::get('/keuangan/donasi/{donasi}/kuitansi', function (int $donasi) {
+        // Gate sama dengan DonasiResource::canAccess — kuitansi memuat PII
+        // donatur dan id sekuensial; user tanpa hak keuangan (santri/wali)
+        // tidak boleh bisa enumerasi kuitansi orang lain.
+        abort_unless(
+            auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false,
+            403,
+        );
+
+        $record = Donasi::query()
+            ->with(['program.sumberDana', 'konfirmator'])
+            ->findOrFail($donasi);
+
+        abort_unless($record->status === Donasi::STATUS_DIKONFIRMASI, 404);
+
+        return view('exports.kuitansi-donasi-print', [
+            'donasi' => $record,
+            'namaPesantren' => TenantBranding::name(tenant('name') ?? 'Pesantren'),
+        ]);
+    })->middleware('auth')->name('tenant.donasi.kuitansi');
 
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');

@@ -6,8 +6,8 @@ use App\Models\Tenant;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Modules\Keuangan\Models\Tagihan;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Models\Tagihan;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Reader\Common\Creator\ReaderFactory;
 use RuntimeException;
@@ -46,10 +46,9 @@ class KeuanganImportService
     ];
 
     public function __construct(
-        private readonly TagihanService $tagihanService = new TagihanService(),
-        private readonly PembayaranService $pembayaranService = new PembayaranService(),
-    ) {
-    }
+        private readonly TagihanService $tagihanService = new TagihanService,
+        private readonly PembayaranService $pembayaranService = new PembayaranService,
+    ) {}
 
     /**
      * @return array{
@@ -96,6 +95,7 @@ class KeuanganImportService
 
                     if ($headers === null) {
                         $headers = $this->mapHeaders($values);
+
                         continue;
                     }
 
@@ -104,6 +104,7 @@ class KeuanganImportService
 
                     if ($payload === []) {
                         $summary['skipped']++;
+
                         continue;
                     }
 
@@ -122,6 +123,7 @@ class KeuanganImportService
 
                     if ($validator->fails()) {
                         $this->gagal($summary, $rowNumber, $payload, $validator->errors()->first());
+
                         continue;
                     }
 
@@ -129,6 +131,7 @@ class KeuanganImportService
                     // akurat (temuan adversarial: dry-run hijau, run nyata gagal).
                     if ($payload['status_bayar'] === 'lunas' && $verifikatorId === null) {
                         $this->gagal($summary, $rowNumber, $payload, 'Baris lunas butuh verifikator (--verifikator=email).');
+
                         continue;
                     }
 
@@ -139,6 +142,7 @@ class KeuanganImportService
 
                     if (! $santri) {
                         $this->gagal($summary, $rowNumber, $payload, 'NIS tidak ditemukan pada tenant ini — import santri dulu.');
+
                         continue;
                     }
 
@@ -158,6 +162,7 @@ class KeuanganImportService
                             'nis' => $payload['nis'],
                             'error' => sprintf('Duplikat di file (baris %d) — dilewati.', $dibuatFileIni[$kunci]),
                         ];
+
                         continue;
                     }
 
@@ -175,6 +180,7 @@ class KeuanganImportService
                                 'nis' => $payload['nis'],
                                 'error' => "Tagihan {$payload['jenis_tagihan']} {$bulan} sudah ada — dilewati (idempoten).",
                             ];
+
                             continue;
                         }
 
@@ -185,6 +191,7 @@ class KeuanganImportService
                         $dibuatFileIni[$kunci] = $rowNumber;
                         $summary['tagihan_dibuat']++;
                         $summary['total_tagihan'] += $nominalAkhir;
+
                         continue;
                     }
 
@@ -226,12 +233,19 @@ class KeuanganImportService
 
                             if ($payload['status_bayar'] === 'lunas' && $nominalAkhir > 0) {
                                 $this->lunasiTagihan($tagihan, $payload, $nominalAkhir, (int) $verifikatorId);
+                            } else {
+                                // 2c — beasiswa potong SPP: tagihan import yang
+                                // BELUM lunas ikut dipotong beasiswa aktif
+                                // (idempoten; baris lunas tidak disentuh agar
+                                // nominal pelunasan = nominal_akhir dari file).
+                                app(BeasiswaService::class)->terapkanPada($tagihan);
                             }
 
                             return 'dibuat';
                         });
                     } catch (\Throwable $e) {
                         $this->gagal($summary, $rowNumber, $payload, $e->getMessage());
+
                         continue;
                     }
 
@@ -244,6 +258,7 @@ class KeuanganImportService
                             'nis' => $payload['nis'],
                             'error' => "Tagihan {$payload['jenis_tagihan']} {$bulan} sudah ada — dilewati (idempoten).",
                         ];
+
                         continue;
                     }
 
@@ -256,6 +271,7 @@ class KeuanganImportService
                             'nis' => $payload['nis'],
                             'error' => "Tagihan {$payload['jenis_tagihan']} {$bulan} sudah ada — pelunasan DILENGKAPI (self-heal).",
                         ];
+
                         continue;
                     }
 
@@ -386,6 +402,7 @@ class KeuanganImportService
 
             if ($value instanceof \DateTimeInterface) {
                 $payload[$key] = Carbon::instance($value)->toDateString();
+
                 continue;
             }
 
