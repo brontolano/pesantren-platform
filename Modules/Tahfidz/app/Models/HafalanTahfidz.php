@@ -25,6 +25,7 @@ class HafalanTahfidz extends Model
         'tanggal_selesai',
         'status',
         'catatan',
+        'client_ref',
     ];
 
     protected $casts = [

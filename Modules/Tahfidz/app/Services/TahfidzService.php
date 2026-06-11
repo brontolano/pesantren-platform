@@ -2,6 +2,8 @@
 
 namespace Modules\Tahfidz\Services;
 
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Modules\Tahfidz\Models\HafalanTahfidz;
 use Modules\Tahfidz\Models\PenilaianTahfidz;
 use Modules\Kesantrian\Models\Santri;
@@ -71,6 +73,69 @@ class TahfidzService
             'direncanakan'=> $hafalan->where('status', 'direncanakan')->count(),
             'berjalan'    => $hafalan->where('status', 'berjalan')->count(),
         ];
+    }
+
+    // ── Setoran PWA Guru (F1-PWA) ────────────────────────────────────────────
+
+    /**
+     * Setoran hafalan dari PWA Guru: tulis HafalanTahfidz (status selesai,
+     * halaqah_id) + PenilaianTahfidz (jenis ziyadah|murajaah, nilai, input_by)
+     * dalam SATU transaksi.
+     *
+     * Idempoten via client_ref (uuid dari klien, pola WP-32): retry dengan
+     * client_ref sama mengembalikan hafalan yang sudah tercatat — unique index
+     * (tenant_id, client_ref) di DB adalah gerbang dedup race-safe.
+     */
+    public function setor(Santri $santri, array $data, ?int $inputBy = null): HafalanTahfidz
+    {
+        $clientRef = isset($data['client_ref']) && $data['client_ref'] !== ''
+            ? (string) $data['client_ref']
+            : null;
+
+        if ($clientRef !== null) {
+            $existing = HafalanTahfidz::query()->where('client_ref', $clientRef)->first();
+            if ($existing !== null) {
+                return $existing->load('penilaian');
+            }
+        }
+
+        try {
+            return DB::transaction(function () use ($santri, $data, $inputBy, $clientRef): HafalanTahfidz {
+                $hafalan = HafalanTahfidz::create([
+                    'tenant_id'       => $santri->tenant_id,
+                    'santri_id'       => $santri->getKey(),
+                    'halaqah_id'      => $data['halaqah_id'] ?? null,
+                    'surah'           => $data['surah'],
+                    'ayat_awal'       => $data['ayat_awal'] ?? null,
+                    'ayat_akhir'      => $data['ayat_akhir'] ?? null,
+                    'status'          => 'selesai',
+                    'tanggal_selesai' => $data['tanggal'] ?? now()->toDateString(),
+                    'catatan'         => $data['catatan'] ?? null,
+                    'client_ref'      => $clientRef,
+                ]);
+
+                $this->addPenilaian($hafalan, [
+                    'jenis'    => $data['jenis'] ?? 'murajaah',
+                    'nilai'    => $data['nilai'] ?? null,
+                    'catatan'  => $data['catatan'] ?? null,
+                    'tanggal'  => $data['tanggal'] ?? now()->toDateString(),
+                    'input_by' => $inputBy,
+                ]);
+
+                return $hafalan->load('penilaian');
+            });
+        } catch (QueryException $e) {
+            // Race retry: dua request paralel dengan client_ref sama — yang
+            // kalah unique index mengambil baris pemenang, bukan error 500.
+            if ($clientRef !== null) {
+                $existing = HafalanTahfidz::query()->where('client_ref', $clientRef)->first();
+                if ($existing !== null) {
+                    return $existing->load('penilaian');
+                }
+            }
+
+            throw $e;
+        }
     }
 
     // ── Penilaian ────────────────────────────────────────────────────────────
