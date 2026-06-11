@@ -23,8 +23,10 @@ class PanelTheme
     public const SETTING_COLOR = 'panel_color_preset';
 
     /**
-     * Registry TEMA (layout). 'topNav' memindah menu utama ke bilah atas;
-     * 'bodyClass' mengaktifkan blok CSS `.tema-…` di theme.css.
+     * Registry TEMA (layout/gaya). 'topNav' memindah menu utama ke bilah atas;
+     * 'bodyClass' mengaktifkan blok CSS `.tema-…` di theme.css; 'primary'
+     * (opsional) = palet Filament bila preset warna masih bawaan; 'vars'
+     * (opsional) = variabel CSS bawaan tema (preset warna menimpanya).
      */
     public const THEMES = [
         'bawaan' => [
@@ -32,6 +34,20 @@ class PanelTheme
             'desc' => 'Menu samping seperti WhatsApp — tampilan standar saat ini.',
             'topNav' => false,
             'bodyClass' => null,
+        ],
+        'baitul-maal' => [
+            'label' => 'Baitul Maal (Hijau–Emas)',
+            'desc' => 'Sidebar hijau hutan gelap beraksen emas, latar krim — desain Baitul Maal Digital.',
+            'topNav' => false,
+            'bodyClass' => 'tema-baitul-maal',
+            'primary' => '#0A5C36',
+            'vars' => [
+                '--tema-sidebar-header' => '#06351F',
+                '--tema-sidebar-header-border' => 'rgba(255, 255, 255, 0.1)',
+                '--tema-active-bg' => 'rgba(238, 220, 154, 0.15)',
+                '--tema-active-fg' => '#ffffff',
+                '--tema-active-dark' => 'linear-gradient(90deg, #157A4C 0%, #0A5C36 100%)',
+            ],
         ],
         'navigasi-atas' => [
             'label' => 'Navigasi Atas',
@@ -116,10 +132,14 @@ class PanelTheme
         return self::resolve(self::SETTING_COLOR, self::COLORS);
     }
 
-    /** Hex warna primer Filament dari preset aktif; null = pakai bawaan panel. */
+    /**
+     * Hex warna primer Filament: preset warna menang; bila preset masih
+     * bawaan, tema boleh membawa primer sendiri; null = bawaan panel.
+     */
     public static function primaryHex(): ?string
     {
-        return self::COLORS[self::color()]['primary'];
+        return self::COLORS[self::color()]['primary']
+            ?? (self::THEMES[self::theme()]['primary'] ?? null);
     }
 
     /** Tema aktif memakai navigasi atas? */
@@ -134,10 +154,16 @@ class PanelTheme
         return self::THEMES[self::theme()]['bodyClass'];
     }
 
-    /** Deklarasi variabel CSS preset warna aktif ('' bila bawaan). */
+    /**
+     * Deklarasi variabel CSS aktif ('' bila semuanya bawaan).
+     * Var bawaan tema dahulu, lalu DITIMPA preset warna pilihan pengguna.
+     */
     public static function cssVars(): string
     {
-        $vars = self::COLORS[self::color()]['vars'];
+        $vars = array_merge(
+            self::THEMES[self::theme()]['vars'] ?? [],
+            self::COLORS[self::color()]['vars'],
+        );
 
         return implode('', array_map(
             fn (string $k, string $v): string => "{$k}:{$v};",

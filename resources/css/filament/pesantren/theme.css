@@ -382,6 +382,68 @@ body.tema-navigasi-atas.dark .fi-topbar {
     border-bottom: 1px solid #2A2A35 !important;
 }
 
+/* Tema "Baitul Maal" (desain pesantren-online-admin / PRD Keuangan Digital):
+   sidebar gradien hijau hutan #06351F→#04281A, aksen emas #D4AF37, item
+   aktif bergaris emas kiri, latar konten krim #FDFBF7. */
+body.tema-baitul-maal .fi-body {
+    background-color: #FDFBF7;
+}
+body.tema-baitul-maal .fi-sidebar {
+    background: linear-gradient(180deg, #06351F 0%, #04281A 100%) !important;
+    border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+body.tema-baitul-maal .fi-sidebar-group-label {
+    color: rgba(238, 220, 154, 0.75) !important;
+}
+body.tema-baitul-maal .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-baitul-maal .fi-sidebar-item-label {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+body.tema-baitul-maal .fi-sidebar-item-btn > .fi-icon,
+body.tema-baitul-maal .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-baitul-maal .fi-sidebar-item-btn .fi-icon {
+    color: #9CB9A9 !important;
+}
+body.tema-baitul-maal .fi-sidebar-item-btn:hover {
+    background-color: rgba(255, 255, 255, 0.07) !important;
+}
+body.tema-baitul-maal .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
+body.tema-baitul-maal .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
+    color: #ffffff !important;
+}
+body.tema-baitul-maal .fi-sidebar-item-btn:hover > .fi-icon,
+body.tema-baitul-maal .fi-sidebar-item-btn:hover .fi-icon {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+/* Aktif: tint emas + garis emas inset kiri (signature desain Baitul Maal) */
+body.tema-baitul-maal .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: rgba(238, 220, 154, 0.15) !important;
+    box-shadow: inset 3px 0 0 #D4AF37 !important;
+}
+body.tema-baitul-maal .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-baitul-maal .fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: #ffffff !important;
+}
+body.tema-baitul-maal .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+body.tema-baitul-maal .fi-sidebar-item.fi-active .fi-icon {
+    color: #EEDC9A !important;
+}
+/* Tombol kecil sidebar (collapse grup, notifikasi) di atas hijau gelap */
+body.tema-baitul-maal .fi-sidebar-group-btn,
+body.tema-baitul-maal .fi-sidebar-group-collapse-btn,
+body.tema-baitul-maal .fi-sidebar .fi-icon-btn {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+body.tema-baitul-maal .fi-sidebar .fi-icon-btn:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+/* Mode gelap: sidebar sudah gelap — samakan latar konten dgn dark bawaan */
+.dark body.tema-baitul-maal .fi-body,
+body.tema-baitul-maal.dark .fi-body {
+    background-color: #121212;
+}
+
 /* Tema "Kompak": kerapatan lebih tinggi — muat lebih banyak data per layar. */
 body.tema-kompak .fi-sidebar-item-btn {
     padding-top: 0.25rem !important;

@@ -66,6 +66,29 @@ class PanelThemeTest extends TestCase
         tenancy()->end();
     }
 
+    public function test_tema_baitul_maal_membawa_vars_dan_primer_sendiri(): void
+    {
+        $this->boot('tema');
+
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'baitul-maal']]);
+
+        $this->assertSame('baitul-maal', PanelTheme::theme());
+        $this->assertSame('tema-baitul-maal', PanelTheme::bodyClass());
+        $this->assertFalse(PanelTheme::topNavigation());
+
+        // Preset warna masih bawaan → primer dibawa tema (forest green).
+        $this->assertSame('#0A5C36', PanelTheme::primaryHex());
+        $this->assertStringContainsString('--tema-sidebar-header:#06351F;', PanelTheme::cssVars());
+        $this->assertStringContainsString('--tema-active-fg:#ffffff;', PanelTheme::cssVars());
+
+        // Pengguna pilih preset warna → preset MENIMPA var & primer tema.
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'senja']]);
+        $this->assertSame('#ea580c', PanelTheme::primaryHex());
+        $this->assertStringContainsString('--tema-active-bg:#ffedd5;', PanelTheme::cssVars());
+
+        tenancy()->end();
+    }
+
     public function test_nilai_tak_dikenal_jatuh_ke_bawaan(): void
     {
         $this->boot('tema');
