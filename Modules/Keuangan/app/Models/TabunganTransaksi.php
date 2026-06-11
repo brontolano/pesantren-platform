@@ -23,6 +23,7 @@ class TabunganTransaksi extends Model
         'keterangan',
         'tanggal',
         'created_by',
+        'ref_transaksi_id',
     ];
 
     protected $casts = [
@@ -40,5 +41,11 @@ class TabunganTransaksi extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /** Transaksi belanja asal (untuk baris refund_kantin). */
+    public function refTransaksi(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'ref_transaksi_id');
     }
 }
