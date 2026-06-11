@@ -448,6 +448,23 @@ Jazakumullahu khairan.
 — {{nama_pesantren}}
 MSG,
             ],
+            // ── 2a Dasbor Mutu ────────────────────────────────────────────
+            [
+                'kode_template' => 'MUTU_LAMPU_KUNING',
+                'judul' => 'Lampu Kuning Mutu Santri',
+                'channel' => 'whatsapp',
+                'variable_dinamis' => ['nama_santri', 'nis', 'jenis', 'keterangan', 'nama_pesantren'],
+                'isi' => <<<'MSG'
+🟡 *LAMPU KUNING MUTU SANTRI*
+
+Santri : {{nama_santri}} ({{nis}})
+Perhatian: {{keterangan}}
+
+Mohon perhatian dan pendampingan untuk ananda. Detail lengkap dapat dilihat pada Dasbor Mutu Santri.
+
+— {{nama_pesantren}}
+MSG,
+            ],
         ];
 
         $tenantId = tenant('id') ?? throw new \RuntimeException('Seeder harus dijalankan dalam konteks tenant.');

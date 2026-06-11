@@ -22,6 +22,13 @@ Schedule::command('payroll:cek-kontrak-habis')
     ->dailyAt('07:30')
     ->withoutOverlapping();
 
+// 2a Dasbor Mutu: hitung lampu kuning semua santri aktif per tenant (cache
+// mutu_lampu) + notifikasi mustahiq/wali sesuai saklar Setting mutu.notif
+// (idempoten harian — guard last_notified_at).
+Schedule::command('mutu:hitung-lampu')
+    ->dailyAt('05:00')
+    ->withoutOverlapping();
+
 Schedule::command('keuangan:rekonsiliasi-harian')
     ->dailyAt('01:30')
     ->withoutOverlapping();
