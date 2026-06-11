@@ -199,6 +199,12 @@ class PayrollService
             throw new InvalidArgumentException('users_id dan periode wajib diisi.');
         }
 
+        // Slip bulanan WAJIB periode YYYY-MM — 'THR-2026' dkk lewat ThrService
+        // (mencegah slip bulanan menduduki slot periode THR; WP-15).
+        if (! preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', (string) $periode)) {
+            throw new InvalidArgumentException("Periode slip bulanan harus berformat YYYY-MM, diterima: {$periode}.");
+        }
+
         $existing = SlipGaji::where('users_id', $usersId)->where('periode', $periode)->first();
         if ($existing !== null) {
             return $existing; // idempoten — satu slip per PTK per periode.
