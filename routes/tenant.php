@@ -11,6 +11,7 @@ use App\Http\Controllers\KeuanganPwaController;
 use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
 use App\Http\Controllers\PengadaanExportController;
+use App\Http\Controllers\PimpinanPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
 use App\Http\Controllers\PortalGuru\PortalGuruGerbangController;
@@ -121,6 +122,16 @@ Route::middleware([
             Route::get('/', [AppSantriController::class, 'home'])->name('home');
             Route::post('/logout', [AppSantriController::class, 'logout'])->name('logout');
         });
+    });
+
+    // WP-35 — Dasbor & Approval Pimpinan dari HP (/pimpinan): baca-saja
+    // kecuali setujui/tolak ApprovalRequest (HANYA via ApprovalService F1).
+    // CATATAN deploy: permission akses_pimpinan baru → butuh tenant:reprovision.
+    Route::middleware(['auth', 'can:akses_pimpinan'])->prefix('pimpinan')->name('tenant.pimpinan.')->group(function () {
+        Route::get('/', [PimpinanPwaController::class, 'beranda'])->name('beranda');
+        Route::get('/api/ringkasan', [PimpinanPwaController::class, 'ringkasan'])->name('ringkasan');
+        Route::post('/api/approval/{approval}/setujui', [PimpinanPwaController::class, 'setujui'])->name('approval.setujui');
+        Route::post('/api/approval/{approval}/tolak', [PimpinanPwaController::class, 'tolak'])->name('approval.tolak');
     });
 
     // F1-PWA — PWA Guru (/guru): aset PWA publik (manifest/SW/ikon, pola
