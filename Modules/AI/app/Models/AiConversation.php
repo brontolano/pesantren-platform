@@ -40,6 +40,7 @@ class AiConversation extends Model
         'verifikasi_status',
         'verifikasi_percobaan',
         'verifikasi_terkunci_sampai',
+        'gagal_beruntun',
     ];
 
     protected function casts(): array
@@ -49,6 +50,7 @@ class AiConversation extends Model
             'opt_out' => 'boolean',
             'verifikasi_percobaan' => 'integer',
             'verifikasi_terkunci_sampai' => 'datetime',
+            'gagal_beruntun' => 'integer',
         ];
     }
 

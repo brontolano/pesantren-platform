@@ -109,6 +109,7 @@ class AIServiceProvider extends ServiceProvider
                 \Modules\AI\Filament\Pages\GeneratorSoal::class,
                 \Modules\AI\Filament\Pages\GeneratorRpp::class,
                 \Modules\AI\Filament\Pages\IkhtisarKitab::class,
+                \Modules\AI\Filament\Pages\KotakMasukWa::class,
             ]);
 
             // T-A013 — dashboard internal "Suara Pasar" di panel PLATFORM
