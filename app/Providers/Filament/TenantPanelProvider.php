@@ -70,6 +70,7 @@ use App\Filament\Resources\Payroll\Cuti\CutiResource;
 use App\Filament\Resources\Payroll\Employee\EmployeeResource;
 use App\Filament\Resources\Payroll\Jabatan\JabatanResource;
 use App\Filament\Resources\Payroll\Khidmah\KhidmahResource;
+use App\Filament\Resources\Payroll\Kontrak\KontrakKerjaResource;
 use App\Filament\Resources\Payroll\Penugasan\PenugasanPegawaiResource;
 use App\Filament\Resources\Payroll\PresensiStaf\PresensiStafResource;
 use App\Filament\Resources\Payroll\SlipGajiResource;
@@ -109,6 +110,7 @@ use App\Filament\Widgets\GreetingBanner;
 use App\Filament\Widgets\KasOverviewWidget;
 use App\Filament\Widgets\KategoriPengeluaranChart;
 use App\Filament\Widgets\KeuanganAreaChart;
+use App\Filament\Widgets\KontrakAkanHabisWidget;
 use App\Filament\Widgets\OnboardingChecklist;
 use App\Filament\Widgets\PengajuanTerbaru;
 use App\Filament\Widgets\QuickAccessWidget;
@@ -167,6 +169,8 @@ class TenantPanelProvider extends PanelProvider
                 PengajuanTerbaru::class,
                 AgendaPengumuman::class,
                 QuickAccessWidget::class,
+                // WP-16 — pengingat kontrak/SK akan habis (canView: payroll + ada data)
+                KontrakAkanHabisWidget::class,
             ];
 
         // PENTING: ->id() & ->path() HARUS dipanggil SEBELUM ->resources()/
@@ -424,6 +428,8 @@ class TenantPanelProvider extends PanelProvider
             PresensiStafResource::class,
             KhidmahResource::class,
             CutiResource::class,
+            // WP-16 — Kontrak, SK & Pengabdian
+            KontrakKerjaResource::class,
         ];
     }
 

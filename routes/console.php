@@ -16,6 +16,12 @@ Schedule::command('ppdb:ingatkan-daftar-ulang')
     ->dailyAt('08:00')
     ->withoutOverlapping();
 
+// WP-16: pengingat kontrak/SK pegawai akan habis (ambang per-tenant via
+// Setting payroll.kontrak_reminder_hari, default 60; idempoten per hari).
+Schedule::command('payroll:cek-kontrak-habis')
+    ->dailyAt('07:30')
+    ->withoutOverlapping();
+
 Schedule::command('keuangan:rekonsiliasi-harian')
     ->dailyAt('01:30')
     ->withoutOverlapping();
