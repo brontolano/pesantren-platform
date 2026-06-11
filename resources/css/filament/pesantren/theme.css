@@ -49,10 +49,11 @@
     border-inline-end: 1px solid #E9EDEF !important;
 }
 
-/* Header brand: warna header WA (#008069) */
+/* Header brand: warna header WA (#008069) — bisa di-override preset warna
+   tema via --tema-* (lihat App\Support\PanelTheme; fallback = nilai lama). */
 .fi-sidebar-header {
-    background: #008069 !important;
-    border-bottom: 1px solid #007259 !important;
+    background: var(--tema-sidebar-header, #008069) !important;
+    border-bottom: 1px solid var(--tema-sidebar-header-border, #007259) !important;
     padding-top: 0.875rem !important;
     padding-bottom: 0.875rem !important;
 }
@@ -129,20 +130,20 @@
     color: #41525D !important;
 }
 
-/* ACTIVE: tint hijau lembut + teks WA dark green */
+/* ACTIVE: tint hijau lembut + teks WA dark green (override-able preset warna) */
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background: #E7F7EE !important;
+    background: var(--tema-active-bg, #E7F7EE) !important;
     box-shadow: none !important;
 }
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
 .fi-sidebar-item.fi-active .fi-sidebar-item-label {
-    color: #008069 !important;
+    color: var(--tema-active-fg, #008069) !important;
     font-weight: 600 !important;
 }
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-active .fi-icon {
-    color: #008069 !important;
+    color: var(--tema-active-fg, #008069) !important;
 }
 
 /* Tombol sidebar misc (collapse grup, notifikasi) */
@@ -220,9 +221,9 @@
     color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* ACTIVE dark: emerald gradient (identitas pesantren) */
+/* ACTIVE dark: emerald gradient (identitas pesantren; override-able preset) */
 .dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background: linear-gradient(90deg, #059669 0%, #047857 100%) !important;
+    background: var(--tema-active-dark, linear-gradient(90deg, #059669 0%, #047857 100%)) !important;
     box-shadow: 0 4px 14px -4px rgba(5, 150, 105, 0.45) !important;
 }
 .dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
@@ -349,4 +350,59 @@
     .fi-sidebar-item-button {
         min-height: 2.75rem;
     }
+}
+
+/* ===================================================================
+   TEMA LAYOUT (App\Support\PanelTheme) — kelas body `tema-…` disuntik
+   via render hook BODY_START. Tema 'bawaan' tanpa kelas = blok ini
+   tidak aktif sama sekali.
+   =================================================================== */
+
+/* Tema "Navigasi Atas": topbar mengambil warna header sidebar agar
+   identitas tema tetap terasa walau sidebar tidak tampil. */
+body.tema-navigasi-atas .fi-topbar {
+    background: var(--tema-sidebar-header, #008069) !important;
+    border-bottom: 1px solid var(--tema-sidebar-header-border, #007259) !important;
+}
+body.tema-navigasi-atas .fi-topbar .fi-topbar-item-label,
+body.tema-navigasi-atas .fi-topbar .fi-icon,
+body.tema-navigasi-atas .fi-topbar .fi-logo,
+body.tema-navigasi-atas .fi-topbar .fi-icon-btn {
+    color: #ffffff !important;
+}
+body.tema-navigasi-atas .fi-topbar .fi-topbar-item-btn:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+body.tema-navigasi-atas .fi-topbar-item.fi-active .fi-topbar-item-btn {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+}
+.dark body.tema-navigasi-atas .fi-topbar,
+body.tema-navigasi-atas.dark .fi-topbar {
+    background: #161823 !important;
+    border-bottom: 1px solid #2A2A35 !important;
+}
+
+/* Tema "Kompak": kerapatan lebih tinggi — muat lebih banyak data per layar. */
+body.tema-kompak .fi-sidebar-item-btn {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+body.tema-kompak .fi-sidebar-item-label {
+    font-size: 0.8125rem !important;
+}
+body.tema-kompak .fi-ta-cell,
+body.tema-kompak .fi-ta-header-cell {
+    padding-top: 0.3125rem !important;
+    padding-bottom: 0.3125rem !important;
+}
+body.tema-kompak .fi-section-content-ctn,
+body.tema-kompak .fi-section-content {
+    padding: 0.75rem !important;
+}
+body.tema-kompak .fi-wi-stats-overview-stat {
+    padding: 0.625rem 0.875rem !important;
+}
+body.tema-kompak .fi-btn {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
 }

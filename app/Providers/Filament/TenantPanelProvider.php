@@ -131,6 +131,12 @@ class TenantPanelProvider extends PanelProvider
                 \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): \Illuminate\Contracts\View\View => view('filament.ui-mode-toggle'),
             )
+            // Tema panel per tenant: suntik variabel CSS preset warna + kelas
+            // body tema layout (lihat App\Support\PanelTheme).
+            ->renderHook(
+                \Filament\View\PanelsRenderHook::BODY_START,
+                fn (): \Illuminate\Contracts\View\View => view('filament.theme-vars'),
+            )
             ->resources($resources)
             ->pages($pages)
             ->widgets($widgets)
@@ -185,6 +191,8 @@ class TenantPanelProvider extends PanelProvider
                 \App\Http\Middleware\RedirectCentralToPlatform::class,
                 PreventAccessFromCentralDomains::class,
                 InitializeTenancyByDomain::class,
+                // Tema panel per tenant (warna + layout) — butuh tenancy aktif.
+                \App\Http\Middleware\ApplyPanelTheme::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
