@@ -9,12 +9,16 @@ use App\Models\TenantModule;
 use App\Models\TenantStorage;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Services\StorageQuotaService;
 use Illuminate\Support\Str;
+use Modules\AI\Services\Metering\AiBudgetProvisioner;
+use Modules\AI\Services\Settings\AiSettingProvisioner;
+use Modules\Akademik\Database\Seeders\KalenderLiburNasionalSeeder;
+use Modules\Akademik\Database\Seeders\KomponenNilaiSeeder;
+use Modules\Akademik\Database\Seeders\LembagaSeeder;
+use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Spatie\Permission\PermissionRegistrar;
 
 /**
@@ -32,7 +36,7 @@ class TenantProvisioner
 {
     /**
      * @return array{email: string, password: ?string}
-     *     password = null bila user admin sudah ada sebelumnya.
+     *                                                 password = null bila user admin sudah ada sebelumnya.
      */
     public function provision(Tenant $tenant, ?string $adminEmail = null): array
     {
@@ -50,7 +54,7 @@ class TenantProvisioner
 
         // T-A002: budget AI default (anggaran tanpa batas, alert 80%) + saldo
         // awal ledger alokasi 0 (CENTRAL). Idempoten — aman tenant:reprovision.
-        app(\Modules\AI\Services\Metering\AiBudgetProvisioner::class)
+        app(AiBudgetProvisioner::class)
             ->provision((string) $tenant->getKey());
 
         return $tenant->run(function () use ($tenant, $adminEmail): array {
@@ -95,21 +99,29 @@ class TenantProvisioner
             // Idempoten (firstOrCreate by nama) — tenant yang sudah mengubah
             // bobotnya tidak ditimpa.
             Artisan::call('db:seed', [
-                '--class' => \Modules\Akademik\Database\Seeders\KomponenNilaiSeeder::class,
+                '--class' => KomponenNilaiSeeder::class,
                 '--force' => true,
             ]);
 
             // (b3c) WP-01: lembaga default "Pondok" — payung kelas/periode.
             // Idempoten (firstOrCreate by nama) — tenant lama tak berubah perilaku.
             Artisan::call('db:seed', [
-                '--class' => \Modules\Akademik\Database\Seeders\LembagaSeeder::class,
+                '--class' => LembagaSeeder::class,
+                '--force' => true,
+            ]);
+
+            // (b3d) WP-02: kalender akademik — libur nasional 2026 (statis,
+            // bisa diedit tenant). Idempoten (firstOrCreate tenant+tanggal_mulai
+            // +keterangan) — entri yang diedit tenant TIDAK ditimpa.
+            Artisan::call('db:seed', [
+                '--class' => KalenderLiburNasionalSeeder::class,
                 '--force' => true,
             ]);
 
             // (b4) T-A010: pengaturan AI default konservatif versi 1 'aktif'
             // (tabel TENANT — wajib di dalam $tenant->run()). Idempoten:
             // tenant yang sudah punya versi apa pun tidak disentuh.
-            app(\Modules\AI\Services\Settings\AiSettingProvisioner::class)
+            app(AiSettingProvisioner::class)
                 ->provision((string) $tenant->getKey());
 
             // (c) User admin super_admin.

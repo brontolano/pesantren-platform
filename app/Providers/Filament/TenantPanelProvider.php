@@ -2,82 +2,114 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\TenantDashboard;
 use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
+use App\Filament\Resources\Akademik\KalenderAkademik\KalenderAkademikResource;
+use App\Filament\Resources\Akademik\Kitab\KitabResource;
+use App\Filament\Resources\Akademik\Lembaga\LembagaResource;
 use App\Filament\Resources\Akademik\Nilai\NilaiResource;
-use App\Filament\Resources\Akademik\PresensiSantri\PresensiSantriResource;
-use App\Filament\Resources\Akademik\Rubrik\RubrikKriteriaResource;
 use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
-use App\Filament\Resources\Akademik\Program\ProgramStudiResource;
 use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
+use App\Filament\Resources\Akademik\PresensiSantri\PresensiSantriResource;
+use App\Filament\Resources\Akademik\Program\ProgramStudiResource;
 use App\Filament\Resources\Akademik\Rapor\RaporResource;
+use App\Filament\Resources\Akademik\Rubrik\RubrikKriteriaResource;
 use App\Filament\Resources\Alumni\AlumniResource;
+use App\Filament\Resources\Approval\ApprovalRequestResource;
+use App\Filament\Resources\Approval\ApprovalRuleResource;
 use App\Filament\Resources\Asrama\BiayaAsrama\BiayaAsramaResource;
 use App\Filament\Resources\Asrama\BlokAsrama\BlokAsramaResource;
 use App\Filament\Resources\Asrama\KamarAsrama\KamarAsramaResource;
 use App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource;
+use App\Filament\Resources\Audit\AuditLogResource;
 use App\Filament\Resources\BroadcastWa\BroadcastWaResource;
 use App\Filament\Resources\CMS\Article\ArticleResource;
 use App\Filament\Resources\CMS\Gallery\GalleryResource;
 use App\Filament\Resources\CMS\Profile\ProfileResource;
 use App\Filament\Resources\CMS\WebsiteSetting\WebsiteSettingResource;
-use App\Filament\Resources\Kegiatan\IzinSantriResource;
-use App\Filament\Resources\Kegiatan\KegiatanResource;
-use App\Filament\Resources\Kegiatan\Recurring\KegiatanRecurringResource;
-use App\Filament\Resources\Kegiatan\Template\KegiatanTemplateResource;
-use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
-use App\Filament\Resources\Kelas\KelasResource;
-use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
-use App\Filament\Resources\Kesehatan\SesiKonselingResource;
+use App\Filament\Resources\Crm\CrmPenawaranResource;
+use App\Filament\Resources\Document\DocumentResource;
 use App\Filament\Resources\Inventory\InventoryBatchResource;
 use App\Filament\Resources\Inventory\InventoryItemResource;
 use App\Filament\Resources\Inventory\InventoryLokasiResource;
+use App\Filament\Resources\Kegiatan\IzinSantriResource;
+use App\Filament\Resources\Kegiatan\KegiatanResource;
+use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
+use App\Filament\Resources\Kegiatan\Recurring\KegiatanRecurringResource;
+use App\Filament\Resources\Kegiatan\Template\KegiatanTemplateResource;
+use App\Filament\Resources\Kelas\KelasResource;
+use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
+use App\Filament\Resources\Kesehatan\SesiKonselingResource;
+use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
 use App\Filament\Resources\Ledger\AkunResource;
-use App\Filament\Resources\Surat\SuratResource;
-use App\Filament\Resources\PPDB\PaketSoal\PaketSoalResource;
-use App\Filament\Resources\PPDB\UjianAttempt\UjianAttemptResource;
 use App\Filament\Resources\Ledger\AlokasiBiaya\AlokasiBiayaResource;
-use App\Filament\Resources\Ledger\KursValuta\KursValutaResource;
 use App\Filament\Resources\Ledger\AnggaranResource;
 use App\Filament\Resources\Ledger\DivisiUnitResource;
-use App\Filament\Resources\Pos\PosKategoriResource;
-use App\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use App\Filament\Resources\Ledger\JurnalResource;
 use App\Filament\Resources\Ledger\KebijakanKehalalanResource;
-use App\Filament\Resources\Pajak\TarifPajakResource;
+use App\Filament\Resources\Ledger\KursValuta\KursValutaResource;
 use App\Filament\Resources\Ledger\PeriodeAkuntansiResource;
 use App\Filament\Resources\Ledger\SumberDanaResource;
-use App\Filament\Resources\Pengadaan\BelanjaResource;
-use App\Filament\Resources\Payroll\SlipGajiResource;
-use App\Filament\Resources\Pembiayaan\AsetResource;
-use App\Filament\Resources\Pembiayaan\MutasiAsetResource;
-use App\Filament\Resources\Pembiayaan\PembiayaanResource;
+use App\Filament\Resources\Media\MediaAuditResource;
+use App\Filament\Resources\Media\MediaFileResource;
+use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use App\Filament\Resources\Mutu\DokumenMutuResource;
 use App\Filament\Resources\Mutu\MutuInspeksiResource;
 use App\Filament\Resources\Mutu\MutuSasaranResource;
 use App\Filament\Resources\Mutu\MutuSkmResource;
 use App\Filament\Resources\Mutu\MutuTemuanResource;
-use App\Filament\Resources\Crm\CrmPenawaranResource;
-use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
-use App\Filament\Resources\Media\MediaFileResource;
-use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
+use App\Filament\Resources\Pajak\TarifPajakResource;
+use App\Filament\Resources\Payroll\Cuti\CutiResource;
+use App\Filament\Resources\Payroll\Employee\EmployeeResource;
+use App\Filament\Resources\Payroll\Khidmah\KhidmahResource;
+use App\Filament\Resources\Payroll\PresensiStaf\PresensiStafResource;
+use App\Filament\Resources\Payroll\SlipGajiResource;
+use App\Filament\Resources\Pembayaran\PembayaranResource;
+use App\Filament\Resources\Pembiayaan\AsetResource;
+use App\Filament\Resources\Pembiayaan\MutasiAsetResource;
+use App\Filament\Resources\Pembiayaan\PembiayaanResource;
+use App\Filament\Resources\PenempatanKelas\PenempatanKelasResource;
+use App\Filament\Resources\Pengadaan\BelanjaResource;
+use App\Filament\Resources\Pengadaan\PurchaseOrder\PurchaseOrderResource;
+use App\Filament\Resources\Pengadaan\Supplier\SupplierResource;
+use App\Filament\Resources\Pos\PosKategoriResource;
+use App\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use App\Filament\Resources\PPDB\CalonSantriDokumenResource;
 use App\Filament\Resources\PPDB\CalonSantriResource;
 use App\Filament\Resources\PPDB\HasilUjianResource;
-use App\Filament\Resources\Pembayaran\PembayaranResource;
-use App\Filament\Resources\PenempatanKelas\PenempatanKelasResource;
+use App\Filament\Resources\PPDB\PaketSoal\PaketSoalResource;
+use App\Filament\Resources\PPDB\TagihanPpdbResource;
+use App\Filament\Resources\PPDB\UjianAttempt\UjianAttemptResource;
+use App\Filament\Resources\Rekonsiliasi\BankStatementResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Santri\SantriResource;
+use App\Filament\Resources\SetorKeliling\SetorKelilingResource;
+use App\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
+use App\Filament\Resources\Surat\SuratResource;
 use App\Filament\Resources\Tabungan\TabunganResource;
 use App\Filament\Resources\TabunganTopup\TabunganTopupResource;
 use App\Filament\Resources\Tagihan\TagihanResource;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource;
-use App\Filament\Resources\Tahfidz\TahfidzTarget\TahfidzTargetResource;
+use App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource;
 use App\Filament\Resources\Tahfidz\PenilaianTahfidzResource;
+use App\Filament\Resources\Tahfidz\TahfidzTarget\TahfidzTargetResource;
 use App\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource;
 use App\Filament\Resources\Users\UserResource;
+use App\Filament\Widgets\AgendaPengumuman;
+use App\Filament\Widgets\GreetingBanner;
+use App\Filament\Widgets\KasOverviewWidget;
+use App\Filament\Widgets\KategoriPengeluaranChart;
+use App\Filament\Widgets\KeuanganAreaChart;
+use App\Filament\Widgets\OnboardingChecklist;
+use App\Filament\Widgets\PengajuanTerbaru;
+use App\Filament\Widgets\QuickAccessWidget;
+use App\Filament\Widgets\StatsPesantren;
+use App\Filament\Widgets\TransaksiTerbaru;
+use App\Http\Middleware\ApplyPanelTheme;
+use App\Http\Middleware\RedirectCentralToPlatform;
+use App\Models\Setting;
 use App\Support\AlbaKidsTenant;
-use App\Filament\Widgets\KesantrianOverviewWidget;
-use App\Filament\Widgets\KeuanganOverviewWidget;
+use App\Support\TenantBranding;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -87,7 +119,9 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
+use Illuminate\Contracts\View\View;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -103,24 +137,24 @@ class TenantPanelProvider extends PanelProvider
     {
         $isAlbaKids = AlbaKidsTenant::isActive();
         $resources = $isAlbaKids ? $this->albaKidsResources() : $this->defaultResources();
-        $pages = $isAlbaKids ? [Dashboard::class] : [\App\Filament\Pages\TenantDashboard::class];
+        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class];
         $widgets = $isAlbaKids
             ? [
-                \App\Filament\Widgets\GreetingBanner::class,
+                GreetingBanner::class,
                 AccountWidget::class,
             ]
             : [
-                \App\Filament\Widgets\GreetingBanner::class,
-                \App\Filament\Widgets\OnboardingChecklist::class,
-                \App\Filament\Widgets\StatsPesantren::class,
-                \App\Filament\Widgets\KeuanganAreaChart::class,
-                \App\Filament\Widgets\KategoriPengeluaranChart::class,
-                \App\Filament\Widgets\TransaksiTerbaru::class,
+                GreetingBanner::class,
+                OnboardingChecklist::class,
+                StatsPesantren::class,
+                KeuanganAreaChart::class,
+                KategoriPengeluaranChart::class,
+                TransaksiTerbaru::class,
                 // Penekanan keuangan tema Baitul Maal (canView = tema aktif saja)
-                \App\Filament\Widgets\KasOverviewWidget::class,
-                \App\Filament\Widgets\PengajuanTerbaru::class,
-                \App\Filament\Widgets\AgendaPengumuman::class,
-                \App\Filament\Widgets\QuickAccessWidget::class,
+                KasOverviewWidget::class,
+                PengajuanTerbaru::class,
+                AgendaPengumuman::class,
+                QuickAccessWidget::class,
             ];
 
         // PENTING: ->id() & ->path() HARUS dipanggil SEBELUM ->resources()/
@@ -131,38 +165,38 @@ class TenantPanelProvider extends PanelProvider
             ->id('tenant')
             ->path('admin')
             ->renderHook(
-                \Filament\View\PanelsRenderHook::USER_MENU_BEFORE,
-                fn (): \Illuminate\Contracts\View\View => view('filament.ui-mode-toggle'),
+                PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): View => view('filament.ui-mode-toggle'),
             )
             // Tema panel per tenant: suntik variabel CSS preset warna + kelas
             // body tema layout (lihat App\Support\PanelTheme).
             ->renderHook(
-                \Filament\View\PanelsRenderHook::BODY_START,
-                fn (): \Illuminate\Contracts\View\View => view('filament.theme-vars'),
+                PanelsRenderHook::BODY_START,
+                fn (): View => view('filament.theme-vars'),
             )
             // Elemen LAYOUT tema Baitul Maal — tiap view self-guard (kosong
             // bila tema lain aktif): font, badge periode, kartu tenant, footer.
             ->renderHook(
-                \Filament\View\PanelsRenderHook::HEAD_END,
-                fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-head'),
+                PanelsRenderHook::HEAD_END,
+                fn (): View => view('filament.tema.baitul-maal-head'),
             )
             ->renderHook(
-                \Filament\View\PanelsRenderHook::TOPBAR_END,
-                fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-topbar'),
+                PanelsRenderHook::TOPBAR_END,
+                fn (): View => view('filament.tema.baitul-maal-topbar'),
             )
             // Tema topNav: bar prioritas + waffle "Semua Menu" (mega-panel)
             // menggantikan deretan grup bawaan yang tak muat (self-guard).
             ->renderHook(
-                \Filament\View\PanelsRenderHook::TOPBAR_LOGO_AFTER,
-                fn (): \Illuminate\Contracts\View\View => view('filament.tema.topnav-megamenu'),
+                PanelsRenderHook::TOPBAR_LOGO_AFTER,
+                fn (): View => view('filament.tema.topnav-megamenu'),
             )
             ->renderHook(
-                \Filament\View\PanelsRenderHook::SIDEBAR_FOOTER,
-                fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-sidebar-footer'),
+                PanelsRenderHook::SIDEBAR_FOOTER,
+                fn (): View => view('filament.tema.baitul-maal-sidebar-footer'),
             )
             ->renderHook(
-                \Filament\View\PanelsRenderHook::FOOTER,
-                fn (): \Illuminate\Contracts\View\View => view('filament.tema.baitul-maal-footer'),
+                PanelsRenderHook::FOOTER,
+                fn (): View => view('filament.tema.baitul-maal-footer'),
             )
             ->resources($resources)
             ->pages($pages)
@@ -205,7 +239,7 @@ class TenantPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/pesantren/theme.css')
             ->brandLogo(fn () => view('filament.brand', [
                 'name' => static::resolveTenantBrandName(),
-                'logoUrl' => \App\Support\TenantBranding::logoUrl(),
+                'logoUrl' => TenantBranding::logoUrl(),
             ]))
             ->brandLogoHeight('2.25rem')
             ->colors([
@@ -215,11 +249,11 @@ class TenantPanelProvider extends PanelProvider
             ->middleware([
                 // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user
                 // di-resolve dari database tenant (bukan central). Mencegah redirect loop.
-                \App\Http\Middleware\RedirectCentralToPlatform::class,
+                RedirectCentralToPlatform::class,
                 PreventAccessFromCentralDomains::class,
                 InitializeTenancyByDomain::class,
                 // Tema panel per tenant (warna + layout) — butuh tenancy aktif.
-                \App\Http\Middleware\ApplyPanelTheme::class,
+                ApplyPanelTheme::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
@@ -247,7 +281,7 @@ class TenantPanelProvider extends PanelProvider
         }
 
         try {
-            $name = \App\Models\Setting::getTenantStringValue('branding_name');
+            $name = Setting::getTenantStringValue('branding_name');
             if (is_string($name) && trim($name) !== '') {
                 return trim($name);
             }
@@ -290,7 +324,7 @@ class TenantPanelProvider extends PanelProvider
             SuratResource::class,
             PaketSoalResource::class,
             UjianAttemptResource::class,
-            \App\Filament\Resources\SetorKeliling\SetorKelilingResource::class,
+            SetorKelilingResource::class,
             AlokasiBiayaResource::class,
             KursValutaResource::class,
             AnggaranResource::class,
@@ -319,7 +353,8 @@ class TenantPanelProvider extends PanelProvider
             GalleryResource::class,
             ProfileResource::class,
             WebsiteSettingResource::class,
-            \App\Filament\Resources\Akademik\Lembaga\LembagaResource::class, // WP-01
+            LembagaResource::class, // WP-01
+            KalenderAkademikResource::class, // WP-02
             PeriodeAkademikResource::class,
             PelajaranResource::class,
             ProgramStudiResource::class,
@@ -334,8 +369,8 @@ class TenantPanelProvider extends PanelProvider
             BiayaAsramaResource::class,
             HafalanTahfidzResource::class,
             // F0-PWA Guru: halaqah + kitab
-            \App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource::class,
-            \App\Filament\Resources\Akademik\Kitab\KitabResource::class,
+            HalaqahResource::class,
+            KitabResource::class,
             TahfidzTargetResource::class,
             PenilaianTahfidzResource::class,
             RiwayatKesehatanResource::class,
@@ -346,27 +381,27 @@ class TenantPanelProvider extends PanelProvider
             IzinSantriResource::class,
             KunjunganWaliResource::class,
             MediaFileResource::class,
-            \App\Filament\Resources\Media\MediaAuditResource::class,
+            MediaAuditResource::class,
             // Pengaturan / Persetujuan (F1 Approval Workflow)
-            \App\Filament\Resources\Approval\ApprovalRequestResource::class,
-            \App\Filament\Resources\Approval\ApprovalRuleResource::class,
+            ApprovalRequestResource::class,
+            ApprovalRuleResource::class,
             // Jejak Audit (F2)
-            \App\Filament\Resources\Audit\AuditLogResource::class,
+            AuditLogResource::class,
             // Repositori Dokumen (F5)
-            \App\Filament\Resources\Document\DocumentResource::class,
+            DocumentResource::class,
             // Rekonsiliasi Bank (F6)
-            \App\Filament\Resources\Rekonsiliasi\BankStatementResource::class,
+            BankStatementResource::class,
             // Skema Biaya / Pricing (G2-16)
-            \App\Filament\Resources\SkemaBiaya\SkemaBiayaResource::class,
+            SkemaBiayaResource::class,
             // Procurement (G2-09)
-            \App\Filament\Resources\Pengadaan\Supplier\SupplierResource::class,
-            \App\Filament\Resources\Pengadaan\PurchaseOrder\PurchaseOrderResource::class,
+            SupplierResource::class,
+            PurchaseOrderResource::class,
             // Pegawai + Struktur Gaji (G2-10)
-            \App\Filament\Resources\Payroll\Employee\EmployeeResource::class,
+            EmployeeResource::class,
             // Presensi + Khidmah + Cuti (G2-11)
-            \App\Filament\Resources\Payroll\PresensiStaf\PresensiStafResource::class,
-            \App\Filament\Resources\Payroll\Khidmah\KhidmahResource::class,
-            \App\Filament\Resources\Payroll\Cuti\CutiResource::class,
+            PresensiStafResource::class,
+            KhidmahResource::class,
+            CutiResource::class,
         ];
     }
 
@@ -379,7 +414,7 @@ class TenantPanelProvider extends PanelProvider
     {
         return [
             CalonSantriResource::class,
-            \App\Filament\Resources\PPDB\TagihanPpdbResource::class,
+            TagihanPpdbResource::class,
             TemplateNotifikasiResource::class,
             BroadcastWaResource::class,
         ];
