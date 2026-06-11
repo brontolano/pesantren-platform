@@ -812,6 +812,7 @@ body.tema-hijau-malam .fi-topbar {
     padding-inline: max(1rem, calc((100% - 1400px) / 2)) !important;
     gap: 0.75rem !important;
     align-items: center !important;
+    flex-wrap: nowrap !important; /* topbar satu baris, jangan pecah */
 }
 
 /* Zona kiri (logo) & kanan (search/notif/user): jangan menyusut,
@@ -834,6 +835,9 @@ body.tema-navigasi-atas .fi-topbar-nav-groups,
 body.tema-pimpinan-biru .fi-topbar-nav-groups,
 body.tema-hijau-malam .fi-topbar-nav-groups {
     display: flex !important;
+    /* Vendor memberi lg:flex-wrap → menu pecah 4-5 baris. Paksa satu
+       baris + scroll horizontal halus. */
+    flex-wrap: nowrap !important;
     align-items: stretch !important;
     gap: 0.125rem !important;
     margin-inline: 0.5rem !important;
