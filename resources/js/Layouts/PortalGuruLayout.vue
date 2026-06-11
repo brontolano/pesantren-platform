@@ -12,6 +12,8 @@ const isOffline = ref(false)
 const navItems = computed(() => [
     { key: 'beranda', label: 'Hari Ini', href: '/guru', active: page.component === 'PortalGuru/Beranda' || page.component === 'PortalGuru/Presensi' },
     { key: 'setoran', label: 'Setoran', href: '/guru/setoran', active: page.component.startsWith('PortalGuru/Setoran') },
+    { key: 'pesan', label: 'Pesan Wali', href: '/guru/pesan', active: page.component === 'PortalGuru/PesanWali' },
+    { key: 'slip', label: 'Slip Saya', href: '/guru/slip-saya', active: page.component === 'PortalGuru/SlipSaya' },
 ])
 
 function syncOfflineState() {

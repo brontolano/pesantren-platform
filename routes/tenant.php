@@ -18,9 +18,11 @@ use App\Http\Controllers\PortalGuru\PortalGuruIzinController;
 use App\Http\Controllers\PortalGuru\PortalGuruJurnalController;
 use App\Http\Controllers\PortalGuru\PortalGuruKitabController;
 use App\Http\Controllers\PortalGuru\PortalGuruNilaiController;
+use App\Http\Controllers\PortalGuru\PortalGuruPesanWaliController;
 use App\Http\Controllers\PortalGuru\PortalGuruPresensiController;
 use App\Http\Controllers\PortalGuru\PortalGuruPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruSetoranController;
+use App\Http\Controllers\PortalGuru\PortalGuruSlipController;
 use App\Http\Controllers\PortalGuru\PortalGuruTahfidzLanjutanController;
 use App\Http\Controllers\PortalGuru\PortalGuruWaliKelasController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
@@ -179,6 +181,13 @@ Route::middleware([
         Route::get('/gerbang/izin-aktif', [PortalGuruGerbangController::class, 'izinAktif'])->name('gerbang.izin-aktif');
         Route::post('/gerbang/jenguk/{pengajuan}/hadir', [PortalGuruGerbangController::class, 'jengukHadir'])->name('gerbang.jenguk.hadir');
         Route::post('/gerbang/jenguk/walk-in', [PortalGuruGerbangController::class, 'jengukWalkIn'])->name('gerbang.jenguk.walk-in');
+
+        // F3-PWA — Pesan ke wali santri (binaan saja, idempoten client_ref)
+        Route::get('/pesan', [PortalGuruPesanWaliController::class, 'index'])->name('pesan.index');
+        Route::post('/pesan', [PortalGuruPesanWaliController::class, 'store'])->name('pesan.store');
+
+        // F3-PWA — Slip gaji milik sendiri (cetak reuse tenant.payroll.slip.print)
+        Route::get('/slip-saya', [PortalGuruSlipController::class, 'index'])->name('slip.index');
     });
 
     Route::prefix('wali')->name('tenant.portal-wali.pwa.')->group(function () {

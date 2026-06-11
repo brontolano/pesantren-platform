@@ -231,6 +231,26 @@ Terima kasih atas perhatiannya.
 MSG,
             ],
 
+            // ── F3-PWA Pesan Wali ───────────────────────────────────────────
+            [
+                'kode_template' => 'PESAN_WALI_BARU',
+                'judul' => 'Pesan Baru dari Guru',
+                'channel' => 'whatsapp',
+                'variable_dinamis' => ['nama_santri', 'nama_guru', 'jenis', 'isi_pesan', 'nama_pesantren'],
+                'isi' => <<<'MSG'
+✉️ *PESAN DARI GURU*
+
+Assalamu'alaikum Bapak/Ibu Wali Santri {{nama_santri}},
+
+Ada pesan ({{jenis}}) dari {{nama_guru}}:
+
+{{isi_pesan}}
+
+Pesan ini juga tersedia di Portal Wali.
+— {{nama_pesantren}}
+MSG,
+            ],
+
             // ── WP-16 Kontrak & SK ──────────────────────────────────────────
             [
                 'kode_template' => 'KONTRAK_AKAN_HABIS',

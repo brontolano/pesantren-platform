@@ -6,12 +6,14 @@ class TemplateRenderer
 {
     public function render(string $content, array $variables = []): string
     {
-        $rendered = $content;
-
+        // strtr sekali-jalan: placeholder yang DIKETIK user di dalam nilai
+        // variabel (mis. "{{nama_pesantren}}" dalam isi pesan) tidak ikut
+        // diekspansi oleh putaran replace berikutnya.
+        $map = [];
         foreach ($variables as $key => $value) {
-            $rendered = str_replace('{{'.$key.'}}', (string) $value, $rendered);
+            $map['{{'.$key.'}}'] = (string) $value;
         }
 
-        return $rendered;
+        return strtr($content, $map);
     }
 }
