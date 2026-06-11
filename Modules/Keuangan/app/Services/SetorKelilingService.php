@@ -34,7 +34,7 @@ class SetorKelilingService
         ]);
     }
 
-    public function tambahItem(SetorKelilingSesi $sesi, Santri|int $santri, float $nominal, ?string $catatan = null): SetorKelilingItem
+    public function tambahItem(SetorKelilingSesi $sesi, Santri|int $santri, float $nominal, ?string $catatan = null, ?string $clientRef = null): SetorKelilingItem
     {
         if ($nominal <= 0) {
             throw new InvalidArgumentException('Nominal setoran harus lebih dari 0.');
@@ -43,7 +43,7 @@ class SetorKelilingService
         // Status WAJIB dicek pada baris ter-LOCK (bukan instance in-memory yang
         // bisa basi) — tanpa ini item bisa diselundupkan setelah sesi diajukan/
         // disetujui dan total tak lagi sinkron dengan uang terposting.
-        return DB::transaction(function () use ($sesi, $santri, $nominal, $catatan): SetorKelilingItem {
+        return DB::transaction(function () use ($sesi, $santri, $nominal, $catatan, $clientRef): SetorKelilingItem {
             $locked = SetorKelilingSesi::query()->lockForUpdate()->findOrFail($sesi->id);
 
             if ($locked->status !== 'draf') {
@@ -55,6 +55,9 @@ class SetorKelilingService
                 'santri_id' => $santri instanceof Santri ? $santri->id : $santri,
                 'nominal' => $nominal,
                 'catatan' => $catatan,
+                // WP-32: idempotensi PWA — client_ref ditulis pada INSERT agar
+                // unique index DB jadi gerbang dedup (race-safe).
+                'client_ref' => $clientRef,
             ]);
 
             $locked->update(['total' => (float) $locked->items()->sum('nominal')]);
