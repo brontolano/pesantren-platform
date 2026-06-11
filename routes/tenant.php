@@ -87,7 +87,7 @@ Route::middleware([
 
         // Direktori dokumen sensitif (arsip HR/kesantrian) WAJIB login —
         // sisanya (logo, galeri landing) tetap publik.
-        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi'];
+        $direktoriSensitif = ['kontrak-kerja', 'mutasi', 'disiplin', 'sertifikasi', 'kerusakan'];
         $segmenPertama = explode('/', $path, 2)[0];
         if (in_array($segmenPertama, $direktoriSensitif, true)) {
             abort_unless(auth()->check(), 403);

@@ -5,9 +5,14 @@ namespace Modules\Kesehatan\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Modules\Kesehatan\Models\KunjunganUks;
-use Modules\Kesehatan\Services\KesehatanService;
+use Illuminate\Support\Facades\DB;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Kesehatan\Models\KunjunganUks;
+use Modules\Kesehatan\Models\Obat;
+use Modules\Kesehatan\Models\ObatMutasi;
+use Modules\Kesehatan\Services\KesehatanService;
+use Modules\Kesehatan\Services\ObatService;
+use Modules\Notifikasi\Services\NotifDispatcher;
 use Throwable;
 
 /**
@@ -82,6 +87,28 @@ class PwaGuruUksController extends Controller
     }
 
     /**
+     * GET /api/pwa/guru/uks/obat
+     * Daftar obat aktif (untuk pilihan obat_keluar di form kunjungan) — WP-28.
+     */
+    public function daftarObat(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        abort_unless($user !== null, 401);
+        abort_unless($user->can('akses_pwa_guru'), 403);
+
+        return response()->json(
+            Obat::query()->where('aktif', true)->orderBy('nama')->get()
+                ->map(fn (Obat $o) => [
+                    'id' => $o->id,
+                    'nama' => $o->nama,
+                    'satuan' => $o->satuan,
+                    'stok' => $o->stok,
+                    'menipis' => $o->isMenipis(),
+                ])
+        );
+    }
+
+    /**
      * POST /api/pwa/guru/uks/catat-kunjungan
      * Catat kunjungan santri ke UKS.
      * Idempoten via client_ref (duplicate request → update saja).
@@ -95,7 +122,10 @@ class PwaGuruUksController extends Controller
      *   "status": "istirahat|pulang|rujuk",
      *   "rujukan_ke": "Puskesmas Klinik (jika status=rujuk)",
      *   "rujukan_biaya": 50000 (jika status=rujuk),
-     *   "client_ref": "uks-20260611-santo-001" (untuk idempotency)
+     *   "client_ref": "uks-20260611-santo-001" (untuk idempotency),
+     *   "obat_keluar": [{"obat_id": 1, "jumlah": 2}] (OPSIONAL — WP-28:
+     *       potong stok obat dengan ref kunjungan; field "obat" string bebas
+     *       lama TETAP jalan tanpa potong stok)
      * }
      */
     public function catatKunjungan(Request $request): JsonResponse
@@ -109,10 +139,13 @@ class PwaGuruUksController extends Controller
             'keluhan' => ['nullable', 'string', 'max:500'],
             'tindakan' => ['nullable', 'string', 'max:1000'],
             'obat' => ['nullable', 'string', 'max:1000'],
-            'status' => ['required', 'in:' . implode(',', KunjunganUks::STATUS)],
+            'status' => ['required', 'in:'.implode(',', KunjunganUks::STATUS)],
             'rujukan_ke' => ['nullable', 'string', 'max:200'],
             'rujukan_biaya' => ['nullable', 'numeric', 'min:0'],
             'client_ref' => ['nullable', 'string', 'max:100'],
+            'obat_keluar' => ['nullable', 'array'],
+            'obat_keluar.*.obat_id' => ['required', 'integer', 'exists:obat,id'],
+            'obat_keluar.*.jumlah' => ['required', 'integer', 'min:1'],
         ]);
 
         try {
@@ -133,10 +166,42 @@ class PwaGuruUksController extends Controller
                 ]
             );
 
+            // WP-28 — pengeluaran stok obat OPSIONAL, atomik (all-or-nothing):
+            // bila salah satu item stoknya kurang, TIDAK ADA stok yang terpotong.
+            // Idempoten per kunjungan: retry PWA TIDAK memotong dobel — bila
+            // sudah ada mutasi keluar ber-ref kunjungan ini, lewati seluruhnya.
+            if (! empty($data['obat_keluar'])) {
+                $sudahKeluar = ObatMutasi::query()
+                    ->where('ref_type', $kunjungan->getMorphClass())
+                    ->where('ref_id', $kunjungan->getKey())
+                    ->where('jenis', 'keluar')
+                    ->exists();
+
+                if (! $sudahKeluar) {
+                    // Gabung duplikat obat_id dalam satu request (2 entri id
+                    // sama = 1 mutasi berjumlah total, bukan 2 potongan).
+                    $gabungan = collect($data['obat_keluar'])
+                        ->groupBy('obat_id')
+                        ->map(fn ($rows) => (int) $rows->sum('jumlah'));
+
+                    $obatService = app(ObatService::class);
+                    DB::transaction(function () use ($gabungan, $kunjungan, $user, $obatService): void {
+                        foreach ($gabungan as $obatId => $jumlah) {
+                            $obatService->keluar(
+                                Obat::findOrFail($obatId),
+                                $jumlah,
+                                $kunjungan,
+                                ['user_id' => $user->id, 'keterangan' => 'Keluar via register UKS'],
+                            );
+                        }
+                    });
+                }
+            }
+
             // Trigger notifikasi ke wali jika rujukan
             if ($kunjungan->status === 'rujuk') {
                 try {
-                    app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('uks_rujukan', [
+                    app(NotifDispatcher::class)->kirim('uks_rujukan', [
                         'data' => [
                             'santri_nama' => $santri->nama,
                             'rujukan_ke' => $kunjungan->rujukan_ke,
