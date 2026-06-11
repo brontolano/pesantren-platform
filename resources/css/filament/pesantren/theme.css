@@ -444,6 +444,126 @@ body.tema-baitul-maal.dark .fi-body {
     background-color: #121212;
 }
 
+/* ---- Baitul Maal LAYOUT (bukan hanya warna) ------------------------- */
+
+/* Tipografi: Plus Jakarta Sans utk teks, Marcellus (serif) utk judul */
+body.tema-baitul-maal,
+body.tema-baitul-maal .fi-body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+body.tema-baitul-maal .fi-header-heading,
+body.tema-baitul-maal .fi-section-header-heading,
+body.tema-baitul-maal .fi-wi-stats-overview-stat-label,
+body.tema-baitul-maal .fi-modal-heading,
+body.tema-baitul-maal .fi-sidebar-header .fi-logo {
+    font-family: 'Marcellus', serif !important;
+    letter-spacing: 0.02em;
+}
+
+/* Topbar: putih semi-transparan + blur, garis krem + hairline emas */
+body.tema-baitul-maal .fi-topbar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #E8E3D4 !important;
+    box-shadow: 0 1px 0 rgba(212, 175, 55, 0.35) !important;
+}
+.dark body.tema-baitul-maal .fi-topbar,
+body.tema-baitul-maal.dark .fi-topbar {
+    background: #161823 !important;
+    border-bottom: 1px solid #2A2A35 !important;
+    box-shadow: 0 1px 0 rgba(212, 175, 55, 0.25) !important;
+}
+
+/* Kartu/section: radius 1.125rem + border krem + bayangan hijau lembut */
+body.tema-baitul-maal .fi-section,
+body.tema-baitul-maal .fi-wi-stats-overview-stat,
+body.tema-baitul-maal .fi-ta-ctn {
+    border-radius: 1.125rem !important;
+    border: 1px solid #E8E3D4 !important;
+    box-shadow: 0 4px 14px rgba(8, 55, 44, 0.06) !important;
+    background-color: #ffffff;
+}
+.dark body.tema-baitul-maal .fi-section,
+.dark body.tema-baitul-maal .fi-wi-stats-overview-stat,
+.dark body.tema-baitul-maal .fi-ta-ctn,
+body.tema-baitul-maal.dark .fi-section,
+body.tema-baitul-maal.dark .fi-wi-stats-overview-stat,
+body.tema-baitul-maal.dark .fi-ta-ctn {
+    border: 1px solid #2A2A35 !important;
+    background-color: #1C1C24;
+}
+
+/* Konten: lebar maksimum 1480px terpusat (main shell desain) */
+body.tema-baitul-maal .fi-page > section,
+body.tema-baitul-maal .fi-page-content {
+    max-width: 1480px;
+    margin-inline: auto;
+    width: 100%;
+}
+
+/* Badge periode Hijriah·Masehi di topbar (pil emas) */
+body.tema-baitul-maal .tema-bm-periode {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border: 1px solid rgba(229, 200, 104, 0.6);
+    background: #FBF6E4;
+    color: #9C7A1E;
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.dark body.tema-baitul-maal .tema-bm-periode,
+body.tema-baitul-maal.dark .tema-bm-periode {
+    background: rgba(212, 175, 55, 0.12);
+    border-color: rgba(212, 175, 55, 0.35);
+    color: #E5C868;
+}
+.tema-bm-periode { display: none; } /* sembunyikan di tema lain (guard ganda) */
+
+/* Kartu "Pesantren aktif" di kaki sidebar */
+body.tema-baitul-maal .tema-bm-tenant {
+    margin: 0.5rem 0.75rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.66rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+body.tema-baitul-maal .tema-bm-tenant b {
+    color: #EEDC9A;
+    font-weight: 700;
+}
+.tema-bm-tenant { display: none; }
+
+/* Footer khidmah */
+body.tema-baitul-maal .tema-bm-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border-top: 1px solid #E8E3D4;
+    background: #ffffff;
+    padding: 0.7rem 1.5rem;
+    font-size: 0.72rem;
+    color: #67786F;
+}
+body.tema-baitul-maal .tema-bm-footer b { color: #0A5C36; }
+body.tema-baitul-maal .tema-bm-footer-gold { color: #9C7A1E; font-weight: 500; }
+.dark body.tema-baitul-maal .tema-bm-footer,
+body.tema-baitul-maal.dark .tema-bm-footer {
+    background: #161823;
+    border-top: 1px solid #2A2A35;
+    color: rgba(255, 255, 255, 0.55);
+}
+.dark body.tema-baitul-maal .tema-bm-footer b,
+body.tema-baitul-maal.dark .tema-bm-footer b { color: #83C2A0; }
+.tema-bm-footer { display: none; }
+
 /* Tema "Kompak": kerapatan lebih tinggi — muat lebih banyak data per layar. */
 body.tema-kompak .fi-sidebar-item-btn {
     padding-top: 0.25rem !important;
