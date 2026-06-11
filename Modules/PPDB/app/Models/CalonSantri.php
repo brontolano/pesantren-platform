@@ -37,6 +37,8 @@ class CalonSantri extends Model
         'program_diminati',
         'tahun_ajaran',
         'gelombang',
+        'jalur',
+        'asal_pondok',
         'status_pendaftaran',
         'catatan_keputusan',
         'tanggal_keputusan',

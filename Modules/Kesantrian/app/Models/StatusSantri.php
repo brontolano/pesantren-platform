@@ -19,6 +19,7 @@ class StatusSantri extends Model
         'status',
         'tanggal_status',
         'alasan',
+        'file_surat_path',
         'durasi_cuti_hari',
         'tanggal_kembali',
         'created_by',
