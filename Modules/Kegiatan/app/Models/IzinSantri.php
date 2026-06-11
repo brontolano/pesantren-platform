@@ -18,7 +18,7 @@ class IzinSantri extends Model
         'tenant_id', 'santri_id', 'jenis_izin',
         'tanggal_mulai', 'tanggal_selesai', 'alasan',
         'status', 'disetujui_oleh', 'catatan_pengurus',
-        'sudah_kembali', 'tanggal_kembali_aktual',
+        'sudah_kembali', 'tanggal_kembali_aktual', 'client_ref',
     ];
 
     protected $casts = [
