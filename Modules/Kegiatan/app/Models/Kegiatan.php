@@ -2,8 +2,8 @@
 
 namespace Modules\Kegiatan\Models;
 
-use App\Traits\BelongsToTenant;
 use App\Models\User;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -19,12 +19,16 @@ class Kegiatan extends Model
         'mulai', 'selesai', 'lokasi', 'status', 'penanggung_jawab_id',
         // G3-19 — penaut template/recurring (additif).
         'template_id', 'recurring_id', 'tanggal_acuan',
+        // WP-11 — pasaran/kilatan: peserta luar [{nama, asal, hadir}] di JSON,
+        // TIDAK menyentuh tabel santri/presensi_kegiatan.
+        'peserta_luar',
     ];
 
     protected $casts = [
-        'mulai'   => 'datetime',
+        'mulai' => 'datetime',
         'selesai' => 'datetime',
         'tanggal_acuan' => 'date',
+        'peserta_luar' => 'array',
     ];
 
     public function penanggungJawab(): BelongsTo

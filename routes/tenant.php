@@ -16,6 +16,7 @@ use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
 use App\Http\Controllers\PortalGuru\PortalGuruPresensiController;
 use App\Http\Controllers\PortalGuru\PortalGuruPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruSetoranController;
+use App\Http\Controllers\PortalGuru\PortalGuruTahfidzLanjutanController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
 use App\Http\Controllers\PortalWali\PortalWaliAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
@@ -34,6 +35,7 @@ use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
 use App\Http\Controllers\SantriExportController;
+use App\Http\Controllers\TahfidzExportController;
 use App\Support\UiMode;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -128,6 +130,12 @@ Route::middleware([
         Route::get('/setoran/{halaqah}', [PortalGuruSetoranController::class, 'form'])->name('setoran.form');
         Route::post('/setoran', [PortalGuruSetoranController::class, 'store'])->name('setoran.store');
 
+        // WP-11 — mode muhaffizh: sima'an & munaqasyah (idempoten client_ref).
+        Route::get('/simaan', [PortalGuruTahfidzLanjutanController::class, 'simaanForm'])->name('simaan.form');
+        Route::post('/simaan', [PortalGuruTahfidzLanjutanController::class, 'simaanStore'])->name('simaan.store');
+        Route::get('/munaqasyah', [PortalGuruTahfidzLanjutanController::class, 'munaqasyahForm'])->name('munaqasyah.form');
+        Route::post('/munaqasyah', [PortalGuruTahfidzLanjutanController::class, 'munaqasyahStore'])->name('munaqasyah.store');
+
         // WP-24 — PWA Guru Disiplin (kepengasuhan mode)
         Route::get('/disiplin/daftar', [PortalGuruDisiplinController::class, 'daftarPelanggaran'])->name('disiplin.daftar');
         Route::get('/disiplin/catat', [PortalGuruDisiplinController::class, 'formCatatPelanggaran'])->name('disiplin.catat');
@@ -200,6 +208,11 @@ Route::middleware([
         Route::get('/rapor-diniyah/{raporDiniyah}/print', [AkademikExportController::class, 'raporDiniyahPrint'])->name('rapor-diniyah.print');
         // WP-08 — cetak syahadah (sertifikat internal) per alumni.
         Route::get('/syahadah/{alumni}/print', [AkademikExportController::class, 'syahadahPrint'])->name('syahadah.print');
+    });
+
+    // WP-11 — cetak daftar peserta wisuda tahfidz per periode (lulus + ditandai).
+    Route::middleware('auth')->prefix('admin/tahfidz/export')->name('tenant.tahfidz.export.')->group(function () {
+        Route::get('/wisuda/print', [TahfidzExportController::class, 'wisudaPrint'])->name('wisuda.print');
     });
 
     Route::middleware('auth')->prefix('admin/keuangan/export')->name('tenant.keuangan.export.')->group(function () {
