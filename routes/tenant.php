@@ -251,6 +251,7 @@ Route::middleware([
         // W3 Tabungan
         Route::get('/santri/{santri}/tabungan', [PortalWaliTabunganController::class, 'show'])->name('tabungan.show');
         Route::post('/santri/{santri}/tabungan/topup', [PortalWaliTabunganController::class, 'topup'])->name('tabungan.topup');
+        Route::post('/santri/{santri}/tabungan/batas-belanja', [PortalWaliTabunganController::class, 'setBatasBelanja'])->name('tabungan.batas-belanja');
         Route::post('/santri/{santri}/tagihan/{tagihan}/bayar-saldo', [PortalWaliTabunganController::class, 'bayarDariSaldo'])->name('tabungan.bayar-saldo');
 
         // W3+ Top Up Tabungan — checkout marketplace (DEMO simulasi pembayaran)

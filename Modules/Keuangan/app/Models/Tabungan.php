@@ -20,11 +20,13 @@ class Tabungan extends Model
         'saldo',
         'limit_harian',
         'is_frozen',
+        'batas_belanja_harian',
     ];
 
     protected $casts = [
         'saldo' => 'decimal:2',
         'limit_harian' => 'decimal:2',
+        'batas_belanja_harian' => 'decimal:2',
         'is_frozen' => 'boolean',
     ];
 

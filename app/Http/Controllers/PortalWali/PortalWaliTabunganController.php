@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\PortalWali\Concerns\ResolvesPortalWaliContext;
 use App\Http\Requests\PortalWali\BayarDariSaldoRequest;
 use App\Http\Requests\PortalWali\StoreTopupRequest;
+use App\Models\Setting;
 use App\Services\PortalWali\PortalWaliService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\BayarDariSaldoService;
 use Modules\Keuangan\Services\TabunganService;
@@ -31,7 +33,18 @@ class PortalWaliTabunganController extends Controller
         $dashboard = $portalWaliService->getDashboardPayload($wali);
         $financial = $portalWaliService->getFinancialPayload($child);
 
+        $tabungan = Tabungan::query()
+            ->where('santri_id', $child->id)
+            ->first();
+        $batasDefault = Setting::getTenantValue('kantin.batas_belanja_default');
+
         return Inertia::render('PortalWali/Tabungan', [
+            // Batas belanja kantin harian anak (2b): null = ikut default
+            // pesantren; 0 = blokir belanja.
+            'batasBelanja' => $tabungan?->batas_belanja_harian !== null
+                ? (float) $tabungan->batas_belanja_harian
+                : null,
+            'batasBelanjaDefault' => is_numeric($batasDefault) ? (float) $batasDefault : null,
             'wali' => [
                 'id' => $wali->id,
                 'name' => $wali->name,
@@ -81,6 +94,37 @@ class PortalWaliTabunganController extends Controller
                 'santri' => $child->id,
             ])
             ->with('success', 'Permintaan setor saldo terkirim. Menunggu verifikasi bendahara.');
+    }
+
+    /**
+     * POST — wali atur batas belanja kantin harian anak (2b, policy-first).
+     * null/kosong = ikut default pesantren; 0 = blokir belanja kantin.
+     */
+    public function setBatasBelanja(
+        Request $request,
+        PortalWaliService $portalWaliService,
+        TabunganService $tabunganService,
+    ): RedirectResponse {
+        $this->currentWali($request);
+        $child = $this->accessibleSantri($request, $portalWaliService, (string) $request->route('santri'));
+
+        $validated = $request->validate([
+            'batas' => ['nullable', 'numeric', 'min:0', 'max:99999999999'],
+        ]);
+
+        $tabungan = $tabunganService->getOrCreateTabungan($child->id);
+        $tabungan->update([
+            'batas_belanja_harian' => ($validated['batas'] ?? null) === null
+                ? null
+                : round((float) $validated['batas'], 2),
+        ]);
+
+        return redirect()
+            ->route('tenant.portal-wali.tabungan.show', [
+                'tenant' => tenant('id') ?? $request->route('tenant'),
+                'santri' => $child->id,
+            ])
+            ->with('success', 'Batas belanja kantin harian diperbarui.');
     }
 
     /**
