@@ -596,6 +596,179 @@ body.tema-baitul-maal.dark .tema-bm-footer {
 body.tema-baitul-maal.dark .tema-bm-footer b { color: #83C2A0; }
 .tema-bm-footer { display: none; }
 
+/* ===================================================================
+   Tema "Pimpinan Biru" (referensi Dashboard Pimpinan navy):
+   navigasi atas putih bersih, header halaman band navy, kartu putih.
+   =================================================================== */
+body.tema-pimpinan-biru .fi-body {
+    background-color: #f1f5f9; /* slate-100 */
+}
+body.tema-pimpinan-biru .fi-topbar {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 2px rgba(15, 42, 74, 0.06) !important;
+}
+/* Header halaman: band navy gradien ala hero referensi */
+body.tema-pimpinan-biru .fi-header {
+    background: linear-gradient(135deg, #0f2a4a 0%, #163d6b 100%);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem !important;
+    margin-bottom: 0.5rem;
+}
+body.tema-pimpinan-biru .fi-header-heading,
+body.tema-pimpinan-biru .fi-header .fi-breadcrumbs-item-label,
+body.tema-pimpinan-biru .fi-header * {
+    color: #ffffff !important;
+}
+body.tema-pimpinan-biru .fi-section,
+body.tema-pimpinan-biru .fi-wi-stats-overview-stat,
+body.tema-pimpinan-biru .fi-ta-ctn {
+    border-radius: 1rem !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 6px 18px -12px rgba(15, 42, 74, 0.25) !important;
+}
+/* Dark: navy pekat, bukan hitam TikTok */
+.dark body.tema-pimpinan-biru .fi-body,
+body.tema-pimpinan-biru.dark .fi-body {
+    background-color: #0a1626 !important;
+}
+.dark body.tema-pimpinan-biru .fi-topbar,
+body.tema-pimpinan-biru.dark .fi-topbar {
+    background: #0f2a4a !important;
+    border-bottom: 1px solid #1e3a5f !important;
+}
+.dark body.tema-pimpinan-biru .fi-section,
+.dark body.tema-pimpinan-biru .fi-wi-stats-overview-stat,
+.dark body.tema-pimpinan-biru .fi-ta-ctn,
+body.tema-pimpinan-biru.dark .fi-section,
+body.tema-pimpinan-biru.dark .fi-wi-stats-overview-stat,
+body.tema-pimpinan-biru.dark .fi-ta-ctn {
+    background-color: #102036 !important;
+    border-color: #1e3a5f !important;
+}
+
+/* ===================================================================
+   Tema "Merah Putih" (referensi white-label merah):
+   sidebar merah marun gelap, konten putih hangat, aksen merah.
+   =================================================================== */
+body.tema-merah-putih .fi-body {
+    background-color: #faf7f5;
+}
+body.tema-merah-putih .fi-sidebar {
+    background: linear-gradient(180deg, #7f1d1d 0%, #450a0a 100%) !important;
+    border-inline-end: none !important;
+}
+body.tema-merah-putih .fi-sidebar-group-label {
+    color: rgba(254, 202, 202, 0.75) !important;
+}
+body.tema-merah-putih .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-merah-putih .fi-sidebar-item-label {
+    color: rgba(255, 255, 255, 0.78) !important;
+}
+body.tema-merah-putih .fi-sidebar-item-btn > .fi-icon,
+body.tema-merah-putih .fi-sidebar-item-btn .fi-icon {
+    color: rgba(254, 202, 202, 0.7) !important;
+}
+body.tema-merah-putih .fi-sidebar-item-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+body.tema-merah-putih .fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+body.tema-merah-putih .fi-sidebar-item-btn:hover .fi-icon {
+    color: #ffffff !important;
+}
+body.tema-merah-putih .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: rgba(255, 255, 255, 0.14) !important;
+    box-shadow: inset 3px 0 0 #ffffff !important;
+}
+body.tema-merah-putih .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+body.tema-merah-putih .fi-sidebar-item.fi-active .fi-icon {
+    color: #ffffff !important;
+}
+body.tema-merah-putih .fi-sidebar-group-btn,
+body.tema-merah-putih .fi-sidebar-group-collapse-btn,
+body.tema-merah-putih .fi-sidebar .fi-icon-btn {
+    color: rgba(254, 202, 202, 0.6) !important;
+}
+/* Kartu: garis aksen merah tipis di atas (ala kartu KPI referensi) */
+body.tema-merah-putih .fi-wi-stats-overview-stat {
+    border-top: 3px solid #dc2626 !important;
+}
+/* Dark: merah-hitam pekat */
+.dark body.tema-merah-putih .fi-body,
+body.tema-merah-putih.dark .fi-body {
+    background-color: #190b0b !important;
+}
+.dark body.tema-merah-putih .fi-topbar,
+body.tema-merah-putih.dark .fi-topbar {
+    background: #2a1212 !important;
+    border-bottom: 1px solid #451a1a !important;
+}
+.dark body.tema-merah-putih .fi-section,
+.dark body.tema-merah-putih .fi-wi-stats-overview-stat,
+.dark body.tema-merah-putih .fi-ta-ctn,
+body.tema-merah-putih.dark .fi-section,
+body.tema-merah-putih.dark .fi-wi-stats-overview-stat,
+body.tema-merah-putih.dark .fi-ta-ctn {
+    background-color: #241010 !important;
+    border-color: #451a1a !important;
+}
+.dark body.tema-merah-putih .fi-sidebar,
+body.tema-merah-putih.dark .fi-sidebar {
+    background: linear-gradient(180deg, #450a0a 0%, #2a0707 100%) !important;
+}
+
+/* ===================================================================
+   Tema "Hijau Malam (Emas)" (referensi dark luxury hijau-emas):
+   navigasi atas hijau pekat beraksen emas; light = krim + topbar hijau.
+   =================================================================== */
+body.tema-hijau-malam .fi-body {
+    background-color: #f6f7f4;
+}
+body.tema-hijau-malam .fi-topbar {
+    background: #0f2419 !important;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.25) !important;
+}
+body.tema-hijau-malam .fi-topbar .fi-topbar-item-label,
+body.tema-hijau-malam .fi-topbar .fi-icon,
+body.tema-hijau-malam .fi-topbar .fi-logo,
+body.tema-hijau-malam .fi-topbar .fi-icon-btn {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+body.tema-hijau-malam .fi-topbar-item.fi-active .fi-topbar-item-btn {
+    background-color: rgba(212, 175, 55, 0.16) !important;
+}
+body.tema-hijau-malam .fi-topbar-item.fi-active .fi-topbar-item-label {
+    color: #e5c868 !important;
+}
+body.tema-hijau-malam .fi-topbar .fi-topbar-item-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+body.tema-hijau-malam .fi-section,
+body.tema-hijau-malam .fi-wi-stats-overview-stat,
+body.tema-hijau-malam .fi-ta-ctn {
+    border-radius: 1rem !important;
+    border: 1px solid #dde3da !important;
+}
+/* Dark (identitas utama tema ini): hijau malam + emas */
+.dark body.tema-hijau-malam .fi-body,
+body.tema-hijau-malam.dark .fi-body {
+    background-color: #0c1510 !important;
+}
+.dark body.tema-hijau-malam .fi-topbar,
+body.tema-hijau-malam.dark .fi-topbar {
+    background: #0f1d15 !important;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important;
+}
+.dark body.tema-hijau-malam .fi-section,
+.dark body.tema-hijau-malam .fi-wi-stats-overview-stat,
+.dark body.tema-hijau-malam .fi-ta-ctn,
+body.tema-hijau-malam.dark .fi-section,
+body.tema-hijau-malam.dark .fi-wi-stats-overview-stat,
+body.tema-hijau-malam.dark .fi-ta-ctn {
+    background-color: #111f17 !important;
+    border-color: #1f3327 !important;
+}
+
 /* Tema "Kompak": kerapatan lebih tinggi — muat lebih banyak data per layar. */
 body.tema-kompak .fi-sidebar-item-btn {
     padding-top: 0.25rem !important;
