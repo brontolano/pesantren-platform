@@ -9,17 +9,17 @@ use Illuminate\Support\Collection;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\Rapor;
+use Modules\Akademik\Models\RaporDiniyah;
+use Modules\Kegiatan\Models\IzinSantri;
+use Modules\Kegiatan\Models\KunjunganWali;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Kesehatan\Models\RiwayatKesehatan;
+use Modules\Kesehatan\Models\SesiKonseling;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Notifikasi\Models\LogNotifikasi;
 use Modules\Tahfidz\Models\HafalanTahfidz;
-use Modules\Tahfidz\Models\PenilaianTahfidz;
-use Modules\Kesehatan\Models\RiwayatKesehatan;
-use Modules\Kesehatan\Models\SesiKonseling;
-use Modules\Kegiatan\Models\IzinSantri;
-use Modules\Kegiatan\Models\KunjunganWali;
 
 class PortalWaliService
 {
@@ -144,6 +144,13 @@ class PortalWaliService
             ->latest('generated_at')
             ->first();
 
+        // WP-10 — rapor diniyah terbaru anak (tab Raport Diniyah).
+        $latestRaporDiniyah = RaporDiniyah::query()
+            ->where('santri_id', $santri->getKey())
+            ->with('periodeAkademik')
+            ->latest('generated_at')
+            ->first();
+
         $nilai = Nilai::query()
             ->where('santri_id', $santri->getKey())
             ->with(['pelajaran', 'periodeAkademik'])
@@ -180,7 +187,7 @@ class PortalWaliService
 
         $izinStats = PortalWaliIzin::query()
             ->where('santri_id', $santri->getKey())
-            ->selectRaw("count(*) as total_pengajuan")
+            ->selectRaw('count(*) as total_pengajuan')
             ->selectRaw("sum(case when status = 'approved' then 1 else 0 end) as total_disetujui")
             ->selectRaw("sum(case when status = 'pending' then 1 else 0 end) as total_pending")
             ->first();
@@ -197,6 +204,16 @@ class PortalWaliService
                 'generatedAt' => optional($latestRapor->generated_at)?->format('Y-m-d H:i:s'),
                 'catatanWaliKelas' => $latestRapor->catatan_walikelas,
                 'ringkasanNilai' => $latestRapor->ringkasan_nilai ?? [],
+            ] : null,
+            'raporDiniyah' => $latestRaporDiniyah ? [
+                'id' => $latestRaporDiniyah->id,
+                'periode' => $latestRaporDiniyah->periodeAkademik?->nama,
+                'tahunAkademik' => $latestRaporDiniyah->periodeAkademik?->tahun_akademik,
+                'generatedAt' => $latestRaporDiniyah->generated_at?->format('Y-m-d H:i:s'),
+                'blokAktif' => RaporDiniyah::blokAktif(),
+                'blok' => $latestRaporDiniyah->blok ?? [],
+                'catatanMustahiq' => $latestRaporDiniyah->catatan_mustahiq,
+                'catatanPengasuh' => $latestRaporDiniyah->catatan_pengasuh,
             ] : null,
             'grades' => $nilai,
             'schedule' => $jadwal,
@@ -363,25 +380,25 @@ class PortalWaliService
             ->orderByDesc('tanggal_target')
             ->get()
             ->map(fn (HafalanTahfidz $h): array => [
-                'id'              => $h->id,
-                'surah'           => $h->surah,
-                'ayat_awal'       => $h->ayat_awal,
-                'ayat_akhir'      => $h->ayat_akhir,
-                'status'          => $h->status,
-                'tanggal_target'  => $h->tanggal_target?->toDateString(),
+                'id' => $h->id,
+                'surah' => $h->surah,
+                'ayat_awal' => $h->ayat_awal,
+                'ayat_akhir' => $h->ayat_akhir,
+                'status' => $h->status,
+                'tanggal_target' => $h->tanggal_target?->toDateString(),
                 'tanggal_selesai' => $h->tanggal_selesai?->toDateString(),
-                'penilaian'       => $h->penilaian->map(fn ($p) => [
-                    'jenis'  => $p->jenis,
-                    'nilai'  => $p->nilai,
-                    'tanggal'=> $p->tanggal?->toDateString(),
+                'penilaian' => $h->penilaian->map(fn ($p) => [
+                    'jenis' => $p->jenis,
+                    'nilai' => $p->nilai,
+                    'tanggal' => $p->tanggal?->toDateString(),
                 ])->values(),
             ])
             ->values();
 
         $ringkasan = [
-            'total'        => $hafalan->count(),
-            'selesai'      => $hafalan->where('status', 'selesai')->count(),
-            'berjalan'     => $hafalan->where('status', 'berjalan')->count(),
+            'total' => $hafalan->count(),
+            'selesai' => $hafalan->where('status', 'selesai')->count(),
+            'berjalan' => $hafalan->where('status', 'berjalan')->count(),
             'direncanakan' => $hafalan->where('status', 'direncanakan')->count(),
         ];
 
@@ -397,13 +414,13 @@ class PortalWaliService
             ->orderByDesc('tanggal')
             ->get()
             ->map(fn (RiwayatKesehatan $r): array => [
-                'id'       => $r->id,
-                'tanggal'  => $r->tanggal?->toDateString(),
-                'keluhan'  => $r->keluhan,
+                'id' => $r->id,
+                'tanggal' => $r->tanggal?->toDateString(),
+                'keluhan' => $r->keluhan,
                 'diagnosa' => $r->diagnosa,
                 'tindakan' => $r->tindakan,
-                'kondisi'  => $r->kondisi,
-                'petugas'  => $r->petugas,
+                'kondisi' => $r->kondisi,
+                'petugas' => $r->petugas,
             ])
             ->values();
 
@@ -413,12 +430,12 @@ class PortalWaliService
             ->orderByDesc('tanggal')
             ->get()
             ->map(fn (SesiKonseling $s): array => [
-                'id'          => $s->id,
-                'tanggal'     => $s->tanggal?->toDateString(),
-                'topik'       => $s->topik,
-                'status'      => $s->status,
+                'id' => $s->id,
+                'tanggal' => $s->tanggal?->toDateString(),
+                'topik' => $s->topik,
+                'status' => $s->status,
                 'rekomendasi' => $s->rekomendasi,
-                'konselor'    => $s->konselor?->name,
+                'konselor' => $s->konselor?->name,
             ])
             ->values();
 
@@ -434,13 +451,13 @@ class PortalWaliService
             ->orderByDesc('tanggal_mulai')
             ->get()
             ->map(fn (IzinSantri $i): array => [
-                'id'              => $i->id,
-                'jenis_izin'      => $i->jenis_izin,
-                'tanggal_mulai'   => $i->tanggal_mulai?->toDateString(),
+                'id' => $i->id,
+                'jenis_izin' => $i->jenis_izin,
+                'tanggal_mulai' => $i->tanggal_mulai?->toDateString(),
                 'tanggal_selesai' => $i->tanggal_selesai?->toDateString(),
-                'alasan'          => $i->alasan,
-                'status'          => $i->status,
-                'sudah_kembali'   => $i->sudah_kembali,
+                'alasan' => $i->alasan,
+                'status' => $i->status,
+                'sudah_kembali' => $i->sudah_kembali,
             ])
             ->values();
 
@@ -449,12 +466,12 @@ class PortalWaliService
             ->orderByDesc('tanggal')
             ->get()
             ->map(fn (KunjunganWali $k): array => [
-                'id'              => $k->id,
+                'id' => $k->id,
                 'nama_pengunjung' => $k->nama_pengunjung,
-                'hubungan'        => $k->hubungan,
-                'tanggal'         => $k->tanggal?->toDateString(),
-                'jam_datang'      => $k->jam_datang,
-                'keperluan'       => $k->keperluan,
+                'hubungan' => $k->hubungan,
+                'tanggal' => $k->tanggal?->toDateString(),
+                'jam_datang' => $k->jam_datang,
+                'keperluan' => $k->keperluan,
             ])
             ->values();
 

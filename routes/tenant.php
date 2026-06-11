@@ -28,6 +28,7 @@ use App\Http\Controllers\PortalWali\PortalWaliNotificationController;
 use App\Http\Controllers\PortalWali\PortalWaliPembayaranController;
 use App\Http\Controllers\PortalWali\PortalWaliProfileController;
 use App\Http\Controllers\PortalWali\PortalWaliPwaController;
+use App\Http\Controllers\PortalWali\PortalWaliRaporDiniyahDownloadController;
 use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
 use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
@@ -161,6 +162,8 @@ Route::middleware([
         Route::get('/izin', [PortalWaliIzinController::class, 'index'])->name('izin');
         Route::post('/izin', [PortalWaliIzinController::class, 'store'])->name('izin.store');
         Route::get('/santri/{santri}/rapor/{rapor}/download', PortalWaliRaporDownloadController::class)->name('rapor.download');
+        // WP-10 — unduh/cetak rapor diniyah anak sendiri (403 untuk anak orang lain).
+        Route::get('/santri/{santri}/rapor-diniyah/{raporDiniyah}/download', PortalWaliRaporDiniyahDownloadController::class)->name('rapor-diniyah.download');
         Route::get('/santri/{santri}/hafalan', PortalWaliHafalanController::class)->name('hafalan');
         Route::get('/santri/{santri}/kesehatan', PortalWaliKesehatanController::class)->name('kesehatan');
         Route::get('/santri/{santri}/kegiatan', PortalWaliKegiatanController::class)->name('kegiatan');
@@ -193,6 +196,8 @@ Route::middleware([
 
     Route::middleware('auth')->prefix('admin/akademik/export')->name('tenant.akademik.export.')->group(function () {
         Route::get('/rapor/{rapor}/print', [AkademikExportController::class, 'raporPrint'])->name('rapor.print');
+        // WP-10 — cetak rapor diniyah; blok tampil mengikuti Setting tenant.
+        Route::get('/rapor-diniyah/{raporDiniyah}/print', [AkademikExportController::class, 'raporDiniyahPrint'])->name('rapor-diniyah.print');
         // WP-08 — cetak syahadah (sertifikat internal) per alumni.
         Route::get('/syahadah/{alumni}/print', [AkademikExportController::class, 'syahadahPrint'])->name('syahadah.print');
     });
