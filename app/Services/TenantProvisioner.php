@@ -99,6 +99,13 @@ class TenantProvisioner
                 '--force' => true,
             ]);
 
+            // (b3c) WP-01: lembaga default "Pondok" — payung kelas/periode.
+            // Idempoten (firstOrCreate by nama) — tenant lama tak berubah perilaku.
+            Artisan::call('db:seed', [
+                '--class' => \Modules\Akademik\Database\Seeders\LembagaSeeder::class,
+                '--force' => true,
+            ]);
+
             // (b4) T-A010: pengaturan AI default konservatif versi 1 'aktif'
             // (tabel TENANT — wajib di dalam $tenant->run()). Idempoten:
             // tenant yang sudah punya versi apa pun tidak disentuh.

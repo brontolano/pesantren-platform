@@ -939,8 +939,8 @@ class DevRoadmapSeeder extends Seeder
         $tasks = [
             ['Gelombang 1 — Jangkar', 'WP-01: Model Lembaga + tautan DivisiUnit Ledger',
                 'Tabel lembaga (jenis formal/diniyah/tahfidz/pondok, jenjang, NSM/NSPP, IJOP, kepala_id, divisi_unit_id FK Ledger); seeder 1 lembaga Pondok per tenant + hook TenantProvisioner; ALTER kelas + lembaga_id (backfill ke default); ALTER periode_akademik + lembaga_id + kalender masehi/hijriyah + tahun_hijriyah, unique -> tenant+lembaga+tahun+semester (periode aktif ganda beda lembaga sah).',
-                'Belum mulai. Tenant lama wajib tak berubah perilaku (test eksplisit).',
-                'todo', 'critical', 0, 'M', 1],
+                'SELESAI (2026-06-11): lembaga + backfill aman-FK dalam migrasi + seeder idempoten (terbukti tak dobel dengan backfill) + resource panel + select di Kelas/Periode. Adversarial menangkap MAJOR: aktivasi periode mematikan periode lembaga lain (PeriodeAkademikService kini scoped per lembaga, NULL-safe). 11 test hijau + smoke + provisioning 8/8. Catatan: rollback down() butuh pembersihan data per-lembaga manual.',
+                'done', 'critical', 100, 'M', 1],
             ['Gelombang 1 — Jangkar', 'WP-02: Kalender akademik + hari efektif',
                 'Tabel kalender_akademik (lembaga NULL = semua; jenis libur_nasional/libur_pondok/ramadhan/ujian/pasaran/kegiatan); KalenderService::isHariEfektif + hariEfektifDalamRentang; seeder libur nasional; tampilan kalender bulanan. Dipakai presensi, rekap kehadiran, potongan cuti. Tanggal Hijriyah = label manual, JANGAN bangun konversi otomatis.',
                 'Belum mulai.',

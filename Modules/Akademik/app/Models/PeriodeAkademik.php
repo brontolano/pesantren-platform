@@ -20,6 +20,9 @@ class PeriodeAkademik extends Model
         'tanggal_mulai',
         'tanggal_akhir',
         'is_active',
+        'lembaga_id',
+        'kalender',
+        'tahun_hijriyah',
     ];
 
     protected $casts = [
@@ -27,6 +30,12 @@ class PeriodeAkademik extends Model
         'tanggal_akhir' => 'date',
         'is_active' => 'boolean',
     ];
+
+    /** WP-01: NULL = lembaga default tenant (perilaku lama). */
+    public function lembaga(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Lembaga::class, 'lembaga_id');
+    }
 
     public function jadwalPelajaran(): HasMany
     {

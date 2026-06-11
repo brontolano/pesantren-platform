@@ -83,6 +83,12 @@ class KelasResource extends Resource
                 ->options(fn () => User::whereHas('roles', fn ($q) => $q->whereIn('name', ['guru', 'tu', 'super_admin']))->pluck('name', 'id'))
                 ->searchable()
                 ->nullable(),
+            Select::make('lembaga_id')
+                ->label('Lembaga (opsional)')
+                ->helperText('Kosong = lembaga default tenant.')
+                ->options(fn () => \Modules\Akademik\Models\Lembaga::query()->where('aktif', true)->pluck('nama', 'id'))
+                ->searchable()
+                ->nullable(),
             Toggle::make('is_active')
                 ->label('Aktif')
                 ->default(true),
