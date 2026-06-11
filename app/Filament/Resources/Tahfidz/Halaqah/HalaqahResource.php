@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Tahfidz\Halaqah;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Tahfidz\Halaqah\Pages\CreateHalaqah;
 use App\Filament\Resources\Tahfidz\Halaqah\Pages\EditHalaqah;
 use App\Filament\Resources\Tahfidz\Halaqah\Pages\ListHalaqah;
@@ -21,19 +22,28 @@ use UnitEnum;
 
 class HalaqahResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Halaqah::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationLabel = 'Halaqah';
-
     protected static UnitEnum|string|null $navigationGroup = 'Tahfidz';
 
-    protected static ?string $modelLabel = 'Halaqah';
+    public static function getNavigationLabel(): string
+    {
+        return istilah('halaqah');
+    }
 
-    protected static ?string $pluralModelLabel = 'Halaqah';
+    public static function getModelLabel(): string
+    {
+        return istilah('halaqah');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return istilah('halaqah');
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -51,11 +61,11 @@ class HalaqahResource extends Resource
             ->schema([
                 Section::make()->schema([
                     TextInput::make('nama')
-                        ->label('Nama Halaqah')
+                        ->label(fn () => 'Nama '.istilah('halaqah'))
                         ->required()
                         ->maxLength(255),
                     Select::make('musyrif_id')
-                        ->label('Musyrif')
+                        ->label(fn () => istilah('musyrif'))
                         ->options(fn () => User::query()
                             ->whereHas('roles', fn ($query) => $query->whereIn('name', ['guru', 'guru_tahfidz', 'super_admin']))
                             ->orderBy('name')
@@ -86,7 +96,7 @@ class HalaqahResource extends Resource
             ->emptyStateIcon('heroicon-o-user-group')
             ->columns([
                 TextColumn::make('nama')->label('Nama')->sortable()->searchable(),
-                TextColumn::make('musyrif.name')->label('Musyrif')->sortable()->searchable(),
+                TextColumn::make('musyrif.name')->label(fn () => istilah('musyrif'))->sortable()->searchable(),
                 TextColumn::make('jenis')->label('Jenis')->badge()->sortable(),
                 TextColumn::make('keanggotaan_aktif_count')
                     ->label('Anggota Aktif')

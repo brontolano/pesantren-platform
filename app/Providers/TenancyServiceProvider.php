@@ -42,9 +42,16 @@ class TenancyServiceProvider extends ServiceProvider
             // Switch koneksi DB ke/dari database tenant saat request
             Events\TenancyInitialized::class => [
                 Listeners\BootstrapTenancy::class,
+                // WP-31: buang cache label istilah tiap ganti konteks tenant.
+                // Penting untuk proses long-running (queue worker pesantren-worker*):
+                // tanpa ini, label lama tertahan di memori proses walau tenant sudah
+                // mengubah Setting dari panel (proses lain). Web FrankenPHP classic
+                // mode tidak terdampak (state mati per request), tapi flush ini aman.
+                fn () => \Modules\Core\Support\IstilahRegistry::flushCache(),
             ],
             Events\TenancyEnded::class => [
                 Listeners\RevertToCentralContext::class,
+                fn () => \Modules\Core\Support\IstilahRegistry::flushCache(),
             ],
         ];
     }

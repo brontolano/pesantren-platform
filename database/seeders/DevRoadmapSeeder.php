@@ -1095,8 +1095,8 @@ class DevRoadmapSeeder extends Seeder
         $tasks = [
             ['Gelombang 1 — Jangkar', 'WP-31: Label istilah per tenant',
                 'Setting label.istilah (JSON map musyrif/mustahiq/takzir/halaqah/bisyaroh -> label tenant) + helper istilah() dipakai navigasi & form (sapu bertahap mulai modul baru) + halaman edit. Pesantren beda istilah bukan beda fitur.',
-                'Belum mulai.',
-                'todo', 'medium', 0, 'S', 1],
+                'SELESAI (2026-06-11): IstilahRegistry 11 kunci + helper istilah() (autoload.files pertama di repo) + halaman Pengaturan > Istilah (simpan hanya override) + dipakai di HalaqahResource sbg bukti pola. Parsing toleran (pelajaran WP-02), cache per-tenant + flush di TenancyInitialized/Ended (adversarial: queue worker long-running pegang cache basi — FrankenPHP web classic mode aman). XSS label & gate 403 dibuktikan test. 7 test hijau. WAJIB daftar ke WP-34.',
+                'done', 'medium', 100, 'S', 1],
             ['Gelombang 1 — Jangkar', 'WP-32: Setor Keliling masuk PWA Keuangan',
                 'Layar di /admin/keuangan/pwa: kamar/blok -> santri -> setoran (atau scan QR); pakai SetorKelilingService yang SUDAH ada; endpoint idempoten; antrean offline IndexedDB pola camera-gps.js + badge belum-tersinkron.',
                 'SELESAI (2026-06-11): 5 endpoint API gate setor_tabungan + layar Vue antrean offline + idempotensi client_ref 2 lapis (insert-time + unique DB). Setoran PWA = item DRAF, posting saldo tetap via persetujuan bendahara (mesin uang tak disentuh). Adversarial 3 lensa: fix 500 santri invalid, fix retry-selamanya 4xx (offline-sync kini tandai gagal+panel merah), fix draf kemarin macet (ajukan kunci semua draf berisi). 11 test hijau + vite hijau. Catatan: timezone app UTC vs WIB digeser jadi keputusan terpisah.',
