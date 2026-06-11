@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Modules\AI\Console\AiAnomaliCommand;
 use Modules\AI\Console\AiBersihkanPercakapanCommand;
 use Modules\AI\Console\AiEskalasiPengingatCommand;
+use Modules\AI\Console\AiEvalCommand;
 use Modules\AI\Console\AiHealthCommand;
 use Modules\AI\Console\AiLaporanEskalasiCommand;
 use Modules\AI\Console\AiPromptCommand;
@@ -59,6 +60,7 @@ class AIServiceProvider extends ServiceProvider
                 AiEskalasiPengingatCommand::class,
                 AiLaporanEskalasiCommand::class,
                 AiBersihkanPercakapanCommand::class,
+                AiEvalCommand::class,
             ]);
         }
     }
