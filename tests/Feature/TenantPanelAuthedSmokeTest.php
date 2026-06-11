@@ -61,7 +61,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $host = $tenant->id.'.localhost';
         $kernel = app(Kernel::class);
 
-        $paths = ['admin', 'admin/santri/santris', 'admin/tagihan/tagihans', 'admin/tahfidz/halaqah/halaqahs', 'admin/akademik/kitab/kitabs', 'admin/akademik/lembaga/lembagas', 'admin/akademik/kalender-akademik/kalender-akademiks', 'admin/payroll/jabatan/jabatans', 'admin/payroll/penugasan/penugasan-pegawais', 'admin/payroll/employee/employees', 'admin/kesantrian/jenis-pelanggaran/jenis-pelanggarans', 'admin/kesantrian/pelanggaran-santri/pelanggaran-santris', 'admin/rekap-disiplin'];
+        $paths = ['admin', 'admin/santri/santris', 'admin/tagihan/tagihans', 'admin/tahfidz/halaqah/halaqahs', 'admin/akademik/kitab/kitabs', 'admin/akademik/lembaga/lembagas', 'admin/akademik/kurikulum/kurikulums', 'admin/akademik/kalender-akademik/kalender-akademiks', 'admin/payroll/jabatan/jabatans', 'admin/payroll/penugasan/penugasan-pegawais', 'admin/payroll/employee/employees', 'admin/kesantrian/jenis-pelanggaran/jenis-pelanggarans', 'admin/kesantrian/pelanggaran-santri/pelanggaran-santris', 'admin/rekap-disiplin'];
         foreach ($paths as $path) {
             $req = Request::create("http://{$host}/{$path}", 'GET');
             $req->headers->set('Host', $host);

@@ -2,27 +2,33 @@
 
 namespace App\Filament\Resources\Akademik\JadwalPelajaran;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\JadwalPelajaran\Pages\CreateJadwalPelajaran;
 use App\Filament\Resources\Akademik\JadwalPelajaran\Pages\EditJadwalPelajaran;
 use App\Filament\Resources\Akademik\JadwalPelajaran\Pages\ListJadwalPelajaran;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\PeriodeAkademik;
-use Modules\Akademik\Services\JadwalPelajaranService;
+use Modules\Akademik\Services\KurikulumService;
 use Modules\Kesantrian\Models\Kelas;
 
 class JadwalPelajaranResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = JadwalPelajaran::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
@@ -35,7 +41,7 @@ class JadwalPelajaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -48,14 +54,33 @@ class JadwalPelajaranResource extends Resource
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
+    }
+
+    /**
+     * WP-06: pesan peringatan LUNAK bila mapel di luar kurikulum aktif
+     * tingkat kelas itu; null bila aman / kelas tanpa kurikulum (perilaku
+     * lama utuh). TIDAK pernah memblokir simpan.
+     */
+    public static function kurikulumWarning(mixed $kelasId, mixed $pelajaranId): ?string
+    {
+        if (! $kelasId || ! $pelajaranId) {
+            return null;
+        }
+
+        $diLuar = app(KurikulumService::class)
+            ->isMapelDiLuarKurikulum((int) $kelasId, (int) $pelajaranId);
+
+        return $diLuar
+            ? 'Mapel ini tidak terdaftar di kurikulum aktif untuk tingkat kelas tersebut.'
+            : null;
     }
 
     public static function form(Schema $schema): Schema
@@ -70,10 +95,27 @@ class JadwalPelajaranResource extends Resource
                 Select::make('kelas_id')
                     ->options(fn () => Kelas::query()->orderBy('nama_kelas')->pluck('nama_kelas', 'id'))
                     ->searchable()
+                    ->live()
                     ->required(),
                 Select::make('pelajaran_id')
                     ->options(fn () => Pelajaran::query()->orderBy('nama')->pluck('nama', 'id'))
                     ->searchable()
+                    ->live()
+                    // WP-06: validasi LUNAK kurikulum — hanya peringatan,
+                    // simpan TIDAK pernah diblokir (tenant tanpa kurikulum
+                    // tidak melihat apa-apa).
+                    ->hint(fn (Get $get): ?string => self::kurikulumWarning($get('kelas_id'), $get('pelajaran_id')))
+                    ->hintColor('warning')
+                    ->afterStateUpdated(function (Get $get, $state): void {
+                        $warning = self::kurikulumWarning($get('kelas_id'), $state);
+                        if ($warning !== null) {
+                            Notification::make()
+                                ->title('Mapel di luar kurikulum')
+                                ->body($warning.' Jadwal tetap bisa disimpan.')
+                                ->warning()
+                                ->send();
+                        }
+                    })
                     ->required(),
                 Select::make('hari')
                     ->options([
@@ -121,4 +163,3 @@ class JadwalPelajaranResource extends Resource
         ];
     }
 }
-

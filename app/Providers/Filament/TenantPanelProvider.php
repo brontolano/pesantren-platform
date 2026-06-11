@@ -6,6 +6,7 @@ use App\Filament\Pages\TenantDashboard;
 use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
 use App\Filament\Resources\Akademik\KalenderAkademik\KalenderAkademikResource;
 use App\Filament\Resources\Akademik\Kitab\KitabResource;
+use App\Filament\Resources\Akademik\Kurikulum\KurikulumResource;
 use App\Filament\Resources\Akademik\Lembaga\LembagaResource;
 use App\Filament\Resources\Akademik\Nilai\NilaiResource;
 use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
@@ -33,12 +34,12 @@ use App\Filament\Resources\Inventory\InventoryBatchResource;
 use App\Filament\Resources\Inventory\InventoryItemResource;
 use App\Filament\Resources\Inventory\InventoryLokasiResource;
 use App\Filament\Resources\Kegiatan\IzinSantriResource;
-use App\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use App\Filament\Resources\Kegiatan\KegiatanResource;
 use App\Filament\Resources\Kegiatan\KunjunganWaliResource;
 use App\Filament\Resources\Kegiatan\Recurring\KegiatanRecurringResource;
 use App\Filament\Resources\Kegiatan\Template\KegiatanTemplateResource;
 use App\Filament\Resources\Kelas\KelasResource;
+use App\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use App\Filament\Resources\Kesantrian\JenisPelanggaran\JenisPelanggaranResource;
 use App\Filament\Resources\Kesantrian\PelanggaranSantri\PelanggaranSantriResource;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
@@ -364,6 +365,7 @@ class TenantPanelProvider extends PanelProvider
             WebsiteSettingResource::class,
             LembagaResource::class, // WP-01
             KalenderAkademikResource::class, // WP-02
+            KurikulumResource::class, // WP-06
             PeriodeAkademikResource::class,
             PelajaranResource::class,
             ProgramStudiResource::class,
