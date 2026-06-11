@@ -25,6 +25,7 @@ class Nilai extends Model
         'nilai_uts',
         'nilai_uas',
         'nilai_akhir',
+        'nilai_komponen',
         'catatan',
         'input_by',
     ];
@@ -34,6 +35,7 @@ class Nilai extends Model
         'nilai_uts' => 'float',
         'nilai_uas' => 'float',
         'nilai_akhir' => 'float',
+        'nilai_komponen' => 'array',
     ];
 
     public function santri(): BelongsTo

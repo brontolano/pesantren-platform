@@ -332,6 +332,9 @@ class TenantPanelProvider extends PanelProvider
             PenempatanAsramaResource::class,
             BiayaAsramaResource::class,
             HafalanTahfidzResource::class,
+            // F0-PWA Guru: halaqah + kitab
+            \App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource::class,
+            \App\Filament\Resources\Akademik\Kitab\KitabResource::class,
             TahfidzTargetResource::class,
             PenilaianTahfidzResource::class,
             RiwayatKesehatanResource::class,

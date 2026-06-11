@@ -60,7 +60,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $host = $tenant->id.'.localhost';
         $kernel = app(Kernel::class);
 
-        $paths = ['admin', 'admin/santri/santris', 'admin/tagihan/tagihans'];
+        $paths = ['admin', 'admin/santri/santris', 'admin/tagihan/tagihans', 'admin/tahfidz/halaqah/halaqahs', 'admin/akademik/kitab/kitabs'];
         foreach ($paths as $path) {
             $req = Request::create("http://{$host}/{$path}", 'GET');
             $req->headers->set('Host', $host);
