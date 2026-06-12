@@ -16,15 +16,6 @@ const props = defineProps({
     recentActivities: { type: Array, default: () => [] },
 })
 
-const currencyFormatter = new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    maximumFractionDigits: 0,
-})
-
-const totalOutstandingLabel = computed(() => currencyFormatter.format(props.summary.totalOutstanding || 0))
-const totalSavingsLabel = computed(() => currencyFormatter.format(props.summary.totalSavings || 0))
-
 const activeChild = computed(() => props.children[0] ?? null)
 
 const shortcuts = computed(() => {
@@ -140,22 +131,5 @@ function activityIcon(type) {
             </div>
         </div>
 
-        <!-- Quick links (2-card) -->
-        <div class="grid grid-cols-2 gap-3">
-            <Link
-                href="/wali/pembayaran-saya"
-                class="rounded-[20px] bg-white px-4 py-4 shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)] transition active:scale-[.98]"
-            >
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Riwayat</p>
-                <p class="mt-2 font-jost text-lg font-semibold text-slate-900">Pembayaran Saya</p>
-            </Link>
-            <Link
-                href="/wali/izin"
-                class="rounded-[20px] bg-white px-4 py-4 shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)] transition active:scale-[.98]"
-            >
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Perizinan</p>
-                <p class="mt-2 font-jost text-lg font-semibold text-slate-900">Layanan Wali</p>
-            </Link>
-        </div>
     </div>
 </template>
