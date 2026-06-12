@@ -243,15 +243,17 @@ class TenantPanelProvider extends PanelProvider
             ->pages($pages)
             ->widgets($widgets)
             ->navigationGroups([
-                NavigationGroup::make('Kesantrian')->icon('heroicon-o-user-group'),
-                NavigationGroup::make('PPDB')->icon('heroicon-o-clipboard-document-list')->collapsible(),
-                NavigationGroup::make('Akademik & Tahfidz')->icon('heroicon-o-academic-cap'),
-                NavigationGroup::make('Keuangan')->icon('heroicon-o-banknotes'),
-                NavigationGroup::make('Akuntansi & Pajak')->icon('heroicon-o-calculator')->collapsible(),
-                NavigationGroup::make('Kepegawaian')->icon('heroicon-o-briefcase')->collapsible(),
-                NavigationGroup::make('AI Khadim Digital')->icon('heroicon-o-sparkles')->collapsible(),
-                NavigationGroup::make('Kelembagaan & Komunikasi')->icon('heroicon-o-building-office')->collapsible(),
-                NavigationGroup::make('Pengaturan & Mutu')->icon('heroicon-o-cog-6-tooth')->collapsible(),
+                // JANGAN beri ->icon() pada grup: Filament v5 melempar 500 bila grup
+                // berikon berisi item berikon (lihat TenantPanelAuthedSmokeTest).
+                NavigationGroup::make('Kesantrian'),
+                NavigationGroup::make('PPDB')->collapsible(),
+                NavigationGroup::make('Akademik & Tahfidz'),
+                NavigationGroup::make('Keuangan'),
+                NavigationGroup::make('Akuntansi & Pajak')->collapsible(),
+                NavigationGroup::make('Kepegawaian')->collapsible(),
+                NavigationGroup::make('AI Khadim Digital')->collapsible(),
+                NavigationGroup::make('Kelembagaan & Komunikasi')->collapsible(),
+                NavigationGroup::make('Pengaturan & Mutu')->collapsible(),
             ]);
 
         if (! $isAlbaKids) {
