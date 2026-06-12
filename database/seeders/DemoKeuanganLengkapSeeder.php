@@ -34,6 +34,7 @@ class DemoKeuanganLengkapSeeder extends Seeder
         $this->jurnalSebulan();
         $this->tagihanBulanIni();
         $this->riwayatApproval();
+        $this->dimensiLaporanDana();
 
         $this->command?->info('Keuangan lengkap selesai.');
     }
@@ -480,6 +481,82 @@ class DemoKeuanganLengkapSeeder extends Seeder
                 $this->buatJurnal($tanggal, $t['desk'], $kas->id, $pendapatan->id, $t['n'], 'demo-juni-' . $i);
             } else {
                 $this->buatJurnal($tanggal, $t['desk'], $beban->id, $kas->id, $t['n'], 'demo-juni-' . $i);
+            }
+        }
+    }
+
+    /**
+     * Isi dimensi sumber_dana_id & divisi_id pada baris jurnal + dana kebajikan,
+     * agar laporan BOS/BOP, Dana Terikat, Kebajikan, dan Realisasi per Divisi berisi.
+     */
+    private function dimensiLaporanDana(): void
+    {
+        $kas = $this->akunKas();
+        $pendapatan = DB::table('akun')->where('kode', 'like', '4%')->where('is_postable', true)->first();
+        $beban = DB::table('akun')->where('kode', 'like', '5%')->where('is_postable', true)->first();
+
+        // 1) Divisi pada baris BEBAN (untuk realisasi per divisi)
+        $divisiIds = DB::table('divisi_unit')->where('is_active', true)->orderBy('id')->pluck('id')->toArray();
+        if ($divisiIds && $beban) {
+            $barisBeban = DB::table('jurnal_baris')->where('akun_id', $beban->id)->whereNull('divisi_id')->orderBy('id')->get();
+            foreach ($barisBeban as $i => $b) {
+                DB::table('jurnal_baris')->where('id', $b->id)
+                    ->update(['divisi_id' => $divisiIds[$i % count($divisiIds)], 'updated_at' => now()]);
+            }
+        }
+
+        // 2) Sumber dana BOS/BOP (kategori negara) + dana terikat: jurnal khusus bertanda
+        $danaNegara = DB::table('sumber_dana')->where('kategori', 'negara')->orderBy('id')->first();
+        $danaTerikat = DB::table('sumber_dana')->where('is_terikat', true)->where('kategori', 'sosial')->orderBy('id')->first();
+
+        if ($kas && $pendapatan && $beban) {
+            foreach ([
+                ['dana' => $danaNegara, 'masuk' => ['Pencairan dana BOP Pesantren tahap 1', 15000000, 'demo-bop-masuk-1'], 'keluar' => ['Belanja operasional dari dana BOP (ATK & kegiatan)', 6200000, 'demo-bop-keluar-1']],
+                ['dana' => $danaTerikat, 'masuk' => ['Infaq terikat program beasiswa yatim', 9000000, 'demo-terikat-masuk-1'], 'keluar' => ['Penyaluran beasiswa yatim semester ganjil', 3500000, 'demo-terikat-keluar-1']],
+            ] as $cfg) {
+                if (! $cfg['dana']) {
+                    continue;
+                }
+                $this->buatJurnal('2026-06-03', $cfg['masuk'][0], $kas->id, $pendapatan->id, $cfg['masuk'][1], $cfg['masuk'][2]);
+                $this->buatJurnal('2026-06-08', $cfg['keluar'][0], $beban->id, $kas->id, $cfg['keluar'][1], $cfg['keluar'][2]);
+
+                foreach ([$cfg['masuk'][2], $cfg['keluar'][2]] as $key) {
+                    $jid = DB::table('jurnal')->where('idempotency_key', $key)->value('id');
+                    if ($jid) {
+                        DB::table('jurnal_baris')->where('jurnal_id', $jid)
+                            ->update(['sumber_dana_id' => $cfg['dana']->id, 'updated_at' => now()]);
+                    }
+                }
+            }
+        }
+
+        // 3) Dana kebajikan: akun induk 2-2000 + anak penyaluran, penerimaan & penyaluran
+        if ($kas) {
+            $induk = DB::table('akun')->where('kode', '2-2000')->first();
+            if (! $induk) {
+                $indukId = DB::table('akun')->insertGetId([
+                    'tenant_id' => $this->tid, 'kode' => '2-2000', 'nama' => 'Titipan Dana Kebajikan',
+                    'tipe' => 'KEWAJIBAN', 'saldo_normal' => 'kredit', 'is_postable' => true,
+                    'is_kas_bank' => false, 'created_at' => now(), 'updated_at' => now(),
+                ]);
+            } else {
+                $indukId = $induk->id;
+            }
+
+            $anak = DB::table('akun')->where('kode', '2-2100')->first();
+            if (! $anak) {
+                DB::table('akun')->insert([
+                    'tenant_id' => $this->tid, 'kode' => '2-2100', 'nama' => 'Penyaluran Fasilitas Umum',
+                    'tipe' => 'KEWAJIBAN', 'saldo_normal' => 'kredit', 'is_postable' => true,
+                    'is_kas_bank' => false, 'parent_id' => $indukId, 'peruntukan' => 'fasilitas_umum',
+                    'created_at' => now(), 'updated_at' => now(),
+                ]);
+            }
+            $anakId = DB::table('akun')->where('kode', '2-2100')->value('id');
+
+            $this->buatJurnal('2026-06-05', 'Penerimaan bunga rekening bank konvensional (syubhat)', $kas->id, $indukId, 425000, 'demo-kebajikan-masuk-1');
+            if ($anakId) {
+                $this->buatJurnal('2026-06-10', 'Penyaluran dana kebajikan: perbaikan MCK umum kampung', $anakId, $kas->id, 250000, 'demo-kebajikan-salur-1');
             }
         }
     }

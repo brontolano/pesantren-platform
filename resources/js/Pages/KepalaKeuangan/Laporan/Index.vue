@@ -8,9 +8,9 @@ const groups = [
     {
         title: 'Operasional',
         items: [
-            { label: 'Laporan Harian', desc: 'Ringkasan penerimaan & pengeluaran harian' },
-            { label: 'Laporan Mingguan', desc: 'Rekap mingguan per divisi' },
-            { label: 'Laporan Bulanan', desc: 'Konsolidasi bulanan lengkap' },
+            { label: 'Laporan Harian', href: '/keuangan/laporan/operasional?tab=harian', desc: 'Ringkasan penerimaan & pengeluaran harian' },
+            { label: 'Laporan Mingguan', href: '/keuangan/laporan/operasional?tab=mingguan', desc: 'Rekap mingguan per divisi' },
+            { label: 'Laporan Bulanan', href: '/keuangan/laporan/operasional?tab=bulanan', desc: 'Konsolidasi bulanan lengkap' },
         ],
     },
     {
@@ -19,16 +19,16 @@ const groups = [
             { label: 'Neraca', href: '/keuangan/laporan/neraca-lr', desc: 'Posisi keuangan (Aset = Kewajiban + Aset Neto)' },
             { label: 'Laba Rugi', href: '/keuangan/laporan/neraca-lr', desc: 'Surplus/defisit berjalan' },
             { label: 'Arus Kas', href: '/keuangan/laporan/arus-kas', desc: 'Operasi · Investasi · Pendanaan' },
-            { label: 'Neraca Saldo', desc: 'Saldo semua akun per tanggal' },
+            { label: 'Neraca Saldo', href: '/keuangan/laporan/neraca-saldo', desc: 'Saldo semua akun per tanggal' },
         ],
     },
     {
         title: 'Dana & Realisasi',
         items: [
-            { label: 'BOS / BOP', desc: 'Realisasi dana bantuan operasional' },
-            { label: 'Dana Kebajikan', desc: 'Penerimaan & penyaluran dana syubhat' },
-            { label: 'Dana Terikat', desc: 'Infaq/sedekah terikat program' },
-            { label: 'Realisasi per Divisi', desc: 'Anggaran vs realisasi per unit' },
+            { label: 'BOS / BOP', href: '/keuangan/laporan/dana?tab=bos-bop', desc: 'Realisasi dana bantuan operasional' },
+            { label: 'Dana Kebajikan', href: '/keuangan/laporan/dana?tab=kebajikan', desc: 'Penerimaan & penyaluran dana syubhat' },
+            { label: 'Dana Terikat', href: '/keuangan/laporan/dana?tab=terikat', desc: 'Infaq/sedekah terikat program' },
+            { label: 'Realisasi per Divisi', href: '/keuangan/laporan/dana?tab=divisi', desc: 'Anggaran vs realisasi per unit' },
         ],
     },
 ]

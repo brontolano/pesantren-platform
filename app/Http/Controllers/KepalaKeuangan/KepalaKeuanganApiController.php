@@ -227,6 +227,31 @@ class KepalaKeuanganApiController extends Controller
         return response()->json($laporan->neraca($tanggal));
     }
 
+    public function laporanOperasional(Request $request, \Modules\Keuangan\Services\LaporanKeuanganService $laporan): JsonResponse
+    {
+        $jenis = $request->input('jenis', 'harian');
+
+        return response()->json(match ($jenis) {
+            'mingguan' => $laporan->laporanMingguan($request->input('sampai')),
+            'bulanan' => $laporan->laporanBulanan($request->input('bulan', now()->format('Y-m'))),
+            default => $laporan->laporanHarian($request->input('tanggal')),
+        });
+    }
+
+    public function laporanDana(Request $request, LaporanService $laporan): JsonResponse
+    {
+        $jenis = $request->input('jenis', 'bos-bop');
+        $dari = $request->input('dari');
+        $sampai = $request->input('sampai');
+
+        return response()->json(match ($jenis) {
+            'kebajikan' => $laporan->danaKebajikan($dari, $sampai),
+            'terikat' => $laporan->laporanDanaTerikat($dari, $sampai),
+            'divisi' => $laporan->realisasiPerDivisi($dari, $sampai),
+            default => $laporan->danaBosBop($dari, $sampai),
+        });
+    }
+
     public function laporanLabaRugi(Request $request, LaporanService $laporan): JsonResponse
     {
         $dari = $request->input('dari');

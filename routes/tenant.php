@@ -420,6 +420,9 @@ Route::middleware([
         Route::get('/laporan', [KepalaKeuanganCtrl::class, 'laporan'])->name('laporan.index');
         Route::get('/laporan/neraca-lr', [KepalaKeuanganCtrl::class, 'neracaLr'])->name('laporan.neraca-lr');
         Route::get('/laporan/arus-kas', [KepalaKeuanganCtrl::class, 'arusKas'])->name('laporan.arus-kas');
+        Route::get('/laporan/operasional', [KepalaKeuanganCtrl::class, 'laporanOperasional'])->name('laporan.operasional');
+        Route::get('/laporan/dana', [KepalaKeuanganCtrl::class, 'laporanDana'])->name('laporan.dana');
+        Route::get('/laporan/neraca-saldo', [KepalaKeuanganCtrl::class, 'laporanNeracaSaldo'])->name('laporan.neraca-saldo');
     });
 
     // API Kepala Keuangan (JSON, lazy-load dari Vue)
@@ -436,6 +439,8 @@ Route::middleware([
         Route::get('/laporan/neraca', [KepalaKeuanganApiController::class, 'laporanNeraca'])->name('laporan.neraca');
         Route::get('/laporan/laba-rugi', [KepalaKeuanganApiController::class, 'laporanLabaRugi'])->name('laporan.laba-rugi');
         Route::get('/laporan/arus-kas', [KepalaKeuanganApiController::class, 'laporanArusKas'])->name('laporan.arus-kas');
+        Route::get('/laporan/operasional', [KepalaKeuanganApiController::class, 'laporanOperasional'])->name('laporan.operasional');
+        Route::get('/laporan/dana', [KepalaKeuanganApiController::class, 'laporanDana'])->name('laporan.dana');
 
         // Loket Kas
         Route::get('/loket', [KepalaKeuanganApiController::class, 'loket'])->name('loket');
