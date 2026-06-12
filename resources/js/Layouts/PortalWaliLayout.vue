@@ -10,9 +10,9 @@ import MosqueSilhouette from '@/Components/Ui/MosqueSilhouette.vue'
 // Peta ikon bottom-nav (presentasional; selaras dengan key dari backend).
 const navIcons = {
     beranda: 'home',
-    tagihan: 'receipt',
-    pembayaran: 'card',
-    tabungan: 'wallet',
+    keuangan: 'wallet',
+    izin: 'document',
+    santri: 'book',
     akun: 'user',
 }
 
@@ -48,42 +48,57 @@ const isOffline = ref(false)
 
 const pageMetaMap = {
     'PortalWali/Dashboard': {
-        title: 'Beranda Wali',
+        title: 'Beranda',
         kicker: 'Pantau semua anak dalam satu genggaman.',
+        isHome: true,
     },
     'PortalWali/Financial': {
-        title: 'Keuangan Santri',
+        title: 'Keuangan',
         kicker: 'Tagihan, pembayaran, dan saldo tabungan anak.',
     },
     'PortalWali/Profile': {
-        title: 'Data Anak',
+        title: 'Santri',
         kicker: 'Profil dan riwayat penempatan santri.',
     },
     'PortalWali/Academic': {
-        title: 'Ringkasan Anak',
+        title: 'Santri',
         kicker: 'Akademik dan rapor santri yang sedang aktif.',
     },
     'PortalWali/Hafalan': {
-        title: 'Ringkasan Anak',
+        title: 'Santri',
         kicker: 'Pantau perkembangan hafalan santri.',
     },
     'PortalWali/Kesehatan': {
-        title: 'Ringkasan Anak',
+        title: 'Santri',
         kicker: 'Riwayat kesehatan dan konseling santri.',
     },
     'PortalWali/Kegiatan': {
-        title: 'Ringkasan Anak',
-        kicker: 'Kegiatan, izin, dan kunjungan wali.',
+        title: 'Info & Akun',
+        kicker: 'Kegiatan, pengumuman, dan jadwal pesantren.',
     },
     'PortalWali/Notifications': {
-        title: 'Pembayaran Saya',
-        kicker: 'Pantau status pembayaran, verifikasi, dan notifikasi penting wali.',
+        title: 'Akun',
+        kicker: 'Notifikasi, pengaturan, dan data akun wali.',
     },
     'PortalWali/Izin': {
-        title: 'Akun Wali',
-        kicker: 'Pengajuan izin dan aktivitas layanan wali.',
+        title: 'Izin & Jenguk',
+        kicker: 'Ajukan izin pulang atau jadwalkan kunjungan.',
+    },
+    'PortalWali/Jenguk': {
+        title: 'Izin & Jenguk',
+        kicker: 'Ajukan izin pulang atau jadwalkan kunjungan.',
+    },
+    'PortalWali/PembayaranSaya': {
+        title: 'Keuangan',
+        kicker: 'Pantau status pembayaran dan verifikasi.',
+    },
+    'PortalWali/Tabungan': {
+        title: 'Keuangan',
+        kicker: 'Saldo dan mutasi tabungan santri.',
     },
 }
+
+const isHomePage = computed(() => pageMetaMap[page.component]?.isHome === true)
 
 const sectionTitle = computed(() => {
     if (props.title) {
@@ -115,9 +130,9 @@ const sectionKicker = computed(() => {
 
 const tabMonograms = {
     beranda: 'BR',
-    tagihan: 'TG',
-    pembayaran: 'BY',
-    tabungan: 'TB',
+    keuangan: 'KU',
+    izin: 'IZ',
+    santri: 'ST',
     akun: 'AK',
 }
 
@@ -252,21 +267,38 @@ onBeforeUnmount(() => {
                             <span>Anda sedang offline. Portal Wali menampilkan data terakhir yang tersimpan; aksi transaksi aktif lagi saat jaringan kembali.</span>
                         </div>
 
-                        <div class="flex items-start justify-between gap-3">
+                        <!-- Beranda: greeting + avatar + notifikasi -->
+                        <div v-if="isHomePage" class="flex items-center justify-between gap-3">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <span class="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-white/20 text-[17px] font-bold text-white ring-1 ring-inset ring-white/30">
+                                    {{ (wali.name || '?').charAt(0).toUpperCase() }}
+                                </span>
+                                <div class="min-w-0">
+                                    <p class="text-[12.5px] text-white/75">Assalamu'alaikum,</p>
+                                    <p class="truncate font-jost text-base font-semibold text-white">{{ wali.name || 'Wali' }}</p>
+                                </div>
+                            </div>
+                            <Link
+                                :href="`/wali/notifikasi`"
+                                class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/16 ring-1 ring-inset ring-white/25"
+                            >
+                                <UiIcon name="bell" class="h-[19px] w-[19px] text-white" />
+                                <span class="absolute right-[9px] top-2 h-2 w-2 rounded-full bg-amber-400 ring-2 ring-emerald-600" />
+                            </Link>
+                        </div>
+
+                        <!-- Non-beranda: judul section -->
+                        <div v-else class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <p class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-emerald-50/90">
-                                    <!-- Aksen emas: bulan sabit + bintang kecil di sisi nama brand -->
                                     <svg
                                         aria-hidden="true"
                                         viewBox="0 0 16 16"
                                         class="h-3 w-3 shrink-0"
                                         fill="none"
-                                        stroke="var(--wali-gold,#c9a24a)"
-                                        stroke-width="1.2"
-                                        stroke-linejoin="round"
                                     >
-                                        <path d="M9.4 2.2A5.2 5.2 0 1 0 13 11a4 4 0 1 1 -3.6 -8.8 Z" fill="var(--wali-gold,#c9a24a)" stroke="none" />
-                                        <path d="M13.6 3 L14.3 4.6 L16 5 L14.3 5.4 L13.6 7 L12.9 5.4 L11.2 5 L12.9 4.6 Z" fill="var(--wali-gold,#c9a24a)" stroke="none" />
+                                        <path d="M9.4 2.2A5.2 5.2 0 1 0 13 11a4 4 0 1 1 -3.6 -8.8 Z" fill="var(--wali-gold,#c9a24a)" />
+                                        <path d="M13.6 3 L14.3 4.6 L16 5 L14.3 5.4 L13.6 7 L12.9 5.4 L11.2 5 L12.9 4.6 Z" fill="var(--wali-gold,#c9a24a)" />
                                     </svg>
                                     Portal Wali
                                 </p>

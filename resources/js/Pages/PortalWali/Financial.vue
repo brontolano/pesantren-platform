@@ -1,215 +1,201 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
-import {
-    UiCard,
-    SectionCard,
-    ListRow,
-    StatusBadge,
-    MoneyText,
-    UiButton,
-    EmptyState,
-    StatCard,
-    IconCircle,
-} from '@/Components/Ui'
+import UiIcon from '@/Components/Ui/UiIcon.vue'
 
 defineOptions({
     layout: PortalWaliLayout,
 })
 
-defineProps({
-    child: {
-        type: Object,
-        required: true,
-    },
-    bills: {
-        type: Array,
-        default: () => [],
-    },
-    payments: {
-        type: Array,
-        default: () => [],
-    },
-    savings: {
-        type: Object,
-        required: true,
-    },
-    summary: {
-        type: Object,
-        required: true,
-    },
+const props = defineProps({
+    child: { type: Object, required: true },
+    bills: { type: Array, default: () => [] },
+    payments: { type: Array, default: () => [] },
+    savings: { type: Object, required: true },
+    summary: { type: Object, required: true },
 })
+
+const activeTab = ref('tagihan')
+
+const currency = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0,
+})
+
+function fmt(v) {
+    return currency.format(v || 0)
+}
+
+const unpaidBills = computed(() => props.bills.filter(b => b.status !== 'lunas'))
+const paidBills = computed(() => props.bills.filter(b => b.status === 'lunas'))
+
+function statusBadge(status) {
+    if (status === 'lunas') return { label: 'Lunas', bg: 'bg-emerald-50', text: 'text-emerald-700', iconBg: 'bg-emerald-50', iconText: 'text-emerald-700' }
+    if (status === 'sebagian') return { label: 'Dibayar sebagian', bg: 'bg-amber-50', text: 'text-amber-700', iconBg: 'bg-amber-50', iconText: 'text-amber-700' }
+    return { label: 'Belum dibayar', bg: 'bg-rose-50', text: 'text-rose-700', iconBg: 'bg-rose-50', iconText: 'text-rose-700' }
+}
 </script>
 
 <template>
-    <div class="space-y-5">
+    <div class="space-y-4">
         <Head>
-            <title>Keuangan Santri</title>
+            <title>Keuangan · {{ child.nama }}</title>
         </Head>
 
-        <UiCard variant="hero-dark" padding="lg">
-            <div class="flex items-start gap-3.5">
-                <IconCircle icon="user" variant="glass" size="lg" />
+        <!-- Tab pills -->
+        <div class="flex gap-2">
+            <button
+                v-for="tab in ['tagihan', 'tabungan', 'riwayat']"
+                :key="tab"
+                class="rounded-full px-4 py-2 font-jost text-[13px] font-semibold transition"
+                :class="activeTab === tab
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-white text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]'"
+                @click="activeTab = tab"
+            >
+                {{ tab === 'tagihan' ? 'Tagihan' : tab === 'tabungan' ? 'Tabungan' : 'Riwayat' }}
+            </button>
+        </div>
+
+        <!-- ==================== TAB: TAGIHAN ==================== -->
+        <template v-if="activeTab === 'tagihan'">
+            <!-- Total tunggakan -->
+            <div class="flex items-center justify-between rounded-[22px] bg-[#f6f0e6] px-5 py-[15px] shadow-[inset_0_0_0_1px_#efe7da]">
+                <div>
+                    <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Total Tunggakan</p>
+                    <p class="mt-[3px] font-jost text-[23px] font-bold tabular-nums text-[#111]">{{ fmt(summary.totalOutstanding) }}</p>
+                </div>
+                <Link
+                    v-if="unpaidBills.length"
+                    :href="`/wali/santri/${child.id}/tagihan/${unpaidBills[0].id}/bayar`"
+                    class="rounded-full bg-emerald-600 px-[18px] py-2.5 font-jost text-[13px] font-semibold text-white shadow-[0_8px_20px_-12px_rgba(5,150,105,0.45)]"
+                >
+                    Bayar semua
+                </Link>
+            </div>
+
+            <!-- Bill list -->
+            <div class="space-y-[11px]">
+                <Link
+                    v-for="bill in bills"
+                    :key="bill.id"
+                    :href="bill.status !== 'lunas' ? `/wali/santri/${child.id}/tagihan/${bill.id}/bayar` : '#'"
+                    class="flex items-center gap-[13px] rounded-[22px] bg-white px-[17px] py-[15px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)] transition active:scale-[.99]"
+                    :class="bill.status === 'lunas' ? 'opacity-75' : ''"
+                >
+                    <span
+                        class="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[14px]"
+                        :class="[statusBadge(bill.status).iconBg, statusBadge(bill.status).iconText]"
+                    >
+                        <UiIcon :name="bill.status === 'lunas' ? 'check-circle' : bill.status === 'sebagian' ? 'clock' : 'receipt'" class="h-5 w-5" />
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-bold text-slate-800">{{ bill.jenisTagihan }}</p>
+                        <p class="mt-0.5 text-xs text-slate-500">
+                            {{ bill.status === 'lunas' ? `Dibayar ${bill.tanggalLunas || '-'}` : `Jatuh tempo ${bill.jatuhTempo || '-'}` }}
+                        </p>
+                        <span
+                            class="mt-1.5 inline-flex rounded-full px-2.5 py-[3px] font-jost text-[10.5px] font-semibold"
+                            :class="[statusBadge(bill.status).bg, statusBadge(bill.status).text]"
+                        >
+                            {{ statusBadge(bill.status).label }}
+                        </span>
+                    </div>
+                    <div class="shrink-0 text-right">
+                        <p class="font-jost text-[15.5px] font-bold tabular-nums text-[#111]">{{ fmt(bill.nominalAkhir) }}</p>
+                        <span v-if="bill.status !== 'lunas'" class="mt-1 flex justify-end text-slate-400">
+                            <UiIcon name="chevron-right" class="h-[15px] w-[15px]" />
+                        </span>
+                    </div>
+                </Link>
+            </div>
+
+            <!-- Empty state -->
+            <div v-if="!bills.length" class="rounded-[22px] bg-white px-5 py-6 text-center shadow-[inset_0_0_0_1px_#efe7da]">
+                <UiIcon name="check-circle" class="mx-auto h-8 w-8 text-emerald-500" />
+                <p class="mt-2 text-sm font-semibold text-slate-700">Tidak ada tagihan</p>
+                <p class="mt-1 text-xs text-slate-500">Semua tagihan anak sudah lunas.</p>
+            </div>
+
+            <!-- Tabungan card (bottom, always visible in tagihan tab) -->
+            <Link
+                :href="`/wali/santri/${child.id}/tabungan`"
+                class="flex items-center gap-[13px] rounded-[22px] bg-gradient-to-br from-emerald-600 to-emerald-800 px-[18px] py-[15px] text-white shadow-[0_16px_44px_-24px_rgba(17,17,17,0.4)] transition active:scale-[.99]"
+            >
+                <span class="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[14px] bg-white/16 ring-1 ring-inset ring-white/25">
+                    <UiIcon name="wallet" class="h-5 w-5" />
+                </span>
                 <div class="min-w-0 flex-1">
-                    <p class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-white/70">
-                        <span class="h-1.5 w-1.5 rounded-full bg-white/80" />
-                        Keuangan
-                    </p>
-                    <h2 class="mt-1.5 truncate text-2xl font-extrabold leading-tight tracking-tight">
-                        {{ child.nama }}
-                    </h2>
-                    <p class="mt-0.5 truncate text-sm text-white/75">
-                        {{ child.kelas || 'Belum ada kelas' }}
-                    </p>
+                    <p class="font-jost text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#e7d3a1]">Tabungan {{ child.nama }}</p>
+                    <p class="mt-0.5 font-jost text-lg font-bold tabular-nums">{{ fmt(savings.saldo) }}</p>
+                </div>
+                <span class="shrink-0 rounded-full bg-white px-4 py-2 font-jost text-[12.5px] font-semibold text-emerald-700">
+                    Setor saldo
+                </span>
+            </Link>
+        </template>
+
+        <!-- ==================== TAB: TABUNGAN ==================== -->
+        <template v-if="activeTab === 'tabungan'">
+            <div class="rounded-[22px] bg-gradient-to-br from-emerald-600 to-emerald-800 px-5 py-5 text-white">
+                <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.14em] text-[#e7d3a1]">Saldo Tabungan</p>
+                <p class="mt-1 font-jost text-3xl font-bold tabular-nums">{{ fmt(savings.saldo) }}</p>
+                <div class="mt-4 flex gap-2">
+                    <Link
+                        :href="`/wali/santri/${child.id}/topup`"
+                        class="rounded-full bg-white px-5 py-2.5 font-jost text-[13px] font-semibold text-emerald-700"
+                    >
+                        Setor Saldo
+                    </Link>
                 </div>
             </div>
 
-            <div class="mt-5 rounded-2xl bg-white/10 px-4 py-4 ring-1 ring-inset ring-white/15">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-white/70">
-                    Total kewajiban
-                </p>
-                <MoneyText
-                    :amount="summary.totalOutstanding"
-                    size="xl"
-                    tone="inherit"
-                    class="mt-1.5 block text-white"
-                />
-            </div>
-        </UiCard>
-
-        <section id="tabungan" class="grid scroll-mt-36 grid-cols-2 gap-3">
-            <StatCard label="Outstanding" icon="receipt" tone="rose" hint="Belum terbayar">
-                <template #value>
-                    <MoneyText :amount="summary.totalOutstanding" size="lg" tone="rose" />
-                </template>
-            </StatCard>
-            <StatCard label="Saldo Tabungan" icon="wallet" tone="emerald" hint="Siap dipakai">
-                <template #value>
-                    <MoneyText :amount="savings.saldo" size="lg" tone="emerald" />
-                </template>
-            </StatCard>
-        </section>
-
-        <SectionCard
-            id="tagihan"
-            class="scroll-mt-36"
-            kicker="Tagihan"
-            title="Laporan Tagihan"
-        >
-            <div v-if="bills.length" class="space-y-3">
-                <UiCard
-                    v-for="bill in bills"
-                    :key="bill.id"
-                    padding="sm"
-                >
-                    <div class="flex items-start justify-between gap-3">
-                        <div class="flex min-w-0 items-start gap-3">
-                            <IconCircle icon="receipt" tone="slate" size="md" />
-                            <div class="min-w-0">
-                                <h4 class="text-[15px] font-bold tracking-tight text-slate-900">
-                                    {{ bill.jenisTagihan }}
-                                </h4>
-                                <p class="mt-0.5 text-sm text-slate-500">
-                                    {{ bill.keterangan || '-' }}
-                                </p>
-                            </div>
+            <div v-if="savings.mutasi?.length" class="rounded-[22px] bg-white shadow-[inset_0_0_0_1px_#efe7da]">
+                <div class="px-[18px] pt-4 pb-2">
+                    <h3 class="font-jost text-sm font-semibold text-slate-800">Mutasi Terakhir</h3>
+                </div>
+                <div class="divide-y divide-[#f6f0e6] px-[18px]">
+                    <div v-for="(m, i) in savings.mutasi.slice(0, 10)" :key="i" class="flex items-center justify-between py-3">
+                        <div>
+                            <p class="text-[13px] font-semibold text-slate-800">{{ m.keterangan }}</p>
+                            <p class="text-xs text-slate-500">{{ m.tanggal }}</p>
                         </div>
-                        <div class="shrink-0 text-right">
-                            <StatusBadge :status="bill.status" size="sm" />
-                            <MoneyText
-                                :amount="bill.nominalAkhir"
-                                size="md"
-                                class="mt-1.5 block"
-                            />
-                        </div>
+                        <p class="font-jost text-sm font-bold tabular-nums" :class="m.tipe === 'kredit' ? 'text-emerald-700' : 'text-rose-600'">
+                            {{ m.tipe === 'kredit' ? '+' : '-' }}{{ fmt(m.nominal) }}
+                        </p>
                     </div>
+                </div>
+            </div>
 
-                    <dl class="mt-3 grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
-                        <div>
-                            <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                Sisa
-                            </dt>
-                            <dd class="mt-0.5">
-                                <MoneyText :amount="bill.sisaTagihan" size="sm" tone="rose" />
-                            </dd>
-                        </div>
-                        <div>
-                            <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                Dibayar
-                            </dt>
-                            <dd class="mt-0.5">
-                                <MoneyText :amount="bill.totalDibayar" size="sm" tone="emerald" />
-                            </dd>
-                        </div>
-                        <div>
-                            <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                Jatuh tempo
-                            </dt>
-                            <dd class="mt-0.5 text-sm font-bold tabular-nums text-slate-700">
-                                {{ bill.jatuhTempo || '-' }}
-                            </dd>
-                        </div>
-                    </dl>
+            <div v-else class="rounded-[22px] bg-white px-5 py-6 text-center shadow-[inset_0_0_0_1px_#efe7da]">
+                <p class="text-sm text-slate-500">Belum ada mutasi tabungan</p>
+            </div>
+        </template>
 
-                    <div v-if="bill.status !== 'lunas'" class="mt-4 flex gap-2">
-                        <UiButton
-                            variant="primary"
-                            as="link"
-                            :href="`/wali/santri/${child.id}/tagihan/${bill.id}/bayar`"
-                            block
-                            icon-left="card"
-                        >
-                            Bayar
-                        </UiButton>
-                        <UiButton
-                            variant="secondary"
-                            as="link"
-                            :href="`/wali/santri/${child.id}/tabungan`"
-                            block
-                            icon-left="wallet"
-                        >
-                            Dari Saldo
-                        </UiButton>
+        <!-- ==================== TAB: RIWAYAT ==================== -->
+        <template v-if="activeTab === 'riwayat'">
+            <div v-if="payments.length" class="rounded-[22px] bg-white shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
+                <div class="divide-y divide-[#f6f0e6] px-[18px]">
+                    <div v-for="payment in payments" :key="payment.id" class="flex items-center gap-[13px] py-3">
+                        <span class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[13px] bg-emerald-50 text-emerald-700">
+                            <UiIcon name="check-circle" class="h-[19px] w-[19px]" />
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-[13.5px] font-semibold text-slate-800">{{ payment.tagihan || 'Pembayaran' }}</p>
+                            <p class="text-xs text-slate-500">{{ payment.tanggalPembayaran || '-' }} · {{ payment.metode || '-' }}</p>
+                        </div>
+                        <p class="shrink-0 font-jost text-sm font-bold tabular-nums text-emerald-700">{{ fmt(payment.nominal) }}</p>
                     </div>
-                </UiCard>
+                </div>
             </div>
 
-            <EmptyState
-                v-else
-                tone="emerald"
-                icon="check-circle"
-                title="Tidak ada tagihan"
-                message="Semua tagihan anak Anda sudah lunas."
-            />
-        </SectionCard>
-
-        <SectionCard
-            kicker="Pembayaran"
-            title="Riwayat Pembayaran"
-            flush
-        >
-            <div v-if="payments.length" class="divide-y divide-slate-100">
-                <ListRow
-                    v-for="payment in payments"
-                    :key="payment.id"
-                    :title="payment.tagihan || 'Pembayaran'"
-                    :subtitle="`${payment.tanggalPembayaran || '-'} · ${payment.metode || '-'}`"
-                >
-                    <template #leading>
-                        <IconCircle icon="check-circle" tone="emerald" size="md" />
-                    </template>
-                    <template #trailing>
-                        <MoneyText :amount="payment.nominal" tone="emerald" size="md" />
-                    </template>
-                </ListRow>
+            <div v-else class="rounded-[22px] bg-white px-5 py-6 text-center shadow-[inset_0_0_0_1px_#efe7da]">
+                <UiIcon name="receipt" class="mx-auto h-8 w-8 text-slate-400" />
+                <p class="mt-2 text-sm font-semibold text-slate-700">Belum ada riwayat</p>
+                <p class="mt-1 text-xs text-slate-500">Riwayat pembayaran akan tampil di sini.</p>
             </div>
-
-            <EmptyState
-                v-else
-                icon="receipt"
-                title="Belum ada pembayaran"
-                message="Riwayat pembayaran untuk anak ini akan tampil di sini."
-            />
-        </SectionCard>
+        </template>
     </div>
 </template>
