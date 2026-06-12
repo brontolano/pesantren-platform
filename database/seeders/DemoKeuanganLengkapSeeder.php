@@ -33,6 +33,7 @@ class DemoKeuanganLengkapSeeder extends Seeder
         $this->setorKeliling();
         $this->jurnalSebulan();
         $this->tagihanBulanIni();
+        $this->riwayatApproval();
 
         $this->command?->info('Keuangan lengkap selesai.');
     }
@@ -480,6 +481,63 @@ class DemoKeuanganLengkapSeeder extends Seeder
             } else {
                 $this->buatJurnal($tanggal, $t['desk'], $beban->id, $kas->id, $t['n'], 'demo-juni-' . $i);
             }
+        }
+    }
+
+    /** Riwayat approval yang sudah diputus agar tab Disetujui/Ditolak berisi. */
+    private function riwayatApproval(): void
+    {
+        if (DB::table('approval_request')->whereIn('status', ['disetujui', 'ditolak'])->exists()) {
+            return;
+        }
+
+        $adminId = DB::table('users')->orderBy('id')->value('id');
+        $bendaharaId = DB::table('users')->orderBy('id')->skip(1)->value('id') ?? $adminId;
+        $beban = DB::table('akun')->where('kode', 'like', '5%')->where('is_postable', true)->first();
+        $kas = $this->akunKas();
+
+        $riwayat = [
+            ['uraian' => 'Pembelian karpet masjid 12 roll', 'total' => 6500000, 'status' => 'disetujui', 'hari' => 6, 'alasan' => null],
+            ['uraian' => 'Servis AC kantor & ruang tamu', 'total' => 950000, 'status' => 'disetujui', 'hari' => 4, 'alasan' => null],
+            ['uraian' => 'Pengadaan proyektor aula baru', 'total' => 8900000, 'status' => 'ditolak', 'hari' => 3, 'alasan' => 'Tunda hingga semester depan, anggaran sarpras sudah menipis'],
+        ];
+
+        foreach ($riwayat as $i => $r) {
+            $belanjaId = DB::table('belanja')->insertGetId([
+                'tenant_id' => $this->tid,
+                'client_ref' => 'demo-belanja-riwayat-' . $i,
+                'tanggal' => now()->subDays($r['hari'])->toDateString(),
+                'uraian' => $r['uraian'],
+                'jenis' => 'barang',
+                'dpp' => $r['total'],
+                'vendor_npwp' => false,
+                'ppn_dipungut' => 0,
+                'pph_dipungut' => 0,
+                'total' => $r['total'],
+                'akun_beban_id' => $beban?->id,
+                'akun_kas_id' => $kas?->id,
+                'status_approval' => $r['status'],
+                'created_by' => $bendaharaId,
+                'approved_by' => $r['status'] === 'disetujui' ? $adminId : null,
+                'approved_at' => $r['status'] === 'disetujui' ? now()->subDays($r['hari'] - 1) : null,
+                'created_at' => now()->subDays($r['hari']),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('approval_request')->insert([
+                'tenant_id' => $this->tid,
+                'approvable_type' => 'Modules\\Pengadaan\\Models\\Belanja',
+                'approvable_id' => $belanjaId,
+                'status' => $r['status'],
+                'current_step' => 1,
+                'approver_role' => 'kepala_keuangan',
+                'diminta_oleh' => $bendaharaId,
+                'diputus_oleh' => $adminId,
+                'diputus_pada' => now()->subDays($r['hari'] - 1),
+                'alasan' => $r['alasan'],
+                'created_at' => now()->subDays($r['hari']),
+                'updated_at' => now(),
+            ]);
         }
     }
 

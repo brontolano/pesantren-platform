@@ -120,7 +120,7 @@ class KepalaKeuanganApiController extends Controller
 
     public function tagihan(Request $request): JsonResponse
     {
-        $query = Tagihan::with('santri:id,nama_lengkap,nis')
+        $query = Tagihan::with('santri:id,nama,nis')
             ->orderByDesc('created_at');
 
         if ($request->filled('status')) {
@@ -134,7 +134,7 @@ class KepalaKeuanganApiController extends Controller
 
     public function pembayaranPending(): JsonResponse
     {
-        $pending = Pembayaran::with('tagihan.santri:id,nama_lengkap,nis', 'creator:id,name')
+        $pending = Pembayaran::with('tagihan.santri:id,nama,nis', 'creator:id,name')
             ->where('is_verified', false)
             ->whereNull('alasan_penolakan')
             ->orderByDesc('created_at')
@@ -170,7 +170,7 @@ class KepalaKeuanganApiController extends Controller
         $totalSaldo = Tabungan::sum('saldo');
         $jumlahRekening = Tabungan::count();
 
-        $mutasiTerakhir = TabunganTransaksi::with('tabungan.santri:id,nama_lengkap,nis')
+        $mutasiTerakhir = TabunganTransaksi::with('tabungan.santri:id,nama,nis')
             ->orderByDesc('created_at')
             ->limit(10)
             ->get();
@@ -187,6 +187,7 @@ class KepalaKeuanganApiController extends Controller
     public function jurnal(Request $request): JsonResponse
     {
         $query = Jurnal::with('baris.akun:id,kode,nama')
+            ->withSum('baris as total_debit', 'debit')
             ->where('status', 'posted')
             ->orderByDesc('tanggal')
             ->orderByDesc('id');
