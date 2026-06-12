@@ -29,8 +29,8 @@ class KepalaKeuanganDemoSeeder extends Seeder
         PeriodeAkuntansi::firstOrCreate(
             ['nama' => 'Juni 2026'],
             [
-                'mulai' => '2026-06-01',
-                'selesai' => '2026-06-30',
+                'tgl_mulai' => '2026-06-01',
+                'tgl_selesai' => '2026-06-30',
                 'status' => 'open',
             ]
         );
