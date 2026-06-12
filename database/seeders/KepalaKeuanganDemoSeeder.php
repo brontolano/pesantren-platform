@@ -115,39 +115,26 @@ class KepalaKeuanganDemoSeeder extends Seeder
             return;
         }
 
-        $divisiIds = DB::table('divisi')->pluck('id')->toArray();
-        if (empty($divisiIds)) {
-            DB::table('divisi')->insert([
-                ['nama' => 'Pendidikan', 'tenant_id' => null, 'created_at' => now(), 'updated_at' => now()],
-                ['nama' => 'Sarana & Prasarana', 'tenant_id' => null, 'created_at' => now(), 'updated_at' => now()],
-                ['nama' => 'Kesantrian', 'tenant_id' => null, 'created_at' => now(), 'updated_at' => now()],
-                ['nama' => 'Humas & Dakwah', 'tenant_id' => null, 'created_at' => now(), 'updated_at' => now()],
-            ]);
-            $divisiIds = DB::table('divisi')->pluck('id')->toArray();
-        }
-
         $anggaranData = [
-            ['divisi' => 0, 'nominal' => 35000000, 'ket' => 'Anggaran operasional pendidikan'],
-            ['divisi' => 1, 'nominal' => 25000000, 'ket' => 'Pemeliharaan gedung & inventaris'],
-            ['divisi' => 2, 'nominal' => 15000000, 'ket' => 'Kegiatan santri & ekstrakurikuler'],
-            ['divisi' => 3, 'nominal' => 10000000, 'ket' => 'Dakwah, humas & publikasi'],
+            ['nominal' => 35000000, 'ket' => 'Anggaran operasional pendidikan'],
+            ['nominal' => 25000000, 'ket' => 'Pemeliharaan gedung & inventaris'],
+            ['nominal' => 15000000, 'ket' => 'Kegiatan santri & ekstrakurikuler'],
+            ['nominal' => 10000000, 'ket' => 'Dakwah, humas & publikasi'],
         ];
 
-        foreach ($anggaranData as $i => $a) {
-            if (isset($divisiIds[$a['divisi']])) {
-                DB::table('anggaran')->insert([
-                    'tenant_id' => null,
-                    'tahun_anggaran' => '2026',
-                    'akun_id' => $bebanAkun->id,
-                    'divisi_id' => $divisiIds[$a['divisi']],
-                    'sumber_dana_id' => null,
-                    'nominal_anggaran' => $a['nominal'],
-                    'mode' => 'tahunan',
-                    'keterangan' => $a['ket'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+        foreach ($anggaranData as $a) {
+            DB::table('anggaran')->insert([
+                'tenant_id' => null,
+                'tahun_anggaran' => '2026',
+                'akun_id' => $bebanAkun->id,
+                'divisi_id' => null,
+                'sumber_dana_id' => null,
+                'nominal_anggaran' => $a['nominal'],
+                'mode' => 'tahunan',
+                'keterangan' => $a['ket'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 
