@@ -69,6 +69,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->pages([
                 Dashboard::class,
+                \App\Filament\Pages\InstalasiTenant::class,
                 \App\Filament\Pages\KalkulatorLangganan::class,
                 \App\Filament\Pages\AktivasiModulTenant::class,
                 \App\Filament\Pages\KelolaKuotaPenyimpanan::class,
