@@ -122,6 +122,8 @@ class LedgerSeeder extends Seeder
             ['1-1100', 'Bank', 'ASET', '1-0000', true, true, null, false],
             ['1-1200', 'Piutang Syahriyah (SPP)', 'ASET', '1-0000', false, true, null, false],
             ['1-1300', 'Persediaan', 'ASET', '1-0000', false, true, null, false],
+            // WP-23: piutang kasbon pegawai — TERPISAH dari 1-1200 (piutang santri).
+            ['1-1400', 'Piutang Pegawai (Kasbon)', 'ASET', '1-0000', false, true, null, false],
             ['1-2000', 'Aset Tetap', 'ASET', '1-0000', false, false, null, false],
             ['1-2100', 'Tanah', 'ASET', '1-2000', false, true, null, false],
             ['1-2200', 'Bangunan', 'ASET', '1-2000', false, true, null, false],

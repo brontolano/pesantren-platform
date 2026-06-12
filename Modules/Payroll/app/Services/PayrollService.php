@@ -15,6 +15,7 @@ use Modules\Pajak\Services\PajakPenghasilanService;
 use Modules\Payroll\Events\SlipGajiFinal;
 use Modules\Payroll\Models\Cuti;
 use Modules\Payroll\Models\Employee;
+use Modules\Payroll\Models\PinjamanPegawai;
 use Modules\Payroll\Models\SlipGaji;
 use RuntimeException;
 
@@ -87,10 +88,19 @@ class PayrollService
             throw new InvalidArgumentException('Potongan (PPh21 + BPJS + cuti) melebihi bruto — neto tidak boleh negatif.');
         }
 
+        // WP-23: cicilan kasbon — 0 bila tak ada pinjaman berjalan (math existing
+        // tak berubah satu rupiah pun). DIKAPS agar neto tak pernah negatif:
+        // bila cicilan > sisa neto bulan ini, hanya sebesar sisa neto yang
+        // dipotong; kekurangannya TERTUNDA otomatis ke bulan berikut (sisa_pokok
+        // hanya berkurang sebesar yang benar-benar dipotong saat slip final).
+        $potonganKasbon = $this->hitungPotonganKasbon($slip, $employee, $neto);
+        $neto = round($neto - $potonganKasbon, 2);
+
         $slip->update([
             'pph21_dipotong' => $pph21,
             'bpjs_dipotong' => $bpjs,
             'potongan_cuti' => $potonganCuti,
+            'potongan_kasbon' => $potonganKasbon,
             'neto' => $neto,
         ]);
 
@@ -165,6 +175,47 @@ class PayrollService
 
         // DECIMAL math, pembulatan SEKALI: half-up ke rupiah utuh.
         return round($hariTakBerbayar * (float) $slip->honor_pokok / $pembagi, 0, PHP_ROUND_HALF_UP);
+    }
+
+    /**
+     * WP-23 — Total cicilan kasbon bulan ini utk slip:
+     * Σ min(cicilan_bulanan, sisa_pokok) atas pinjaman BERJALAN milik employee,
+     * dikaps $cap (sisa neto setelah PPh21/BPJS/cuti) agar neto >= 0.
+     * - min(cicilan, sisa_pokok) = cicilan terakhir otomatis sebesar sisa
+     *   (total cicilan = pokok PERSIS, tanpa selisih pembulatan).
+     * - Hanya slip bulanan YYYY-MM (THR dkk tidak memotong cicilan).
+     * - Urutan FIFO (id ASC) — deterministik antara hitung & aplikasi final.
+     */
+    public function hitungPotonganKasbon(SlipGaji $slip, Employee $employee, float $cap, bool $lock = false): float
+    {
+        if (! preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', trim((string) $slip->periode))) {
+            return 0.0; // bukan slip bulanan — kasbon hanya dicicil dari gaji bulanan.
+        }
+        if ($cap <= 0) {
+            return 0.0;
+        }
+
+        $query = PinjamanPegawai::query()
+            ->where('employee_id', $employee->id)
+            ->where('status', 'berjalan')
+            ->orderBy('id');
+        if ($lock) {
+            $query->lockForUpdate();
+        }
+
+        $total = 0.0;
+        $sisaCap = round($cap, 2);
+        foreach ($query->get() as $pinjaman) {
+            if ($sisaCap <= 0) {
+                break;
+            }
+            $ambil = min((float) $pinjaman->cicilan_bulanan, (float) $pinjaman->sisa_pokok, $sisaCap);
+            $ambil = round($ambil, 2);
+            $total = round($total + $ambil, 2);
+            $sisaCap = round($sisaCap - $ambil, 2);
+        }
+
+        return $total;
     }
 
     /** WP-14 — pembagi hari kerja periode dari kebijakan tenant. */
@@ -268,10 +319,25 @@ class PayrollService
             $employee = Employee::where('users_id', $slip->users_id)->first();
             if ($employee !== null) {
                 $potonganTerkini = $this->hitungPotonganCuti($slip, $employee);
-                if (round($potonganTerkini) !== round((float) $slip->potongan_cuti)) {
+                if (round($potonganTerkini, 2) !== round((float) $slip->potongan_cuti, 2)) {
                     throw new RuntimeException(
-                        'Potongan cuti slip basi (tersimpan '.round((float) $slip->potongan_cuti)
-                        .', terkini '.round($potonganTerkini)
+                        'Potongan cuti slip basi (tersimpan '.round((float) $slip->potongan_cuti, 2)
+                        .', terkini '.round($potonganTerkini, 2)
+                        .') — jalankan Terapkan Potongan ulang sebelum finalisasi.',
+                    );
+                }
+
+                // WP-23 (TOCTOU + lock): kunci pinjaman berjalan lalu hitung ulang
+                // cicilan dgn cap yang sama persis spt terapkanPotongan; sisa_pokok
+                // yang berubah sejak draft (slip lain final / pelunasan dipercepat)
+                // membuat angka tersimpan basi → tolak, jangan posting uang salah.
+                $capKasbon = round((float) $slip->bruto - (float) $slip->pph21_dipotong
+                    - (float) $slip->bpjs_dipotong - (float) $slip->potongan_cuti, 2);
+                $kasbonTerkini = $this->hitungPotonganKasbon($slip, $employee, $capKasbon, lock: true);
+                if (round($kasbonTerkini, 2) !== round((float) $slip->potongan_kasbon, 2)) {
+                    throw new RuntimeException(
+                        'Potongan kasbon slip basi (tersimpan '.round((float) $slip->potongan_kasbon, 2)
+                        .', terkini '.round($kasbonTerkini, 2)
                         .') — jalankan Terapkan Potongan ulang sebelum finalisasi.',
                     );
                 }
@@ -293,7 +359,19 @@ class PayrollService
             if ((float) $slip->potongan_cuti > 0) {
                 $baris[] = ['akun_id' => $bebanGaji->id, 'debit' => 0, 'kredit' => (float) $slip->potongan_cuti, 'memo' => 'Potongan cuti tak berbayar'];
             }
-            $baris[] = ['akun_id' => $kas->id, 'debit' => 0, 'kredit' => (float) $slip->neto, 'memo' => 'Pembayaran gaji neto'];
+            // WP-23: cicilan kasbon = pengurang Piutang Pegawai (1-1400) — baris
+            // ADDITIF (hanya bila > 0) agar jurnal slip tanpa kasbon identik.
+            // D bruto = K pph + bpjs + cuti + kasbon + neto tetap seimbang.
+            if ((float) $slip->potongan_kasbon > 0) {
+                $piutangPegawai = app(KasbonService::class)->akunPiutangPegawai();
+                $baris[] = ['akun_id' => $piutangPegawai->id, 'debit' => 0, 'kredit' => (float) $slip->potongan_kasbon, 'memo' => 'Cicilan kasbon pegawai'];
+            }
+            // WP-23: neto bisa 0 (cicilan kasbon dikaps tepat sebesar sisa neto) —
+            // baris 0/0 ditolak JurnalService; lewati baris kas bila neto 0
+            // (jurnal tetap seimbang: D bruto = K potongan-potongan).
+            if ((float) $slip->neto > 0) {
+                $baris[] = ['akun_id' => $kas->id, 'debit' => 0, 'kredit' => (float) $slip->neto, 'memo' => 'Pembayaran gaji neto'];
+            }
 
             $jurnal = $this->jurnalService->postJurnal([
                 'tanggal' => now(),
@@ -304,6 +382,30 @@ class PayrollService
                 'dibuat_oleh' => $dibuatOleh,
                 'baris' => $baris,
             ]);
+
+            // WP-23: kurangi sisa_pokok HANYA di sini (slip FINAL, dalam transaksi
+            // yang sama dgn posting jurnal + perubahan status). Finalize 2× tak
+            // mengurangi 2×: panggilan kedua berhenti di guard status final di atas.
+            // Baris pinjaman sudah ter-lock oleh hitungPotonganKasbon(lock: true).
+            if ($employee !== null && (float) $slip->potongan_kasbon > 0) {
+                $sisaPotongan = round((float) $slip->potongan_kasbon, 2);
+                $daftarPinjaman = PinjamanPegawai::query()
+                    ->where('employee_id', $employee->id)
+                    ->where('status', 'berjalan')
+                    ->orderBy('id')->get(); // FIFO — urutan sama dgn hitungPotonganKasbon.
+                foreach ($daftarPinjaman as $pinjaman) {
+                    if ($sisaPotongan <= 0) {
+                        break;
+                    }
+                    $ambil = round(min((float) $pinjaman->cicilan_bulanan, (float) $pinjaman->sisa_pokok, $sisaPotongan), 2);
+                    $sisaBaru = round((float) $pinjaman->sisa_pokok - $ambil, 2);
+                    $pinjaman->update([
+                        'sisa_pokok' => $sisaBaru,
+                        'status' => $sisaBaru <= 0.0 ? 'lunas' : 'berjalan', // lunas otomatis saat sisa 0.
+                    ]);
+                    $sisaPotongan = round($sisaPotongan - $ambil, 2);
+                }
+            }
 
             $slip->update(['status' => 'final', 'jurnal_id' => $jurnal->id]);
             SlipGajiFinal::dispatch($slip->fresh());
