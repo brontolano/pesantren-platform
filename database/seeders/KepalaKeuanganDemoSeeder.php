@@ -130,7 +130,7 @@ class KepalaKeuanganDemoSeeder extends Seeder
                 'divisi_id' => null,
                 'sumber_dana_id' => null,
                 'nominal_anggaran' => $a['nominal'],
-                'mode' => 'tahunan',
+                'mode' => 'peringatan',
                 'keterangan' => $a['ket'],
                 'created_at' => now(),
                 'updated_at' => now(),
