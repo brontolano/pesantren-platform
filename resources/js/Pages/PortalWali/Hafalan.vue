@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import UiIcon from '@/Components/Ui/UiIcon.vue'
 
 defineOptions({ layout: PortalWaliLayout })
 
@@ -10,77 +11,97 @@ const props = defineProps({
     ringkasan: { type: Object, default: () => ({}) },
 })
 
-const statusColor = (status) => ({
-    'selesai':      'bg-emerald-50 text-emerald-700',
-    'berjalan':     'bg-amber-50 text-amber-700',
-    'ditunda':      'bg-red-50 text-red-700',
-    'direncanakan': 'bg-slate-50 text-slate-600',
-}[status] ?? 'bg-slate-50 text-slate-600')
+function nilaiColor(nilai) {
+    if (!nilai) return 'bg-slate-100 text-slate-600'
+    const v = String(nilai).toLowerCase()
+    if (['mumtaz', 'lancar', 'a'].includes(v)) return 'bg-emerald-50 text-emerald-700'
+    if (['jayyid', 'baik', 'b'].includes(v)) return 'bg-amber-50 text-amber-700'
+    return 'bg-slate-100 text-slate-600'
+}
+
+function jenisIconBg(jenis) {
+    const j = String(jenis || '').toLowerCase()
+    if (j.includes('muraja')) return 'bg-[#f7efdc] text-[#a07c2c]'
+    return 'bg-emerald-50 text-emerald-700'
+}
+
+const formatDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }) : '-'
 </script>
 
 <template>
-    <div class="space-y-5">
-        <Head><title>Hafalan — {{ santri.nama }}</title></Head>
+    <div class="space-y-4">
+        <Head><title>Tahfidz · {{ santri.nama }}</title></Head>
 
-        <!-- Header -->
-        <div class="flex items-center gap-3">
-            <Link href="/wali" class="text-slate-400 hover:text-slate-700">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-            </Link>
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">Tahfidz</p>
-                <h2 class="font-jost text-2xl text-slate-900">Hafalan {{ santri.nama }}</h2>
+        <div>
+            <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a07c2c]">{{ santri.nama }} · {{ santri.halaqah || 'Halaqah' }}</p>
+            <h1 class="mt-1 font-jost text-[26px] font-bold tracking-tight text-[#111]">Tahfidz</h1>
+        </div>
+
+        <!-- Tab pills -->
+        <div class="flex gap-2">
+            <span class="rounded-full bg-emerald-600 px-4 py-2 font-jost text-[13px] font-semibold text-white">Tahfidz</span>
+            <Link :href="`/wali/santri/${santri.id}/akademik`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Rapor</Link>
+            <Link :href="`/wali/santri/${santri.id}/kesehatan`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Kesehatan</Link>
+        </div>
+
+        <!-- Progress card -->
+        <div class="rounded-[26px] bg-gradient-to-br from-[#0b8f63] via-emerald-600 to-emerald-700 p-5 text-white shadow-[0_16px_44px_-24px_rgba(17,17,17,0.4)]">
+            <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e7d3a1]">Hafalan saat ini</p>
+            <p class="mt-[7px] font-jost text-[21px] font-bold">{{ ringkasan.posisiTerakhir || 'Belum ada data' }}</p>
+            <div v-if="ringkasan.persentase" class="mt-[14px]">
+                <div class="h-2 overflow-hidden rounded-full bg-white/[.22]">
+                    <div class="h-full rounded-full bg-[#e7d3a1]" :style="{ width: `${ringkasan.persentase}%` }" />
+                </div>
+                <div class="mt-2 flex items-center justify-between text-xs text-white/[.78]">
+                    <span>{{ ringkasan.selesai ?? 0 }} juz selesai</span>
+                    <span v-if="ringkasan.target">target {{ ringkasan.target }}</span>
+                </div>
             </div>
         </div>
 
-        <!-- Ringkasan -->
-        <div class="grid grid-cols-2 gap-3 rounded-[1.75rem] bg-slate-950 p-5 text-white">
-            <div class="rounded-[1.25rem] bg-white/8 px-4 py-4">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/55">Total Hafalan</p>
-                <p class="mt-2 text-2xl font-semibold">{{ ringkasan.total ?? 0 }}</p>
+        <!-- Stats -->
+        <div class="grid grid-cols-2 gap-[11px]">
+            <div class="rounded-[20px] bg-white px-4 py-[14px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
+                <p class="font-jost text-[21px] font-bold tabular-nums text-emerald-700">{{ ringkasan.ziyadahPekan ?? 0 }} hal</p>
+                <p class="mt-0.5 text-xs text-slate-500">Ziyadah pekan ini</p>
             </div>
-            <div class="rounded-[1.25rem] bg-white/8 px-4 py-4">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/55">Selesai</p>
-                <p class="mt-2 text-2xl font-semibold text-emerald-400">{{ ringkasan.selesai ?? 0 }}</p>
+            <div class="rounded-[20px] bg-white px-4 py-[14px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
+                <p class="font-jost text-[21px] font-bold tabular-nums text-[#a07c2c]">{{ ringkasan.murajaahPekan ?? 0 }} sesi</p>
+                <p class="mt-0.5 text-xs text-slate-500">Muraja'ah pekan ini</p>
             </div>
         </div>
 
-        <!-- Daftar Hafalan -->
-        <section class="space-y-3">
-            <h3 class="font-jost text-xl text-slate-900">Riwayat Hafalan</h3>
+        <!-- Setoran terakhir -->
+        <div class="space-y-[10px]">
+            <h3 class="font-jost text-[15.5px] font-semibold text-[#111]">Setoran terakhir</h3>
 
-            <div v-if="hafalan.length" class="space-y-3">
-                <article
-                    v-for="item in hafalan"
-                    :key="item.id"
-                    class="rounded-[1.75rem] border border-black/5 bg-white px-4 py-4 shadow-[0_8px_24px_-16px_rgba(15,23,42,0.3)]"
+            <div v-if="hafalan.length" class="rounded-[22px] bg-white px-[17px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
+                <div
+                    v-for="(item, i) in hafalan.slice(0, 5)"
+                    :key="item.id || i"
+                    class="flex items-center gap-3 py-3"
+                    :class="i < Math.min(hafalan.length, 5) - 1 ? 'border-b border-[#f6f0e6]' : ''"
                 >
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <p class="font-semibold text-slate-900">{{ item.surah }}</p>
-                            <p class="mt-1 text-sm text-slate-500">
-                                Ayat {{ item.ayat_awal ?? '?' }} – {{ item.ayat_akhir ?? '?' }}
-                            </p>
-                        </div>
-                        <span class="rounded-full px-3 py-1 text-xs font-semibold" :class="statusColor(item.status)">
-                            {{ item.status }}
-                        </span>
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" :class="jenisIconBg(item.jenis || item.penilaian?.[0]?.jenis)">
+                        <UiIcon :name="String(item.jenis || item.penilaian?.[0]?.jenis || '').toLowerCase().includes('muraja') ? 'book' : 'check-circle'" class="h-[18px] w-[18px]" />
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[13px] font-semibold text-slate-800">{{ item.surah }} {{ item.ayat_awal }}–{{ item.ayat_akhir }}</p>
+                        <p class="text-[11.5px] text-slate-500">{{ formatDate(item.tanggal || item.created_at) }} · {{ item.jenis || item.penilaian?.[0]?.jenis || 'ziyadah' }}</p>
                     </div>
-                    <div v-if="item.tanggal_target" class="mt-3 text-sm text-slate-500">
-                        Target: {{ new Date(item.tanggal_target).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) }}
-                    </div>
-                    <div v-if="item.penilaian?.length" class="mt-3 rounded-[1rem] bg-slate-50 px-3 py-3 text-sm text-slate-600">
-                        <p class="font-semibold text-slate-700">Penilaian Terakhir</p>
-                        <p>{{ item.penilaian[0].jenis }} — Nilai: <span class="font-semibold">{{ item.penilaian[0].nilai ?? '-' }}</span></p>
-                    </div>
-                </article>
+                    <span
+                        v-if="item.penilaian?.[0]?.nilai || item.nilai"
+                        class="shrink-0 rounded-full px-[11px] py-1 font-jost text-[10.5px] font-semibold"
+                        :class="nilaiColor(item.penilaian?.[0]?.nilai || item.nilai)"
+                    >
+                        {{ item.penilaian?.[0]?.nilai || item.nilai }}
+                    </span>
+                </div>
             </div>
 
-            <div v-else class="rounded-[1.75rem] bg-slate-50 px-5 py-8 text-center text-sm text-slate-400">
-                Belum ada data hafalan tercatat.
+            <div v-else class="rounded-[22px] bg-white px-5 py-6 text-center shadow-[inset_0_0_0_1px_#efe7da]">
+                <p class="text-sm text-slate-500">Belum ada data hafalan tercatat.</p>
             </div>
-        </section>
+        </div>
     </div>
 </template>

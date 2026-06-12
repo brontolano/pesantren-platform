@@ -23,6 +23,7 @@ class PortalWaliNotificationController extends Controller
                 'id' => $wali->id,
                 'name' => $wali->name,
                 'email' => $wali->email,
+                'phone' => $wali->phone ?? $wali->no_hp ?? null,
             ],
             'children' => $dashboard['children'],
             'navigation' => $this->navigationItems($dashboard['children']),

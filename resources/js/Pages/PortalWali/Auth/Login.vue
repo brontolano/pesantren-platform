@@ -22,39 +22,42 @@ const submit = () => {
     <Head title="Masuk Portal Wali" />
 
     <PortalWaliAuthLayout>
-        <div class="space-y-6">
-            <div class="space-y-1.5">
-                <h2 class="text-2xl font-bold tracking-tight">Masuk Portal Wali</h2>
-                <p class="text-sm leading-relaxed text-stone-600">
-                    Pantau tagihan, tabungan, dan status pembayaran anak dari satu akun wali.
-                </p>
-            </div>
+        <div>
+            <h1 class="font-['Jost',sans-serif] text-[28px] font-bold leading-[1.15] tracking-tight text-[#111]">
+                Selamat datang<br>kembali
+            </h1>
+            <p class="mt-2.5 text-[15px] leading-relaxed text-[#64748b]">
+                Masuk untuk memantau ananda dan mengurus keperluan dengan pesantren.
+            </p>
 
-            <form class="space-y-4" @submit.prevent="submit">
-                <div class="space-y-1.5">
-                    <label for="identifier" class="block text-sm font-medium text-stone-800">
-                        Nomor WhatsApp / email wali
+            <form class="mt-8 space-y-4" @submit.prevent="submit">
+                <div class="space-y-[7px]">
+                    <label for="identifier" class="font-['Jost',sans-serif] text-[13px] font-semibold text-[#1e293b]">
+                        Nomor WhatsApp
                     </label>
-                    <input
-                        id="identifier"
-                        v-model="form.identifier"
-                        type="text"
-                        name="identifier"
-                        autocomplete="username"
-                        required
-                        placeholder="Contoh: 0812xxxx atau email wali"
-                        class="block w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:border-[var(--wali-primary)] focus:ring-2 focus:ring-[var(--wali-primary)]/15"
-                    >
+                    <div class="flex items-center gap-2.5 rounded-[14px] bg-white px-4 py-3.5 shadow-[inset_0_0_0_1px_#efe7da] transition focus-within:shadow-[inset_0_0_0_2px_#059669]">
+                        <svg class="h-5 w-5 shrink-0 text-[#94a3b8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
+                        <input
+                            id="identifier"
+                            v-model="form.identifier"
+                            type="text"
+                            name="identifier"
+                            autocomplete="username"
+                            required
+                            placeholder="0812 3456 7890"
+                            class="w-full border-0 bg-transparent p-0 text-[15px] text-[#111] outline-none placeholder:text-[#94a3b8] focus:ring-0"
+                        >
+                    </div>
                     <p v-if="form.errors.identifier" class="text-sm text-red-600">
                         {{ form.errors.identifier }}
                     </p>
                 </div>
 
-                <div class="space-y-1.5">
-                    <label for="password" class="block text-sm font-medium text-stone-800">
-                        Password
+                <div class="space-y-[7px]">
+                    <label for="password" class="font-['Jost',sans-serif] text-[13px] font-semibold text-[#1e293b]">
+                        Kata sandi
                     </label>
-                    <div class="relative">
+                    <div class="flex items-center justify-between rounded-[14px] bg-white px-4 py-3.5 shadow-[inset_0_0_0_1px_#efe7da] transition focus-within:shadow-[inset_0_0_0_2px_#059669]">
                         <input
                             id="password"
                             v-model="form.password"
@@ -62,52 +65,51 @@ const submit = () => {
                             name="password"
                             autocomplete="current-password"
                             required
-                            placeholder="Password akun wali"
-                            class="block w-full rounded-2xl border border-stone-300 bg-white px-4 py-3 pr-20 text-base shadow-sm outline-none transition focus:border-[var(--wali-primary)] focus:ring-2 focus:ring-[var(--wali-primary)]/15"
+                            placeholder="••••••••"
+                            class="w-full border-0 bg-transparent p-0 text-[15px] text-[#111] outline-none placeholder:text-[#94a3b8] focus:ring-0"
                         >
                         <button
                             type="button"
-                            class="absolute inset-y-0 right-0 px-4 text-sm font-medium text-stone-500"
+                            class="ml-3 shrink-0 font-['Jost',sans-serif] text-xs font-semibold text-emerald-700"
                             @click="showPassword = !showPassword"
                         >
-                            {{ showPassword ? 'Tutup' : 'Lihat' }}
+                            {{ showPassword ? 'Sembunyikan' : 'Tampilkan' }}
                         </button>
                     </div>
+                    <p v-if="form.errors.password" class="text-sm text-red-600">
+                        {{ form.errors.password }}
+                    </p>
                 </div>
 
-                <div class="flex items-center justify-between gap-3">
-                    <label class="flex items-center gap-2 text-sm text-stone-700">
-                        <input
-                            v-model="form.remember"
-                            type="checkbox"
-                            name="remember"
-                            class="h-4 w-4 rounded border-stone-300 text-[var(--wali-primary)] focus:ring-[var(--wali-primary)]"
-                        >
-                        Tetap masuk
-                    </label>
-                    <Link href="/wali/lupa-password" class="text-sm font-medium text-[var(--wali-primary)] underline-offset-2 hover:underline">
-                        Lupa password?
+                <div class="text-right">
+                    <Link href="/wali/lupa-password" class="font-['Jost',sans-serif] text-[13px] font-semibold text-emerald-700">
+                        Lupa kata sandi?
                     </Link>
                 </div>
 
-                <button
-                    type="submit"
-                    :disabled="form.processing"
-                    class="block w-full rounded-2xl bg-[var(--wali-primary)] px-4 py-3.5 text-center text-base font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
-                >
-                    {{ form.processing ? 'Memproses…' : 'Masuk' }}
-                </button>
-            </form>
+                <div class="mt-7 space-y-3.5">
+                    <button
+                        type="submit"
+                        :disabled="form.processing"
+                        class="block w-full rounded-full bg-emerald-600 px-4 py-4 text-center font-['Jost',sans-serif] text-base font-semibold text-white shadow-[0_8px_20px_-12px_rgba(5,150,105,0.45)] transition active:scale-[0.99] disabled:opacity-60"
+                    >
+                        {{ form.processing ? 'Memproses…' : 'Masuk' }}
+                    </button>
 
-            <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-stone-700">
-                <p class="font-semibold text-stone-900">Belum pernah masuk?</p>
-                <p class="mt-1 leading-relaxed">
-                    Aktifkan dulu akun wali dengan kode WhatsApp.
-                    <Link href="/wali/aktivasi" class="font-medium text-[var(--wali-primary)] underline-offset-2 hover:underline">
-                        Aktifkan akun di sini
-                    </Link>.
-                </p>
-            </div>
+                    <div class="flex items-center gap-3.5 text-[#94a3b8]">
+                        <span class="h-px flex-1 bg-[#e7d3a1]" />
+                        <span class="text-xs">akun baru?</span>
+                        <span class="h-px flex-1 bg-[#e7d3a1]" />
+                    </div>
+
+                    <Link
+                        href="/wali/aktivasi"
+                        class="block w-full rounded-full bg-white px-4 py-[15px] text-center font-['Jost',sans-serif] text-[15px] font-semibold text-emerald-700 shadow-[inset_0_0_0_1px_#efe7da] transition active:scale-[0.99]"
+                    >
+                        Aktifkan dengan kode dari pesantren
+                    </Link>
+                </div>
+            </form>
         </div>
     </PortalWaliAuthLayout>
 </template>

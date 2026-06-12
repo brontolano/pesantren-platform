@@ -44,7 +44,6 @@ trait ResolvesPortalWaliContext
         $financialHref = $firstChildId
             ? route('tenant.portal-wali.financial', ['tenant' => $tenantId, 'santri' => $firstChildId])
             : $dashboardHref;
-        $financialSection = request()->query('section', 'tagihan');
 
         return [
             [
@@ -54,32 +53,39 @@ trait ResolvesPortalWaliContext
                 'active' => request()->routeIs('tenant.portal-wali.dashboard'),
             ],
             [
-                'key' => 'tagihan',
-                'label' => 'Tagihan',
+                'key' => 'keuangan',
+                'label' => 'Keuangan',
                 'href' => $firstChildId
                     ? "{$financialHref}&section=tagihan#tagihan"
                     : $dashboardHref,
-                'active' => request()->routeIs('tenant.portal-wali.financial') && $financialSection !== 'tabungan',
+                'active' => request()->routeIs('tenant.portal-wali.financial')
+                    || request()->routeIs('tenant.portal-wali.pembayaran.*')
+                    || request()->routeIs('tenant.portal-wali.tabungan.*'),
             ],
             [
-                'key' => 'pembayaran',
-                'label' => 'Pembayaran',
-                'href' => route('tenant.portal-wali.pembayaran.index', ['tenant' => $tenantId]),
-                'active' => request()->routeIs('tenant.portal-wali.pembayaran.*'),
+                'key' => 'izin',
+                'label' => 'Izin',
+                'href' => route('tenant.portal-wali.izin', ['tenant' => $tenantId]),
+                'active' => request()->routeIs('tenant.portal-wali.izin')
+                    || request()->routeIs('tenant.portal-wali.jenguk.*'),
             ],
             [
-                'key' => 'tabungan',
-                'label' => 'Tabungan',
+                'key' => 'santri',
+                'label' => 'Santri',
                 'href' => $firstChildId
-                    ? route('tenant.portal-wali.tabungan.show', ['tenant' => $tenantId, 'santri' => $firstChildId])
+                    ? "/wali/santri/{$firstChildId}/hafalan"
                     : $dashboardHref,
-                'active' => request()->routeIs('tenant.portal-wali.tabungan.*'),
+                'active' => request()->routeIs('tenant.portal-wali.profile')
+                    || request()->routeIs('tenant.portal-wali.academic')
+                    || request()->routeIs('tenant.portal-wali.hafalan')
+                    || request()->routeIs('tenant.portal-wali.kesehatan'),
             ],
             [
                 'key' => 'akun',
                 'label' => 'Akun',
                 'href' => route('tenant.portal-wali.notifications', ['tenant' => $tenantId]),
-                'active' => request()->routeIs('tenant.portal-wali.izin'),
+                'active' => request()->routeIs('tenant.portal-wali.notifications')
+                    || request()->routeIs('tenant.portal-wali.kegiatan'),
             ],
         ];
     }

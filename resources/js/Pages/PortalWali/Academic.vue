@@ -1,191 +1,104 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import UiIcon from '@/Components/Ui/UiIcon.vue'
 
-defineOptions({
-    layout: PortalWaliLayout,
+defineOptions({ layout: PortalWaliLayout })
+
+const props = defineProps({
+    child: { type: Object, required: true },
+    latestRapor: { type: Object, default: null },
+    raporDiniyah: { type: Object, default: null },
+    grades: { type: Array, default: () => [] },
+    schedule: { type: Array, default: () => [] },
+    attendance: { type: Object, required: true },
 })
 
-defineProps({
-    child: {
-        type: Object,
-        required: true,
-    },
-    latestRapor: {
-        type: Object,
-        default: null,
-    },
-    raporDiniyah: {
-        type: Object,
-        default: null,
-    },
-    grades: {
-        type: Array,
-        default: () => [],
-    },
-    schedule: {
-        type: Array,
-        default: () => [],
-    },
-    attendance: {
-        type: Object,
-        required: true,
-    },
-})
+function barColor(nilai) {
+    if (nilai >= 90) return 'bg-emerald-500'
+    return 'bg-[#c9a24a]'
+}
+
+function scoreColor(nilai) {
+    if (nilai >= 90) return 'text-emerald-700'
+    return 'text-amber-700'
+}
 </script>
 
 <template>
-    <div class="space-y-5">
-        <Head>
-            <title>Akademik Santri</title>
-        </Head>
+    <div class="space-y-4">
+        <Head><title>Rapor · {{ child.nama }}</title></Head>
 
-        <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
-                Akademik
-            </p>
-            <h2 class="mt-3 font-jost text-3xl leading-tight">
-                {{ child.nama }}
-            </h2>
-            <p class="mt-2 text-sm leading-6 text-white/75">
-                {{ child.kelas || 'Belum ada kelas' }}
-            </p>
-        </section>
+        <div>
+            <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.16em] text-[#a07c2c]">{{ child.nama }} · {{ latestRapor?.periode || 'Semester' }}</p>
+            <h1 class="mt-1 font-jost text-[26px] font-bold tracking-tight text-[#111]">Rapor Akademik</h1>
+        </div>
 
-        <section class="grid grid-cols-3 gap-3">
-            <div class="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                    IPK
-                </p>
-                <p class="mt-2 text-2xl font-semibold text-slate-900">
-                    {{ latestRapor?.ipk ?? '-' }}
-                </p>
+        <!-- Tab pills -->
+        <div class="flex gap-2">
+            <Link :href="`/wali/santri/${child.id}/hafalan`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Tahfidz</Link>
+            <span class="rounded-full bg-emerald-600 px-4 py-2 font-jost text-[13px] font-semibold text-white">Rapor</span>
+            <Link :href="`/wali/santri/${child.id}/kesehatan`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Kesehatan</Link>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 gap-[11px]">
+            <div class="rounded-[20px] bg-white px-4 py-[14px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
+                <p class="font-jost text-[24px] font-bold tabular-nums text-emerald-700">{{ latestRapor?.ipk ?? '-' }}</p>
+                <p class="mt-0.5 text-xs text-slate-500">Rata-rata nilai</p>
             </div>
-            <div class="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                    Ranking
-                </p>
-                <p class="mt-2 text-2xl font-semibold text-slate-900">
+            <div class="rounded-[20px] bg-white px-4 py-[14px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
+                <p class="font-jost text-[24px] font-bold tabular-nums text-[#a07c2c]">
                     {{ latestRapor?.rankKelas ?? '-' }}
+                    <span v-if="latestRapor?.jumlahSiswa" class="text-sm font-medium text-slate-400">/ {{ latestRapor.jumlahSiswa }}</span>
                 </p>
+                <p class="mt-0.5 text-xs text-slate-500">Peringkat kelas</p>
             </div>
-            <div class="rounded-[1.5rem] bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">
-                    Izin
-                </p>
-                <p class="mt-2 text-2xl font-semibold text-slate-900">
-                    {{ attendance.totalDisetujui }}
-                </p>
-            </div>
-        </section>
+        </div>
 
-        <section class="rounded-[1.75rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
-            <div class="flex items-center justify-between gap-3">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Rapor terakhir
-                    </p>
-                    <h3 class="mt-1 font-jost text-2xl text-slate-900">
-                        {{ latestRapor?.periode || 'Belum ada rapor' }}
-                    </h3>
-                </div>
-                <Link
-                    v-if="latestRapor"
-                    :href="`/wali/santri/${child.id}/rapor/${latestRapor.id}/download`"
-                    class="rounded-full bg-emerald-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700"
-                >
-                    Download PDF
-                </Link>
-            </div>
-            <p class="mt-3 text-sm text-slate-600">
-                {{ latestRapor?.catatanWaliKelas || 'Catatan wali kelas belum tersedia.' }}
-            </p>
-        </section>
-
-        <!-- WP-10 — Raport Diniyah: unduh/print rapor diniyah anak sendiri. -->
-        <section class="rounded-[1.75rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
-            <div class="flex items-center justify-between gap-3">
-                <div>
-                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                        Raport Diniyah
-                    </p>
-                    <h3 class="mt-1 font-jost text-2xl text-slate-900">
-                        {{ raporDiniyah?.periode || 'Belum ada raport diniyah' }}
-                    </h3>
-                </div>
-                <Link
-                    v-if="raporDiniyah"
-                    :href="`/wali/santri/${child.id}/rapor-diniyah/${raporDiniyah.id}/download`"
-                    class="rounded-full bg-emerald-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700"
-                >
-                    Unduh / Print PDF
-                </Link>
-            </div>
-            <p class="mt-3 text-sm text-slate-600">
-                {{ raporDiniyah?.catatanMustahiq || raporDiniyah?.catatanPengasuh || 'Catatan mustahiq belum tersedia.' }}
-            </p>
-        </section>
-
-        <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Nilai
-                </p>
-                <h3 class="mt-1 font-jost text-2xl text-slate-900">
-                    Rekap Pelajaran
-                </h3>
-            </div>
-
-            <div v-if="grades.length" class="grid gap-3">
-                <article
-                    v-for="grade in grades"
-                    :key="`${grade.kode}-${grade.periode}`"
-                    class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
-                >
-                    <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                                {{ grade.kode }}
-                            </p>
-                            <h4 class="mt-1 text-lg font-semibold text-slate-900">
-                                {{ grade.pelajaran }}
-                            </h4>
-                            <p class="mt-1 text-sm text-slate-500">
-                                {{ grade.periode || '-' }}
-                            </p>
-                        </div>
-                        <div class="rounded-full bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-900">
-                            {{ grade.nilaiAkhir ?? '-' }}
-                        </div>
+        <!-- Nilai per mata pelajaran -->
+        <div v-if="grades.length" class="rounded-[24px] bg-white px-5 py-[18px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
+            <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Nilai per mata pelajaran</p>
+            <div class="mt-[14px] space-y-[10px]">
+                <div v-for="grade in grades" :key="`${grade.kode}-${grade.periode}`" class="space-y-[6px]">
+                    <div class="flex items-center justify-between text-[13.5px]">
+                        <span class="font-semibold text-slate-800">{{ grade.pelajaran }}</span>
+                        <span class="font-jost font-bold tabular-nums" :class="scoreColor(grade.nilaiAkhir)">{{ grade.nilaiAkhir ?? '-' }}</span>
                     </div>
-                </article>
+                    <div v-if="grade.nilaiAkhir" class="h-[6px] overflow-hidden rounded-full bg-[#f6f0e6]">
+                        <div class="h-full rounded-full" :class="barColor(grade.nilaiAkhir)" :style="{ width: `${grade.nilaiAkhir}%` }" />
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Jadwal
-                </p>
-                <h3 class="mt-1 font-jost text-2xl text-slate-900">
-                    Kalender Pelajaran
-                </h3>
-            </div>
+        <!-- Catatan wali kelas -->
+        <div v-if="latestRapor?.catatanWaliKelas" class="flex gap-[10px] rounded-[18px] bg-[#f6f0e6] px-4 py-[13px] shadow-[inset_0_0_0_1px_#efe7da]">
+            <UiIcon name="info" class="mt-px h-[17px] w-[17px] shrink-0 text-[#a07c2c]" />
+            <p class="text-xs leading-relaxed text-slate-600"><strong>Catatan wali kelas:</strong> {{ latestRapor.catatanWaliKelas }}</p>
+        </div>
 
-            <div v-if="schedule.length" class="grid gap-3">
-                <article
-                    v-for="item in schedule"
-                    :key="`${item.hari}-${item.jamMulai}-${item.pelajaran}`"
-                    class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 text-sm shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
-                >
-                    <p class="font-semibold text-slate-900">
-                        {{ item.hari }} · {{ item.jamMulai }} - {{ item.jamSelesai }}
-                    </p>
-                    <p class="mt-1 text-slate-500">
-                        {{ item.pelajaran }} · {{ item.ruangan || 'Ruang belum diatur' }}
-                    </p>
-                </article>
-            </div>
-        </section>
+        <!-- Download -->
+        <div class="space-y-3">
+            <Link
+                v-if="latestRapor"
+                :href="`/wali/santri/${child.id}/rapor/${latestRapor.id}/download`"
+                class="block rounded-full bg-white py-[14px] text-center font-jost text-[14.5px] font-semibold text-emerald-700 shadow-[inset_0_0_0_1px_#efe7da]"
+            >
+                Unduh rapor (PDF)
+            </Link>
+            <Link
+                v-if="raporDiniyah"
+                :href="`/wali/santri/${child.id}/rapor-diniyah/${raporDiniyah.id}/download`"
+                class="block rounded-full bg-white py-[14px] text-center font-jost text-[14.5px] font-semibold text-emerald-700 shadow-[inset_0_0_0_1px_#efe7da]"
+            >
+                Unduh rapor diniyah (PDF)
+            </Link>
+        </div>
+
+        <!-- Empty -->
+        <div v-if="!grades.length && !latestRapor" class="rounded-[22px] bg-white px-5 py-6 text-center shadow-[inset_0_0_0_1px_#efe7da]">
+            <p class="text-sm text-slate-500">Belum ada data rapor tersedia.</p>
+        </div>
     </div>
 </template>

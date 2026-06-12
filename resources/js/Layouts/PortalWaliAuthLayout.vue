@@ -1,55 +1,49 @@
 <script setup>
 import { computed } from 'vue'
-import { Head, Link, usePage } from '@inertiajs/vue3'
+import { Head, usePage } from '@inertiajs/vue3'
 
 const page = usePage()
 
 const branding = computed(() => page.props.branding ?? {})
 
 const rootStyle = computed(() => ({
-    '--wali-primary': branding.value.primaryColor ?? '#0f172a',
-    '--wali-secondary': branding.value.secondaryColor ?? '#d97706',
+    '--wali-primary': branding.value.primaryColor ?? '#059669',
+    '--wali-secondary': branding.value.secondaryColor ?? '#047857',
 }))
 </script>
 
 <template>
     <Head>
-        <meta name="theme-color" :content="branding.primaryColor ?? '#0f172a'">
+        <meta name="theme-color" :content="branding.primaryColor ?? '#059669'">
     </Head>
 
-    <div class="min-h-screen bg-stone-100 text-stone-900" :style="rootStyle">
-        <div class="mx-auto flex min-h-screen max-w-md flex-col px-5 py-6">
-            <Link href="/" class="mb-6 inline-flex items-center gap-2 text-sm font-medium text-stone-600">
+    <div class="min-h-screen bg-[#fffaf3] text-[#111] antialiased" :style="rootStyle">
+        <div class="mx-auto flex min-h-screen max-w-md flex-col px-7 pt-[calc(env(safe-area-inset-top)+40px)]">
+            <!-- Brand mark -->
+            <div class="mb-9 flex items-center gap-2.5">
                 <span
                     v-if="branding.logoUrl"
-                    class="inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-2xl bg-white ring-1 ring-stone-200"
+                    class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800"
                 >
                     <img :src="branding.logoUrl" :alt="branding.name ?? 'Logo'" class="h-full w-full object-contain p-1">
                 </span>
                 <span
                     v-else
-                    class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-[var(--wali-primary)] text-sm font-semibold text-white"
+                    class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800"
                 >
-                    {{ (branding.shortName ?? 'PW').slice(0, 2).toUpperCase() }}
+                    <span class="h-4 w-4 rounded-full bg-[#e7d3a1]" style="-webkit-mask:radial-gradient(circle at 68% 32%,transparent 52%,#000 53%);mask:radial-gradient(circle at 68% 32%,transparent 52%,#000 53%);" />
                 </span>
-                <span class="min-w-0">
-                    <span class="block truncate text-stone-900">{{ branding.name ?? 'Portal Wali' }}</span>
-                    <span class="block truncate text-xs text-stone-500">{{ branding.tagline ?? 'Portal Wali Santri' }}</span>
+                <span class="font-['Jost',sans-serif] text-[17px] font-bold text-[#111]">
+                    {{ branding.name || 'Pesantren' }}<span class="text-[#c9a24a]">.</span>online
                 </span>
-            </Link>
-
-            <div class="mb-5 rounded-[2rem] bg-[linear-gradient(135deg,var(--wali-primary),var(--wali-secondary))] px-6 py-7 text-white shadow-lg shadow-stone-300/60">
-                <p class="text-xs font-semibold uppercase tracking-[0.28em] text-amber-100/90">Portal Wali</p>
-                <h1 class="mt-3 text-2xl font-semibold leading-tight">
-                    Masuk, aktivasi, dan atur ulang akses wali dari HP.
-                </h1>
-                <p class="mt-2 text-sm leading-relaxed text-white/80">
-                    Gunakan nomor WhatsApp atau email wali yang terdaftar pada data santri aktif.
-                </p>
             </div>
 
-            <div class="flex-1 rounded-[2rem] bg-white p-6 shadow-sm shadow-stone-200/80">
+            <div class="flex-1">
                 <slot />
+            </div>
+
+            <div class="pb-14 pt-8 text-center text-[12.5px] leading-relaxed text-[#94a3b8]">
+                Butuh bantuan? Hubungi admin pesantren<br>melalui WhatsApp resmi.
             </div>
         </div>
     </div>

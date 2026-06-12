@@ -26,6 +26,8 @@ class PortalWaliDashboardController extends Controller
             ],
             'children' => $dashboard['children'],
             'summary' => $dashboard['summary'],
+            'announcements' => $dashboard['announcements'] ?? [],
+            'recentActivities' => $dashboard['recentActivities'] ?? [],
             'navigation' => $this->navigationItems($dashboard['children']),
         ]);
     }
