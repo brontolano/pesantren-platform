@@ -32,6 +32,12 @@ const groups = [
         ],
     },
     {
+        title: 'Rekap Tahunan',
+        items: [
+            { label: 'Laporan Keuangan Tahunan', href: '/keuangan/laporan/rekap-tahunan', desc: 'Penerimaan → Penyaluran → Surplus/Defisit (format PDF)' },
+        ],
+    },
+    {
         title: 'Standar Akuntansi',
         items: [
             { label: 'PSAK 109 — Zakat & Infak', href: '/keuangan/laporan/psak109', desc: 'Perubahan dana, posisi keuangan, aset kelolaan' },

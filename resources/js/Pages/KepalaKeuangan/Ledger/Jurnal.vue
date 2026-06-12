@@ -32,13 +32,10 @@ onMounted(async () => {
                  class="rounded-xl border border-[#ece3cf] bg-white p-4">
                 <div class="mb-1 flex items-center justify-between">
                     <span class="text-xs font-semibold text-[#8a9690]">{{ j.nomor }}</span>
-                    <span class="rounded-full px-2 py-0.5 text-[10px] font-bold"
-                          :class="j.kehalalan === 'halal' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'">
-                        {{ j.kehalalan }}
-                    </span>
+                    <span class="font-semibold text-sm text-[#0A5C36]">{{ formatRupiah(j.total_debit) }}</span>
                 </div>
-                <div class="text-sm font-medium">{{ j.keterangan }}</div>
-                <div class="mt-1 text-xs text-[#8a9690]">{{ formatTanggal(j.tanggal) }} · {{ formatRupiah(j.total_debit) }}</div>
+                <div v-if="j.deskripsi" class="text-sm font-medium text-[#3a4d42]">{{ j.deskripsi }}</div>
+                <div class="mt-1 text-xs text-[#8a9690]">{{ formatTanggal(j.tanggal) }}</div>
             </div>
         </div>
 

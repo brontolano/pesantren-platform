@@ -155,4 +155,9 @@ class KepalaKeuanganPwaController extends Controller
     {
         return Inertia::render('KepalaKeuangan/Laporan/Isak35', $this->baseProps());
     }
+
+    public function rekapTahunan(): Response
+    {
+        return Inertia::render('KepalaKeuangan/Laporan/RekapTahunan', $this->baseProps());
+    }
 }

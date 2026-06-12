@@ -426,6 +426,7 @@ Route::middleware([
         Route::get('/laporan/psak109', [KepalaKeuanganCtrl::class, 'laporanPsak109'])->name('laporan.psak109');
         Route::get('/laporan/isak35', [KepalaKeuanganCtrl::class, 'laporanIsak35'])->name('laporan.isak35');
         Route::get('/pajak', [KepalaKeuanganCtrl::class, 'pajak'])->name('pajak.index');
+        Route::get('/laporan/rekap-tahunan', [KepalaKeuanganCtrl::class, 'rekapTahunan'])->name('laporan.rekap-tahunan');
     });
 
     // API Kepala Keuangan (JSON, lazy-load dari Vue)
@@ -448,6 +449,7 @@ Route::middleware([
         Route::post('/laporan/tutup-buku', [KepalaKeuanganApiController::class, 'tutupBuku'])->name('laporan.tutup-buku');
         Route::get('/laporan/psak109', [KepalaKeuanganApiController::class, 'laporanPsak109'])->name('laporan.psak109');
         Route::get('/laporan/isak35', [KepalaKeuanganApiController::class, 'laporanIsak35'])->name('laporan.isak35');
+        Route::get('/laporan/rekap-tahunan', [KepalaKeuanganApiController::class, 'rekapTahunan'])->name('laporan.rekap-tahunan');
 
         // Pajak
         Route::get('/pajak/spt-masa', [KepalaKeuanganApiController::class, 'sptMasa'])->name('pajak.spt-masa');

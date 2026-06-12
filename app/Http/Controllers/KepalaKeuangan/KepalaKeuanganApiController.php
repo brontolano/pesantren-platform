@@ -630,4 +630,34 @@ class KepalaKeuanganApiController extends Controller
             default => $svc->perubahanAsetNeto($from, $to),
         });
     }
+
+    public function rekapTahunan(Request $request, LaporanService $laporan): JsonResponse
+    {
+        $tahun = (int) $request->input('tahun', now()->year);
+        $from = "{$tahun}-01-01";
+        $to = "{$tahun}-12-31";
+
+        $lr = $laporan->labaRugi($from, $to);
+
+        $penerimaan = collect($lr['pendapatan'])->map(fn ($r) => [
+            'nama' => $r['nama'],
+            'kode' => $r['kode'],
+            'nominal' => $r['saldo'],
+        ])->values()->all();
+
+        $penyaluran = collect($lr['beban'])->map(fn ($r) => [
+            'nama' => $r['nama'],
+            'kode' => $r['kode'],
+            'nominal' => $r['saldo'],
+        ])->values()->all();
+
+        return response()->json([
+            'tahun' => $tahun,
+            'penerimaan' => $penerimaan,
+            'total_penerimaan' => $lr['total_pendapatan'],
+            'penyaluran' => $penyaluran,
+            'total_penyaluran' => $lr['total_beban'],
+            'surplus_defisit' => $lr['surplus_defisit'],
+        ]);
+    }
 }
