@@ -63,7 +63,7 @@ class KepalaKeuanganApiController extends Controller
         $totalKas = $saldoPerAkun->sum('saldo');
 
         $pendingVerifikasi = Pembayaran::where('is_verified', false)
-            ->whereNull('rejected_at')
+            ->whereNull('alasan_penolakan')
             ->count();
 
         $periodeAktif = PeriodeAkuntansi::where('status', 'open')->first();
@@ -71,18 +71,22 @@ class KepalaKeuanganApiController extends Controller
         $kasTunai = $saldoPerAkun->filter(fn ($a) => str_starts_with($a['kode'], '1101'))->sum('saldo');
         $kasBankNominal = $totalKas - $kasTunai;
 
-        $pendingApproval = ApprovalRequest::with('user:id,name')
-            ->whereNull('approved_at')
-            ->whereNull('rejected_at')
-            ->orderByDesc('created_at')
-            ->limit(5)
-            ->get()
-            ->map(fn ($a) => [
-                'id' => $a->id,
-                'keterangan' => $a->keterangan ?? $a->tipe,
-                'pemohon' => $a->user?->name ?? '-',
-                'nominal' => $a->nominal ?? 0,
-            ]);
+        try {
+            $pendingApproval = ApprovalRequest::with('user:id,name')
+                ->whereNull('approved_at')
+                ->whereNull('rejected_at')
+                ->orderByDesc('created_at')
+                ->limit(5)
+                ->get()
+                ->map(fn ($a) => [
+                    'id' => $a->id,
+                    'keterangan' => $a->keterangan ?? $a->tipe,
+                    'pemohon' => $a->user?->name ?? '-',
+                    'nominal' => $a->nominal ?? 0,
+                ]);
+        } catch (\Throwable) {
+            $pendingApproval = collect();
+        }
 
         $today = now()->toDateString();
         $penerimaanHariIni = Pembayaran::where('is_verified', true)
@@ -131,7 +135,7 @@ class KepalaKeuanganApiController extends Controller
     {
         $pending = Pembayaran::with('tagihan.santri:id,nama_lengkap,nis', 'creator:id,name')
             ->where('is_verified', false)
-            ->whereNull('rejected_at')
+            ->whereNull('alasan_penolakan')
             ->orderByDesc('created_at')
             ->paginate(20);
 
@@ -395,7 +399,7 @@ class KepalaKeuanganApiController extends Controller
 
         $status = $request->input('status', 'menunggu');
         if ($status === 'menunggu') {
-            $query->whereNull('approved_at')->whereNull('rejected_at');
+            $query->whereNull('approved_at')->whereNull('alasan_penolakan');
         } elseif ($status === 'disetujui') {
             $query->whereNotNull('approved_at');
         } elseif ($status === 'ditolak') {
