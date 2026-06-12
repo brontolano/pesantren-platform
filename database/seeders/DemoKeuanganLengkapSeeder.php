@@ -347,7 +347,7 @@ class DemoKeuanganLengkapSeeder extends Seeder
             [
                 'tenant_id' => $this->tid, 'employee_id' => $empIds[1],
                 'nominal' => 3000000, 'tanggal' => now()->toDateString(), 'cicilan_bulanan' => 300000,
-                'sisa_pokok' => 3000000, 'status' => 'diajukan',
+                'sisa_pokok' => 3000000, 'status' => 'diajukan', 'disetujui_oleh' => null,
                 'catatan' => 'Pengajuan pinjaman biaya pendidikan anak', 'created_at' => now(), 'updated_at' => now(),
             ],
         ]);
