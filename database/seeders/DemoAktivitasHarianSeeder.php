@@ -41,16 +41,17 @@ class DemoAktivitasHarianSeeder extends Seeder
             return;
         }
 
+        $periodeId = DB::table('periode_akuntansi')->where('status', 'open')->value('id');
+
         $jurnalId = DB::table('jurnal')->insertGetId([
             'tenant_id' => $this->tid,
             'nomor' => 'JU-' . strtoupper(substr(md5($key), 0, 8)),
             'tanggal' => now()->toDateString(),
             'deskripsi' => $deskripsi,
             'status' => 'posted',
-            'kehalalan' => 'halal',
             'idempotency_key' => $key,
-            'posted_at' => now(),
-            'created_by' => 1,
+            'periode_id' => $periodeId,
+            'dibuat_oleh' => DB::table('users')->orderBy('id')->value('id'),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
