@@ -40,13 +40,17 @@ class KepalaKeuanganApiController extends Controller
 
     public function beranda(BukuBesarService $bukuBesar): JsonResponse
     {
-        $kasBank = Akun::where('is_kas_bank', true)
+        $akunKasBank = Akun::where('is_kas_bank', true)
             ->where('is_postable', true)
             ->orderBy('kode')
             ->get(['id', 'kode', 'nama']);
 
-        $saldoPerAkun = $kasBank->map(function ($akun) use ($bukuBesar) {
-            $saldo = $bukuBesar->saldoAkun($akun->id);
+        $neracaSaldo = $bukuBesar->neracaSaldo();
+        $saldoMap = $neracaSaldo->keyBy('akun_id');
+
+        $saldoPerAkun = $akunKasBank->map(function ($akun) use ($saldoMap) {
+            $row = $saldoMap->get($akun->id);
+            $saldo = $row ? (float) $row['debit'] - (float) $row['kredit'] : 0;
 
             return [
                 'id' => $akun->id,
@@ -65,7 +69,7 @@ class KepalaKeuanganApiController extends Controller
         $periodeAktif = PeriodeAkuntansi::where('status', 'open')->first();
 
         $kasTunai = $saldoPerAkun->filter(fn ($a) => str_starts_with($a['kode'], '1101'))->sum('saldo');
-        $kasBank = $totalKas - $kasTunai;
+        $kasBankNominal = $totalKas - $kasTunai;
 
         $pendingApproval = ApprovalRequest::with('user:id,name')
             ->whereNull('approved_at')
@@ -85,7 +89,7 @@ class KepalaKeuanganApiController extends Controller
             ->whereDate('verified_at', $today)
             ->sum('nominal');
 
-        $kasAkunIds = $kasBank->pluck('id');
+        $kasAkunIds = $akunKasBank->pluck('id');
         $pengeluaranHariIni = JurnalBaris::whereIn('akun_id', $kasAkunIds)
             ->where('kredit', '>', 0)
             ->whereHas('jurnal', fn ($q) => $q->where('status', 'posted')->whereDate('tanggal', $today))
@@ -94,7 +98,7 @@ class KepalaKeuanganApiController extends Controller
         return response()->json([
             'totalKas' => $totalKas,
             'kasTunai' => $kasTunai,
-            'kasBank' => $kasBank,
+            'kasBank' => $kasBankNominal,
             'saldoPerAkun' => $saldoPerAkun,
             'pendingVerifikasi' => $pendingVerifikasi,
             'pendingApproval' => $pendingApproval,
