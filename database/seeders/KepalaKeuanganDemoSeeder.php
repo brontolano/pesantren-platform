@@ -5,23 +5,21 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Models\JurnalBaris;
 use Modules\Ledger\Models\PeriodeAkuntansi;
 
-/**
- * Seed data demo untuk PWA Kepala Keuangan.
- * Buat periode terbuka + jurnal agar Beranda tidak kosong.
- *
- * Jalankan: php artisan tenants:run db:seed --option="class=Database\Seeders\KepalaKeuanganDemoSeeder" --tenants=demo
- */
 class KepalaKeuanganDemoSeeder extends Seeder
 {
     public function run(): void
     {
         $this->seedPeriode();
         $this->seedJurnalDemo();
+        $this->seedAnggaran();
+        $this->seedPosTransaksi();
+        $this->seedSlipGaji();
     }
 
     private function seedPeriode(): void
@@ -38,7 +36,7 @@ class KepalaKeuanganDemoSeeder extends Seeder
 
     private function seedJurnalDemo(): void
     {
-        if (Jurnal::where('status', 'posted')->exists()) {
+        if (Jurnal::where('status', 'posted')->count() >= 8) {
             return;
         }
 
@@ -75,14 +73,14 @@ class KepalaKeuanganDemoSeeder extends Seeder
             ['tanggal' => now()->toDateString(), 'deskripsi' => 'Belanja ATK kantor', 'debit_akun' => $beban->id, 'kredit_akun' => $kas->id, 'nominal' => 450000],
         ];
 
-        $counter = 1;
+        $counter = Jurnal::max('id') + 1;
         foreach ($entries as $entry) {
             $jurnal = Jurnal::create([
                 'nomor' => 'JU-DEMO-' . str_pad((string) $counter, 4, '0', STR_PAD_LEFT),
                 'tanggal' => $entry['tanggal'],
                 'deskripsi' => $entry['deskripsi'],
                 'status' => 'posted',
-                'kehalalan' => 'halal',
+                'kehalalan' => $counter % 5 === 0 ? 'syubhat' : 'halal',
                 'idempotency_key' => 'demo-seed-' . $counter,
                 'posted_at' => $entry['tanggal'],
                 'created_by' => 1,
@@ -103,6 +101,157 @@ class KepalaKeuanganDemoSeeder extends Seeder
             ]);
 
             $counter++;
+        }
+    }
+
+    private function seedAnggaran(): void
+    {
+        if (DB::table('anggaran')->count() > 0) {
+            return;
+        }
+
+        $bebanAkun = Akun::where('kode', 'like', '5%')->where('is_postable', true)->first();
+        if (! $bebanAkun) {
+            return;
+        }
+
+        $divisiIds = DB::table('divisi')->pluck('id')->toArray();
+        if (empty($divisiIds)) {
+            DB::table('divisi')->insert([
+                ['nama' => 'Pendidikan', 'tenant_id' => null, 'created_at' => now(), 'updated_at' => now()],
+                ['nama' => 'Sarana & Prasarana', 'tenant_id' => null, 'created_at' => now(), 'updated_at' => now()],
+                ['nama' => 'Kesantrian', 'tenant_id' => null, 'created_at' => now(), 'updated_at' => now()],
+                ['nama' => 'Humas & Dakwah', 'tenant_id' => null, 'created_at' => now(), 'updated_at' => now()],
+            ]);
+            $divisiIds = DB::table('divisi')->pluck('id')->toArray();
+        }
+
+        $anggaranData = [
+            ['divisi' => 0, 'nominal' => 35000000, 'ket' => 'Anggaran operasional pendidikan'],
+            ['divisi' => 1, 'nominal' => 25000000, 'ket' => 'Pemeliharaan gedung & inventaris'],
+            ['divisi' => 2, 'nominal' => 15000000, 'ket' => 'Kegiatan santri & ekstrakurikuler'],
+            ['divisi' => 3, 'nominal' => 10000000, 'ket' => 'Dakwah, humas & publikasi'],
+        ];
+
+        foreach ($anggaranData as $i => $a) {
+            if (isset($divisiIds[$a['divisi']])) {
+                DB::table('anggaran')->insert([
+                    'tenant_id' => null,
+                    'tahun_anggaran' => '2026',
+                    'akun_id' => $bebanAkun->id,
+                    'divisi_id' => $divisiIds[$a['divisi']],
+                    'sumber_dana_id' => null,
+                    'nominal_anggaran' => $a['nominal'],
+                    'mode' => 'tahunan',
+                    'keterangan' => $a['ket'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+    }
+
+    private function seedPosTransaksi(): void
+    {
+        if (DB::table('pos_transaksi')->count() > 0) {
+            return;
+        }
+
+        $sesi = DB::table('pos_sesi')->where('status', 'closed')->first()
+            ?? DB::table('pos_sesi')->first();
+
+        if (! $sesi) {
+            return;
+        }
+
+        $items = [
+            ['ket' => 'Nasi goreng', 'nominal' => 8000, 'jenis' => 'penjualan'],
+            ['ket' => 'Mie ayam', 'nominal' => 7000, 'jenis' => 'penjualan'],
+            ['ket' => 'Es teh manis', 'nominal' => 3000, 'jenis' => 'penjualan'],
+            ['ket' => 'Roti bakar', 'nominal' => 5000, 'jenis' => 'penjualan'],
+            ['ket' => 'Aqua botol', 'nominal' => 3000, 'jenis' => 'penjualan'],
+            ['ket' => 'Nasi ayam geprek', 'nominal' => 10000, 'jenis' => 'penjualan'],
+            ['ket' => 'Jus jeruk', 'nominal' => 5000, 'jenis' => 'penjualan'],
+            ['ket' => 'Bakso', 'nominal' => 8000, 'jenis' => 'penjualan'],
+            ['ket' => 'Sate ayam', 'nominal' => 12000, 'jenis' => 'penjualan'],
+            ['ket' => 'Nasi uduk', 'nominal' => 6000, 'jenis' => 'penjualan'],
+            ['ket' => 'Gorengan 5 pcs', 'nominal' => 5000, 'jenis' => 'penjualan'],
+            ['ket' => 'Tahu crispy', 'nominal' => 4000, 'jenis' => 'penjualan'],
+            ['ket' => 'Es campur', 'nominal' => 7000, 'jenis' => 'penjualan'],
+            ['ket' => 'Nasi goreng spesial', 'nominal' => 12000, 'jenis' => 'penjualan'],
+            ['ket' => 'Indomie telur', 'nominal' => 6000, 'jenis' => 'penjualan'],
+        ];
+
+        foreach ($items as $i => $item) {
+            DB::table('pos_transaksi')->insert([
+                'tenant_id' => null,
+                'sesi_id' => $sesi->id,
+                'kategori_id' => null,
+                'jenis' => $item['jenis'],
+                'nominal' => $item['nominal'],
+                'santri_id' => null,
+                'ref_type' => null,
+                'ref_id' => null,
+                'jurnal_id' => null,
+                'keterangan' => $item['ket'],
+                'dibuat_oleh' => $sesi->kasir_id ?? 1,
+                'metode_bayar' => $i % 3 === 0 ? 'qris' : 'tunai',
+                'harga_kotor' => $item['nominal'],
+                'diskon' => 0,
+                'poin' => 0,
+                'created_at' => now()->subHours(rand(1, 8))->subMinutes(rand(0, 59)),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+    private function seedSlipGaji(): void
+    {
+        if (DB::table('slip_gaji')->count() > 0) {
+            return;
+        }
+
+        $userIds = DB::table('users')->pluck('id')->take(6)->toArray();
+        if (empty($userIds)) {
+            return;
+        }
+
+        $names = ['Ustadz Ahmad', 'Ustadzah Fatimah', 'Ustadz Ridwan', 'Pak Hasan (TU)', 'Bu Aisyah (Dapur)', 'Pak Mahmud (Keamanan)'];
+
+        foreach ($userIds as $i => $uid) {
+            $honorPokok = match (true) {
+                $i < 3 => 2500000,
+                default => 1800000,
+            };
+            $tunjangan = $i < 3 ? 500000 : 300000;
+            $bruto = $honorPokok + $tunjangan;
+            $pph = $bruto > 2500000 ? (int) ($bruto * 0.025) : 0;
+            $neto = $bruto - $pph;
+
+            DB::table('slip_gaji')->insert([
+                'tenant_id' => null,
+                'users_id' => $uid,
+                'periode' => '2026-06',
+                'honor_pokok' => $honorPokok,
+                'tunjangan' => $tunjangan,
+                'poin' => 0,
+                'tarif_poin' => 0,
+                'honor_poin' => 0,
+                'honor_output' => 0,
+                'bruto' => $bruto,
+                'pph21_dipotong' => $pph,
+                'neto' => $neto,
+                'jurnal_id' => null,
+                'status' => $i < 4 ? 'final' : 'draft',
+                'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'bpjs_dipotong' => 0,
+                'potongan_cuti' => 0,
+                'tipe' => 'gaji',
+                'tahun_thr' => null,
+                'potongan_kasbon' => $i === 2 ? 200000 : 0,
+            ]);
         }
     }
 }

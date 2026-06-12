@@ -4,17 +4,11 @@ export function formatRupiah(value) {
     if (Number.isNaN(num)) return 'Rp 0'
 
     const abs = Math.abs(num)
-    if (abs >= 1_000_000_000) {
-        return `${num < 0 ? '−' : ''}Rp ${(abs / 1_000_000_000).toFixed(1).replace('.0', '')} M`
-    }
-    if (abs >= 1_000_000) {
-        return `${num < 0 ? '−' : ''}Rp ${(abs / 1_000_000).toFixed(1).replace('.0', '')} jt`
-    }
-    if (abs >= 1_000) {
-        return `${num < 0 ? '−' : ''}Rp ${(abs / 1_000).toFixed(0)} rb`
+    if (abs >= 1_000_000_000_000) {
+        return `${num < 0 ? '−' : ''}Rp ${(abs / 1_000_000_000_000).toFixed(1).replace('.0', '')} T`
     }
 
-    return `Rp ${new Intl.NumberFormat('id-ID').format(num)}`
+    return formatRupiahFull(num)
 }
 
 export function formatRupiahFull(value) {

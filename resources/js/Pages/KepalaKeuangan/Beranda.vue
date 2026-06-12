@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
-import { formatRupiah } from '@/keuangan-pwa/format.js'
+import { formatRupiah, formatRupiahFull } from '@/keuangan-pwa/format.js'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 const props = defineProps({ can: Object })
@@ -57,7 +57,7 @@ onMounted(async () => {
                  style="border: 1px solid rgba(201,162,74,0.3);">
                 <div class="mb-1 text-[11px] uppercase tracking-wider text-[#e7d3a1]">Total Posisi Kas</div>
                 <div class="font-['Marcellus',serif] text-2xl">
-                    {{ formatRupiah(data?.totalKas ?? 0) }}
+                    {{ formatRupiahFull(data?.totalKas ?? 0) }}
                 </div>
                 <div class="mt-2 text-xs opacity-75">
                     Periode: {{ data?.periodeAktif ?? '-' }}
@@ -68,11 +68,11 @@ onMounted(async () => {
             <div class="grid grid-cols-2 gap-3">
                 <div class="rounded-xl border border-[#ece3cf] bg-white p-3.5">
                     <div class="mb-0.5 text-[10px] uppercase tracking-wider text-[#8a9690]">Kas Tunai</div>
-                    <div class="font-semibold text-[#0A5C36]">{{ formatRupiah(data?.kasTunai ?? 0) }}</div>
+                    <div class="font-semibold text-[#0A5C36]">{{ formatRupiahFull(data?.kasTunai ?? 0) }}</div>
                 </div>
                 <div class="rounded-xl border border-[#ece3cf] bg-white p-3.5">
                     <div class="mb-0.5 text-[10px] uppercase tracking-wider text-[#8a9690]">Bank</div>
-                    <div class="font-semibold text-[#0A5C36]">{{ formatRupiah(data?.kasBank ?? 0) }}</div>
+                    <div class="font-semibold text-[#0A5C36]">{{ formatRupiahFull(data?.kasBank ?? 0) }}</div>
                 </div>
             </div>
         </div>
@@ -160,11 +160,11 @@ onMounted(async () => {
         <div class="space-y-2">
             <div class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
                 <span class="text-sm text-[#8a9690]">Penerimaan</span>
-                <span class="font-semibold text-emerald-600">+{{ formatRupiah(data.ringkasanHarian.penerimaan ?? 0) }}</span>
+                <span class="font-semibold text-emerald-600">+{{ formatRupiahFull(data.ringkasanHarian.penerimaan ?? 0) }}</span>
             </div>
             <div class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
                 <span class="text-sm text-[#8a9690]">Pengeluaran</span>
-                <span class="font-semibold text-rose-600">−{{ formatRupiah(data.ringkasanHarian.pengeluaran ?? 0) }}</span>
+                <span class="font-semibold text-rose-600">−{{ formatRupiahFull(data.ringkasanHarian.pengeluaran ?? 0) }}</span>
             </div>
             <div class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
                 <span class="text-sm text-[#8a9690]">Belum Diverifikasi</span>
