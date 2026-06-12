@@ -72,17 +72,18 @@ class KepalaKeuanganApiController extends Controller
         $kasBankNominal = $totalKas - $kasTunai;
 
         try {
-            $pendingApproval = ApprovalRequest::with('user:id,name')
-                ->whereNull('approved_at')
-                ->whereNull('rejected_at')
+            $pendingApproval = ApprovalRequest::with(['peminta:id,name', 'approvable'])
+                ->where('status', 'menunggu')
                 ->orderByDesc('created_at')
                 ->limit(5)
                 ->get()
                 ->map(fn ($a) => [
                     'id' => $a->id,
-                    'keterangan' => $a->keterangan ?? $a->tipe,
-                    'pemohon' => $a->user?->name ?? '-',
-                    'nominal' => $a->nominal ?? 0,
+                    'keterangan' => $a->approvable->uraian
+                        ?? $a->approvable->keterangan
+                        ?? class_basename($a->approvable_type),
+                    'pemohon' => $a->peminta?->name ?? '-',
+                    'nominal' => (float) ($a->approvable->total ?? $a->approvable->nominal ?? 0),
                 ]);
         } catch (\Throwable) {
             $pendingApproval = collect();
@@ -394,19 +395,27 @@ class KepalaKeuanganApiController extends Controller
 
     public function approval(Request $request): JsonResponse
     {
-        $query = ApprovalRequest::with('user:id,name')
-            ->orderByDesc('created_at');
-
         $status = $request->input('status', 'menunggu');
-        if ($status === 'menunggu') {
-            $query->whereNull('approved_at')->whereNull('alasan_penolakan');
-        } elseif ($status === 'disetujui') {
-            $query->whereNotNull('approved_at');
-        } elseif ($status === 'ditolak') {
-            $query->whereNotNull('rejected_at');
-        }
 
-        return response()->json($query->paginate(20));
+        $page = ApprovalRequest::with(['peminta:id,name', 'approvable'])
+            ->where('status', $status)
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        $page->getCollection()->transform(fn ($a) => [
+            'id' => $a->id,
+            'keterangan' => $a->approvable->uraian
+                ?? $a->approvable->keterangan
+                ?? class_basename($a->approvable_type),
+            'pemohon' => $a->peminta?->name ?? '-',
+            'divisi' => $a->approver_role ?? '-',
+            'nominal' => (float) ($a->approvable->total ?? $a->approvable->nominal ?? 0),
+            'tanggal' => $a->created_at?->toDateString(),
+            'status' => $a->status,
+            'pagu_persen' => null,
+        ]);
+
+        return response()->json($page);
     }
 
     public function approvalSetujui(ApprovalRequest $approval, ApprovalService $service): JsonResponse
