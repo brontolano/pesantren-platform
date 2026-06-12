@@ -124,7 +124,7 @@ class KepalaKeuanganDemoSeeder extends Seeder
 
         foreach ($anggaranData as $a) {
             DB::table('anggaran')->insert([
-                'tenant_id' => null,
+                'tenant_id' => tenant()->getTenantKey(),
                 'tahun_anggaran' => '2026',
                 'akun_id' => $bebanAkun->id,
                 'divisi_id' => null,
@@ -171,7 +171,7 @@ class KepalaKeuanganDemoSeeder extends Seeder
 
         foreach ($items as $i => $item) {
             DB::table('pos_transaksi')->insert([
-                'tenant_id' => null,
+                'tenant_id' => tenant()->getTenantKey(),
                 'sesi_id' => $sesi->id,
                 'kategori_id' => null,
                 'jenis' => $item['jenis'],
@@ -216,7 +216,7 @@ class KepalaKeuanganDemoSeeder extends Seeder
             $neto = $bruto - $pph;
 
             DB::table('slip_gaji')->insert([
-                'tenant_id' => null,
+                'tenant_id' => tenant()->getTenantKey(),
                 'users_id' => $uid,
                 'periode' => '2026-06',
                 'honor_pokok' => $honorPokok,
