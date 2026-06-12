@@ -93,6 +93,7 @@ use App\Filament\Resources\Payroll\Khidmah\KhidmahResource;
 use App\Filament\Resources\Payroll\Kontrak\KontrakKerjaResource;
 use App\Filament\Resources\Payroll\Pelamar\PelamarResource;
 use App\Filament\Resources\Payroll\Penugasan\PenugasanPegawaiResource;
+use App\Filament\Resources\Payroll\Pinjaman\PinjamanPegawaiResource;
 use App\Filament\Resources\Payroll\PresensiStaf\PresensiStafResource;
 use App\Filament\Resources\Payroll\SlipGajiResource;
 use App\Filament\Resources\Pembayaran\PembayaranResource;
@@ -466,6 +467,8 @@ class TenantPanelProvider extends PanelProvider
             PresensiStafResource::class,
             KhidmahResource::class,
             CutiResource::class,
+            // WP-23 — Kasbon / pinjaman pegawai (potongan cicilan otomatis)
+            PinjamanPegawaiResource::class,
             // WP-16 — Kontrak, SK & Pengabdian
             KontrakKerjaResource::class,
             // WP-19 — Rekrutmen Ringan
