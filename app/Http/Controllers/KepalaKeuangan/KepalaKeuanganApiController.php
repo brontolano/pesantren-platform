@@ -68,7 +68,7 @@ class KepalaKeuanganApiController extends Controller
 
         $periodeAktif = PeriodeAkuntansi::where('status', 'open')->first();
 
-        $kasTunai = $saldoPerAkun->filter(fn ($a) => str_starts_with($a['kode'], '1101'))->sum('saldo');
+        $kasTunai = $saldoPerAkun->filter(fn ($a) => str_contains(strtolower($a['nama']), 'kas') && ! str_contains(strtolower($a['nama']), 'bank'))->sum('saldo');
         $kasBankNominal = $totalKas - $kasTunai;
 
         try {
