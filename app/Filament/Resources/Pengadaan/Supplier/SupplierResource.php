@@ -35,7 +35,7 @@ class SupplierResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Supplier';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 20;
 

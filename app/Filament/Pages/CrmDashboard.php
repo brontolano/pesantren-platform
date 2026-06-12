@@ -21,7 +21,7 @@ class CrmDashboard extends Page
 
     protected static ?string $title = 'CRM — Funnel Pendaftaran & Churn';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 29;
 

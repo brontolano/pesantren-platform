@@ -55,7 +55,7 @@ class EmployeeResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pegawai';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 24;
 

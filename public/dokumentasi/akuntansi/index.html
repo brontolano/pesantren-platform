@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akuntansi &amp; Pajak · Panduan Pesantren.online</title>
+<meta name="description" content="Buku besar, jurnal, anggaran, neraca, laporan keuangan, dan perpajakan pesantren.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a><a class="nav-item" href="../navigasi-baru/">🧭 Navigasi Baru</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama &amp; Kehidupan Santri</a><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a></div><div class="nav-group"><div class="nav-group-title">Modul Lanjutan</div><a class="nav-item active" href="../akuntansi/">📊 Akuntansi &amp; Pajak</a><div class="nav-sub"><a href="#1-apa-itu-modul-akuntansi">1. Apa Itu Modul Akuntansi?</a><a href="#2-bagan-akun-coa">2. Bagan Akun (COA)</a><a href="#3-jurnal-umum-amp-jurnal-manual">3. Jurnal Umum &amp; Jurnal Manual</a><a href="#4-buku-besar-amp-bku">4. Buku Besar &amp; BKU</a><a href="#5-anggaran-rkam-amp-varians">5. Anggaran (RKAM) &amp; Varians</a><a href="#6-sumber-dana-amp-kehalalan">6. Sumber Dana &amp; Kehalalan</a><a href="#7-neraca-saldo">7. Neraca Saldo</a><a href="#8-periode-amp-tutup-buku">8. Periode &amp; Tutup Buku</a><a href="#9-perpajakan-tarif-kalkulator-buku-pembantu">9. Perpajakan</a><a href="#10-laporan-keuangan">10. Laporan Keuangan</a><a href="#11-contoh-jurnal-manual-penyesuaian">11. Contoh: Jurnal Manual</a><a href="#12-contoh-membuat-anggaran-divisi">12. Contoh: Anggaran Divisi</a><a href="#13-pengingat-penting">13. Pengingat Penting</a><a href="#14-contekan-cepat-akuntansi">Contekan Cepat</a></div><a class="nav-item" href="../ai-khadim/">🤖 AI Khadim Digital</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">📊</div>
+        <div>
+          <h1>Akuntansi &amp; Pajak</h1>
+          <p class="lead">Buku besar, jurnal, anggaran, neraca, laporan keuangan, dan perpajakan pesantren.</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a> dan paham dasar <a href="../bendahara/">💰 Bendahara</a>.
+Modul ini untuk staf yang mengurus pembukuan resmi pesantren — bukan hanya catat bayar, tapi juga jurnal, neraca, dan laporan ke yayasan.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Apa itu modul Akuntansi?</li>
+<li>Bagan Akun (COA)</li>
+<li>Jurnal Umum &amp; Jurnal Manual</li>
+<li>Buku Besar &amp; BKU</li>
+<li>Anggaran (RKAM) &amp; Varians</li>
+<li>Sumber Dana &amp; Kehalalan</li>
+<li>Neraca Saldo</li>
+<li>Periode &amp; Tutup Buku</li>
+<li>Perpajakan: Tarif, Kalkulator, Buku Pembantu</li>
+<li>Laporan Keuangan</li>
+<li>Contoh: Jurnal Manual Penyesuaian</li>
+<li>Contoh: Membuat Anggaran Divisi</li>
+<li>Pengingat Penting</li>
+<li>Contekan Cepat Akuntansi</li>
+</ol>
+<hr>
+<h2 id="1-apa-itu-modul-akuntansi">1. Apa Itu Modul Akuntansi?<a class="anchor" href="#1-apa-itu-modul-akuntansi" aria-hidden="true">#</a></h2>
+<p>Bayangkan pesantren punya dua tingkat pencatatan uang:</p>
+<ul>
+<li><strong>Keuangan</strong> (modul Bendahara) = catatan harian. "Siapa bayar, berapa, kapan." Seperti buku kas sederhana.</li>
+<li><strong>Akuntansi</strong> (modul ini) = pembukuan resmi. "Uang itu masuk ke rekening apa, laporannya gimana ke yayasan, neracanya seimbang tidak." Seperti buku besar di kantor akuntan.</li>
+</ul>
+<p>Kabar baiknya: sebagian besar jurnal <strong>otomatis terbuat</strong> saat bendahara mencatat pembayaran. Bapak/Ibu di bagian akuntansi hanya perlu:</p>
+<ol>
+<li>Memastikan bagan akun (daftar rekening) sudah benar.</li>
+<li>Membuat jurnal manual kalau ada koreksi atau penyesuaian.</li>
+<li>Menutup periode di akhir bulan/tahun.</li>
+<li>Mencetak laporan keuangan resmi.</li>
+</ol>
+<hr>
+<h2 id="2-bagan-akun-coa">2. Bagan Akun (COA)<a class="anchor" href="#2-bagan-akun-coa" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> saat awal setup pesantren, atau saat ada jenis rekening baru (misal: rekening donasi khusus renovasi).</p>
+<p><strong>Apa itu?</strong> COA = Chart of Accounts = daftar semua "kotak uang" pesantren. Setiap kotak punya kode dan nama. Contoh:</p>
+<table>
+<thead><tr><th>Kode</th><th>Nama Akun</th><th>Jenis</th></tr></thead>
+<tbody>
+<tr><td>1-1001</td><td>Kas Pesantren</td><td>Aset</td></tr>
+<tr><td>1-1002</td><td>Bank BRI</td><td>Aset</td></tr>
+<tr><td>4-1001</td><td>Pendapatan SPP</td><td>Pendapatan</td></tr>
+<tr><td>5-1001</td><td>Beban Listrik</td><td>Beban</td></tr>
+</tbody>
+</table>
+<p>Ada 5 jenis besar: <strong>Aset</strong> (harta), <strong>Kewajiban</strong> (utang), <strong>Ekuitas</strong> (modal), <strong>Pendapatan</strong> (uang masuk), <strong>Beban</strong> (uang keluar).</p>
+<p><strong>Siapkan dulu:</strong> daftar rekening yang dibutuhkan pesantren (biasanya sudah terisi otomatis saat pertama kali).</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Bagan Akun</strong>.</li>
+<li>Lihat daftar akun yang sudah ada. Akun bawaan sudah cukup untuk kebanyakan pesantren.</li>
+<li>Kalau perlu tambah → ketuk <strong>+ Tambah</strong> → isi kode, nama, jenis akun → <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> akun baru muncul di daftar, diurutkan sesuai kode.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Tidak bisa menghapus akun</em> → akun yang sudah pernah dipakai di jurnal tidak bisa dihapus. Ini supaya pembukuan tidak rusak. Kalau salah, nonaktifkan saja.</li>
+</ul>
+<hr>
+<h2 id="3-jurnal-umum-amp-jurnal-manual">3. Jurnal Umum &amp; Jurnal Manual<a class="anchor" href="#3-jurnal-umum-amp-jurnal-manual" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong></p>
+<ul>
+<li><strong>Jurnal otomatis</strong> — terbuat sendiri setiap ada pembayaran, tabungan, atau transaksi lain. Tidak perlu diapa-apakan.</li>
+<li><strong>Jurnal manual</strong> — untuk koreksi, penyesuaian akhir bulan, atau transaksi yang tidak tercatat otomatis (misal: beban listrik yang belum dibayar).</li>
+</ul>
+<p><strong>Apa itu double-entry?</strong> Setiap jurnal punya minimal 2 baris: satu <strong>debit</strong>, satu <strong>kredit</strong>. Jumlah debit HARUS sama dengan kredit. Aplikasi akan menolak kalau tidak seimbang.</p>
+<p><strong>Siapkan dulu:</strong> tahu akun mana yang mau didebit dan dikredit, jumlahnya berapa, dan keterangan transaksinya apa.</p>
+<p><strong>Langkahnya (jurnal manual):</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Jurnal Manual</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Tanggal</strong> — tanggal transaksi terjadi.</li>
+<li><strong>Keterangan</strong> — jelaskan singkat, misal "Penyesuaian beban listrik Juni".</li>
+<li><strong>Baris 1</strong>: pilih akun (misal: Beban Listrik), isi kolom <strong>Debit</strong>.</li>
+<li><strong>Baris 2</strong>: pilih akun (misal: Utang Listrik), isi kolom <strong>Kredit</strong> dengan angka yang sama.</li>
+</ul></li>
+<li>Pastikan total debit = total kredit (ada indikator di bawah).</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> jurnal muncul di daftar dengan status <strong>posted</strong> (sudah tercatat di buku besar).</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Tombol Simpan tidak bisa diklik</em> → cek apakah total debit sudah sama dengan kredit. Kalau belum sama, pasti tidak bisa disimpan.</li>
+<li><em>Salah jurnal yang sudah di-posting</em> → JANGAN dihapus. Buat jurnal koreksi (jurnal balik) untuk membatalkan efeknya.</li>
+</ul>
+<hr>
+<h2 id="4-buku-besar-amp-bku">4. Buku Besar &amp; BKU<a class="anchor" href="#4-buku-besar-amp-bku" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> saat ingin melihat riwayat transaksi per akun, atau membuat laporan kas harian/bulanan.</p>
+<p><strong>Apa bedanya?</strong></p>
+<ul>
+<li><strong>Buku Besar</strong> = riwayat semua transaksi untuk SATU akun tertentu. Misal: buka buku besar "Kas Pesantren" → lihat semua uang masuk dan keluar dari kas.</li>
+<li><strong>BKU (Buku Kas Umum)</strong> = ringkasan arus kas seluruh pesantren. Sering diminta oleh Kemenag atau yayasan.</li>
+</ul>
+<p><strong>Langkahnya (Buku Besar):</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Buku Besar</strong>.</li>
+<li>Pilih akun yang mau dilihat (misal: Kas Pesantren).</li>
+<li>Pilih periode (bulan/tahun).</li>
+<li>Tabel menampilkan: tanggal, keterangan, debit, kredit, saldo berjalan.</li>
+</ol>
+<p><strong>Langkahnya (BKU):</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Buku Kas Umum</strong>.</li>
+<li>Pilih periode.</li>
+<li>Lihat ringkasan: saldo awal + pemasukan - pengeluaran = saldo akhir.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> tabel terisi dan saldo berjalan masuk akal (tidak minus untuk kas).</p>
+<hr>
+<h2 id="5-anggaran-rkam-amp-varians">5. Anggaran (RKAM) &amp; Varians<a class="anchor" href="#5-anggaran-rkam-amp-varians" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> awal tahun ajaran saat menyusun rencana anggaran, dan setiap bulan saat mau membandingkan rencana vs kenyataan.</p>
+<p><strong>Apa itu?</strong></p>
+<ul>
+<li><strong>RKAM</strong> = Rencana Kegiatan dan Anggaran Madrasah. Berisi rencana uang masuk dan uang keluar untuk setahun.</li>
+<li><strong>Varians</strong> = selisih antara anggaran (rencana) dan realisasi (kenyataan). Kalau direncanakan Rp 10 juta tapi terpakai Rp 12 juta → varians = -2 juta (lebih boros).</li>
+</ul>
+<p><strong>Siapkan dulu:</strong> daftar divisi/unit, pos-pos anggaran, dan angka rencana untuk masing-masing.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Anggaran</strong>.</li>
+<li>Ketuk <strong>+ Tambah Anggaran</strong>.</li>
+<li>Pilih <strong>divisi/unit</strong> (misal: Akademik, Asrama, Dapur).</li>
+<li>Pilih <strong>tahun anggaran</strong>.</li>
+<li>Isi pos-pos anggaran:<ul>
+<li>Nama pos (misal: Buku Pelajaran)</li>
+<li>Akun yang terkait (misal: Beban Buku)</li>
+<li>Jumlah rencana per bulan atau per tahun</li>
+</ul></li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> anggaran muncul di daftar. Kolom "Realisasi" dan "Varians" otomatis terisi begitu ada transaksi terkait.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Realisasi tidak muncul</em> → pastikan akun di anggaran SAMA dengan akun yang dipakai di jurnal. Kalau beda akun, aplikasi tidak bisa mencocokkan.</li>
+</ul>
+<hr>
+<h2 id="6-sumber-dana-amp-kehalalan">6. Sumber Dana &amp; Kehalalan<a class="anchor" href="#6-sumber-dana-amp-kehalalan" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setiap kali ada uang masuk dari sumber yang berbeda, terutama untuk pesantren yang menjaga akuntansi syariah.</p>
+<p><strong>Apa itu?</strong></p>
+<ul>
+<li><strong>Sumber Dana</strong> = dari mana uangnya berasal. Contoh: SPP, Donasi, BOS, Infaq, Wakaf.</li>
+<li><strong>Kehalalan</strong> = status syariah uang itu. Ada dua: <strong>Halal</strong> (jelas halalnya) dan <strong>Syubhat</strong> (meragukan, perlu ditelaah lebih lanjut).</li>
+</ul>
+<p>Ini penting supaya laporan keuangan pesantren bisa memisahkan dana halal dan syubhat — sesuai prinsip akuntansi syariah.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Saat membuat jurnal atau transaksi, ada kolom <strong>Sumber Dana</strong> dan <strong>Kehalalan</strong>.</li>
+<li>Pilih sumber dana yang sesuai.</li>
+<li>Pilih status kehalalan: <strong>Halal</strong> atau <strong>Syubhat</strong>.</li>
+<li>Simpan seperti biasa.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> di laporan keuangan, ada kolom/filter sumber dana dan kehalalan. Bisa cetak laporan per sumber dana.</p>
+<blockquote>
+<p>💡 Kalau ragu apakah suatu dana halal atau syubhat, konsultasikan dengan pimpinan pesantren atau dewan syariah. Jangan asal pilih.</p>
+</blockquote>
+<hr>
+<h2 id="7-neraca-saldo">7. Neraca Saldo<a class="anchor" href="#7-neraca-saldo" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> akhir bulan atau akhir tahun, untuk memastikan pembukuan seimbang.</p>
+<p><strong>Apa itu?</strong> Neraca saldo = daftar SEMUA akun beserta saldonya. Kalau pembukuan benar, maka <strong>total debit = total kredit</strong>. Kalau tidak sama, artinya ada jurnal yang salah.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Neraca Saldo</strong>.</li>
+<li>Pilih periode (sampai tanggal berapa).</li>
+<li>Lihat tabel: setiap akun ada kolom Debit dan Kredit.</li>
+<li>Di baris paling bawah: <strong>Total Debit</strong> dan <strong>Total Kredit</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> total debit = total kredit. Ada tanda centang hijau "Seimbang".</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Tidak seimbang</em> → ada jurnal yang salah. Cek jurnal manual terakhir, mungkin ada yang salah ketik nominal. Buat jurnal koreksi.</li>
+</ul>
+<hr>
+<h2 id="8-periode-amp-tutup-buku">8. Periode &amp; Tutup Buku<a class="anchor" href="#8-periode-amp-tutup-buku" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> akhir bulan atau akhir tahun, setelah semua transaksi selesai dicatat dan diperiksa.</p>
+<p><strong>Apa itu?</strong> Tutup buku = mengunci periode supaya tidak ada yang bisa mengubah atau menambah jurnal di periode itu lagi. Ini penting agar laporan yang sudah dicetak tidak berubah.</p>
+<p><strong>Siapkan dulu:</strong></p>
+<ul>
+<li>Pastikan semua jurnal sudah benar (cek neraca saldo dulu).</li>
+<li>Pastikan semua pembayaran sudah diverifikasi.</li>
+<li>Cetak laporan yang dibutuhkan SEBELUM menutup buku.</li>
+</ul>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Periode Akuntansi</strong>.</li>
+<li>Cari periode yang mau ditutup (misal: Juni 2026).</li>
+<li>Ketuk <strong>Tutup Periode</strong>.</li>
+<li>Konfirmasi: "Yakin menutup periode ini? Jurnal tidak bisa ditambah lagi."</li>
+<li>Ketuk <strong>Ya, Tutup</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> status periode berubah jadi <strong>Ditutup</strong> (ikon gembok). Jurnal baru di periode itu akan ditolak.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Sudah terlanjur tutup tapi ada yang salah</em> → hanya admin/pimpinan yang bisa membuka kembali periode tertutup. Hubungi admin.</li>
+</ul>
+<hr>
+<h2 id="9-perpajakan-tarif-kalkulator-buku-pembantu">9. Perpajakan: Tarif, Kalkulator, Buku Pembantu<a class="anchor" href="#9-perpajakan-tarif-kalkulator-buku-pembantu" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setiap bulan saat menghitung pajak penghasilan pegawai (PPh 21), atau saat perlu laporan pajak tahunan.</p>
+<p><strong>Apa saja yang ada?</strong></p>
+<ul>
+<li><strong>Tarif Pajak (TER)</strong> — tabel tarif efektif rata-rata PPh 21 yang sudah diisi sesuai aturan terbaru. Bapak/Ibu tidak perlu menghafal — aplikasi yang menghitung.</li>
+<li><strong>Kalkulator Pajak</strong> — masukkan gaji kotor pegawai, status PTKP (TK/0, K/1, dst.), dan tunjangan. Aplikasi menghitung PPh 21 yang harus dipotong.</li>
+<li><strong>Buku Pembantu Pajak</strong> — catatan pajak per pegawai per bulan. Bisa dicetak untuk bukti potong tahunan (1721-A1).</li>
+</ul>
+<p><strong>Langkahnya (menghitung pajak pegawai):</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Kalkulator Pajak</strong>.</li>
+<li>Pilih pegawai (atau ketik manual gaji kotor).</li>
+<li>Pastikan status PTKP benar (misal: K/2 = kawin, 2 tanggungan).</li>
+<li>Klik <strong>Hitung</strong>.</li>
+<li>Lihat hasil: PPh 21 per bulan yang harus dipotong.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> angka pajak muncul dan bisa dicetak.</p>
+<p><strong>Langkahnya (melihat buku pembantu pajak):</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Buku Pembantu Pajak</strong>.</li>
+<li>Pilih pegawai dan tahun.</li>
+<li>Tabel 12 bulan: gaji kotor, potongan pajak, gaji bersih.</li>
+</ol>
+<blockquote>
+<p>💡 Kalau tarif pajak berubah (biasanya awal Januari), admin akan memperbarui tabel tarif. Bapak/Ibu tidak perlu mengubah sendiri.</p>
+</blockquote>
+<hr>
+<h2 id="10-laporan-keuangan">10. Laporan Keuangan<a class="anchor" href="#10-laporan-keuangan" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> akhir bulan, akhir tahun, atau kapan saja pimpinan meminta laporan.</p>
+<p><strong>Jenis laporan yang tersedia:</strong></p>
+<table>
+<thead><tr><th>Nama Laporan</th><th>Isinya</th></tr></thead>
+<tbody>
+<tr><td>Neraca</td><td>Posisi keuangan: harta, utang, dan modal pesantren</td></tr>
+<tr><td>Laba Rugi</td><td>Pendapatan dikurangi beban = surplus/defisit</td></tr>
+<tr><td>Arus Kas</td><td>Uang masuk dan keluar dikelompokkan: operasi, investasi, pendanaan</td></tr>
+<tr><td>PSAK 109</td><td>Laporan khusus zakat, infaq, sedekah (standar akuntansi syariah)</td></tr>
+<tr><td>ISAK 35</td><td>Laporan untuk entitas nirlaba (yayasan/pesantren)</td></tr>
+<tr><td>Rekap Tahunan</td><td>Ringkasan setahun penuh untuk rapat yayasan</td></tr>
+</tbody>
+</table>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Laporan Keuangan</strong>.</li>
+<li>Pilih jenis laporan.</li>
+<li>Pilih periode.</li>
+<li>Klik <strong>Tampilkan</strong>.</li>
+<li>Untuk mencetak: <strong>Export</strong> (Excel) atau <strong>Cetak</strong> (Ctrl+P → Save as PDF).</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> laporan tampil lengkap, angka neraca seimbang, tidak ada akun yang janggal.</p>
+<blockquote>
+<p>💡 Kepala Keuangan juga bisa melihat laporan ini via <strong>PWA Kepala Keuangan</strong> di HP — tanpa harus buka laptop.</p>
+</blockquote>
+<hr>
+<h2 id="11-contoh-jurnal-manual-penyesuaian">11. Contoh Pengisian: Jurnal Manual Penyesuaian<a class="anchor" href="#11-contoh-jurnal-manual-penyesuaian" aria-hidden="true">#</a></h2>
+<p><strong>Kasus:</strong> Akhir bulan Juni, listrik sudah dipakai tapi belum dibayar. Tagihan PLN Rp 2.500.000. Kita perlu mencatat beban ini supaya laporan bulan Juni akurat.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Buka <strong>Akuntansi &amp; Pajak</strong> → <strong>Jurnal Manual</strong> → <strong>+ Tambah</strong>.</li>
+<li>Tanggal: <strong>30 Juni 2026</strong>.</li>
+<li>Keterangan: <strong>"Penyesuaian beban listrik Juni — belum dibayar"</strong>.</li>
+<li>Baris 1: Akun = <strong>Beban Listrik</strong> → Debit = <strong>2500000</strong>.</li>
+<li>Baris 2: Akun = <strong>Utang Beban</strong> → Kredit = <strong>2500000</strong>.</li>
+<li>Cek: total debit (2.500.000) = total kredit (2.500.000). Seimbang!</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> jurnal masuk ke buku besar. Beban Listrik bertambah Rp 2,5 juta. Utang Beban juga bertambah Rp 2,5 juta.</p>
+<blockquote>
+<p>💡 Nanti kalau listrik sudah dibayar (bulan depan), bendahara mencatat pembayaran biasa. Jurnal otomatis akan mengurangi Utang Beban.</p>
+</blockquote>
+<hr>
+<h2 id="12-contoh-membuat-anggaran-divisi">12. Contoh Pengisian: Membuat Anggaran Divisi<a class="anchor" href="#12-contoh-membuat-anggaran-divisi" aria-hidden="true">#</a></h2>
+<p><strong>Kasus:</strong> Divisi Akademik butuh anggaran untuk tahun ajaran 2026/2027. Ada 3 pos: Buku Pelajaran, ATK, dan Pelatihan Guru.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Buka <strong>Akuntansi &amp; Pajak</strong> → <strong>Anggaran</strong> → <strong>+ Tambah Anggaran</strong>.</li>
+<li>Divisi: <strong>Akademik</strong>.</li>
+<li>Tahun: <strong>2026/2027</strong>.</li>
+<li>Tambah pos pertama:<ul>
+<li>Nama pos: <strong>Buku Pelajaran</strong></li>
+<li>Akun: <strong>Beban Buku</strong></li>
+<li>Jumlah rencana: <strong>15000000</strong> (Rp 15 juta setahun)</li>
+</ul></li>
+<li>Tambah pos kedua:<ul>
+<li>Nama pos: <strong>ATK (Alat Tulis Kantor)</strong></li>
+<li>Akun: <strong>Beban ATK</strong></li>
+<li>Jumlah rencana: <strong>3000000</strong></li>
+</ul></li>
+<li>Tambah pos ketiga:<ul>
+<li>Nama pos: <strong>Pelatihan Guru</strong></li>
+<li>Akun: <strong>Beban Pelatihan</strong></li>
+<li>Jumlah rencana: <strong>5000000</strong></li>
+</ul></li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> anggaran Divisi Akademik muncul. Total = Rp 23 juta. Setiap bulan, kolom Realisasi terisi otomatis dari jurnal terkait, dan Varians menunjukkan selisih.</p>
+<hr>
+<h2 id="13-pengingat-penting">13. Pengingat Penting<a class="anchor" href="#13-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>⛔ <strong>Jangan menghapus jurnal yang sudah di-posting.</strong> Kalau salah, buat jurnal koreksi (jurnal balik). Menghapus = merusak jejak audit.</li>
+<li>✅ <strong>Cek neraca saldo setiap akhir bulan.</strong> Kalau tidak seimbang, segera cari dan perbaiki sebelum tutup buku.</li>
+<li>🔒 <strong>Tutup buku tepat waktu.</strong> Jangan biarkan periode lama tetap terbuka — orang bisa tidak sengaja menambah jurnal di bulan yang sudah lewat.</li>
+<li>🔢 <strong>Nominal tanpa titik/koma:</strong> dua juta lima ratus ribu = <code>2500000</code>.</li>
+<li>📊 <strong>Debit HARUS sama dengan Kredit.</strong> Ini hukum dasar akuntansi. Aplikasi tidak akan menyimpan jurnal yang tidak seimbang.</li>
+<li>🏷️ <strong>Isi sumber dana dan kehalalan.</strong> Jangan dikosongi — ini penting untuk laporan syariah.</li>
+<li>📸 Ada angka aneh atau error? <strong>Foto layar → kirim admin.</strong> Jangan coba betulkan sendiri.</li>
+</ol>
+<hr>
+<h2 id="14-contekan-cepat-akuntansi">Contekan Cepat Akuntansi<a class="anchor" href="#14-contekan-cepat-akuntansi" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Lihat daftar akun (COA)</td><td>Akuntansi &amp; Pajak → Bagan Akun</td></tr>
+<tr><td>Buat jurnal koreksi</td><td>Akuntansi &amp; Pajak → Jurnal Manual → + Tambah</td></tr>
+<tr><td>Lihat riwayat per akun</td><td>Akuntansi &amp; Pajak → Buku Besar</td></tr>
+<tr><td>Lihat ringkasan kas</td><td>Akuntansi &amp; Pajak → Buku Kas Umum</td></tr>
+<tr><td>Buat anggaran</td><td>Akuntansi &amp; Pajak → Anggaran → + Tambah</td></tr>
+<tr><td>Cek neraca seimbang</td><td>Akuntansi &amp; Pajak → Neraca Saldo</td></tr>
+<tr><td>Tutup buku bulan ini</td><td>Akuntansi &amp; Pajak → Periode Akuntansi → Tutup Periode</td></tr>
+<tr><td>Hitung pajak pegawai</td><td>Akuntansi &amp; Pajak → Kalkulator Pajak</td></tr>
+<tr><td>Lihat pajak per pegawai</td><td>Akuntansi &amp; Pajak → Buku Pembantu Pajak</td></tr>
+<tr><td>Cetak laporan neraca</td><td>Akuntansi &amp; Pajak → Laporan Keuangan → Neraca</td></tr>
+<tr><td>Cetak laba rugi</td><td>Akuntansi &amp; Pajak → Laporan Keuangan → Laba Rugi</td></tr>
+<tr><td>Cetak laporan PSAK 109</td><td>Akuntansi &amp; Pajak → Laporan Keuangan → PSAK 109</td></tr>
+</tbody>
+</table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../bendahara/"><span>‹ Sebelumnya</span><b>Bendahara</b></a>
+      <a class="pager-link next" href="../ai-khadim/"><span>Berikutnya ›</span><b>AI Khadim Digital</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-apa-itu-modul-akuntansi">1. Apa Itu Modul Akuntansi?</a><a href="#2-bagan-akun-coa">2. Bagan Akun (COA)</a><a href="#3-jurnal-umum-amp-jurnal-manual">3. Jurnal Umum &amp; Jurnal Manual</a><a href="#4-buku-besar-amp-bku">4. Buku Besar &amp; BKU</a><a href="#5-anggaran-rkam-amp-varians">5. Anggaran (RKAM) &amp; Varians</a><a href="#6-sumber-dana-amp-kehalalan">6. Sumber Dana &amp; Kehalalan</a><a href="#7-neraca-saldo">7. Neraca Saldo</a><a href="#8-periode-amp-tutup-buku">8. Periode &amp; Tutup Buku</a><a href="#9-perpajakan-tarif-kalkulator-buku-pembantu">9. Perpajakan</a><a href="#10-laporan-keuangan">10. Laporan Keuangan</a><a href="#11-contoh-jurnal-manual-penyesuaian">11. Contoh: Jurnal Manual</a><a href="#12-contoh-membuat-anggaran-divisi">12. Contoh: Anggaran Divisi</a><a href="#13-pengingat-penting">13. Pengingat Penting</a><a href="#14-contekan-cepat-akuntansi">Contekan Cepat</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

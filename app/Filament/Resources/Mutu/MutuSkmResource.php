@@ -30,7 +30,7 @@ class MutuSkmResource extends Resource
 
     protected static ?string $pluralModelLabel = 'SKM (Kepuasan Wali)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Mutu / SYAMIL';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
     protected static ?int $navigationSort = 5;
 

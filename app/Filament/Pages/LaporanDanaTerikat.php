@@ -26,7 +26,7 @@ class LaporanDanaTerikat extends Page implements HasForms
 
     protected static ?string $title = 'Laporan Dana Terikat (PSAK 112/109)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pelaporan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
     protected static ?int $navigationSort = 8;
 

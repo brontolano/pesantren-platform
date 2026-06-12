@@ -32,7 +32,7 @@ class DivisiUnitResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Divisi / Unit';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
 
     protected static ?int $navigationSort = 3;
 

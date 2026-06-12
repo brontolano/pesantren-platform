@@ -30,7 +30,7 @@ class AuditLogResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Jejak Audit';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
     protected static ?int $navigationSort = 31;
 

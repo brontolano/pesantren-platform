@@ -34,7 +34,7 @@ class AreaPiketResource extends Resource
 
     protected static ?string $modelLabel = 'Area Piket';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Sarpras & Umum';
+    protected static UnitEnum|string|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 2;
 

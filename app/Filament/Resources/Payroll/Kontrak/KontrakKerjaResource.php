@@ -53,7 +53,7 @@ class KontrakKerjaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kontrak & SK';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 26;
 

@@ -34,7 +34,7 @@ class KunjunganWaliResource extends Resource
 
     protected static ?string $navigationLabel = 'Kunjungan Wali';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kegiatan & Perizinan';
+    protected static UnitEnum|string|null $navigationGroup = 'Kesantrian';
 
     protected static ?int $navigationSort = 3;
 

@@ -36,7 +36,7 @@ class PresensiStafResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Presensi Staf';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 26;
 

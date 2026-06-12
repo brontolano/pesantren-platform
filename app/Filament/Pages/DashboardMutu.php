@@ -21,7 +21,7 @@ class DashboardMutu extends Page
 
     protected static ?string $title = 'Dashboard KPI Mutu (SPMI)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Mutu / SYAMIL';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
     protected static ?int $navigationSort = 6;
 

@@ -33,7 +33,7 @@ class AkunResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Bagan Akun';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
 
     protected static ?int $navigationSort = 1;
 

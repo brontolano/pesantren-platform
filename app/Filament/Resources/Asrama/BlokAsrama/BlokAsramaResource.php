@@ -26,7 +26,7 @@ class BlokAsramaResource extends Resource
 
     protected static ?string $navigationLabel = 'Blok Asrama';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Asrama';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
 
     protected static ?int $navigationSort = 1;
 

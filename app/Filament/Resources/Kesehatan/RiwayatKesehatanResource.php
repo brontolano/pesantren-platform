@@ -34,7 +34,7 @@ class RiwayatKesehatanResource extends Resource
 
     protected static ?string $navigationLabel = 'Riwayat Kesehatan';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kesehatan & Konseling';
+    protected static UnitEnum|string|null $navigationGroup = 'Kesantrian';
 
     protected static ?int $navigationSort = 1;
 

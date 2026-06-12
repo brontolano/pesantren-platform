@@ -37,7 +37,7 @@ class JabatanResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Jabatan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 25;
 

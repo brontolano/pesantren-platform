@@ -47,7 +47,7 @@ class PenugasanPegawaiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Penugasan Pegawai';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 26;
 

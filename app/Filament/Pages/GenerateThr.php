@@ -29,7 +29,7 @@ class GenerateThr extends Page
 
     protected static ?string $title = 'Generate THR';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 28;
 

@@ -28,7 +28,7 @@ class PenempatanAsramaResource extends Resource
 
     protected static ?string $navigationLabel = 'Penempatan Asrama';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Asrama';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
 
     protected static ?int $navigationSort = 3;
 

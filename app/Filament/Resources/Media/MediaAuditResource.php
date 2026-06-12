@@ -25,7 +25,7 @@ class MediaAuditResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Riwayat Media';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'File Storage';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 2;
 

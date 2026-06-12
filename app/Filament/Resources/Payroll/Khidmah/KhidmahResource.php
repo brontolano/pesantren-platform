@@ -33,7 +33,7 @@ class KhidmahResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Khidmah';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 27;
 

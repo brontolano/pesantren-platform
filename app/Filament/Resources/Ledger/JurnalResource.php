@@ -29,7 +29,7 @@ class JurnalResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Jurnal Umum';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
 
     protected static ?int $navigationSort = 6;
 

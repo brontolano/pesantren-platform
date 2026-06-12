@@ -157,6 +157,6 @@ class TemplateNotifikasiResource extends Resource
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Notifikasi';
+        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Kelembagaan & Komunikasi';
     }
 }

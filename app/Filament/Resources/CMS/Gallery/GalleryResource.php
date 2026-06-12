@@ -43,7 +43,7 @@ class GalleryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Galeri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Website & CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 2;
 

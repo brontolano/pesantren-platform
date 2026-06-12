@@ -37,7 +37,7 @@ class KegiatanRecurringResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kegiatan Berulang';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kegiatan & Perizinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
 
     protected static ?int $navigationSort = 6;
 

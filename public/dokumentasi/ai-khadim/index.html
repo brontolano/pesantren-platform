@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Khadim Digital · Panduan Pesantren.online</title>
+<meta name="description" content="Asisten cerdas pesantren: generator soal, RPP, ikhtisar kitab, chatbot WhatsApp, dan basis pengetahuan.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a><a class="nav-item" href="../navigasi-baru/">🧭 Navigasi Baru</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../akuntansi/">📒 Akuntansi</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama & Kehidupan Santri</a><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a></div><div class="nav-group"><div class="nav-group-title">Fitur Cerdas</div><a class="nav-item active" href="../ai-khadim/">🤖 AI Khadim Digital</a><div class="nav-sub"><a href="#1-apa-itu-ai-khadim-digital">1. Apa Itu AI Khadim Digital?</a><a href="#2-pengaturan-ai-wawancara-digital">2. Pengaturan AI (Wawancara Digital)</a><a href="#3-persetujuan-pimpinan">3. Persetujuan Pimpinan</a><a href="#4-sumber-pengetahuan-rag">4. Sumber Pengetahuan (RAG)</a><a href="#5-generator-soal">5. Generator Soal</a><a href="#6-generator-rpp-modul-ajar">6. Generator RPP / Modul Ajar</a><a href="#7-ikhtisar-kitab">7. Ikhtisar Kitab</a><a href="#8-kotak-masuk-whatsapp">8. Kotak Masuk WhatsApp</a><a href="#9-eskalasi-tanya-ustadz">9. Eskalasi Tanya Ustadz</a><a href="#10-usulan-faq-faq-mining">10. Usulan FAQ (FAQ Mining)</a><a href="#11-contoh-pengisian-generator-soal">11. Contoh: Generator Soal</a><a href="#12-pengingat-penting">12. Pengingat Penting</a><a href="#contekan-cepat-ai-khadim">Contekan Cepat AI Khadim</a></div></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">🤖</div>
+        <div>
+
+          <h1>AI Khadim Digital</h1>
+          <p class="lead">Asisten cerdas pesantren: generator soal, RPP, ikhtisar kitab, chatbot WhatsApp, dan basis pengetahuan.</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>.
+AI Khadim Digital adalah asisten pintar yang membantu guru dan staf mengerjakan tugas berulang — seperti membuat soal, menyusun RPP, atau menjawab pertanyaan wali lewat WhatsApp.
+<strong>Semua hasil AI wajib diperiksa manusia sebelum dipakai.</strong></p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Apa Itu AI Khadim Digital?</li>
+<li>Pengaturan AI (Wawancara Digital)</li>
+<li>Persetujuan Pimpinan</li>
+<li>Sumber Pengetahuan (RAG)</li>
+<li>Generator Soal</li>
+<li>Generator RPP / Modul Ajar</li>
+<li>Ikhtisar Kitab</li>
+<li>Kotak Masuk WhatsApp</li>
+<li>Eskalasi Tanya Ustadz</li>
+<li>Usulan FAQ (FAQ Mining)</li>
+<li>Contoh Pengisian: Generator Soal</li>
+<li>Pengingat Penting</li>
+</ol>
+<hr>
+<h2 id="1-apa-itu-ai-khadim-digital">1. Apa Itu AI Khadim Digital?<a class="anchor" href="#1-apa-itu-ai-khadim-digital" aria-hidden="true">#</a></h2>
+<p>Bayangkan Bapak/Ibu punya asisten yang tidak pernah tidur, bisa membantu:</p>
+<ul>
+<li><strong>Membuat soal ujian</strong> — tinggal pilih mata pelajaran dan bab, soal langsung jadi.</li>
+<li><strong>Menyusun RPP / modul ajar</strong> — pilih template, isi kelas dan pelajaran, RPP langsung tersusun.</li>
+<li><strong>Merangkum kitab kuning</strong> — kitab tebal dibuatkan poin-poin belajar dan istilah penting.</li>
+<li><strong>Menjawab pertanyaan wali di WhatsApp</strong> — chatbot otomatis menjawab pertanyaan umum (jadwal, biaya, dsb.).</li>
+<li><strong>Mengumpulkan FAQ</strong> — pertanyaan yang sering muncul dikumpulkan otomatis untuk ditambahkan ke basis pengetahuan.</li>
+</ul>
+<p><strong>Penting:</strong> AI Khadim bukan pengganti ustadz. Ia hanya <em>pembantu</em>. Semua hasil AI <strong>wajib diperiksa dan disetujui manusia</strong> sebelum dipakai santri atau wali.</p>
+<hr>
+<h2 id="2-pengaturan-ai-wawancara-digital">2. Pengaturan AI (Wawancara Digital)<a class="anchor" href="#2-pengaturan-ai-wawancara-digital" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> pertama kali mengaktifkan AI Khadim, atau saat ingin mengubah aturan AI pesantren.</p>
+<p><strong>Siapkan dulu:</strong> nama pesantren, manhaj/kurikulum yang diikuti, daftar fitur yang ingin diaktifkan.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Pengaturan AI</strong>.</li>
+<li>Sistem menampilkan wizard 6 langkah. Ikuti satu per satu:
+<ul>
+<li><strong>Langkah 1 — Identitas & Manhaj:</strong> isi nama pesantren, jenjang (MI/MTs/MA), manhaj (Salafi/Modern/Kombinasi).</li>
+<li><strong>Langkah 2 — Batasan Syariah:</strong> tentukan topik yang <em>tidak boleh</em> dijawab AI (contoh: fatwa langsung, ikhtilaf tanpa rujukan ustadz).</li>
+<li><strong>Langkah 3 — Fitur per Role:</strong> centang fitur mana yang boleh dipakai oleh guru, TU, bendahara, pimpinan.</li>
+<li><strong>Langkah 4 — Privasi Data:</strong> pilih data apa saja yang boleh diakses AI (nama santri, nilai, keuangan, dsb.).</li>
+<li><strong>Langkah 5 — Kanal Layanan:</strong> aktifkan chatbot WhatsApp, atau hanya pakai di dalam aplikasi saja.</li>
+<li><strong>Langkah 6 — Anggaran Kredit:</strong> atur batas pemakaian AI per bulan (agar biaya terkontrol).</li>
+</ul>
+</li>
+<li>Ketuk <strong>Kirim untuk Persetujuan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pesan "Pengaturan dikirim ke Pimpinan untuk disetujui".</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Wizard tidak muncul</em> → pastikan akun Bapak/Ibu punya hak akses "Admin AI" atau "Pimpinan". Kalau tidak, hubungi admin.</li>
+<li><em>Ingin mengubah setelah disetujui</em> → buka Pengaturan AI lagi, ubah, lalu kirim ulang untuk persetujuan.</li>
+</ul>
+<hr>
+<h2 id="3-persetujuan-pimpinan">3. Persetujuan Pimpinan<a class="anchor" href="#3-persetujuan-pimpinan" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setelah staf mengirim pengaturan AI (Bagian 2), pimpinan/mudir harus menyetujui.</p>
+<p><strong>Langkahnya (untuk Pimpinan):</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Persetujuan Kebijakan</strong>.</li>
+<li>Muncul daftar pengaturan yang menunggu. Ketuk satu baris untuk melihat isi lengkapnya.</li>
+<li>Baca tiap poin: identitas, batasan syariah, fitur, privasi, kanal, anggaran.</li>
+<li>Kalau setuju → ketuk <strong>Setujui</strong>. Kalau perlu revisi → ketuk <strong>Tolak</strong>, tulis catatan apa yang harus diubah.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> status berubah menjadi "Disetujui". Fitur AI langsung aktif sesuai pengaturan.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Pimpinan menolak</em> → staf menerima notifikasi beserta catatan. Ubah pengaturan sesuai catatan, kirim ulang.</li>
+</ul>
+<hr>
+<h2 id="4-sumber-pengetahuan-rag">4. Sumber Pengetahuan (RAG)<a class="anchor" href="#4-sumber-pengetahuan-rag" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> agar AI menjawab sesuai konteks pesantren — bukan jawaban umum dari internet.</p>
+<p><strong>Siapkan dulu:</strong> file dokumen yang ingin diunggah (PDF, Word, atau teks). Contoh: kurikulum, SOP, brosur, FAQ manual.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Sumber Pengetahuan</strong>.</li>
+<li>Ketuk <strong>+ Unggah Dokumen</strong>.</li>
+<li>Pilih file dari komputer. Beri <strong>judul</strong> dan <strong>kategori</strong> (contoh: "Kurikulum MTs", "SOP Keuangan", "FAQ Pendaftaran").</li>
+<li>Ketuk <strong>Simpan</strong>. Tunggu sebentar — sistem membaca dan mengindeks isi dokumen.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> dokumen muncul di daftar dengan status "Terindeks". Sekarang AI bisa menjawab berdasarkan isi dokumen itu.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Status "Gagal"</em> → file mungkin rusak atau formatnya tidak didukung. Coba konversi ke PDF dulu.</li>
+<li><em>AI tetap menjawab salah</em> → periksa apakah dokumen yang diunggah memang berisi informasi yang ditanya. Tambahkan dokumen yang lebih lengkap.</li>
+</ul>
+<hr>
+<h2 id="5-generator-soal">5. Generator Soal<a class="anchor" href="#5-generator-soal" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> guru mau membuat soal ujian atau latihan tanpa mengetik satu per satu.</p>
+<p><strong>Siapkan dulu:</strong> tahu mata pelajaran, bab/materi, tingkat kognitif (C1 Hafalan sampai C6 Kreasi), dan jenis soal (pilihan ganda / esai / isian).</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Generator Soal</strong>.</li>
+<li>Ketuk <strong>+ Buat Soal Baru</strong>.</li>
+<li>Isi formulir:
+<ul>
+<li><strong>Mata pelajaran</strong> — pilih dari daftar (Fiqih, Aqidah, Bahasa Arab, Matematika, dst.).</li>
+<li><strong>Bab / Materi</strong> — ketik atau pilih bab yang mau diujikan.</li>
+<li><strong>Tingkat kognitif</strong> — pilih C1 (Hafalan), C2 (Pemahaman), C3 (Penerapan), C4 (Analisis), C5 (Evaluasi), C6 (Kreasi). Boleh campur.</li>
+<li><strong>Jenis soal</strong> — Pilihan Ganda, Esai, Isian Singkat, atau campur.</li>
+<li><strong>Jumlah soal</strong> — ketik angka (misal 20).</li>
+</ul>
+</li>
+<li>Ketuk <strong>Buat Soal</strong>. Tunggu beberapa detik.</li>
+<li>AI menampilkan daftar soal. <strong>Periksa satu per satu</strong> — betulkan yang salah, hapus yang tidak sesuai.</li>
+<li>Kalau sudah bagus → ketuk <strong>Setujui & Simpan</strong>.</li>
+<li>Untuk mencetak: ketuk <strong>Cetak</strong> atau <strong>Download PDF</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> soal tersimpan di daftar soal dengan status "Disetujui". Bisa dicetak atau dipakai di ujian online.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Soal tidak sesuai materi</em> → pastikan Sumber Pengetahuan sudah diunggah untuk pelajaran itu. Coba tulis bab/materi lebih spesifik.</li>
+<li><em>Kunci jawaban salah</em> → <strong>betulkan manual</strong>. AI tidak sempurna — guru WAJIB memeriksa setiap soal.</li>
+</ul>
+<hr>
+<h2 id="6-generator-rpp-modul-ajar">6. Generator RPP / Modul Ajar<a class="anchor" href="#6-generator-rpp-modul-ajar" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> guru mau menyusun Rencana Pelaksanaan Pembelajaran (RPP) atau modul ajar tanpa mulai dari nol.</p>
+<p><strong>Siapkan dulu:</strong> tahu mata pelajaran, kelas, dan topik yang akan diajarkan.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Generator RPP</strong>.</li>
+<li>Ketuk <strong>+ Buat RPP Baru</strong>.</li>
+<li>Isi formulir:
+<ul>
+<li><strong>Template</strong> — pilih format RPP (Kurikulum Merdeka / KTSP / format pesantren).</li>
+<li><strong>Mata pelajaran</strong> — pilih dari daftar.</li>
+<li><strong>Kelas</strong> — pilih kelasnya.</li>
+<li><strong>Topik / Bab</strong> — ketik topik yang akan diajarkan.</li>
+<li><strong>Jumlah pertemuan</strong> — berapa kali tatap muka.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Buat RPP</strong>. Tunggu beberapa detik.</li>
+<li>AI menampilkan RPP lengkap: tujuan, kegiatan pembuka, inti, penutup, asesmen. <strong>Edit tiap seksi</strong> sesuai kebutuhan.</li>
+<li>Kalau sudah sesuai → ketuk <strong>Simpan</strong>.</li>
+<li>Untuk mencetak: ketuk <strong>Cetak</strong> atau <strong>Download Word</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> RPP tersimpan di daftar dengan nama pelajaran dan kelas. Bisa diunduh sebagai file Word.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Isi RPP terlalu umum</em> → tambahkan topik yang lebih spesifik. Contoh: bukan "Fiqih" tapi "Fiqih Thaharah — Bab Wudhu".</li>
+<li><em>Format tidak sesuai sekolah</em> → pilih template yang sesuai, atau minta admin menambahkan template baru.</li>
+</ul>
+<hr>
+<h2 id="7-ikhtisar-kitab">7. Ikhtisar Kitab<a class="anchor" href="#7-ikhtisar-kitab" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> guru ingin merangkum kitab kuning jadi poin belajar, istilah kunci, dan pertanyaan diskusi. Cocok untuk persiapan mengajar atau membuat bahan kultum.</p>
+<p><strong>Siapkan dulu:</strong> nama kitab atau bagian kitab yang ingin dirangkum (harus sudah diunggah di Sumber Pengetahuan).</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Ikhtisar Kitab</strong>.</li>
+<li>Ketuk <strong>+ Buat Ikhtisar Baru</strong>.</li>
+<li>Pilih <strong>kitab</strong> dari daftar (yang sudah diunggah di Sumber Pengetahuan).</li>
+<li>Pilih <strong>bab atau halaman</strong> yang ingin dirangkum.</li>
+<li>Centang apa yang mau dihasilkan:
+<ul>
+<li>☑ Poin-poin belajar utama</li>
+<li>☑ Istilah kunci + penjelasan singkat</li>
+<li>☑ Pertanyaan diskusi untuk santri</li>
+<li>☑ Kerangka kultum (opsional)</li>
+</ul>
+</li>
+<li>Ketuk <strong>Buat Ikhtisar</strong>.</li>
+<li>Periksa hasil. Edit jika perlu → <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> ikhtisar tersimpan dan bisa dicetak atau diunduh.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Rangkuman kurang tepat</em> → AI merangkum berdasarkan teks yang diunggah. Kalau teksnya scan buram, hasilnya bisa salah. Unggah ulang dengan kualitas lebih baik.</li>
+<li><em>Istilah Arab salah</em> → betulkan manual. AI belum sempurna untuk teks Arab gundul.</li>
+</ul>
+<hr>
+<h2 id="8-kotak-masuk-whatsapp">8. Kotak Masuk WhatsApp<a class="anchor" href="#8-kotak-masuk-whatsapp" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> melihat percakapan chatbot WhatsApp dengan wali santri, mengambil alih percakapan, atau mengirim balasan resmi.</p>
+<p><strong>Siapkan dulu:</strong> kanal WhatsApp harus sudah diaktifkan di Pengaturan AI (Bagian 2, Langkah 5).</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Kotak Masuk WA</strong>.</li>
+<li>Muncul daftar percakapan. Percakapan baru ada di atas.</li>
+<li>Ketuk satu percakapan untuk melihat isi chat.</li>
+<li>Kalau bot sudah menjawab dengan benar → tidak perlu apa-apa.</li>
+<li>Kalau jawaban bot kurang tepat atau wali butuh bantuan manusia:
+<ul>
+<li>Ketuk <strong>Ambil Alih</strong> → sekarang Bapak/Ibu yang menjawab.</li>
+<li>Ketik balasan → ketuk <strong>Kirim</strong>.</li>
+<li>Setelah selesai → ketuk <strong>Kembalikan ke Bot</strong> agar bot melanjutkan.</li>
+</ul>
+</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> percakapan yang diambil alih bertanda "Manual". Setelah dikembalikan, bertanda "Bot" lagi.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Bot menjawab salah terus untuk topik tertentu</em> → tambahkan FAQ atau dokumen di Sumber Pengetahuan untuk topik itu.</li>
+<li><em>Pesan tidak masuk</em> → periksa koneksi WhatsApp di Pengaturan AI. Hubungi admin jika perlu.</li>
+</ul>
+<hr>
+<h2 id="9-eskalasi-tanya-ustadz">9. Eskalasi Tanya Ustadz<a class="anchor" href="#9-eskalasi-tanya-ustadz" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> ada pertanyaan yang AI tidak bisa jawab — otomatis masuk antrian untuk dijawab ustadz secara manual.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Tanya Ustadz</strong>.</li>
+<li>Muncul daftar pertanyaan yang menunggu. Setiap baris menampilkan: pertanyaan, nama penanya, tanggal masuk.</li>
+<li>Ketuk satu pertanyaan → baca isinya.</li>
+<li>Pilih <strong>Assign ke Ustadz</strong> → pilih ustadz yang tepat untuk menjawab.</li>
+<li>Ustadz yang ditunjuk menerima notifikasi. Ia membuka pertanyaan, menulis jawaban, lalu ketuk <strong>Kirim Jawaban</strong>.</li>
+<li>Penanya menerima jawaban lewat WhatsApp atau di aplikasi.</li>
+<li>Pertanyaan otomatis berstatus <strong>Selesai</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> antrian berkurang, pertanyaan berstatus "Selesai" dengan nama ustadz penjawab.</p>
+<blockquote>
+<p>💡 <strong>Laporan bulanan:</strong> di halaman Tanya Ustadz ada tombol <strong>Laporan</strong> — menampilkan statistik: berapa pertanyaan masuk, berapa dijawab, rata-rata waktu jawab, topik terbanyak.</p>
+</blockquote>
+<hr>
+<h2 id="10-usulan-faq-faq-mining">10. Usulan FAQ (FAQ Mining)<a class="anchor" href="#10-usulan-faq-faq-mining" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> AI otomatis mengumpulkan pertanyaan yang sering muncul dari percakapan. Staf me-review dan menyetujui untuk masuk ke basis pengetahuan.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>AI Khadim</strong> → <strong>Usulan FAQ</strong>.</li>
+<li>Muncul daftar FAQ yang diusulkan AI. Setiap baris menampilkan: pertanyaan, jawaban yang diusulkan, jumlah kemunculan.</li>
+<li>Ketuk satu baris untuk melihat detail.</li>
+<li>Periksa pertanyaan dan jawabannya. Edit kalau perlu.</li>
+<li>Kalau bagus → ketuk <strong>Setujui</strong>. FAQ langsung masuk ke Sumber Pengetahuan.</li>
+<li>Kalau tidak sesuai → ketuk <strong>Tolak</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> FAQ yang disetujui muncul di Sumber Pengetahuan. Pertanyaan serupa berikutnya langsung bisa dijawab AI.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Jawaban yang diusulkan salah</em> → edit dulu sebelum menyetujui. Jangan langsung approve tanpa baca.</li>
+</ul>
+<hr>
+<h2 id="11-contoh-pengisian-generator-soal">11. Contoh Pengisian: Generator Soal<a class="anchor" href="#11-contoh-pengisian-generator-soal" aria-hidden="true">#</a></h2>
+<p>Berikut contoh langkah demi langkah membuat soal Fiqih kelas 3 MTs:</p>
+<ol>
+<li>Buka <strong>AI Khadim</strong> → <strong>Generator Soal</strong> → <strong>+ Buat Soal Baru</strong>.</li>
+<li>Isi formulir:
+<ul>
+<li><strong>Mata pelajaran:</strong> Fiqih</li>
+<li><strong>Bab / Materi:</strong> Sholat Jenazah</li>
+<li><strong>Tingkat kognitif:</strong> C1 (Hafalan) = 5 soal, C2 (Pemahaman) = 10 soal, C3 (Penerapan) = 5 soal</li>
+<li><strong>Jenis soal:</strong> Pilihan Ganda</li>
+<li><strong>Jumlah soal:</strong> 20</li>
+</ul>
+</li>
+<li>Ketuk <strong>Buat Soal</strong>. Tunggu sekitar 10 detik.</li>
+<li>AI menampilkan 20 soal pilihan ganda beserta kunci jawaban.</li>
+<li>Periksa satu per satu:
+<ul>
+<li>Soal nomor 3 kunci jawabannya salah? → klik <strong>Edit</strong>, betulkan, simpan.</li>
+<li>Soal nomor 15 terlalu mudah? → klik <strong>Hapus</strong>, nanti buat lagi atau tambahkan manual.</li>
+</ul>
+</li>
+<li>Kalau semua sudah diperiksa → ketuk <strong>Setujui & Simpan</strong>.</li>
+<li>Ketuk <strong>Download PDF</strong> → cetak untuk dibagikan ke santri.</li>
+</ol>
+<blockquote>
+<p>📌 <strong>Ingat:</strong> AI bisa salah, terutama untuk soal hukum fiqih yang detail. Selalu cocokkan dengan kitab rujukan.</p>
+</blockquote>
+<hr>
+<h2 id="12-pengingat-penting">12. Pengingat Penting<a class="anchor" href="#12-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>🧑‍🏫 <strong>Manusia tetap pengambil keputusan.</strong> AI hanya membantu menyiapkan — guru yang memutuskan soal mana yang dipakai, RPP mana yang benar, jawaban mana yang layak dikirim.</li>
+<li>💳 <strong>Kredit AI terbatas.</strong> Setiap kali AI bekerja (membuat soal, menjawab chat, dsb.), kredit berkurang. Kalau habis, fitur AI berhenti sampai bulan depan atau ditambah admin.</li>
+<li>🔒 <strong>Data santri dijaga ketat.</strong> AI hanya mengakses data yang diizinkan di Pengaturan AI. Tidak ada data yang dikirim ke luar tanpa izin.</li>
+<li>📋 <strong>Semua hasil AI bisa diedit.</strong> Jangan takut mengubah hasil AI. Justru itu yang diharapkan — AI menyiapkan draf, manusia menyempurnakan.</li>
+<li>⚠️ <strong>Jangan unggah data pribadi sensitif</strong> (KTP, rekening, password) ke Sumber Pengetahuan.</li>
+<li>📸 Ada yang aneh? <strong>Foto layar → kirim admin.</strong> Jangan coba-coba memperbaiki sendiri kalau tidak yakin.</li>
+</ol>
+<hr>
+<h2 id="contekan-cepat-ai-khadim">Contekan Cepat AI Khadim<a class="anchor" href="#contekan-cepat-ai-khadim" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Atur AI pertama kali</td>
+<td>AI Khadim → Pengaturan AI</td>
+</tr>
+<tr>
+<td>Pimpinan setujui kebijakan AI</td>
+<td>AI Khadim → Persetujuan Kebijakan</td>
+</tr>
+<tr>
+<td>Unggah dokumen untuk AI</td>
+<td>AI Khadim → Sumber Pengetahuan → + Unggah</td>
+</tr>
+<tr>
+<td>Buat soal ujian otomatis</td>
+<td>AI Khadim → Generator Soal → + Buat Soal Baru</td>
+</tr>
+<tr>
+<td>Buat RPP / modul ajar</td>
+<td>AI Khadim → Generator RPP → + Buat RPP Baru</td>
+</tr>
+<tr>
+<td>Rangkum kitab kuning</td>
+<td>AI Khadim → Ikhtisar Kitab → + Buat Ikhtisar Baru</td>
+</tr>
+<tr>
+<td>Lihat chat WA bot</td>
+<td>AI Khadim → Kotak Masuk WA</td>
+</tr>
+<tr>
+<td>Ambil alih chat dari bot</td>
+<td>Kotak Masuk WA → pilih chat → Ambil Alih</td>
+</tr>
+<tr>
+<td>Jawab pertanyaan sulit</td>
+<td>AI Khadim → Tanya Ustadz</td>
+</tr>
+<tr>
+<td>Review FAQ otomatis</td>
+<td>AI Khadim → Usulan FAQ</td>
+</tr>
+<tr>
+<td>Cek sisa kredit AI</td>
+<td>AI Khadim → Pengaturan AI → Langkah 6</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../akademik/"><span>‹ Sebelumnya</span><b>Akademik Lanjutan</b></a>
+      <a class="pager-link next" href="../wali-santri/"><span>Berikutnya ›</span><b>Wali Santri</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-apa-itu-ai-khadim-digital">1. Apa Itu AI Khadim Digital?</a><a href="#2-pengaturan-ai-wawancara-digital">2. Pengaturan AI (Wawancara Digital)</a><a href="#3-persetujuan-pimpinan">3. Persetujuan Pimpinan</a><a href="#4-sumber-pengetahuan-rag">4. Sumber Pengetahuan (RAG)</a><a href="#5-generator-soal">5. Generator Soal</a><a href="#6-generator-rpp-modul-ajar">6. Generator RPP / Modul Ajar</a><a href="#7-ikhtisar-kitab">7. Ikhtisar Kitab</a><a href="#8-kotak-masuk-whatsapp">8. Kotak Masuk WhatsApp</a><a href="#9-eskalasi-tanya-ustadz">9. Eskalasi Tanya Ustadz</a><a href="#10-usulan-faq-faq-mining">10. Usulan FAQ (FAQ Mining)</a><a href="#11-contoh-pengisian-generator-soal">11. Contoh: Generator Soal</a><a href="#12-pengingat-penting">12. Pengingat Penting</a><a href="#contekan-cepat-ai-khadim">Contekan Cepat AI Khadim</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -39,7 +39,7 @@ class AsetResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Aset';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pembiayaan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 1;
 

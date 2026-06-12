@@ -27,7 +27,7 @@ class LaporanKehalalan extends Page
 
     protected static ?string $title = 'Laporan Kehalalan Dana';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
 
     protected static ?int $navigationSort = 9;
 

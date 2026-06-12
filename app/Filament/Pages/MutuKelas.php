@@ -18,7 +18,7 @@ class MutuKelas extends Page
 
     protected static ?string $title = 'Heatmap Mutu per Kelas';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pelaporan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
     protected static ?int $navigationSort = 31;
 

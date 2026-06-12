@@ -41,7 +41,7 @@ class CutiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Cuti';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 25;
 

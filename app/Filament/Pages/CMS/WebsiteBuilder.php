@@ -21,7 +21,7 @@ class WebsiteBuilder extends Page
 
     protected static ?string $title = 'Website Builder';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Website & CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 3;
 

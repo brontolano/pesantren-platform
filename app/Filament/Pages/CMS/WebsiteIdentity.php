@@ -28,7 +28,7 @@ class WebsiteIdentity extends Page implements HasForms
 
     protected static ?string $title = 'Identitas & Kontak Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Website & CMS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 8;
 

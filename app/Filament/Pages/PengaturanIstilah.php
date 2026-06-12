@@ -29,7 +29,7 @@ class PengaturanIstilah extends Page implements HasForms
 
     protected static ?string $title = 'Istilah Pesantren';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
     protected static ?int $navigationSort = 16;
 

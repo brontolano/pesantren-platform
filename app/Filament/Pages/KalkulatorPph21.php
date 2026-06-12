@@ -29,7 +29,7 @@ class KalkulatorPph21 extends Page implements HasForms
 
     protected static ?string $title = 'Kalkulator PPh21 (PTKP-tiered) & BPJS';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
 
     protected static ?int $navigationSort = 28;
 

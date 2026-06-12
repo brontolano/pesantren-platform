@@ -28,7 +28,7 @@ class NeracaSaldo extends Page implements HasForms
 
     protected static ?string $title = 'Neraca Saldo (Trial Balance)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
 
     protected static ?int $navigationSort = 12;
 

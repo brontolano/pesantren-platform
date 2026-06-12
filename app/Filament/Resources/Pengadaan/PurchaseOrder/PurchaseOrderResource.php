@@ -42,7 +42,7 @@ class PurchaseOrderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Purchase Order';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 21;
 

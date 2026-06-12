@@ -45,7 +45,7 @@ class ObatResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Stok Obat';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kesehatan & Konseling';
+    protected static UnitEnum|string|null $navigationGroup = 'Kesantrian';
 
     protected static ?int $navigationSort = 3;
 

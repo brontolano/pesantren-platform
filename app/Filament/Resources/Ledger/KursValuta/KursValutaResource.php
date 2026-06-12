@@ -32,7 +32,7 @@ class KursValutaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kurs Valuta (Donor)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
 
     protected static ?int $navigationSort = 31;
 

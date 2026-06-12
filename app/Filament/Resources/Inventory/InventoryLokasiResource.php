@@ -35,7 +35,7 @@ class InventoryLokasiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Lokasi Inventory';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
 
     protected static ?int $navigationSort = 22;
 
