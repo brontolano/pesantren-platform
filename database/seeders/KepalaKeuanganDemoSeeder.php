@@ -235,7 +235,7 @@ class KepalaKeuanganDemoSeeder extends Seeder
                 'updated_at' => now(),
                 'bpjs_dipotong' => 0,
                 'potongan_cuti' => 0,
-                'tipe' => 'gaji',
+                'tipe' => 'bulanan',
                 'tahun_thr' => null,
                 'potongan_kasbon' => $i === 2 ? 200000 : 0,
             ]);
