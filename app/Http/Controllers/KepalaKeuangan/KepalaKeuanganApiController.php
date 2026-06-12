@@ -238,6 +238,43 @@ class KepalaKeuanganApiController extends Controller
         });
     }
 
+    public function tutupBukuPratinjau(\Modules\Ledger\Services\PeriodClosingService $closing): JsonResponse
+    {
+        abort_unless(Auth::user()?->can('close_period') ?? false, 403);
+
+        $periode = PeriodeAkuntansi::where('status', 'open')->orderBy('tgl_mulai')->first();
+        if (! $periode) {
+            return response()->json(['periode' => null]);
+        }
+
+        return response()->json($closing->pratinjau($periode) + [
+            'periode_id' => $periode->id,
+            'tgl_mulai' => $periode->tgl_mulai->toDateString(),
+            'tgl_selesai' => $periode->tgl_selesai->toDateString(),
+        ]);
+    }
+
+    public function tutupBuku(Request $request, \Modules\Ledger\Services\PeriodClosingService $closing): JsonResponse
+    {
+        abort_unless(Auth::user()?->can('close_period') ?? false, 403);
+
+        $request->validate(['konfirmasi' => 'required|in:TUTUP']);
+
+        $periode = PeriodeAkuntansi::where('status', 'open')->orderBy('tgl_mulai')->first();
+        abort_if(! $periode, 422, 'Tidak ada periode terbuka.');
+
+        try {
+            $hasil = $closing->tutupBuku($periode, Auth::id());
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'message' => "Periode {$periode->nama} berhasil ditutup.",
+            'surplus_defisit' => $hasil['surplus_defisit'],
+        ]);
+    }
+
     public function laporanDana(Request $request, LaporanService $laporan): JsonResponse
     {
         $jenis = $request->input('jenis', 'bos-bop');

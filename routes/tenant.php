@@ -441,6 +441,8 @@ Route::middleware([
         Route::get('/laporan/arus-kas', [KepalaKeuanganApiController::class, 'laporanArusKas'])->name('laporan.arus-kas');
         Route::get('/laporan/operasional', [KepalaKeuanganApiController::class, 'laporanOperasional'])->name('laporan.operasional');
         Route::get('/laporan/dana', [KepalaKeuanganApiController::class, 'laporanDana'])->name('laporan.dana');
+        Route::get('/laporan/tutup-buku', [KepalaKeuanganApiController::class, 'tutupBukuPratinjau'])->name('laporan.tutup-buku.pratinjau');
+        Route::post('/laporan/tutup-buku', [KepalaKeuanganApiController::class, 'tutupBuku'])->name('laporan.tutup-buku');
 
         // Loket Kas
         Route::get('/loket', [KepalaKeuanganApiController::class, 'loket'])->name('loket');

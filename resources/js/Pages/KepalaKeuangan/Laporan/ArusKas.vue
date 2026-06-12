@@ -2,17 +2,46 @@
 import { onMounted, ref } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
-import { formatRupiahFull } from '@/keuangan-pwa/format.js'
+import { formatRupiahFull, formatTanggal } from '@/keuangan-pwa/format.js'
 
 defineOptions({ layout: KepalaKeuanganLayout })
-defineProps({ can: Object })
+const props = defineProps({ can: Object })
 
 const loading = ref(true)
 const data = ref(null)
 
+const tutup = ref(null)
+const tutupLoading = ref(false)
+const tutupPesan = ref(null)
+
+async function muatPratinjau() {
+    if (!props.can?.close_period) return
+    try { tutup.value = await api.get('/laporan/tutup-buku') } catch { /* */ }
+}
+
+async function kunciPeriode() {
+    if (!tutup.value?.periode) return
+    if (!confirm(`Tutup buku periode ${tutup.value.periode}? Semua akun pendapatan & beban akan di-nol-kan ke Aset Neto dan periode DIKUNCI.`)) return
+    const ketik = prompt('Ketik TUTUP untuk konfirmasi akhir:')
+    if (ketik !== 'TUTUP') return
+
+    tutupLoading.value = true
+    tutupPesan.value = null
+    try {
+        const res = await api.post('/laporan/tutup-buku', { konfirmasi: 'TUTUP' })
+        tutupPesan.value = { ok: true, teks: res.message }
+        await muatPratinjau()
+    } catch (e) {
+        tutupPesan.value = { ok: false, teks: e.message }
+    } finally {
+        tutupLoading.value = false
+    }
+}
+
 onMounted(async () => {
     try { data.value = await api.get('/laporan/arus-kas') } catch { /* */ }
     loading.value = false
+    muatPratinjau()
 })
 </script>
 
@@ -41,10 +70,57 @@ onMounted(async () => {
                 <div class="font-['Marcellus',serif] text-xl">{{ formatRupiahFull(data.netCashFlow) }}</div>
             </div>
 
-            <!-- Tutup Buku section placeholder -->
-            <div class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-6 text-center text-sm text-[#8a9690]">
-                Fitur Tutup Buku — akan dibangun di Fase 6
-            </div>
+            <!-- Tutup Buku -->
+            <section v-if="props.can?.close_period" class="rounded-xl border border-[#ece3cf] bg-white p-4">
+                <h2 class="mb-2 font-['Marcellus',serif] text-base text-[#0A5C36]">Tutup Buku</h2>
+
+                <div v-if="!tutup" class="text-sm text-[#8a9690]">Memuat pratinjau…</div>
+
+                <div v-else-if="!tutup.periode" class="text-sm text-[#8a9690]">
+                    Tidak ada periode akuntansi yang terbuka.
+                </div>
+
+                <template v-else>
+                    <div class="mb-3 space-y-1.5 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-[#8a9690]">Periode</span>
+                            <span class="font-semibold">{{ tutup.periode }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-[#8a9690]">Rentang</span>
+                            <span>{{ formatTanggal(tutup.tgl_mulai) }} – {{ formatTanggal(tutup.tgl_selesai) }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-[#8a9690]">Surplus / Defisit</span>
+                            <span class="font-bold" :class="tutup.surplus_defisit >= 0 ? 'text-emerald-600' : 'text-rose-600'">
+                                {{ formatRupiahFull(tutup.surplus_defisit) }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-[#8a9690]">Baris jurnal penutup</span>
+                            <span>{{ tutup.jumlah_baris }}</span>
+                        </div>
+                    </div>
+
+                    <div v-if="tutupPesan" class="mb-3 rounded-lg px-3 py-2 text-sm"
+                         :class="tutupPesan.ok ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'">
+                        {{ tutupPesan.teks }}
+                    </div>
+
+                    <button v-if="!tutup.sudah_ditutup"
+                            @click="kunciPeriode" :disabled="tutupLoading"
+                            class="w-full rounded-xl bg-[#0A5C36] py-3 text-sm font-bold text-white transition hover:bg-[#084a2c] disabled:opacity-50">
+                        {{ tutupLoading ? 'Memproses…' : '🔒 Kunci Periode ' + tutup.periode }}
+                    </button>
+                    <div v-else class="rounded-lg bg-emerald-50 px-3 py-2 text-center text-sm font-semibold text-emerald-700">
+                        ✓ Periode sudah ditutup
+                    </div>
+
+                    <p class="mt-2 text-[11px] leading-relaxed text-[#8a9690]">
+                        Tutup buku memposting jurnal penutup (pendapatan & beban → Aset Neto) lalu mengunci periode dari posting baru. Pembukaan kembali hanya lewat panel admin.
+                    </p>
+                </template>
+            </section>
         </template>
     </div>
 </template>
