@@ -31,6 +31,19 @@ const groups = [
             { label: 'Realisasi per Divisi', href: '/keuangan/laporan/dana?tab=divisi', desc: 'Anggaran vs realisasi per unit' },
         ],
     },
+    {
+        title: 'Standar Akuntansi',
+        items: [
+            { label: 'PSAK 109 — Zakat & Infak', href: '/keuangan/laporan/psak109', desc: 'Perubahan dana, posisi keuangan, aset kelolaan' },
+            { label: 'ISAK 35 — Nonlaba', href: '/keuangan/laporan/isak35', desc: 'Aset neto tanpa/dengan pembatasan' },
+        ],
+    },
+    {
+        title: 'Perpajakan',
+        items: [
+            { label: 'Pusat Pajak', href: '/keuangan/pajak', desc: 'SPT Masa PPh 21, e-Bupot, SPT Badan, Sisa Lebih' },
+        ],
+    },
 ]
 </script>
 

@@ -77,8 +77,20 @@ class PayrollService
         }
 
         $bruto = (float) $slip->bruto;
-        $pph21 = app(PajakPenghasilanService::class)
-            ->pph21Bulanan($bruto, $employee->ptkp_status ?? 'TK0');
+        $pajakService = app(PajakPenghasilanService::class);
+        $ptkpStatus = $employee->ptkp_status ?? 'TK0';
+        $periode = trim((string) $slip->periode);
+        $bulanKe = preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $periode)
+            ? (int) substr($periode, 5, 2) : 1;
+
+        if ($bulanKe === 12) {
+            $akumulasi = $pajakService->akumulasiSampaiSebelumnya($slip->users_id, $periode);
+            $pph21 = $pajakService->pph21BulananTer(
+                $bruto, $ptkpStatus, 12, $akumulasi['bruto'], $akumulasi['pph21'],
+            );
+        } else {
+            $pph21 = $pajakService->pph21BulananTer($bruto, $ptkpStatus, $bulanKe);
+        }
         $bpjs = app(BpjsService::class)->potonganPekerja($bruto);
         // WP-14: potongan cuti tak berbayar — 0 bila tak ada cuti tak berbayar,
         // sehingga math PPh21/BPJS/neto existing TIDAK berubah satu rupiah pun.

@@ -26,6 +26,12 @@ use Modules\Ledger\Models\JurnalBaris;
 use Modules\Ledger\Models\PeriodeAkuntansi;
 use Modules\Ledger\Services\BukuBesarService;
 use Modules\Ledger\Services\LaporanService;
+use Modules\Pajak\Services\EBupotService;
+use Modules\Pajak\Services\LaporanIsak35Service;
+use Modules\Pajak\Services\LaporanPsak109Service;
+use Modules\Pajak\Services\SisaLebihService;
+use Modules\Pajak\Services\SptBadanService;
+use Modules\Pajak\Services\SptMasaService;
 use Modules\Payroll\Models\SlipGaji;
 use Modules\Payroll\Services\PayrollService;
 
@@ -550,5 +556,78 @@ class KepalaKeuanganApiController extends Controller
         $request->validate(['periode_id' => 'required|string']);
 
         return response()->json(['message' => 'Payroll diproses. Slip gaji diterbitkan.']);
+    }
+
+    // ── Pajak & Standar Akuntansi ───────────────────────────────
+
+    public function sptMasa(Request $request, SptMasaService $svc): JsonResponse
+    {
+        $masa = $request->query('masa', now()->format('Y-m'));
+        return response()->json($svc->rekap($masa));
+    }
+
+    public function sptMasaTahunan(Request $request, SptMasaService $svc): JsonResponse
+    {
+        $tahun = $request->query('tahun', now()->format('Y'));
+        return response()->json($svc->rekapTahunan($tahun));
+    }
+
+    public function ebupot(Request $request, EBupotService $svc): JsonResponse
+    {
+        $masa = $request->query('masa', now()->format('Y-m'));
+        return response()->json($svc->generate($masa));
+    }
+
+    public function ebupotCsv(Request $request, EBupotService $svc)
+    {
+        $masa = $request->query('masa', now()->format('Y-m'));
+        $csv = $svc->toCsv($masa);
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=ebupot-pph21-{$masa}.csv",
+        ]);
+    }
+
+    public function ebupotTahunan(Request $request, EBupotService $svc): JsonResponse
+    {
+        $request->validate(['users_id' => 'required|integer', 'tahun' => 'required|string']);
+        return response()->json($svc->rekapTahunan((int) $request->users_id, $request->tahun));
+    }
+
+    public function sptBadan(Request $request, SptBadanService $svc): JsonResponse
+    {
+        $tahun = $request->query('tahun', (string) (now()->year - 1));
+        return response()->json($svc->worksheet($tahun));
+    }
+
+    public function sisaLebih(SisaLebihService $svc): JsonResponse
+    {
+        return response()->json($svc->ringkasan());
+    }
+
+    public function laporanPsak109(Request $request, LaporanPsak109Service $svc): JsonResponse
+    {
+        $jenis = $request->query('jenis', 'perubahan_dana');
+        $from = $request->query('from');
+        $to = $request->query('to');
+
+        return response()->json(match ($jenis) {
+            'posisi_keuangan' => $svc->posisiKeuangan($to),
+            'aset_kelolaan' => $svc->perubahanAsetKelolaan($from, $to),
+            default => $svc->perubahanDana($from, $to),
+        });
+    }
+
+    public function laporanIsak35(Request $request, LaporanIsak35Service $svc): JsonResponse
+    {
+        $jenis = $request->query('jenis', 'perubahan_aset_neto');
+        $from = $request->query('from');
+        $to = $request->query('to');
+
+        return response()->json(match ($jenis) {
+            'penghasilan_komprehensif' => $svc->penghasilanKomprehensif($from, $to),
+            'posisi_keuangan' => $svc->posisiKeuangan($to),
+            default => $svc->perubahanAsetNeto($from, $to),
+        });
     }
 }

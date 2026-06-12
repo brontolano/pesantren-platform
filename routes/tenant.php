@@ -423,6 +423,9 @@ Route::middleware([
         Route::get('/laporan/operasional', [KepalaKeuanganCtrl::class, 'laporanOperasional'])->name('laporan.operasional');
         Route::get('/laporan/dana', [KepalaKeuanganCtrl::class, 'laporanDana'])->name('laporan.dana');
         Route::get('/laporan/neraca-saldo', [KepalaKeuanganCtrl::class, 'laporanNeracaSaldo'])->name('laporan.neraca-saldo');
+        Route::get('/laporan/psak109', [KepalaKeuanganCtrl::class, 'laporanPsak109'])->name('laporan.psak109');
+        Route::get('/laporan/isak35', [KepalaKeuanganCtrl::class, 'laporanIsak35'])->name('laporan.isak35');
+        Route::get('/pajak', [KepalaKeuanganCtrl::class, 'pajak'])->name('pajak.index');
     });
 
     // API Kepala Keuangan (JSON, lazy-load dari Vue)
@@ -443,6 +446,17 @@ Route::middleware([
         Route::get('/laporan/dana', [KepalaKeuanganApiController::class, 'laporanDana'])->name('laporan.dana');
         Route::get('/laporan/tutup-buku', [KepalaKeuanganApiController::class, 'tutupBukuPratinjau'])->name('laporan.tutup-buku.pratinjau');
         Route::post('/laporan/tutup-buku', [KepalaKeuanganApiController::class, 'tutupBuku'])->name('laporan.tutup-buku');
+        Route::get('/laporan/psak109', [KepalaKeuanganApiController::class, 'laporanPsak109'])->name('laporan.psak109');
+        Route::get('/laporan/isak35', [KepalaKeuanganApiController::class, 'laporanIsak35'])->name('laporan.isak35');
+
+        // Pajak
+        Route::get('/pajak/spt-masa', [KepalaKeuanganApiController::class, 'sptMasa'])->name('pajak.spt-masa');
+        Route::get('/pajak/spt-masa-tahunan', [KepalaKeuanganApiController::class, 'sptMasaTahunan'])->name('pajak.spt-masa-tahunan');
+        Route::get('/pajak/ebupot', [KepalaKeuanganApiController::class, 'ebupot'])->name('pajak.ebupot');
+        Route::get('/pajak/ebupot/csv', [KepalaKeuanganApiController::class, 'ebupotCsv'])->name('pajak.ebupot.csv');
+        Route::get('/pajak/ebupot-tahunan', [KepalaKeuanganApiController::class, 'ebupotTahunan'])->name('pajak.ebupot-tahunan');
+        Route::get('/pajak/spt-badan', [KepalaKeuanganApiController::class, 'sptBadan'])->name('pajak.spt-badan');
+        Route::get('/pajak/sisa-lebih', [KepalaKeuanganApiController::class, 'sisaLebih'])->name('pajak.sisa-lebih');
 
         // Loket Kas
         Route::get('/loket', [KepalaKeuanganApiController::class, 'loket'])->name('loket');

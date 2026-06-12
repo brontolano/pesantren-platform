@@ -25,6 +25,7 @@ class SumberDana extends Model
         'is_wakaf',
         'is_terikat',
         'is_active',
+        'is_komersial',
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class SumberDana extends Model
         'is_wakaf' => 'boolean',
         'is_terikat' => 'boolean',
         'is_active' => 'boolean',
+        'is_komersial' => 'boolean',
     ];
 
     /** Dana bukan-halal (syubhat/non_halal) — wajib diperlakukan sebagai Dana Kebajikan. */
