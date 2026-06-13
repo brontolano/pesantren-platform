@@ -41,6 +41,65 @@ class DemoPersonaSeeder extends Seeder
         if (Schema::hasTable('presensi_santri')) {
             $this->wireKehadiran($guru?->id, $now);
         }
+        if ($guru && Schema::hasTable('slip_gaji')) {
+            $this->wireSlip($guru->id, $now); // slip guru (role guru punya view_slip_sendiri)
+        }
+        if ($guru && Schema::hasTable('pelanggaran_santri') && Schema::hasTable('jenis_pelanggaran')) {
+            $this->wirePelanggaran($guru->id, $now);
+        }
+        if (Schema::hasTable('izin_santri')) {
+            $this->wireIzin($now);
+        }
+    }
+
+    private function wireSlip(int $userId, $now): void
+    {
+        foreach (['2026-05', '2026-06'] as $periode) {
+            $pokok = 2800000;
+            $tunj = 600000;
+            $bruto = $pokok + $tunj;
+            $pph = (int) round($bruto * 0.025);
+            $bpjs = (int) round($bruto * 0.02);
+            DB::table('slip_gaji')->updateOrInsert(
+                ['tenant_id' => tenant('id') ?? 'demo', 'users_id' => $userId, 'periode' => $periode],
+                [
+                    'honor_pokok' => $pokok, 'tunjangan' => $tunj, 'poin' => 0, 'tarif_poin' => 0,
+                    'honor_poin' => 0, 'honor_output' => 0, 'bruto' => $bruto, 'pph21_dipotong' => $pph,
+                    'bpjs_dipotong' => $bpjs, 'potongan_cuti' => 0, 'potongan_kasbon' => 0,
+                    'neto' => $bruto - $pph - $bpjs, 'tipe' => 'bulanan', 'status' => 'final',
+                    'created_by' => $userId, 'jurnal_id' => null, 'updated_at' => $now, 'created_at' => $now,
+                ],
+            );
+        }
+    }
+
+    private function wirePelanggaran(int $pencatatId, $now): void
+    {
+        $jenis = DB::table('jenis_pelanggaran')->orderBy('id')->limit(3)->pluck('id')->all();
+        $santri = DB::table('santri')->orderBy('id')->limit(3)->pluck('id')->all();
+        $kronologi = ['Terlambat ke masjid', 'Tidak memakai seragam', 'Membawa HP'];
+        foreach ($santri as $i => $sid) {
+            if (! isset($jenis[$i])) {
+                continue;
+            }
+            DB::table('pelanggaran_santri')->updateOrInsert(
+                ['tenant_id' => tenant('id') ?? 'demo', 'santri_id' => $sid, 'jenis_pelanggaran_id' => $jenis[$i]],
+                ['waktu_kejadian' => $now, 'lokasi' => 'Asrama', 'kronologi' => $kronologi[$i] ?? 'Pelanggaran', 'pencatat_id' => $pencatatId, 'status' => 'dicatat', 'updated_at' => $now, 'created_at' => $now],
+            );
+        }
+    }
+
+    private function wireIzin($now): void
+    {
+        $santri = DB::table('santri')->orderBy('id')->offset(3)->limit(2)->pluck('id')->all();
+        $defs = [['pulang', 'Acara keluarga'], ['sakit', 'Periksa ke dokter']];
+        foreach ($santri as $i => $sid) {
+            [$jenis, $alasan] = $defs[$i] ?? ['pulang', 'Keperluan'];
+            DB::table('izin_santri')->updateOrInsert(
+                ['tenant_id' => tenant('id') ?? 'demo', 'santri_id' => $sid, 'jenis_izin' => $jenis],
+                ['tanggal_mulai' => $now->toDateString(), 'tanggal_selesai' => $now->copy()->addDays(2)->toDateString(), 'alasan' => $alasan, 'status' => 'diajukan', 'sudah_kembali' => false, 'updated_at' => $now, 'created_at' => $now],
+            );
+        }
     }
 
     private function persona(string $email, string $name, string $role): ?User
