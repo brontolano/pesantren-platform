@@ -3,6 +3,17 @@ import { onMounted, ref, watch } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
 import { formatRupiahFull } from '@/keuangan-pwa/format.js'
+import {
+    PageHeader,
+    SectionCard,
+    ListRow,
+    StatCard,
+    MoneyText,
+    UiField,
+    IconCircle,
+    LoadingState,
+    EmptyState,
+} from '@/Shared'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 
@@ -20,82 +31,120 @@ onMounted(muat)
 </script>
 
 <template>
-    <div>
-        <h1 class="mb-1 font-['Marcellus',serif] text-lg text-[#0A5C36]">Laporan Keuangan</h1>
-        <p class="mb-4 text-xs text-[#8a9690]">Rekap Penerimaan & Penyaluran Tahunan</p>
+    <div class="space-y-5">
+        <PageHeader
+            kicker="Laporan Keuangan"
+            title="Rekap Tahunan"
+            subtitle="Rekap Penerimaan & Penyaluran Tahunan"
+        />
 
-        <div class="mb-4 flex items-center gap-2">
-            <input v-model="tahun" type="number" min="2020" max="2030" @change="muat"
-                   class="w-24 rounded-lg border border-[#ece3cf] px-3 py-1.5 text-sm">
-            <span class="text-xs text-[#8a9690]">Januari — Desember {{ tahun }}</span>
-        </div>
+        <UiField label="Tahun anggaran" hint="Periode Januari — Desember">
+            <template #default="{ fieldId, describedby }">
+                <div class="flex items-center gap-3">
+                    <input
+                        :id="fieldId"
+                        :aria-describedby="describedby"
+                        v-model="tahun"
+                        type="number"
+                        min="2020"
+                        max="2030"
+                        inputmode="numeric"
+                        @change="muat"
+                        class="w-28 min-h-[48px] rounded-2xl bg-white px-4 py-3 text-sm font-semibold tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                    >
+                    <span class="text-sm font-medium text-slate-500">Januari — Desember {{ tahun }}</span>
+                </div>
+            </template>
+        </UiField>
 
-        <div v-if="loading" class="space-y-3">
-            <div v-for="i in 6" :key="i" class="h-10 animate-pulse rounded-lg bg-[#e8e1d0]/60"></div>
-        </div>
+        <LoadingState v-if="loading" variant="list" :count="6" />
 
         <template v-else-if="data">
             <!-- Penerimaan -->
-            <div class="mb-4 rounded-xl border border-[#ece3cf] bg-white p-4">
-                <div class="mb-3 text-xs font-bold uppercase tracking-wider text-[#8a9690]">Penerimaan</div>
-                <div v-for="r in data.penerimaan" :key="r.kode"
-                     class="flex justify-between border-b border-[#ece3cf]/60 px-1 py-2 text-sm last:border-0">
-                    <span class="text-[#3a4d42]">{{ r.nama }}</span>
-                    <span class="font-semibold">{{ formatRupiahFull(r.nominal) }}</span>
+            <SectionCard kicker="Penerimaan" title="Penerimaan" flush>
+                <div class="divide-y divide-slate-100">
+                    <ListRow v-for="r in data.penerimaan" :key="r.kode" :title="r.nama">
+                        <template #trailing>
+                            <MoneyText :amount="r.nominal" size="sm" tone="default" />
+                        </template>
+                    </ListRow>
+                    <ListRow>
+                        <template #title>
+                            <span class="font-extrabold text-slate-900">Total Penerimaan</span>
+                        </template>
+                        <template #trailing>
+                            <MoneyText :amount="data.total_penerimaan" size="md" tone="emerald" />
+                        </template>
+                    </ListRow>
                 </div>
-                <div class="flex justify-between border-t border-[#ece3cf] pt-2 font-bold text-sm">
-                    <span>Total Penerimaan</span>
-                    <span class="text-emerald-600">{{ formatRupiahFull(data.total_penerimaan) }}</span>
-                </div>
-            </div>
+            </SectionCard>
 
             <!-- Penyaluran -->
-            <div class="mb-4 rounded-xl border border-[#ece3cf] bg-white p-4">
-                <div class="mb-3 text-xs font-bold uppercase tracking-wider text-[#8a9690]">Penggunaan & Penyaluran Dana</div>
-                <div v-for="r in data.penyaluran" :key="r.kode"
-                     class="flex justify-between border-b border-[#ece3cf]/60 px-1 py-2 text-sm last:border-0">
-                    <span class="text-[#3a4d42]">{{ r.nama }}</span>
-                    <span class="font-semibold">{{ formatRupiahFull(r.nominal) }}</span>
+            <SectionCard kicker="Penyaluran" title="Penggunaan & Penyaluran Dana" flush>
+                <div class="divide-y divide-slate-100">
+                    <ListRow v-for="r in data.penyaluran" :key="r.kode" :title="r.nama">
+                        <template #trailing>
+                            <MoneyText :amount="r.nominal" size="sm" tone="default" />
+                        </template>
+                    </ListRow>
+                    <ListRow>
+                        <template #title>
+                            <span class="font-extrabold text-slate-900">Total Penyaluran</span>
+                        </template>
+                        <template #trailing>
+                            <MoneyText :amount="data.total_penyaluran" size="md" tone="rose" />
+                        </template>
+                    </ListRow>
                 </div>
-                <div class="flex justify-between border-t border-[#ece3cf] pt-2 font-bold text-sm">
-                    <span>Total Penyaluran</span>
-                    <span class="text-rose-600">{{ formatRupiahFull(data.total_penyaluran) }}</span>
-                </div>
-            </div>
+            </SectionCard>
 
             <!-- Surplus / Defisit -->
-            <div class="rounded-2xl bg-gradient-to-br from-[#0A5C36] to-[#06342b] p-5 text-center text-white"
-                 style="border: 1px solid rgba(201,162,74,0.3);">
-                <div class="text-[11px] uppercase tracking-wider text-[#e7d3a1]">
-                    {{ (data.surplus_defisit ?? 0) >= 0 ? 'Surplus' : 'Defisit' }} Tahun {{ data.tahun }}
+            <StatCard
+                :tone="(data.surplus_defisit ?? 0) < 0 ? 'rose' : 'emerald'"
+                :label="`${(data.surplus_defisit ?? 0) >= 0 ? 'Surplus' : 'Defisit'} Tahun ${data.tahun}`"
+            >
+                <template #value>
+                    <MoneyText
+                        :amount="Math.abs(data.surplus_defisit ?? 0)"
+                        size="xl"
+                        :tone="(data.surplus_defisit ?? 0) < 0 ? 'rose' : 'emerald'"
+                    />
+                </template>
+
+                <div class="mt-3 flex items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs">
+                    <span class="inline-flex items-center gap-1.5 text-slate-500">
+                        <IconCircle icon="arrow-down-left" tone="emerald" size="sm" />
+                        <span class="tabular-nums">{{ formatRupiahFull(data.total_penerimaan) }}</span>
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 text-slate-500">
+                        <IconCircle icon="arrow-up-right" tone="rose" size="sm" />
+                        <span class="tabular-nums">{{ formatRupiahFull(data.total_penyaluran) }}</span>
+                    </span>
                 </div>
-                <div class="mt-1 font-['Marcellus',serif] text-2xl"
-                     :class="(data.surplus_defisit ?? 0) < 0 ? 'text-rose-300' : ''">
-                    {{ formatRupiahFull(Math.abs(data.surplus_defisit ?? 0)) }}
-                </div>
-                <div class="mt-3 flex justify-between text-xs text-[#e7d3a1]/80">
-                    <span>Penerimaan: {{ formatRupiahFull(data.total_penerimaan) }}</span>
-                    <span>Penyaluran: {{ formatRupiahFull(data.total_penyaluran) }}</span>
-                </div>
-            </div>
+            </StatCard>
 
             <!-- Tanda tangan -->
-            <div class="mt-6 flex justify-between text-center text-[10px] text-[#8a9690]">
-                <div>
-                    <div>Mengetahui,</div>
-                    <div class="font-semibold">Ketua Yayasan</div>
-                    <div class="mt-10 border-t border-[#ece3cf] pt-1">(.....................)</div>
+            <SectionCard kicker="Pengesahan" title="Tanda Tangan">
+                <div class="flex justify-between text-center text-xs text-slate-500">
+                    <div>
+                        <div>Mengetahui,</div>
+                        <div class="font-semibold text-slate-700">Ketua Yayasan</div>
+                        <div class="mt-10 border-t border-slate-200 pt-1">(.....................)</div>
+                    </div>
+                    <div>
+                        <div>&nbsp;</div>
+                        <div class="font-semibold text-slate-700">Bendahara</div>
+                        <div class="mt-10 border-t border-slate-200 pt-1">(.....................)</div>
+                    </div>
                 </div>
-                <div>
-                    <div>&nbsp;</div>
-                    <div class="font-semibold">Bendahara</div>
-                    <div class="mt-10 border-t border-[#ece3cf] pt-1">(.....................)</div>
-                </div>
-            </div>
+            </SectionCard>
         </template>
 
-        <div v-else class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-8 text-center text-sm text-[#8a9690]">
-            Tidak ada data untuk tahun {{ tahun }}
-        </div>
+        <EmptyState
+            v-else
+            icon="chart"
+            title="Belum ada data"
+            :message="`Tidak ada data untuk tahun ${tahun}`"
+        />
     </div>
 </template>

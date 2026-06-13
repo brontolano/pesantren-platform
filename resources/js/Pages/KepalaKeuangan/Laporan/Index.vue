@@ -1,5 +1,6 @@
 <script setup>
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
+import { PageHeader, SectionCard, ListRow, IconCircle } from '@/Shared'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 defineProps({ can: Object })
@@ -54,28 +55,34 @@ const groups = [
 </script>
 
 <template>
-    <div>
-        <h1 class="mb-5 font-['Marcellus',serif] text-lg text-[#0A5C36]">Pusat Laporan</h1>
+    <div class="space-y-5">
+        <PageHeader kicker="Keuangan" title="Pusat Laporan" subtitle="Operasional, akuntansi, dana & standar pelaporan" />
 
-        <div v-for="g in groups" :key="g.title" class="mb-5">
-            <h2 class="mb-2 text-xs font-bold uppercase tracking-wider text-[#8a9690]">{{ g.title }}</h2>
-            <div class="space-y-2">
-                <component
-                    :is="item.href ? 'a' : 'div'"
+        <SectionCard v-for="g in groups" :key="g.title" :title="g.title" flush>
+            <div class="divide-y divide-slate-100">
+                <ListRow
                     v-for="item in g.items"
                     :key="item.label"
-                    :href="item.href"
-                    class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3 transition"
-                    :class="item.href ? 'hover:border-[#C9A24A]/50 hover:shadow-sm cursor-pointer' : 'opacity-75'">
-                    <div>
-                        <div class="text-sm font-medium text-[#3a4d42]">{{ item.label }}</div>
-                        <div class="text-xs text-[#8a9690]">{{ item.desc }}</div>
-                    </div>
-                    <svg v-if="item.href" viewBox="0 0 24 24" class="h-4 w-4 flex-shrink-0 text-[#C9A24A]" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 5l7 7-7 7" />
-                    </svg>
-                </component>
+                    :href="item.href || undefined"
+                    :title="item.label"
+                    :subtitle="item.desc"
+                    :chevron="!!item.href"
+                    :class="item.href ? '' : 'opacity-75'">
+                    <template #leading>
+                        <IconCircle
+                            :icon="{
+                                'Operasional': 'calendar',
+                                'Akuntansi': 'chart',
+                                'Dana & Realisasi': 'wallet',
+                                'Rekap Tahunan': 'document',
+                                'Standar Akuntansi': 'book',
+                                'Perpajakan': 'receipt',
+                            }[g.title] || 'document'"
+                            :tone="item.href ? 'emerald' : 'slate'"
+                            size="sm" />
+                    </template>
+                </ListRow>
             </div>
-        </div>
+        </SectionCard>
     </div>
 </template>

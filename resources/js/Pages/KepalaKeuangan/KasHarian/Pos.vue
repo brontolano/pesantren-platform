@@ -3,6 +3,20 @@ import { onMounted, ref, computed } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
 import { formatRupiah } from '@/keuangan-pwa/format.js'
+import {
+    PageHeader,
+    SectionCard,
+    UiCard,
+    ListRow,
+    StatCard,
+    UiButton,
+    SegmentedControl,
+    UiField,
+    UiInput,
+    MoneyText,
+    EmptyState,
+    LoadingState,
+} from '@/Shared'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 const props = defineProps({ can: Object })
@@ -78,105 +92,118 @@ onMounted(fetchData)
 </script>
 
 <template>
-    <div>
-        <div class="mb-4 flex items-center justify-between">
-            <h1 class="font-['Marcellus',serif] text-lg text-[#0A5C36]">POS Kantin</h1>
-            <div v-if="props.can?.operate_pos" class="flex rounded-lg border border-[#ece3cf] bg-white p-0.5">
-                <button v-for="m in ['supervisi','kasir']" :key="m"
-                        class="rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition"
-                        :class="mode === m ? 'bg-[#0A5C36] text-white' : 'text-[#3a4d42]'"
-                        @click="switchMode(m)">
-                    {{ m }}
-                </button>
-            </div>
-        </div>
+    <div class="space-y-5">
+        <PageHeader kicker="Kas Harian" title="POS Kantin">
+            <template v-if="props.can?.operate_pos" #right>
+                <div class="w-44">
+                    <SegmentedControl
+                        :model-value="mode"
+                        :options="[
+                            { value: 'supervisi', label: 'Supervisi', icon: 'chart' },
+                            { value: 'kasir', label: 'Kasir', icon: 'cash' },
+                        ]"
+                        @update:model-value="switchMode"
+                    />
+                </div>
+            </template>
+        </PageHeader>
 
-        <div v-if="loading" class="space-y-3">
-            <div class="h-24 animate-pulse rounded-2xl bg-[#e8e1d0]/60"></div>
-            <div class="h-40 animate-pulse rounded-xl bg-[#e8e1d0]/60"></div>
-        </div>
+        <LoadingState v-if="loading" variant="card" :count="2" />
 
         <!-- ═══ Mode Supervisi ═══ -->
         <template v-else-if="mode === 'supervisi'">
-            <div v-if="ringkasan" class="space-y-3">
-                <div class="rounded-2xl bg-gradient-to-br from-[#0A5C36] to-[#06342b] p-5 text-white"
-                     style="border: 1px solid rgba(201,162,74,0.3);">
-                    <div class="text-[11px] uppercase tracking-wider text-[#e7d3a1]">Omzet Hari Ini</div>
-                    <div class="font-['Marcellus',serif] text-2xl">{{ formatRupiah(ringkasan.omzetHariIni) }}</div>
-                    <div class="mt-1 text-xs opacity-75">{{ ringkasan.totalTransaksi ?? 0 }} transaksi</div>
-                </div>
+            <div v-if="ringkasan" class="space-y-5">
+                <UiCard variant="hero-dark" padding="md">
+                    <p class="text-[11px] font-semibold uppercase tracking-wider text-white/70">Omzet Hari Ini</p>
+                    <MoneyText :amount="ringkasan.omzetHariIni" size="xl" tone="inherit" class="mt-1 block text-white" />
+                    <p class="mt-1 text-xs text-white/75 tabular-nums">{{ ringkasan.totalTransaksi ?? 0 }} transaksi</p>
+                </UiCard>
 
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="rounded-xl border border-[#ece3cf] bg-white p-3.5">
-                        <div class="text-[10px] uppercase tracking-wider text-[#8a9690]">Sesi Aktif</div>
-                        <div class="text-lg font-bold text-[#0A5C36]">{{ ringkasan.sesiAktif ?? 0 }}</div>
-                    </div>
-                    <div class="rounded-xl border border-[#ece3cf] bg-white p-3.5">
-                        <div class="text-[10px] uppercase tracking-wider text-[#8a9690]">Stok Rendah</div>
-                        <div class="text-lg font-bold" :class="(ringkasan.stokRendah ?? 0) > 0 ? 'text-amber-600' : 'text-[#0A5C36]'">
-                            {{ ringkasan.stokRendah ?? 0 }}
-                        </div>
-                    </div>
+                    <StatCard icon="clock" tone="emerald" label="Sesi Aktif">
+                        <template #value>
+                            <span class="text-2xl font-extrabold tabular-nums tracking-tight text-emerald-700">{{ ringkasan.sesiAktif ?? 0 }}</span>
+                        </template>
+                    </StatCard>
+                    <StatCard
+                        icon="info"
+                        :tone="(ringkasan.stokRendah ?? 0) > 0 ? 'amber' : 'emerald'"
+                        label="Stok Rendah"
+                    >
+                        <template #value>
+                            <span
+                                class="text-2xl font-extrabold tabular-nums tracking-tight"
+                                :class="(ringkasan.stokRendah ?? 0) > 0 ? 'text-amber-600' : 'text-emerald-700'"
+                            >{{ ringkasan.stokRendah ?? 0 }}</span>
+                        </template>
+                    </StatCard>
                 </div>
 
-                <div v-if="ringkasan.topProduk?.length">
-                    <h2 class="mb-2 text-sm font-semibold text-[#3a4d42]">Produk Terlaris</h2>
-                    <div class="space-y-2">
-                        <div v-for="(p, idx) in ringkasan.topProduk" :key="idx"
-                             class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-2.5">
-                            <div class="flex items-center gap-2">
-                                <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[#C9A24A]/10 text-[10px] font-bold text-[#C9A24A]">{{ idx + 1 }}</span>
-                                <span class="text-sm">{{ p.nama }}</span>
-                            </div>
-                            <span class="text-xs font-semibold text-[#8a9690]">{{ p.terjual }} pcs</span>
-                        </div>
+                <SectionCard v-if="ringkasan.topProduk?.length" title="Produk Terlaris" flush>
+                    <div class="divide-y divide-slate-100">
+                        <ListRow v-for="(p, idx) in ringkasan.topProduk" :key="idx" :title="p.nama">
+                            <template #leading>
+                                <span class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-50 text-xs font-bold tabular-nums text-amber-600 ring-1 ring-inset ring-amber-100">{{ idx + 1 }}</span>
+                            </template>
+                            <template #trailing>
+                                <span class="text-sm font-semibold tabular-nums text-slate-500">{{ p.terjual }} pcs</span>
+                            </template>
+                        </ListRow>
                     </div>
-                </div>
+                </SectionCard>
             </div>
-            <div v-else class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-8 text-center text-sm text-[#8a9690]">
-                Data POS belum tersedia
-            </div>
+            <EmptyState
+                v-else
+                icon="cash"
+                title="Data POS belum tersedia"
+                message="Belum ada transaksi atau sesi kasir untuk ditampilkan."
+            />
         </template>
 
         <!-- ═══ Mode Kasir ═══ -->
         <template v-else>
             <!-- Search -->
-            <input v-model="searchQuery" placeholder="Cari produk..."
-                   class="mb-3 w-full rounded-lg border border-[#ece3cf] bg-white px-3 py-2.5 text-sm focus:border-[#0A5C36] focus:outline-none focus:ring-1 focus:ring-[#0A5C36]">
+            <UiField label="Cari Produk">
+                <UiInput v-model="searchQuery" placeholder="Cari produk..." />
+            </UiField>
 
             <!-- Product grid -->
-            <div class="mb-4 grid grid-cols-3 gap-2">
+            <div class="grid grid-cols-3 gap-2">
                 <button v-for="p in produkFiltered" :key="p.id"
-                        class="flex flex-col items-center rounded-xl border border-[#ece3cf] bg-white p-2.5 text-center transition hover:border-[#C9A24A]/50 hover:shadow-sm"
+                        type="button"
+                        class="flex flex-col items-center rounded-2xl bg-white p-2.5 text-center shadow-soft ring-1 ring-slate-100 transition-all duration-200 hover:ring-emerald-200 active:scale-[.97]"
                         @click="tambahKeKeranjang(p)">
-                    <div class="mb-1 text-xs font-medium leading-tight">{{ p.nama }}</div>
-                    <div class="text-[10px] font-bold text-[#0A5C36]">{{ formatRupiah(p.harga) }}</div>
-                    <div v-if="p.stok != null" class="mt-0.5 text-[9px] text-[#8a9690]">stok: {{ p.stok }}</div>
+                    <div class="mb-1 text-xs font-semibold leading-tight tracking-tight text-slate-900">{{ p.nama }}</div>
+                    <MoneyText :amount="p.harga" size="sm" tone="emerald" />
+                    <div v-if="p.stok != null" class="mt-0.5 text-[10px] tabular-nums text-slate-400">stok: {{ p.stok }}</div>
                 </button>
             </div>
 
             <!-- Keranjang -->
-            <div v-if="keranjang.length" class="rounded-xl border border-[#C9A24A]/40 bg-white p-4">
-                <h2 class="mb-2 text-sm font-semibold text-[#3a4d42]">Keranjang</h2>
-                <div class="space-y-2">
-                    <div v-for="k in keranjang" :key="k.id"
-                         class="flex items-center justify-between text-sm">
-                        <div class="flex items-center gap-2">
-                            <button @click="hapusDariKeranjang(k.id)" class="text-rose-400 hover:text-rose-600">×</button>
-                            <span>{{ k.nama }} ×{{ k.qty }}</span>
-                        </div>
-                        <span class="font-semibold">{{ formatRupiah(k.harga * k.qty) }}</span>
-                    </div>
+            <SectionCard v-if="keranjang.length" title="Keranjang" flush>
+                <div class="divide-y divide-slate-100">
+                    <ListRow v-for="k in keranjang" :key="k.id">
+                        <template #leading>
+                            <button type="button" @click="hapusDariKeranjang(k.id)" class="flex h-7 w-7 items-center justify-center rounded-full text-rose-400 transition hover:bg-rose-50 hover:text-rose-600">
+                                <span class="text-lg leading-none">×</span>
+                            </button>
+                        </template>
+                        <template #title>{{ k.nama }} ×{{ k.qty }}</template>
+                        <template #trailing>
+                            <MoneyText :amount="k.harga * k.qty" size="sm" />
+                        </template>
+                    </ListRow>
                 </div>
-                <div class="mt-3 flex items-center justify-between border-t border-[#ece3cf] pt-3">
-                    <span class="font-bold">Total</span>
-                    <span class="text-lg font-bold text-[#0A5C36]">{{ formatRupiah(totalKeranjang) }}</span>
+                <div class="flex items-center justify-between border-t border-slate-100 px-4 py-3">
+                    <span class="font-bold tracking-tight text-slate-900">Total</span>
+                    <MoneyText :amount="totalKeranjang" size="lg" tone="emerald" />
                 </div>
-                <button @click="checkout" :disabled="submitting"
-                        class="mt-3 w-full rounded-lg bg-[#0A5C36] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#08472a] disabled:opacity-50">
-                    {{ submitting ? 'Memproses...' : 'Bayar' }}
-                </button>
-            </div>
+                <div class="px-4 pb-4">
+                    <UiButton variant="primary" block :loading="submitting" :disabled="submitting" iconLeft="cash" @click="checkout">
+                        {{ submitting ? 'Memproses...' : 'Bayar' }}
+                    </UiButton>
+                </div>
+            </SectionCard>
         </template>
     </div>
 </template>

@@ -3,6 +3,15 @@ import { onMounted, ref } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
 import { formatRupiahFull } from '@/keuangan-pwa/format.js'
+import {
+    PageHeader,
+    SegmentedControl,
+    SectionCard,
+    UiCard,
+    MoneyText,
+    UiIcon,
+    LoadingState,
+} from '@/Shared'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 
@@ -27,109 +36,119 @@ onMounted(muat)
 </script>
 
 <template>
-    <div>
-        <h1 class="mb-4 font-['Marcellus',serif] text-lg text-[#0A5C36]">Laporan ISAK 35</h1>
-        <p class="mb-4 text-xs text-[#8a9690]">Entitas Berorientasi Nonlaba</p>
+    <div class="space-y-5">
+        <PageHeader
+            kicker="ISAK 35"
+            title="Laporan ISAK 35"
+            subtitle="Entitas Berorientasi Nonlaba"
+        />
 
-        <div class="mb-4 flex gap-1 overflow-x-auto rounded-xl bg-[#e8e1d0]/60 p-1">
-            <button v-for="t in tabs" :key="t.key" @click="gantiTab(t.key)"
-                    class="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition"
-                    :class="tab === t.key ? 'bg-white text-[#0A5C36] shadow-sm' : 'text-[#8a9690]'">
-                {{ t.label }}
-            </button>
-        </div>
+        <SegmentedControl
+            :model-value="tab"
+            :options="tabs.map((t) => ({ value: t.key, label: t.label }))"
+            @update:model-value="gantiTab"
+        />
 
-        <div v-if="loading" class="space-y-3">
-            <div v-for="i in 4" :key="i" class="h-10 animate-pulse rounded-lg bg-[#e8e1d0]/60"></div>
-        </div>
+        <LoadingState v-if="loading" variant="card" :count="4" />
 
         <!-- Perubahan Aset Neto -->
         <template v-else-if="tab === 'perubahan_aset_neto' && data">
-            <div v-for="(section, key) in data" :key="key" class="mb-4 rounded-xl border border-[#ece3cf] bg-white p-4">
-                <div class="mb-2 text-xs font-bold uppercase tracking-wider text-[#8a9690]">
-                    {{ key.replace(/_/g, ' ') }}
-                </div>
-                <template v-if="typeof section === 'object' && section !== null">
+            <SectionCard
+                v-for="(section, key) in data"
+                :key="key"
+                :title="key.replace(/_/g, ' ')"
+                flush
+            >
+                <div v-if="typeof section === 'object' && section !== null" class="divide-y divide-slate-100">
                     <div v-for="(v, k) in section" :key="k"
-                         class="flex justify-between py-1.5 text-sm"
+                         class="flex items-center justify-between gap-3 px-5 py-3 text-sm"
                          :class="k === 'saldo_akhir' || k === 'perubahan' ? 'font-bold' : ''">
-                        <span>{{ k.replace(/_/g, ' ') }}</span>
-                        <span :class="{ 'text-emerald-600': v > 0 && (k === 'surplus' || k === 'perubahan'), 'text-rose-600': v < 0 }">
-                            {{ formatRupiahFull(v) }}
-                        </span>
+                        <span class="capitalize text-slate-600">{{ k.replace(/_/g, ' ') }}</span>
+                        <MoneyText
+                            :amount="v"
+                            size="sm"
+                            :tone="v > 0 && (k === 'surplus' || k === 'perubahan') ? 'emerald' : (v < 0 ? 'rose' : 'default')"
+                        />
                     </div>
-                </template>
-            </div>
+                </div>
+            </SectionCard>
         </template>
 
         <!-- Penghasilan Komprehensif -->
         <template v-else-if="tab === 'penghasilan_komprehensif' && data">
-            <div v-for="key in ['tanpa_pembatasan', 'dengan_pembatasan']" :key="key"
-                 class="mb-4 rounded-xl border border-[#ece3cf] bg-white p-4">
-                <div class="mb-2 text-xs font-bold uppercase tracking-wider text-[#8a9690]">
-                    {{ key.replace(/_/g, ' ') }}
+            <SectionCard
+                v-for="key in ['tanpa_pembatasan', 'dengan_pembatasan']"
+                :key="key"
+                :title="key.replace(/_/g, ' ')"
+                flush
+            >
+                <div class="divide-y divide-slate-100">
+                    <div class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                        <span class="text-slate-600">Total Pendapatan</span>
+                        <MoneyText :amount="data[key]?.total_pendapatan ?? 0" size="sm" strong tone="default" />
+                    </div>
+                    <div class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                        <span class="text-slate-600">Total Beban</span>
+                        <MoneyText :amount="data[key]?.total_beban ?? 0" size="sm" strong tone="default" />
+                    </div>
+                    <div class="flex items-center justify-between gap-3 px-5 py-3 text-sm font-bold">
+                        <span class="text-slate-600">Surplus / Defisit</span>
+                        <MoneyText
+                            :amount="data[key]?.surplus ?? 0"
+                            size="sm"
+                            :tone="(data[key]?.surplus ?? 0) >= 0 ? 'emerald' : 'rose'"
+                        />
+                    </div>
                 </div>
-                <div class="space-y-1.5 text-sm">
-                    <div class="flex justify-between">
-                        <span>Total Pendapatan</span>
-                        <span class="font-semibold">{{ formatRupiahFull(data[key]?.total_pendapatan ?? 0) }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span>Total Beban</span>
-                        <span class="font-semibold">{{ formatRupiahFull(data[key]?.total_beban ?? 0) }}</span>
-                    </div>
-                    <div class="flex justify-between border-t border-[#ece3cf] pt-2 font-bold">
-                        <span>Surplus / Defisit</span>
-                        <span :class="(data[key]?.surplus ?? 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'">
-                            {{ formatRupiahFull(data[key]?.surplus ?? 0) }}
-                        </span>
-                    </div>
-                </div>
-            </div>
+            </SectionCard>
 
-            <div class="rounded-2xl bg-gradient-to-br from-[#0A5C36] to-[#06342b] p-4 text-center text-white"
-                 style="border: 1px solid rgba(201,162,74,0.3);">
-                <div class="text-[11px] uppercase tracking-wider text-[#e7d3a1]">Total Surplus</div>
-                <div class="font-['Marcellus',serif] text-xl">{{ formatRupiahFull(data.surplus_total ?? 0) }}</div>
-            </div>
+            <UiCard variant="hero-dark" padding="md">
+                <div class="text-center">
+                    <div class="text-[11px] font-semibold uppercase tracking-wider text-white/80">Total Surplus</div>
+                    <div class="mt-1">
+                        <MoneyText :amount="data.surplus_total ?? 0" size="xl" tone="inherit" />
+                    </div>
+                </div>
+            </UiCard>
         </template>
 
         <!-- Posisi Keuangan -->
         <template v-else-if="tab === 'posisi_keuangan' && data">
-            <div class="space-y-4">
-                <div class="rounded-xl border border-[#ece3cf] bg-white p-4">
-                    <div class="mb-2 text-xs font-bold uppercase tracking-wider text-[#8a9690]">Aset</div>
+            <SectionCard title="Aset" flush>
+                <div class="divide-y divide-slate-100">
                     <div v-for="item in (data.aset ?? [])" :key="item.kode"
-                         class="flex justify-between py-1.5 text-sm">
-                        <span>{{ item.nama ?? item.kode }}</span>
-                        <span class="font-semibold">{{ formatRupiahFull(item.saldo ?? 0) }}</span>
+                         class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                        <span class="text-slate-600">{{ item.nama ?? item.kode }}</span>
+                        <MoneyText :amount="item.saldo ?? 0" size="sm" strong tone="default" />
                     </div>
-                    <div class="flex justify-between border-t border-[#ece3cf] pt-2 font-bold text-sm">
-                        <span>Total Aset</span>
-                        <span>{{ formatRupiahFull(data.total_aset ?? 0) }}</span>
+                    <div class="flex items-center justify-between gap-3 px-5 py-3 text-sm font-bold">
+                        <span class="text-slate-600">Total Aset</span>
+                        <MoneyText :amount="data.total_aset ?? 0" size="sm" tone="default" />
                     </div>
                 </div>
+            </SectionCard>
 
-                <div class="rounded-xl border border-[#ece3cf] bg-white p-4">
-                    <div class="mb-2 text-xs font-bold uppercase tracking-wider text-[#8a9690]">Aset Neto</div>
-                    <div class="flex justify-between py-1.5 text-sm">
-                        <span>Tanpa Pembatasan</span>
-                        <span class="font-semibold">{{ formatRupiahFull(data.aset_neto?.tanpa_pembatasan ?? 0) }}</span>
+            <SectionCard title="Aset Neto" flush>
+                <div class="divide-y divide-slate-100">
+                    <div class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                        <span class="text-slate-600">Tanpa Pembatasan</span>
+                        <MoneyText :amount="data.aset_neto?.tanpa_pembatasan ?? 0" size="sm" strong tone="default" />
                     </div>
-                    <div class="flex justify-between py-1.5 text-sm">
-                        <span>Dengan Pembatasan</span>
-                        <span class="font-semibold">{{ formatRupiahFull(data.aset_neto?.dengan_pembatasan ?? 0) }}</span>
+                    <div class="flex items-center justify-between gap-3 px-5 py-3 text-sm">
+                        <span class="text-slate-600">Dengan Pembatasan</span>
+                        <MoneyText :amount="data.aset_neto?.dengan_pembatasan ?? 0" size="sm" strong tone="default" />
                     </div>
-                    <div class="flex justify-between border-t border-[#ece3cf] pt-2 font-bold text-sm">
-                        <span>Total Aset Neto</span>
-                        <span class="text-[#0A5C36]">{{ formatRupiahFull(data.aset_neto?.total ?? 0) }}</span>
+                    <div class="flex items-center justify-between gap-3 px-5 py-3 text-sm font-bold">
+                        <span class="text-slate-600">Total Aset Neto</span>
+                        <MoneyText :amount="data.aset_neto?.total ?? 0" size="sm" tone="emerald" />
                     </div>
                 </div>
+            </SectionCard>
 
-                <div class="rounded-lg px-3 py-2 text-center text-sm font-semibold"
-                     :class="data.seimbang ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'">
-                    {{ data.seimbang ? '✓ Neraca Seimbang' : '✗ Neraca Tidak Seimbang' }}
-                </div>
+            <div class="flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold ring-1 ring-inset"
+                 :class="data.seimbang ? 'bg-emerald-50 text-emerald-700 ring-emerald-100' : 'bg-rose-50 text-rose-700 ring-rose-100'">
+                <UiIcon :name="data.seimbang ? 'check-circle' : 'x-circle'" class="h-4 w-4" />
+                {{ data.seimbang ? 'Neraca Seimbang' : 'Neraca Tidak Seimbang' }}
             </div>
         </template>
     </div>
