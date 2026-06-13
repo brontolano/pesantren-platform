@@ -1,13 +1,13 @@
 <script setup>
 import { Head } from '@inertiajs/vue3'
 import { ref, onMounted } from 'vue'
+import { AppShell, PageHeader, SectionCard, ListRow, StatusBadge, MoneyText, EmptyState, LoadingState, IconCircle } from '@/Shared'
+
+defineProps({ navigation: { type: Array, default: () => [] } })
 
 const slip = ref([])
 const error = ref('')
-
-function rp(n) {
-    return 'Rp ' + Number(n || 0).toLocaleString('id-ID')
-}
+const loading = ref(true)
 
 onMounted(async () => {
     try {
@@ -16,22 +16,45 @@ onMounted(async () => {
         })
         if (res.ok) slip.value = (await res.json()).slip || []
         else error.value = 'Gagal memuat slip.'
-    } catch (e) { error.value = 'Tidak ada koneksi.' }
+    } catch (e) {
+        error.value = 'Tidak ada koneksi.'
+    } finally {
+        loading.value = false
+    }
 })
 </script>
 
 <template>
     <Head title="Slip Gaji Saya" />
-    <div class="min-h-screen bg-[#FDFBF7] p-4">
-        <h1 class="text-lg font-semibold text-[#0A5C36] mb-3">Slip Gaji Saya</h1>
-        <p v-if="error" class="text-sm text-red-600">{{ error }}</p>
-        <div v-else class="space-y-3">
-            <div v-for="s in slip" :key="s.periode" class="rounded-xl bg-white border p-4">
-                <div class="font-medium">{{ s.periode }}</div>
-                <div class="text-sm text-gray-600">Bruto {{ rp(s.bruto) }} · PPh21 {{ rp(s.pph21) }}</div>
-                <div class="text-lg font-semibold text-[#0A5C36]">Diterima {{ rp(s.neto) }}</div>
-            </div>
-            <p v-if="slip.length === 0" class="text-sm text-gray-400">Belum ada slip final.</p>
+
+    <AppShell :nav-items="navigation" brand-name="Keuangan Lapangan">
+        <div class="space-y-5">
+            <PageHeader kicker="Penggajian" title="Slip Gaji Saya" subtitle="Riwayat slip final Anda" />
+
+            <LoadingState v-if="loading" variant="list" :count="3" />
+
+            <template v-else>
+                <SectionCard v-if="slip.length" flush>
+                    <div class="divide-y divide-slate-100">
+                        <ListRow v-for="s in slip" :key="s.periode">
+                            <template #leading><IconCircle icon="cash" tone="emerald" /></template>
+                            <template #title>{{ s.periode }}</template>
+                            <template #subtitle>Bruto <MoneyText :amount="s.bruto" size="sm" tone="muted" /> · PPh21 <MoneyText :amount="s.pph21" size="sm" tone="muted" /></template>
+                            <template #trailing>
+                                <MoneyText :amount="s.neto" tone="emerald" size="md" />
+                                <StatusBadge status="lunas" label="Diterima" size="sm" class="mt-1" />
+                            </template>
+                        </ListRow>
+                    </div>
+                </SectionCard>
+
+                <EmptyState
+                    v-else
+                    icon="document"
+                    :title="error || 'Belum ada slip'"
+                    :message="error ? 'Periksa koneksi lalu coba lagi.' : 'Slip gaji final Anda akan muncul di sini.'"
+                />
+            </template>
         </div>
-    </div>
+    </AppShell>
 </template>
