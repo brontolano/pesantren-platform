@@ -162,18 +162,28 @@ class PimpinanPwaController extends Controller
                 ? null // super_admin melihat semua
                 : $user->getRoleNames()->all();
 
-            $q = ApprovalRequest::query()->menunggu()->latest('id')->limit(20);
+            $q = ApprovalRequest::query()->menunggu()->with(['approvable', 'peminta'])->latest('id')->limit(20);
             if ($roleNames !== null) {
                 $q->whereIn('approver_role', $roleNames === [] ? ['__none__'] : $roleNames);
             }
 
-            $approvals = $q->get()->map(fn (ApprovalRequest $r) => [
-                'id' => $r->id,
-                'tipe' => class_basename($r->approvable_type),
-                'approvable_id' => $r->approvable_id,
-                'approver_role' => $r->approver_role,
-                'diajukan_pada' => $r->created_at?->toDateTimeString(),
-            ]);
+            // Perkaya payload agar pimpinan tidak menyetujui "buta": nominal +
+            // pemohon + keterangan diambil DEFENSIF dari approvable polymorphic
+            // (atribut tak ada -> null tanpa error).
+            $approvals = $q->get()->map(function (ApprovalRequest $r) {
+                $a = $r->approvable;
+
+                return [
+                    'id' => $r->id,
+                    'tipe' => class_basename($r->approvable_type),
+                    'approvable_id' => $r->approvable_id,
+                    'approver_role' => $r->approver_role,
+                    'diajukan_pada' => $r->created_at?->toDateTimeString(),
+                    'nominal' => $a ? ($a->nominal ?? $a->jumlah ?? $a->total ?? $a->amount ?? $a->nilai ?? null) : null,
+                    'keterangan' => $a ? ($a->keterangan ?? $a->deskripsi ?? $a->catatan ?? $a->nama ?? $a->judul ?? null) : null,
+                    'pemohon' => $r->peminta?->name,
+                ];
+            });
         }
 
         return [
