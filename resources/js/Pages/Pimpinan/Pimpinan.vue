@@ -1,17 +1,54 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
-import { ref, onMounted } from 'vue'
+import { Head, usePage } from '@inertiajs/vue3'
+import { computed, ref, onMounted } from 'vue'
+import {
+    AppShell, HeroHeader, StatCard, SectionCard, ListRow, EmptyState,
+    LoadingState, BottomSheet, UiButton, UiField, UiInput, MoneyText, IconCircle,
+} from '@/Shared'
 
 defineProps({ userName: String })
 
+const page = usePage()
+const branding = computed(() => page.props.branding ?? {})
+const brandName = computed(() => branding.value.name || 'Pesantren')
+
 const data = ref(null)
 const error = ref('')
-const busy = ref({})
-const tolakId = ref(null)
+const loading = ref(true)
+const busy = ref(false)
+
+// BottomSheet approval
+const sheetOpen = ref(false)
+const activeItem = ref(null)
+const mode = ref('confirm') // 'confirm' | 'reject'
 const alasan = ref('')
 
-function rp(n) {
-    return 'Rp ' + Number(n || 0).toLocaleString('id-ID')
+const navItems = [
+    { key: 'beranda', label: 'Beranda', href: '/pimpinan', active: true },
+    { key: 'akun', label: 'Panel', href: '/admin', active: false },
+]
+
+const TIPE_LABEL = {
+    JurnalManual: 'Jurnal Manual',
+    Pencairan: 'Pencairan Dana',
+    Pembiayaan: 'Pengajuan Pembiayaan',
+    Payroll: 'Penggajian',
+    Pengeluaran: 'Pengeluaran',
+    Belanja: 'Belanja',
+}
+function tipeLabel(t) {
+    return TIPE_LABEL[t] || (t || 'Permintaan').replace(/([a-z])([A-Z])/g, '$1 $2')
+}
+
+const MUTU_TONE = {
+    hijau: 'bg-emerald-50 text-emerald-700 ring-emerald-100',
+    kuning: 'bg-amber-50 text-amber-700 ring-amber-100',
+    merah: 'bg-rose-50 text-rose-700 ring-rose-100',
+}
+const MUTU_DOT = { hijau: 'bg-emerald-500', kuning: 'bg-amber-500', merah: 'bg-rose-500' }
+
+function persenText(k) {
+    return k?.persen === null || k?.persen === undefined ? '—' : `${k.persen}%`
 }
 
 function csrf() {
@@ -19,34 +56,54 @@ function csrf() {
 }
 
 async function muat() {
+    loading.value = true
+    error.value = ''
     try {
         const res = await fetch('/pimpinan/api/ringkasan', {
             headers: { Accept: 'application/json' }, credentials: 'same-origin',
         })
         if (res.ok) data.value = await res.json()
         else error.value = 'Gagal memuat data.'
-    } catch (e) { error.value = 'Tidak ada koneksi.' }
+    } catch (e) {
+        error.value = 'Tidak ada koneksi.'
+    } finally {
+        loading.value = false
+    }
 }
 
-async function putuskan(id, aksi) {
-    busy.value[id] = true
+function bukaItem(item) {
+    activeItem.value = item
+    mode.value = 'confirm'
+    alasan.value = ''
+    sheetOpen.value = true
+}
+
+async function putuskan(aksi) {
+    const item = activeItem.value
+    if (!item) return
+    busy.value = true
     try {
         const body = aksi === 'tolak' ? JSON.stringify({ alasan: alasan.value }) : '{}'
-        const res = await fetch(`/pimpinan/api/approval/${id}/${aksi}`, {
+        const res = await fetch(`/pimpinan/api/approval/${item.id}/${aksi}`, {
             method: 'POST', credentials: 'same-origin',
             headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf() },
             body,
         })
         if (res.ok) {
-            tolakId.value = null
+            sheetOpen.value = false
+            activeItem.value = null
             alasan.value = ''
             await muat()
         } else {
             const j = await res.json().catch(() => ({}))
             error.value = j.message || 'Gagal memproses.'
+            sheetOpen.value = false
         }
-    } catch (e) { error.value = 'Tidak ada koneksi.' }
-    busy.value[id] = false
+    } catch (e) {
+        error.value = 'Tidak ada koneksi.'
+    } finally {
+        busy.value = false
+    }
 }
 
 onMounted(muat)
@@ -54,98 +111,160 @@ onMounted(muat)
 
 <template>
     <Head title="Dasbor Pimpinan" />
-    <div class="min-h-screen bg-[#FDFBF7] p-4 max-w-lg mx-auto">
-        <h1 class="text-lg font-semibold text-[#0A5C36]">Dasbor Pimpinan</h1>
-        <p class="text-xs text-gray-500 mb-3">Assalamu'alaikum, {{ userName }}</p>
 
-        <p v-if="error" class="text-sm text-red-600 mb-2">{{ error }}</p>
-
-        <div v-if="data" class="space-y-4">
-            <!-- Kas hari ini -->
-            <section class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white border p-4 col-span-2">
-                    <div class="text-xs text-gray-500">Saldo Kas</div>
-                    <div class="text-xl font-semibold">{{ rp(data.kas.saldo) }}</div>
-                </div>
-                <div class="rounded-xl bg-white border p-4">
-                    <div class="text-xs text-gray-500">Pemasukan</div>
-                    <div class="font-semibold">{{ rp(data.kas.pendapatan) }}</div>
-                </div>
-                <div class="rounded-xl bg-white border p-4">
-                    <div class="text-xs text-gray-500">Pengeluaran</div>
-                    <div class="font-semibold">{{ rp(data.kas.beban) }}</div>
-                </div>
-            </section>
-
-            <!-- Kehadiran hari ini -->
-            <section class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white border p-4">
-                    <div class="text-xs text-gray-500">Kehadiran Santri Hari Ini</div>
-                    <div class="text-xl font-semibold">
-                        {{ data.kehadiran.santri.persen === null ? '—' : data.kehadiran.santri.persen + '%' }}
+    <AppShell :nav-items="navItems" :brand-name="brandName" :theme-color="branding.primaryColor || '#059669'">
+        <template #header>
+            <HeroHeader :name="userName || 'Pimpinan'" greeting="Assalamu'alaikum,">
+                <!-- KPI headline: Saldo Kas + Surplus/Defisit (kartu kaca di atas gradient) -->
+                <div v-if="data" class="grid grid-cols-2 gap-[11px]">
+                    <div class="col-span-2 rounded-[20px] bg-white/15 px-4 py-[14px] ring-1 ring-inset ring-white/20 backdrop-blur-sm">
+                        <p class="font-jost text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/70">Saldo Kas</p>
+                        <MoneyText :amount="data.kas.saldo" tone="inherit" size="xl" class="mt-1 block text-white" />
                     </div>
-                    <div class="text-xs text-gray-400">{{ data.kehadiran.santri.hadir }}/{{ data.kehadiran.santri.total }} catatan</div>
-                </div>
-                <div class="rounded-xl bg-white border p-4">
-                    <div class="text-xs text-gray-500">Kehadiran Guru Hari Ini</div>
-                    <div class="text-xl font-semibold">
-                        {{ data.kehadiran.guru.persen === null ? '—' : data.kehadiran.guru.persen + '%' }}
+                    <div class="rounded-[20px] bg-white/15 px-4 py-[14px] ring-1 ring-inset ring-white/20 backdrop-blur-sm">
+                        <p class="font-jost text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white/70">Pemasukan</p>
+                        <MoneyText :amount="data.kas.pendapatan" tone="inherit" size="md" class="mt-1 block text-white" />
                     </div>
-                    <div class="text-xs text-gray-400">{{ data.kehadiran.guru.hadir }}/{{ data.kehadiran.guru.total }} catatan</div>
-                </div>
-            </section>
-
-            <!-- Lampu mutu (defensif — tampil hanya bila modul mutu siap) -->
-            <section v-if="data.mutu" class="rounded-xl bg-white border p-4">
-                <div class="text-xs text-gray-500 mb-2">Lampu Mutu</div>
-                <div class="flex gap-4">
-                    <span v-for="(jumlah, warna) in data.mutu" :key="warna" class="text-sm">
-                        <span :class="{
-                            'text-green-700': warna === 'hijau',
-                            'text-amber-600': warna === 'kuning',
-                            'text-red-600': warna === 'merah',
-                        }">●</span> {{ warna }}: <b>{{ jumlah }}</b>
-                    </span>
-                </div>
-            </section>
-
-            <!-- Antrean lain (baca-saja) -->
-            <section class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-white border p-4">
-                    <div class="text-xs text-gray-500">Izin Santri Menunggu</div>
-                    <div class="text-xl font-semibold">{{ data.antrean.izin_diajukan }}</div>
-                </div>
-                <div class="rounded-xl bg-white border p-4">
-                    <div class="text-xs text-gray-500">Pelanggaran Belum Diverifikasi</div>
-                    <div class="text-xl font-semibold">{{ data.antrean.pelanggaran_menunggu }}</div>
-                </div>
-            </section>
-
-            <!-- Antrean approval (hanya rule yang user-nya approver) -->
-            <section class="rounded-xl bg-white border p-4">
-                <div class="text-xs text-gray-500 mb-2">Menunggu Persetujuan Anda</div>
-                <p v-if="data.antrean.approval.length === 0" class="text-sm text-gray-400">Tidak ada antrean.</p>
-                <div v-for="item in data.antrean.approval" :key="item.id" class="border-t py-2 first:border-t-0">
-                    <div class="text-sm font-medium">{{ item.tipe }} #{{ item.approvable_id }}</div>
-                    <div class="text-xs text-gray-400">{{ item.diajukan_pada }}</div>
-                    <div class="flex gap-2 mt-2" v-if="tolakId !== item.id">
-                        <button class="rounded-lg bg-[#0A5C36] text-white text-sm px-3 py-1.5 disabled:opacity-50"
-                            :disabled="busy[item.id]" @click="putuskan(item.id, 'setujui')">Setujui</button>
-                        <button class="rounded-lg border border-red-300 text-red-700 text-sm px-3 py-1.5"
-                            :disabled="busy[item.id]" @click="tolakId = item.id">Tolak…</button>
-                    </div>
-                    <div v-else class="mt-2 space-y-2">
-                        <input v-model="alasan" placeholder="Alasan penolakan (wajib)"
-                            class="w-full rounded-lg border px-3 py-1.5 text-sm" />
-                        <div class="flex gap-2">
-                            <button class="rounded-lg bg-red-600 text-white text-sm px-3 py-1.5 disabled:opacity-50"
-                                :disabled="busy[item.id] || !alasan.trim()" @click="putuskan(item.id, 'tolak')">Kirim Penolakan</button>
-                            <button class="rounded-lg border text-sm px-3 py-1.5" @click="tolakId = null; alasan = ''">Batal</button>
-                        </div>
+                    <div class="rounded-[20px] bg-white/15 px-4 py-[14px] ring-1 ring-inset ring-white/20 backdrop-blur-sm">
+                        <p class="font-jost text-[10.5px] font-semibold uppercase tracking-[0.14em]"
+                           :class="data.kas.surplus_defisit < 0 ? 'text-rose-200' : 'text-[#e7d3a1]'">
+                            {{ data.kas.surplus_defisit < 0 ? 'Defisit' : 'Surplus' }}
+                        </p>
+                        <MoneyText :amount="data.kas.surplus_defisit" tone="inherit" size="md" signed class="mt-1 block text-white" />
                     </div>
                 </div>
-            </section>
+            </HeroHeader>
+        </template>
+
+        <div class="space-y-5">
+            <!-- Loading -->
+            <LoadingState v-if="loading && !data" variant="stat" :count="4" />
+
+            <!-- Error -->
+            <div
+                v-else-if="error && !data"
+                class="rounded-3xl bg-white p-6 text-center ring-1 ring-rose-100 shadow-soft"
+            >
+                <IconCircle icon="wifi-off" tone="rose" size="lg" class="mx-auto" />
+                <p class="mt-3 text-sm font-semibold text-slate-700">{{ error }}</p>
+                <UiButton variant="secondary" size="sm" icon-left="arrow-up-right" class="mt-4" @click="muat">
+                    Coba lagi
+                </UiButton>
+            </div>
+
+            <template v-else-if="data">
+                <!-- Kehadiran hari ini -->
+                <div class="grid grid-cols-2 gap-3">
+                    <StatCard
+                        icon="user" tone="emerald" label="Hadir Santri"
+                        :value="persenText(data.kehadiran.santri)"
+                        :hint="`${data.kehadiran.santri.hadir}/${data.kehadiran.santri.total} catatan`"
+                    />
+                    <StatCard
+                        icon="user" tone="teal" label="Hadir Guru"
+                        :value="persenText(data.kehadiran.guru)"
+                        :hint="`${data.kehadiran.guru.hadir}/${data.kehadiran.guru.total} catatan`"
+                    />
+                </div>
+
+                <!-- Antrean operasional -->
+                <div class="grid grid-cols-2 gap-3">
+                    <StatCard icon="document" tone="amber" label="Izin Menunggu" :value="data.antrean.izin_diajukan" />
+                    <StatCard icon="ban" tone="rose" label="Pelanggaran Baru" :value="data.antrean.pelanggaran_menunggu" />
+                </div>
+
+                <!-- Lampu Mutu (defensif) -->
+                <SectionCard v-if="data.mutu && Object.keys(data.mutu).length" kicker="Mutu" title="Lampu Mutu">
+                    <div class="flex flex-wrap gap-2">
+                        <span
+                            v-for="(jumlah, warna) in data.mutu"
+                            :key="warna"
+                            class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-jost text-xs font-semibold capitalize ring-1 ring-inset"
+                            :class="MUTU_TONE[warna] || 'bg-slate-100 text-slate-600 ring-slate-200'"
+                        >
+                            <span class="h-2 w-2 rounded-full" :class="MUTU_DOT[warna] || 'bg-slate-400'" />
+                            {{ warna }} · {{ jumlah }}
+                        </span>
+                    </div>
+                </SectionCard>
+
+                <!-- Inbox approval -->
+                <SectionCard kicker="Persetujuan" title="Menunggu Persetujuan Anda" flush>
+                    <EmptyState
+                        v-if="!data.antrean.approval.length"
+                        icon="check-circle" tone="emerald"
+                        title="Tidak ada antrean"
+                        message="Semua permintaan persetujuan sudah diproses."
+                    />
+                    <div v-else class="divide-y divide-slate-100">
+                        <ListRow
+                            v-for="item in data.antrean.approval"
+                            :key="item.id"
+                            chevron
+                            class="cursor-pointer"
+                            @click="bukaItem(item)"
+                        >
+                            <template #leading>
+                                <IconCircle icon="inbox" tone="amber" />
+                            </template>
+                            <template #title>{{ tipeLabel(item.tipe) }} #{{ item.approvable_id }}</template>
+                            <template #subtitle>
+                                {{ item.pemohon ? `Oleh ${item.pemohon}` : (item.diajukan_pada || '—') }}
+                            </template>
+                            <template #trailing>
+                                <MoneyText v-if="item.nominal != null" :amount="item.nominal" size="sm" />
+                            </template>
+                        </ListRow>
+                    </div>
+                </SectionCard>
+            </template>
         </div>
-        <p v-else-if="!error" class="text-sm text-gray-400">Memuat...</p>
-    </div>
+
+        <!-- Sheet konfirmasi / penolakan -->
+        <BottomSheet v-model="sheetOpen" :title="activeItem ? tipeLabel(activeItem.tipe) : ''">
+            <div v-if="activeItem" class="space-y-3">
+                <dl class="space-y-2.5 rounded-2xl bg-slate-50 p-4 text-sm">
+                    <div v-if="activeItem.nominal != null" class="flex items-center justify-between gap-3">
+                        <dt class="text-slate-500">Nominal</dt>
+                        <dd><MoneyText :amount="activeItem.nominal" size="md" /></dd>
+                    </div>
+                    <div v-if="activeItem.pemohon" class="flex items-center justify-between gap-3">
+                        <dt class="text-slate-500">Pemohon</dt>
+                        <dd class="font-semibold text-slate-800">{{ activeItem.pemohon }}</dd>
+                    </div>
+                    <div v-if="activeItem.keterangan" class="flex flex-col gap-1">
+                        <dt class="text-slate-500">Keterangan</dt>
+                        <dd class="text-slate-800">{{ activeItem.keterangan }}</dd>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
+                        <dt class="text-slate-500">Diajukan</dt>
+                        <dd class="text-slate-700">{{ activeItem.diajukan_pada || '—' }}</dd>
+                    </div>
+                </dl>
+
+                <UiField v-if="mode === 'reject'" label="Alasan penolakan" required>
+                    <template #default="{ fieldId, describedby, invalid }">
+                        <UiInput
+                            :id="fieldId" v-model="alasan" type="textarea" :rows="3"
+                            :aria-describedby="describedby" :invalid="invalid"
+                            placeholder="Tuliskan alasan penolakan (wajib)…"
+                        />
+                    </template>
+                </UiField>
+            </div>
+
+            <template #footer>
+                <div v-if="mode === 'confirm'" class="flex gap-2">
+                    <UiButton variant="danger" block :disabled="busy" @click="mode = 'reject'">Tolak…</UiButton>
+                    <UiButton variant="primary" block :loading="busy" @click="putuskan('setujui')">Setujui</UiButton>
+                </div>
+                <div v-else class="flex gap-2">
+                    <UiButton variant="ghost" block :disabled="busy" @click="mode = 'confirm'">Batal</UiButton>
+                    <UiButton variant="danger" block :loading="busy" :disabled="!alasan.trim()" @click="putuskan('tolak')">
+                        Kirim Penolakan
+                    </UiButton>
+                </div>
+            </template>
+        </BottomSheet>
+    </AppShell>
 </template>
