@@ -3,6 +3,18 @@ import { onMounted, ref, watch } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
 import { formatRupiah } from '@/keuangan-pwa/format.js'
+import {
+    PageHeader,
+    SectionCard,
+    StatCard,
+    ListRow,
+    Chip,
+    MoneyText,
+    EmptyState,
+    LoadingState,
+    IconCircle,
+    UiIcon,
+} from '@/Shared'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 
@@ -37,117 +49,166 @@ const labelTerikat = { wakaf: 'Wakaf (PSAK 112)', zis: 'Zakat-Infak-Sedekah (PSA
 </script>
 
 <template>
-    <h2 class="mb-3 font-['Marcellus',serif] text-lg text-[#0A5C36]">Dana & Realisasi</h2>
+    <div class="space-y-5">
+        <PageHeader kicker="Laporan" title="Dana & Realisasi" subtitle="Posisi dana per kategori sumber" />
 
-    <div class="mb-4 flex flex-wrap gap-2">
-        <button v-for="t in tabs" :key="t.key" @click="aktif = t.key"
-                class="rounded-full border px-3.5 py-1.5 text-xs font-semibold transition"
-                :class="aktif === t.key
-                    ? 'border-[#0A5C36] bg-[#0A5C36] text-white'
-                    : 'border-[#ece3cf] bg-white text-[#3a4d42]'">
-            {{ t.label }}
-        </button>
-    </div>
+        <div class="flex flex-wrap gap-2">
+            <Chip
+                v-for="t in tabs"
+                :key="t.key"
+                :active="aktif === t.key"
+                :icon="{ 'bos-bop': 'bank', 'kebajikan': 'heart', 'terikat': 'wallet', 'divisi': 'chart' }[t.key]"
+                size="sm"
+                @click="aktif = t.key"
+            >
+                {{ t.label }}
+            </Chip>
+        </div>
 
-    <div v-if="loading" class="space-y-3">
-        <div v-for="i in 3" :key="i" class="h-16 animate-pulse rounded-xl bg-[#e8e1d0]/60"></div>
-    </div>
+        <LoadingState v-if="loading" variant="card" :count="3" />
 
-    <div v-else-if="error" class="rounded-2xl bg-red-50 px-4 py-5 text-sm text-red-700">
-        Gagal memuat: {{ error }}
-    </div>
+        <div
+            v-else-if="error"
+            class="flex items-start gap-2 rounded-3xl bg-rose-50 px-4 py-4 text-sm text-rose-700 ring-1 ring-rose-100"
+        >
+            <UiIcon name="x-circle" class="mt-0.5 h-4 w-4 shrink-0" />
+            <span>Gagal memuat: {{ error }}</span>
+        </div>
 
-    <template v-else-if="data">
-        <!-- BOS/BOP -->
-        <template v-if="aktif === 'bos-bop'">
-            <div v-if="data.length" class="space-y-2.5">
-                <div v-for="d in data" :key="d.kode" class="rounded-xl border border-[#ece3cf] bg-white p-4">
-                    <div class="mb-2 flex items-start justify-between gap-2">
-                        <div>
-                            <div class="text-sm font-semibold">{{ d.nama }}</div>
-                            <div class="text-[11px] text-[#8a9690]">{{ d.kode }}<span v-if="d.rezim"> · {{ d.rezim.replaceAll('_', ' ').toUpperCase() }}</span></div>
+        <template v-else-if="data">
+            <!-- BOS/BOP -->
+            <template v-if="aktif === 'bos-bop'">
+                <SectionCard v-if="data.length" title="Sumber dana negara" subtitle="BOS / BOP" flush>
+                    <div class="divide-y divide-slate-100">
+                        <ListRow v-for="d in data" :key="d.kode">
+                            <template #leading>
+                                <IconCircle icon="bank" tone="emerald" />
+                            </template>
+                            <template #title>{{ d.nama }}</template>
+                            <template #subtitle>
+                                {{ d.kode }}<span v-if="d.rezim"> · {{ d.rezim.replaceAll('_', ' ').toUpperCase() }}</span>
+                            </template>
+                            <template #trailing>
+                                <span
+                                    class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold tabular-nums ring-1 ring-inset"
+                                    :class="d.sisa >= 0 ? 'bg-emerald-50 text-emerald-700 ring-emerald-100' : 'bg-rose-50 text-rose-700 ring-rose-100'"
+                                >
+                                    sisa <MoneyText :amount="d.sisa" size="sm" tone="inherit" />
+                                </span>
+                            </template>
+                            <div class="grid grid-cols-2 gap-3 pt-1">
+                                <div>
+                                    <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Penerimaan</span>
+                                    <div><MoneyText :amount="d.penerimaan" size="sm" tone="emerald" /></div>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Penggunaan</span>
+                                    <div><MoneyText :amount="d.penggunaan" size="sm" tone="rose" /></div>
+                                </div>
+                            </div>
+                        </ListRow>
+                    </div>
+                </SectionCard>
+                <EmptyState
+                    v-else
+                    icon="bank"
+                    title="Belum ada sumber dana"
+                    message="Belum ada sumber dana kategori negara"
+                />
+            </template>
+
+            <!-- Dana Kebajikan -->
+            <template v-else-if="aktif === 'kebajikan'">
+                <div class="flex items-start gap-2 rounded-3xl bg-amber-50 px-4 py-4 text-xs leading-5 text-amber-800 ring-1 ring-amber-100">
+                    <UiIcon name="info" class="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>Dana kebajikan (penerimaan syubhat) disajikan terpisah dari surplus dan hanya boleh disalurkan untuk fasilitas umum.</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <StatCard tone="emerald" icon="arrow-down-left" label="Penerimaan">
+                        <template #value>
+                            <MoneyText :amount="data.penerimaan" size="lg" tone="emerald" />
+                        </template>
+                    </StatCard>
+                    <StatCard tone="teal" icon="wallet" label="Saldo">
+                        <template #value>
+                            <MoneyText :amount="data.saldo" size="lg" tone="emerald" />
+                        </template>
+                    </StatCard>
+                </div>
+
+                <SectionCard v-if="data.penyaluran?.length" title="Penyaluran" flush>
+                    <div class="divide-y divide-slate-100">
+                        <ListRow v-for="p in data.penyaluran" :key="p.kode">
+                            <template #leading>
+                                <IconCircle icon="heart" tone="rose" />
+                            </template>
+                            <template #title>{{ p.nama }}</template>
+                            <template #subtitle>
+                                {{ p.kode }}<span v-if="p.peruntukan"> · {{ p.peruntukan }}</span>
+                            </template>
+                            <template #trailing>
+                                <MoneyText :amount="p.jumlah" size="sm" tone="rose" />
+                            </template>
+                        </ListRow>
+                    </div>
+                </SectionCard>
+                <EmptyState
+                    v-else
+                    icon="heart"
+                    title="Belum ada penyaluran"
+                    message="Belum ada penyaluran dana kebajikan"
+                />
+            </template>
+
+            <!-- Dana Terikat -->
+            <template v-else-if="aktif === 'terikat'">
+                <template v-for="(rows, kunci) in data" :key="kunci">
+                    <SectionCard v-if="rows.length" :title="labelTerikat[kunci] ?? kunci" flush>
+                        <div class="divide-y divide-slate-100">
+                            <ListRow v-for="d in rows" :key="d.kode">
+                                <template #leading>
+                                    <IconCircle icon="wallet" tone="emerald" />
+                                </template>
+                                <template #title>{{ d.nama }}</template>
+                                <template #trailing>
+                                    <MoneyText :amount="d.saldo" size="sm" tone="emerald" />
+                                </template>
+                                <div class="flex justify-between pt-1 text-xs text-slate-500">
+                                    <span class="tabular-nums">Masuk {{ formatRupiah(d.penerimaan) }}</span>
+                                    <span class="tabular-nums">Pakai {{ formatRupiah(d.penggunaan) }}</span>
+                                </div>
+                            </ListRow>
                         </div>
-                        <span class="rounded-full px-2.5 py-0.5 text-[11px] font-bold"
-                              :class="d.sisa >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
-                            sisa {{ formatRupiah(d.sisa) }}
-                        </span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 text-sm">
-                        <div><span class="text-xs text-[#8a9690]">Penerimaan</span><div class="font-semibold text-emerald-600">{{ formatRupiah(d.penerimaan) }}</div></div>
-                        <div><span class="text-xs text-[#8a9690]">Penggunaan</span><div class="font-semibold text-rose-600">{{ formatRupiah(d.penggunaan) }}</div></div>
-                    </div>
-                </div>
-            </div>
-            <div v-else class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-6 text-center text-sm text-[#8a9690]">
-                Belum ada sumber dana kategori negara
-            </div>
-        </template>
+                    </SectionCard>
+                    <SectionCard v-else :title="labelTerikat[kunci] ?? kunci">
+                        <p class="text-center text-xs text-slate-400">Tidak ada</p>
+                    </SectionCard>
+                </template>
+            </template>
 
-        <!-- Dana Kebajikan -->
-        <template v-else-if="aktif === 'kebajikan'">
-            <div class="mb-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
-                Dana kebajikan (penerimaan syubhat) disajikan terpisah dari surplus dan hanya boleh disalurkan untuk fasilitas umum.
-            </div>
-            <div class="mb-3 grid grid-cols-2 gap-3">
-                <div class="rounded-xl border border-[#ece3cf] bg-white p-3.5">
-                    <div class="text-[10px] uppercase tracking-wider text-[#8a9690]">Penerimaan</div>
-                    <div class="font-semibold text-[#0A5C36]">{{ formatRupiah(data.penerimaan) }}</div>
-                </div>
-                <div class="rounded-xl border border-[#ece3cf] bg-white p-3.5">
-                    <div class="text-[10px] uppercase tracking-wider text-[#8a9690]">Saldo</div>
-                    <div class="font-semibold text-[#0A5C36]">{{ formatRupiah(data.saldo) }}</div>
-                </div>
-            </div>
-            <h3 class="mb-2 text-sm font-semibold text-[#3a4d42]">Penyaluran</h3>
-            <div v-if="data.penyaluran?.length" class="space-y-2">
-                <div v-for="p in data.penyaluran" :key="p.kode"
-                     class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
-                    <div>
-                        <div class="text-sm font-medium">{{ p.nama }}</div>
-                        <div class="text-xs text-[#8a9690]">{{ p.kode }}<span v-if="p.peruntukan"> · {{ p.peruntukan }}</span></div>
+            <!-- Realisasi per Divisi -->
+            <template v-else>
+                <SectionCard v-if="data.length" title="Realisasi per divisi" flush>
+                    <div class="divide-y divide-slate-100">
+                        <ListRow v-for="d in data" :key="d.divisi">
+                            <template #leading>
+                                <IconCircle icon="chart" tone="blue" />
+                            </template>
+                            <template #title>{{ d.divisi }}</template>
+                            <template #trailing>
+                                <MoneyText :amount="d.realisasi" size="sm" tone="emerald" />
+                            </template>
+                        </ListRow>
                     </div>
-                    <span class="font-semibold text-rose-600">{{ formatRupiah(p.jumlah) }}</span>
-                </div>
-            </div>
-            <div v-else class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-6 text-center text-sm text-[#8a9690]">
-                Belum ada penyaluran
-            </div>
-        </template>
-
-        <!-- Dana Terikat -->
-        <template v-else-if="aktif === 'terikat'">
-            <template v-for="(rows, kunci) in data" :key="kunci">
-                <h3 class="mb-2 mt-4 first:mt-0 text-sm font-semibold text-[#3a4d42]">{{ labelTerikat[kunci] ?? kunci }}</h3>
-                <div v-if="rows.length" class="space-y-2">
-                    <div v-for="d in rows" :key="d.kode" class="rounded-xl border border-[#ece3cf] bg-white p-4">
-                        <div class="mb-1.5 flex justify-between">
-                            <span class="text-sm font-semibold">{{ d.nama }}</span>
-                            <span class="text-sm font-bold text-[#0A5C36]">{{ formatRupiah(d.saldo) }}</span>
-                        </div>
-                        <div class="flex justify-between text-xs text-[#8a9690]">
-                            <span>Masuk {{ formatRupiah(d.penerimaan) }}</span>
-                            <span>Pakai {{ formatRupiah(d.penggunaan) }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-4 text-center text-xs text-[#8a9690]">
-                    Tidak ada
-                </div>
+                </SectionCard>
+                <EmptyState
+                    v-else
+                    icon="chart"
+                    title="Belum ada realisasi"
+                    message="Belum ada realisasi beban"
+                />
             </template>
         </template>
-
-        <!-- Realisasi per Divisi -->
-        <template v-else>
-            <div v-if="data.length" class="space-y-2">
-                <div v-for="d in data" :key="d.divisi"
-                     class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
-                    <span class="text-sm font-medium">{{ d.divisi }}</span>
-                    <span class="font-semibold text-[#0A5C36]">{{ formatRupiah(d.realisasi) }}</span>
-                </div>
-            </div>
-            <div v-else class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-6 text-center text-sm text-[#8a9690]">
-                Belum ada realisasi beban
-            </div>
-        </template>
-    </template>
+    </div>
 </template>

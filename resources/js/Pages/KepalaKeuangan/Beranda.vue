@@ -3,6 +3,18 @@ import { onMounted, ref } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
 import { formatRupiah, formatRupiahFull } from '@/keuangan-pwa/format.js'
+import {
+    PageHeader,
+    SectionCard,
+    UiCard,
+    ListRow,
+    StatCard,
+    MoneyText,
+    IconCircle,
+    EmptyState,
+    LoadingState,
+    UiButton,
+} from '@/Shared'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 const props = defineProps({ can: Object })
@@ -34,144 +46,142 @@ onMounted(async () => {
 </script>
 
 <template>
-    <!-- Posisi Kas -->
-    <section class="mb-5">
-        <h2 class="mb-3 font-['Marcellus',serif] text-base text-[#0A5C36]">Posisi Kas</h2>
+    <div class="space-y-5">
+        <!-- Posisi Kas -->
+        <section class="space-y-3">
+            <PageHeader kicker="Bendahara" title="Posisi Kas" />
 
-        <!-- Skeleton -->
-        <div v-if="loading" class="space-y-3">
-            <div class="h-24 animate-pulse rounded-2xl bg-[#e8e1d0]/60"></div>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="h-16 animate-pulse rounded-xl bg-[#e8e1d0]/60"></div>
-                <div class="h-16 animate-pulse rounded-xl bg-[#e8e1d0]/60"></div>
-            </div>
-        </div>
-
-        <div v-else-if="error" class="rounded-2xl bg-red-50 px-4 py-5 text-sm text-red-700">
-            Gagal memuat data: {{ error }}
-        </div>
-
-        <div v-else>
-            <!-- Total kas card -->
-            <div class="mb-3 rounded-2xl bg-gradient-to-br from-[#0A5C36] to-[#06342b] p-5 text-white shadow-lg"
-                 style="border: 1px solid rgba(201,162,74,0.3);">
-                <div class="mb-1 text-[11px] uppercase tracking-wider text-[#e7d3a1]">Total Posisi Kas</div>
-                <div class="font-['Marcellus',serif] text-2xl">
-                    {{ formatRupiahFull(data?.totalKas ?? 0) }}
-                </div>
-                <div class="mt-2 text-xs opacity-75">
-                    Periode: {{ data?.periodeAktif ?? '-' }}
-                </div>
+            <!-- Skeleton -->
+            <div v-if="loading" class="space-y-3">
+                <LoadingState variant="hero" :count="1" />
+                <LoadingState variant="stat" :count="2" />
             </div>
 
-            <!-- Kas & Bank breakdown -->
-            <div class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl border border-[#ece3cf] bg-white p-3.5">
-                    <div class="mb-0.5 text-[10px] uppercase tracking-wider text-[#8a9690]">Kas Tunai</div>
-                    <div class="font-semibold text-[#0A5C36]">{{ formatRupiahFull(data?.kasTunai ?? 0) }}</div>
-                </div>
-                <div class="rounded-xl border border-[#ece3cf] bg-white p-3.5">
-                    <div class="mb-0.5 text-[10px] uppercase tracking-wider text-[#8a9690]">Bank</div>
-                    <div class="font-semibold text-[#0A5C36]">{{ formatRupiahFull(data?.kasBank ?? 0) }}</div>
-                </div>
-            </div>
-        </div>
-    </section>
+            <UiCard v-else-if="error" padding="md" class="text-sm text-rose-700 ring-rose-100">
+                Gagal memuat data: {{ error }}
+            </UiCard>
 
-    <!-- Approval Inbox -->
-    <section v-if="props.can?.approve_pencairan" class="mb-5">
-        <div class="flex items-center justify-between">
-            <h2 class="font-['Marcellus',serif] text-base text-[#0A5C36]">Menunggu Persetujuan</h2>
-            <a href="/keuangan/pengeluaran/approval"
-               class="text-xs font-semibold text-[#C9A24A] hover:underline">
-                Lihat Semua
-            </a>
-        </div>
+            <div v-else class="space-y-3">
+                <!-- Total kas card -->
+                <UiCard variant="hero-dark" padding="md">
+                    <div class="text-[11px] font-semibold uppercase tracking-wider text-white/70">Total Posisi Kas</div>
+                    <div class="mt-1">
+                        <MoneyText :amount="data?.totalKas ?? 0" size="xl" tone="inherit" class="text-white" />
+                    </div>
+                    <div class="mt-2 text-xs text-white/75">
+                        Periode: {{ data?.periodeAktif ?? '-' }}
+                    </div>
+                </UiCard>
 
-        <div v-if="loading" class="mt-3 space-y-2">
-            <div v-for="i in 3" :key="i" class="h-14 animate-pulse rounded-xl bg-[#e8e1d0]/60"></div>
-        </div>
-
-        <div v-else-if="data?.pendingApproval?.length" class="mt-3 space-y-2">
-            <div v-for="item in data.pendingApproval.slice(0, 5)" :key="item.id"
-                 class="flex items-center gap-3 rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
-                <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                    <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
-                    </svg>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <div class="truncate text-sm font-medium">{{ item.keterangan }}</div>
-                    <div class="text-xs text-[#8a9690]">{{ item.pemohon }} · {{ formatRupiah(item.nominal) }}</div>
+                <!-- Kas & Bank breakdown -->
+                <div class="grid grid-cols-2 gap-3">
+                    <StatCard icon="cash" tone="emerald" label="Kas Tunai" compact>
+                        <template #value>
+                            <MoneyText :amount="data?.kasTunai ?? 0" size="lg" tone="emerald" />
+                        </template>
+                    </StatCard>
+                    <StatCard icon="bank" tone="teal" label="Bank" compact>
+                        <template #value>
+                            <MoneyText :amount="data?.kasBank ?? 0" size="lg" tone="emerald" />
+                        </template>
+                    </StatCard>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div v-else class="mt-3 rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-6 text-center text-sm text-[#8a9690]">
-            Tidak ada pengajuan menunggu
-        </div>
-    </section>
+        <!-- Approval Inbox -->
+        <SectionCard
+            v-if="props.can?.approve_pencairan"
+            kicker="Pengeluaran"
+            title="Menunggu Persetujuan"
+            flush
+        >
+            <template #right>
+                <UiButton href="/keuangan/pengeluaran/approval" variant="ghost" size="sm" iconRight="chevron-right">
+                    Lihat Semua
+                </UiButton>
+            </template>
 
-    <!-- Quick Shortcuts -->
-    <section class="mb-5">
-        <h2 class="mb-3 font-['Marcellus',serif] text-base text-[#0A5C36]">Pintasan</h2>
-        <div class="grid grid-cols-4 gap-2.5">
-            <a v-for="s in shortcuts" :key="s.label" :href="s.href"
-               class="flex flex-col items-center gap-1.5 rounded-xl border border-[#ece3cf] bg-white px-2 py-3 text-center transition hover:border-[#C9A24A]/50 hover:shadow-sm">
-                <!-- Icons -->
-                <div class="flex h-9 w-9 items-center justify-center rounded-xl"
-                     :class="{
-                         'bg-emerald-50 text-emerald-600': s.color === 'emerald',
-                         'bg-blue-50 text-blue-600': s.color === 'blue',
-                         'bg-amber-50 text-amber-600': s.color === 'amber',
-                         'bg-teal-50 text-teal-600': s.color === 'teal',
-                         'bg-rose-50 text-rose-600': s.color === 'rose',
-                         'bg-purple-50 text-purple-600': s.color === 'purple',
-                         'bg-indigo-50 text-indigo-600': s.color === 'indigo',
-                         'bg-orange-50 text-orange-600': s.color === 'orange',
-                     }">
-                    <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- receipt -->
-                        <template v-if="s.icon === 'receipt'"><rect x="5" y="2" width="14" height="20" rx="1" /><path d="M9 6h6M9 10h6M9 14h3" /></template>
-                        <!-- check -->
-                        <template v-else-if="s.icon === 'check'"><path d="M5 13l4 4L19 7" /></template>
-                        <!-- banknotes -->
-                        <template v-else-if="s.icon === 'banknotes'"><rect x="2" y="6" width="20" height="12" rx="2" /><circle cx="12" cy="12" r="3" /></template>
-                        <!-- piggy -->
-                        <template v-else-if="s.icon === 'piggy'"><path d="M19 10c0-4-3.6-7-8-7S3 6 3 10c0 3 2 5.5 5 6.5V19a1 1 0 0 0 1 1h1M15 10c0 3-2 5.5-5 6.5" /><circle cx="8" cy="9" r="1" fill="currentColor" /></template>
-                        <!-- stamp -->
-                        <template v-else-if="s.icon === 'stamp'"><path d="M5 21h14M7 21v-3a5 5 0 0 1 10 0v3M12 12V6" /><circle cx="12" cy="4" r="2" /></template>
-                        <!-- users -->
-                        <template v-else-if="s.icon === 'users'"><circle cx="9" cy="7" r="3" /><path d="M3 19c0-3 3-5 6-5s6 2 6 5" /><circle cx="17" cy="7" r="2" /><path d="M21 19c0-2-2-4-4-4" /></template>
-                        <!-- book -->
-                        <template v-else-if="s.icon === 'book'"><path d="M4 4h4c2 0 4 1 4 3s-2 3-4 3H4zm0 0v16m0 0h4c2 0 4-1 4-3s-2-3-4-3H4M20 4h-4c-2 0-4 1-4 3m8-3v16m0 0h-4c-2 0-4-1-4-3" /></template>
-                        <!-- chart -->
-                        <template v-else><rect x="3" y="12" width="4" height="8" rx="1" /><rect x="10" y="8" width="4" height="12" rx="1" /><rect x="17" y="4" width="4" height="16" rx="1" /></template>
-                    </svg>
-                </div>
-                <span class="text-[10px] font-semibold leading-tight text-[#3a4d42]">{{ s.label }}</span>
-            </a>
-        </div>
-    </section>
+            <LoadingState v-if="loading" variant="list" :count="3" class="p-2" />
 
-    <!-- Ringkasan Harian -->
-    <section v-if="!loading && data?.ringkasanHarian" class="mb-5">
-        <h2 class="mb-3 font-['Marcellus',serif] text-base text-[#0A5C36]">Ringkasan Hari Ini</h2>
-        <div class="space-y-2">
-            <div class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
-                <span class="text-sm text-[#8a9690]">Penerimaan</span>
-                <span class="font-semibold text-emerald-600">+{{ formatRupiahFull(data.ringkasanHarian.penerimaan ?? 0) }}</span>
+            <div v-else-if="data?.pendingApproval?.length" class="divide-y divide-slate-100">
+                <ListRow
+                    v-for="item in data.pendingApproval.slice(0, 5)"
+                    :key="item.id"
+                    :title="item.keterangan"
+                >
+                    <template #leading>
+                        <IconCircle icon="clock" tone="amber" size="sm" />
+                    </template>
+                    <template #subtitle>
+                        {{ item.pemohon }} · {{ formatRupiah(item.nominal) }}
+                    </template>
+                </ListRow>
             </div>
-            <div class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
-                <span class="text-sm text-[#8a9690]">Pengeluaran</span>
-                <span class="font-semibold text-rose-600">−{{ formatRupiahFull(data.ringkasanHarian.pengeluaran ?? 0) }}</span>
+
+            <EmptyState
+                v-else
+                icon="check-circle"
+                tone="emerald"
+                title="Tidak ada pengajuan menunggu"
+                message="Semua pengajuan pencairan sudah ditindaklanjuti."
+            />
+        </SectionCard>
+
+        <!-- Quick Shortcuts -->
+        <SectionCard kicker="Akses cepat" title="Pintasan">
+            <div class="grid grid-cols-4 gap-2.5">
+                <a
+                    v-for="s in shortcuts"
+                    :key="s.label"
+                    :href="s.href"
+                    class="flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-center transition-all duration-200 hover:bg-slate-50/70 active:scale-[.97]"
+                >
+                    <IconCircle
+                        :icon="{ receipt: 'receipt', check: 'check', banknotes: 'cash', piggy: 'wallet', stamp: 'check-circle', users: 'user', book: 'book', chart: 'chart' }[s.icon] || 'chart'"
+                        :tone="{ emerald: 'emerald', blue: 'blue', amber: 'amber', teal: 'teal', rose: 'rose', purple: 'blue', indigo: 'blue', orange: 'amber' }[s.color] || 'slate'"
+                        size="sm"
+                    />
+                    <span class="text-[10px] font-semibold leading-tight text-slate-600">{{ s.label }}</span>
+                </a>
             </div>
-            <div class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
-                <span class="text-sm text-[#8a9690]">Belum Diverifikasi</span>
-                <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-700">
-                    {{ data.ringkasanHarian.belumVerifikasi ?? 0 }}
-                </span>
+        </SectionCard>
+
+        <!-- Ringkasan Harian -->
+        <SectionCard
+            v-if="!loading && data?.ringkasanHarian"
+            kicker="Hari ini"
+            title="Ringkasan Hari Ini"
+            flush
+        >
+            <div class="divide-y divide-slate-100">
+                <ListRow title="Penerimaan">
+                    <template #leading>
+                        <IconCircle icon="arrow-down-left" tone="emerald" size="sm" />
+                    </template>
+                    <template #trailing>
+                        <MoneyText :amount="data.ringkasanHarian.penerimaan ?? 0" size="sm" tone="emerald" sign="plus" />
+                    </template>
+                </ListRow>
+                <ListRow title="Pengeluaran">
+                    <template #leading>
+                        <IconCircle icon="arrow-up-right" tone="rose" size="sm" />
+                    </template>
+                    <template #trailing>
+                        <MoneyText :amount="data.ringkasanHarian.pengeluaran ?? 0" size="sm" tone="rose" sign="minus" />
+                    </template>
+                </ListRow>
+                <ListRow title="Belum Diverifikasi">
+                    <template #leading>
+                        <IconCircle icon="clock" tone="amber" size="sm" />
+                    </template>
+                    <template #trailing>
+                        <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold tabular-nums text-amber-700 ring-1 ring-inset ring-amber-100">
+                            {{ data.ringkasanHarian.belumVerifikasi ?? 0 }}
+                        </span>
+                    </template>
+                </ListRow>
             </div>
-        </div>
-    </section>
+        </SectionCard>
+    </div>
 </template>

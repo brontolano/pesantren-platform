@@ -3,6 +3,17 @@ import { onMounted, ref } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
 import { formatRupiah, formatTanggal } from '@/keuangan-pwa/format.js'
+import {
+    PageHeader,
+    SectionCard,
+    ListRow,
+    StatusBadge,
+    Chip,
+    UiButton,
+    MoneyText,
+    EmptyState,
+    LoadingState,
+} from '@/Shared'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 const props = defineProps({ can: Object })
@@ -51,73 +62,88 @@ onMounted(fetchPeriodes)
 </script>
 
 <template>
-    <div>
-        <h1 class="mb-4 font-['Marcellus',serif] text-lg text-[#0A5C36]">Payroll & PPh21</h1>
+    <div class="space-y-5">
+        <PageHeader kicker="Pengeluaran" title="Payroll & PPh21" />
 
-        <div v-if="loading" class="space-y-3">
-            <div class="h-20 animate-pulse rounded-2xl bg-[#e8e1d0]/60"></div>
-            <div v-for="i in 4" :key="i" class="h-14 animate-pulse rounded-xl bg-[#e8e1d0]/60"></div>
-        </div>
+        <LoadingState v-if="loading" variant="stat" :count="4" />
 
         <template v-else>
             <!-- Periode selector -->
-            <div class="mb-4 flex gap-2 overflow-x-auto pb-1">
-                <button v-for="p in periodes" :key="p.id"
-                        class="flex-shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition"
-                        :class="selectedPeriode?.id === p.id ? 'border-[#0A5C36] bg-[#0A5C36] text-white' : 'border-[#ece3cf] bg-white text-[#3a4d42]'"
-                        @click="selectedPeriode = p; fetchSlips(p.id)">
+            <div class="flex gap-2 overflow-x-auto pb-1">
+                <Chip
+                    v-for="p in periodes"
+                    :key="p.id"
+                    size="sm"
+                    :active="selectedPeriode?.id === p.id"
+                    @click="selectedPeriode = p; fetchSlips(p.id)"
+                >
                     {{ p.label }}
-                </button>
+                </Chip>
+            </div>
+
+            <!-- Status periode -->
+            <div v-if="selectedPeriode?.diproses" class="flex justify-start">
+                <StatusBadge status="terverifikasi" label="Sudah diproses" />
             </div>
 
             <!-- Ringkasan -->
-            <div v-if="ringkasan" class="mb-4 rounded-2xl bg-gradient-to-br from-[#0A5C36] to-[#06342b] p-5 text-white"
-                 style="border: 1px solid rgba(201,162,74,0.3);">
+            <div
+                v-if="ringkasan"
+                class="rounded-3xl bg-gradient-to-br from-[var(--wali-primary,#059669)] to-emerald-900 p-5 text-white shadow-soft ring-1 ring-[var(--wali-accent,#C9A24A)]/30"
+            >
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <div class="text-[10px] uppercase tracking-wider text-[#e7d3a1]">Total Gaji Kotor</div>
-                        <div class="font-['Marcellus',serif] text-lg">{{ formatRupiah(ringkasan.totalKotor) }}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-white/70">Total Gaji Kotor</div>
+                        <MoneyText :amount="ringkasan.totalKotor" size="lg" tone="inherit" class="mt-1 block text-white" />
                     </div>
                     <div>
-                        <div class="text-[10px] uppercase tracking-wider text-[#e7d3a1]">Total Bersih</div>
-                        <div class="font-['Marcellus',serif] text-lg">{{ formatRupiah(ringkasan.totalBersih) }}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-white/70">Total Bersih</div>
+                        <MoneyText :amount="ringkasan.totalBersih" size="lg" tone="inherit" class="mt-1 block text-white" />
                     </div>
                     <div>
-                        <div class="text-[10px] uppercase tracking-wider text-[#e7d3a1]">PPh21</div>
-                        <div class="text-sm font-semibold">{{ formatRupiah(ringkasan.totalPph) }}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-white/70">PPh21</div>
+                        <MoneyText :amount="ringkasan.totalPph" size="sm" tone="inherit" class="mt-1 block text-white" />
                     </div>
                     <div>
-                        <div class="text-[10px] uppercase tracking-wider text-[#e7d3a1]">Pegawai</div>
-                        <div class="text-sm font-semibold">{{ ringkasan.jumlahPegawai }} orang</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-white/70">Pegawai</div>
+                        <div class="mt-1 text-sm font-semibold tabular-nums">{{ ringkasan.jumlahPegawai }} orang</div>
                     </div>
                 </div>
             </div>
 
             <!-- Proses button -->
-            <div v-if="props.can?.run_payroll && selectedPeriode && !selectedPeriode.diproses" class="mb-4">
-                <button @click="prosesGaji" :disabled="processing"
-                        class="w-full rounded-xl bg-[#C9A24A] px-4 py-3 text-sm font-bold text-white shadow transition hover:bg-[#b8913f] disabled:opacity-50">
-                    {{ processing ? 'Memproses...' : 'Proses Gaji Periode Ini' }}
-                </button>
-            </div>
+            <UiButton
+                v-if="props.can?.run_payroll && selectedPeriode && !selectedPeriode.diproses"
+                variant="primary"
+                block
+                icon-left="check-circle"
+                :loading="processing"
+                :disabled="processing"
+                @click="prosesGaji"
+            >
+                {{ processing ? 'Memproses...' : 'Proses Gaji Periode Ini' }}
+            </UiButton>
 
             <!-- Slip list -->
-            <h2 class="mb-2 text-sm font-semibold text-[#3a4d42]">Daftar Slip</h2>
-            <div v-if="slips.length" class="space-y-2">
-                <div v-for="s in slips" :key="s.id"
-                     class="flex items-center justify-between rounded-xl border border-[#ece3cf] bg-white px-4 py-3">
-                    <div>
-                        <div class="text-sm font-medium">{{ s.nama_pegawai }}</div>
-                        <div class="text-xs text-[#8a9690]">{{ s.jabatan ?? '-' }}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm font-semibold text-[#0A5C36]">{{ formatRupiah(s.gaji_bersih) }}</div>
-                        <div v-if="s.pph" class="text-[10px] text-[#8a9690]">PPh: {{ formatRupiah(s.pph) }}</div>
-                    </div>
+            <SectionCard v-if="slips.length" kicker="Payroll" title="Daftar Slip" flush>
+                <div class="divide-y divide-slate-100">
+                    <ListRow v-for="s in slips" :key="s.id" :title="s.nama_pegawai" :subtitle="s.jabatan ?? '-'">
+                        <template #trailing>
+                            <MoneyText :amount="s.gaji_bersih" size="sm" tone="emerald" />
+                            <div v-if="s.pph" class="mt-0.5 text-[10px] text-slate-400">
+                                PPh: {{ formatRupiah(s.pph) }}
+                            </div>
+                        </template>
+                    </ListRow>
                 </div>
-            </div>
-            <div v-else class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-6 text-center text-sm text-[#8a9690]">
-                Belum ada slip gaji di periode ini
+            </SectionCard>
+            <div v-else class="space-y-3">
+                <PageHeader kicker="Payroll" title="Daftar Slip" />
+                <EmptyState
+                    icon="wallet"
+                    title="Belum ada slip"
+                    message="Belum ada slip gaji di periode ini"
+                />
             </div>
         </template>
     </div>

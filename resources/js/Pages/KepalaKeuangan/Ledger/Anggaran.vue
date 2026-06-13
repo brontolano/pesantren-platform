@@ -3,6 +3,15 @@ import { onMounted, ref } from 'vue'
 import KepalaKeuanganLayout from '@/Layouts/KepalaKeuanganLayout.vue'
 import { api } from '@/keuangan-pwa/api.js'
 import { formatRupiah } from '@/keuangan-pwa/format.js'
+import {
+    PageHeader,
+    SectionCard,
+    ListRow,
+    MoneyText,
+    StatusBadge,
+    LoadingState,
+    EmptyState,
+} from '@/Shared'
 
 defineOptions({ layout: KepalaKeuanganLayout })
 defineProps({ can: Object })
@@ -20,34 +29,52 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div>
-        <h1 class="mb-4 font-['Marcellus',serif] text-lg text-[#0A5C36]">Anggaran & Realisasi</h1>
+    <div class="space-y-5">
+        <PageHeader
+            kicker="Pengawasan Belanja"
+            title="Anggaran & Realisasi"
+            subtitle="Pantau penyerapan pagu setiap divisi."
+        />
 
-        <div v-if="loading" class="space-y-3">
-            <div v-for="i in 4" :key="i" class="h-20 animate-pulse rounded-xl bg-[#e8e1d0]/60"></div>
-        </div>
+        <LoadingState v-if="loading" variant="list" :count="4" />
 
-        <div v-else-if="data.length" class="space-y-3">
-            <div v-for="d in data" :key="d.divisi"
-                 class="rounded-xl border border-[#ece3cf] bg-white p-4">
-                <div class="mb-1 flex items-center justify-between text-sm">
-                    <span class="font-medium">{{ d.divisi }}</span>
-                    <span class="text-xs text-[#8a9690]">{{ Math.round((d.realisasi / (d.pagu || 1)) * 100) }}%</span>
-                </div>
-                <div class="mb-2 h-2 overflow-hidden rounded-full bg-[#ece3cf]">
-                    <div class="h-full rounded-full transition-all"
-                         :class="(d.realisasi / (d.pagu || 1)) > 0.9 ? 'bg-rose-500' : (d.realisasi / (d.pagu || 1)) > 0.8 ? 'bg-amber-500' : 'bg-[#0A5C36]'"
-                         :style="{ width: Math.min(100, (d.realisasi / (d.pagu || 1)) * 100) + '%' }"></div>
-                </div>
-                <div class="flex justify-between text-xs text-[#8a9690]">
-                    <span>Realisasi: {{ formatRupiah(d.realisasi) }}</span>
-                    <span>Pagu: {{ formatRupiah(d.pagu) }}</span>
-                </div>
+        <SectionCard v-else-if="data.length" flush>
+            <div class="divide-y divide-slate-100">
+                <ListRow v-for="d in data" :key="d.divisi" :title="d.divisi">
+                    <template #trailing>
+                        <StatusBadge
+                            size="sm"
+                            :status="(d.realisasi / (d.pagu || 1)) > 0.9 ? 'belum_bayar' : (d.realisasi / (d.pagu || 1)) > 0.8 ? 'menunggu' : 'aktif'"
+                            :label="Math.round((d.realisasi / (d.pagu || 1)) * 100) + '%'"
+                        />
+                    </template>
+
+                    <div class="space-y-2">
+                        <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                            <div class="h-full rounded-full transition-all"
+                                 :class="(d.realisasi / (d.pagu || 1)) > 0.9 ? 'bg-rose-500' : (d.realisasi / (d.pagu || 1)) > 0.8 ? 'bg-amber-500' : 'bg-[var(--wali-primary,#059669)]'"
+                                 :style="{ width: Math.min(100, (d.realisasi / (d.pagu || 1)) * 100) + '%' }"></div>
+                        </div>
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Realisasi</p>
+                                <MoneyText :amount="d.realisasi" size="sm" />
+                            </div>
+                            <div class="min-w-0 text-right">
+                                <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Pagu</p>
+                                <MoneyText :amount="d.pagu" size="sm" tone="muted" />
+                            </div>
+                        </div>
+                    </div>
+                </ListRow>
             </div>
-        </div>
+        </SectionCard>
 
-        <div v-else class="rounded-xl border border-dashed border-[#ece3cf] bg-white/60 p-8 text-center text-sm text-[#8a9690]">
-            Data anggaran belum tersedia. Realisasi belanja tetap bisa dilihat di Jurnal.
-        </div>
+        <EmptyState
+            v-else
+            icon="chart"
+            title="Data anggaran belum tersedia"
+            message="Realisasi belanja tetap bisa dilihat di Jurnal."
+        />
     </div>
 </template>
