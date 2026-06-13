@@ -119,6 +119,12 @@ class DemoAutoLoginController extends Controller
             'role' => 'santri',
             'route' => 'tenant.pengabdian.beranda',
         ],
+        'santri' => [
+            'email' => 'santri.demo@demo.pesantren.online',
+            'name' => 'Santri Demo',
+            'role' => 'santri',
+            'route' => 'tenant.santri-app.beranda',
+        ],
     ];
 
     public function __invoke(string $peran): RedirectResponse
