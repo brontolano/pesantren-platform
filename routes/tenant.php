@@ -16,6 +16,7 @@ use App\Http\Controllers\DemoApps\PosKantinDemoController;
 use App\Http\Controllers\DemoApps\KeamananDemoController;
 use App\Http\Controllers\DemoApps\PengasuhanDemoController;
 use App\Http\Controllers\DemoApps\PengabdianDemoController;
+use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\EmisExportController;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
@@ -221,6 +222,15 @@ Route::middleware([
         Route::get('/presensi', [PengabdianDemoController::class, 'presensi'])->name('presensi');
         Route::get('/laporan', [PengabdianDemoController::class, 'laporan'])->name('laporan');
         Route::get('/profil', [PengabdianDemoController::class, 'profil'])->name('profil');
+    });
+
+    Route::middleware('auth')->prefix('santri-app')->name('tenant.santri-app.')->group(function () {
+        Route::get('/', [SantriDemoController::class, 'beranda'])->name('beranda');
+        Route::get('/jadwal', [SantriDemoController::class, 'jadwal'])->name('jadwal');
+        Route::get('/hafalan', [SantriDemoController::class, 'hafalan'])->name('hafalan');
+        Route::get('/keuangan', [SantriDemoController::class, 'keuangan'])->name('keuangan');
+        Route::get('/izin', [SantriDemoController::class, 'izin'])->name('izin');
+        Route::get('/pengumuman', [SantriDemoController::class, 'pengumuman'])->name('pengumuman');
     });
 
     // 2c Baitul Maal — kuitansi donasi (pola print blade). HANYA donasi yang
