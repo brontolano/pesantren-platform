@@ -2,6 +2,7 @@
 import { Head } from '@inertiajs/vue3'
 import { onMounted, onUnmounted, ref } from 'vue'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
+import { PageHeader, SectionCard, ListRow, StatusBadge, Chip, EmptyState, IconCircle } from '@/Shared'
 
 defineOptions({ layout: PortalGuruLayout })
 
@@ -43,28 +44,47 @@ const badge = (status) => ({
     <div class="space-y-5">
         <Head><title>Pengawas Ujian</title></Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Mode Pengawas</p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">{{ sesi.nama }}</h2>
-            <p class="text-sm text-slate-500">{{ sesi.pelajaran }} · {{ sesi.kelas }} — daftar peserta diperbarui otomatis.</p>
-        </section>
+        <PageHeader
+            kicker="Mode Pengawas"
+            :title="sesi.nama"
+            :subtitle="`${sesi.pelajaran} · ${sesi.kelas} — daftar peserta diperbarui otomatis.`"
+        >
+            <template #right>
+                <Chip :active="true" tone="brand" size="sm" icon="wifi-off">Live</Chip>
+            </template>
+        </PageHeader>
 
-        <section v-if="daftar.length === 0" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Belum ada santri yang mulai</p>
-        </section>
+        <SectionCard v-if="daftar.length === 0" flush>
+            <EmptyState
+                icon="user"
+                title="Belum ada santri yang mulai"
+                message="Daftar peserta akan muncul otomatis saat santri membuka ujian."
+            />
+        </SectionCard>
 
-        <section v-else class="space-y-2">
-            <div v-for="a in daftar" :key="a.id" class="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm">
-                <div class="min-w-0">
-                    <p class="truncate text-sm font-semibold text-slate-900">{{ a.santri }}</p>
-                    <p class="text-xs text-slate-400">NIS {{ a.nis }} · mulai {{ a.mulai_at }} · {{ a.terjawab }}/{{ a.total_soal }} terjawab</p>
-                </div>
-                <div class="shrink-0 text-right">
-                    <span class="rounded-full px-2 py-1 text-[10px] font-bold uppercase" :class="badge(a.status)">{{ a.status }}</span>
-                    <p v-if="a.status === 'berjalan'" class="mt-1 font-mono text-xs text-slate-600">sisa {{ sisa(a.sisa_detik) }}</p>
-                    <p v-else-if="a.selesai_at" class="mt-1 text-xs text-slate-400">selesai {{ a.selesai_at }}</p>
-                </div>
+        <SectionCard v-else flush>
+            <div class="divide-y divide-slate-100">
+                <ListRow v-for="a in daftar" :key="a.id">
+                    <template #leading>
+                        <IconCircle icon="user" tone="slate" variant="tint" size="sm" />
+                    </template>
+                    <template #title>{{ a.santri }}</template>
+                    <template #subtitle>
+                        NIS {{ a.nis }} · mulai {{ a.mulai_at }} · {{ a.terjawab }}/{{ a.total_soal }} terjawab
+                    </template>
+                    <template #trailing>
+                        <div class="text-right">
+                            <StatusBadge
+                                :status="{ berjalan: 'aktif', menunggu_nilai: 'menunggu', selesai: 'batal' }[a.status] ?? 'info'"
+                                :label="a.status"
+                                size="sm"
+                            />
+                            <p v-if="a.status === 'berjalan'" class="mt-1 font-mono text-xs tabular-nums text-slate-600">sisa {{ sisa(a.sisa_detik) }}</p>
+                            <p v-else-if="a.selesai_at" class="mt-1 text-xs text-slate-400">selesai {{ a.selesai_at }}</p>
+                        </div>
+                    </template>
+                </ListRow>
             </div>
-        </section>
+        </SectionCard>
     </div>
 </template>

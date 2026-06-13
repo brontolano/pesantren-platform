@@ -2,6 +2,16 @@
 import { Head, Link } from '@inertiajs/vue3'
 import { ref, computed, onMounted } from 'vue'
 import PortalGuruLayout from '../../../Layouts/PortalGuruLayout.vue'
+import {
+    PageHeader,
+    SectionCard,
+    UiCard,
+    StatCard,
+    UiButton,
+    UiIcon,
+    EmptyState,
+    LoadingState,
+} from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -89,58 +99,61 @@ onMounted(() => {
             <title>Poin Terbaru</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
-                Kepengasuhan · Disiplin
-            </p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">Poin Terbaru</h2>
-            <p class="text-sm text-slate-500">Status akumulasi poin santri ({{ masaBerlakuText() }})</p>
-        </section>
+        <PageHeader
+            kicker="Kepengasuhan · Disiplin"
+            title="Poin Terbaru"
+            :subtitle="`Status akumulasi poin santri (${masaBerlakuText()})`"
+        />
 
         <!-- Ambang Eskalasi -->
-        <section v-if="ambang.length > 0" class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-            <p class="text-sm font-semibold text-slate-700 mb-3">Ambang Eskalasi</p>
-            <div class="space-y-2">
+        <SectionCard v-if="ambang.length > 0" title="Ambang Eskalasi" flush>
+            <div class="divide-y divide-slate-100">
                 <div
                     v-for="(item, idx) in ambang"
                     :key="idx"
-                    class="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2"
+                    class="flex items-center justify-between px-5 py-3"
                 >
                     <p class="text-sm font-semibold text-slate-700">{{ item.label }}</p>
-                    <p class="text-sm font-bold text-amber-700">≥ {{ item.poin }} poin</p>
+                    <p class="text-sm font-bold tabular-nums text-amber-700">≥ {{ item.poin }} poin</p>
                 </div>
             </div>
-        </section>
+        </SectionCard>
 
         <!-- Error -->
-        <section v-if="error" class="rounded-[1.5rem] bg-red-50 border border-red-200 px-5 py-4">
-            <p class="text-sm font-semibold text-red-700">{{ error }}</p>
-        </section>
+        <UiCard v-if="error" padding="md" class="border border-rose-200 bg-rose-50">
+            <div class="flex items-center gap-3">
+                <UiIcon name="x-circle" class="h-5 w-5 text-rose-600" />
+                <p class="text-sm font-semibold text-rose-700">{{ error }}</p>
+            </div>
+        </UiCard>
 
         <!-- Loading -->
-        <section v-if="loading" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-sm text-slate-500">Memuat data poin...</p>
-        </section>
+        <LoadingState v-if="loading" variant="list" :count="3" />
 
         <!-- Stats -->
         <section v-if="!loading && daftar.length > 0" class="grid grid-cols-2 gap-3">
-            <div class="rounded-[1.5rem] bg-gradient-to-br from-amber-100 to-amber-50 px-4 py-4 shadow">
-                <p class="text-xs font-semibold uppercase text-amber-700">Santri Cincang</p>
-                <p class="mt-1 text-2xl font-bold text-amber-900">{{ totalSantriCincang }}</p>
-            </div>
-            <div class="rounded-[1.5rem] bg-gradient-to-br from-slate-100 to-slate-50 px-4 py-4 shadow">
-                <p class="text-xs font-semibold uppercase text-slate-700">Total Santri</p>
-                <p class="mt-1 text-2xl font-bold text-slate-900">{{ daftar.length }}</p>
-            </div>
+            <StatCard
+                tone="amber"
+                icon="info"
+                label="Santri Berpoin"
+                :value="totalSantriCincang"
+            />
+            <StatCard
+                tone="slate"
+                icon="user"
+                label="Total Santri"
+                :value="daftar.length"
+            />
         </section>
 
         <!-- Empty state -->
-        <section v-if="!loading && daftar.length === 0" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Belum ada data poin</p>
-            <p class="mt-2 text-sm text-slate-500">
-                Belum ada catatan pelanggaran santri untuk periode {{ masaBerlakuText() }}.
-            </p>
-        </section>
+        <EmptyState
+            v-if="!loading && daftar.length === 0"
+            icon="check-circle"
+            tone="emerald"
+            title="Belum ada data poin"
+            :message="`Belum ada catatan pelanggaran santri untuk periode ${masaBerlakuText()}.`"
+        />
 
         <!-- Daftar Poin -->
         <section v-if="!loading && daftar.length > 0" class="space-y-3">
@@ -148,7 +161,7 @@ onMounted(() => {
                 v-for="santri in daftar"
                 :key="santri.santri_id"
                 :class="[
-                    'rounded-[1.5rem] border-l-4 shadow px-5 py-4',
+                    'rounded-3xl border-l-4 px-5 py-4 shadow-soft',
                     poinColor(santri.total_poin),
                 ]"
             >
@@ -158,7 +171,7 @@ onMounted(() => {
                         <p class="text-xs text-slate-600">{{ santri.nis }}</p>
                     </div>
                     <div class="text-right">
-                        <p :class="['text-2xl font-bold', poinTextColor(santri.total_poin)]">
+                        <p :class="['text-2xl font-bold tabular-nums', poinTextColor(santri.total_poin)]">
                             {{ santri.total_poin }}
                         </p>
                         <p class="text-xs text-slate-500">poin</p>
@@ -166,14 +179,15 @@ onMounted(() => {
                 </div>
 
                 <!-- Status eskalasi -->
-                <div v-if="statusPoin(santri.total_poin)" class="mt-3 rounded-lg bg-white/50 px-3 py-2">
+                <div v-if="statusPoin(santri.total_poin)" class="mt-3 flex items-center gap-2 rounded-xl bg-white/60 px-3 py-2">
+                    <UiIcon name="info" :class="['h-4 w-4 shrink-0', poinTextColor(santri.total_poin)]" />
                     <p :class="['text-xs font-semibold', poinTextColor(santri.total_poin)]">
-                        🚨 {{ statusPoin(santri.total_poin).label }} — Tindakan eskalasi diperlukan
+                        {{ statusPoin(santri.total_poin).label }} — Tindakan eskalasi diperlukan
                     </p>
                 </div>
 
                 <!-- Progress bar -->
-                <div class="mt-3 h-2 rounded-full bg-slate-200 overflow-hidden">
+                <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
                     <div
                         :style="{ width: Math.min((santri.total_poin / 100) * 100, 100) + '%' }"
                         :class="[
@@ -189,18 +203,12 @@ onMounted(() => {
 
         <!-- Action Button -->
         <section class="flex gap-3 pb-6">
-            <Link
-                href="/guru"
-                class="flex-1 rounded-[1rem] bg-slate-200 px-4 py-3 text-center font-semibold text-slate-700 hover:bg-slate-300 transition-colors"
-            >
+            <UiButton href="/guru" variant="secondary" size="lg" block>
                 Kembali
-            </Link>
-            <Link
-                href="/guru/disiplin/daftar"
-                class="flex-1 rounded-[1rem] bg-amber-500 px-4 py-3 text-center font-semibold text-white hover:bg-amber-600 transition-colors"
-            >
+            </UiButton>
+            <UiButton href="/guru/disiplin/daftar" variant="primary" size="lg" block>
                 Lihat Daftar
-            </Link>
+            </UiButton>
         </section>
     </div>
 </template>

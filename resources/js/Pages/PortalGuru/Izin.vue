@@ -1,6 +1,7 @@
 <script setup>
 import { Head, useForm, router } from '@inertiajs/vue3'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
+import { PageHeader, SectionCard, ListRow, StatusBadge, UiField, UiInput, UiButton, EmptyState, IconCircle } from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -48,69 +49,110 @@ const warnaStatus = {
             <title>Izin Pegawai</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Izin Pegawai</p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">Izin Harian</h2>
-        </section>
+        <PageHeader
+            kicker="Izin Pegawai"
+            title="Izin Harian"
+        />
 
         <!-- Antrean approver -->
-        <section v-if="antrean.length > 0" class="space-y-3">
-            <h3 class="text-sm font-semibold text-slate-700">Menunggu Persetujuan Anda</h3>
-            <div v-for="item in antrean" :key="item.id" class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-                <p class="text-base font-semibold text-slate-900">{{ item.employee }}</p>
-                <p class="text-sm text-slate-500">
-                    {{ item.jenis_label }} · {{ item.tanggal_mulai }} s.d. {{ item.tanggal_selesai }} ({{ item.jumlah_hari }} hari)
-                </p>
-                <p v-if="item.alasan" class="mt-1 text-sm text-slate-600">{{ item.alasan }}</p>
-                <div class="mt-3 flex gap-2">
-                    <button class="rounded-full bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white" @click="putuskan(item.id, 'setujui')">
-                        Setujui
-                    </button>
-                    <button class="rounded-full bg-rose-600 px-4 py-1.5 text-sm font-semibold text-white" @click="putuskan(item.id, 'tolak')">
-                        Tolak
-                    </button>
-                </div>
+        <SectionCard
+            v-if="antrean.length > 0"
+            title="Menunggu Persetujuan Anda"
+            flush
+        >
+            <div class="divide-y divide-slate-100">
+                <ListRow
+                    v-for="item in antrean"
+                    :key="item.id"
+                    :title="item.employee"
+                    :subtitle="`${item.jenis_label} · ${item.tanggal_mulai} s.d. ${item.tanggal_selesai} (${item.jumlah_hari} hari)`"
+                >
+                    <template #leading>
+                        <IconCircle icon="calendar" tone="amber" />
+                    </template>
+                    <p v-if="item.alasan" class="text-sm text-slate-600">{{ item.alasan }}</p>
+                    <div class="mt-3 flex gap-2">
+                        <UiButton variant="primary" size="sm" iconLeft="check" @click="putuskan(item.id, 'setujui')">
+                            Setujui
+                        </UiButton>
+                        <UiButton variant="danger" size="sm" iconLeft="x-circle" @click="putuskan(item.id, 'tolak')">
+                            Tolak
+                        </UiButton>
+                    </div>
+                </ListRow>
             </div>
-        </section>
+        </SectionCard>
 
         <!-- Form ajukan -->
-        <section v-if="employee" class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-            <h3 class="text-sm font-semibold text-slate-700">Ajukan Izin</h3>
-            <form class="mt-3 space-y-3" @submit.prevent="ajukan">
-                <select v-model="form.jenis" class="w-full rounded-xl border-slate-300 text-sm">
-                    <option v-for="j in jenisIzin" :key="j.value" :value="j.value">{{ j.label }}</option>
-                </select>
+        <SectionCard v-if="employee" title="Ajukan Izin">
+            <form class="space-y-3" @submit.prevent="ajukan">
+                <UiField label="Jenis Izin">
+                    <template #default="{ fieldId, describedby }">
+                        <select
+                            :id="fieldId"
+                            v-model="form.jenis"
+                            :aria-describedby="describedby"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                            <option v-for="j in jenisIzin" :key="j.value" :value="j.value">{{ j.label }}</option>
+                        </select>
+                    </template>
+                </UiField>
                 <div class="grid grid-cols-2 gap-3">
-                    <input v-model="form.tanggal_mulai" type="date" required class="rounded-xl border-slate-300 text-sm" />
-                    <input v-model="form.tanggal_selesai" type="date" required class="rounded-xl border-slate-300 text-sm" />
+                    <UiField label="Tanggal Mulai" required>
+                        <template #default="{ fieldId, describedby, invalid }">
+                            <UiInput :id="fieldId" v-model="form.tanggal_mulai" type="date" :aria-describedby="describedby" :invalid="invalid" required />
+                        </template>
+                    </UiField>
+                    <UiField label="Tanggal Selesai" required>
+                        <template #default="{ fieldId, describedby, invalid }">
+                            <UiInput :id="fieldId" v-model="form.tanggal_selesai" type="date" :aria-describedby="describedby" :invalid="invalid" required />
+                        </template>
+                    </UiField>
                 </div>
-                <textarea v-model="form.alasan" rows="2" placeholder="Alasan (opsional)" class="w-full rounded-xl border-slate-300 text-sm"></textarea>
-                <p v-if="Object.keys(form.errors).length" class="text-sm text-rose-600">
+                <UiField label="Alasan" hint="Opsional">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput :id="fieldId" v-model="form.alasan" type="textarea" :rows="2" placeholder="Alasan (opsional)" :aria-describedby="describedby" />
+                    </template>
+                </UiField>
+                <p v-if="Object.keys(form.errors).length" class="text-sm font-medium text-rose-600">
                     {{ Object.values(form.errors)[0] }}
                 </p>
-                <button type="submit" :disabled="form.processing" class="w-full rounded-full bg-amber-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                <UiButton type="submit" variant="primary" size="md" block :loading="form.processing" :disabled="form.processing">
                     Kirim Pengajuan
-                </button>
+                </UiButton>
             </form>
-        </section>
+        </SectionCard>
 
-        <section v-else class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Akun belum tertaut data pegawai</p>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Hubungi admin pesantren agar akun Anda ditautkan ke data pegawai (HR).</p>
-        </section>
+        <EmptyState
+            v-else
+            icon="user"
+            title="Akun belum tertaut data pegawai"
+            message="Hubungi admin pesantren agar akun Anda ditautkan ke data pegawai (HR)."
+        />
 
         <!-- Riwayat saya -->
-        <section v-if="izinSaya.length > 0" class="space-y-3">
-            <h3 class="text-sm font-semibold text-slate-700">Izin Saya</h3>
-            <div v-for="item in izinSaya" :key="item.id" class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-semibold text-slate-900">{{ item.jenis_label }}</p>
-                    <span class="rounded-full px-3 py-0.5 text-xs font-semibold" :class="warnaStatus[item.status] || 'bg-slate-100 text-slate-600'">
-                        {{ item.status }}
-                    </span>
-                </div>
-                <p class="mt-1 text-sm text-slate-500">{{ item.tanggal_mulai }} s.d. {{ item.tanggal_selesai }} ({{ item.jumlah_hari }} hari)</p>
+        <SectionCard
+            v-if="izinSaya.length > 0"
+            title="Izin Saya"
+            flush
+        >
+            <div class="divide-y divide-slate-100">
+                <ListRow
+                    v-for="item in izinSaya"
+                    :key="item.id"
+                    :title="item.jenis_label"
+                    :subtitle="`${item.tanggal_mulai} s.d. ${item.tanggal_selesai} (${item.jumlah_hari} hari)`"
+                >
+                    <template #trailing>
+                        <StatusBadge
+                            :status="item.status === 'disetujui' ? 'terverifikasi' : item.status === 'diajukan' ? 'menunggu' : item.status"
+                            :label="item.status"
+                            size="sm"
+                        />
+                    </template>
+                </ListRow>
             </div>
-        </section>
+        </SectionCard>
     </div>
 </template>

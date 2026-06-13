@@ -2,6 +2,20 @@
 import { Head, Link } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import PortalGuruLayout from '../../../Layouts/PortalGuruLayout.vue'
+import {
+    PageHeader,
+    SectionCard,
+    UiCard,
+    ListRow,
+    StatCard,
+    StatusBadge,
+    UiButton,
+    UiField,
+    UiIcon,
+    IconCircle,
+    EmptyState,
+    LoadingState,
+} from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -91,91 +105,99 @@ onMounted(() => {
             <title>Daftar Pelanggaran</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
-                Kepengasuhan · Disiplin
-            </p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">Daftar Pelanggaran</h2>
-            <p class="text-sm text-slate-500">Pelanggaran santri bulan {{ bulan }}</p>
-        </section>
+        <PageHeader
+            kicker="Kepengasuhan · Disiplin"
+            title="Daftar Pelanggaran"
+            :subtitle="`Pelanggaran santri bulan ${bulan}`"
+        />
 
         <!-- Filter -->
-        <section class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
+        <SectionCard>
             <div class="space-y-3">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Bulan</label>
-                    <input
-                        v-model="bulan"
-                        type="month"
-                        @change="handleFilterChange"
-                        class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-amber-500 focus:outline-none"
-                    />
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Status</label>
-                    <select
-                        v-model="statusFilter"
-                        @change="handleFilterChange"
-                        class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-amber-500 focus:outline-none"
-                    >
-                        <option
-                            v-for="opt in statusOptions"
-                            :key="opt.value"
-                            :value="opt.value"
+                <UiField label="Bulan">
+                    <template #default="{ fieldId }">
+                        <input
+                            :id="fieldId"
+                            v-model="bulan"
+                            type="month"
+                            @change="handleFilterChange"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        />
+                    </template>
+                </UiField>
+                <UiField label="Status">
+                    <template #default="{ fieldId }">
+                        <select
+                            :id="fieldId"
+                            v-model="statusFilter"
+                            @change="handleFilterChange"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
                         >
-                            {{ opt.label }}
-                        </option>
-                    </select>
-                </div>
+                            <option
+                                v-for="opt in statusOptions"
+                                :key="opt.value"
+                                :value="opt.value"
+                            >
+                                {{ opt.label }}
+                            </option>
+                        </select>
+                    </template>
+                </UiField>
             </div>
-        </section>
+        </SectionCard>
 
         <!-- Error -->
-        <section v-if="error" class="rounded-[1.5rem] bg-red-50 border border-red-200 px-5 py-4">
-            <p class="text-sm font-semibold text-red-700">{{ error }}</p>
-        </section>
+        <UiCard v-if="error" padding="md">
+            <div class="flex items-start gap-3">
+                <IconCircle icon="x-circle" tone="rose" size="sm" />
+                <p class="text-sm font-semibold text-rose-700">{{ error }}</p>
+            </div>
+        </UiCard>
 
         <!-- Loading -->
-        <section v-if="loading" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-sm text-slate-500">Memuat data...</p>
-        </section>
+        <LoadingState v-if="loading" variant="card" :count="3" />
 
         <!-- Stats -->
         <section v-if="!loading && daftar.length > 0" class="grid grid-cols-2 gap-3">
-            <div class="rounded-[1.5rem] bg-gradient-to-br from-amber-100 to-amber-50 px-4 py-4 shadow">
-                <p class="text-xs font-semibold uppercase text-amber-700">Total Poin</p>
-                <p class="mt-1 text-2xl font-bold text-amber-900">{{ totalPoinSemua }}</p>
-            </div>
-            <div class="rounded-[1.5rem] bg-gradient-to-br from-slate-100 to-slate-50 px-4 py-4 shadow">
-                <p class="text-xs font-semibold uppercase text-slate-700">Total Santri</p>
-                <p class="mt-1 text-2xl font-bold text-slate-900">{{ daftar.length }}</p>
-            </div>
+            <StatCard
+                icon="chart"
+                tone="amber"
+                label="Total Poin"
+                :value="totalPoinSemua"
+            />
+            <StatCard
+                icon="user"
+                tone="slate"
+                label="Total Santri"
+                :value="daftar.length"
+            />
         </section>
 
         <!-- Empty state -->
-        <section v-if="!loading && daftar.length === 0" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Tidak ada pelanggaran</p>
-            <p class="mt-2 text-sm text-slate-500">
-                Belum ada catatan pelanggaran untuk bulan {{ bulan }}.
-            </p>
-        </section>
+        <EmptyState
+            v-if="!loading && daftar.length === 0"
+            icon="check-circle"
+            tone="emerald"
+            title="Tidak ada pelanggaran"
+            :message="`Belum ada catatan pelanggaran untuk bulan ${bulan}.`"
+        />
 
         <!-- Daftar Santri -->
         <section v-if="!loading && daftar.length > 0" class="space-y-4">
-            <article
+            <UiCard
                 v-for="santri in daftar"
                 :key="santri.santri_id"
-                class="rounded-[1.5rem] bg-white shadow overflow-hidden"
+                padding="none"
             >
                 <!-- Header santri -->
-                <div class="px-5 py-4 border-b border-slate-100">
+                <div class="border-b border-slate-100 px-5 py-4">
                     <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <p class="font-semibold text-slate-900">{{ santri.nama }}</p>
-                            <p class="text-xs text-slate-500">{{ santri.nis }} · {{ santri.kelas }}</p>
+                        <div class="min-w-0">
+                            <p class="truncate font-bold tracking-tight text-slate-900">{{ santri.nama }}</p>
+                            <p class="truncate text-xs text-slate-500">{{ santri.nis }} · {{ santri.kelas }}</p>
                         </div>
-                        <div class="text-right">
-                            <p class="text-sm font-bold text-amber-700">{{ santri.poin_bulan_ini }} poin</p>
+                        <div class="shrink-0 text-right">
+                            <p class="text-sm font-bold tabular-nums text-amber-700">{{ santri.poin_bulan_ini }} poin</p>
                             <p class="text-xs text-slate-500">{{ santri.total_pelanggaran }} pelanggaran</p>
                         </div>
                     </div>
@@ -187,54 +209,64 @@ onMounted(() => {
                         v-for="pelang in santri.pelanggaran"
                         :key="pelang.id"
                         :class="[
-                            'rounded-lg border-l-4 p-3',
+                            'rounded-2xl border-l-4 p-3',
                             kategoriColor[pelang.kategori] || 'bg-slate-50 border-slate-200',
                         ]"
                     >
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2">
-                                    <p class="font-semibold text-sm">{{ pelang.jenis_pelanggaran }}</p>
-                                    <span :class="['text-xs px-2 py-1 rounded-full', kategoriBadge[pelang.kategori]]">
+                                    <p class="text-sm font-semibold">{{ pelang.jenis_pelanggaran }}</p>
+                                    <span :class="['rounded-full px-2 py-1 text-xs font-semibold', kategoriBadge[pelang.kategori]]">
                                         {{ pelang.kategori }}
                                     </span>
                                 </div>
-                                <p class="text-xs mt-1 text-slate-600">{{ pelang.alasan }}</p>
-                                <div class="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
-                                    <span>📅 {{ pelang.waktu_kejadian }}</span>
-                                    <span v-if="pelang.lokasi">📍 {{ pelang.lokasi }}</span>
+                                <p class="mt-1 text-xs text-slate-600">{{ pelang.alasan }}</p>
+                                <div class="mt-2 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                                    <span class="inline-flex items-center gap-1">
+                                        <UiIcon name="calendar" class="h-3.5 w-3.5 shrink-0" />
+                                        {{ pelang.waktu_kejadian }}
+                                    </span>
+                                    <span v-if="pelang.lokasi" class="inline-flex items-center gap-1">
+                                        <UiIcon name="home" class="h-3.5 w-3.5 shrink-0" />
+                                        {{ pelang.lokasi }}
+                                    </span>
                                 </div>
-                                <p v-if="pelang.status === 'dicatat'" class="text-xs text-amber-700 mt-2 font-semibold">
-                                    ⏳ Menunggu verifikasi oleh {{ pelang.pencatat }}
-                                </p>
-                                <p v-else class="text-xs text-emerald-700 mt-2">
-                                    ✓ Diverifikasi oleh {{ pelang.verifikator }} · {{ pelang.verified_at }}
-                                </p>
+                                <div v-if="pelang.status === 'dicatat'" class="mt-2">
+                                    <StatusBadge status="menunggu" :label="`Menunggu verifikasi oleh ${pelang.pencatat}`" size="sm" />
+                                </div>
+                                <div v-else class="mt-2">
+                                    <StatusBadge status="terverifikasi" :label="`Diverifikasi oleh ${pelang.verifikator} · ${pelang.verified_at}`" size="sm" />
+                                </div>
                             </div>
-                            <div class="text-right">
-                                <p class="font-bold text-lg">{{ pelang.poin }}</p>
+                            <div class="shrink-0 text-right">
+                                <p class="text-lg font-bold tabular-nums">{{ pelang.poin }}</p>
                                 <p class="text-xs text-slate-500">poin</p>
                             </div>
                         </div>
                     </div>
                 </div>
-            </article>
+            </UiCard>
         </section>
 
         <!-- Action Button -->
         <section class="flex gap-3 pb-6">
-            <Link
+            <UiButton
                 href="/guru"
-                class="flex-1 rounded-[1rem] bg-slate-200 px-4 py-3 text-center font-semibold text-slate-700 hover:bg-slate-300 transition-colors"
+                variant="secondary"
+                block
+                iconLeft="arrow-left"
             >
                 Kembali
-            </Link>
-            <Link
+            </UiButton>
+            <UiButton
                 href="/guru/disiplin/catat"
-                class="flex-1 rounded-[1rem] bg-amber-500 px-4 py-3 text-center font-semibold text-white hover:bg-amber-600 transition-colors"
+                variant="primary"
+                block
+                iconLeft="plus"
             >
-                + Catat Baru
-            </Link>
+                Catat Baru
+            </UiButton>
         </section>
     </div>
 </template>

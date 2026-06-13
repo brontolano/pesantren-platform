@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
+import { PageHeader, SectionCard, ListRow, UiField, UiButton, SegmentedControl, UiIcon } from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -66,96 +67,111 @@ function submit() {
             <title>Capaian Kitab</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
-                Capaian Kitab · {{ kajian.metode }}
-            </p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">{{ kajian.kitab }}</h2>
-            <p class="text-sm text-slate-500">{{ kajian.kelompok || '—' }}</p>
-        </section>
+        <PageHeader
+            :kicker="`Capaian Kitab · ${kajian.metode}`"
+            :title="kajian.kitab"
+            :subtitle="kajian.kelompok || '—'"
+        />
 
-        <section class="space-y-3 rounded-[1.5rem] bg-white px-5 py-5 shadow">
-            <div v-if="isSorogan">
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-400">Santri</label>
-                <select
-                    v-model="form.santri_id"
-                    class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
-                >
-                    <option :value="null" disabled>— pilih santri —</option>
-                    <option v-for="s in peserta" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
-                </select>
-            </div>
-            <p v-else class="rounded-2xl bg-amber-50 px-4 py-2 text-sm text-amber-700">
-                Satu update untuk SEMUA peserta ({{ peserta.length }} santri) — posisi kelompok.
-            </p>
+        <SectionCard>
+            <div class="space-y-4">
+                <UiField v-if="isSorogan" label="Santri">
+                    <template #default="{ fieldId }">
+                        <select
+                            :id="fieldId"
+                            v-model="form.santri_id"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                            <option :value="null" disabled>— pilih santri —</option>
+                            <option v-for="s in peserta" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
+                        </select>
+                    </template>
+                </UiField>
+                <p v-else class="flex items-start gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700 ring-1 ring-inset ring-amber-100">
+                    <UiIcon name="info" class="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>Satu update untuk SEMUA peserta ({{ peserta.length }} santri) — posisi kelompok.</span>
+                </p>
 
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-400">Posisi (halaman/bab)</label>
-                <input
-                    v-model="form.posisi"
-                    type="text"
-                    placeholder='Misal: "Bab Thaharah hal. 12"'
-                    class="mt-1 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
-                />
-            </div>
+                <UiField label="Posisi (halaman/bab)">
+                    <template #default="{ fieldId }">
+                        <input
+                            :id="fieldId"
+                            v-model="form.posisi"
+                            type="text"
+                            placeholder='Misal: "Bab Thaharah hal. 12"'
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                    </template>
+                </UiField>
 
-            <div class="flex flex-wrap gap-2">
-                <button
-                    v-for="opsi in ['lanjut', 'ulang', 'khatam']"
-                    :key="opsi"
+                <UiField label="Status">
+                    <template #default>
+                        <SegmentedControl
+                            v-model="form.status"
+                            :options="[
+                                { value: 'lanjut', label: 'Lanjut', icon: 'arrow-up-right' },
+                                { value: 'ulang', label: 'Ulang', icon: 'clock' },
+                                { value: 'khatam', label: 'Khatam', icon: 'check-circle' },
+                            ]"
+                        />
+                    </template>
+                </UiField>
+
+                <UiField label="Catatan (opsional)">
+                    <template #default="{ fieldId }">
+                        <textarea
+                            :id="fieldId"
+                            v-model="form.catatan"
+                            rows="2"
+                            placeholder="Catatan (opsional)"
+                            class="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium leading-6 text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        ></textarea>
+                    </template>
+                </UiField>
+
+                <p v-if="errorMessage" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ errorMessage }}</p>
+                <p v-if="savedAt" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
+                    Capaian tersimpan {{ savedAt }}.
+                </p>
+
+                <UiButton
                     type="button"
-                    class="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition"
-                    :class="form.status === opsi ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600'"
-                    @click="form.status = opsi"
+                    variant="primary"
+                    size="lg"
+                    block
+                    :loading="saving"
+                    :disabled="saving || (isSorogan && !form.santri_id)"
+                    @click="submit()"
                 >
-                    {{ opsi }}
-                </button>
+                    {{ saving ? 'Menyimpan…' : 'Simpan Capaian' }}
+                </UiButton>
             </div>
+        </SectionCard>
 
-            <textarea
-                v-model="form.catatan"
-                rows="2"
-                placeholder="Catatan (opsional)"
-                class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
-            ></textarea>
-
-            <p v-if="errorMessage" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ errorMessage }}</p>
-            <p v-if="savedAt" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
-                Capaian tersimpan {{ savedAt }}.
-            </p>
-
-            <button
-                type="button"
-                class="w-full rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white disabled:opacity-60"
-                :disabled="saving || (isSorogan && !form.santri_id)"
-                @click="submit()"
-            >
-                {{ saving ? 'Menyimpan…' : 'Simpan Capaian' }}
-            </button>
-        </section>
-
-        <section v-if="riwayatTerpilih.length > 0" class="space-y-2">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Riwayat Terakhir</p>
-            <div
-                v-for="(r, i) in riwayatTerpilih"
-                :key="i"
-                class="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm"
-            >
-                <div class="min-w-0">
-                    <p class="truncate text-sm font-semibold text-slate-900">{{ r.posisi }}</p>
-                    <p class="text-xs text-slate-400">{{ r.tanggal }}<span v-if="r.catatan"> · {{ r.catatan }}</span></p>
-                </div>
-                <span
-                    class="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider"
-                    :class="{
-                        'bg-emerald-50 text-emerald-700': r.status === 'lanjut',
-                        'bg-amber-50 text-amber-700': r.status === 'ulang',
-                        'bg-sky-50 text-sky-700': r.status === 'khatam',
-                    }"
+        <SectionCard v-if="riwayatTerpilih.length > 0" kicker="Riwayat" title="Riwayat Terakhir" flush>
+            <div class="divide-y divide-slate-100">
+                <ListRow
+                    v-for="(r, i) in riwayatTerpilih"
+                    :key="i"
+                    :title="r.posisi"
                 >
-                    {{ r.status }}
-                </span>
+                    <template #subtitle>
+                        {{ r.tanggal }}<span v-if="r.catatan"> · {{ r.catatan }}</span>
+                    </template>
+                    <template #trailing>
+                        <span
+                            class="inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ring-1 ring-inset"
+                            :class="{
+                                'bg-emerald-50 text-emerald-700 ring-emerald-100': r.status === 'lanjut',
+                                'bg-amber-50 text-amber-700 ring-amber-100': r.status === 'ulang',
+                                'bg-sky-50 text-sky-700 ring-sky-100': r.status === 'khatam',
+                            }"
+                        >
+                            {{ r.status }}
+                        </span>
+                    </template>
+                </ListRow>
             </div>
-        </section>
+        </SectionCard>
     </div>
 </template>

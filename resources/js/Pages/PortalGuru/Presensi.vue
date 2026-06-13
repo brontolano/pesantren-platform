@@ -2,6 +2,17 @@
 import { computed, ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
+import {
+    PageHeader,
+    SectionCard,
+    ListRow,
+    StatCard,
+    EmptyState,
+    UiButton,
+    UiField,
+    UiInput,
+    SegmentedControl,
+} from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -126,45 +137,52 @@ function submitJurnal() {
             <title>Presensi Kelas</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Presensi Kelas</p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">{{ sesi.pelajaran }}</h2>
-            <p class="text-sm text-slate-500">{{ sesi.kelas }} · {{ tanggal }} · {{ sesi.jam_mulai }}–{{ sesi.jam_selesai }}</p>
-        </section>
+        <PageHeader
+            kicker="Presensi Kelas"
+            :title="sesi.pelajaran"
+            :subtitle="`${sesi.kelas} · ${tanggal} · ${sesi.jam_mulai}–${sesi.jam_selesai}`"
+        />
 
-        <section class="flex flex-wrap gap-2 text-xs font-semibold">
-            <span class="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">Hadir {{ ringkasan.hadir }}</span>
-            <span class="rounded-full bg-sky-50 px-3 py-1 text-sky-700">Izin {{ ringkasan.izin }}</span>
-            <span class="rounded-full bg-amber-50 px-3 py-1 text-amber-700">Sakit {{ ringkasan.sakit }}</span>
-            <span class="rounded-full bg-rose-50 px-3 py-1 text-rose-700">Alpa {{ ringkasan.alpa }}</span>
-        </section>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatCard tone="emerald" label="Hadir" :value="ringkasan.hadir" compact />
+            <StatCard tone="blue" label="Izin" :value="ringkasan.izin" compact />
+            <StatCard tone="amber" label="Sakit" :value="ringkasan.sakit" compact />
+            <StatCard tone="rose" label="Alpa" :value="ringkasan.alpa" compact />
+        </div>
 
-        <section v-if="santri.length === 0" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Belum ada santri di rombel ini</p>
-            <p class="mt-2 text-sm text-slate-500">Hubungi TU untuk memasukkan santri ke kelas.</p>
-        </section>
+        <EmptyState
+            v-if="santri.length === 0"
+            icon="user"
+            title="Belum ada santri di rombel ini"
+            message="Hubungi TU untuk memasukkan santri ke kelas."
+        />
 
-        <section v-else class="space-y-2">
-            <p class="text-xs text-slate-500">Semua santri default <strong>hadir</strong>. Ketuk tombol status untuk menandai pengecualian.</p>
-            <div
-                v-for="s in santri"
-                :key="s.id"
-                class="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-3 shadow-sm"
-            >
-                <div class="min-w-0">
-                    <p class="truncate text-sm font-semibold text-slate-900">{{ s.nama }}</p>
-                    <p class="text-xs text-slate-400">{{ s.nis }}</p>
-                </div>
-                <button
-                    type="button"
-                    class="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition"
-                    :class="statusClasses[statusMap[s.id]] || statusClasses.hadir"
-                    @click="cycleStatus(s.id)"
+        <SectionCard
+            v-else
+            title="Daftar Santri"
+            subtitle="Semua santri default hadir. Ketuk tombol status untuk menandai pengecualian."
+            flush
+        >
+            <div class="divide-y divide-slate-100">
+                <ListRow
+                    v-for="s in santri"
+                    :key="s.id"
+                    :title="s.nama"
+                    :subtitle="s.nis"
                 >
-                    {{ statusMap[s.id] }}
-                </button>
+                    <template #trailing>
+                        <button
+                            type="button"
+                            class="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition"
+                            :class="statusClasses[statusMap[s.id]] || statusClasses.hadir"
+                            @click="cycleStatus(s.id)"
+                        >
+                            {{ statusMap[s.id] }}
+                        </button>
+                    </template>
+                </ListRow>
             </div>
-        </section>
+        </SectionCard>
 
         <section v-if="santri.length > 0" class="sticky bottom-20 space-y-2">
             <p v-if="errorMessage" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">
@@ -173,63 +191,78 @@ function submitJurnal() {
             <p v-if="savedAt" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
                 Presensi tersimpan {{ savedAt }}.
             </p>
-            <button
+            <UiButton
                 type="button"
-                class="w-full rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white disabled:opacity-60"
+                variant="primary"
+                size="lg"
+                block
+                :loading="saving"
                 :disabled="saving"
                 @click="submit()"
             >
                 {{ saving ? 'Menyimpan…' : 'Simpan Presensi' }}
-            </button>
+            </UiButton>
         </section>
 
         <!-- F2-PWA — Jurnal KBM 30-detik -->
-        <section v-if="showJurnal" class="space-y-3 rounded-[1.5rem] bg-white px-5 py-5 shadow">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Jurnal KBM</p>
-                <p class="mt-1 text-sm text-slate-500">30 detik saja: materi & status sesi. Hadir otomatis {{ ringkasan.hadir }} santri.</p>
-            </div>
+        <SectionCard
+            v-if="showJurnal"
+            kicker="Jurnal KBM"
+            title="Jurnal KBM"
+            :subtitle="`30 detik saja: materi & status sesi. Hadir otomatis ${ringkasan.hadir} santri.`"
+        >
+            <div class="space-y-3">
+                <SegmentedControl
+                    v-model="jurnalForm.status"
+                    :options="[
+                        { value: 'terlaksana', label: 'Terlaksana' },
+                        { value: 'kosong', label: 'Kosong' },
+                        { value: 'diganti', label: 'Diganti' },
+                    ]"
+                />
 
-            <div class="flex flex-wrap gap-2">
-                <button
-                    v-for="opsi in ['terlaksana', 'kosong', 'diganti']"
-                    :key="opsi"
+                <UiField label="Materi">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput
+                            :id="fieldId"
+                            :aria-describedby="describedby"
+                            v-model="jurnalForm.materi"
+                            type="textarea"
+                            :rows="2"
+                            placeholder="Materi yang diajarkan (wajib bila terlaksana)"
+                        />
+                    </template>
+                </UiField>
+
+                <UiField label="Metode">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput
+                            :id="fieldId"
+                            :aria-describedby="describedby"
+                            v-model="jurnalForm.metode"
+                            type="text"
+                            placeholder="Metode (opsional: ceramah, hafalan, praktik…)"
+                        />
+                    </template>
+                </UiField>
+
+                <p v-if="jurnalError" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ jurnalError }}</p>
+                <p v-if="jurnalSavedAt" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
+                    Jurnal tersimpan {{ jurnalSavedAt }}.
+                </p>
+
+                <UiButton
                     type="button"
-                    class="rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition"
-                    :class="jurnalForm.status === opsi ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600'"
-                    @click="jurnalForm.status = opsi"
+                    variant="primary"
+                    size="lg"
+                    block
+                    :loading="jurnalSaving"
+                    :disabled="jurnalSaving"
+                    @click="submitJurnal()"
                 >
-                    {{ opsi }}
-                </button>
+                    {{ jurnalSaving ? 'Menyimpan…' : 'Simpan Jurnal KBM' }}
+                </UiButton>
             </div>
-
-            <textarea
-                v-model="jurnalForm.materi"
-                rows="2"
-                placeholder="Materi yang diajarkan (wajib bila terlaksana)"
-                class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
-            ></textarea>
-
-            <input
-                v-model="jurnalForm.metode"
-                type="text"
-                placeholder="Metode (opsional: ceramah, hafalan, praktik…)"
-                class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 focus:border-emerald-600 focus:outline-none"
-            />
-
-            <p v-if="jurnalError" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ jurnalError }}</p>
-            <p v-if="jurnalSavedAt" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">
-                Jurnal tersimpan {{ jurnalSavedAt }}.
-            </p>
-
-            <button
-                type="button"
-                class="w-full rounded-full bg-amber-600 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white disabled:opacity-60"
-                :disabled="jurnalSaving"
-                @click="submitJurnal()"
-            >
-                {{ jurnalSaving ? 'Menyimpan…' : 'Simpan Jurnal KBM' }}
-            </button>
-        </section>
+        </SectionCard>
     </div>
 </template>
