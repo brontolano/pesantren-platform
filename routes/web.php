@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\CmsPublicApiController;
 use App\Http\Controllers\Api\PpdbPublicApiController;
 use App\Http\Controllers\Api\PublicDirectoryApiController;
 use App\Http\Controllers\Api\TenantApiController;
+use App\Http\Controllers\Auth\StaffLoginController;
 use App\Http\Controllers\DonasiPublikController;
+use App\Http\Controllers\LauncherController;
 use App\Http\Controllers\TenantWebsiteController;
 use App\Support\KebijakanPrivasiSistem;
 use App\Support\TenantBranding;
@@ -31,9 +33,10 @@ Route::get('/caddy/ssl-check', function () {
     return response('ok');
 })->name('caddy.ssl-check');
 
-// Root: central landing (pesantren.online) atau HUB APLIKASI tenant (domain sistem).
-// Domain sistem tenant (mis. pesantren.asy-syifaa.com) menampilkan launcher portal
-// login bergaya menu aplikasi (icon grid). Website publik = domain terpisah (asy-syifaa.com).
+// Root: central landing (pesantren.online) atau PINTU SISTEM tenant (domain sistem).
+// Domain sistem tenant (mis. pesantren.asy-syifaa.com) = satu pintu terkunci login:
+// guest → /masuk; setelah login → diarahkan per peran (LauncherController +
+// App\Support\AppLauncher). Website publik = domain terpisah (type='website').
 Route::get('/', function () {
     if (in_array(request()->getHost(), config('tenancy.central_domains', []), true)) {
         return view('landing');
@@ -44,10 +47,7 @@ Route::get('/', function () {
         ->value('type');
 
     if ($domainType === 'sistem') {
-        return view('tenant.launcher', [
-            'pesantren' => TenantBranding::name(tenant()?->name ?? 'Portal Pesantren'),
-            'logoUrl' => TenantBranding::logoUrl(),
-        ]);
+        return app()->call([app(LauncherController::class), '__invoke']);
     }
 
     return app()->call([app(TenantLandingPageController::class), '__invoke']);
@@ -114,9 +114,19 @@ Route::post('/donasi/{ref}/bukti', [DonasiPublikController::class, 'uploadBukti'
 Route::get('/embed/widget.js', [EmbedWidgetController::class, 'script'])->name('tenant.embed.script');
 Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('tenant.embed.data');
 
-// Fallback login route untuk middleware 'auth' pada route non-panel (mis. export tenant).
-// Pada domain tenant, /admin/login adalah halaman login panel tenant.
-Route::get('/login', fn () => redirect('/admin/login'))->name('login');
+// ── Satu pintu login (domain sistem) ──
+// Halaman login bermerek (islami, brand tenant) menggantikan launcher anonim.
+// Mengautentikasi guard `web` yang sama dgn panel Filament; sukses → '/' lalu
+// LauncherController mengarahkan sesuai peran. Akun wali/peserta dirutekan benar.
+Route::get('/masuk', [StaffLoginController::class, 'show'])->name('tenant.masuk.show');
+Route::post('/masuk', [StaffLoginController::class, 'store'])
+    ->middleware('throttle:20,1')
+    ->name('tenant.masuk.store');
+Route::post('/keluar', [StaffLoginController::class, 'logout'])->name('tenant.masuk.logout');
+
+// Fallback login route untuk middleware 'auth' pada route non-panel → satu pintu /masuk.
+// (Unifikasi /admin/login Filament menyusul via kustomisasi panel.)
+Route::get('/login', fn () => redirect('/masuk'))->name('login');
 
 // Portal peserta LAMA (/portal, panel Filament) sudah disatukan ke PWA /spmb.
 // Redirect semua /portal/* ke /spmb/login agar tautan/bookmark lama tetap berfungsi
