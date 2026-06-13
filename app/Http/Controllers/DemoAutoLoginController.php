@@ -63,6 +63,62 @@ class DemoAutoLoginController extends Controller
             'role' => 'kepala',
             'route' => 'tenant.pimpinan.beranda',
         ],
+        // App PWA demo peran (controller-dummy, gate auth). Role best-effort —
+        // bila role tak ada di tenant, user tetap dibuat & login (gate hanya auth).
+        'uks' => [
+            'email' => 'uks.demo@demo.pesantren.online',
+            'name' => 'Petugas UKS Demo',
+            'role' => 'pengelola_uks',
+            'route' => 'tenant.uks.beranda',
+        ],
+        'tu' => [
+            'email' => 'tu.demo@demo.pesantren.online',
+            'name' => 'Staf TU Demo',
+            'role' => 'tata_usaha',
+            'route' => 'tenant.tu.beranda',
+        ],
+        'humas' => [
+            'email' => 'humas.demo@demo.pesantren.online',
+            'name' => 'Staf Humas Demo',
+            'role' => 'admin_pesantren',
+            'route' => 'tenant.humas.beranda',
+        ],
+        'kepegawaian' => [
+            'email' => 'kepegawaian.demo@demo.pesantren.online',
+            'name' => 'Staf HRD Demo',
+            'role' => 'kepala_keuangan',
+            'route' => 'tenant.kepegawaian.beranda',
+        ],
+        'ppdb-panitia' => [
+            'email' => 'ppdb.demo@demo.pesantren.online',
+            'name' => 'Panitia PPDB Demo',
+            'role' => 'tata_usaha',
+            'route' => 'tenant.ppdb-panitia.beranda',
+        ],
+        'pos-kantin' => [
+            'email' => 'poskantin.demo@demo.pesantren.online',
+            'name' => 'Kasir Kantin Demo',
+            'role' => 'keuangan',
+            'route' => 'tenant.pos-kantin.beranda',
+        ],
+        'keamanan' => [
+            'email' => 'keamanan.demo@demo.pesantren.online',
+            'name' => 'Petugas Keamanan Demo',
+            'role' => 'guru',
+            'route' => 'tenant.keamanan.beranda',
+        ],
+        'pengasuhan' => [
+            'email' => 'pengasuhan.demo@demo.pesantren.online',
+            'name' => 'Musyrif Demo',
+            'role' => 'guru',
+            'route' => 'tenant.pengasuhan.beranda',
+        ],
+        'pengabdian' => [
+            'email' => 'pengabdian.demo@demo.pesantren.online',
+            'name' => 'Santri Pengabdian Demo',
+            'role' => 'santri',
+            'route' => 'tenant.pengabdian.beranda',
+        ],
     ];
 
     public function __invoke(string $peran): RedirectResponse
