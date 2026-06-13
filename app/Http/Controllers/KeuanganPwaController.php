@@ -27,10 +27,40 @@ class KeuanganPwaController extends Controller
         ];
     }
 
+    /**
+     * Item bottom-nav (kontrak {key,label,href,active}) — di-gate per izin
+     * `can.*` & ditandai aktif via nama rute. Dipakai KeuanganLapanganLayout.
+     */
+    private function nav(array $can): array
+    {
+        $base = '/admin/keuangan/pwa';
+        $items = [
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => $base, 'route' => 'beranda', 'show' => true],
+            ['key' => 'catat', 'label' => 'Belanja', 'href' => "{$base}/catat-belanja", 'route' => 'belanja', 'show' => $can['input_belanja']],
+            ['key' => 'setor', 'label' => 'Setor', 'href' => "{$base}/setor-keliling", 'route' => 'setor-keliling', 'show' => $can['setor_tabungan']],
+            ['key' => 'dasbor', 'label' => 'Dasbor', 'href' => "{$base}/dasbor", 'route' => 'dasbor', 'show' => $can['view_laporan_pimpinan']],
+            ['key' => 'slip', 'label' => 'Slip', 'href' => "{$base}/slip-saya", 'route' => 'slip', 'show' => $can['view_slip_sendiri']],
+        ];
+
+        return collect($items)
+            ->filter(fn (array $i): bool => $i['show'])
+            ->map(fn (array $i): array => [
+                'key' => $i['key'],
+                'label' => $i['label'],
+                'href' => $i['href'],
+                'active' => request()->routeIs("tenant.keuangan.pwa.{$i['route']}"),
+            ])
+            ->values()
+            ->all();
+    }
+
     public function beranda()
     {
+        $can = $this->can();
+
         return Inertia::render('KeuanganPwa/Beranda', [
-            'can' => $this->can(),
+            'can' => $can,
+            'navigation' => $this->nav($can),
             'userName' => Auth::user()?->name,
         ]);
     }
@@ -38,6 +68,7 @@ class KeuanganPwaController extends Controller
     public function catatBelanja()
     {
         return Inertia::render('KeuanganPwa/CatatBelanja', [
+            'navigation' => $this->nav($this->can()),
             'sumberDana' => SumberDana::orderBy('kode_dana')->get(['id', 'kode_dana', 'nama_sumber']),
             'divisi' => DivisiUnit::orderBy('nama_divisi')->get(['id', 'nama_divisi']),
             'akunBeban' => Akun::whereIn('tipe', ['BEBAN', 'ASET'])->where('is_postable', true)->orderBy('kode')->get(['id', 'kode', 'nama']),
@@ -47,17 +78,23 @@ class KeuanganPwaController extends Controller
 
     public function catatPemasukan()
     {
-        return Inertia::render('KeuanganPwa/CatatPemasukan');
+        return Inertia::render('KeuanganPwa/CatatPemasukan', [
+            'navigation' => $this->nav($this->can()),
+        ]);
     }
 
     public function dasbor()
     {
-        return Inertia::render('KeuanganPwa/DasborPimpinan');
+        return Inertia::render('KeuanganPwa/DasborPimpinan', [
+            'navigation' => $this->nav($this->can()),
+        ]);
     }
 
     public function slipSaya()
     {
-        return Inertia::render('KeuanganPwa/SlipSaya');
+        return Inertia::render('KeuanganPwa/SlipSaya', [
+            'navigation' => $this->nav($this->can()),
+        ]);
     }
 
     /** WP-32: Setor Keliling — pilih kamar → santri → setoran draf (offline-ready). */
@@ -65,6 +102,8 @@ class KeuanganPwaController extends Controller
     {
         abort_unless(Auth::user()?->can('setor_tabungan') ?? false, 403);
 
-        return Inertia::render('KeuanganPwa/SetorKeliling');
+        return Inertia::render('KeuanganPwa/SetorKeliling', [
+            'navigation' => $this->nav($this->can()),
+        ]);
     }
 }
