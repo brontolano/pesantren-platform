@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
+import { PageHeader, UiCard, EmptyState } from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -118,75 +119,79 @@ const stateBadge = {
             <title>Grid Nilai</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Grid Nilai</p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">{{ pelajaran }}</h2>
-            <p class="text-sm text-slate-500">{{ kelas }} · {{ periode.nama }} · tersimpan otomatis per baris</p>
-        </section>
+        <PageHeader
+            kicker="Grid Nilai"
+            :title="pelajaran"
+            :subtitle="`${kelas} · ${periode.nama} · tersimpan otomatis per baris`"
+        />
 
-        <section v-if="rows.length === 0" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Belum ada santri aktif di kelas ini</p>
-        </section>
+        <EmptyState
+            v-if="rows.length === 0"
+            icon="book"
+            title="Belum ada santri aktif di kelas ini"
+        />
 
-        <section v-else class="overflow-x-auto rounded-[1.5rem] bg-white shadow">
-            <table class="w-full min-w-[480px] table-auto text-sm">
-                <thead>
-                    <tr class="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-400">
-                        <th class="px-4 py-3">Santri</th>
-                        <template v-if="komponen.length > 0">
-                            <th v-for="k in komponen" :key="k.id" class="px-2 py-3">
-                                {{ k.nama }}
-                                <span class="block font-normal normal-case">{{ k.bobot }}%</span>
-                            </th>
-                        </template>
-                        <template v-else>
-                            <th class="px-2 py-3">Harian</th>
-                            <th class="px-2 py-3">UTS</th>
-                            <th class="px-2 py-3">UAS</th>
-                        </template>
-                        <th class="px-2 py-3">Akhir</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(row, idx) in rows" :key="row.santri_id" class="border-b border-slate-50">
-                        <td class="px-4 py-3">
-                            <p class="font-semibold text-slate-900">{{ row.nama }}</p>
-                            <p class="text-xs" :class="stateBadge[row._state]?.cls || 'text-slate-400'">
-                                {{ row._error || stateBadge[row._state]?.text || row.nis }}
-                            </p>
-                        </td>
-                        <template v-if="komponen.length > 0">
-                            <td v-for="k in komponen" :key="k.id" class="px-2 py-2">
-                                <input
-                                    v-model="row.nilai_komponen[k.id]"
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    inputmode="numeric"
-                                    class="w-16 rounded-xl border border-slate-200 px-2 py-2 text-center focus:border-emerald-600 focus:outline-none"
-                                    @input="jadwalkanSimpan(idx)"
-                                />
+        <UiCard v-else padding="none">
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[480px] table-auto font-jost text-sm tabular-nums">
+                    <thead>
+                        <tr class="border-b border-slate-100 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                            <th class="sticky left-0 z-10 bg-white px-4 py-3">Santri</th>
+                            <template v-if="komponen.length > 0">
+                                <th v-for="k in komponen" :key="k.id" class="px-2 py-3">
+                                    {{ k.nama }}
+                                    <span class="block font-normal normal-case text-slate-400">{{ k.bobot }}%</span>
+                                </th>
+                            </template>
+                            <template v-else>
+                                <th class="px-2 py-3">Harian</th>
+                                <th class="px-2 py-3">UTS</th>
+                                <th class="px-2 py-3">UAS</th>
+                            </template>
+                            <th class="px-2 py-3">Akhir</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr v-for="(row, idx) in rows" :key="row.santri_id">
+                            <td class="sticky left-0 z-10 bg-white px-4 py-3">
+                                <p class="font-semibold text-slate-900">{{ row.nama }}</p>
+                                <p class="text-xs" :class="stateBadge[row._state]?.cls || 'text-slate-400'">
+                                    {{ row._error || stateBadge[row._state]?.text || row.nis }}
+                                </p>
                             </td>
-                        </template>
-                        <template v-else>
-                            <td v-for="kolom in ['nilai_harian', 'nilai_uts', 'nilai_uas']" :key="kolom" class="px-2 py-2">
-                                <input
-                                    v-model="row[kolom]"
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    inputmode="numeric"
-                                    class="w-16 rounded-xl border border-slate-200 px-2 py-2 text-center focus:border-emerald-600 focus:outline-none"
-                                    @input="jadwalkanSimpan(idx)"
-                                />
+                            <template v-if="komponen.length > 0">
+                                <td v-for="k in komponen" :key="k.id" class="px-2 py-2">
+                                    <input
+                                        v-model="row.nilai_komponen[k.id]"
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        inputmode="numeric"
+                                        class="w-16 rounded-xl border border-slate-200 bg-white px-2 py-2 text-center tabular-nums transition focus:border-[var(--wali-primary,#059669)] focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]/20"
+                                        @input="jadwalkanSimpan(idx)"
+                                    />
+                                </td>
+                            </template>
+                            <template v-else>
+                                <td v-for="kolom in ['nilai_harian', 'nilai_uts', 'nilai_uas']" :key="kolom" class="px-2 py-2">
+                                    <input
+                                        v-model="row[kolom]"
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        inputmode="numeric"
+                                        class="w-16 rounded-xl border border-slate-200 bg-white px-2 py-2 text-center tabular-nums transition focus:border-[var(--wali-primary,#059669)] focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]/20"
+                                        @input="jadwalkanSimpan(idx)"
+                                    />
+                                </td>
+                            </template>
+                            <td class="px-2 py-2 text-center font-semibold tabular-nums text-slate-900">
+                                {{ row.nilai_akhir ?? '—' }}
                             </td>
-                        </template>
-                        <td class="px-2 py-2 text-center font-semibold text-slate-900">
-                            {{ row.nilai_akhir ?? '—' }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </UiCard>
     </div>
 </template>

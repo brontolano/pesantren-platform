@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
+import { PageHeader, SectionCard, UiCard, UiField, UiButton, SegmentedControl, EmptyState } from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -62,67 +63,73 @@ function submit(attempt = 0) {
             <title>Munaqasyah</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Tahfidz Lanjutan</p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">Catat Munaqasyah</h2>
-        </section>
+        <PageHeader kicker="Tahfidz Lanjutan" title="Catat Munaqasyah" />
 
-        <section v-if="santri.length === 0" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Belum ada {{ istilah.santri || 'santri' }} binaan</p>
-            <p class="mt-2 text-sm text-slate-500">Tambahkan anggota {{ istilah.halaqah || 'halaqah' }} dari panel admin.</p>
-        </section>
+        <EmptyState
+            v-if="santri.length === 0"
+            icon="user"
+            :title="`Belum ada ${istilah.santri || 'santri'} binaan`"
+            :message="`Tambahkan anggota ${istilah.halaqah || 'halaqah'} dari panel admin.`"
+        />
 
-        <form v-else class="space-y-4 rounded-[1.5rem] bg-white px-5 py-5 shadow" @submit.prevent="submit()">
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="mnq-santri">Santri</label>
-                <select id="mnq-santri" v-model="form.santri_id" required class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-                    <option value="" disabled>Pilih santri…</option>
-                    <option v-for="s in santri" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
-                </select>
-            </div>
+        <SectionCard v-else>
+            <form class="space-y-4" @submit.prevent="submit()">
+                <UiField label="Santri">
+                    <template #default="{ fieldId }">
+                        <select :id="fieldId" v-model="form.santri_id" required class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]">
+                            <option value="" disabled>Pilih santri…</option>
+                            <option v-for="s in santri" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
+                        </select>
+                    </template>
+                </UiField>
 
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="mnq-juz">Juz diuji</label>
-                <input id="mnq-juz" v-model="form.juz_diuji" type="text" required maxlength="255" placeholder="cth. Juz 1-10" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-            </div>
+                <UiField label="Juz diuji">
+                    <template #default="{ fieldId }">
+                        <input :id="fieldId" v-model="form.juz_diuji" type="text" required maxlength="255" placeholder="cth. Juz 1-10" class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]">
+                    </template>
+                </UiField>
 
-            <div>
-                <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Hasil</span>
-                <div class="mt-1 grid grid-cols-2 gap-2">
-                    <button type="button" class="rounded-xl px-3 py-2 text-sm font-semibold" :class="form.hasil === 'lulus' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600'" @click="form.hasil = 'lulus'">
-                        Lulus
-                    </button>
-                    <button type="button" class="rounded-xl px-3 py-2 text-sm font-semibold" :class="form.hasil === 'mengulang' ? 'bg-rose-700 text-white' : 'bg-slate-100 text-slate-600'" @click="form.hasil = 'mengulang'">
-                        Mengulang
-                    </button>
+                <UiField label="Hasil">
+                    <template #default>
+                        <SegmentedControl
+                            v-model="form.hasil"
+                            :options="[
+                                { value: 'lulus', label: 'Lulus', icon: 'check-circle' },
+                                { value: 'mengulang', label: 'Mengulang', icon: 'clock' },
+                            ]"
+                        />
+                    </template>
+                </UiField>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <UiField label="Nilai (0–100)">
+                        <template #default="{ fieldId }">
+                            <input :id="fieldId" v-model.number="form.nilai" type="number" min="0" max="100" step="0.01" class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]">
+                        </template>
+                    </UiField>
+                    <UiField label="Tanggal">
+                        <template #default="{ fieldId }">
+                            <input :id="fieldId" v-model="form.tanggal" type="date" required class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]">
+                        </template>
+                    </UiField>
                 </div>
-            </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="mnq-nilai">Nilai (0–100)</label>
-                    <input id="mnq-nilai" v-model.number="form.nilai" type="number" min="0" max="100" step="0.01" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-                </div>
-                <div>
-                    <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="mnq-tanggal">Tanggal</label>
-                    <input id="mnq-tanggal" v-model="form.tanggal" type="date" required class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-                </div>
-            </div>
+                <UiField label="Periode akademik">
+                    <template #default="{ fieldId }">
+                        <select :id="fieldId" v-model="form.periode_akademik_id" class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]">
+                            <option :value="null">— Tanpa periode —</option>
+                            <option v-for="p in periode" :key="p.id" :value="p.id">{{ p.nama }}</option>
+                        </select>
+                    </template>
+                </UiField>
 
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="mnq-periode">Periode akademik</label>
-                <select id="mnq-periode" v-model="form.periode_akademik_id" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-                    <option :value="null">— Tanpa periode —</option>
-                    <option v-for="p in periode" :key="p.id" :value="p.id">{{ p.nama }}</option>
-                </select>
-            </div>
+                <p v-if="errorMessage" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ errorMessage }}</p>
+                <p v-if="successMessage" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">{{ successMessage }}</p>
 
-            <p v-if="errorMessage" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ errorMessage }}</p>
-            <p v-if="successMessage" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">{{ successMessage }}</p>
-
-            <button type="submit" class="w-full rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white disabled:opacity-60" :disabled="saving">
-                {{ saving ? 'Menyimpan…' : 'Catat Munaqasyah' }}
-            </button>
-        </form>
+                <UiButton type="submit" variant="primary" size="lg" block :loading="saving" :disabled="saving">
+                    {{ saving ? 'Menyimpan…' : 'Catat Munaqasyah' }}
+                </UiButton>
+            </form>
+        </SectionCard>
     </div>
 </template>

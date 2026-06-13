@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
+import { PageHeader, SectionCard, ListRow, EmptyState } from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -17,32 +18,36 @@ defineProps({
             <title>Capaian Kitab</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Kajian Kitab</p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">Kajian yang Saya Ampu</h2>
-            <p class="text-sm text-slate-500">Sorogan dicatat per santri; bandongan satu posisi untuk kelompok.</p>
-        </section>
+        <PageHeader
+            kicker="Kajian Kitab"
+            title="Kajian yang Saya Ampu"
+            subtitle="Sorogan dicatat per santri; bandongan satu posisi untuk kelompok."
+        />
 
-        <section v-if="kajian.length === 0" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Belum ada kajian kitab aktif</p>
-            <p class="mt-2 text-sm text-slate-500">Hubungi TU untuk mendaftarkan kajian Anda.</p>
-        </section>
+        <EmptyState
+            v-if="kajian.length === 0"
+            icon="book"
+            title="Belum ada kajian kitab aktif"
+            message="Hubungi TU untuk mendaftarkan kajian Anda."
+        />
 
-        <section v-else class="space-y-2">
-            <Link
-                v-for="k in kajian"
-                :key="k.id"
-                :href="k.form_url"
-                class="flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-4 shadow-sm"
-            >
-                <div class="min-w-0">
-                    <p class="truncate text-sm font-semibold text-slate-900">{{ k.kitab }}</p>
-                    <p class="text-xs text-slate-400">{{ k.kelompok || '—' }}</p>
-                </div>
-                <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-700">
-                    {{ k.metode }}
-                </span>
-            </Link>
-        </section>
+        <SectionCard v-else flush>
+            <div class="divide-y divide-slate-100">
+                <ListRow
+                    v-for="k in kajian"
+                    :key="k.id"
+                    :href="k.form_url"
+                    :title="k.kitab"
+                    :subtitle="k.kelompok || '—'"
+                    chevron
+                >
+                    <template #trailing>
+                        <span class="inline-flex shrink-0 items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700 ring-1 ring-inset ring-emerald-100">
+                            {{ k.metode }}
+                        </span>
+                    </template>
+                </ListRow>
+            </div>
+        </SectionCard>
     </div>
 </template>

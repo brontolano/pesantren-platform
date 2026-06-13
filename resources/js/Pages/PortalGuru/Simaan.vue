@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
+import { PageHeader, SectionCard, UiField, UiButton, EmptyState, UiIcon } from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -61,57 +62,117 @@ function submit(attempt = 0) {
             <title>Sima'an</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Tahfidz Lanjutan</p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">Catat Sima'an</h2>
-        </section>
+        <PageHeader kicker="Tahfidz Lanjutan" title="Catat Sima'an" />
 
-        <section v-if="santri.length === 0" class="rounded-[1.5rem] bg-white px-5 py-8 text-center shadow">
-            <p class="text-base font-semibold text-slate-800">Belum ada {{ istilah.santri || 'santri' }} binaan</p>
-            <p class="mt-2 text-sm text-slate-500">Tambahkan anggota {{ istilah.halaqah || 'halaqah' }} dari panel admin.</p>
-        </section>
+        <EmptyState
+            v-if="santri.length === 0"
+            icon="book"
+            :title="`Belum ada ${istilah.santri || 'santri'} binaan`"
+            :message="`Tambahkan anggota ${istilah.halaqah || 'halaqah'} dari panel admin.`"
+        />
 
-        <form v-else class="space-y-4 rounded-[1.5rem] bg-white px-5 py-5 shadow" @submit.prevent="submit()">
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="simaan-santri">Santri</label>
-                <select id="simaan-santri" v-model="form.santri_id" required class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-                    <option value="" disabled>Pilih santri…</option>
-                    <option v-for="s in santri" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
-                </select>
-            </div>
+        <SectionCard v-else>
+            <form class="space-y-4" @submit.prevent="submit()">
+                <UiField label="Santri" required>
+                    <template #default="{ fieldId, invalid }">
+                        <select
+                            :id="fieldId"
+                            v-model="form.santri_id"
+                            required
+                            :aria-invalid="invalid || undefined"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                            <option value="" disabled>Pilih santri…</option>
+                            <option v-for="s in santri" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
+                        </select>
+                    </template>
+                </UiField>
 
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="simaan-rentang">Rentang</label>
-                <input id="simaan-rentang" v-model="form.rentang" type="text" required maxlength="255" placeholder="cth. Juz 1-5 / Al-Baqarah 1-141" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-            </div>
+                <UiField label="Rentang" required>
+                    <template #default="{ fieldId, invalid }">
+                        <input
+                            :id="fieldId"
+                            v-model="form.rentang"
+                            type="text"
+                            required
+                            maxlength="255"
+                            placeholder="cth. Juz 1-5 / Al-Baqarah 1-141"
+                            :aria-invalid="invalid || undefined"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                    </template>
+                </UiField>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="simaan-kelancaran">Kelancaran (0–100)</label>
-                    <input id="simaan-kelancaran" v-model.number="form.nilai_kelancaran" type="number" min="0" max="100" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <UiField label="Kelancaran (0–100)">
+                        <template #default="{ fieldId, invalid }">
+                            <input
+                                :id="fieldId"
+                                v-model.number="form.nilai_kelancaran"
+                                type="number"
+                                inputmode="numeric"
+                                min="0"
+                                max="100"
+                                :aria-invalid="invalid || undefined"
+                                class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                            >
+                        </template>
+                    </UiField>
+                    <UiField label="Tajwid (0–100)">
+                        <template #default="{ fieldId, invalid }">
+                            <input
+                                :id="fieldId"
+                                v-model.number="form.nilai_tajwid"
+                                type="number"
+                                inputmode="numeric"
+                                min="0"
+                                max="100"
+                                :aria-invalid="invalid || undefined"
+                                class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                            >
+                        </template>
+                    </UiField>
                 </div>
-                <div>
-                    <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="simaan-tajwid">Tajwid (0–100)</label>
-                    <input id="simaan-tajwid" v-model.number="form.nilai_tajwid" type="number" min="0" max="100" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-                </div>
-            </div>
 
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="simaan-tanggal">Tanggal</label>
-                <input id="simaan-tanggal" v-model="form.tanggal" type="date" required class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-            </div>
+                <UiField label="Tanggal" required>
+                    <template #default="{ fieldId, invalid }">
+                        <input
+                            :id="fieldId"
+                            v-model="form.tanggal"
+                            type="date"
+                            required
+                            :aria-invalid="invalid || undefined"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                    </template>
+                </UiField>
 
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="simaan-catatan">Catatan</label>
-                <textarea id="simaan-catatan" v-model="form.catatan" rows="2" maxlength="500" class="mt-1 w-full rounded-xl border-slate-200 text-sm" />
-            </div>
+                <UiField label="Catatan">
+                    <template #default="{ fieldId, invalid }">
+                        <textarea
+                            :id="fieldId"
+                            v-model="form.catatan"
+                            rows="2"
+                            maxlength="500"
+                            :aria-invalid="invalid || undefined"
+                            class="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium leading-6 text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        />
+                    </template>
+                </UiField>
 
-            <p v-if="errorMessage" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ errorMessage }}</p>
-            <p v-if="successMessage" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">{{ successMessage }}</p>
+                <p v-if="errorMessage" class="flex items-start gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700">
+                    <UiIcon name="x-circle" size="18" class="mt-0.5 shrink-0" />
+                    <span>{{ errorMessage }}</span>
+                </p>
+                <p v-if="successMessage" class="flex items-start gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                    <UiIcon name="check-circle" size="18" class="mt-0.5 shrink-0" />
+                    <span>{{ successMessage }}</span>
+                </p>
 
-            <button type="submit" class="w-full rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white disabled:opacity-60" :disabled="saving">
-                {{ saving ? 'Menyimpan…' : "Catat Sima'an" }}
-            </button>
-        </form>
+                <UiButton type="submit" variant="primary" size="lg" block :loading="saving" :disabled="saving">
+                    {{ saving ? 'Menyimpan…' : "Catat Sima'an" }}
+                </UiButton>
+            </form>
+        </SectionCard>
     </div>
 </template>

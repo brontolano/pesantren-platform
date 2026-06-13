@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
+import { UiCard, UiField, UiButton, SegmentedControl, UiIcon } from '@/Shared'
 
 const props = defineProps({
     santri: { type: Array, default: () => [] },
@@ -56,85 +57,131 @@ function submit(attempt = 0) {
 </script>
 
 <template>
-    <form class="space-y-4 rounded-[1.5rem] bg-white px-5 py-5 shadow" @submit.prevent="submit()">
-        <div>
-            <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="setoran-santri">Santri</label>
-            <select
-                id="setoran-santri"
-                v-model="form.santri_id"
-                required
-                class="mt-1 w-full rounded-xl border-slate-200 text-sm"
-            >
-                <option value="" disabled>Pilih santri…</option>
-                <option v-for="s in santri" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
-            </select>
-        </div>
+    <form @submit.prevent="submit()">
+        <UiCard padding="md">
+            <div class="space-y-4">
+                <UiField label="Santri">
+                    <template #default="{ fieldId }">
+                        <select
+                            :id="fieldId"
+                            v-model="form.santri_id"
+                            required
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                            <option value="" disabled>Pilih santri…</option>
+                            <option v-for="s in santri" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
+                        </select>
+                    </template>
+                </UiField>
 
-        <div>
-            <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="setoran-surah">Surah</label>
-            <input
-                id="setoran-surah"
-                v-model="form.surah"
-                type="text"
-                required
-                maxlength="100"
-                placeholder="cth. Al-Mulk"
-                class="mt-1 w-full rounded-xl border-slate-200 text-sm"
-            >
-        </div>
+                <UiField label="Surah">
+                    <template #default="{ fieldId }">
+                        <input
+                            :id="fieldId"
+                            v-model="form.surah"
+                            type="text"
+                            required
+                            maxlength="100"
+                            placeholder="cth. Al-Mulk"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                    </template>
+                </UiField>
 
-        <div class="grid grid-cols-2 gap-3">
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="setoran-ayat-awal">Ayat awal</label>
-                <input id="setoran-ayat-awal" v-model.number="form.ayat_awal" type="number" min="1" max="286" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-            </div>
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="setoran-ayat-akhir">Ayat akhir</label>
-                <input id="setoran-ayat-akhir" v-model.number="form.ayat_akhir" type="number" min="1" max="286" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-            </div>
-        </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <UiField label="Ayat awal">
+                        <template #default="{ fieldId }">
+                            <input
+                                :id="fieldId"
+                                v-model.number="form.ayat_awal"
+                                type="number"
+                                min="1"
+                                max="286"
+                                inputmode="numeric"
+                                class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                            >
+                        </template>
+                    </UiField>
+                    <UiField label="Ayat akhir">
+                        <template #default="{ fieldId }">
+                            <input
+                                :id="fieldId"
+                                v-model.number="form.ayat_akhir"
+                                type="number"
+                                min="1"
+                                max="286"
+                                inputmode="numeric"
+                                class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                            >
+                        </template>
+                    </UiField>
+                </div>
 
-        <div>
-            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Jenis setoran</span>
-            <div class="mt-1 grid grid-cols-2 gap-2">
-                <button
-                    type="button"
-                    class="rounded-xl px-3 py-2 text-sm font-semibold"
-                    :class="form.jenis === 'ziyadah' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600'"
-                    @click="form.jenis = 'ziyadah'"
+                <UiField label="Jenis setoran">
+                    <SegmentedControl
+                        v-model="form.jenis"
+                        :options="[
+                            { value: 'ziyadah', label: 'Ziyadah' },
+                            { value: 'murajaah', label: 'Muraja\'ah' },
+                        ]"
+                    />
+                </UiField>
+
+                <UiField label="Nilai (0–100)">
+                    <template #default="{ fieldId }">
+                        <input
+                            :id="fieldId"
+                            v-model.number="form.nilai"
+                            type="number"
+                            min="0"
+                            max="100"
+                            step="0.5"
+                            inputmode="decimal"
+                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium tabular-nums text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                    </template>
+                </UiField>
+
+                <UiField label="Catatan">
+                    <template #default="{ fieldId }">
+                        <textarea
+                            :id="fieldId"
+                            v-model="form.catatan"
+                            rows="2"
+                            maxlength="500"
+                            class="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium leading-6 text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        />
+                    </template>
+                </UiField>
+
+                <p
+                    v-if="errorMessage"
+                    class="flex items-start gap-2 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700"
+                    role="alert"
                 >
-                    Ziyadah
-                </button>
-                <button
-                    type="button"
-                    class="rounded-xl px-3 py-2 text-sm font-semibold"
-                    :class="form.jenis === 'murajaah' ? 'bg-emerald-700 text-white' : 'bg-slate-100 text-slate-600'"
-                    @click="form.jenis = 'murajaah'"
+                    <UiIcon name="x-circle" class="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{{ errorMessage }}</span>
+                </p>
+                <p
+                    v-if="successMessage"
+                    class="flex items-start gap-2 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700"
                 >
-                    Muraja'ah
-                </button>
+                    <UiIcon name="check-circle" class="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{{ successMessage }}</span>
+                </p>
+
+                <UiButton
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    block
+                    :loading="saving"
+                    :disabled="saving"
+                    icon-left="check"
+                >
+                    {{ saving ? 'Menyimpan…' : 'Catat Setoran' }}
+                </UiButton>
             </div>
-        </div>
-
-        <div>
-            <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="setoran-nilai">Nilai (0–100)</label>
-            <input id="setoran-nilai" v-model.number="form.nilai" type="number" min="0" max="100" step="0.5" class="mt-1 w-full rounded-xl border-slate-200 text-sm">
-        </div>
-
-        <div>
-            <label class="text-xs font-semibold uppercase tracking-wider text-slate-500" for="setoran-catatan">Catatan</label>
-            <textarea id="setoran-catatan" v-model="form.catatan" rows="2" maxlength="500" class="mt-1 w-full rounded-xl border-slate-200 text-sm" />
-        </div>
-
-        <p v-if="errorMessage" class="rounded-2xl bg-rose-50 px-4 py-2 text-sm font-medium text-rose-700">{{ errorMessage }}</p>
-        <p v-if="successMessage" class="rounded-2xl bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700">{{ successMessage }}</p>
-
-        <button
-            type="submit"
-            class="w-full rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold uppercase tracking-wider text-white disabled:opacity-60"
-            :disabled="saving"
-        >
-            {{ saving ? 'Menyimpan…' : 'Catat Setoran' }}
-        </button>
+        </UiCard>
     </form>
 </template>

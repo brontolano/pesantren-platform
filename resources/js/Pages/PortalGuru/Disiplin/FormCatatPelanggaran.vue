@@ -2,6 +2,7 @@
 import { Head, Link } from '@inertiajs/vue3'
 import { ref, computed } from 'vue'
 import PortalGuruLayout from '../../../Layouts/PortalGuruLayout.vue'
+import { PageHeader, SectionCard, UiField, UiInput, UiButton, IconCircle, UiIcon, StatCard } from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -117,80 +118,97 @@ const handleSubmit = async () => {
             <title>Catat Pelanggaran</title>
         </Head>
 
-        <section>
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
-                Kepengasuhan · Disiplin
-            </p>
-            <h2 class="mt-1 text-2xl font-semibold text-slate-900">Catat Pelanggaran</h2>
-            <p class="text-sm text-slate-500">Tambah catatan pelanggaran santri baru</p>
-        </section>
+        <PageHeader
+            kicker="Kepengasuhan · Disiplin"
+            title="Catat Pelanggaran"
+            subtitle="Tambah catatan pelanggaran santri baru"
+        />
 
         <form @submit.prevent="handleSubmit" class="space-y-4">
             <!-- Success Alert -->
-            <section v-if="success" class="rounded-[1.5rem] bg-emerald-50 border border-emerald-200 px-5 py-4">
-                <p class="text-sm font-semibold text-emerald-700">✓ Pelanggaran berhasil dicatat! Mengalihkan...</p>
-            </section>
+            <div v-if="success" class="flex items-center gap-3 rounded-3xl bg-emerald-50 px-5 py-4 ring-1 ring-emerald-100">
+                <IconCircle icon="check-circle" tone="emerald" size="sm" />
+                <p class="text-sm font-semibold text-emerald-700">Pelanggaran berhasil dicatat! Mengalihkan...</p>
+            </div>
 
             <!-- Error Alert -->
-            <section v-if="error && !success" class="rounded-[1.5rem] bg-red-50 border border-red-200 px-5 py-4">
-                <p class="text-sm font-semibold text-red-700">{{ error }}</p>
-            </section>
+            <div v-if="error && !success" class="flex items-center gap-3 rounded-3xl bg-rose-50 px-5 py-4 ring-1 ring-rose-100">
+                <IconCircle icon="x-circle" tone="rose" size="sm" />
+                <p class="text-sm font-semibold text-rose-700">{{ error }}</p>
+            </div>
 
             <!-- Pilih Santri -->
-            <section class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-                <label class="block text-sm font-semibold text-slate-700">Pilih Santri</label>
-                <select
-                    v-model="form.santri_id"
-                    @change="handleSantriChange"
-                    required
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-amber-500 focus:outline-none"
-                >
-                    <option value="">-- Pilih Santri --</option>
-                    <option
-                        v-for="santri in santriList"
-                        :key="santri.id"
-                        :value="santri.id"
-                    >
-                        {{ santri.nama }} ({{ santri.nis }}) · {{ santri.kelas }}
-                    </option>
-                </select>
+            <SectionCard title="Pilih Santri">
+                <UiField label="Santri" required>
+                    <template #default="{ fieldId, describedby }">
+                        <select
+                            :id="fieldId"
+                            :aria-describedby="describedby"
+                            v-model="form.santri_id"
+                            @change="handleSantriChange"
+                            required
+                            class="w-full min-h-[48px] rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                            <option value="">-- Pilih Santri --</option>
+                            <option
+                                v-for="santri in santriList"
+                                :key="santri.id"
+                                :value="santri.id"
+                            >
+                                {{ santri.nama }} ({{ santri.nis }}) · {{ santri.kelas }}
+                            </option>
+                        </select>
+                    </template>
+                </UiField>
 
                 <!-- Info santri terpilih -->
-                <div v-if="selectedSantri" class="mt-3 rounded-lg bg-slate-50 p-3 text-sm">
-                    <p class="font-semibold text-slate-900">{{ selectedSantri.nama }}</p>
-                    <p class="text-xs text-slate-600">{{ selectedSantri.nis }} · {{ selectedSantri.kelas }}</p>
+                <div v-if="selectedSantri" class="mt-3 flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
+                    <IconCircle icon="user" tone="slate" size="sm" />
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-slate-900">{{ selectedSantri.nama }}</p>
+                        <p class="text-xs text-slate-600">{{ selectedSantri.nis }} · {{ selectedSantri.kelas }}</p>
+                    </div>
                 </div>
-            </section>
+            </SectionCard>
 
             <!-- Pilih Jenis Pelanggaran -->
-            <section class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-                <label class="block text-sm font-semibold text-slate-700">Jenis Pelanggaran</label>
-                <select
-                    v-model="form.jenis_pelanggaran_id"
-                    @change="handleJenisChange"
-                    required
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-amber-500 focus:outline-none"
-                >
-                    <option value="">-- Pilih Jenis --</option>
-                    <option
-                        v-for="jenis in jenisList"
-                        :key="jenis.id"
-                        :value="jenis.id"
-                        :disabled="!jenis.aktif"
-                    >
-                        {{ jenis.nama }} ({{ jenis.poin }} poin) — {{ jenis.kategori }}
-                    </option>
-                </select>
+            <SectionCard title="Jenis Pelanggaran">
+                <UiField label="Jenis Pelanggaran" required>
+                    <template #default="{ fieldId, describedby }">
+                        <select
+                            :id="fieldId"
+                            :aria-describedby="describedby"
+                            v-model="form.jenis_pelanggaran_id"
+                            @change="handleJenisChange"
+                            required
+                            class="w-full min-h-[48px] rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        >
+                            <option value="">-- Pilih Jenis --</option>
+                            <option
+                                v-for="jenis in jenisList"
+                                :key="jenis.id"
+                                :value="jenis.id"
+                                :disabled="!jenis.aktif"
+                            >
+                                {{ jenis.nama }} ({{ jenis.poin }} poin) — {{ jenis.kategori }}
+                            </option>
+                        </select>
+                    </template>
+                </UiField>
 
                 <!-- Info jenis terpilih -->
-                <div v-if="selectedJenis" :class="['mt-3 rounded-lg p-3 text-sm', kategoriColor[selectedJenis.kategori]]">
-                    <p class="font-semibold">
-                        {{ kategoriIcon[selectedJenis.kategori] }} {{ selectedJenis.nama }}
+                <div v-if="selectedJenis" :class="['mt-3 rounded-2xl border p-3 text-sm', kategoriColor[selectedJenis.kategori]]">
+                    <p class="flex items-center gap-2 font-semibold">
+                        <UiIcon
+                            :name="selectedJenis.kategori === 'berat' ? 'ban' : (selectedJenis.kategori === 'prestasi' ? 'heart' : 'info')"
+                            class="h-4 w-4 shrink-0"
+                        />
+                        {{ selectedJenis.nama }}
                     </p>
                     <div class="mt-2 grid grid-cols-2 gap-2 text-xs">
                         <div>
                             <p class="font-semibold">Poin</p>
-                            <p class="text-lg font-bold">{{ selectedJenis.poin }}</p>
+                            <p class="text-lg font-bold tabular-nums">{{ selectedJenis.poin }}</p>
                         </div>
                         <div>
                             <p class="font-semibold">Sanksi Default</p>
@@ -198,85 +216,101 @@ const handleSubmit = async () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </SectionCard>
 
             <!-- Waktu Kejadian -->
-            <section class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-                <label class="block text-sm font-semibold text-slate-700">Waktu Kejadian</label>
-                <input
-                    v-model="form.waktu_kejadian"
-                    type="datetime-local"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-amber-500 focus:outline-none"
-                />
-                <p class="mt-1 text-xs text-slate-500">Default: sekarang</p>
-            </section>
+            <SectionCard title="Waktu Kejadian">
+                <UiField label="Waktu Kejadian" hint="Default: sekarang">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput
+                            :id="fieldId"
+                            :aria-describedby="describedby"
+                            v-model="form.waktu_kejadian"
+                            type="datetime-local"
+                        />
+                    </template>
+                </UiField>
+            </SectionCard>
 
             <!-- Lokasi -->
-            <section class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-                <label class="block text-sm font-semibold text-slate-700">Lokasi (Opsional)</label>
-                <input
-                    v-model="form.lokasi"
-                    type="text"
-                    placeholder="mis. Asrama putra, Musholla, Kantor"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-amber-500 focus:outline-none"
-                />
-            </section>
+            <SectionCard title="Lokasi">
+                <UiField label="Lokasi (Opsional)">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput
+                            :id="fieldId"
+                            :aria-describedby="describedby"
+                            v-model="form.lokasi"
+                            type="text"
+                            placeholder="mis. Asrama putra, Musholla, Kantor"
+                        />
+                    </template>
+                </UiField>
+            </SectionCard>
 
             <!-- Alasan / Kronologi -->
-            <section class="rounded-[1.5rem] bg-white px-5 py-4 shadow">
-                <label class="block text-sm font-semibold text-slate-700">
-                    Alasan / Kronologi <span class="text-red-500">*</span>
-                </label>
-                <textarea
-                    v-model="form.alasan"
+            <SectionCard title="Alasan / Kronologi">
+                <UiField
+                    label="Alasan / Kronologi"
                     required
-                    minlength="5"
-                    placeholder="Jelaskan detail kejadian pelanggaran secara singkat (min. 5 karakter)"
-                    class="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-amber-500 focus:outline-none"
-                    rows="5"
-                ></textarea>
-                <p class="mt-1 text-xs text-slate-500">
-                    Karakter: {{ form.alasan.length }}/500
-                </p>
-            </section>
+                    :hint="`Karakter: ${form.alasan.length}/500`"
+                >
+                    <template #default="{ fieldId, describedby }">
+                        <textarea
+                            :id="fieldId"
+                            :aria-describedby="describedby"
+                            v-model="form.alasan"
+                            required
+                            minlength="5"
+                            placeholder="Jelaskan detail kejadian pelanggaran secara singkat (min. 5 karakter)"
+                            rows="5"
+                            class="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium leading-6 text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 placeholder:font-normal placeholder:text-slate-400 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
+                        ></textarea>
+                    </template>
+                </UiField>
+            </SectionCard>
 
             <!-- Summary -->
-            <section v-if="selectedSantri && selectedJenis" class="rounded-[1.5rem] bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 px-5 py-4">
-                <p class="text-sm font-semibold text-amber-900">📋 Ringkasan Catatan</p>
-                <div class="mt-3 space-y-1 text-sm text-amber-800">
-                    <p>
-                        <span class="font-semibold">Santri:</span> {{ selectedSantri.nama }} ({{ selectedSantri.nis }})
-                    </p>
-                    <p>
-                        <span class="font-semibold">Jenis:</span> {{ selectedJenis.nama }} · {{ selectedJenis.kategori }}
-                    </p>
-                    <p>
-                        <span class="font-semibold">Poin:</span> <span class="font-bold">{{ selectedJenis.poin }}</span>
-                    </p>
+            <SectionCard v-if="selectedSantri && selectedJenis" title="Ringkasan Catatan">
+                <div class="grid grid-cols-2 gap-3">
+                    <StatCard
+                        icon="user"
+                        tone="slate"
+                        label="Santri"
+                        :value="selectedSantri.nama"
+                        :hint="selectedSantri.nis"
+                    />
+                    <StatCard
+                        icon="chart"
+                        tone="amber"
+                        label="Poin"
+                        :value="selectedJenis.poin"
+                        :hint="`${selectedJenis.nama} · ${selectedJenis.kategori}`"
+                    />
                 </div>
-            </section>
+            </SectionCard>
 
             <!-- Actions -->
-            <section class="flex gap-3 pb-6">
-                <Link
+            <div class="flex gap-3 pb-6">
+                <UiButton
                     href="/guru"
-                    class="flex-1 rounded-[1rem] bg-slate-200 px-4 py-3 text-center font-semibold text-slate-700 hover:bg-slate-300 transition-colors"
+                    variant="secondary"
+                    size="lg"
+                    block
                 >
                     Batal
-                </Link>
-                <button
+                </UiButton>
+                <UiButton
                     type="submit"
-                    :disabled="!isFormValid || loading"
-                    :class="[
-                        'flex-1 rounded-[1rem] px-4 py-3 text-center font-semibold transition-colors',
-                        isFormValid && !loading
-                            ? 'bg-amber-500 text-white hover:bg-amber-600'
-                            : 'bg-slate-200 text-slate-500 cursor-not-allowed',
-                    ]"
+                    variant="primary"
+                    size="lg"
+                    block
+                    :disabled="!isFormValid"
+                    :loading="loading"
+                    icon-left="check"
                 >
-                    {{ loading ? 'Menyimpan...' : '✓ Simpan' }}
-                </button>
-            </section>
+                    {{ loading ? 'Menyimpan...' : 'Simpan' }}
+                </UiButton>
+            </div>
         </form>
     </div>
 </template>
