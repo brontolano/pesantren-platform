@@ -26,6 +26,9 @@ const STATUS_META = {
     alpa: { label: 'Alpa', icon: 'x-circle', tone: 'rose', ring: 'ring-rose-100 bg-rose-50 text-rose-700' },
 }
 
+// Fallback aman bila status di luar 4 kunci dikenal (cegah TypeError → blank).
+const metaFor = (status) => STATUS_META[status] ?? STATUS_META.hadir
+
 function cycle(id) {
     const cur = presensi[id]
     const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(cur) + 1) % STATUS_CYCLE.length]
@@ -79,10 +82,10 @@ function simpan() {
                             <button
                                 type="button"
                                 class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-inset transition-all duration-200 active:scale-[.96]"
-                                :class="STATUS_META[presensi[s.id]].ring"
+                                :class="metaFor(presensi[s.id]).ring"
                                 @click="cycle(s.id)"
                             >
-                                {{ STATUS_META[presensi[s.id]].label }}
+                                {{ metaFor(presensi[s.id]).label }}
                             </button>
                         </template>
                     </ListRow>
