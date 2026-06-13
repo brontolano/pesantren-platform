@@ -1,7 +1,182 @@
 [
-  { "relation": ["delegate_permission/common.handle_all_urls"], "target": { "namespace": "android_app", "package_name": "online.pesantren.demo.guru",     "sha256_cert_fingerprints": ["AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"] } },
-  { "relation": ["delegate_permission/common.handle_all_urls"], "target": { "namespace": "android_app", "package_name": "online.pesantren.demo.wali",     "sha256_cert_fingerprints": ["AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"] } },
-  { "relation": ["delegate_permission/common.handle_all_urls"], "target": { "namespace": "android_app", "package_name": "online.pesantren.demo.keuangan", "sha256_cert_fingerprints": ["AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"] } },
-  { "relation": ["delegate_permission/common.handle_all_urls"], "target": { "namespace": "android_app", "package_name": "online.pesantren.demo.kasir",    "sha256_cert_fingerprints": ["AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"] } },
-  { "relation": ["delegate_permission/common.handle_all_urls"], "target": { "namespace": "android_app", "package_name": "online.pesantren.demo.pimpinan", "sha256_cert_fingerprints": ["AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"] } }
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.guru",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.wali",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.keuangan",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.kasir",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.pimpinan",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.uks",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.tu",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.humas",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.kepegawaian",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.ppdbpanitia",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.poskantin",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.keamanan",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.pengasuhan",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.pengabdian",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "online.pesantren.demo.santri",
+      "sha256_cert_fingerprints": [
+        "AB:B9:BF:44:41:D8:57:29:7F:94:BE:F9:D6:98:28:84:A8:C5:3E:E1:6D:34:55:06:FA:AE:F0:24:17:EE:29:CF"
+      ]
+    }
+  }
 ]
