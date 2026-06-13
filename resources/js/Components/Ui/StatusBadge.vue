@@ -32,6 +32,38 @@ const MAP = {
     // info / netral
     info: { label: 'Info', tone: 'blue', icon: 'info' },
     aktif: { label: 'Aktif', tone: 'emerald', icon: 'check-circle' },
+    nonaktif: { label: 'Nonaktif', tone: 'slate', icon: 'ban' },
+    // kehadiran / presensi
+    hadir: { label: 'Hadir', tone: 'emerald', icon: 'check-circle' },
+    izin: { label: 'Izin', tone: 'blue', icon: 'info' },
+    sakit: { label: 'Sakit', tone: 'amber', icon: 'heart' },
+    alpa: { label: 'Alpa', tone: 'rose', icon: 'x-circle' },
+    alpha: { label: 'Alpa', tone: 'rose', icon: 'x-circle' },
+    terlambat: { label: 'Terlambat', tone: 'amber', icon: 'clock' },
+    // UKS / kesehatan
+    istirahat: { label: 'Istirahat', tone: 'amber', icon: 'clock' },
+    pulang: { label: 'Pulang', tone: 'emerald', icon: 'check-circle' },
+    rujuk: { label: 'Dirujuk', tone: 'blue', icon: 'arrow-up-right' },
+    // disiplin / perizinan / approval
+    dicatat: { label: 'Dicatat', tone: 'amber', icon: 'clock' },
+    diajukan: { label: 'Diajukan', tone: 'amber', icon: 'clock' },
+    disetujui: { label: 'Disetujui', tone: 'emerald', icon: 'check-circle' },
+    // dokumen / laporan / publikasi
+    draft: { label: 'Draf', tone: 'slate', icon: 'document' },
+    draf: { label: 'Draf', tone: 'slate', icon: 'document' },
+    terkirim: { label: 'Terkirim', tone: 'blue', icon: 'arrow-up-right' },
+    diverifikasi: { label: 'Diverifikasi', tone: 'emerald', icon: 'check-circle' },
+    final: { label: 'Final', tone: 'emerald', icon: 'check-circle' },
+    published: { label: 'Terbit', tone: 'emerald', icon: 'check-circle' },
+    terbit: { label: 'Terbit', tone: 'emerald', icon: 'check-circle' },
+    // ujian / sesi
+    berlangsung: { label: 'Berlangsung', tone: 'blue', icon: 'clock' },
+    selesai: { label: 'Selesai', tone: 'emerald', icon: 'check-circle' },
+    // PPDB
+    diterima: { label: 'Diterima', tone: 'emerald', icon: 'check-circle' },
+    lulus: { label: 'Lulus', tone: 'emerald', icon: 'check-circle' },
+    cadangan: { label: 'Cadangan', tone: 'amber', icon: 'clock' },
+    tertunggak: { label: 'Tertunggak', tone: 'rose', icon: 'x-circle' },
 }
 
 const TONES = {
