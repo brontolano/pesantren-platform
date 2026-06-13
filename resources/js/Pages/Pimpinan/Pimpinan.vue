@@ -23,9 +23,10 @@ const activeItem = ref(null)
 const mode = ref('confirm') // 'confirm' | 'reject'
 const alasan = ref('')
 
+// Dasbor pimpinan = satu layar mandiri; nav cukup Beranda (tanpa tautan ke
+// panel Filament yang membingungkan/keluar dari konteks aplikasi).
 const navItems = [
     { key: 'beranda', label: 'Beranda', href: '/pimpinan', active: true },
-    { key: 'akun', label: 'Panel', href: '/admin', active: false },
 ]
 
 const TIPE_LABEL = {
