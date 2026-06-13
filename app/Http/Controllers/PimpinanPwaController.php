@@ -136,19 +136,27 @@ class PimpinanPwaController extends Controller
         ];
     }
 
-    /** Lampu mutu — DEFENSIF: tabel sedang dibangun paralel; null bila belum ada. */
+    /**
+     * Lampu mutu — DEFENSIF GANDA: tabel mutu_lampu bisa ADA tapi berbeda skema
+     * antar versi modul Mutu (mis. tanpa kolom 'warna') → cek kolom + try/catch
+     * agar dasbor pimpinan tidak 500. null = blok tidak ditampilkan.
+     */
     private function lampuMutu(): ?array
     {
-        if (! Schema::hasTable('mutu_lampu')) {
+        if (! Schema::hasTable('mutu_lampu') || ! Schema::hasColumn('mutu_lampu', 'warna')) {
             return null;
         }
 
-        return DB::table('mutu_lampu')
-            ->where('tenant_id', tenant('id'))
-            ->select('warna', DB::raw('count(*) as jumlah'))
-            ->groupBy('warna')
-            ->pluck('jumlah', 'warna')
-            ->all();
+        try {
+            return DB::table('mutu_lampu')
+                ->where('tenant_id', tenant('id'))
+                ->select('warna', DB::raw('count(*) as jumlah'))
+                ->groupBy('warna')
+                ->pluck('jumlah', 'warna')
+                ->all();
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     private function antrean(): array
