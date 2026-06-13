@@ -6,6 +6,7 @@ use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
+use App\Http\Controllers\DemoAutoLoginController;
 use App\Http\Controllers\EmisExportController;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
@@ -120,6 +121,15 @@ Route::middleware([
             ['Content-Type' => $disk->mimeType($path) ?: 'application/octet-stream'],
         );
     })->where('path', '.*')->name('tenant.storage.file');
+
+    /*
+     * Auto-login demo untuk PWA/TWA showcase — melogin user demo lalu redirect
+     * ke PWA terkait TANPA kredensial. Dikunci ganda di controller: flag
+     * DEMO_AUTOLOGIN + tenant harus 'demo' (selain itu 404). Lihat config/demo.php.
+     * peran: guru | wali | keuangan | keuangan-lapangan | pimpinan
+     */
+    Route::get('/demo-masuk/{peran}', DemoAutoLoginController::class)
+        ->name('tenant.demo.autologin');
 
     // 2c Baitul Maal — kuitansi donasi (pola print blade). HANYA donasi yang
     // sudah dikonfirmasi bendahara; akses wajib login (dipanggil dari panel).
