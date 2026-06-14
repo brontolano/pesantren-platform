@@ -22,7 +22,7 @@
         .aside .brand{display:flex;align-items:center;gap:14px}
         .aside .brandmark{width:60px;height:60px;padding:7px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
         .aside .pname{font-weight:800;font-size:1.3rem;line-height:1.25}
-        .aside .hero{margin:auto 0 auto auto;max-width:26rem;text-align:left}
+        .aside .hero{margin:auto auto auto 33rem;max-width:26rem;text-align:left}
         .aside .bismillah{font-size:1.7rem;margin-bottom:16px;color:var(--gold-soft)}
         .aside h2{font-size:clamp(1.9rem,2.8vw,2.7rem);font-weight:800;line-height:1.15;letter-spacing:-.01em}
         .aside .lead{margin-top:14px;opacity:.86;font-size:1.05rem;max-width:42ch;line-height:1.6}
@@ -30,7 +30,7 @@
 
         /* ══ Panel kanan: FORM (1/4 lebar) ══ */
         .main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 22px}
-        .card{width:100%;max-width:380px}
+        .card{width:100%;max-width:430px}
         .top{text-align:center}
         .top .brandmark{width:68px;height:68px;margin:0 auto 14px;padding:9px;box-shadow:var(--shadow-soft);border:1px solid var(--border)}
         .top h1{font-size:1.2rem;font-weight:800}
@@ -58,7 +58,7 @@
         footer{margin-top:24px;text-align:center;font-size:.71rem;color:var(--muted)}
         footer a{color:var(--brand);font-weight:600}
 
-        @media(min-width:1200px){.aside{display:block}}
+        @media(min-width:1320px){.aside{display:block}}
     </style>
 </head>
 <body>
