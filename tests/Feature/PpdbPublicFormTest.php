@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Setting;
 use App\Models\Tenant;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -58,40 +57,29 @@ class PpdbPublicFormTest extends TestCase
         $response->assertSee('Asy-Syifaa');
     }
 
-    public function test_public_ppdb_form_receives_tenant_field_configuration(): void
+    public function test_public_ppdb_form_receives_minimal_form_options(): void
     {
         $suffix = Str::lower(Str::random(6));
         $subdomain = 'config-'.$suffix;
         $host = $subdomain.'.localhost';
-        $tenant = $this->createProvisionedTenant($subdomain, 'PPDB Config', $host);
-
-        tenancy()->initialize($tenant);
-
-        Setting::create([
-            'tenant_id' => $tenant->id,
-            'key' => 'ppdb_form_fields',
-            'value' => [
-                'fields' => [
-                    'nik' => 'hidden',
-                    'catatan_tambahan' => 'required',
-                ],
-            ],
-        ]);
-
-        tenancy()->end();
+        $this->createProvisionedTenant($subdomain, 'PPDB Config', $host);
 
         $response = $this->call('GET', "http://{$host}/ppdb", [], [], [], [
-                'HTTP_HOST' => $host,
-                'SERVER_NAME' => $host,
-            ]);
+            'HTTP_HOST' => $host,
+            'SERVER_NAME' => $host,
+        ]);
 
         $response->assertOk();
 
         $page = $response->viewData('page');
+        $options = $page['props']['formOptions'];
 
-        $this->assertSame('hidden', $page['props']['fieldConfiguration']['nik']['mode']);
-        $this->assertSame('required', $page['props']['fieldConfiguration']['catatan_tambahan']['mode']);
-        $this->assertSame('required', $page['props']['fieldConfiguration']['nama']['mode']);
+        // Form publik kini SINGKAT & tetap (tak lagi digerakkan fieldConfiguration).
+        $this->assertArrayNotHasKey('fieldConfiguration', $page['props']);
+        $this->assertContains('SD/MI', $options['jenjangAsal']);
+        $this->assertSame('L', $options['jenisKelamin'][0]['value']);
+        // 'program diminati' sudah dihapus dari form.
+        $this->assertArrayNotHasKey('programDiminati', $options);
     }
 
     public function test_public_ppdb_form_submit_persists_candidate_for_current_tenant(): void
@@ -103,13 +91,15 @@ class PpdbPublicFormTest extends TestCase
 
         $response = $this->from("http://{$host}/ppdb")->post("http://{$host}/ppdb", [
             'nama' => 'Calon Baru',
+            'jenisKelamin' => 'L',
+            'tempatLahir' => 'Bandung',
             'tanggalLahir' => '2012-07-07',
-            'jenisKelamin' => 'Laki-laki',
             'jenjangAsal' => 'SD/MI',
-            'sekolahAsal' => 'SDIT Contoh',
+            'asalSekolah' => 'SDIT Contoh',
             'namaWali' => 'Ahmad Wali',
             'noHpWali' => '081234567890',
-            'programDiminati' => 'Tahfidz',
+            'emailWali' => 'wali@contoh.id',
+            'setuju_kebijakan' => '1',
         ], [
             'HTTP_HOST' => $host,
             'SERVER_NAME' => $host,
@@ -130,8 +120,12 @@ class PpdbPublicFormTest extends TestCase
         $this->assertSame($candidateNumber, $candidate->nomor_pendaftaran);
         $this->assertSame('Calon Baru', $candidate->nama);
         $this->assertSame('L', $candidate->jenis_kelamin);
-        $this->assertSame('Tahfidz', $candidate->program_diminati);
+        $this->assertSame('SD/MI', $candidate->jenjang_asal);
+        $this->assertSame('SDIT Contoh', $candidate->asal_sekolah);
+        $this->assertSame('Ahmad Wali', $candidate->nama_wali);
+        $this->assertSame('081234567890', $candidate->no_hp_wali);
         $this->assertSame('pending', $candidate->status_pendaftaran);
+        $this->assertNotNull($candidate->consent_kebijakan_at);
     }
 
     public function test_public_tracking_page_is_accessible_without_login_and_offers_portal_cta(): void

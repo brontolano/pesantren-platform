@@ -63,11 +63,11 @@ class KebijakanPrivasiTest extends TestCase
         $tenant->domains()->firstOrCreate(['domain' => $tenant->id]); // module route BySubdomain
         tenancy()->end();
 
-        // Kontrak form module (PublicPpdbController): field camelCase.
+        // Kontrak form publik singkat (PublicPpdbController): field camelCase.
         $payload = [
-            'nama' => 'Calon Uji', 'jenisKelamin' => 'Laki-laki', 'tempatLahir' => 'Sumedang',
-            'tanggalLahir' => '2013-02-02', 'programDiminati' => 'Reguler',
-            'namaWali' => 'Ayah Uji', 'noHpWali' => '081234567890', 'jenjangAsal' => 'SD/MI', 'sekolahAsal' => 'MI Uji',
+            'nama' => 'Calon Uji', 'jenisKelamin' => 'L', 'tempatLahir' => 'Sumedang',
+            'tanggalLahir' => '2013-02-02',
+            'namaWali' => 'Ayah Uji', 'noHpWali' => '081234567890', 'jenjangAsal' => 'SD/MI', 'asalSekolah' => 'MI Uji',
         ];
 
         // Tanpa centang -> ditolak.

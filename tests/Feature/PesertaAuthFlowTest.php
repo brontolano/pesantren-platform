@@ -59,13 +59,13 @@ class PesertaAuthFlowTest extends TestCase
         $submitResponse = $this->from("http://{$host}/ppdb")->post("http://{$host}/ppdb", [
             'nama' => 'Calon Auth',
             'tanggalLahir' => '2012-07-07',
-            'jenisKelamin' => 'Laki-laki',
+            'jenisKelamin' => 'L',
             'jenjangAsal' => 'SD/MI',
-            'sekolahAsal' => 'SDIT Auth',
+            'asalSekolah' => 'SDIT Auth',
             'namaWali' => 'Ahmad Wali',
             'noHpWali' => '081234567890',
             'emailWali' => 'wali.auth@example.test',
-            'programDiminati' => 'Tahfidz',
+            'setuju_kebijakan' => '1',
         ], [
             'HTTP_HOST' => $host,
             'SERVER_NAME' => $host,

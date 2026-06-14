@@ -150,6 +150,12 @@ class CalonSantriResource extends Resource
                     ->label('Nama Lengkap')
                     ->required()
                     ->maxLength(255),
+                // Field bermode 'staf' di portal SPMB — disembunyikan dari peserta,
+                // diisi/diverifikasi operator dari data EMIS di sini.
+                TextInput::make('nisn')
+                    ->label('NISN (diisi panitia)')
+                    ->maxLength(50)
+                    ->helperText('Tidak tampil di portal peserta — diverifikasi operator dari data EMIS.'),
                 DatePicker::make('tanggal_lahir')
                     ->label('Tanggal Lahir')
                     ->required(),

@@ -37,22 +37,8 @@ class DaftarUlangService
             if ($santri === null) {
                 $tahun = (int) Carbon::now()->year;
 
-                $ortu = (array) ($calon->data_ortu ?? []);
-
-                $santri = Santri::create([
+                $santri = Santri::create(array_merge($this->mapBiodata($calon), [
                     'nis' => $nis,
-                    'nama' => (string) $calon->nama,
-                    'tanggal_lahir' => $calon->tanggal_lahir->format('Y-m-d'),
-                    'tempat_lahir' => $calon->tempat_lahir,
-                    'jenis_kelamin' => $this->mapJenisKelamin((string) $calon->jenis_kelamin),
-                    'asal_sekolah' => $calon->asal_sekolah,
-                    'alamat' => $calon->alamat ?? null,
-                    'no_hp_wali' => $calon->no_hp_wali,
-                    'email_wali' => $calon->email_wali,
-                    'nama_ayah' => $calon->nama_ayah ?? ($ortu['nama_ayah'] ?? null),
-                    'nama_ibu' => $calon->nama_ibu ?? ($ortu['nama_ibu'] ?? null),
-                    'no_hp_ayah' => $ortu['no_hp_ayah'] ?? null,
-                    'no_hp_ibu' => $ortu['no_hp_ibu'] ?? null,
                     'status' => 'aktif',
                     'tahun_angkatan' => $tahun.'/'.($tahun + 1),
                     'wali_user_id' => $calon->user_id,
@@ -61,8 +47,8 @@ class DaftarUlangService
                     // foto/ttd/sampel tulisan utk pengembangan internal.
                     'consent_ai_dataset' => $calon->consent_kebijakan_at !== null,
                     'consented_at' => $calon->consent_kebijakan_at,
-                    'consented_by' => $calon->nama_ayah,
-                ]);
+                    'consented_by' => $calon->nama_wali ?: $calon->nama_ayah,
+                ]));
             }
 
             // Titik penetapan AKUN: konversi calon→santri membuat akun login
@@ -81,6 +67,42 @@ class DaftarUlangService
 
             return $santri;
         });
+    }
+
+    /**
+     * Salin SELURUH biodata calon → kolom santri yang setara (parity 1:1).
+     * Kunci kolom sama persis di kedua tabel, jadi cukup copy by nama.
+     *
+     * @return array<string, mixed>
+     */
+    private function mapBiodata(CalonSantri $calon): array
+    {
+        $shared = [
+            // Pribadi
+            'nama', 'tempat_lahir', 'nik', 'nisn', 'agama', 'nama_panggilan', 'cita_cita', 'anak_ke', 'jumlah_saudara',
+            // Alamat / domisili
+            'alamat', 'rt_rw', 'desa_kelurahan', 'kecamatan', 'kabupaten_kota', 'provinsi', 'kode_pos',
+            // Pendidikan asal
+            'asal_sekolah', 'jenjang_asal', 'npsn', 'tahun_lulus',
+            // Ayah
+            'nama_ayah', 'nik_ayah', 'pendidikan_ayah', 'pekerjaan_ayah', 'penghasilan_ayah', 'no_hp_ayah',
+            // Ibu
+            'nama_ibu', 'nik_ibu', 'pendidikan_ibu', 'pekerjaan_ibu', 'penghasilan_ibu', 'no_hp_ibu',
+            // Wali (akun)
+            'nama_wali', 'hubungan_wali', 'pekerjaan_wali', 'penghasilan_wali', 'no_hp_wali', 'email_wali',
+            // Kesehatan
+            'golongan_darah', 'tinggi_badan', 'berat_badan', 'riwayat_penyakit',
+        ];
+
+        $data = [];
+        foreach ($shared as $col) {
+            $data[$col] = $calon->{$col};
+        }
+
+        $data['tanggal_lahir'] = $calon->tanggal_lahir->format('Y-m-d');
+        $data['jenis_kelamin'] = $this->mapJenisKelamin((string) $calon->jenis_kelamin);
+
+        return $data;
     }
 
     private function mapJenisKelamin(string $jk): string
