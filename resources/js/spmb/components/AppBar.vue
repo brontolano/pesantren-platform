@@ -34,14 +34,13 @@ defineProps({
                 </svg>
             </Link>
 
-            <!-- Logo brand (Beranda) -->
-            <div
-                v-else-if="brandHeader"
-                class="ml-1 flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/15"
-            >
-                <img v-if="logoUrl" :src="logoUrl" :alt="`Logo ${brandName}`" class="h-full w-full rounded-xl bg-white object-contain p-0.5">
-                <span v-else class="text-base font-bold" aria-hidden="true">{{ (brandName || 'P').charAt(0).toUpperCase() }}</span>
-            </div>
+            <!-- Logo brand (Beranda) — transparan, hanya logo (tanpa kotak putih) -->
+            <template v-else-if="brandHeader">
+                <img v-if="logoUrl" :src="logoUrl" :alt="`Logo ${brandName}`" class="ml-1 h-10 w-10 shrink-0 object-contain">
+                <div v-else class="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-base font-bold" aria-hidden="true">
+                    {{ (brandName || 'P').charAt(0).toUpperCase() }}
+                </div>
+            </template>
 
             <div class="min-w-0 flex-1" :class="showBack ? 'pl-1' : 'pl-2'">
                 <p class="truncate text-[15px] font-semibold leading-tight">{{ title || brandName }}</p>
