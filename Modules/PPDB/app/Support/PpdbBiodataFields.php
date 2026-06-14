@@ -24,6 +24,7 @@ class PpdbBiodataFields
         'ayah' => 'Data Ayah',
         'ibu' => 'Data Ibu',
         'wali' => 'Data Wali / Penanggung Jawab',
+        'pembiayaan' => 'Penanggung Biaya',
         'kesehatan' => 'Kesehatan',
     ];
 
@@ -46,6 +47,8 @@ class PpdbBiodataFields
 
     private const OPT_GOLDAR = ['A', 'B', 'AB', 'O', 'Tidak tahu'];
 
+    private const OPT_PEMBIAYA = ['Ayah', 'Ibu', 'Orang Tua (Ayah & Ibu)', 'Wali', 'Lainnya'];
+
     /**
      * Definisi lengkap tiap field.
      *
@@ -54,6 +57,20 @@ class PpdbBiodataFields
     public static function all(): array
     {
         $text = fn (int $max = 255): array => ['string', "max:{$max}"];
+
+        // Blok alamat domisili terurai untuk satu pihak (ayah|ibu|wali), semua
+        // opsional. Field wilayah dirender sbg cascade ber-scope di frontend.
+        $addr = static function (string $pihak) use ($text): array {
+            return [
+                "alamat_{$pihak}" => ['label' => 'Alamat (jalan/dusun)', 'mode' => 'optional', 'section' => $pihak, 'type' => 'textarea', 'rules' => $text(500)],
+                "rt_rw_{$pihak}" => ['label' => 'RT/RW', 'mode' => 'optional', 'section' => $pihak, 'type' => 'text', 'rules' => $text(20), 'placeholder' => '003/008'],
+                "provinsi_{$pihak}" => ['label' => 'Provinsi', 'mode' => 'optional', 'section' => $pihak, 'type' => 'wilayah', 'wilayah' => 'provinsi', 'rules' => $text()],
+                "kabupaten_kota_{$pihak}" => ['label' => 'Kabupaten / Kota', 'mode' => 'optional', 'section' => $pihak, 'type' => 'wilayah', 'wilayah' => 'kabupaten_kota', 'rules' => $text()],
+                "kecamatan_{$pihak}" => ['label' => 'Kecamatan', 'mode' => 'optional', 'section' => $pihak, 'type' => 'wilayah', 'wilayah' => 'kecamatan', 'rules' => $text()],
+                "desa_kelurahan_{$pihak}" => ['label' => 'Desa / Kelurahan', 'mode' => 'optional', 'section' => $pihak, 'type' => 'wilayah', 'wilayah' => 'desa_kelurahan', 'rules' => $text()],
+                "kode_pos_{$pihak}" => ['label' => 'Kode pos', 'mode' => 'optional', 'section' => $pihak, 'type' => 'text', 'rules' => $text(10), 'placeholder' => '45321'],
+            ];
+        };
 
         return [
             // ── A. Data Pribadi ──────────────────────────────────────────────
@@ -91,6 +108,7 @@ class PpdbBiodataFields
             'pekerjaan_ayah' => ['label' => 'Pekerjaan ayah', 'mode' => 'optional', 'section' => 'ayah', 'type' => 'text', 'rules' => $text()],
             'penghasilan_ayah' => ['label' => 'Penghasilan ayah / bulan', 'mode' => 'optional', 'section' => 'ayah', 'type' => 'select', 'rules' => ['in:'.implode(',', self::OPT_PENGHASILAN)], 'options' => self::opts(self::OPT_PENGHASILAN)],
             'no_hp_ayah' => ['label' => 'No. HP ayah', 'mode' => 'optional', 'section' => 'ayah', 'type' => 'tel', 'rules' => $text(20)],
+            ...$addr('ayah'),
 
             // ── E. Data Ibu ──────────────────────────────────────────────────
             'nama_ibu' => ['label' => 'Nama ibu', 'mode' => 'required', 'section' => 'ibu', 'type' => 'text', 'rules' => $text()],
@@ -99,6 +117,7 @@ class PpdbBiodataFields
             'pekerjaan_ibu' => ['label' => 'Pekerjaan ibu', 'mode' => 'optional', 'section' => 'ibu', 'type' => 'text', 'rules' => $text()],
             'penghasilan_ibu' => ['label' => 'Penghasilan ibu / bulan', 'mode' => 'optional', 'section' => 'ibu', 'type' => 'select', 'rules' => ['in:'.implode(',', self::OPT_PENGHASILAN)], 'options' => self::opts(self::OPT_PENGHASILAN)],
             'no_hp_ibu' => ['label' => 'No. HP ibu', 'mode' => 'optional', 'section' => 'ibu', 'type' => 'tel', 'rules' => $text(20)],
+            ...$addr('ibu'),
 
             // ── F. Data Wali / Penanggung Jawab ──────────────────────────────
             'nama_wali' => ['label' => 'Nama wali', 'mode' => 'optional', 'section' => 'wali', 'type' => 'text', 'rules' => $text(), 'help' => 'Isi bila penanggung jawab bukan ayah/ibu kandung.'],
@@ -107,8 +126,12 @@ class PpdbBiodataFields
             'penghasilan_wali' => ['label' => 'Penghasilan wali / bulan', 'mode' => 'optional', 'section' => 'wali', 'type' => 'select', 'rules' => ['in:'.implode(',', self::OPT_PENGHASILAN)], 'options' => self::opts(self::OPT_PENGHASILAN)],
             'no_hp_wali' => ['label' => 'No. WhatsApp wali', 'mode' => 'required', 'section' => 'wali', 'type' => 'tel', 'rules' => $text(20), 'help' => 'Nomor ini jadi kunci akun portal & notifikasi.'],
             'email_wali' => ['label' => 'Email wali', 'mode' => 'optional', 'section' => 'wali', 'type' => 'email', 'rules' => ['email', 'max:255']],
+            ...$addr('wali'),
 
-            // ── G. Kesehatan ─────────────────────────────────────────────────
+            // ── G. Penanggung Biaya ──────────────────────────────────────────
+            'pembiaya' => ['label' => 'Penanggung biaya pendidikan', 'mode' => 'optional', 'section' => 'pembiayaan', 'type' => 'select', 'rules' => ['in:'.implode(',', self::OPT_PEMBIAYA)], 'options' => self::opts(self::OPT_PEMBIAYA), 'help' => 'Pihak yang menanggung biaya: orang tua atau wali.'],
+
+            // ── H. Kesehatan ─────────────────────────────────────────────────
             'golongan_darah' => ['label' => 'Golongan darah', 'mode' => 'optional', 'section' => 'kesehatan', 'type' => 'select', 'rules' => ['in:'.implode(',', self::OPT_GOLDAR)], 'options' => self::opts(self::OPT_GOLDAR)],
             'tinggi_badan' => ['label' => 'Tinggi badan (cm)', 'mode' => 'optional', 'section' => 'kesehatan', 'type' => 'number', 'rules' => ['integer', 'min:50', 'max:250']],
             'berat_badan' => ['label' => 'Berat badan (kg)', 'mode' => 'optional', 'section' => 'kesehatan', 'type' => 'number', 'rules' => ['integer', 'min:10', 'max:200']],

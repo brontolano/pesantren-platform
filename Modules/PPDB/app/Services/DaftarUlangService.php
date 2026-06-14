@@ -84,12 +84,17 @@ class DaftarUlangService
             'alamat', 'rt_rw', 'desa_kelurahan', 'kecamatan', 'kabupaten_kota', 'provinsi', 'kode_pos',
             // Pendidikan asal
             'asal_sekolah', 'jenjang_asal', 'npsn', 'tahun_lulus',
-            // Ayah
+            // Ayah + alamat ayah
             'nama_ayah', 'nik_ayah', 'pendidikan_ayah', 'pekerjaan_ayah', 'penghasilan_ayah', 'no_hp_ayah',
-            // Ibu
+            'alamat_ayah', 'rt_rw_ayah', 'desa_kelurahan_ayah', 'kecamatan_ayah', 'kabupaten_kota_ayah', 'provinsi_ayah', 'kode_pos_ayah',
+            // Ibu + alamat ibu
             'nama_ibu', 'nik_ibu', 'pendidikan_ibu', 'pekerjaan_ibu', 'penghasilan_ibu', 'no_hp_ibu',
-            // Wali (akun)
+            'alamat_ibu', 'rt_rw_ibu', 'desa_kelurahan_ibu', 'kecamatan_ibu', 'kabupaten_kota_ibu', 'provinsi_ibu', 'kode_pos_ibu',
+            // Wali (akun) + alamat wali
             'nama_wali', 'hubungan_wali', 'pekerjaan_wali', 'penghasilan_wali', 'no_hp_wali', 'email_wali',
+            'alamat_wali', 'rt_rw_wali', 'desa_kelurahan_wali', 'kecamatan_wali', 'kabupaten_kota_wali', 'provinsi_wali', 'kode_pos_wali',
+            // Penanggung biaya
+            'pembiaya',
             // Kesehatan
             'golongan_darah', 'tinggi_badan', 'berat_badan', 'riwayat_penyakit',
         ];

@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import SpmbLayout from '@/Layouts/SpmbLayout.vue';
 import MdCard from '@/spmb/components/MdCard.vue';
@@ -41,14 +41,41 @@ const sections = computed(() => Object.entries(props.biodataSections)
     }))
     .filter((s) => s.fields.length > 0));
 
-const alamatRequired = computed(() => props.fieldConfiguration.provinsi?.mode === 'required');
-
 // Form: seed dari nilai biodata saat ini (candidate.values), hanya field terlihat.
 const form = useForm(
     Object.fromEntries(visibleFields.map((f) => [f.key, props.candidate.values?.[f.key] ?? ''])),
 );
 
 const canEdit = computed(() => props.candidate.canEditBiodata);
+
+// Scope alamat dari key field level-provinsi: 'provinsi'→'' , 'provinsi_ayah'→'_ayah'.
+const scope = (key) => key.replace('provinsi', '');
+
+// Sumber alamat yang bisa disalin ke pihak tertentu (key, label, scope kolom).
+const copySources = (pihak) => ({
+    ayah: [{ key: 'santri', label: 'Domisili Santri', scope: '' }],
+    ibu: [{ key: 'santri', label: 'Domisili Santri', scope: '' }, { key: 'ayah', label: 'Ayah', scope: '_ayah' }],
+    wali: [{ key: 'santri', label: 'Domisili Santri', scope: '' }, { key: 'ayah', label: 'Ayah', scope: '_ayah' }, { key: 'ibu', label: 'Ibu', scope: '_ibu' }],
+}[pihak] ?? []);
+
+// Pilihan "Alamat sama dengan" per pihak (indikator + pemicu salin).
+const alamatSama = reactive({ ayah: '', ibu: '', wali: '' });
+
+const ALAMAT_BASES = ['alamat', 'rt_rw', 'provinsi', 'kabupaten_kota', 'kecamatan', 'desa_kelurahan', 'kode_pos'];
+const copyAlamat = (fromScope, toPihak) => {
+    if (!canEdit.value) return;
+    const toScope = `_${toPihak}`;
+    ALAMAT_BASES.forEach((base) => {
+        form[base + toScope] = form[base + fromScope] ?? '';
+    });
+};
+
+// Pilih "alamat sama dengan X" → salin alamat X ke pihak ini. Kosong = isi manual.
+const onSamaDengan = (pihak, key) => {
+    alamatSama[pihak] = key;
+    const src = copySources(pihak).find((s) => s.key === key);
+    if (src) copyAlamat(src.scope, pihak);
+};
 
 const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
 </script>
@@ -153,16 +180,37 @@ const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
                     >
                         <div class="grid grid-cols-1 gap-4">
                             <template v-for="f in sec.fields" :key="f.key">
-                                <!-- Cascade wilayah: dirender sekali di posisi 'provinsi' -->
+                                <!-- "Alamat sama dengan" — di atas blok alamat ayah/ibu/wali -->
+                                <div
+                                    v-if="f.key === 'alamat_' + sec.key && copySources(sec.key).length"
+                                    class="rounded-xl bg-stone-100 px-3 py-3"
+                                >
+                                    <MdField
+                                        type="select"
+                                        label="Alamat sama dengan"
+                                        :model-value="alamatSama[sec.key]"
+                                        :options="copySources(sec.key).map((s) => ({ value: s.key, label: s.label }))"
+                                        :disabled="!canEdit"
+                                        help="Pilih untuk menyalin alamat tersebut ke sini. Biarkan kosong untuk isi manual."
+                                        @update:model-value="(v) => onSamaDengan(sec.key, v)"
+                                    />
+                                </div>
+
+                                <!-- Cascade wilayah: dirender sekali di posisi 'provinsi' (ber-scope per pihak) -->
                                 <WilayahCascade
                                     v-if="f.type === 'wilayah' && f.wilayah === 'provinsi'"
-                                    v-model:provinsi="form.provinsi"
-                                    v-model:kabupaten-kota="form.kabupaten_kota"
-                                    v-model:kecamatan="form.kecamatan"
-                                    v-model:desa-kelurahan="form.desa_kelurahan"
-                                    :required="alamatRequired"
+                                    :scope="scope(f.key)"
+                                    :provinsi="form['provinsi' + scope(f.key)]"
+                                    :kabupaten-kota="form['kabupaten_kota' + scope(f.key)]"
+                                    :kecamatan="form['kecamatan' + scope(f.key)]"
+                                    :desa-kelurahan="form['desa_kelurahan' + scope(f.key)]"
+                                    :required="f.mode === 'required'"
                                     :disabled="!canEdit"
                                     :errors="form.errors"
+                                    @update:provinsi="(v) => (form['provinsi' + scope(f.key)] = v)"
+                                    @update:kabupaten-kota="(v) => (form['kabupaten_kota' + scope(f.key)] = v)"
+                                    @update:kecamatan="(v) => (form['kecamatan' + scope(f.key)] = v)"
+                                    @update:desa-kelurahan="(v) => (form['desa_kelurahan' + scope(f.key)] = v)"
                                 />
                                 <template v-else-if="f.type === 'wilayah'" />
                                 <MdField
