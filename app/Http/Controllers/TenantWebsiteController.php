@@ -76,7 +76,7 @@ class TenantWebsiteController extends Controller
         // alihkan "Isi Formulir Pendaftaran" ke URL itu (Setting ppdb_external_url).
         // Guard: jika /ppdb di-embed iframe (Sec-Fetch-Dest: iframe), tetap render
         // form agar tidak terjadi loop bila website mengembed halaman ini.
-        $external = isset($settings['ppdb_external_url']) ? trim((string) $settings['ppdb_external_url']) : '';
+        $external = trim((string) (\App\Models\Setting::getTenantStringValue('ppdb_external_url') ?? ''));
         if ($external !== '' && $request->header('Sec-Fetch-Dest') !== 'iframe') {
             return redirect()->away($external);
         }
