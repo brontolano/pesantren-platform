@@ -72,6 +72,15 @@ class TenantWebsiteController extends Controller
         $tenant = $this->resolveTenant($request);
         $settings = $this->settings($tenant->id);
 
+        // Tenant dengan pendaftaran via website eksternal (mis. asy-syifaa) →
+        // alihkan "Isi Formulir Pendaftaran" ke URL itu (Setting ppdb_external_url).
+        // Guard: jika /ppdb di-embed iframe (Sec-Fetch-Dest: iframe), tetap render
+        // form agar tidak terjadi loop bila website mengembed halaman ini.
+        $external = isset($settings['ppdb_external_url']) ? trim((string) $settings['ppdb_external_url']) : '';
+        if ($external !== '' && $request->header('Sec-Fetch-Dest') !== 'iframe') {
+            return redirect()->away($external);
+        }
+
         return view('tenant.ppdb-form', [
             'tenant' => $tenant,
             's' => $settings,
