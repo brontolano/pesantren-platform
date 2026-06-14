@@ -44,25 +44,36 @@ class PpdbFormFieldConfigurationServiceTest extends TestCase
 
         $this->assertSame('required', $configuration['nama']['mode']);
         $this->assertSame('optional', $configuration['nik']['mode']);
-        $this->assertSame('required', $configuration['program_diminati']['mode']);
+        // NISN default = 'staf' (diisi panitia, disembunyikan dari peserta).
+        $this->assertSame('staf', $configuration['nisn']['mode']);
+        // 'program_diminati' sudah dihapus dari biodata SPMB.
+        $this->assertArrayNotHasKey('program_diminati', $configuration);
 
         tenancy()->end();
     }
 
-    public function test_set_configuration_persists_normalized_modes_for_current_tenant(): void
+    public function test_set_configuration_persists_overridden_modes_for_current_tenant(): void
     {
         tenancy()->initialize($this->tenantA);
 
-        $setting = app(PpdbFormFieldConfigurationService::class)->setConfiguration([
+        $service = app(PpdbFormFieldConfigurationService::class);
+        $setting = $service->setConfiguration([
             'nik' => 'hidden',
             'email_wali' => 'required',
-            'catatan_tambahan' => 'hidden',
+            'no_hp_ayah' => 'staf',
         ]);
 
+        // Hanya override yang disimpan; sisanya pakai default saat dibaca.
         $this->assertSame(PpdbFormFieldConfigurationService::SETTING_KEY, $setting->key);
         $this->assertSame('hidden', $setting->value['fields']['nik']);
         $this->assertSame('required', $setting->value['fields']['email_wali']);
-        $this->assertSame('required', $setting->value['fields']['nama']);
+        $this->assertSame('staf', $setting->value['fields']['no_hp_ayah']);
+
+        $config = $service->getConfiguration();
+        $this->assertSame('hidden', $config['nik']['mode']);
+        $this->assertSame('required', $config['email_wali']['mode']);
+        $this->assertSame('staf', $config['no_hp_ayah']['mode']);
+        $this->assertSame('required', $config['nama']['mode']); // default tetap
 
         tenancy()->end();
     }

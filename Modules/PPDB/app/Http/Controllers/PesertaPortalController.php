@@ -18,6 +18,7 @@ use Modules\PPDB\Services\DaftarUlangService;
 use Modules\PPDB\Services\PpdbDocumentUploadService;
 use Modules\PPDB\Services\PpdbFormFieldConfigurationService;
 use Modules\PPDB\Services\PpdbStatusTrackingService;
+use Modules\PPDB\Support\PpdbBiodataFields;
 use Modules\PPDB\Support\PpdbDocumentTypes;
 
 class PesertaPortalController extends Controller
@@ -39,6 +40,7 @@ class PesertaPortalController extends Controller
         return Inertia::render('PPDB/Portal/Dashboard', [
             'candidate' => $this->buildCandidatePayload($calon, $fieldConfiguration),
             'fieldConfiguration' => $fieldConfiguration,
+            'biodataSections' => PpdbBiodataFields::SECTIONS,
             'statusCard' => $this->buildStatusCard($calon, $tracking['tracking_url']),
             'stepper' => $this->buildStepper($calon),
             'checklist' => $this->buildChecklist($calon, $fieldConfiguration),
@@ -358,27 +360,13 @@ class PesertaPortalController extends Controller
 
         $this->authorize('update', $calon);
 
-        $fieldConfiguration = $this->fieldConfigurationService->getConfiguration();
-        $validated = $request->validate($this->buildValidationRules($fieldConfiguration));
-        $validated = $this->stripHiddenFields($validated, $fieldConfiguration);
+        // Validasi HANYA field yang terlihat peserta (mode required|optional).
+        // Field 'hidden'/'staf' tak masuk aturan → peserta tak bisa menulisnya.
+        $config = $this->fieldConfigurationService->getConfiguration();
+        $validated = $request->validate($this->buildValidationRules($config));
 
-        $calon->update([
-            'nama' => $validated['nama'] ?? $calon->nama,
-            'tanggal_lahir' => $validated['tanggalLahir'] ?? $calon->tanggal_lahir?->format('Y-m-d'),
-            'tempat_lahir' => $validated['tempatLahir'] ?? null,
-            'jenis_kelamin' => $this->mapJenisKelamin($validated['jenisKelamin'] ?? null, $calon->jenis_kelamin),
-            'asal_sekolah' => $validated['sekolahAsal'] ?? null,
-            'program_diminati' => $validated['programDiminati'] ?? $calon->program_diminati,
-            'nama_ayah' => $validated['namaWali'] ?? null,
-            'no_hp_wali' => $validated['noHpWali'] ?? null,
-            'email_wali' => $validated['emailWali'] ?? null,
-            'data_ortu' => [
-                'nik' => $validated['nik'] ?? null,
-                'jenjang_asal' => $validated['jenjangAsal'] ?? null,
-                'hubungan' => $validated['hubunganWali'] ?? null,
-                'catatan_tambahan' => $validated['catatanTambahan'] ?? null,
-            ],
-        ]);
+        // Kunci field = nama kolom (snake_case) → persist langsung, tanpa pemetaan.
+        $calon->update($validated);
 
         return back()->with('success', 'Biodata pendaftaran berhasil diperbarui.');
     }
@@ -433,31 +421,37 @@ class PesertaPortalController extends Controller
      */
     private function buildCandidatePayload(CalonSantri $calon, array $fieldConfiguration): array
     {
-        $dataOrtu = is_array($calon->data_ortu) ? $calon->data_ortu : [];
+        // Nilai tiap field biodata, dikunci nama kolom (snake_case) agar form Vue
+        // bisa mengikat langsung ke candidate.values[key].
+        $values = [];
+        foreach (PpdbBiodataFields::keys() as $key) {
+            $values[$key] = $this->fieldValue($calon, $key);
+        }
 
         return [
             'id' => $calon->id,
             'nomorPendaftaran' => $calon->nomor_pendaftaran,
             'statusPendaftaran' => (string) $calon->status_pendaftaran,
             'nama' => (string) $calon->nama,
-            'nik' => (string) ($dataOrtu['nik'] ?? ''),
-            'tempatLahir' => (string) ($calon->tempat_lahir ?? ''),
-            'tanggalLahir' => $calon->tanggal_lahir?->format('Y-m-d') ?? '',
-            'jenisKelamin' => $this->formatJenisKelamin($calon->jenis_kelamin),
-            'jenjangAsal' => (string) ($dataOrtu['jenjang_asal'] ?? ''),
-            'sekolahAsal' => (string) ($calon->asal_sekolah ?? ''),
-            'namaWali' => (string) ($calon->nama_ayah ?? ''),
-            'hubunganWali' => (string) ($dataOrtu['hubungan'] ?? ''),
-            'noHpWali' => (string) ($calon->no_hp_wali ?? ''),
-            'emailWali' => (string) ($calon->email_wali ?? ''),
-            'programDiminati' => (string) ($calon->program_diminati ?? ''),
-            'catatanTambahan' => (string) ($dataOrtu['catatan_tambahan'] ?? ''),
+            'values' => $values,
             'canEditBiodata' => $this->isEditableStatus((string) $calon->status_pendaftaran),
             'completion' => [
                 'filled' => $this->countCompletedRequiredFields($calon, $fieldConfiguration),
                 'total' => $this->countRequiredFields($fieldConfiguration),
             ],
         ];
+    }
+
+    /** Nilai satu field biodata untuk payload form (tanggal → Y-m-d, null → ''). */
+    private function fieldValue(CalonSantri $calon, string $key): mixed
+    {
+        if ($key === 'tanggal_lahir') {
+            return $calon->tanggal_lahir?->format('Y-m-d') ?? '';
+        }
+
+        $value = $calon->{$key};
+
+        return $value ?? '';
     }
 
     /**
@@ -552,112 +546,52 @@ class PesertaPortalController extends Controller
     }
 
     /**
-     * @param  array<string, array{label: string, mode: string}>  $fieldConfiguration
+     * Aturan validasi HANYA untuk field yang terlihat peserta (mode
+     * required|optional). Field hidden/staf sengaja diabaikan agar peserta tak
+     * dapat menulisnya. Kunci aturan = nama kolom (snake_case).
+     *
+     * @param  array<string, array<string, mixed>>  $config
      * @return array<string, array<int, string>>
      */
-    private function buildValidationRules(array $fieldConfiguration): array
+    private function buildValidationRules(array $config): array
     {
-        $definitions = [
-            'nama' => ['key' => 'nama', 'rules' => ['string', 'max:255']],
-            'nik' => ['key' => 'nik', 'rules' => ['string', 'max:50']],
-            'tempatLahir' => ['key' => 'tempat_lahir', 'rules' => ['string', 'max:100']],
-            'tanggalLahir' => ['key' => 'tanggal_lahir', 'rules' => ['date']],
-            'jenisKelamin' => ['key' => 'jenis_kelamin', 'rules' => ['in:Laki-laki,Perempuan']],
-            'jenjangAsal' => ['key' => 'jenjang_asal', 'rules' => ['in:SD/MI,SMP/MTs,SMA/MA,Paket Kesetaraan']],
-            'sekolahAsal' => ['key' => 'sekolah_asal', 'rules' => ['string', 'max:255']],
-            'namaWali' => ['key' => 'nama_wali', 'rules' => ['string', 'max:255']],
-            'hubunganWali' => ['key' => 'hubungan_wali', 'rules' => ['string', 'max:100']],
-            'noHpWali' => ['key' => 'no_hp_wali', 'rules' => ['string', 'max:20']],
-            'emailWali' => ['key' => 'email_wali', 'rules' => ['email', 'max:255']],
-            'programDiminati' => ['key' => 'program_diminati', 'rules' => ['in:Reguler,Tahfidz,Muadalah']],
-            'catatanTambahan' => ['key' => 'catatan_tambahan', 'rules' => ['string', 'max:1000']],
-        ];
-
         $rules = [];
 
-        foreach ($definitions as $requestField => $definition) {
-            $mode = $fieldConfiguration[$definition['key']]['mode'] ?? 'optional';
-            $prefix = $mode === 'required' ? 'required' : 'nullable';
+        foreach (PpdbBiodataFields::all() as $key => $def) {
+            $mode = $config[$key]['mode'] ?? $def['mode'];
 
-            $rules[$requestField] = [$prefix, ...$definition['rules']];
+            if (! in_array($mode, ['required', 'optional'], true)) {
+                continue; // hidden & staf: di luar jangkauan peserta
+            }
+
+            $prefix = $mode === 'required' ? 'required' : 'nullable';
+            $rules[$key] = [$prefix, ...$def['rules']];
         }
 
         return $rules;
     }
 
     /**
-     * @param  array<string, mixed>  $validated
-     * @param  array<string, array{label: string, mode: string}>  $fieldConfiguration
-     * @return array<string, mixed>
+     * @param  array<string, array<string, mixed>>  $config
      */
-    private function stripHiddenFields(array $validated, array $fieldConfiguration): array
+    private function countRequiredFields(array $config): int
     {
-        $requestKeyMap = [
-            'nama' => 'nama',
-            'nik' => 'nik',
-            'tempatLahir' => 'tempat_lahir',
-            'tanggalLahir' => 'tanggal_lahir',
-            'jenisKelamin' => 'jenis_kelamin',
-            'jenjangAsal' => 'jenjang_asal',
-            'sekolahAsal' => 'sekolah_asal',
-            'namaWali' => 'nama_wali',
-            'hubunganWali' => 'hubungan_wali',
-            'noHpWali' => 'no_hp_wali',
-            'emailWali' => 'email_wali',
-            'programDiminati' => 'program_diminati',
-            'catatanTambahan' => 'catatan_tambahan',
-        ];
-
-        foreach ($requestKeyMap as $requestKey => $configKey) {
-            if (($fieldConfiguration[$configKey]['mode'] ?? 'optional') === 'hidden') {
-                unset($validated[$requestKey]);
-            }
-        }
-
-        return $validated;
-    }
-
-    /**
-     * @param  array<string, array{label: string, mode: string}>  $fieldConfiguration
-     */
-    private function countRequiredFields(array $fieldConfiguration): int
-    {
-        return collect($fieldConfiguration)
+        return collect($config)
             ->where('mode', 'required')
             ->count();
     }
 
     /**
-     * @param  array<string, array{label: string, mode: string}>  $fieldConfiguration
+     * @param  array<string, array<string, mixed>>  $config
      */
-    private function countCompletedRequiredFields(CalonSantri $calon, array $fieldConfiguration): int
+    private function countCompletedRequiredFields(CalonSantri $calon, array $config): int
     {
-        $dataOrtu = is_array($calon->data_ortu) ? $calon->data_ortu : [];
+        return collect($config)
+            ->filter(fn (array $field): bool => ($field['mode'] ?? null) === 'required')
+            ->filter(function (array $field, string $key) use ($calon): bool {
+                $value = $calon->{$key};
 
-        $values = [
-            'nama' => $calon->nama,
-            'nik' => $dataOrtu['nik'] ?? null,
-            'tempat_lahir' => $calon->tempat_lahir,
-            'tanggal_lahir' => $calon->tanggal_lahir?->format('Y-m-d'),
-            'jenis_kelamin' => $calon->jenis_kelamin,
-            'jenjang_asal' => $dataOrtu['jenjang_asal'] ?? null,
-            'sekolah_asal' => $calon->asal_sekolah,
-            'nama_wali' => $calon->nama_ayah,
-            'hubungan_wali' => $dataOrtu['hubungan'] ?? null,
-            'no_hp_wali' => $calon->no_hp_wali,
-            'email_wali' => $calon->email_wali,
-            'program_diminati' => $calon->program_diminati,
-            'catatan_tambahan' => $dataOrtu['catatan_tambahan'] ?? null,
-        ];
-
-        return collect($fieldConfiguration)
-            ->filter(fn (array $field): bool => $field['mode'] === 'required')
-            ->filter(function (array $field, string $key) use ($values): bool {
-                $value = $values[$key] ?? null;
-
-                return is_string($value)
-                    ? trim($value) !== ''
-                    : $value !== null;
+                return is_string($value) ? trim($value) !== '' : $value !== null;
             })
             ->count();
     }
@@ -729,23 +663,5 @@ class PesertaPortalController extends Controller
     private function isEditableStatus(string $status): bool
     {
         return ! in_array($status, ['ditolak', 'registrasi_ulang'], true);
-    }
-
-    private function formatJenisKelamin(?string $value): string
-    {
-        return match ($value) {
-            'L' => 'Laki-laki',
-            'P' => 'Perempuan',
-            default => '',
-        };
-    }
-
-    private function mapJenisKelamin(?string $value, ?string $fallback): ?string
-    {
-        return match ($value) {
-            'Laki-laki' => 'L',
-            'Perempuan' => 'P',
-            default => $fallback,
-        };
     }
 }

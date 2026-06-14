@@ -6,6 +6,9 @@
 import { onBeforeUnmount, ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import SpmbLayout from '@/Layouts/SpmbLayout.vue';
+import MdCard from '@/spmb/components/MdCard.vue';
+import MdButton from '@/spmb/components/MdButton.vue';
+import MdField from '@/spmb/components/MdField.vue';
 
 const props = defineProps({
     pendaftaran: {
@@ -63,143 +66,136 @@ const resend = () => {
 <template>
     <Head title="Aktivasi Akun" />
 
-    <SpmbLayout>
-        <div class="space-y-6">
-            <div class="space-y-1.5">
-                <h1 class="text-2xl font-bold tracking-tight">
+    <SpmbLayout :bottom-nav="false" brand-header>
+        <div class="space-y-4">
+            <div class="px-1">
+                <h1 class="text-2xl font-bold tracking-tight text-stone-900">
                     Aktifkan Akun Anda
                 </h1>
-                <p class="text-sm leading-relaxed text-stone-600">
+                <p class="mt-1 text-[13px] leading-relaxed text-stone-600">
                     Kami sudah mengirim kode 6 angka ke WhatsApp wali.
                     Masukkan kode tersebut, lalu buat password untuk masuk portal.
                 </p>
             </div>
 
-            <form class="space-y-4" @submit.prevent="submit">
-                <div class="space-y-1.5">
-                    <label for="pendaftaran" class="block text-sm font-medium text-stone-800">
-                        Nomor pendaftaran
-                    </label>
-                    <input
-                        id="pendaftaran"
+            <MdCard>
+                <form class="space-y-4" @submit.prevent="submit">
+                    <MdField
                         v-model="form.pendaftaran"
                         type="text"
-                        name="pendaftaran"
-                        autocapitalize="characters"
-                        autocorrect="off"
-                        required
+                        label="Nomor pendaftaran"
                         placeholder="Contoh: PSB-2026-0001"
-                        class="block w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:border-[var(--spmb-primary)] focus:ring-2 focus:ring-[var(--spmb-primary)]/20"
-                    >
-                    <p class="text-xs text-stone-500">
-                        Nomor ini tertera di pesan WhatsApp dan di layar setelah Anda mendaftar.
-                    </p>
-                    <p v-if="form.errors.pendaftaran" class="text-sm text-red-600">
-                        {{ form.errors.pendaftaran }}
-                    </p>
-                </div>
-
-                <div class="space-y-1.5">
-                    <label for="kode" class="block text-sm font-medium text-stone-800">
-                        Kode dari WhatsApp (6 angka)
-                    </label>
-                    <input
-                        id="kode"
-                        v-model="form.kode"
-                        type="text"
-                        name="kode"
-                        inputmode="numeric"
-                        pattern="[0-9]*"
-                        maxlength="6"
-                        autocomplete="one-time-code"
                         required
-                        placeholder="••••••"
-                        class="block w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-center text-2xl font-semibold tracking-[0.5em] shadow-sm outline-none transition placeholder:tracking-normal focus:border-[var(--spmb-primary)] focus:ring-2 focus:ring-[var(--spmb-primary)]/20"
-                    >
-                    <p v-if="form.errors.kode" class="text-sm text-red-600">
-                        {{ form.errors.kode }}
-                    </p>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-stone-500">Belum menerima kode?</span>
-                        <button
-                            type="button"
-                            :disabled="resendForm.processing || resendCooldown > 0 || !form.pendaftaran"
-                            class="font-medium text-[var(--spmb-primary)] underline-offset-2 transition hover:underline disabled:cursor-not-allowed disabled:opacity-50"
-                            @click="resend"
-                        >
-                            <template v-if="resendCooldown > 0">
-                                Kirim ulang ({{ resendCooldown }} dtk)
-                            </template>
-                            <template v-else-if="resendForm.processing">
-                                Mengirim…
-                            </template>
-                            <template v-else>
-                                Kirim ulang kode
-                            </template>
-                        </button>
-                    </div>
-                </div>
+                        help="Nomor ini tertera di pesan WhatsApp dan di layar setelah Anda mendaftar."
+                        :error="form.errors.pendaftaran"
+                    />
 
-                <div class="space-y-1.5">
-                    <label for="password" class="block text-sm font-medium text-stone-800">
-                        Buat password (minimal 8 karakter)
-                    </label>
-                    <div class="relative">
+                    <div>
+                        <span class="mb-1.5 block text-[13px] font-medium text-stone-700">
+                            Kode dari WhatsApp (6 angka)<span class="text-red-500"> *</span>
+                        </span>
                         <input
-                            id="password"
-                            v-model="form.password"
+                            id="kode"
+                            v-model="form.kode"
+                            type="text"
+                            name="kode"
+                            inputmode="numeric"
+                            pattern="[0-9]*"
+                            maxlength="6"
+                            autocomplete="one-time-code"
+                            required
+                            placeholder="••••••"
+                            class="block h-14 w-full rounded-xl border bg-white px-3.5 text-center text-2xl font-semibold tracking-[0.5em]
+                                   text-stone-900 outline-none transition placeholder:tracking-normal placeholder:text-stone-400
+                                   focus:border-[var(--spmb-primary)] focus:ring-2 focus:ring-[var(--spmb-primary)]/25"
+                            :class="form.errors.kode ? 'border-red-400 ring-2 ring-red-100' : 'border-stone-300'"
+                        >
+                        <p v-if="form.errors.kode" class="mt-1 text-[12px] font-medium text-red-600">
+                            {{ form.errors.kode }}
+                        </p>
+                        <div class="mt-2 flex items-center justify-between text-[13px]">
+                            <span class="text-stone-500">Belum menerima kode?</span>
+                            <button
+                                type="button"
+                                :disabled="resendForm.processing || resendCooldown > 0 || !form.pendaftaran"
+                                class="font-semibold text-[var(--spmb-primary)] underline-offset-2 transition active:underline disabled:cursor-not-allowed disabled:opacity-50"
+                                @click="resend"
+                            >
+                                <template v-if="resendCooldown > 0">
+                                    Kirim ulang ({{ resendCooldown }} dtk)
+                                </template>
+                                <template v-else-if="resendForm.processing">
+                                    Mengirim…
+                                </template>
+                                <template v-else>
+                                    Kirim ulang kode
+                                </template>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="mb-1.5 block text-[13px] font-medium text-stone-700">
+                            Buat password (minimal 8 karakter)<span class="text-red-500"> *</span>
+                        </span>
+                        <div class="relative">
+                            <input
+                                id="password"
+                                v-model="form.password"
+                                :type="showPassword ? 'text' : 'password'"
+                                name="password"
+                                autocomplete="new-password"
+                                required
+                                minlength="8"
+                                placeholder="Password baru"
+                                class="block h-12 w-full rounded-xl border bg-white px-3.5 pr-20 text-[15px]
+                                       text-stone-900 outline-none transition placeholder:text-stone-400
+                                       focus:border-[var(--spmb-primary)] focus:ring-2 focus:ring-[var(--spmb-primary)]/25"
+                                :class="form.errors.password ? 'border-red-400 ring-2 ring-red-100' : 'border-stone-300'"
+                            >
+                            <button
+                                type="button"
+                                class="absolute inset-y-0 right-0 px-4 text-[13px] font-semibold text-stone-500 transition active:text-stone-800"
+                                @click="showPassword = !showPassword"
+                            >
+                                {{ showPassword ? 'Tutup' : 'Lihat' }}
+                            </button>
+                        </div>
+                        <p v-if="form.errors.password" class="mt-1 text-[12px] font-medium text-red-600">
+                            {{ form.errors.password }}
+                        </p>
+                    </div>
+
+                    <div>
+                        <span class="mb-1.5 block text-[13px] font-medium text-stone-700">
+                            Ulangi password<span class="text-red-500"> *</span>
+                        </span>
+                        <input
+                            id="password_confirmation"
+                            v-model="form.password_confirmation"
                             :type="showPassword ? 'text' : 'password'"
-                            name="password"
+                            name="password_confirmation"
                             autocomplete="new-password"
                             required
                             minlength="8"
-                            placeholder="Password baru"
-                            class="block w-full rounded-xl border border-stone-300 bg-white px-4 py-3 pr-20 text-base shadow-sm outline-none transition focus:border-[var(--spmb-primary)] focus:ring-2 focus:ring-[var(--spmb-primary)]/20"
+                            placeholder="Ketik ulang password yang sama"
+                            class="block h-12 w-full rounded-xl border border-stone-300 bg-white px-3.5 text-[15px]
+                                   text-stone-900 outline-none transition placeholder:text-stone-400
+                                   focus:border-[var(--spmb-primary)] focus:ring-2 focus:ring-[var(--spmb-primary)]/25"
                         >
-                        <button
-                            type="button"
-                            class="absolute inset-y-0 right-0 px-4 text-sm font-medium text-stone-500 transition hover:text-stone-800"
-                            @click="showPassword = !showPassword"
-                        >
-                            {{ showPassword ? 'Tutup' : 'Lihat' }}
-                        </button>
                     </div>
-                    <p v-if="form.errors.password" class="text-sm text-red-600">
-                        {{ form.errors.password }}
-                    </p>
-                </div>
 
-                <div class="space-y-1.5">
-                    <label for="password_confirmation" class="block text-sm font-medium text-stone-800">
-                        Ulangi password
-                    </label>
-                    <input
-                        id="password_confirmation"
-                        v-model="form.password_confirmation"
-                        :type="showPassword ? 'text' : 'password'"
-                        name="password_confirmation"
-                        autocomplete="new-password"
-                        required
-                        minlength="8"
-                        placeholder="Ketik ulang password yang sama"
-                        class="block w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:border-[var(--spmb-primary)] focus:ring-2 focus:ring-[var(--spmb-primary)]/20"
-                    >
-                </div>
+                    <MdButton type="submit" :loading="form.processing">
+                        {{ form.processing ? 'Memproses…' : 'Aktifkan & Masuk' }}
+                    </MdButton>
+                </form>
+            </MdCard>
 
-                <button
-                    type="submit"
-                    :disabled="form.processing"
-                    class="block w-full rounded-xl bg-[var(--spmb-primary)] px-4 py-3.5 text-center text-base font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
-                >
-                    {{ form.processing ? 'Memproses…' : 'Aktifkan & Masuk' }}
-                </button>
-            </form>
-
-            <p class="text-center text-sm text-stone-600">
+            <p class="text-center text-[13px] text-stone-600">
                 Sudah pernah aktivasi?
                 <Link
                     href="/spmb/login"
-                    class="font-medium text-[var(--spmb-primary)] underline-offset-2 hover:underline"
+                    class="font-semibold text-[var(--spmb-primary)] underline-offset-2 active:underline"
                 >
                     Masuk di sini
                 </Link>

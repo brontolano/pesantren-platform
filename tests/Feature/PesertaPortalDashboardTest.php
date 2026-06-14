@@ -80,31 +80,21 @@ class PesertaPortalDashboardTest extends TestCase
         $response->assertSee('Ahmad Peserta');
     }
 
-    public function test_peserta_can_update_own_biodata_using_tenant_field_configuration(): void
+    public function test_peserta_can_update_own_biodata_into_real_columns(): void
     {
         tenancy()->initialize($this->tenant);
 
+        // nik dijadikan wajib via konfigurasi tenant.
         Setting::create([
             'tenant_id' => $this->tenant->id,
             'key' => 'ppdb_form_fields',
-            'value' => [
-                'fields' => [
-                    'nik' => 'required',
-                    'catatan_tambahan' => 'hidden',
-                ],
-            ],
+            'value' => ['fields' => ['nik' => 'required']],
         ]);
 
         $user = $this->makePeserta('edit@spmb.test');
         $candidate = $this->makeCandidate($user, [
             'nomor_pendaftaran' => 'PPDB-2026-202',
             'nama' => 'Nama Lama',
-            'data_ortu' => [
-                'nik' => null,
-                'jenjang_asal' => 'SD/MI',
-                'hubungan' => 'Ayah',
-                'catatan_tambahan' => 'Lama',
-            ],
         ]);
 
         tenancy()->end();
@@ -113,19 +103,37 @@ class PesertaPortalDashboardTest extends TestCase
             ->actingAs($user)
             ->from("http://{$this->host}/spmb")
             ->put("http://{$this->host}/spmb/biodata", [
+                // Pribadi (wajib)
                 'nama' => 'Nama Baru',
                 'nik' => '3216549870123456',
-                'tempatLahir' => 'Subang',
-                'tanggalLahir' => '2012-02-03',
-                'jenisKelamin' => 'Perempuan',
-                'jenjangAsal' => 'SMP/MTs',
-                'sekolahAsal' => 'MTs Baru',
-                'namaWali' => 'Ibu Baru',
-                'hubunganWali' => 'Ibu',
-                'noHpWali' => '081234567890',
-                'emailWali' => 'ortu@contoh.id',
-                'programDiminati' => 'Tahfidz',
-                'catatanTambahan' => 'Tidak dipakai karena hidden',
+                'tempat_lahir' => 'Subang',
+                'tanggal_lahir' => '2012-02-03',
+                'jenis_kelamin' => 'P',
+                // Alamat (wajib)
+                'alamat' => 'Jl. Mawar No. 1',
+                'rt_rw' => '003/008',
+                'provinsi' => 'Jawa Barat',
+                'kabupaten_kota' => 'Kabupaten Subang',
+                'kecamatan' => 'Subang',
+                'desa_kelurahan' => 'Karanganyar',
+                'kode_pos' => '41211',
+                // Pendidikan (wajib)
+                'asal_sekolah' => 'MTs Baru',
+                'jenjang_asal' => 'SMP/MTs',
+                // Ortu (nama wajib)
+                'nama_ayah' => 'Bapak Baru',
+                'pekerjaan_ayah' => 'Petani',
+                'penghasilan_ayah' => 'Rp1.000.000 - Rp3.000.000',
+                'nama_ibu' => 'Ibu Baru',
+                // Wali (no_hp_wali wajib)
+                'nama_wali' => 'Ibu Baru',
+                'hubungan_wali' => 'Ibu Kandung',
+                'no_hp_wali' => '081234567890',
+                'email_wali' => 'ortu@contoh.id',
+                // Kesehatan (opsional)
+                'golongan_darah' => 'O',
+                // Field 'staf' — TIDAK boleh tertulis oleh peserta.
+                'nisn' => '9999999999',
             ], [
                 'HTTP_HOST' => $this->host,
                 'SERVER_NAME' => $this->host,
@@ -138,18 +146,45 @@ class PesertaPortalDashboardTest extends TestCase
         $updated = $candidate->fresh();
         tenancy()->end();
 
+        // Tersimpan di KOLOM ASLI (bukan data_ortu).
         $this->assertSame('Nama Baru', $updated->nama);
+        $this->assertSame('3216549870123456', $updated->nik);
         $this->assertSame('Subang', $updated->tempat_lahir);
         $this->assertSame('P', $updated->jenis_kelamin);
+        $this->assertSame('Jl. Mawar No. 1', $updated->alamat);
+        $this->assertSame('Jawa Barat', $updated->provinsi);
         $this->assertSame('MTs Baru', $updated->asal_sekolah);
-        $this->assertSame('Ibu Baru', $updated->nama_ayah);
+        $this->assertSame('SMP/MTs', $updated->jenjang_asal);
+        $this->assertSame('Bapak Baru', $updated->nama_ayah);
+        $this->assertSame('Petani', $updated->pekerjaan_ayah);
+        $this->assertSame('Rp1.000.000 - Rp3.000.000', $updated->penghasilan_ayah);
+        $this->assertSame('Ibu Baru', $updated->nama_ibu);
+        $this->assertSame('Ibu Kandung', $updated->hubungan_wali);
         $this->assertSame('081234567890', $updated->no_hp_wali);
         $this->assertSame('ortu@contoh.id', $updated->email_wali);
-        $this->assertSame('Tahfidz', $updated->program_diminati);
-        $this->assertSame('3216549870123456', $updated->data_ortu['nik']);
-        $this->assertSame('SMP/MTs', $updated->data_ortu['jenjang_asal']);
-        $this->assertSame('Ibu', $updated->data_ortu['hubungan']);
-        $this->assertNull($updated->data_ortu['catatan_tambahan']);
+        $this->assertSame('O', $updated->golongan_darah);
+
+        // Field 'staf' DIABAIKAN — peserta tidak bisa menulis NISN.
+        $this->assertNull($updated->nisn);
+    }
+
+    public function test_wilayah_provinsi_endpoint_returns_json_array_for_peserta(): void
+    {
+        tenancy()->initialize($this->tenant);
+        $user = $this->makePeserta('wilayah@spmb.test');
+        $this->makeCandidate($user, ['nomor_pendaftaran' => 'PPDB-2026-404']);
+        tenancy()->end();
+
+        $response = $this
+            ->actingAs($user)
+            ->call('GET', "http://{$this->host}/spmb/wilayah/provinsi", [], [], [], [
+                'HTTP_HOST' => $this->host,
+                'SERVER_NAME' => $this->host,
+                'HTTP_ACCEPT' => 'application/json',
+            ]);
+
+        $response->assertOk();
+        $this->assertIsArray($response->json());
     }
 
     public function test_peserta_cannot_update_other_participants_data(): void

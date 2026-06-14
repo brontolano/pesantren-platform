@@ -6,6 +6,7 @@ use Modules\PPDB\Http\Controllers\PesertaPwaController;
 use Modules\PPDB\Http\Controllers\PesertaPortalController;
 use Modules\PPDB\Http\Controllers\PpdbFileController;
 use Modules\PPDB\Http\Controllers\PublicPpdbController;
+use Modules\PPDB\Http\Controllers\WilayahController;
 use Modules\PPDB\Http\Controllers\PPDBController;
 use Modules\PPDB\Http\Middleware\ShareSpmbPageData;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -142,6 +143,12 @@ Route::middleware([
             ->name('tagihan.bukti');
         Route::put('/biodata', [PesertaPortalController::class, 'updateBiodata'])
             ->name('biodata.update');
+
+        // Cascade wilayah untuk form biodata (read-only, by nama).
+        Route::get('/wilayah/provinsi', [WilayahController::class, 'provinsi'])->name('wilayah.provinsi');
+        Route::get('/wilayah/kabupaten', [WilayahController::class, 'kabupaten'])->name('wilayah.kabupaten');
+        Route::get('/wilayah/kecamatan', [WilayahController::class, 'kecamatan'])->name('wilayah.kecamatan');
+        Route::get('/wilayah/desa', [WilayahController::class, 'desa'])->name('wilayah.desa');
     });
 });
 

@@ -9,31 +9,31 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Services\PesertaAccountService;
-use Modules\PPDB\Services\PpdbFormFieldConfigurationService;
 use Modules\PPDB\Services\PpdbRegistrationNumberService;
 use Modules\PPDB\Services\PpdbStatusTrackingService;
 
 class PublicPpdbController extends Controller
 {
-    public function create(PpdbFormFieldConfigurationService $fieldConfigurationService): Response
+    public function create(): Response
     {
-        $fieldConfiguration = $fieldConfigurationService->getConfiguration();
-
+        // Form publik SENGAJA singkat: cukup untuk menerbitkan nomor + akun.
+        // Biodata LENGKAP diisi peserta di portal /spmb setelah aktivasi.
         return Inertia::render('PPDB/PublicForm', [
             'tenant' => [
                 'id' => tenant()?->getTenantKey(),
                 'name' => tenant()?->getAttribute('name') ?? 'Pesantren',
             ],
-            'fieldConfiguration' => $fieldConfiguration,
             'formOptions' => [
-                'jenisKelamin' => ['Laki-laki', 'Perempuan'],
+                'jenisKelamin' => [
+                    ['value' => 'L', 'label' => 'Laki-laki'],
+                    ['value' => 'P', 'label' => 'Perempuan'],
+                ],
                 'jenjangAsal' => ['SD/MI', 'SMP/MTs', 'SMA/MA', 'Paket Kesetaraan'],
-                'programDiminati' => ['Reguler', 'Tahfidz', 'Muadalah'],
             ],
             'registrationChecklist' => [
-                'Isi biodata calon santri dan wali dengan lengkap.',
-                'Pastikan nomor WhatsApp wali aktif untuk notifikasi hasil seleksi.',
-                'Siapkan scan dokumen karena tahap unggah akan diaktifkan setelah nomor pendaftaran terbit.',
+                'Isi data ringkas calon santri & wali untuk menerbitkan nomor pendaftaran.',
+                'Pastikan nomor WhatsApp wali aktif — kode aktivasi & notifikasi dikirim ke sana.',
+                'Biodata lengkap & unggah dokumen dilakukan di portal SPMB setelah akun aktif.',
             ],
         ]);
     }
@@ -72,39 +72,38 @@ class PublicPpdbController extends Controller
 
     public function store(
         Request $request,
-        PpdbFormFieldConfigurationService $fieldConfigurationService,
         PpdbRegistrationNumberService $registrationNumberService,
         PesertaAccountService $pesertaAccountService
     )
     {
-        $validated = $request->validate(
-            $this->buildValidationRules($fieldConfigurationService->getConfiguration())
-            + ['setuju_kebijakan' => ['accepted']],
-            ['setuju_kebijakan.accepted' => 'Centang persetujuan Kebijakan Privasi Sistem untuk melanjutkan.'],
-        );
-
-        $jenisKelamin = $validated['jenisKelamin'] === 'Laki-laki' ? 'L' : 'P';
+        $validated = $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
+            'jenisKelamin' => ['required', 'in:L,P'],
+            'tempatLahir' => ['nullable', 'string', 'max:100'],
+            'tanggalLahir' => ['required', 'date'],
+            'jenjangAsal' => ['required', 'in:SD/MI,SMP/MTs,SMA/MA,Paket Kesetaraan'],
+            'asalSekolah' => ['required', 'string', 'max:255'],
+            'namaWali' => ['required', 'string', 'max:255'],
+            'noHpWali' => ['required', 'string', 'max:20'],
+            'emailWali' => ['nullable', 'email', 'max:255'],
+            'setuju_kebijakan' => ['accepted'],
+        ], ['setuju_kebijakan.accepted' => 'Centang persetujuan Kebijakan Privasi Sistem untuk melanjutkan.']);
 
         // Nomor + insert satu transaksi (race-safe, retry saat tabrakan nomor).
+        // Biodata lengkap menyusul di portal /spmb (PesertaPortalController).
         $calon = $registrationNumberService->createWithNomor([
             'tenant_id' => tenant()?->getTenantKey(),
             'nama' => $validated['nama'],
-            'tanggal_lahir' => $validated['tanggalLahir'],
+            'jenis_kelamin' => $validated['jenisKelamin'],
             'tempat_lahir' => $validated['tempatLahir'] ?? null,
-            'jenis_kelamin' => $jenisKelamin,
-            'asal_sekolah' => $validated['sekolahAsal'] ?? null,
-            'program_diminati' => $validated['programDiminati'],
-            'nama_ayah' => $validated['namaWali'],
+            'tanggal_lahir' => $validated['tanggalLahir'],
+            'jenjang_asal' => $validated['jenjangAsal'],
+            'asal_sekolah' => $validated['asalSekolah'],
+            'nama_wali' => $validated['namaWali'],
             'no_hp_wali' => $validated['noHpWali'],
             'email_wali' => $validated['emailWali'] ?? null,
             'status_pendaftaran' => 'pending',
             'consent_kebijakan_at' => now(), // persetujuan Kebijakan Privasi Sistem (UU PDP)
-            'data_ortu' => [
-                'nik' => $validated['nik'] ?? null,
-                'jenjang_asal' => $validated['jenjangAsal'] ?? null,
-                'hubungan' => $validated['hubunganWali'] ?? null,
-                'catatan_tambahan' => $validated['catatanTambahan'] ?? null,
-            ],
         ]);
 
         $nomorPendaftaran = $calon->nomor_pendaftaran;
@@ -130,40 +129,6 @@ class PublicPpdbController extends Controller
         // OTP dari WhatsApp lalu membuat password.
         return redirect('/spmb/aktivasi?pendaftaran='.urlencode($nomorPendaftaran))
             ->with('success', "Pendaftaran berhasil! Nomor pendaftaran Anda: {$nomorPendaftaran}. Simpan nomor ini.{$infoAktivasi}");
-    }
-
-    /**
-     * @param  array<string, array{label: string, mode: string}>  $fieldConfiguration
-     * @return array<string, array<int, string>>
-     */
-    private function buildValidationRules(array $fieldConfiguration): array
-    {
-        $definitions = [
-            'nama' => ['key' => 'nama', 'rules' => ['string', 'max:255']],
-            'nik' => ['key' => 'nik', 'rules' => ['string', 'max:50']],
-            'tempatLahir' => ['key' => 'tempat_lahir', 'rules' => ['string', 'max:100']],
-            'tanggalLahir' => ['key' => 'tanggal_lahir', 'rules' => ['date']],
-            'jenisKelamin' => ['key' => 'jenis_kelamin', 'rules' => ['in:Laki-laki,Perempuan']],
-            'jenjangAsal' => ['key' => 'jenjang_asal', 'rules' => ['in:SD/MI,SMP/MTs,SMA/MA,Paket Kesetaraan']],
-            'sekolahAsal' => ['key' => 'sekolah_asal', 'rules' => ['string', 'max:255']],
-            'namaWali' => ['key' => 'nama_wali', 'rules' => ['string', 'max:255']],
-            'hubunganWali' => ['key' => 'hubungan_wali', 'rules' => ['string', 'max:100']],
-            'noHpWali' => ['key' => 'no_hp_wali', 'rules' => ['string', 'max:20']],
-            'emailWali' => ['key' => 'email_wali', 'rules' => ['email', 'max:255']],
-            'programDiminati' => ['key' => 'program_diminati', 'rules' => ['in:Reguler,Tahfidz,Muadalah']],
-            'catatanTambahan' => ['key' => 'catatan_tambahan', 'rules' => ['string', 'max:1000']],
-        ];
-
-        $rules = [];
-
-        foreach ($definitions as $requestField => $definition) {
-            $mode = $fieldConfiguration[$definition['key']]['mode'] ?? 'optional';
-            $prefix = $mode === 'required' ? 'required' : 'nullable';
-
-            $rules[$requestField] = [$prefix, ...$definition['rules']];
-        }
-
-        return $rules;
     }
 
     private function humanizeStatus(string $status): string
