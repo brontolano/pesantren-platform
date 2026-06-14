@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, reactive } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import SpmbLayout from '@/Layouts/SpmbLayout.vue';
 import MdCard from '@/spmb/components/MdCard.vue';
@@ -51,12 +51,15 @@ const canEdit = computed(() => props.candidate.canEditBiodata);
 // Scope alamat dari key field level-provinsi: 'provinsi'→'' , 'provinsi_ayah'→'_ayah'.
 const scope = (key) => key.replace('provinsi', '');
 
-// Sumber yang bisa disalin alamatnya ke pihak tertentu.
+// Sumber alamat yang bisa disalin ke pihak tertentu (key, label, scope kolom).
 const copySources = (pihak) => ({
-    ayah: [{ scope: '', label: 'Domisili Santri' }],
-    ibu: [{ scope: '', label: 'Domisili Santri' }, { scope: '_ayah', label: 'Ayah' }],
-    wali: [{ scope: '', label: 'Domisili Santri' }, { scope: '_ayah', label: 'Ayah' }, { scope: '_ibu', label: 'Ibu' }],
+    ayah: [{ key: 'santri', label: 'Domisili Santri', scope: '' }],
+    ibu: [{ key: 'santri', label: 'Domisili Santri', scope: '' }, { key: 'ayah', label: 'Ayah', scope: '_ayah' }],
+    wali: [{ key: 'santri', label: 'Domisili Santri', scope: '' }, { key: 'ayah', label: 'Ayah', scope: '_ayah' }, { key: 'ibu', label: 'Ibu', scope: '_ibu' }],
 }[pihak] ?? []);
+
+// Pilihan "Alamat sama dengan" per pihak (indikator + pemicu salin).
+const alamatSama = reactive({ ayah: '', ibu: '', wali: '' });
 
 const ALAMAT_BASES = ['alamat', 'rt_rw', 'provinsi', 'kabupaten_kota', 'kecamatan', 'desa_kelurahan', 'kode_pos'];
 const copyAlamat = (fromScope, toPihak) => {
@@ -65,6 +68,13 @@ const copyAlamat = (fromScope, toPihak) => {
     ALAMAT_BASES.forEach((base) => {
         form[base + toScope] = form[base + fromScope] ?? '';
     });
+};
+
+// Pilih "alamat sama dengan X" → salin alamat X ke pihak ini. Kosong = isi manual.
+const onSamaDengan = (pihak, key) => {
+    alamatSama[pihak] = key;
+    const src = copySources(pihak).find((s) => s.key === key);
+    if (src) copyAlamat(src.scope, pihak);
 };
 
 const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
@@ -170,22 +180,20 @@ const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
                     >
                         <div class="grid grid-cols-1 gap-4">
                             <template v-for="f in sec.fields" :key="f.key">
-                                <!-- Bar "salin alamat" di atas blok alamat ayah/ibu/wali -->
+                                <!-- "Alamat sama dengan" — di atas blok alamat ayah/ibu/wali -->
                                 <div
                                     v-if="f.key === 'alamat_' + sec.key && copySources(sec.key).length"
-                                    class="flex flex-wrap items-center gap-2 rounded-xl bg-stone-100 px-3 py-2"
+                                    class="rounded-xl bg-stone-100 px-3 py-3"
                                 >
-                                    <span class="text-[12px] font-medium text-stone-600">Salin alamat dari:</span>
-                                    <button
-                                        v-for="src in copySources(sec.key)"
-                                        :key="src.scope"
-                                        type="button"
+                                    <MdField
+                                        type="select"
+                                        label="Alamat sama dengan"
+                                        :model-value="alamatSama[sec.key]"
+                                        :options="copySources(sec.key).map((s) => ({ value: s.key, label: s.label }))"
                                         :disabled="!canEdit"
-                                        class="rounded-full border border-stone-300 bg-white px-3 py-1 text-[12px] font-medium text-[var(--spmb-primary)] transition active:bg-stone-50 disabled:opacity-50"
-                                        @click="copyAlamat(src.scope, sec.key)"
-                                    >
-                                        {{ src.label }}
-                                    </button>
+                                        help="Pilih untuk menyalin alamat tersebut ke sini. Biarkan kosong untuk isi manual."
+                                        @update:model-value="(v) => onSamaDengan(sec.key, v)"
+                                    />
                                 </div>
 
                                 <!-- Cascade wilayah: dirender sekali di posisi 'provinsi' (ber-scope per pihak) -->
