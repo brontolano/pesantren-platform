@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Auth\StaffLoginController;
 use App\Models\User;
 use App\Support\AppLauncher;
 use App\Support\TenantBranding;
@@ -15,16 +16,20 @@ use Illuminate\View\View;
  * Otak "launcher" untuk domain tenant bertipe `sistem` (mis.
  * pesantren.asy-syifaa.com). Dipanggil dari route `home` di routes/web.php.
  *
- * - Guest  → dikunci ke halaman login bermerek (/masuk), intended = '/'.
+ * - Guest  → halaman login bermerek dirender langsung di '/' (satu pintu).
  * - Login  → diarahkan per peran via App\Support\AppLauncher:
- *            wali/peserta/santri auto-route ke portalnya; staf melihat hub.
+ *            wali/peserta/santri auto-route ke portalnya; staf admin (tanpa PWA
+ *            khusus) auto-route ke /admin; staf ber-PWA melihat hub pemilih.
  */
 class LauncherController extends Controller
 {
     public function __invoke(): RedirectResponse|View
     {
         if (! Auth::check()) {
-            return redirect()->guest('/masuk');
+            // Login terpusat di "/" — render halaman login bermerek langsung di
+            // sini (tidak redirect ke /masuk). StaffLoginController::show()
+            // mengembalikan view yang sama (untuk tamu).
+            return app(StaffLoginController::class)->show();
         }
 
         /** @var User $user */

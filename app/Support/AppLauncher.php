@@ -83,8 +83,17 @@ final class AppLauncher
             return ['kind' => 'redirect', 'url' => self::routeOr('tenant.santri-app.beranda', '/santri-app')];
         }
 
-        // Staf (dan fallback authenticated-tanpa-app) → hub. Hub sendiri yang
-        // memutuskan tile mana yang muncul (lihat pwaHome / adminPanelUrl).
+        // Staf admin tanpa aplikasi PWA khusus (mis. admin_pesantren) → langsung
+        // ke panel administrasi /admin. Hub-nya hanya akan berisi satu tile panel,
+        // jadi mampir hub cuma menambah satu klik. Staf yang PUNYA aplikasi PWA
+        // (guru/keuangan/pimpinan/kasir) tetap melihat hub agar bisa memilih
+        // aplikasi vs panel.
+        $adminUrl = self::adminPanelUrl($user);
+        if ($adminUrl !== null && self::pwaHome($user) === null) {
+            return ['kind' => 'redirect', 'url' => $adminUrl];
+        }
+
+        // Staf dengan aplikasi PWA (dan fallback authenticated-tanpa-app) → hub.
         return ['kind' => 'hub'];
     }
 
