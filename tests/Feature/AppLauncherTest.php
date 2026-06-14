@@ -117,11 +117,14 @@ class AppLauncherTest extends TestCase
         $this->assertStringContainsString('/admin/keuangan/pwa', AppLauncher::pwaHome($u)['url']);
     }
 
-    public function test_admin_pesantren_hub_tanpa_pwa_khusus(): void
+    public function test_admin_pesantren_langsung_ke_admin_panel(): void
     {
         $this->boot();
         $u = $this->user(['admin_pesantren']);
-        $this->assertSame('hub', AppLauncher::primaryDestination($u)['kind']);
+        // Staf admin tanpa aplikasi PWA khusus → auto-redirect ke /admin (bukan hub).
+        $dest = AppLauncher::primaryDestination($u);
+        $this->assertSame('redirect', $dest['kind']);
+        $this->assertStringContainsString('/admin', $dest['url']);
         $this->assertNull(AppLauncher::pwaHome($u));
         $this->assertNotNull(AppLauncher::adminPanelUrl($u));
     }
@@ -144,13 +147,14 @@ class AppLauncherTest extends TestCase
         $this->assertNull(AppLauncher::websiteUrl());
     }
 
-    public function test_controller_guest_dikunci_ke_masuk(): void
+    public function test_controller_guest_render_login_di_root(): void
     {
         $this->boot();
         Auth::logout();
         $resp = app(LauncherController::class)();
-        $this->assertInstanceOf(RedirectResponse::class, $resp);
-        $this->assertStringContainsString('/masuk', $resp->getTargetUrl());
+        // Satu pintu: login bermerek dirender langsung di '/', bukan redirect ke /masuk.
+        $this->assertInstanceOf(View::class, $resp);
+        $this->assertSame('tenant.login', $resp->name());
     }
 
     public function test_controller_wali_auto_redirect(): void

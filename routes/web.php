@@ -35,8 +35,9 @@ Route::get('/caddy/ssl-check', function () {
 
 // Root: central landing (pesantren.online) atau PINTU SISTEM tenant (domain sistem).
 // Domain sistem tenant (mis. pesantren.asy-syifaa.com) = satu pintu terkunci login:
-// guest → /masuk; setelah login → diarahkan per peran (LauncherController +
-// App\Support\AppLauncher). Website publik = domain terpisah (type='website').
+// guest → login bermerek dirender langsung di '/'; setelah login → diarahkan per
+// peran (LauncherController + App\Support\AppLauncher). Website publik = domain
+// terpisah (type='website').
 Route::get('/', function () {
     if (in_array(request()->getHost(), config('tenancy.central_domains', []), true)) {
         return view('landing');
@@ -115,20 +116,22 @@ Route::get('/embed/widget.js', [EmbedWidgetController::class, 'script'])->name('
 Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('tenant.embed.data');
 
 // ── Satu pintu login (domain sistem) ──
-// Halaman login bermerek (islami, brand tenant) menggantikan launcher anonim.
-// Mengautentikasi guard `web` yang sama dgn panel Filament; sukses → '/' lalu
-// LauncherController mengarahkan sesuai peran. Akun wali/peserta dirutekan benar.
-Route::get('/masuk', [StaffLoginController::class, 'show'])->name('tenant.masuk.show');
+// Halaman login bermerek (islami, brand tenant) dirender di ROOT '/' oleh
+// LauncherController saat tamu. GET /masuk = alias lama → redirect ke '/'.
+// Form login mem-POST ke /masuk (store); sukses → '/' lalu LauncherController
+// mengarahkan sesuai peran (staf admin → /admin). Wali/peserta dirutekan benar.
+Route::get('/masuk', fn () => redirect('/'))->name('tenant.masuk.show');
 Route::post('/masuk', [StaffLoginController::class, 'store'])
     ->middleware('throttle:20,1')
     ->name('tenant.masuk.store');
 Route::post('/keluar', [StaffLoginController::class, 'logout'])->name('tenant.masuk.logout');
 
-// Fallback login route untuk middleware 'auth' pada route non-panel → satu pintu /masuk.
-// Catatan: JANGAN shadow GET /admin/login di sini — menimpa route login panel
-// Filament membuat redirect-guest /admin error 500. Unifikasi /admin/login → /masuk
-// harus lewat kustomisasi panel Filament (follow-up), bukan route web.
-Route::get('/login', fn () => redirect('/masuk'))->name('login');
+// Fallback login route untuk middleware 'auth' (termasuk redirect-guest panel
+// Filament tenant) → satu pintu di '/'. Login panel /admin/login DISATUKAN ke
+// '/' lewat kustomisasi Panel Filament (App\Filament\Pages\Auth\Login yang
+// redirect ke '/'), BUKAN shadow route web — menimpa GET /admin/login via route
+// web pernah membuat redirect-guest /admin error 500.
+Route::get('/login', fn () => redirect('/'))->name('login');
 
 // Portal peserta LAMA (/portal, panel Filament) sudah disatukan ke PWA /spmb.
 // Redirect semua /portal/* ke /spmb/login agar tautan/bookmark lama tetap berfungsi

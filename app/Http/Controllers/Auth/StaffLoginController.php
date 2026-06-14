@@ -16,13 +16,15 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 /**
- * Login bermerek "satu pintu" untuk domain sistem tenant (/masuk).
+ * Login bermerek "satu pintu" untuk domain sistem tenant. Halaman login
+ * dirender di ROOT '/' (oleh LauncherController saat tamu); GET /masuk hanya
+ * alias yang redirect ke '/'. Form mem-POST ke /masuk (tenant.masuk.store).
  *
  * Mengautentikasi guard `web` yang SAMA dengan panel Filament tenant (yang
  * tanpa MFA), lalu selalu kembali ke '/' agar LauncherController mengarahkan
- * sesuai peran. Akun wali/peserta yang memakai form ini tetap dirutekan benar
- * ke portalnya. CTA sekunder (Wali / PPDB) hanya berupa tautan ke alur OTP
- * yang sudah ada — tidak menduplikasi logika auth.
+ * sesuai peran (staf admin → /admin). Akun wali/peserta yang memakai form ini
+ * tetap dirutekan benar ke portalnya. CTA sekunder (Wali / PPDB) hanya berupa
+ * tautan ke alur login masing-masing — tidak menduplikasi logika auth.
  */
 class StaffLoginController extends Controller
 {
@@ -82,7 +84,8 @@ class StaffLoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->to('/masuk');
+        // Login terpusat di "/" (satu pintu) — kembalikan ke sana setelah keluar.
+        return redirect()->to('/');
     }
 
     private function routeOr(string $name, string $fallback): string

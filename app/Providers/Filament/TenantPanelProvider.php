@@ -261,7 +261,10 @@ class TenantPanelProvider extends PanelProvider
         }
 
         return $panel
-            ->login()
+            // Login panel DISATUKAN ke halaman bermerek di '/': page login bawaan
+            // /admin/login hanya redirect ke '/' (lihat App\Filament\Pages\Auth\Login).
+            // Aman — mengganti page class, BUKAN shadow route web (yang dulu 500).
+            ->login(\App\Filament\Pages\Auth\Login::class)
             ->passwordReset()
             ->profile()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
