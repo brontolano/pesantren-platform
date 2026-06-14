@@ -41,14 +41,31 @@ const sections = computed(() => Object.entries(props.biodataSections)
     }))
     .filter((s) => s.fields.length > 0));
 
-const alamatRequired = computed(() => props.fieldConfiguration.provinsi?.mode === 'required');
-
 // Form: seed dari nilai biodata saat ini (candidate.values), hanya field terlihat.
 const form = useForm(
     Object.fromEntries(visibleFields.map((f) => [f.key, props.candidate.values?.[f.key] ?? ''])),
 );
 
 const canEdit = computed(() => props.candidate.canEditBiodata);
+
+// Scope alamat dari key field level-provinsi: 'provinsi'→'' , 'provinsi_ayah'→'_ayah'.
+const scope = (key) => key.replace('provinsi', '');
+
+// Sumber yang bisa disalin alamatnya ke pihak tertentu.
+const copySources = (pihak) => ({
+    ayah: [{ scope: '', label: 'Domisili Santri' }],
+    ibu: [{ scope: '', label: 'Domisili Santri' }, { scope: '_ayah', label: 'Ayah' }],
+    wali: [{ scope: '', label: 'Domisili Santri' }, { scope: '_ayah', label: 'Ayah' }, { scope: '_ibu', label: 'Ibu' }],
+}[pihak] ?? []);
+
+const ALAMAT_BASES = ['alamat', 'rt_rw', 'provinsi', 'kabupaten_kota', 'kecamatan', 'desa_kelurahan', 'kode_pos'];
+const copyAlamat = (fromScope, toPihak) => {
+    if (!canEdit.value) return;
+    const toScope = `_${toPihak}`;
+    ALAMAT_BASES.forEach((base) => {
+        form[base + toScope] = form[base + fromScope] ?? '';
+    });
+};
 
 const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
 </script>
@@ -153,16 +170,39 @@ const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
                     >
                         <div class="grid grid-cols-1 gap-4">
                             <template v-for="f in sec.fields" :key="f.key">
-                                <!-- Cascade wilayah: dirender sekali di posisi 'provinsi' -->
+                                <!-- Bar "salin alamat" di atas blok alamat ayah/ibu/wali -->
+                                <div
+                                    v-if="f.key === 'alamat_' + sec.key && copySources(sec.key).length"
+                                    class="flex flex-wrap items-center gap-2 rounded-xl bg-stone-100 px-3 py-2"
+                                >
+                                    <span class="text-[12px] font-medium text-stone-600">Salin alamat dari:</span>
+                                    <button
+                                        v-for="src in copySources(sec.key)"
+                                        :key="src.scope"
+                                        type="button"
+                                        :disabled="!canEdit"
+                                        class="rounded-full border border-stone-300 bg-white px-3 py-1 text-[12px] font-medium text-[var(--spmb-primary)] transition active:bg-stone-50 disabled:opacity-50"
+                                        @click="copyAlamat(src.scope, sec.key)"
+                                    >
+                                        {{ src.label }}
+                                    </button>
+                                </div>
+
+                                <!-- Cascade wilayah: dirender sekali di posisi 'provinsi' (ber-scope per pihak) -->
                                 <WilayahCascade
                                     v-if="f.type === 'wilayah' && f.wilayah === 'provinsi'"
-                                    v-model:provinsi="form.provinsi"
-                                    v-model:kabupaten-kota="form.kabupaten_kota"
-                                    v-model:kecamatan="form.kecamatan"
-                                    v-model:desa-kelurahan="form.desa_kelurahan"
-                                    :required="alamatRequired"
+                                    :scope="scope(f.key)"
+                                    :provinsi="form['provinsi' + scope(f.key)]"
+                                    :kabupaten-kota="form['kabupaten_kota' + scope(f.key)]"
+                                    :kecamatan="form['kecamatan' + scope(f.key)]"
+                                    :desa-kelurahan="form['desa_kelurahan' + scope(f.key)]"
+                                    :required="f.mode === 'required'"
                                     :disabled="!canEdit"
                                     :errors="form.errors"
+                                    @update:provinsi="(v) => (form['provinsi' + scope(f.key)] = v)"
+                                    @update:kabupaten-kota="(v) => (form['kabupaten_kota' + scope(f.key)] = v)"
+                                    @update:kecamatan="(v) => (form['kecamatan' + scope(f.key)] = v)"
+                                    @update:desa-kelurahan="(v) => (form['desa_kelurahan' + scope(f.key)] = v)"
                                 />
                                 <template v-else-if="f.type === 'wilayah'" />
                                 <MdField

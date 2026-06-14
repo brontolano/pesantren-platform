@@ -130,6 +130,12 @@ class PesertaPortalDashboardTest extends TestCase
                 'hubungan_wali' => 'Ibu Kandung',
                 'no_hp_wali' => '081234567890',
                 'email_wali' => 'ortu@contoh.id',
+                // Alamat domisili ayah (opsional, terpisah)
+                'alamat_ayah' => 'Jl. Ayah No. 9',
+                'provinsi_ayah' => 'Jawa Barat',
+                'kabupaten_kota_ayah' => 'Kabupaten Subang',
+                // Penanggung biaya
+                'pembiaya' => 'Ayah',
                 // Kesehatan (opsional)
                 'golongan_darah' => 'O',
                 // Field 'staf' — TIDAK boleh tertulis oleh peserta.
@@ -162,6 +168,9 @@ class PesertaPortalDashboardTest extends TestCase
         $this->assertSame('Ibu Kandung', $updated->hubungan_wali);
         $this->assertSame('081234567890', $updated->no_hp_wali);
         $this->assertSame('ortu@contoh.id', $updated->email_wali);
+        $this->assertSame('Jl. Ayah No. 9', $updated->alamat_ayah);
+        $this->assertSame('Jawa Barat', $updated->provinsi_ayah);
+        $this->assertSame('Ayah', $updated->pembiaya);
         $this->assertSame('O', $updated->golongan_darah);
 
         // Field 'staf' DIABAIKAN — peserta tidak bisa menulis NISN.
