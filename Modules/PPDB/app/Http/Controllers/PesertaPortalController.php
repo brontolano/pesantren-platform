@@ -56,6 +56,22 @@ class PesertaPortalController extends Controller
     }
 
     /**
+     * Halaman pengisian Biodata TERPISAH (wizard bertahap) — layar fokus, lepas
+     * dari Beranda agar tidak padat. Memakai payload & konfigurasi field yang sama.
+     */
+    public function biodata(Request $request): Response
+    {
+        $calon = $this->resolveOwnedCandidate($request->user());
+        $fieldConfiguration = $this->fieldConfigurationService->getConfiguration();
+
+        return Inertia::render('PPDB/Portal/Biodata', [
+            'candidate' => $this->buildCandidatePayload($calon, $fieldConfiguration),
+            'fieldConfiguration' => $fieldConfiguration,
+            'biodataSections' => PpdbBiodataFields::SECTIONS,
+        ]);
+    }
+
+    /**
      * DASH-3 — timeline riwayat aktivitas peserta (event nyata bertanggal,
      * urut terbaru dulu). Melengkapi stepper (status) dengan jejak aksi.
      *
@@ -564,8 +580,10 @@ class PesertaPortalController extends Controller
                 continue; // hidden & staf: di luar jangkauan peserta
             }
 
-            $prefix = $mode === 'required' ? 'required' : 'nullable';
-            $rules[$key] = [$prefix, ...$def['rules']];
+            // SEMUA field 'nullable' agar wizard bisa SIMPAN PROGRES sebagian
+            // (anti data hilang). Kelengkapan field wajib tetap dilacak & ditampilkan
+            // (countCompletedRequiredFields), bukan dipaksakan saat simpan.
+            $rules[$key] = ['nullable', ...$def['rules']];
         }
 
         return $rules;

@@ -80,6 +80,29 @@ class PesertaPortalDashboardTest extends TestCase
         $response->assertSee('Ahmad Peserta');
     }
 
+    public function test_biodata_wizard_page_renders_for_owned_peserta(): void
+    {
+        tenancy()->initialize($this->tenant);
+        $user = $this->makePeserta('biodata@spmb.test');
+        $this->makeCandidate($user, [
+            'nomor_pendaftaran' => 'PPDB-2026-505',
+            'nama' => 'Calon Biodata',
+        ]);
+        tenancy()->end();
+
+        $response = $this
+            ->actingAs($user)
+            ->withHeaders(['X-Inertia' => 'true', 'X-Requested-With' => 'XMLHttpRequest'])
+            ->call('GET', "http://{$this->host}/spmb/biodata", [], [], [], [
+                'HTTP_HOST' => $this->host,
+                'SERVER_NAME' => $this->host,
+            ]);
+
+        $response->assertOk();
+        $response->assertSee('PPDB\\/Portal\\/Biodata', false);
+        $response->assertSee('PPDB-2026-505');
+    }
+
     public function test_peserta_can_update_own_biodata_into_real_columns(): void
     {
         tenancy()->initialize($this->tenant);
