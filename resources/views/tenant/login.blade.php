@@ -5,56 +5,71 @@
     <style>
         body{display:flex}
         .split{display:flex;width:100%;min-height:100dvh}
-        /* ── Panel kiri (hero hijau) — desktop saja ── */
-        .aside{position:relative;display:none;flex:1.25;overflow:hidden;color:#fff;padding:56px 52px;
+
+        /* ══ Panel kiri: HERO (3/4 lebar, layar lebar saja) ══ */
+        .aside{position:relative;display:none;flex:3;overflow:hidden;color:#fff;
             background:linear-gradient(160deg,var(--brand) 0%,var(--brand-strong) 100%)}
-        .aside .mosque{position:absolute;left:0;right:0;bottom:0;z-index:1;color:rgba(255,255,255,.10)}
-        .aside .content{position:relative;z-index:2;display:flex;flex-direction:column;height:100%}
+        /* halo emas di belakang figur */
+        .aside .glow{position:absolute;left:2%;bottom:12%;width:42%;height:58%;z-index:1;pointer-events:none;
+            background:radial-gradient(circle at 50% 50%,rgba(201,162,74,.30),transparent 68%);filter:blur(8px)}
+        /* foto pengasuh — NEMPEL ke dasar panel (grounded) */
+        .aside .abuya{position:absolute;left:1.5%;bottom:0;height:min(80vh,640px);width:auto;z-index:2;
+            object-fit:contain;object-position:bottom;filter:drop-shadow(0 18px 38px rgba(0,0,0,.38));pointer-events:none}
+        /* scrim: dasar dipekatkan agar pinggang membaur ke hijau (tak terlihat kepotong) */
+        .aside .scrim{position:absolute;left:0;right:0;bottom:0;height:30%;z-index:3;pointer-events:none;
+            background:linear-gradient(to top,var(--brand-strong) 0%,transparent 100%)}
+        .aside .content{position:relative;z-index:4;display:flex;flex-direction:column;height:100%;padding:56px}
         .aside .brand{display:flex;align-items:center;gap:14px}
-        .aside .brandmark{width:58px;height:58px;padding:7px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-        .aside .pname{font-weight:800;font-size:1.15rem;line-height:1.25}
-        .aside .hero{margin-top:auto}
-        .aside .bismillah{font-size:1.45rem;opacity:.92;margin-bottom:18px}
-        .aside h2{font-size:clamp(1.5rem,2.4vw,2.05rem);font-weight:800;line-height:1.2;letter-spacing:-.01em}
-        .aside .lead{margin-top:12px;opacity:.85;font-size:.95rem;max-width:38ch;line-height:1.6}
-        .aside .orn{margin-top:26px;max-width:280px}
-        /* ── Panel kanan (form) ── */
-        .main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 22px}
-        .card{width:100%;max-width:398px}
+        .aside .brandmark{width:60px;height:60px;padding:7px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+        .aside .pname{font-weight:800;font-size:1.3rem;line-height:1.25}
+        .aside .hero{margin:auto 0 auto auto;max-width:26rem;text-align:left}
+        .aside .bismillah{font-size:1.7rem;margin-bottom:16px;color:var(--gold-soft)}
+        .aside h2{font-size:clamp(1.9rem,2.8vw,2.7rem);font-weight:800;line-height:1.15;letter-spacing:-.01em}
+        .aside .lead{margin-top:14px;opacity:.86;font-size:1.05rem;max-width:42ch;line-height:1.6}
+        .aside .orn{margin-top:28px;max-width:300px}
+
+        /* ══ Panel kanan: FORM (1/4 lebar) ══ */
+        .main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 22px}
+        .card{width:100%;max-width:380px}
         .top{text-align:center}
-        .top .brandmark{width:72px;height:72px;margin:0 auto 14px;padding:9px;box-shadow:var(--shadow-soft);border:1px solid var(--border)}
-        .top h1{font-size:1.1rem;font-weight:800}
-        .top .sub{font-size:.85rem;color:var(--muted);margin-top:3px}
-        form{margin-top:22px;display:flex;flex-direction:column;gap:14px}
-        .field label{display:block;font-size:.8rem;font-weight:600;margin-bottom:6px}
+        .top .brandmark{width:68px;height:68px;margin:0 auto 14px;padding:9px;box-shadow:var(--shadow-soft);border:1px solid var(--border)}
+        .top h1{font-size:1.2rem;font-weight:800}
+        .top .sub{font-size:.82rem;color:var(--muted);margin-top:3px}
+        form{margin-top:22px;display:flex;flex-direction:column;gap:13px}
+        .field label{display:block;font-size:.78rem;font-weight:600;margin-bottom:6px}
         .field input{width:100%;border:1px solid var(--border);background:#fff;border-radius:13px;padding:12px 14px;
-            font-size:.95rem;font-family:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+            font-size:.93rem;font-family:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s}
         .field input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
-        .remember{display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--muted);font-weight:500;cursor:pointer}
+        .remember{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted);font-weight:500;cursor:pointer}
         .remember input{width:16px;height:16px;accent-color:var(--brand)}
-        .err{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:11px;padding:10px 13px;font-size:.83rem;margin-top:18px}
-        .btn{appearance:none;border:none;cursor:pointer;width:100%;border-radius:9999px;padding:13px 18px;font-size:.96rem;
+        .err{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:11px;padding:10px 13px;font-size:.82rem;margin-top:16px}
+        .btn{appearance:none;border:none;cursor:pointer;width:100%;border-radius:9999px;padding:13px;font-size:.95rem;
             font-weight:700;font-family:inherit;color:#fff;min-height:48px;box-shadow:var(--shadow-brand);
             background:linear-gradient(135deg,var(--brand),var(--brand-strong));transition:transform .15s}
         .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0)}
         .alt{margin-top:24px}
-        .alt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+        .alt-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
         .alt-card{display:flex;flex-direction:column;gap:3px;border:1px solid var(--border);border-radius:14px;
-            padding:12px 13px;background:#fff;transition:border-color .15s,transform .15s}
+            padding:11px 13px;background:#fff;transition:border-color .15s,transform .15s}
         .alt-card:hover{border-color:var(--gold);transform:translateY(-2px)}
-        .alt-card .ttl{font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:7px}
+        .alt-card .ttl{font-weight:700;font-size:.84rem;display:flex;align-items:center;gap:7px}
         .alt-card .ds{font-size:.71rem;color:var(--muted);line-height:1.35}
         .alt-card svg{width:18px;height:18px;stroke:var(--brand);fill:none;stroke-width:1.6;flex-shrink:0}
-        footer{margin-top:26px;text-align:center;font-size:.72rem;color:var(--muted)}
+        footer{margin-top:24px;text-align:center;font-size:.71rem;color:var(--muted)}
         footer a{color:var(--brand);font-weight:600}
-        @media(min-width:900px){.aside{display:block}}
+
+        @media(min-width:1200px){.aside{display:block}}
     </style>
 </head>
 <body>
 <div class="split">
     <aside class="aside">
-        @include('tenant.partials.islamic-bg', ['id' => 'pat-login', 'color' => '#ffffff', 'opacity' => 0.07])
-        <div class="mosque">@include('tenant.partials.mosque')</div>
+        @include('tenant.partials.islamic-bg', ['id' => 'pat-login', 'color' => '#ffffff', 'opacity' => 0.06])
+        <div class="glow"></div>
+        @if (! empty($heroImageUrl))
+            <img class="abuya" src="{{ $heroImageUrl }}" alt="" aria-hidden="true">
+        @endif
+        <div class="scrim"></div>
         <div class="content">
             <div class="brand">
                 <div class="brandmark">@include('tenant.partials.brandmark', ['logoUrl' => $logoUrl, 'pesantren' => $pesantren])</div>

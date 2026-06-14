@@ -46,6 +46,30 @@ final class TenantBranding
         return url('/_tenant-storage/' . ltrim($path, '/'));
     }
 
+    /**
+     * URL foto/figur hero untuk halaman login (mis. foto pengasuh), atau null.
+     * Sumber: Setting `branding_hero_image` — boleh URL absolut, path absolut
+     * (aset statis di public/), atau path disk tenant (di-serve /_tenant-storage).
+     */
+    public static function heroImageUrl(): ?string
+    {
+        try {
+            $path = Setting::getTenantStringValue('branding_hero_image', null);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($path === null || trim($path) === '') {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return url('/_tenant-storage/' . ltrim($path, '/'));
+    }
+
     public static function name(string $default = 'Pesantren'): string
     {
         try {

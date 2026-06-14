@@ -35,6 +35,7 @@ class StaffLoginController extends Controller
         return view('tenant.login', [
             'pesantren' => TenantBranding::name(tenant()?->name ?? 'Portal Pesantren'),
             'logoUrl' => TenantBranding::logoUrl(),
+            'heroImageUrl' => TenantBranding::heroImageUrl(),
             'primaryColor' => TenantBranding::primaryColor('#0f5132'),
             'waliLoginUrl' => $this->routeOr('tenant.portal-wali.auth.login', '/wali/login'),
             'ppdbUrl' => $this->routeOr('spmb.login', '/spmb/login'),
