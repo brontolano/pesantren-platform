@@ -1,17 +1,14 @@
 <script setup>
-import { computed, reactive } from 'vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+// Beranda Portal SPMB — HUB ringkas (bukan tempat isi form). Form biodata pindah
+// ke halaman fokus /spmb/biodata (wizard). Beranda menampilkan status, progres,
+// dan jalan pintas ke aksi penting.
+import { Head, Link } from '@inertiajs/vue3';
 import SpmbLayout from '@/Layouts/SpmbLayout.vue';
 import MdCard from '@/spmb/components/MdCard.vue';
 import MdButton from '@/spmb/components/MdButton.vue';
-import MdField from '@/spmb/components/MdField.vue';
-import FormSection from '@/spmb/components/FormSection.vue';
-import WilayahCascade from '@/spmb/components/WilayahCascade.vue';
 
 const props = defineProps({
     candidate: { type: Object, required: true },
-    fieldConfiguration: { type: Object, required: true },
-    biodataSections: { type: Object, required: true },
     statusCard: { type: Object, required: true },
     stepper: { type: Array, required: true },
     timeline: { type: Array, default: () => [] },
@@ -19,95 +16,42 @@ const props = defineProps({
     mainAction: { type: Object, required: true },
     tracking: { type: Object, required: true },
     bolehDaftarUlang: { type: Boolean, default: false },
+    // diterima dari controller, tak dipakai di hub (dipakai di halaman biodata)
+    fieldConfiguration: { type: Object, default: () => ({}) },
+    biodataSections: { type: Object, default: () => ({}) },
 });
 
-const SECTION_ICONS = {
-    pribadi: '🧑', alamat: '📍', pendidikan: '🎓',
-    ayah: '👨', ibu: '👩', wali: '🧑‍🤝‍🧑', kesehatan: '❤️',
+const pct = () => {
+    const { filled = 0, total = 0 } = props.candidate.completion ?? {};
+    return total > 0 ? Math.round((filled / total) * 100) : 0;
 };
 
-// Field yang TERLIHAT peserta (mode required|optional). hidden/staf disembunyikan.
-const visibleFields = Object.entries(props.fieldConfiguration)
-    .filter(([, d]) => d.mode === 'required' || d.mode === 'optional')
-    .map(([key, d]) => ({ key, ...d }));
-
-// Section terurut + field-nya (hanya yang punya field terlihat).
-const sections = computed(() => Object.entries(props.biodataSections)
-    .map(([key, title]) => ({
-        key,
-        title,
-        icon: SECTION_ICONS[key] ?? '•',
-        fields: visibleFields.filter((f) => f.section === key),
-    }))
-    .filter((s) => s.fields.length > 0));
-
-// Form: seed dari nilai biodata saat ini (candidate.values), hanya field terlihat.
-const form = useForm(
-    Object.fromEntries(visibleFields.map((f) => [f.key, props.candidate.values?.[f.key] ?? ''])),
-);
-
-const canEdit = computed(() => props.candidate.canEditBiodata);
-
-// Scope alamat dari key field level-provinsi: 'provinsi'→'' , 'provinsi_ayah'→'_ayah'.
-const scope = (key) => key.replace('provinsi', '');
-
-// Sumber alamat yang bisa disalin ke pihak tertentu (key, label, scope kolom).
-const copySources = (pihak) => ({
-    ayah: [{ key: 'santri', label: 'Domisili Santri', scope: '' }],
-    ibu: [{ key: 'santri', label: 'Domisili Santri', scope: '' }, { key: 'ayah', label: 'Ayah', scope: '_ayah' }],
-    wali: [{ key: 'santri', label: 'Domisili Santri', scope: '' }, { key: 'ayah', label: 'Ayah', scope: '_ayah' }, { key: 'ibu', label: 'Ibu', scope: '_ibu' }],
-}[pihak] ?? []);
-
-// Pilihan "Alamat sama dengan" per pihak (indikator + pemicu salin).
-const alamatSama = reactive({ ayah: '', ibu: '', wali: '' });
-
-const ALAMAT_BASES = ['alamat', 'rt_rw', 'provinsi', 'kabupaten_kota', 'kecamatan', 'desa_kelurahan', 'kode_pos'];
-const copyAlamat = (fromScope, toPihak) => {
-    if (!canEdit.value) return;
-    const toScope = `_${toPihak}`;
-    ALAMAT_BASES.forEach((base) => {
-        form[base + toScope] = form[base + fromScope] ?? '';
-    });
-};
-
-// Pilih "alamat sama dengan X" → salin alamat X ke pihak ini. Kosong = isi manual.
-const onSamaDengan = (pihak, key) => {
-    alamatSama[pihak] = key;
-    const src = copySources(pihak).find((s) => s.key === key);
-    if (src) copyAlamat(src.scope, pihak);
-};
-
-const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
+const quickLinks = [
+    { href: '/spmb/berkas', icon: '📄', label: 'Berkas' },
+    { href: '/spmb/tagihan', icon: '🧾', label: 'Tagihan' },
+    { href: '/spmb/kartu-ujian', icon: '🪪', label: 'Kartu Ujian' },
+    { href: '/spmb/pengumuman', icon: '📣', label: 'Pengumuman' },
+];
 </script>
 
 <template>
     <Head :title="`Portal SPMB ${candidate.nomorPendaftaran}`" />
 
-    <SpmbLayout brand-header :subtitle="candidate.statusCardSubtitle">
+    <SpmbLayout brand-header>
         <div class="space-y-4">
             <!-- Hero status -->
             <MdCard>
-                <div class="flex items-start justify-between gap-3">
-                    <div class="min-w-0">
-                        <span class="inline-flex rounded-full bg-[var(--spmb-primary)]/12 px-2.5 py-1 text-[11px] font-semibold text-[var(--spmb-primary)]">
-                            {{ statusCard.badge }}
-                        </span>
-                        <h1 class="mt-2 text-lg font-bold leading-snug text-stone-900">{{ statusCard.title }}</h1>
-                        <p class="mt-1 text-[13px] leading-relaxed text-stone-600">{{ statusCard.description }}</p>
-                    </div>
+                <div class="mb-2 flex items-center justify-between gap-2">
+                    <span class="inline-flex rounded-full bg-[var(--spmb-primary)]/12 px-2.5 py-1 text-[11px] font-semibold text-[var(--spmb-primary)]">
+                        {{ statusCard.badge }}
+                    </span>
+                    <span class="truncate text-[12px] font-medium text-stone-500">Calon: {{ candidate.nama }}</span>
                 </div>
-                <div class="mt-4 grid grid-cols-2 gap-2">
-                    <div class="rounded-xl bg-stone-900 px-3 py-2.5 text-white">
-                        <div class="text-[10px] uppercase tracking-wider text-white/60">No. Pendaftaran</div>
-                        <div class="mt-0.5 text-[15px] font-bold">{{ candidate.nomorPendaftaran }}</div>
-                    </div>
-                    <div class="rounded-xl bg-stone-100 px-3 py-2.5">
-                        <div class="text-[10px] uppercase tracking-wider text-stone-500">Kelengkapan</div>
-                        <div class="mt-0.5 text-[15px] font-bold text-stone-900">
-                            {{ candidate.completion.filled }} / {{ candidate.completion.total }}
-                            <span class="text-[11px] font-medium text-stone-500">wajib</span>
-                        </div>
-                    </div>
+                <h1 class="mt-2 text-lg font-bold leading-snug text-stone-900">{{ statusCard.title }}</h1>
+                <p class="mt-1 text-[13px] leading-relaxed text-stone-600">{{ statusCard.description }}</p>
+                <div class="mt-3 inline-flex items-center gap-2 rounded-xl bg-stone-900 px-3 py-2 text-white">
+                    <span class="text-[10px] uppercase tracking-wider text-white/60">No. Pendaftaran</span>
+                    <span class="text-[14px] font-bold">{{ candidate.nomorPendaftaran }}</span>
                 </div>
             </MdCard>
 
@@ -119,13 +63,38 @@ const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
                 </div>
             </Link>
 
-            <!-- Aksi cepat (yang tak ada di bottom nav) -->
-            <div class="grid grid-cols-2 gap-3">
-                <Link href="/spmb/kartu-ujian" class="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-3 py-3 text-[13px] font-medium text-stone-800 shadow-sm active:bg-stone-50">
-                    <span class="text-lg">🪪</span> Kartu Ujian
-                </Link>
-                <Link href="/spmb/pengumuman" class="flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-3 py-3 text-[13px] font-medium text-stone-800 shadow-sm active:bg-stone-50">
-                    <span class="text-lg">📣</span> Pengumuman
+            <!-- CTA UTAMA: Lengkapi Biodata (ke halaman wizard) -->
+            <Link href="/spmb/biodata" class="block">
+                <MdCard>
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="min-w-0">
+                            <h2 class="text-[15px] font-bold text-stone-900">Biodata peserta</h2>
+                            <p class="mt-0.5 text-[12px] text-stone-500">
+                                {{ candidate.completion.filled }} / {{ candidate.completion.total }} data wajib terisi
+                            </p>
+                        </div>
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--spmb-primary)] text-white">
+                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6" /></svg>
+                        </span>
+                    </div>
+                    <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-stone-200">
+                        <div class="h-full rounded-full bg-[var(--spmb-primary)] transition-all" :style="{ width: pct() + '%' }" />
+                    </div>
+                    <p class="mt-2 text-[12px] font-medium text-[var(--spmb-primary)]">
+                        {{ pct() < 100 ? 'Ketuk untuk lengkapi biodata →' : 'Biodata lengkap — ketuk untuk meninjau →' }}
+                    </p>
+                </MdCard>
+            </Link>
+
+            <!-- Aksi cepat (bento) -->
+            <div class="grid grid-cols-4 gap-2">
+                <Link
+                    v-for="q in quickLinks"
+                    :key="q.href"
+                    :href="q.href"
+                    class="flex flex-col items-center gap-1 rounded-2xl border border-stone-200 bg-white px-1 py-3 text-[11px] font-medium text-stone-700 shadow-sm active:bg-stone-50"
+                >
+                    <span class="text-xl">{{ q.icon }}</span> {{ q.label }}
                 </Link>
             </div>
 
@@ -134,107 +103,21 @@ const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
                 <h2 class="mb-2 px-1 text-[13px] font-semibold text-stone-500">Tahap pendaftaran</h2>
                 <div class="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1" style="scrollbar-width: none">
                     <div
-                        v-for="(step, index) in stepper"
-                        :key="step.title"
+                        v-for="(stepItem, index) in stepper"
+                        :key="stepItem.title"
                         class="w-32 shrink-0 rounded-2xl border px-3 py-3"
                         :class="{
-                            'border-[var(--spmb-primary)]/30 bg-[var(--spmb-primary)]/8': step.state === 'current',
-                            'border-stone-200 bg-white': step.state === 'upcoming',
-                            'border-stone-900 bg-stone-900 text-white': step.state === 'done',
+                            'border-[var(--spmb-primary)]/30 bg-[var(--spmb-primary)]/8': stepItem.state === 'current',
+                            'border-stone-200 bg-white': stepItem.state === 'upcoming',
+                            'border-stone-900 bg-stone-900 text-white': stepItem.state === 'done',
                         }"
                     >
-                        <div class="text-[10px] font-semibold uppercase tracking-wide" :class="step.state === 'done' ? 'text-white/50' : 'text-stone-400'">
+                        <div class="text-[10px] font-semibold uppercase tracking-wide" :class="stepItem.state === 'done' ? 'text-white/50' : 'text-stone-400'">
                             Tahap {{ index + 1 }}
                         </div>
-                        <div class="mt-1 text-[13px] font-bold leading-tight">{{ step.title }}</div>
+                        <div class="mt-1 text-[13px] font-bold leading-tight">{{ stepItem.title }}</div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Biodata peserta (form bertahap) -->
-            <div id="biodata-form" class="space-y-3">
-                <div class="flex items-center justify-between px-1">
-                    <h2 class="text-base font-bold text-stone-900">Biodata peserta</h2>
-                    <span v-if="!canEdit" class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-800">
-                        Terkunci
-                    </span>
-                </div>
-                <p class="px-1 text-[13px] leading-relaxed text-stone-600">
-                    Lengkapi data ini sejujur-jujurnya. Panitia memakai data yang Anda isi di sini.
-                </p>
-
-                <form class="space-y-3" @submit.prevent="submit">
-                    <div v-if="Object.keys(form.errors).length" class="rounded-2xl border border-red-200 bg-red-50 p-3.5 text-[13px] text-red-700">
-                        <p class="font-semibold">Periksa kembali isian berikut:</p>
-                        <ul class="mt-1.5 list-disc pl-5">
-                            <li v-for="(message, field) in form.errors" :key="field">{{ message }}</li>
-                        </ul>
-                    </div>
-
-                    <FormSection
-                        v-for="(sec, idx) in sections"
-                        :key="sec.key"
-                        :title="sec.title"
-                        :icon="sec.icon"
-                        :default-open="idx === 0"
-                    >
-                        <div class="grid grid-cols-1 gap-4">
-                            <template v-for="f in sec.fields" :key="f.key">
-                                <!-- "Alamat sama dengan" — di atas blok alamat ayah/ibu/wali -->
-                                <div
-                                    v-if="f.key === 'alamat_' + sec.key && copySources(sec.key).length"
-                                    class="rounded-xl bg-stone-100 px-3 py-3"
-                                >
-                                    <MdField
-                                        type="select"
-                                        label="Alamat sama dengan"
-                                        :model-value="alamatSama[sec.key]"
-                                        :options="copySources(sec.key).map((s) => ({ value: s.key, label: s.label }))"
-                                        :disabled="!canEdit"
-                                        help="Pilih untuk menyalin alamat tersebut ke sini. Biarkan kosong untuk isi manual."
-                                        @update:model-value="(v) => onSamaDengan(sec.key, v)"
-                                    />
-                                </div>
-
-                                <!-- Cascade wilayah: dirender sekali di posisi 'provinsi' (ber-scope per pihak) -->
-                                <WilayahCascade
-                                    v-if="f.type === 'wilayah' && f.wilayah === 'provinsi'"
-                                    :scope="scope(f.key)"
-                                    :provinsi="form['provinsi' + scope(f.key)]"
-                                    :kabupaten-kota="form['kabupaten_kota' + scope(f.key)]"
-                                    :kecamatan="form['kecamatan' + scope(f.key)]"
-                                    :desa-kelurahan="form['desa_kelurahan' + scope(f.key)]"
-                                    :required="f.mode === 'required'"
-                                    :disabled="!canEdit"
-                                    :errors="form.errors"
-                                    @update:provinsi="(v) => (form['provinsi' + scope(f.key)] = v)"
-                                    @update:kabupaten-kota="(v) => (form['kabupaten_kota' + scope(f.key)] = v)"
-                                    @update:kecamatan="(v) => (form['kecamatan' + scope(f.key)] = v)"
-                                    @update:desa-kelurahan="(v) => (form['desa_kelurahan' + scope(f.key)] = v)"
-                                />
-                                <template v-else-if="f.type === 'wilayah'" />
-                                <MdField
-                                    v-else
-                                    v-model="form[f.key]"
-                                    :type="f.type"
-                                    :label="f.label"
-                                    :options="f.options || []"
-                                    :required="f.mode === 'required'"
-                                    :disabled="!canEdit"
-                                    :placeholder="f.placeholder || ''"
-                                    :help="f.help || ''"
-                                    :error="form.errors[f.key]"
-                                />
-                            </template>
-                        </div>
-                    </FormSection>
-
-                    <div class="sticky bottom-2 z-10 pt-1">
-                        <MdButton type="submit" :loading="form.processing" :disabled="!canEdit">
-                            {{ form.processing ? 'Menyimpan…' : 'Simpan biodata' }}
-                        </MdButton>
-                    </div>
-                </form>
             </div>
 
             <!-- Checklist -->
@@ -278,7 +161,6 @@ const submit = () => form.put('/spmb/biodata', { preserveScroll: true });
                 <p class="mt-1 text-[12px] leading-relaxed text-stone-500">
                     Tautan ini hanya untuk melihat status ringkas. Mengubah biodata atau unggah dokumen tetap wajib login.
                 </p>
-                <div class="mt-3 break-all rounded-xl bg-stone-100 px-3 py-2.5 text-[12px] text-stone-700">{{ tracking.url }}</div>
                 <a :href="tracking.url" target="_blank" rel="noopener noreferrer" class="mt-3 block">
                     <MdButton variant="tonal">Buka link status</MdButton>
                 </a>

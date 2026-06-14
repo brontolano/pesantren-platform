@@ -141,6 +141,8 @@ Route::middleware([
         Route::post('/tagihan/{tagihan}/bukti', [PesertaPortalController::class, 'uploadBukti'])
             ->whereNumber('tagihan')
             ->name('tagihan.bukti');
+        Route::get('/biodata', [PesertaPortalController::class, 'biodata'])
+            ->name('biodata');
         Route::put('/biodata', [PesertaPortalController::class, 'updateBiodata'])
             ->name('biodata.update');
 
