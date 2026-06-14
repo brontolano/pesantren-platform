@@ -125,8 +125,14 @@ Route::post('/masuk', [StaffLoginController::class, 'store'])
 Route::post('/keluar', [StaffLoginController::class, 'logout'])->name('tenant.masuk.logout');
 
 // Fallback login route untuk middleware 'auth' pada route non-panel → satu pintu /masuk.
-// (Unifikasi /admin/login Filament menyusul via kustomisasi panel.)
 Route::get('/login', fn () => redirect('/masuk'))->name('login');
+
+// Satu pintu ke PANEL ADMIN: Filament mengarahkan guest /admin → /admin/login;
+// kita belokkan ke login utama bermerek (/masuk). intended=/admin dipertahankan,
+// jadi sesudah login langsung masuk panel. Pada domain central → /platform/login.
+Route::get('/admin/login', fn () => in_array(request()->getHost(), config('tenancy.central_domains', []), true)
+    ? redirect('/platform/login')
+    : redirect('/masuk'));
 
 // Portal peserta LAMA (/portal, panel Filament) sudah disatukan ke PWA /spmb.
 // Redirect semua /portal/* ke /spmb/login agar tautan/bookmark lama tetap berfungsi

@@ -6,7 +6,7 @@
         body{display:flex}
         .split{display:flex;width:100%;min-height:100dvh}
         /* ── Panel kiri (hero hijau) — desktop saja ── */
-        .aside{position:relative;display:none;flex:1.05;overflow:hidden;color:#fff;padding:56px 52px;
+        .aside{position:relative;display:none;flex:1.25;overflow:hidden;color:#fff;padding:56px 52px;
             background:linear-gradient(160deg,var(--brand) 0%,var(--brand-strong) 100%)}
         .aside .mosque{position:absolute;left:0;right:0;bottom:0;z-index:1;color:rgba(255,255,255,.10)}
         .aside .content{position:relative;z-index:2;display:flex;flex-direction:column;height:100%}
