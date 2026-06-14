@@ -129,6 +129,19 @@ class AppLauncherTest extends TestCase
         $this->assertNotNull(AppLauncher::adminPanelUrl($u));
     }
 
+    public function test_super_admin_ke_admin_panel_bukan_wali(): void
+    {
+        $this->boot();
+        // super_admin dapat Gate::before "boleh segalanya" → can('view_own_children')
+        // SELALU true. Pastikan TIDAK nyasar ke /wali, melainkan langsung ke /admin.
+        $u = $this->user(['super_admin']);
+        $this->assertTrue($u->can('view_own_children'), 'precondition: super_admin bypass aktif');
+        $dest = AppLauncher::primaryDestination($u);
+        $this->assertSame('redirect', $dest['kind']);
+        $this->assertStringContainsString('/admin', $dest['url']);
+        $this->assertStringNotContainsString('/wali', $dest['url']);
+    }
+
     public function test_admin_panel_null_untuk_wali(): void
     {
         $this->boot();

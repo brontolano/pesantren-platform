@@ -71,7 +71,13 @@ final class AppLauncher
     public static function primaryDestination(User $user): array
     {
         // Akun keluarga/eksternal = satu tujuan, lewati hub staf.
-        if ($user->hasRole('wali') || $user->can('view_own_children')) {
+        // PENTING: cek BERBASIS ROLE, bukan can('view_own_children'). super_admin
+        // mendapat Gate::before "boleh segalanya" (AppServiceProvider) → can(apa pun)
+        // SELALU true untuknya, sehingga klausa can() dulu menyeret super_admin/admin
+        // ke /wali (lalu 403 karena EnsureUserIsWali butuh role wali). view_own_children
+        // pun HANYA berasal dari role wali (RolesAndPermissionsSeeder), jadi hasRole()
+        // sudah cukup & benar.
+        if ($user->hasRole('wali')) {
             return ['kind' => 'redirect', 'url' => self::routeOr('tenant.portal-wali.dashboard', '/wali')];
         }
         if ($user->hasRole('peserta')) {
@@ -83,12 +89,20 @@ final class AppLauncher
             return ['kind' => 'redirect', 'url' => self::routeOr('tenant.santri-app.beranda', '/santri-app')];
         }
 
+        $adminUrl = self::adminPanelUrl($user);
+
+        // super_admin = admin penuh tenant (dibuat TenantProvisioner) → langsung
+        // /admin. TIDAK bisa memakai pwaHome() sebagai pembeda untuknya karena can()
+        // di-bypass Gate::before → pwaHome palsu non-null (seolah punya app pimpinan).
+        if ($adminUrl !== null && $user->hasRole('super_admin')) {
+            return ['kind' => 'redirect', 'url' => $adminUrl];
+        }
+
         // Staf admin tanpa aplikasi PWA khusus (mis. admin_pesantren) → langsung
         // ke panel administrasi /admin. Hub-nya hanya akan berisi satu tile panel,
         // jadi mampir hub cuma menambah satu klik. Staf yang PUNYA aplikasi PWA
         // (guru/keuangan/pimpinan/kasir) tetap melihat hub agar bisa memilih
         // aplikasi vs panel.
-        $adminUrl = self::adminPanelUrl($user);
         if ($adminUrl !== null && self::pwaHome($user) === null) {
             return ['kind' => 'redirect', 'url' => $adminUrl];
         }
