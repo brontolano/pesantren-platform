@@ -8,6 +8,13 @@ import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import SpmbLayout from '@/Layouts/SpmbLayout.vue';
 
+// ppdbUrl: tujuan "Isi Formulir Pendaftaran". Default form internal /ppdb;
+// tenant dgn pendaftaran di website eksternal (Setting ppdb_external_url)
+// mendapat URL absolut → pakai <a> biasa (bukan Inertia <Link>).
+defineProps({
+    ppdbUrl: { type: String, default: '/ppdb' },
+});
+
 const form = useForm({
     identifier: '',
     password:   '',
@@ -182,8 +189,8 @@ const submit = () => {
                 <p class="text-sm text-stone-600">
                     Belum pernah mendaftar?
                 </p>
-                <Link
-                    href="/ppdb"
+                <a
+                    :href="ppdbUrl"
                     class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl
                            border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold
                            text-stone-700 shadow-sm transition hover:border-[var(--spmb-primary)]/50
@@ -195,7 +202,7 @@ const submit = () => {
                         <path d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                     Isi Formulir Pendaftaran
-                </Link>
+                </a>
             </div>
 
         </div>

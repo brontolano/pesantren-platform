@@ -65,7 +65,14 @@ class PesertaAuthController extends Controller
             return $redirect;
         }
 
-        return Inertia::render('PPDB/Portal/Login');
+        // "Isi Formulir Pendaftaran": tenant dgn pendaftaran via website eksternal
+        // (Setting ppdb_external_url, mis. asy-syifaa) → link ke URL itu; selain itu
+        // form internal /ppdb.
+        $external = trim((string) (\App\Models\Setting::getTenantStringValue('ppdb_external_url') ?? ''));
+
+        return Inertia::render('PPDB/Portal/Login', [
+            'ppdbUrl' => $external !== '' ? $external : '/ppdb',
+        ]);
     }
 
     /**
