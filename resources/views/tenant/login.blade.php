@@ -6,29 +6,29 @@
         body{display:flex}
         .split{display:flex;width:100%;min-height:100dvh}
 
-        /* ══ Panel kiri: HERO (3/4 lebar, layar lebar saja) ══ */
+        /* ══ Bagian 1: HERO (foto + teks) — layar lebar ══ */
         .aside{position:relative;display:none;flex:3;overflow:hidden;color:#fff;
             background:linear-gradient(160deg,var(--brand) 0%,var(--brand-strong) 100%)}
-        /* halo emas di belakang figur */
-        .aside .glow{position:absolute;left:2%;bottom:12%;width:42%;height:58%;z-index:1;pointer-events:none;
+        .aside .glow{position:absolute;left:4%;bottom:4%;width:34%;height:54%;z-index:1;pointer-events:none;
             background:radial-gradient(circle at 50% 50%,rgba(201,162,74,.30),transparent 68%);filter:blur(8px)}
-        /* foto pengasuh — NEMPEL ke dasar panel (grounded) */
-        .aside .abuya{position:absolute;left:1.5%;bottom:0;height:min(80vh,640px);width:auto;z-index:2;
-            object-fit:contain;object-position:bottom;filter:drop-shadow(0 18px 38px rgba(0,0,0,.38));pointer-events:none}
-        /* scrim: dasar dipekatkan agar pinggang membaur ke hijau (tak terlihat kepotong) */
-        .aside .scrim{position:absolute;left:0;right:0;bottom:0;height:30%;z-index:3;pointer-events:none;
+        /* scrim di lapisan ATAS (z5) — hanya menutup 26% dasar, membaurkan kaki foto */
+        .aside .scrim{position:absolute;left:0;right:0;bottom:0;height:26%;z-index:5;pointer-events:none;
             background:linear-gradient(to top,var(--brand-strong) 0%,transparent 100%)}
-        .aside .content{position:relative;z-index:4;display:flex;flex-direction:column;height:100%;padding:56px}
+        .aside .content{position:relative;z-index:4;display:flex;flex-direction:column;height:100%;padding:48px 52px 0}
         .aside .brand{display:flex;align-items:center;gap:14px}
-        .aside .brandmark{width:60px;height:60px;padding:7px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-        .aside .pname{font-weight:800;font-size:1.3rem;line-height:1.25}
-        .aside .hero{margin:auto auto auto 31rem;max-width:26rem;text-align:left}
-        .aside .bismillah{font-size:1.7rem;margin-bottom:16px;color:var(--gold-soft)}
-        .aside h2{font-size:clamp(1.9rem,2.8vw,2.7rem);font-weight:800;line-height:1.15;letter-spacing:-.01em}
-        .aside .lead{margin-top:14px;opacity:.86;font-size:1.05rem;max-width:42ch;line-height:1.6}
-        .aside .orn{margin-top:28px;max-width:300px}
+        .aside .brandmark{width:58px;height:58px;padding:7px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+        .aside .pname{font-weight:800;font-size:1.25rem;line-height:1.25}
+        /* foto + teks: satu grup di bawah, foto grounded (flex-end + padding-bottom 0) */
+        .aside .herowrap{margin-top:auto;display:flex;align-items:flex-end;gap:32px}
+        .aside .abuya{flex-shrink:0;align-self:flex-end;height:min(74vh,560px);width:auto;
+            filter:drop-shadow(0 16px 34px rgba(0,0,0,.35))}
+        .aside .hero{align-self:center;max-width:24rem;min-width:0;text-align:left;padding-bottom:6vh}
+        .aside .bismillah{font-size:1.6rem;margin-bottom:14px;color:var(--gold-soft)}
+        .aside h2{font-size:clamp(1.7rem,2.3vw,2.3rem);font-weight:800;line-height:1.18;letter-spacing:-.01em}
+        .aside .lead{margin-top:12px;opacity:.86;font-size:1rem;max-width:34ch;line-height:1.6}
+        .aside .orn{margin-top:24px;max-width:280px}
 
-        /* ══ Panel kanan: FORM (1/4 lebar) ══ */
+        /* ══ Bagian 2: FORM (diperlebar +50%) ══ */
         .main{flex:1.8;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 30px}
         .card{width:100%;max-width:520px}
         .top{text-align:center}
@@ -37,53 +37,58 @@
         .top .sub{font-size:.82rem;color:var(--muted);margin-top:3px}
         form{margin-top:22px;display:flex;flex-direction:column;gap:13px}
         .field label{display:block;font-size:.78rem;font-weight:600;margin-bottom:6px}
-        .field input{width:100%;border:1px solid var(--border);background:#fff;border-radius:13px;padding:12px 14px;
-            font-size:.93rem;font-family:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s}
+        .field input{width:100%;border:1px solid var(--border);background:#fff;border-radius:13px;padding:13px 15px;
+            font-size:.95rem;font-family:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s}
         .field input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 18%,transparent)}
-        .remember{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted);font-weight:500;cursor:pointer}
+        .remember{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);font-weight:500;cursor:pointer}
         .remember input{width:16px;height:16px;accent-color:var(--brand)}
         .err{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:11px;padding:10px 13px;font-size:.82rem;margin-top:16px}
-        .btn{appearance:none;border:none;cursor:pointer;width:100%;border-radius:9999px;padding:13px;font-size:.95rem;
-            font-weight:700;font-family:inherit;color:#fff;min-height:48px;box-shadow:var(--shadow-brand);
+        .btn{appearance:none;border:none;cursor:pointer;width:100%;border-radius:9999px;padding:14px;font-size:.97rem;
+            font-weight:700;font-family:inherit;color:#fff;min-height:50px;box-shadow:var(--shadow-brand);
             background:linear-gradient(135deg,var(--brand),var(--brand-strong));transition:transform .15s}
         .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0)}
         .alt{margin-top:24px}
-        .alt-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-top:14px}
+        .alt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
         .alt-card{display:flex;flex-direction:column;gap:3px;border:1px solid var(--border);border-radius:14px;
-            padding:11px 13px;background:#fff;transition:border-color .15s,transform .15s}
+            padding:12px 14px;background:#fff;transition:border-color .15s,transform .15s}
         .alt-card:hover{border-color:var(--gold);transform:translateY(-2px)}
-        .alt-card .ttl{font-weight:700;font-size:.84rem;display:flex;align-items:center;gap:7px}
-        .alt-card .ds{font-size:.71rem;color:var(--muted);line-height:1.35}
+        .alt-card .ttl{font-weight:700;font-size:.85rem;display:flex;align-items:center;gap:7px}
+        .alt-card .ds{font-size:.72rem;color:var(--muted);line-height:1.35}
         .alt-card svg{width:18px;height:18px;stroke:var(--brand);fill:none;stroke-width:1.6;flex-shrink:0}
-        footer{margin-top:24px;text-align:center;font-size:.71rem;color:var(--muted)}
+        footer{margin-top:24px;text-align:center;font-size:.72rem;color:var(--muted)}
         footer a{color:var(--brand);font-weight:600}
 
-        @media(min-width:1480px){.aside{display:block}}
+        @media(max-width:560px){.alt-grid{grid-template-columns:1fr}}
+        @media(min-width:1280px){.aside{display:block}}
     </style>
 </head>
 <body>
 <div class="split">
+    {{-- Bagian 1: Foto + Teks (satu grup) --}}
     <aside class="aside">
         @include('tenant.partials.islamic-bg', ['id' => 'pat-login', 'color' => '#ffffff', 'opacity' => 0.06])
         <div class="glow"></div>
-        @if (! empty($heroImageUrl))
-            <img class="abuya" src="{{ $heroImageUrl }}" alt="" aria-hidden="true">
-        @endif
-        <div class="scrim"></div>
         <div class="content">
             <div class="brand">
                 <div class="brandmark">@include('tenant.partials.brandmark', ['logoUrl' => $logoUrl, 'pesantren' => $pesantren])</div>
                 <div class="pname">{{ $pesantren }}</div>
             </div>
-            <div class="hero">
-                <div class="arabic bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-                <h2>Selamat datang di Portal Sistem</h2>
-                <p class="lead">Pendidikan adab, ilmu, dan layanan santri dalam satu sistem terpadu.</p>
-                <div class="orn">@include('tenant.partials.ornament', ['color' => 'var(--gold)'])</div>
+            <div class="herowrap">
+                @if (! empty($heroImageUrl))
+                    <img class="abuya" src="{{ $heroImageUrl }}" alt="" aria-hidden="true">
+                @endif
+                <div class="hero">
+                    <div class="arabic bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+                    <h2>Selamat datang di Portal Sistem</h2>
+                    <p class="lead">Pendidikan adab, ilmu, dan layanan santri dalam satu sistem terpadu.</p>
+                    <div class="orn">@include('tenant.partials.ornament', ['color' => 'var(--gold)'])</div>
+                </div>
             </div>
         </div>
+        <div class="scrim"></div>
     </aside>
 
+    {{-- Bagian 2: Form --}}
     <main class="main">
         <div class="card">
             <div class="top">
