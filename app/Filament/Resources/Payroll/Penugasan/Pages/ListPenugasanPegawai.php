@@ -4,8 +4,10 @@ namespace App\Filament\Resources\Payroll\Penugasan\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Payroll\Penugasan\PenugasanPegawaiResource;
+use App\Models\Tenant;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Payroll\Models\PenugasanPegawai;
 use Modules\Payroll\Services\PenugasanImportService;
 
 class ListPenugasanPegawai extends ListRecords
@@ -22,8 +24,8 @@ class ListPenugasanPegawai extends ListRecords
                 'entitas' => 'penugasan',
                 'template' => ['nip', 'jabatan', 'lembaga', 'tanggal_mulai', 'nomor_sk', 'is_primary', 'keterangan'],
                 'template_contoh' => ['P001', 'Wali Kelas', 'Madrasah Aliyah', '2024-07-01', 'SK/001/2024', 'ya', ''],
-                'export' => fn (\App\Models\Tenant $t) => \Modules\Payroll\Models\PenugasanPegawai::withoutGlobalScopes()
-                    ->where('tenant_id', $t->id)->with(['employee', 'jabatan', 'lembaga'])->get()
+                'export' => fn (Tenant $t) => PenugasanPegawai::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with(['employee', 'jabatan', 'lembaga'])->lazy()
                     ->map(fn ($p): array => [
                         'nip' => $p->employee?->nip, 'jabatan' => $p->jabatan?->nama, 'lembaga' => $p->lembaga?->nama,
                         'tanggal_mulai' => $p->tanggal_mulai, 'nomor_sk' => $p->nomor_sk,

@@ -25,7 +25,7 @@ class ListPelajaran extends ListRecords
                 'template' => ['nama', 'kode', 'sks', 'guru'],
                 'template_contoh' => ['Nahwu', 'NHW', '2', 'ustadz@contoh.test'],
                 'export' => fn (Tenant $t) => Pelajaran::withoutGlobalScopes()
-                    ->where('tenant_id', $t->id)->with('guruPengampu')->orderBy('nama')->get()
+                    ->where('tenant_id', $t->id)->with('guruPengampu')->orderBy('nama')->lazy()
                     ->map(fn (Pelajaran $p): array => [
                         'nama' => $p->nama, 'kode' => $p->kode, 'sks' => $p->sks,
                         'guru' => $p->guruPengampu?->email,
@@ -39,4 +39,3 @@ class ListPelajaran extends ListRecords
         ];
     }
 }
-

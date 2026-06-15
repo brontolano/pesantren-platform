@@ -4,12 +4,14 @@ namespace App\Filament\Resources\Asrama\PenempatanAsrama\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource;
+use App\Models\Tenant;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Asrama\Models\PenempatanAsrama;
 use Modules\Asrama\Services\AsramaImportService;
 use Modules\Asrama\Services\PenempatanOtomatisService;
 
@@ -34,8 +36,8 @@ class ListPenempatanAsrama extends ListRecords
                 'entitas' => 'asrama',
                 'template' => ['nis', 'nama', 'blok', 'kamar', 'kapasitas', 'gender_blok', 'tanggal_masuk', 'keterangan'],
                 'template_contoh' => ['2024001', 'Ahmad', 'Blok A', 'A-1', '8', 'putra', '2026-07-14', ''],
-                'export' => fn (\App\Models\Tenant $t) => \Modules\Asrama\Models\PenempatanAsrama::withoutGlobalScopes()
-                    ->where('tenant_id', $t->id)->with(['santri', 'kamar.blok'])->get()
+                'export' => fn (Tenant $t) => PenempatanAsrama::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with(['santri', 'kamar.blok'])->lazy()
                     ->map(fn ($p): array => ['nis' => $p->santri?->nis, 'nama' => $p->santri?->nama, 'blok' => $p->kamar?->blok?->nama_blok, 'kamar' => $p->kamar?->nomor_kamar, 'kapasitas' => $p->kamar?->kapasitas, 'gender_blok' => $p->kamar?->blok?->gender, 'tanggal_masuk' => $p->tanggal_masuk, 'keterangan' => $p->keterangan]),
                 'label' => 'Import Asrama',
                 'service' => AsramaImportService::class,
@@ -70,4 +72,3 @@ class ListPenempatanAsrama extends ListRecords
         ];
     }
 }
-

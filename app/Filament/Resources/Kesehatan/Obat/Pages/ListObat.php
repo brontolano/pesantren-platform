@@ -4,9 +4,11 @@ namespace App\Filament\Resources\Kesehatan\Obat\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Kesehatan\ObatResource;
+use App\Models\Tenant;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Kesehatan\Models\Obat;
 use Modules\Kesehatan\Services\ObatImportService;
 
 class ListObat extends ListRecords
@@ -30,8 +32,8 @@ class ListObat extends ListRecords
                 'entitas' => 'obat',
                 'template' => ['nama', 'satuan', 'stok', 'ambang_menipis'],
                 'template_contoh' => ['Paracetamol', 'tablet', '100', '20'],
-                'export' => fn (\App\Models\Tenant $t) => \Modules\Kesehatan\Models\Obat::withoutGlobalScopes()
-                    ->where('tenant_id', $t->id)->orderBy('nama')->get()
+                'export' => fn (Tenant $t) => Obat::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->orderBy('nama')->lazy()
                     ->map(fn ($o): array => ['nama' => $o->nama, 'satuan' => $o->satuan, 'stok' => $o->stok, 'ambang_menipis' => $o->ambang_menipis]),
                 'label' => 'Import Obat',
                 'service' => ObatImportService::class,

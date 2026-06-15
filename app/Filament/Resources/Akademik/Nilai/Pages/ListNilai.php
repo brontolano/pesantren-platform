@@ -4,10 +4,12 @@ namespace App\Filament\Resources\Akademik\Nilai\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Akademik\Nilai\NilaiResource;
+use App\Models\Tenant;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Services\NilaiImportService;
 use Modules\Kesantrian\Models\Kelas;
@@ -46,8 +48,8 @@ class ListNilai extends ListRecords
                 'entitas' => 'nilai',
                 'template' => ['nis', 'pelajaran', 'periode', 'kelas', 'nilai_harian', 'nilai_uts', 'nilai_uas', 'nilai_akhir', 'catatan'],
                 'template_contoh' => ['2024001', 'NHW', '2026/2027', 'VII-A', '80', '75', '90', '82', ''],
-                'export' => fn (\App\Models\Tenant $t) => \Modules\Akademik\Models\Nilai::withoutGlobalScopes()
-                    ->where('tenant_id', $t->id)->with(['santri', 'pelajaran', 'periodeAkademik', 'kelas'])->get()
+                'export' => fn (Tenant $t) => Nilai::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with(['santri', 'pelajaran', 'periodeAkademik', 'kelas'])->lazy()
                     ->map(fn ($n): array => ['nis' => $n->santri?->nis, 'pelajaran' => $n->pelajaran?->kode, 'periode' => $n->periodeAkademik?->tahun_akademik, 'kelas' => $n->kelas?->nama_kelas, 'nilai_harian' => $n->nilai_harian, 'nilai_uts' => $n->nilai_uts, 'nilai_uas' => $n->nilai_uas, 'nilai_akhir' => $n->nilai_akhir, 'catatan' => $n->catatan]),
                 'label' => 'Import Nilai',
                 'service' => NilaiImportService::class,
@@ -59,4 +61,3 @@ class ListNilai extends ListRecords
         ];
     }
 }
-

@@ -35,7 +35,7 @@ class ListHalaqah extends ListRecords
                 'template' => ['nama', 'musyrif', 'jenis'],
                 'template_contoh' => ['Halaqah A', 'musyrif@contoh.test', 'tahfidz'],
                 'export' => fn (Tenant $t) => Halaqah::withoutGlobalScopes()
-                    ->where('tenant_id', $t->id)->with('musyrif')->orderBy('nama')->get()
+                    ->where('tenant_id', $t->id)->with('musyrif')->orderBy('nama')->lazy()
                     ->map(fn ($h): array => ['nama' => $h->nama, 'musyrif' => $h->musyrif?->email, 'jenis' => $h->jenis]),
                 'label' => 'Import Halaqah',
                 'service' => HalaqahImportService::class,
@@ -50,7 +50,7 @@ class ListHalaqah extends ListRecords
                 'template_contoh' => ['2024001', 'Halaqah A', '2026-01-15'],
                 'export' => fn (Tenant $t) => HalaqahSantri::withoutGlobalScopes()
                     ->where('tenant_id', $t->id)->whereNull('left_at')->with(['santri', 'halaqah'])
-                    ->get()
+                    ->lazy()
                     ->map(fn ($k): array => [
                         'nis' => $k->santri?->nis,
                         'halaqah' => $k->halaqah?->nama,

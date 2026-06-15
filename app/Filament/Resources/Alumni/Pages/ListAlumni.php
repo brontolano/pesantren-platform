@@ -4,12 +4,14 @@ namespace App\Filament\Resources\Alumni\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Alumni\AlumniResource;
+use App\Models\Tenant;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Services\KelulusanService;
+use Modules\Kesantrian\Models\Alumni;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Services\AlumniImportService;
 use Throwable;
@@ -27,8 +29,8 @@ class ListAlumni extends ListRecords
                 'entitas' => 'alumni',
                 'template' => ['nis', 'tahun_lulus', 'status_lanjutan', 'sekolah_tujuan', 'catatan'],
                 'template_contoh' => ['2019001', '2024', 'kuliah', 'UIN Bandung', ''],
-                'export' => fn (\App\Models\Tenant $t) => \Modules\Kesantrian\Models\Alumni::withoutGlobalScopes()
-                    ->where('tenant_id', $t->id)->with('santri')->get()
+                'export' => fn (Tenant $t) => Alumni::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with('santri')->lazy()
                     ->map(fn ($a): array => ['nis' => $a->santri?->nis, 'tahun_lulus' => $a->tahun_lulus, 'status_lanjutan' => $a->status_lanjutan, 'sekolah_tujuan' => $a->sekolah_tujuan, 'catatan' => $a->catatan]),
                 'label' => 'Import Alumni',
                 'service' => AlumniImportService::class,

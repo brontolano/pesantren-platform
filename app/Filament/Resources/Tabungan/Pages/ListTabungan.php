@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Tabungan\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Tabungan\TabunganResource;
+use App\Models\Tenant;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Services\TabunganSaldoImportService;
 
 class ListTabungan extends ListRecords
@@ -20,8 +22,8 @@ class ListTabungan extends ListRecords
                 'entitas' => 'saldo tabungan',
                 'template' => ['nis', 'saldo_awal', 'keterangan'],
                 'template_contoh' => ['2024001', '150000', 'Saldo migrasi'],
-                'export' => fn (\App\Models\Tenant $t) => \Modules\Keuangan\Models\Tabungan::withoutGlobalScopes()
-                    ->where('tenant_id', $t->id)->with('santri')->get()
+                'export' => fn (Tenant $t) => Tabungan::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with('santri')->lazy()
                     ->map(fn ($tb): array => ['nis' => $tb->santri?->nis, 'saldo_awal' => $tb->saldo, 'keterangan' => '']),
                 'label' => 'Import Saldo Awal',
                 'service' => TabunganSaldoImportService::class,
@@ -32,4 +34,3 @@ class ListTabungan extends ListRecords
         ];
     }
 }
-
