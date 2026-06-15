@@ -18,8 +18,10 @@ class ListHalaqah extends ListRecords
     {
         return [
             CreateAction::make()->label('Tambah Halaqah'),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'halaqah',
+                'template' => ['nama', 'musyrif', 'jenis'],
+                'template_contoh' => ['Halaqah A', 'musyrif@contoh.test', 'tahfidz'],
                 'label' => 'Import Halaqah',
                 'service' => HalaqahImportService::class,
                 'directory' => 'imports/tahfidz/halaqah/uploads',

@@ -18,8 +18,10 @@ class ListJadwalPelajaran extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'jadwal',
+                'template' => ['kelas', 'pelajaran', 'periode', 'hari', 'jam_mulai', 'jam_selesai', 'ruangan'],
+                'template_contoh' => ['VII-A', 'NHW', '2026/2027', 'senin', '07:00', '08:30', 'R1'],
                 'label' => 'Import Jadwal',
                 'service' => JadwalImportService::class,
                 'directory' => 'imports/akademik/jadwal/uploads',

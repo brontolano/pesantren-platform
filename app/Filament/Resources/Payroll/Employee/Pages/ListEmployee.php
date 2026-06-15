@@ -15,8 +15,10 @@ class ListEmployee extends ListRecords
     {
         return [
             CreateAction::make()->label('Tambah Pegawai'),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'pegawai',
+                'template' => ['nip', 'nama', 'jabatan', 'status_kepegawaian', 'nik', 'nuptk', 'tanggal_masuk', 'email'],
+                'template_contoh' => ['P001', 'Ustadz Ali', 'Guru', 'tetap', '', '', '2020-07-01', 'ali@contoh.test'],
                 'label' => 'Import Pegawai',
                 'service' => PegawaiImportService::class,
                 'directory' => 'imports/payroll/pegawai/uploads',

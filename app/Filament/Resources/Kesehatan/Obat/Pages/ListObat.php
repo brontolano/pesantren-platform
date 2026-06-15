@@ -18,8 +18,10 @@ class ListObat extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'obat',
+                'template' => ['nama', 'satuan', 'stok', 'ambang_menipis'],
+                'template_contoh' => ['Paracetamol', 'tablet', '100', '20'],
                 'label' => 'Import Obat',
                 'service' => ObatImportService::class,
                 'directory' => 'imports/kesehatan/obat/uploads',

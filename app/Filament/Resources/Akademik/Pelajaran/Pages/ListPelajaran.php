@@ -18,8 +18,10 @@ class ListPelajaran extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'pelajaran',
+                'template' => ['nama', 'kode', 'sks', 'guru'],
+                'template_contoh' => ['Nahwu', 'NHW', '2', 'ustadz@contoh.test'],
                 'label' => 'Import Pelajaran',
                 'service' => PelajaranImportService::class,
                 'directory' => 'imports/akademik/pelajaran/uploads',

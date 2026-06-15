@@ -18,8 +18,10 @@ class ListNilai extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'nilai',
+                'template' => ['nis', 'pelajaran', 'periode', 'kelas', 'nilai_harian', 'nilai_uts', 'nilai_uas', 'nilai_akhir', 'catatan'],
+                'template_contoh' => ['2024001', 'NHW', '2026/2027', 'VII-A', '80', '75', '90', '82', ''],
                 'label' => 'Import Nilai',
                 'service' => NilaiImportService::class,
                 'directory' => 'imports/akademik/nilai/uploads',

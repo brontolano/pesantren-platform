@@ -23,8 +23,10 @@ class ListPenempatanAsrama extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'asrama',
+                'template' => ['nis', 'nama', 'blok', 'kamar', 'kapasitas', 'gender_blok', 'tanggal_masuk', 'keterangan'],
+                'template_contoh' => ['2024001', 'Ahmad', 'Blok A', 'A-1', '8', 'putra', '2026-07-14', ''],
                 'label' => 'Import Asrama',
                 'service' => AsramaImportService::class,
                 'directory' => 'imports/asrama/uploads',

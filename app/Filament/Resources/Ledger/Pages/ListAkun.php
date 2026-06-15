@@ -21,8 +21,10 @@ class ListAkun extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'saldo awal',
+                'template' => ['kode_akun', 'debit', 'kredit', 'keterangan'],
+                'template_contoh' => ['1-1000', '5000000', '', 'Kas awal'],
                 'label' => 'Import Saldo Awal',
                 'service' => LedgerSaldoAwalImportService::class,
                 'directory' => 'imports/ledger/saldo-awal/uploads',

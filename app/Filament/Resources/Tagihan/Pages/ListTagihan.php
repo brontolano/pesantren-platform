@@ -22,8 +22,10 @@ class ListTagihan extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'tagihan',
+                'template' => ['nis', 'jenis_tagihan', 'nominal', 'jatuh_tempo', 'diskon', 'bulan', 'status_bayar', 'tanggal_pembayaran', 'metode', 'nomor_bukti'],
+                'template_contoh' => ['2024001', 'SPP', '300000', '2026-07-10', '0', '2026-07', 'belum', '', '', ''],
                 'label' => 'Import Tagihan/SPP',
                 'service' => KeuanganImportService::class,
                 'directory' => 'imports/keuangan/uploads',

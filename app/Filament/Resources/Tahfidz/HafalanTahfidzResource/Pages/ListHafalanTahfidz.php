@@ -18,8 +18,10 @@ class ListHafalanTahfidz extends ListRecords
     {
         return [
             CreateAction::make(),
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'hafalan',
+                'template' => ['nis', 'halaqah', 'surah', 'ayat_awal', 'ayat_akhir', 'status', 'tanggal_target', 'tanggal_selesai', 'catatan'],
+                'template_contoh' => ['2024001', 'Halaqah A', 'Al-Baqarah', '1', '5', 'proses', '', '', ''],
                 'label' => 'Import Hafalan',
                 'service' => HafalanImportService::class,
                 'directory' => 'imports/tahfidz/hafalan/uploads',

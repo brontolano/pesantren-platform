@@ -41,6 +41,57 @@ use Illuminate\Support\Facades\Storage;
 trait HasImportAction
 {
     /**
+     * Pasangan aksi siap-spread untuk header List: [Unduh Template, Import].
+     * Tombol template hanya muncul bila config punya 'template' (daftar kolom).
+     *
+     * @param  ImportConfig  $config
+     * @return list<Action>
+     */
+    protected function importActions(array $config): array
+    {
+        return array_values(array_filter([
+            $this->buildTemplateAction($config),
+            $this->buildImportAction($config),
+        ]));
+    }
+
+    /**
+     * Aksi "Unduh Template" — CSV berisi header kolom (+ baris contoh opsional)
+     * sesuai yang diterima importer, agar admin tahu format yang benar.
+     *
+     * @param  ImportConfig  $config
+     */
+    protected function buildTemplateAction(array $config): ?Action
+    {
+        $columns = $config['template'] ?? null;
+        if (empty($columns) || ! is_array($columns)) {
+            return null;
+        }
+
+        $entitas = $config['entitas'];
+        $ability = $config['ability'] ?? null;
+        $contoh = $config['template_contoh'] ?? [];
+        $filename = 'template-import-'.str()->slug($entitas).'.csv';
+
+        return Action::make(($config['name'] ?? 'import'.str()->studly($entitas)).'Template')
+            ->label('Unduh Template')
+            ->icon('heroicon-o-document-arrow-down')
+            ->color('gray')
+            ->visible(fn (): bool => tenancy()->initialized
+                && ($ability === null || (auth()->user()?->can($ability) ?? false)))
+            ->action(function () use ($columns, $contoh, $filename) {
+                return response()->streamDownload(function () use ($columns, $contoh): void {
+                    $out = fopen('php://output', 'w');
+                    fputcsv($out, $columns);
+                    if ($contoh !== []) {
+                        fputcsv($out, $contoh);
+                    }
+                    fclose($out);
+                }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+            });
+    }
+
+    /**
      * Bangun Action import siap pakai untuk header halaman List.
      *
      * @param  ImportConfig  $config

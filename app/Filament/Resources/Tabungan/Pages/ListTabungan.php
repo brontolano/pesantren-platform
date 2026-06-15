@@ -16,8 +16,10 @@ class ListTabungan extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            $this->buildImportAction([
+            ...$this->importActions([
                 'entitas' => 'saldo tabungan',
+                'template' => ['nis', 'saldo_awal', 'keterangan'],
+                'template_contoh' => ['2024001', '150000', 'Saldo migrasi'],
                 'label' => 'Import Saldo Awal',
                 'service' => TabunganSaldoImportService::class,
                 'directory' => 'imports/keuangan/tabungan/uploads',
