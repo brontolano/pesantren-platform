@@ -58,4 +58,13 @@ class ImportTemplateDownloadTest extends TestCase
             ->callAction('importObatTemplate')
             ->assertFileDownloaded('template-import-obat.csv');
     }
+
+    public function test_modal_import_dengan_seksi_pemetaan_mount_tanpa_error(): void
+    {
+        // Mount modal import → membangun schema termasuk Section pemetaan kolom
+        // (closure visible/options dieksekusi) — memastikan tak ada error konstruksi.
+        Livewire::test(ListObat::class)
+            ->mountAction('importObat')
+            ->assertActionMounted('importObat');
+    }
 }

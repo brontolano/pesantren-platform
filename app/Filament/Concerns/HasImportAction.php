@@ -3,10 +3,13 @@
 namespace App\Filament\Concerns;
 
 use App\Models\Tenant;
+use App\Support\ImportColumnMapper;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Section;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Storage;
 
@@ -158,6 +161,8 @@ trait HasImportAction
         $petunjuk = $config['petunjuk']
             ?? 'Unggah file .xlsx / .csv / .ods. Hanya sheet pertama yang dibaca. Baris yang sudah ada akan dilewati (aman diulang).';
         $extraSchema = $config['schema'] ?? [];
+        $columns = $config['template'] ?? [];
+        $aliases = $config['aliases'] ?? [];
 
         /** @var callable $invoke */
         $invoke = $config['invoke'] ?? function (object $service, Tenant $tenant, string $path, bool $dryRun, array $data): array {
@@ -167,34 +172,90 @@ trait HasImportAction
         /** @var callable|null $extraSummary */
         $extraSummary = $config['extraSummary'] ?? null;
 
+        $fileUpload = FileUpload::make('file')
+            ->label('File data '.$entitas)
+            ->acceptedFileTypes([
+                'text/csv',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.oasis.opendocument.spreadsheet',
+            ])
+            ->storeFiles(true)
+            ->disk('local')
+            ->directory($directory)
+            ->required();
+
+        $schema = [
+            Placeholder::make('petunjuk')->label('Petunjuk')->content($petunjuk),
+            $fileUpload,
+        ];
+
+        // Pemetaan kolom fleksibel (Level 2): muncul bila importer punya kolom
+        // kanonik. Saat file diunggah, tebak pemetaan (profil tersimpan / auto),
+        // lalu admin bisa sesuaikan. Biarkan kosong = pakai header apa adanya.
+        if ($columns !== []) {
+            $fileUpload->live()->afterStateUpdated(function (?string $state, callable $set) use ($columns, $aliases, $entitas): void {
+                if (blank($state)) {
+                    return;
+                }
+                try {
+                    $mapper = app(ImportColumnMapper::class);
+                    $headers = $mapper->headers(Storage::disk('local')->path($state));
+                    $profil = $mapper->loadProfile($entitas);
+                    $auto = $mapper->autoMatch($headers, $columns, $aliases);
+                    foreach ($columns as $col) {
+                        $pilih = $profil[$col] ?? ($auto[$col] !== '' ? $auto[$col] : null);
+                        $set("map.{$col}", $pilih);
+                    }
+                } catch (\Throwable) {
+                    // gagal baca header → biarkan, import jatuh ke alias bawaan
+                }
+            });
+
+            $mapFields = array_map(
+                fn (string $col) => Select::make("map.{$col}")
+                    ->label($col)
+                    ->options(function (callable $get): array {
+                        $f = $get('file');
+                        if (blank($f)) {
+                            return [];
+                        }
+                        try {
+                            $h = app(ImportColumnMapper::class)->headers(Storage::disk('local')->path($f));
+
+                            return array_combine($h, $h) ?: [];
+                        } catch (\Throwable) {
+                            return [];
+                        }
+                    })
+                    ->searchable()
+                    ->native(false),
+                $columns,
+            );
+
+            $schema[] = Section::make('Pemetaan kolom (opsional)')
+                ->description('Cocokkan kolom file Anda ke field sistem bila namanya berbeda. Biarkan apa adanya jika header sudah sesuai template.')
+                ->collapsed()
+                ->visible(fn (callable $get): bool => filled($get('file')))
+                ->schema([
+                    ...$mapFields,
+                    Checkbox::make('simpan_profil')
+                        ->label('Simpan pemetaan ini untuk impor berikutnya (pesantren ini)'),
+                ]);
+        }
+
+        $schema = [...$schema, ...$extraSchema, Checkbox::make('dry_run')
+            ->label('Validasi dulu (dry-run) — tidak menyimpan ke database')
+            ->default(true)];
+
         return Action::make($name)
             ->label($label)
             ->icon('heroicon-o-arrow-up-tray')
             ->color('gray')
             ->visible(fn (): bool => tenancy()->initialized
                 && ($ability === null || (auth()->user()?->can($ability) ?? false)))
-            ->schema([
-                Placeholder::make('petunjuk')
-                    ->label('Petunjuk')
-                    ->content($petunjuk),
-                FileUpload::make('file')
-                    ->label('File data '.$entitas)
-                    ->acceptedFileTypes([
-                        'text/csv',
-                        'application/vnd.ms-excel',
-                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                        'application/vnd.oasis.opendocument.spreadsheet',
-                    ])
-                    ->storeFiles(true)
-                    ->disk('local')
-                    ->directory($directory)
-                    ->required(),
-                ...$extraSchema,
-                Checkbox::make('dry_run')
-                    ->label('Validasi dulu (dry-run) — tidak menyimpan ke database')
-                    ->default(true),
-            ])
-            ->action(function (array $data) use ($serviceClass, $entitas, $invoke, $extraSummary): void {
+            ->schema($schema)
+            ->action(function (array $data) use ($serviceClass, $entitas, $invoke, $extraSummary, $columns): void {
                 $relativePath = $data['file'];
                 $absolutePath = Storage::disk('local')->path($relativePath);
                 $dryRun = (bool) ($data['dry_run'] ?? false);
@@ -211,11 +272,26 @@ trait HasImportAction
                     return;
                 }
 
+                // Pemetaan kolom: bila admin memilih mapping, normalisasi file
+                // dulu agar service importer (tak diubah) menerima header kanonik.
+                $tmpNormalized = null;
+                $mapping = array_filter($data['map'] ?? [], fn ($v): bool => filled($v));
+                if ($columns !== [] && $mapping !== []) {
+                    $mapper = app(ImportColumnMapper::class);
+                    if (! empty($data['simpan_profil'])) {
+                        $mapper->saveProfile($entitas, $data['map']);
+                    }
+                    $tmpNormalized = $mapper->normalizeToCsv($absolutePath, $columns, $mapping);
+                }
+
                 try {
                     $service = app($serviceClass);
-                    $summary = $invoke($service, $tenant, $absolutePath, $dryRun, $data);
+                    $summary = $invoke($service, $tenant, $tmpNormalized ?? $absolutePath, $dryRun, $data);
                 } finally {
                     Storage::disk('local')->delete($relativePath);
+                    if ($tmpNormalized !== null && is_file($tmpNormalized)) {
+                        @unlink($tmpNormalized);
+                    }
                 }
 
                 $modeLabel = $dryRun ? 'Validasi (dry-run)' : 'Import';
