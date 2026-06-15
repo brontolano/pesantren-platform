@@ -63,6 +63,45 @@ class UnitSetupRegistry
                         self::resourceUrl(\App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource::class)),
                 ],
             ],
+            'keuangan' => [
+                'label' => 'Keuangan',
+                'icon' => 'heroicon-o-banknotes',
+                'permission' => 'manage_keuangan',
+                'steps' => [
+                    self::step('skema_biaya', 'Skema biaya', 'Template tagihan (SPP, dll).',
+                        self::adaData(\Modules\Keuangan\Models\SkemaBiaya::class),
+                        self::resourceUrl(\App\Filament\Resources\SkemaBiaya\SkemaBiayaResource::class)),
+                    self::step('tagihan', 'Tagihan / SPP', 'Buat atau impor tagihan santri.',
+                        self::adaData(\Modules\Keuangan\Models\Tagihan::class),
+                        self::resourceUrl(\App\Filament\Resources\Tagihan\TagihanResource::class)),
+                    self::step('tabungan', 'Saldo tabungan', 'Saldo awal tabungan (bila go-live tengah tahun).',
+                        self::adaData(\Modules\Keuangan\Models\Tabungan::class),
+                        self::resourceUrl(\App\Filament\Resources\Tabungan\TabunganResource::class)),
+                ],
+            ],
+            'asrama' => [
+                'label' => 'Asrama',
+                'icon' => 'heroicon-o-home-modern',
+                'permission' => 'manage_santri',
+                'steps' => [
+                    self::step('blok', 'Blok & kamar', 'Bangunan & kamar (auto saat impor penempatan).',
+                        self::adaData(\Modules\Asrama\Models\BlokAsrama::class),
+                        self::resourceUrl(\App\Filament\Resources\Asrama\BlokAsrama\BlokAsramaResource::class)),
+                    self::step('penempatan', 'Penempatan santri', 'Tempatkan santri ke kamar (bisa impor).',
+                        self::adaData(\Modules\Asrama\Models\PenempatanAsrama::class),
+                        self::resourceUrl(\App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource::class)),
+                ],
+            ],
+            'sdm' => [
+                'label' => 'SDM / Pegawai',
+                'icon' => 'heroicon-o-briefcase',
+                'permission' => 'manage_payroll',
+                'steps' => [
+                    self::step('pegawai', 'Data pegawai', 'Guru & karyawan (bisa impor).',
+                        self::adaData(\Modules\Payroll\Models\Employee::class),
+                        self::resourceUrl(\App\Filament\Resources\Payroll\Employee\EmployeeResource::class)),
+                ],
+            ],
         ];
     }
 
