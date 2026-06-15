@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,7 @@ class DashboardMutu extends Page
 
     protected static ?string $title = 'Dashboard KPI Mutu (SPMI)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 6;
 
@@ -38,7 +39,7 @@ class DashboardMutu extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     protected function getViewData(): array

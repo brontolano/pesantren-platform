@@ -3,6 +3,7 @@
 namespace Modules\Pembiayaan\Services;
 
 use App\Models\Tenant;
+use App\Support\Uang;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Modules\Pembiayaan\Models\Aset;
@@ -154,17 +155,10 @@ class AsetImportService
         return $summary;
     }
 
-    /** Parsing nominal tahan format Indonesia ("150.000.000,50") + bulatkan 2 desimal. */
+    /** Parsing nominal tak ambigu (ribuan/desimal/round-trip) — sumber tunggal. */
     private function angka(mixed $nilai): float
     {
-        $teks = trim((string) $nilai);
-        if ($teks === '') {
-            return 0.0;
-        }
-        $teks = str_replace(['.', ' '], '', $teks);
-        $teks = str_replace(',', '.', $teks);
-
-        return is_numeric($teks) ? round((float) $teks, 2) : 0.0;
+        return Uang::parse($nilai);
     }
 
     private function bool(mixed $nilai): bool

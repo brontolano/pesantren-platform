@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -31,7 +32,7 @@ class PengaturanNotifikasi extends Page implements HasForms
 
     protected static ?string $title = 'Pengaturan Notifikasi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi';
 
     protected static ?int $navigationSort = 3;
 
@@ -49,7 +50,7 @@ class PengaturanNotifikasi extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public function mount(): void

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Ledger;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Ledger\Pages\ListKebijakanKehalalan;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -23,7 +25,7 @@ use Modules\Ledger\Support\FiturKeuangan;
  */
 class KebijakanKehalalanResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = KebijakanKehalalan::class;
 
@@ -35,13 +37,13 @@ class KebijakanKehalalanResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kebijakan Kehalalan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 21;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('ledger')
+        return UiMode::advanced() && static::moduleVisible('ledger')
             && FiturKeuangan::pemisahanKehalalanAktif()
             && (auth()->user()?->can('manage_dana_kebajikan') ?? false);
     }

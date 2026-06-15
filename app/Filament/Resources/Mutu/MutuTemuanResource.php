@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Mutu;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Mutu\MutuTemuan\Pages\CreateMutuTemuan;
 use App\Filament\Resources\Mutu\MutuTemuan\Pages\EditMutuTemuan;
 use App\Filament\Resources\Mutu\MutuTemuan\Pages\ListMutuTemuan;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -25,7 +27,7 @@ use Modules\Mutu\Services\MutuKpiService;
 
 class MutuTemuanResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = MutuTemuan::class;
 
@@ -37,13 +39,13 @@ class MutuTemuanResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Temuan (Non-Conformance)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 3;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
+        return UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
     }
 
     public static function canAccess(): bool
@@ -75,7 +77,9 @@ class MutuTemuanResource extends Resource
                 TextColumn::make('judul')->label('Temuan')->searchable()->wrap(),
                 TextColumn::make('severity')->label('Severity')->badge()
                     ->formatStateUsing(fn (?string $s): string => MutuTemuan::SEVERITY[$s] ?? $s)
-                    ->color(fn (?string $s): string => match ($s) { 'kritis' => 'danger', 'major' => 'warning', default => 'gray' }),
+                    ->color(fn (?string $s): string => match ($s) {
+                        'kritis' => 'danger', 'major' => 'warning', default => 'gray'
+                    }),
                 TextColumn::make('status')->label('Status')->badge()
                     ->color(fn (?string $s): string => match ($s) {
                         'tutup' => 'success', 'verifikasi' => 'info', 'tindakan' => 'warning', default => 'danger',

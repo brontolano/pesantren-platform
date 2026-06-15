@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Media;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Media\Pages\CreateMediaFile;
 use App\Filament\Resources\Media\Pages\ListMediaFiles;
 use App\Models\MediaFile;
@@ -13,8 +14,8 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
@@ -28,7 +29,7 @@ use Illuminate\Support\Facades\Storage;
 
 class MediaFileResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = MediaFile::class;
 
@@ -40,7 +41,7 @@ class MediaFileResource extends Resource
 
     protected static ?string $pluralModelLabel = 'File Media';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
     protected static ?int $navigationSort = 1;
 

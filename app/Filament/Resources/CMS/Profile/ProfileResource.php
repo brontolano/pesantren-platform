@@ -2,26 +2,30 @@
 
 namespace App\Filament\Resources\CMS\Profile;
 
+use App\Filament\Concerns\BuiltInWebsiteGate;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\CMS\Profile\Pages\CreateProfile;
 use App\Filament\Resources\CMS\Profile\Pages\EditProfile;
 use App\Filament\Resources\CMS\Profile\Pages\ListProfiles;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\CMS\Models\WebsiteSection;
 
 class ProfileResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
-    use \App\Filament\Concerns\BuiltInWebsiteGate;
+    use BuiltInWebsiteGate;
+    use ModuleGate;
 
     protected static ?string $model = WebsiteSection::class;
 
@@ -33,13 +37,13 @@ class ProfileResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Profil Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
     protected static ?int $navigationSort = 9;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('cms') && (static::canAccess());
+        return UiMode::advanced() && static::moduleVisible('cms') && (static::canAccess());
     }
 
     public static function canAccess(): bool
@@ -59,12 +63,12 @@ class ProfileResource extends Resource
         return static::canAccess() && ! static::getEloquentQuery()->exists();
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return static::canAccess() && $record->tenant_id === tenant('id');
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return false;
     }
@@ -154,4 +158,3 @@ class ProfileResource extends Resource
         ];
     }
 }
-

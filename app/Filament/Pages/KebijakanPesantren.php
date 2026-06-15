@@ -37,7 +37,7 @@ class KebijakanPesantren extends Page implements HasForms
 
     protected static ?string $title = 'Kebijakan Pesantren';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 5;
 

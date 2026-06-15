@@ -2,19 +2,23 @@
 
 namespace App\Filament\Resources\CMS\WebsiteSetting;
 
-use App\Filament\Resources\CMS\WebsiteSetting\Pages\ListWebsiteSettings;
+use App\Filament\Concerns\BuiltInWebsiteGate;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\CMS\WebsiteSetting\Pages\EditWebsiteSetting;
+use App\Filament\Resources\CMS\WebsiteSetting\Pages\ListWebsiteSettings;
+use App\Support\UiMode;
 use Filament\Actions\EditAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\CMS\Models\WebsiteSetting;
 
 class WebsiteSettingResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
-    use \App\Filament\Concerns\BuiltInWebsiteGate;
+    use BuiltInWebsiteGate;
+    use ModuleGate;
 
     protected static ?string $model = WebsiteSetting::class;
 
@@ -26,13 +30,13 @@ class WebsiteSettingResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pengaturan Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
     protected static ?int $navigationSort = 10;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::builtInWebsiteEnabled()
+        return UiMode::advanced() && static::builtInWebsiteEnabled()
             && static::moduleVisible('cms')
             && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
@@ -49,7 +53,7 @@ class WebsiteSettingResource extends Resource
         return false; // setting dibuat via seed/Website Builder, bukan manual
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return false;
     }
@@ -94,4 +98,3 @@ class WebsiteSettingResource extends Resource
         ];
     }
 }
-

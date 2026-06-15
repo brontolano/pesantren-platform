@@ -98,8 +98,9 @@ class TenantRecoveryService
         $db = $tenant->database()->getName();
         $c = $this->conn();
 
+        // --single-transaction: gagal di tengah = rollback penuh (tak ada DB setengah-restore).
         $cmd = sprintf(
-            'gunzip -c %s | psql -v ON_ERROR_STOP=1 -h %s -p %s -U %s -d %s',
+            'gunzip -c %s | psql -v ON_ERROR_STOP=1 --single-transaction -h %s -p %s -U %s -d %s',
             escapeshellarg($sqlGzPath),
             escapeshellarg((string) $c['host']),
             escapeshellarg((string) $c['port']),
@@ -121,8 +122,9 @@ class TenantRecoveryService
             @rename($dir, $dir.'.bak-'.now()->format('Ymd_His'));
         }
 
+        // --no-absolute-names + buang '..' : cegah path-traversal arsip jahat keluar storage.
         $cmd = sprintf(
-            'tar -xzf %s -C %s',
+            'tar --no-absolute-names -xzf %s -C %s',
             escapeshellarg($tarPath),
             escapeshellarg(storage_path()),
         );
@@ -160,7 +162,15 @@ class TenantRecoveryService
         });
 
         // 3) Migrasi ulang skema tenant (pola TenantMigrateAllCommand).
-        Artisan::call('tenants:migrate', ['--tenants' => [$tenant->getKey()]]);
+        //    Bila migrate GAGAL: hentikan SEBELUM hapus file — backup ($dbBackup/$filesBackup)
+        //    jadi jalur pemulihan; jangan tinggalkan skema rusak + file terhapus.
+        $exit = Artisan::call('tenants:migrate', ['--tenants' => [$tenant->getKey()]]);
+        if ($exit !== 0) {
+            throw new \RuntimeException(
+                "Migrasi tenant gagal saat reset (exit {$exit}). Data BELUM dihapus dari storage; "
+                ."pulihkan DB dari backup: {$dbBackup}".($filesBackup ? " & file: {$filesBackup}" : '')
+            );
+        }
 
         // 4) Hapus file unggahan (sudah aman di $filesBackup).
         $this->clearFiles($tenant);
@@ -183,6 +193,11 @@ class TenantRecoveryService
     {
         try {
             $db = $tenant->database()->getName();
+            // Nama DB diinterpolasi ke SQL → batasi ke pola aman (whitelist), cegah injeksi
+            // bila skema penamaan tenant berubah di kemudian hari.
+            if (! preg_match('/^[A-Za-z0-9_]+$/', $db)) {
+                return null;
+            }
             $c = $this->conn();
             $process = Process::fromShellCommandline(
                 sprintf(

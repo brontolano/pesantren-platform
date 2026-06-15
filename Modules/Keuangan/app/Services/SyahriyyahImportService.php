@@ -3,11 +3,12 @@
 namespace Modules\Keuangan\Services;
 
 use App\Models\Tenant;
+use App\Support\Uang;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
-use Modules\Kesantrian\Models\Santri;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Reader\Common\Creator\ReaderFactory;
 use RuntimeException;
@@ -40,10 +41,9 @@ class SyahriyyahImportService
     ];
 
     public function __construct(
-        private readonly TagihanService $tagihanService = new TagihanService(),
-        private readonly PembayaranService $pembayaranService = new PembayaranService(),
-    ) {
-    }
+        private readonly TagihanService $tagihanService = new TagihanService,
+        private readonly PembayaranService $pembayaranService = new PembayaranService,
+    ) {}
 
     /**
      * @return array{
@@ -358,15 +358,7 @@ class SyahriyyahImportService
 
     private function angka(mixed $nilai): float
     {
-        if (is_int($nilai) || is_float($nilai)) {
-            return (float) $nilai;
-        }
-
-        $teks = preg_replace('/[^\d,.\-]/', '', (string) $nilai);
-        $teks = str_replace('.', '', $teks);   // 700.000 → 700000
-        $teks = str_replace(',', '.', $teks);
-
-        return $teks === '' || $teks === '-' ? 0.0 : (float) $teks;
+        return Uang::parse($nilai);
     }
 
     private function parseTanggal(mixed $nilai, string $bulanFallback): string

@@ -16,7 +16,7 @@ class MutuLembaga extends Page
 
     protected static ?string $title = 'Mutu per Lembaga';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 32;
 

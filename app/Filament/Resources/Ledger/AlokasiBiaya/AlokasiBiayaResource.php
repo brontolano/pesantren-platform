@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Ledger\AlokasiBiaya;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Ledger\AlokasiBiaya\Pages\ListAlokasiBiaya;
+use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -15,7 +17,7 @@ use Modules\Ledger\Models\AlokasiBiaya;
  */
 class AlokasiBiayaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = AlokasiBiaya::class;
 
@@ -27,13 +29,13 @@ class AlokasiBiayaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Alokasi Biaya';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 30;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
     }
 
     public static function canAccess(): bool

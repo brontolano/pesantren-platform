@@ -2,34 +2,36 @@
 
 namespace App\Filament\Resources\BroadcastWa;
 
-use App\Support\AlbaKidsTenant;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\BroadcastWa\Pages\CreateBroadcastWa;
 use App\Filament\Resources\BroadcastWa\Pages\EditBroadcastWa;
 use App\Filament\Resources\BroadcastWa\Pages\ListBroadcastWa;
+use App\Support\AlbaKidsTenant;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Actions\Action;
-use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
 use Modules\Notifikasi\Services\BroadcastWaService;
 
 class BroadcastWaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = BroadcastWa::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static \UnitEnum|string|null $navigationGroup = 'Komunikasi';
 
     protected static ?int $navigationSort = 2;
 
@@ -48,7 +50,7 @@ class BroadcastWaResource extends Resource
         return auth()->user()?->can('manage_notifikasi') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_notifikasi') ?? false;
     }

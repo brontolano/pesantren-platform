@@ -3,13 +3,14 @@
 namespace App\Filament\Resources\Audit;
 
 use App\Filament\Resources\Audit\AuditLog\Pages\ListAuditLog;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\DatePicker;
+use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Filament\Forms\Components\DatePicker;
-use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,7 @@ class AuditLogResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Jejak Audit';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 31;
 
@@ -42,7 +43,7 @@ class AuditLogResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public static function canCreate(): bool

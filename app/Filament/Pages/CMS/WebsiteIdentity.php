@@ -2,8 +2,10 @@
 
 namespace App\Filament\Pages\CMS;
 
-use Filament\Forms\Components\TextInput;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -20,7 +22,7 @@ use Modules\CMS\Models\WebsiteSetting;
 class WebsiteIdentity extends Page implements HasForms
 {
     use InteractsWithForms;
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-identification';
 
@@ -28,7 +30,7 @@ class WebsiteIdentity extends Page implements HasForms
 
     protected static ?string $title = 'Identitas & Kontak Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
     protected static ?int $navigationSort = 8;
 
@@ -43,7 +45,7 @@ class WebsiteIdentity extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public function mount(): void

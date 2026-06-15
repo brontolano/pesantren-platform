@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -30,7 +31,7 @@ class BukuPembantuPajak extends Page implements HasForms
 
     protected static ?string $title = 'Buku Pembantu Pajak';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pajak';
 
     protected static ?int $navigationSort = 13;
 
@@ -49,7 +50,7 @@ class BukuPembantuPajak extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public function mount(): void

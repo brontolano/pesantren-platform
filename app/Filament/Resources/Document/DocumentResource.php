@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Document;
 use App\Filament\Resources\Document\Document\Pages\CreateDocument;
 use App\Filament\Resources\Document\Document\Pages\ListDocument;
 use App\Services\StorageQuotaService;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
@@ -38,7 +39,7 @@ class DocumentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Repositori Dokumen';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 32;
 
@@ -50,7 +51,7 @@ class DocumentResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public static function canEdit(Model $record): bool

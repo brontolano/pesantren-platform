@@ -12,26 +12,24 @@ use Modules\Kesantrian\Services\WaliImportService;
  * Penggunaan:
  *   php artisan wali:import asy-syifaa
  *   php artisan wali:import asy-syifaa --dry-run       (preview tanpa simpan)
- *   php artisan wali:import asy-syifaa --update-only   (hanya update link, tidak buat user baru)
  */
 class ImportWaliCommand extends Command
 {
     protected $signature = 'wali:import
         {tenant : ID tenant (misal: asy-syifaa)}
-        {--dry-run : Preview akun yang akan dibuat tanpa menyimpan}
-        {--update-only : Hanya update wali_user_id di santri, tidak buat akun baru}
-        {--send-wa : Kirim notifikasi WA ke wali setelah akun dibuat (butuh WAHA aktif)}';
+        {--dry-run : Preview akun yang akan dibuat tanpa menyimpan}';
 
     protected $description = 'Bulk create akun Portal Wali dari data santri (kunci: no_hp_wali; login wali pakai no. HP)';
 
     public function handle(): int
     {
         $tenantId = (string) $this->argument('tenant');
-        $dryRun   = (bool)   $this->option('dry-run');
+        $dryRun = (bool) $this->option('dry-run');
 
         $tenant = Tenant::find($tenantId);
         if (! $tenant) {
             $this->error("Tenant '{$tenantId}' tidak ditemukan.");
+
             return self::FAILURE;
         }
 

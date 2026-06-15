@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Ledger;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Ledger\Pages\CreateDivisiUnit;
 use App\Filament\Resources\Ledger\Pages\EditDivisiUnit;
 use App\Filament\Resources\Ledger\Pages\ListDivisiUnit;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -16,11 +18,12 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Ledger\Models\DivisiUnit;
 
 class DivisiUnitResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = DivisiUnit::class;
 
@@ -32,13 +35,13 @@ class DivisiUnitResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Divisi / Unit';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 3;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -51,12 +54,12 @@ class DivisiUnitResource extends Resource
         return auth()->user()?->can('manage_ledger') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_ledger') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_ledger') ?? false;
     }

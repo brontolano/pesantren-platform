@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Mutu;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Mutu\MutuInspeksi\Pages\CreateMutuInspeksi;
 use App\Filament\Resources\Mutu\MutuInspeksi\Pages\EditMutuInspeksi;
 use App\Filament\Resources\Mutu\MutuInspeksi\Pages\ListMutuInspeksi;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -21,7 +23,7 @@ use Modules\Mutu\Models\MutuSasaran;
 
 class MutuInspeksiResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = MutuInspeksi::class;
 
@@ -33,13 +35,13 @@ class MutuInspeksiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Inspeksi / Audit Mutu';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 4;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
+        return UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
     }
 
     public static function canAccess(): bool

@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Media;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Media\Pages\ListMediaAudit;
 use App\Models\MediaAudit;
 use App\Services\StorageQuotaService;
+use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -13,7 +15,7 @@ use Filament\Tables\Table;
 
 class MediaAuditResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = MediaAudit::class;
 
@@ -25,7 +27,7 @@ class MediaAuditResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Riwayat Media';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
     protected static ?int $navigationSort = 2;
 
@@ -37,7 +39,7 @@ class MediaAuditResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public static function canCreate(): bool

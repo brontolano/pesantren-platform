@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Approval;
 use App\Filament\Resources\Approval\ApprovalRule\Pages\CreateApprovalRule;
 use App\Filament\Resources\Approval\ApprovalRule\Pages\EditApprovalRule;
 use App\Filament\Resources\Approval\ApprovalRule\Pages\ListApprovalRule;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Facades\Filament;
@@ -37,7 +38,7 @@ class ApprovalRuleResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Aturan Persetujuan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 30;
 
@@ -49,7 +50,7 @@ class ApprovalRuleResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public static function form(Schema $schema): Schema

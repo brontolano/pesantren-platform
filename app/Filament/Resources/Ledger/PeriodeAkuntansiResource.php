@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Ledger;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Ledger\Pages\CreatePeriodeAkuntansi;
 use App\Filament\Resources\Ledger\Pages\EditPeriodeAkuntansi;
 use App\Filament\Resources\Ledger\Pages\ListPeriodeAkuntansi;
 use App\Services\AuditLogger;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -16,13 +18,14 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Ledger\Models\PeriodeAkuntansi;
 use Modules\Ledger\Services\PeriodClosingService;
 use Modules\Ledger\Services\PeriodeService;
 
 class PeriodeAkuntansiResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PeriodeAkuntansi::class;
 
@@ -34,13 +37,13 @@ class PeriodeAkuntansiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Periode Akuntansi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 5;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -53,7 +56,7 @@ class PeriodeAkuntansiResource extends Resource
         return auth()->user()?->can('manage_ledger') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         // Periode yang sudah closed tidak boleh diedit (immutability).
         if ($record instanceof PeriodeAkuntansi && $record->isClosed()) {
@@ -63,7 +66,7 @@ class PeriodeAkuntansiResource extends Resource
         return auth()->user()?->can('manage_ledger') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         if ($record instanceof PeriodeAkuntansi && ($record->isClosed() || $record->jurnal()->exists())) {
             return false;

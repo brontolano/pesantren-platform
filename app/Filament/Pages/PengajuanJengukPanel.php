@@ -17,7 +17,7 @@ class PengajuanJengukPanel extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-hand-raised';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepengasuhan';
 
     protected static ?int $navigationSort = 61;
 

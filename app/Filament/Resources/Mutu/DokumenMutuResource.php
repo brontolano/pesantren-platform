@@ -2,16 +2,18 @@
 
 namespace App\Filament\Resources\Mutu;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Mutu\Pages\CreateDokumenMutu;
 use App\Filament\Resources\Mutu\Pages\EditDokumenMutu;
 use App\Filament\Resources\Mutu\Pages\ListDokumenMutu;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Notifications\Notification;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -23,7 +25,7 @@ use Modules\Mutu\Services\MutuService;
 
 class DokumenMutuResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = DokumenMutu::class;
 
@@ -35,13 +37,13 @@ class DokumenMutuResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Dokumen Mutu';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 1;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
+        return UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
     }
 
     public static function canAccess(): bool

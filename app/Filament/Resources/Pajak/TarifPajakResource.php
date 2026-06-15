@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Pajak;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Pajak\Pages\ListTarifPajak;
+use App\Support\UiMode;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -12,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Pajak\Models\TarifPajak;
 
 /**
@@ -19,7 +22,7 @@ use Modules\Pajak\Models\TarifPajak;
  */
 class TarifPajakResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = TarifPajak::class;
 
@@ -31,13 +34,13 @@ class TarifPajakResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Tarif Pajak';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pajak';
 
     protected static ?int $navigationSort = 14;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('pajak') && (auth()->user()?->can('manage_pajak') ?? false);
+        return UiMode::advanced() && static::moduleVisible('pajak') && (auth()->user()?->can('manage_pajak') ?? false);
     }
 
     public static function canAccess(): bool
@@ -50,7 +53,7 @@ class TarifPajakResource extends Resource
         return false; // 5 tarif standar di-seed; cukup diedit, tak perlu buat baru.
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_pajak') ?? false;
     }

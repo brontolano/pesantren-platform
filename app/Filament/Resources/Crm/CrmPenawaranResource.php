@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Crm;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Crm\Pages\ListCrmPenawaran;
+use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -15,7 +17,7 @@ use Modules\PPDB\Models\CrmPenawaran;
  */
 class CrmPenawaranResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = CrmPenawaran::class;
 
@@ -27,13 +29,13 @@ class CrmPenawaranResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Penawaran (Quotation)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
     protected static ?int $navigationSort = 30;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_laporan_pimpinan', 'manage_keuangan']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_laporan_pimpinan', 'manage_keuangan']) ?? false);
     }
 
     public static function canAccess(): bool

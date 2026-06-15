@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Mutu;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Mutu\MutuSasaran\Pages\CreateMutuSasaran;
 use App\Filament\Resources\Mutu\MutuSasaran\Pages\EditMutuSasaran;
 use App\Filament\Resources\Mutu\MutuSasaran\Pages\ListMutuSasaran;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -23,7 +25,7 @@ use Modules\Mutu\Services\MutuKpiService;
 
 class MutuSasaranResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = MutuSasaran::class;
 
@@ -35,13 +37,13 @@ class MutuSasaranResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Sasaran Mutu (KPI)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 2;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
+        return UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
     }
 
     public static function canAccess(): bool

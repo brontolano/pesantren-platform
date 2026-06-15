@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -10,6 +11,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Modules\Ledger\Services\BukuBesarService;
@@ -28,7 +30,7 @@ class NeracaSaldo extends Page implements HasForms
 
     protected static ?string $title = 'Neraca Saldo (Trial Balance)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 12;
 
@@ -47,7 +49,7 @@ class NeracaSaldo extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public function mount(): void
@@ -67,7 +69,7 @@ class NeracaSaldo extends Page implements HasForms
     }
 
     #[Computed]
-    public function rows(): \Illuminate\Support\Collection
+    public function rows(): Collection
     {
         return app(BukuBesarService::class)->neracaSaldo($this->data['to'] ?? null);
     }

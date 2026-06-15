@@ -40,7 +40,7 @@ class KegiatanResource extends Resource
 
     protected static ?string $navigationLabel = 'Kegiatan';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
+    protected static UnitEnum|string|null $navigationGroup = 'Kepengasuhan';
 
     protected static ?int $navigationSort = 1;
 

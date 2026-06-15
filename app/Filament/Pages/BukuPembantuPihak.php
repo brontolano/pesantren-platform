@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,7 @@ class BukuPembantuPihak extends Page
 
     protected static ?string $title = 'Buku Besar Pembantu — Piutang Santri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 10;
 
@@ -40,7 +41,7 @@ class BukuPembantuPihak extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     protected function getViewData(): array
