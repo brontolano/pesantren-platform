@@ -92,6 +92,19 @@ class UnitSetupRegistry
                         self::resourceUrl(\App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource::class)),
                 ],
             ],
+            'tahfidz' => [
+                'label' => 'Tahfidz',
+                'icon' => 'heroicon-o-book-open',
+                'permission' => 'manage_santri',
+                'steps' => [
+                    self::step('halaqah', 'Halaqah', 'Kelompok hafalan + musyrif (bisa impor).',
+                        self::adaData(\Modules\Tahfidz\Models\Halaqah::class),
+                        self::resourceUrl(\App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource::class)),
+                    self::step('hafalan', 'Progres hafalan', 'Data hafalan santri (bisa impor).',
+                        self::adaData(\Modules\Tahfidz\Models\HafalanTahfidz::class),
+                        self::resourceUrl(\App\Filament\Resources\Tahfidz\HafalanTahfidzResource::class)),
+                ],
+            ],
             'sdm' => [
                 'label' => 'SDM / Pegawai',
                 'icon' => 'heroicon-o-briefcase',
