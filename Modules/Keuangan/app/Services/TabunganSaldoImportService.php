@@ -3,9 +3,10 @@
 namespace Modules\Keuangan\Services;
 
 use App\Models\Tenant;
+use App\Support\Uang;
 use Illuminate\Support\Facades\Validator;
-use Modules\Keuangan\Models\TabunganTransaksi;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Models\TabunganTransaksi;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Reader\Common\Creator\ReaderFactory;
 use RuntimeException;
@@ -34,9 +35,8 @@ class TabunganSaldoImportService
     ];
 
     public function __construct(
-        private readonly TabunganService $tabunganService = new TabunganService(),
-    ) {
-    }
+        private readonly TabunganService $tabunganService = new TabunganService,
+    ) {}
 
     /**
      * @return array{
@@ -162,18 +162,10 @@ class TabunganSaldoImportService
         return $summary;
     }
 
-    /** Parsing nominal tahan format Indonesia ("1.000.000,50") + bulatkan 2 desimal. */
+    /** Parsing nominal tak ambigu (ribuan/desimal/round-trip) — sumber tunggal. */
     private function angka(mixed $nilai): float
     {
-        $teks = trim((string) $nilai);
-        if ($teks === '') {
-            return 0.0;
-        }
-        // Buang pemisah ribuan titik & spasi, jadikan koma desimal → titik.
-        $teks = str_replace(['.', ' '], '', $teks);
-        $teks = str_replace(',', '.', $teks);
-
-        return is_numeric($teks) ? round((float) $teks, 2) : 0.0;
+        return Uang::parse($nilai);
     }
 
     /**

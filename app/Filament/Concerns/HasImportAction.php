@@ -157,11 +157,6 @@ trait HasImportAction
     }
 
     /**
-     * Bangun Action import siap pakai untuk header halaman List.
-     *
-     * @param  ImportConfig  $config
-     */
-    /**
      * Saklar kebijakan per tenant (KebijakanRegistry) untuk fitur impor opsional.
      * Baca TOLERAN (bool / "1"/"true"/"ya" / bungkus ['value'=>..]); default mati.
      */
@@ -185,6 +180,11 @@ trait HasImportAction
         return false;
     }
 
+    /**
+     * Bangun Action import siap pakai untuk header halaman List.
+     *
+     * @param  ImportConfig  $config
+     */
     protected function buildImportAction(array $config): Action
     {
         $entitas = $config['entitas'];

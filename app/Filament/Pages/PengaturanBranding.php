@@ -12,6 +12,7 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -43,6 +44,8 @@ class PengaturanBranding extends Page implements HasForms
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationLabel = 'Settings & Branding';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
     protected static ?string $title = 'Settings & Branding';
 
@@ -95,22 +98,22 @@ class PengaturanBranding extends Page implements HasForms
         $this->currentLogoPath = data_get($settings->get('branding_logo')?->value, 'logo_path');
 
         $this->form->fill([
-            'branding_name'             => data_get($settings->get('branding_name')?->value, 'text'),
-            'branding_tagline'          => data_get($settings->get('branding_tagline')?->value, 'text'),
-            'branding_primary_color'    => data_get($settings->get('branding_primary_color')?->value, 'color', self::DEFAULT_PRIMARY),
-            'branding_secondary_color'  => data_get($settings->get('branding_secondary_color')?->value, 'color', self::DEFAULT_SECONDARY),
-            'branding_logo'             => null,   // SENGAJA null — lihat komentar di atas
-            'branding_favicon'          => data_get($settings->get('branding_favicon')?->value, 'text'),
-            'branding_font'             => data_get($settings->get('branding_font')?->value, 'text', 'default'),
-            'branding_latitude'         => data_get($settings->get('branding_latitude')?->value, 'text'),
-            'branding_longitude'        => data_get($settings->get('branding_longitude')?->value, 'text'),
-            'ppdb_form_fields'          => data_get($settings->get('ppdb_form_fields')?->value, 'fields', []),
-            'admission_inline_enabled'  => (bool) data_get($settings->get('admission_inline_enabled')?->value, 'enabled', false),
-            'admission_academic_year'   => data_get($settings->get('admission_academic_year')?->value, 'text', '2026/2027'),
-            'admission_admin_whatsapp'  => data_get($settings->get('admission_admin_whatsapp')?->value, 'text'),
-            'admission_bank_name'       => data_get($settings->get('admission_bank_name')?->value, 'text'),
-            'admission_account_number'  => data_get($settings->get('admission_account_number')?->value, 'text'),
-            'admission_account_name'    => data_get($settings->get('admission_account_name')?->value, 'text'),
+            'branding_name' => data_get($settings->get('branding_name')?->value, 'text'),
+            'branding_tagline' => data_get($settings->get('branding_tagline')?->value, 'text'),
+            'branding_primary_color' => data_get($settings->get('branding_primary_color')?->value, 'color', self::DEFAULT_PRIMARY),
+            'branding_secondary_color' => data_get($settings->get('branding_secondary_color')?->value, 'color', self::DEFAULT_SECONDARY),
+            'branding_logo' => null,   // SENGAJA null — lihat komentar di atas
+            'branding_favicon' => data_get($settings->get('branding_favicon')?->value, 'text'),
+            'branding_font' => data_get($settings->get('branding_font')?->value, 'text', 'default'),
+            'branding_latitude' => data_get($settings->get('branding_latitude')?->value, 'text'),
+            'branding_longitude' => data_get($settings->get('branding_longitude')?->value, 'text'),
+            'ppdb_form_fields' => data_get($settings->get('ppdb_form_fields')?->value, 'fields', []),
+            'admission_inline_enabled' => (bool) data_get($settings->get('admission_inline_enabled')?->value, 'enabled', false),
+            'admission_academic_year' => data_get($settings->get('admission_academic_year')?->value, 'text', '2026/2027'),
+            'admission_admin_whatsapp' => data_get($settings->get('admission_admin_whatsapp')?->value, 'text'),
+            'admission_bank_name' => data_get($settings->get('admission_bank_name')?->value, 'text'),
+            'admission_account_number' => data_get($settings->get('admission_account_number')?->value, 'text'),
+            'admission_account_name' => data_get($settings->get('admission_account_name')?->value, 'text'),
             'admission_transfer_amount' => data_get($settings->get('admission_transfer_amount')?->value, 'text'),
             'admission_transfer_instructions' => data_get($settings->get('admission_transfer_instructions')?->value, 'text'),
             'admission_success_message' => data_get($settings->get('admission_success_message')?->value, 'text'),
@@ -201,7 +204,7 @@ class PengaturanBranding extends Page implements HasForms
                 Section::make('Landing Registration')
                     ->description('Pengaturan form inline di landing page, termasuk admin WhatsApp dan informasi transfer.')
                     ->schema([
-                        \Filament\Forms\Components\Toggle::make('admission_inline_enabled')
+                        Toggle::make('admission_inline_enabled')
                             ->label('Aktifkan form pendaftaran inline di landing page')
                             ->inline(false),
                         TextInput::make('admission_academic_year')
@@ -238,7 +241,7 @@ class PengaturanBranding extends Page implements HasForms
 
         // Jika user upload logo baru → pakai; jika tidak → pertahankan logo lama.
         $newLogoPath = $data['branding_logo'] ?? null;
-        $logoPath    = $newLogoPath ?: $this->currentLogoPath;
+        $logoPath = $newLogoPath ?: $this->currentLogoPath;
 
         if ($newLogoPath) {
             // Daftarkan logo baru ke media library
@@ -248,16 +251,16 @@ class PengaturanBranding extends Page implements HasForms
         }
 
         $payloads = [
-            'branding_name'            => ['text' => $data['branding_name'] ?? null],
-            'branding_tagline'         => ['text' => $data['branding_tagline'] ?? null],
-            'branding_primary_color'   => ['color' => $data['branding_primary_color'] ?? null],
+            'branding_name' => ['text' => $data['branding_name'] ?? null],
+            'branding_tagline' => ['text' => $data['branding_tagline'] ?? null],
+            'branding_primary_color' => ['color' => $data['branding_primary_color'] ?? null],
             'branding_secondary_color' => ['color' => $data['branding_secondary_color'] ?? null],
-            'branding_logo'            => ['logo_path' => $logoPath],
-            'branding_favicon'         => ['text' => $data['branding_favicon'] ?? null],
-            'branding_font'            => ['text' => $data['branding_font'] ?? 'default'],
-            'branding_latitude'        => ['text' => $data['branding_latitude'] ?? null],
-            'branding_longitude'       => ['text' => $data['branding_longitude'] ?? null],
-            'ppdb_form_fields'         => ['fields' => $data['ppdb_form_fields'] ?? []],
+            'branding_logo' => ['logo_path' => $logoPath],
+            'branding_favicon' => ['text' => $data['branding_favicon'] ?? null],
+            'branding_font' => ['text' => $data['branding_font'] ?? 'default'],
+            'branding_latitude' => ['text' => $data['branding_latitude'] ?? null],
+            'branding_longitude' => ['text' => $data['branding_longitude'] ?? null],
+            'ppdb_form_fields' => ['fields' => $data['ppdb_form_fields'] ?? []],
             'admission_inline_enabled' => ['enabled' => (bool) ($data['admission_inline_enabled'] ?? false)],
             'admission_academic_year' => ['text' => $data['admission_academic_year'] ?? '2026/2027'],
             'admission_admin_whatsapp' => ['text' => $data['admission_admin_whatsapp'] ?? null],
@@ -276,16 +279,16 @@ class PengaturanBranding extends Page implements HasForms
         // Reset FileUpload ke kosong agar tidak mencoba preview path final
         // (path final di disk tenant tidak bisa di-resolve via URL standar).
         $this->form->fill([
-            'branding_name'            => $data['branding_name'] ?? null,
-            'branding_tagline'         => $data['branding_tagline'] ?? null,
-            'branding_primary_color'   => $data['branding_primary_color'] ?? null,
+            'branding_name' => $data['branding_name'] ?? null,
+            'branding_tagline' => $data['branding_tagline'] ?? null,
+            'branding_primary_color' => $data['branding_primary_color'] ?? null,
             'branding_secondary_color' => $data['branding_secondary_color'] ?? null,
-            'branding_logo'            => null,   // Selalu kosong pasca-save
-            'branding_favicon'         => $data['branding_favicon'] ?? null,
-            'branding_font'            => $data['branding_font'] ?? 'default',
-            'branding_latitude'        => $data['branding_latitude'] ?? null,
-            'branding_longitude'       => $data['branding_longitude'] ?? null,
-            'ppdb_form_fields'         => $data['ppdb_form_fields'] ?? [],
+            'branding_logo' => null,   // Selalu kosong pasca-save
+            'branding_favicon' => $data['branding_favicon'] ?? null,
+            'branding_font' => $data['branding_font'] ?? 'default',
+            'branding_latitude' => $data['branding_latitude'] ?? null,
+            'branding_longitude' => $data['branding_longitude'] ?? null,
+            'ppdb_form_fields' => $data['ppdb_form_fields'] ?? [],
             'admission_inline_enabled' => (bool) ($data['admission_inline_enabled'] ?? false),
             'admission_academic_year' => $data['admission_academic_year'] ?? '2026/2027',
             'admission_admin_whatsapp' => $data['admission_admin_whatsapp'] ?? null,
@@ -322,10 +325,10 @@ class PengaturanBranding extends Page implements HasForms
                 ['path' => $path],
                 [
                     'original_name' => basename($path),
-                    'mime'          => $disk->mimeType($path) ?: 'image/png',
-                    'size_bytes'    => (int) $disk->size($path),
-                    'folder'        => 'branding',
-                    'uploaded_by'   => Auth::id(),
+                    'mime' => $disk->mimeType($path) ?: 'image/png',
+                    'size_bytes' => (int) $disk->size($path),
+                    'folder' => 'branding',
+                    'uploaded_by' => Auth::id(),
                 ],
             );
         } catch (\Throwable) {

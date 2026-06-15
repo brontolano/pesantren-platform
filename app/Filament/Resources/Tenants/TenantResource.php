@@ -137,6 +137,7 @@ class TenantResource extends Resource
                         ->icon('heroicon-o-circle-stack')
                         ->color('gray')
                         ->action(function (Tenant $record) {
+                            abort_unless(static::canRecovery(auth()->user()), 403);
                             $size = app(TenantRecoveryService::class)->size($record);
                             Notification::make()
                                 ->title('Database tenant')
@@ -151,6 +152,7 @@ class TenantResource extends Resource
                         ->requiresConfirmation()
                         ->modalDescription('Buat & unduh backup database tenant ini (.sql.gz).')
                         ->action(function (Tenant $record) {
+                            abort_unless(static::canRecovery(auth()->user()), 403);
                             $path = app(TenantRecoveryService::class)->backup($record);
 
                             return response()->download($path)->deleteFileAfterSend();
@@ -162,6 +164,7 @@ class TenantResource extends Resource
                         ->requiresConfirmation()
                         ->modalDescription('Buat & unduh backup file unggahan tenant ini (.tar.gz): foto santri, dokumen, dll.')
                         ->action(function (Tenant $record) {
+                            abort_unless(static::canRecovery(auth()->user()), 403);
                             $path = app(TenantRecoveryService::class)->backupFiles($record);
                             if ($path === null) {
                                 Notification::make()->title('Tidak ada file')->body('Tenant ini belum punya file unggahan.')->info()->send();
@@ -184,9 +187,18 @@ class TenantResource extends Resource
                                 ->directory('tenant-restore-uploads')
                                 ->acceptedFileTypes(['application/gzip', 'application/x-gzip', 'application/octet-stream'])
                                 ->required(),
+                            TextInput::make('konfirmasi')
+                                ->label('Ketik ID pesantren untuk konfirmasi')
+                                ->helperText(fn (Tenant $record): string => 'Menimpa SELURUH data DB. Ketik persis: '.$record->getKey())
+                                ->required(),
                         ])
                         ->action(function (array $data, Tenant $record) {
                             abort_unless(static::canRecovery(auth()->user()), 403);
+                            if (trim((string) ($data['konfirmasi'] ?? '')) !== (string) $record->getKey()) {
+                                Notification::make()->title('Konfirmasi tidak cocok')->body('Ketik ID pesantren yang benar.')->danger()->send();
+
+                                return;
+                            }
                             $svc = app(TenantRecoveryService::class);
                             $path = Storage::disk('local')->path($data['file']);
                             try {
@@ -215,9 +227,18 @@ class TenantResource extends Resource
                                 ->directory('tenant-restore-uploads')
                                 ->acceptedFileTypes(['application/gzip', 'application/x-gzip', 'application/octet-stream'])
                                 ->required(),
+                            TextInput::make('konfirmasi')
+                                ->label('Ketik ID pesantren untuk konfirmasi')
+                                ->helperText(fn (Tenant $record): string => 'Menimpa file unggahan. Ketik persis: '.$record->getKey())
+                                ->required(),
                         ])
                         ->action(function (array $data, Tenant $record) {
                             abort_unless(static::canRecovery(auth()->user()), 403);
+                            if (trim((string) ($data['konfirmasi'] ?? '')) !== (string) $record->getKey()) {
+                                Notification::make()->title('Konfirmasi tidak cocok')->body('Ketik ID pesantren yang benar.')->danger()->send();
+
+                                return;
+                            }
                             $path = Storage::disk('local')->path($data['file']);
                             try {
                                 app(TenantRecoveryService::class)->restoreFiles($record, $path);

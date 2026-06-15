@@ -3,6 +3,7 @@
 namespace Modules\Ledger\Services;
 
 use App\Models\Tenant;
+use App\Support\Uang;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\Jurnal;
 use OpenSpout\Common\Entity\Row;
@@ -34,8 +35,7 @@ class LedgerSaldoAwalImportService
 
     public function __construct(
         private readonly JurnalService $jurnalService = new JurnalService,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{
@@ -181,15 +181,7 @@ class LedgerSaldoAwalImportService
 
     private function angka(mixed $nilai): float
     {
-        $teks = trim((string) $nilai);
-        if ($teks === '') {
-            return 0.0;
-        }
-        // Buang pemisah ribuan titik, jadikan koma desimal → titik.
-        $teks = str_replace(['.', ' '], '', $teks);
-        $teks = str_replace(',', '.', $teks);
-
-        return is_numeric($teks) ? (float) $teks : 0.0;
+        return Uang::parse($nilai);
     }
 
     private function gagal(array &$summary, int $rowNumber, ?string $ref, string $pesan): void
