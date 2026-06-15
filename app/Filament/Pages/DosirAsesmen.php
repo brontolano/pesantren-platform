@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +23,7 @@ class DosirAsesmen extends Page
 
     protected static ?string $title = 'L4 Dosir Asesmen & L7 Operasional';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
 
     protected static ?int $navigationSort = 9;
 
@@ -39,7 +40,7 @@ class DosirAsesmen extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     #[Computed]

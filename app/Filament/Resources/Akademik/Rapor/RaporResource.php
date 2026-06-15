@@ -2,10 +2,11 @@
 
 namespace App\Filament\Resources\Akademik\Rapor;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\Rapor\Pages\ListRapor;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,14 +17,15 @@ use Modules\Kesantrian\Models\Kelas;
 
 class RaporResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = Rapor::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationLabel = 'Rapor';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 5;
 
@@ -60,12 +62,12 @@ class RaporResource extends Resource
                     ->icon('heroicon-o-sparkles')
                     ->visible(fn (): bool => auth()->user()?->can('manage_akademik') ?? false)
                     ->form([
-                        \Filament\Forms\Components\Select::make('periode_akademik_id')
+                        Select::make('periode_akademik_id')
                             ->label('Periode Akademik')
                             ->options(fn () => PeriodeAkademik::query()->orderByDesc('tanggal_mulai')->pluck('nama', 'id'))
                             ->required()
                             ->searchable(),
-                        \Filament\Forms\Components\Select::make('kelas_id')
+                        Select::make('kelas_id')
                             ->label('Kelas')
                             ->options(fn () => Kelas::query()->orderBy('nama_kelas')->pluck('nama_kelas', 'id'))
                             ->required()
@@ -100,4 +102,3 @@ class RaporResource extends Resource
         ];
     }
 }
-

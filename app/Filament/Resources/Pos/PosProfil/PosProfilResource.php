@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Pos\PosProfil;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Pos\PosProfil\Pages\CreatePosProfil;
 use App\Filament\Resources\Pos\PosProfil\Pages\EditPosProfil;
 use App\Filament\Resources\Pos\PosProfil\Pages\ListPosProfil;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -21,7 +23,7 @@ use Modules\Ledger\Models\Akun;
 
 class PosProfilResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PosProfil::class;
 
@@ -33,13 +35,13 @@ class PosProfilResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Profil Loket POS';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
 
     protected static ?int $navigationSort = 19;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
+        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
     }
 
     public static function canAccess(): bool

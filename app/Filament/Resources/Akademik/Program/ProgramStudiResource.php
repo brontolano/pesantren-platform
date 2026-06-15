@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Akademik\Program;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\Program\Pages\CreateProgramStudi;
 use App\Filament\Resources\Akademik\Program\Pages\EditProgramStudi;
 use App\Filament\Resources\Akademik\Program\Pages\ListProgramStudi;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Repeater;
@@ -21,25 +23,25 @@ use Modules\Akademik\Models\ProgramStudi;
 
 class ProgramStudiResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = ProgramStudi::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationLabel = 'Program & Kurikulum';
+    protected static ?string $navigationLabel = 'Program Studi';
 
     protected static ?string $modelLabel = 'Program';
 
     protected static ?string $pluralModelLabel = 'Program & Kurikulum';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 10;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool

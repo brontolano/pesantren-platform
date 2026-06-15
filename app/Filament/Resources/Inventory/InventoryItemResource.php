@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Inventory;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Inventory\InventoryItem\Pages\CreateInventoryItem;
 use App\Filament\Resources\Inventory\InventoryItem\Pages\EditInventoryItem;
 use App\Filament\Resources\Inventory\InventoryItem\Pages\ListInventoryItem;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -32,7 +34,7 @@ use Modules\Ledger\Models\Akun;
  */
 class InventoryItemResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = InventoryItem::class;
 
@@ -44,13 +46,13 @@ class InventoryItemResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Inventory Koperasi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
 
     protected static ?int $navigationSort = 21;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
+        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
     }
 
     public static function canAccess(): bool

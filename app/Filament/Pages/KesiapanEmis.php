@@ -24,7 +24,7 @@ class KesiapanEmis extends Page
 
     protected static ?string $title = 'Kesiapan Data EMIS';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'UKS & Alumni';
 
     protected static ?int $navigationSort = 11;
 

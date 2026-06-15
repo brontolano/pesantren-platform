@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Akademik\PresensiSantri;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\PresensiSantri\Pages\CreatePresensiSantri;
 use App\Filament\Resources\Akademik\PresensiSantri\Pages\EditPresensiSantri;
 use App\Filament\Resources\Akademik\PresensiSantri\Pages\ListPresensiSantri;
@@ -21,7 +22,7 @@ use Modules\Kesantrian\Models\Santri;
 
 class PresensiSantriResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PresensiSantri::class;
 
@@ -33,7 +34,7 @@ class PresensiSantriResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Presensi Harian';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 8;
 

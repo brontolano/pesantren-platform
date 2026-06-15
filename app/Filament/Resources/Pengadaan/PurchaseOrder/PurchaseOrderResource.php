@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Pengadaan\PurchaseOrder;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Pengadaan\PurchaseOrder\Pages\CreatePurchaseOrder;
 use App\Filament\Resources\Pengadaan\PurchaseOrder\Pages\EditPurchaseOrder;
 use App\Filament\Resources\Pengadaan\PurchaseOrder\Pages\ListPurchaseOrder;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -18,6 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\DivisiUnit;
 use Modules\Ledger\Models\SumberDana;
@@ -30,7 +33,7 @@ use Modules\Pengadaan\Services\PurchaseOrderService;
  */
 class PurchaseOrderResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PurchaseOrder::class;
 
@@ -42,13 +45,13 @@ class PurchaseOrderResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Purchase Order';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
 
     protected static ?int $navigationSort = 21;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('pengadaan') && (auth()->user()?->canAny(['view_keuangan', 'input_belanja', 'manage_ledger']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('pengadaan') && (auth()->user()?->canAny(['view_keuangan', 'input_belanja', 'manage_ledger']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -61,7 +64,7 @@ class PurchaseOrderResource extends Resource
         return auth()->user()?->can('input_belanja') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return $record instanceof PurchaseOrder && $record->status === 'draft'
             && (auth()->user()?->can('input_belanja') ?? false);

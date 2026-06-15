@@ -2,37 +2,41 @@
 
 namespace App\Filament\Resources\Akademik\Pelajaran;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\Pelajaran\Pages\CreatePelajaran;
 use App\Filament\Resources\Akademik\Pelajaran\Pages\EditPelajaran;
 use App\Filament\Resources\Akademik\Pelajaran\Pages\ListPelajaran;
 use App\Models\User;
+use App\Support\UiMode;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\Pelajaran;
 
 class PelajaranResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = Pelajaran::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationLabel = 'Pelajaran';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 2;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -45,12 +49,12 @@ class PelajaranResource extends Resource
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
@@ -99,4 +103,3 @@ class PelajaranResource extends Resource
         ];
     }
 }
-

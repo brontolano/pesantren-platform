@@ -2,39 +2,42 @@
 
 namespace App\Filament\Resources\Kesehatan;
 
-use BackedEnum;
-use UnitEnum;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatan\Pages\CreateRiwayatKesehatan;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatan\Pages\EditRiwayatKesehatan;
 use App\Filament\Resources\Kesehatan\RiwayatKesehatan\Pages\ListRiwayatKesehatan;
+use App\Support\UiMode;
+use BackedEnum;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Modules\Kesehatan\Models\RiwayatKesehatan;
+use UnitEnum;
 
 class RiwayatKesehatanResource extends Resource
 {
     /** Mode simple: menu lanjutan disembunyikan (fungsi & route tetap aktif). */
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced();
+        return UiMode::advanced();
     }
 
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = RiwayatKesehatan::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-heart';
 
     protected static ?string $navigationLabel = 'Riwayat Kesehatan';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kesantrian';
+    protected static UnitEnum|string|null $navigationGroup = 'UKS & Alumni';
 
     protected static ?int $navigationSort = 1;
 
@@ -63,7 +66,7 @@ class RiwayatKesehatanResource extends Resource
             Select::make('kondisi')
                 ->label('Kondisi')
                 ->options([
-                    'baik'  => 'Baik',
+                    'baik' => 'Baik',
                     'sakit' => 'Sakit',
                     'rujuk' => 'Rujuk ke RS',
                 ])
@@ -104,9 +107,9 @@ class RiwayatKesehatanResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListRiwayatKesehatan::route('/'),
+            'index' => ListRiwayatKesehatan::route('/'),
             'create' => CreateRiwayatKesehatan::route('/create'),
-            'edit'   => EditRiwayatKesehatan::route('/{record}/edit'),
+            'edit' => EditRiwayatKesehatan::route('/{record}/edit'),
         ];
     }
 

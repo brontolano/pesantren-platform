@@ -31,7 +31,7 @@ class JenisPelanggaranResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-scale';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kesantrian';
+    protected static UnitEnum|string|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
 
     protected static ?int $navigationSort = 8;
 

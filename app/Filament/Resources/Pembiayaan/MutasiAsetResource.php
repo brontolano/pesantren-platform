@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Pembiayaan;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Pembiayaan\Pages\ListMutasiAset;
+use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -17,7 +19,7 @@ use Modules\Pembiayaan\Models\MutasiAset;
  */
 class MutasiAsetResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = MutasiAset::class;
 
@@ -29,13 +31,13 @@ class MutasiAsetResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Mutasi / Pelepasan Aset';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
 
     protected static ?int $navigationSort = 2;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('pembiayaan') && (auth()->user()?->can('manage_pembiayaan') ?? false);
+        return UiMode::advanced() && static::moduleVisible('pembiayaan') && (auth()->user()?->can('manage_pembiayaan') ?? false);
     }
 
     public static function canAccess(): bool

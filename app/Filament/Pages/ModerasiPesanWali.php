@@ -28,7 +28,7 @@ class ModerasiPesanWali extends Page implements HasTable
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
 
     protected static ?int $navigationSort = 11;
 

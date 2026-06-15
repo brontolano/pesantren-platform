@@ -2,17 +2,20 @@
 
 namespace App\Filament\Resources\Pembiayaan;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Pembiayaan\Pages\CreateAset;
 use App\Filament\Resources\Pembiayaan\Pages\EditAset;
 use App\Filament\Resources\Pembiayaan\Pages\ListAset;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -27,7 +30,7 @@ use Modules\Pembiayaan\Services\DepresiasiService;
 
 class AsetResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Aset::class;
 
@@ -39,13 +42,13 @@ class AsetResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Aset';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
 
     protected static ?int $navigationSort = 1;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('pembiayaan') && (auth()->user()?->can('manage_pembiayaan') ?? false);
+        return UiMode::advanced() && static::moduleVisible('pembiayaan') && (auth()->user()?->can('manage_pembiayaan') ?? false);
     }
 
     public static function canAccess(): bool
@@ -116,7 +119,7 @@ class AsetResource extends Resource
                         $svc = app(DepresiasiService::class);
                         $svc->buatJadwal($record);
                         $n = $svc->postingHinggaPeriode($record, $data['periode'], Auth::id());
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title($n > 0 ? "$n periode penyusutan diposting." : 'Tidak ada periode jatuh tempo.')
                             ->success()->send();
                     }),
@@ -136,7 +139,7 @@ class AsetResource extends Resource
                             'keterangan' => $data['keterangan'] ?? null,
                             'created_by' => Auth::id(),
                         ]);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title($record->is_wakaf
                                 ? 'Aset wakaf dilepas (tanpa pengakuan laba/rugi).'
                                 : 'Aset dilepas — jurnal laba/rugi diposting.')

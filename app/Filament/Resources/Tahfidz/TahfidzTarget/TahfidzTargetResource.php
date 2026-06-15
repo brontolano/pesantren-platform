@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Tahfidz\TahfidzTarget;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Tahfidz\TahfidzTarget\Pages\CreateTahfidzTarget;
 use App\Filament\Resources\Tahfidz\TahfidzTarget\Pages\EditTahfidzTarget;
 use App\Filament\Resources\Tahfidz\TahfidzTarget\Pages\ListTahfidzTarget;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -20,7 +22,7 @@ use Modules\Tahfidz\Services\TahfidzKpiService;
 
 class TahfidzTargetResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = TahfidzTarget::class;
 
@@ -32,13 +34,13 @@ class TahfidzTargetResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Target Tahfidz (KPI)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tahfidz';
 
     protected static ?int $navigationSort = 6;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool

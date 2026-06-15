@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\GenerateThr;
 use App\Filament\Pages\GridNilai;
 use App\Filament\Pages\KasirKantin;
@@ -246,13 +247,19 @@ class TenantPanelProvider extends PanelProvider
                 // JANGAN beri ->icon() pada grup: Filament v5 melempar 500 bila grup
                 // berikon berisi item berikon (lihat TenantPanelAuthedSmokeTest).
                 NavigationGroup::make('Kesantrian'),
+                NavigationGroup::make('Kepengasuhan & Kedisiplinan')->collapsible(),
+                NavigationGroup::make('UKS & Alumni')->collapsible(),
                 NavigationGroup::make('PPDB')->collapsible(),
-                NavigationGroup::make('Akademik & Tahfidz'),
+                NavigationGroup::make('Akademik')->collapsible(),
+                NavigationGroup::make('Tahfidz')->collapsible(),
                 NavigationGroup::make('Keuangan'),
+                NavigationGroup::make('Kas & Kantin')->collapsible(),
                 NavigationGroup::make('Akuntansi & Pajak')->collapsible(),
                 NavigationGroup::make('Kepegawaian')->collapsible(),
                 NavigationGroup::make('AI Khadim Digital')->collapsible(),
                 NavigationGroup::make('Kelembagaan & Komunikasi')->collapsible(),
+                NavigationGroup::make('Sarana & Logistik')->collapsible(),
+                NavigationGroup::make('Laporan Pimpinan')->collapsible(),
                 NavigationGroup::make('Pengaturan & Mutu')->collapsible(),
             ]);
 
@@ -264,7 +271,7 @@ class TenantPanelProvider extends PanelProvider
             // Login panel DISATUKAN ke halaman bermerek di '/': page login bawaan
             // /admin/login hanya redirect ke '/' (lihat App\Filament\Pages\Auth\Login).
             // Aman — mengganti page class, BUKAN shadow route web (yang dulu 500).
-            ->login(\App\Filament\Pages\Auth\Login::class)
+            ->login(Login::class)
             ->passwordReset()
             ->profile()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])

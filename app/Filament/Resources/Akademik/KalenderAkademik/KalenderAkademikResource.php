@@ -43,7 +43,7 @@ class KalenderAkademikResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kalender Akademik';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static UnitEnum|string|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 1;
 

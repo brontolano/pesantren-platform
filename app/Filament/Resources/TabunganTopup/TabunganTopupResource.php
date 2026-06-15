@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TabunganTopup;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\TabunganTopup\Pages\ListTabunganTopup;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
@@ -16,7 +17,7 @@ use Modules\Keuangan\Services\TopupService;
 
 class TabunganTopupResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = TabunganTopup::class;
 
@@ -28,7 +29,7 @@ class TabunganTopupResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Topup Tabungan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
 
     protected static ?int $navigationSort = 5;
 
@@ -102,7 +103,7 @@ class TabunganTopupResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn (TabunganTopup $record) => $record->status === 'menunggu' && auth()->user()?->can('manage_keuangan'))
                     ->action(function (TabunganTopup $record): void {
-                        (new TopupService())->setujui($record, auth()->id());
+                        (new TopupService)->setujui($record, auth()->id());
                     }),
                 Action::make('tolak')
                     ->label('Tolak')
@@ -116,7 +117,7 @@ class TabunganTopupResource extends Resource
                             ->rows(3),
                     ])
                     ->action(function (TabunganTopup $record, array $data): void {
-                        (new TopupService())->tolak($record, auth()->id(), $data['alasan']);
+                        (new TopupService)->tolak($record, auth()->id(), $data['alasan']);
                     }),
             ]);
     }

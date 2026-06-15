@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Kegiatan\Template;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Kegiatan\Template\Pages\CreateKegiatanTemplate;
 use App\Filament\Resources\Kegiatan\Template\Pages\EditKegiatanTemplate;
 use App\Filament\Resources\Kegiatan\Template\Pages\ListKegiatanTemplate;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -25,7 +27,7 @@ use Modules\Kegiatan\Services\KegiatanLanjutService;
 
 class KegiatanTemplateResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = KegiatanTemplate::class;
 
@@ -37,13 +39,13 @@ class KegiatanTemplateResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Template Kegiatan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
 
     protected static ?int $navigationSort = 5;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
+        return UiMode::advanced() && static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
     }
 
     public static function canAccess(): bool
