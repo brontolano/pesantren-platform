@@ -28,24 +28,43 @@ class UnitSetupRegistry
     public static function units(): array
     {
         return [
+            // 1 — KESANTRIAN (fold: asrama + kesehatan, sesuai domain navigasi)
             'kesantrian' => [
                 'label' => 'Kesantrian',
                 'icon' => 'heroicon-o-user-group',
                 'permission' => 'manage_santri',
                 'steps' => [
-                    self::step('identitas', 'Identitas pesantren', 'Nama, logo, kontak pondok.',
-                        self::settingTerisi('branding_name'),
-                        self::pageUrl(\App\Filament\Pages\PengaturanBranding::class)),
                     self::step('santri', 'Data santri', 'Impor dari Excel atau tambah manual.',
                         self::adaData(\Modules\Kesantrian\Models\Santri::class),
                         self::resourceUrl(\App\Filament\Resources\Santri\SantriResource::class)),
                     self::step('wali', 'Akun wali', 'Buat akun wali (login pakai no. HP).',
                         self::adaWali(),
                         self::resourceUrl(\App\Filament\Resources\Santri\SantriResource::class)),
+                    self::step('asrama', 'Penempatan asrama', 'Blok/kamar + penempatan santri (bisa impor).',
+                        self::adaData(\Modules\Asrama\Models\PenempatanAsrama::class),
+                        self::resourceUrl(\App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource::class)),
+                    self::step('obat', 'Master obat (UKS)', 'Daftar obat (bisa impor).',
+                        self::adaData(\Modules\Kesehatan\Models\Obat::class),
+                        self::resourceUrl(\App\Filament\Resources\Kesehatan\ObatResource::class)),
                 ],
             ],
+            // 2 — PPDB
+            'ppdb' => [
+                'label' => 'PPDB',
+                'icon' => 'heroicon-o-clipboard-document-list',
+                'permission' => 'view_santri',
+                'steps' => [
+                    self::step('jadwal_ujian', 'Jadwal ujian', 'Jadwal ujian seleksi.',
+                        self::adaData(\Modules\PPDB\Models\JadwalUjian::class),
+                        self::resourceUrl(\App\Filament\Resources\PPDB\JadwalUjian\JadwalUjianResource::class)),
+                    self::step('bank_soal', 'Bank/paket soal', 'Paket soal ujian masuk.',
+                        self::adaData(\Modules\PPDB\Models\PaketSoal::class),
+                        null),
+                ],
+            ],
+            // 3 — AKADEMIK & TAHFIDZ (fold: tahfidz)
             'akademik' => [
-                'label' => 'Akademik',
+                'label' => 'Akademik & Tahfidz',
                 'icon' => 'heroicon-o-academic-cap',
                 'permission' => 'manage_akademik',
                 'steps' => [
@@ -61,8 +80,12 @@ class UnitSetupRegistry
                     self::step('jadwal', 'Jadwal pelajaran', 'Jadwal per kelas (bisa impor).',
                         self::adaData(\Modules\Akademik\Models\JadwalPelajaran::class),
                         self::resourceUrl(\App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource::class)),
+                    self::step('halaqah', 'Halaqah tahfidz', 'Kelompok hafalan + musyrif (bisa impor).',
+                        self::adaData(\Modules\Tahfidz\Models\Halaqah::class),
+                        self::resourceUrl(\App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource::class)),
                 ],
             ],
+            // 4 — KEUANGAN (operasional)
             'keuangan' => [
                 'label' => 'Keuangan',
                 'icon' => 'heroicon-o-banknotes',
@@ -71,58 +94,77 @@ class UnitSetupRegistry
                     self::step('skema_biaya', 'Skema biaya', 'Template tagihan (SPP, dll).',
                         self::adaData(\Modules\Keuangan\Models\SkemaBiaya::class),
                         self::resourceUrl(\App\Filament\Resources\SkemaBiaya\SkemaBiayaResource::class)),
+                    self::step('metode', 'Metode pembayaran', 'Tunai/transfer/QRIS, dll.',
+                        self::adaData(\Modules\Keuangan\Models\MetodePembayaran::class),
+                        null),
                     self::step('tagihan', 'Tagihan / SPP', 'Buat atau impor tagihan santri.',
                         self::adaData(\Modules\Keuangan\Models\Tagihan::class),
                         self::resourceUrl(\App\Filament\Resources\Tagihan\TagihanResource::class)),
-                    self::step('tabungan', 'Saldo tabungan', 'Saldo awal tabungan (bila go-live tengah tahun).',
-                        self::adaData(\Modules\Keuangan\Models\Tabungan::class),
-                        self::resourceUrl(\App\Filament\Resources\Tabungan\TabunganResource::class)),
                 ],
             ],
-            'asrama' => [
-                'label' => 'Asrama',
-                'icon' => 'heroicon-o-home-modern',
-                'permission' => 'manage_santri',
+            // 5 — AKUNTANSI & PAJAK (fondasi uang)
+            'akuntansi' => [
+                'label' => 'Akuntansi & Pajak',
+                'icon' => 'heroicon-o-calculator',
+                'permission' => 'manage_ledger',
                 'steps' => [
-                    self::step('blok', 'Blok & kamar', 'Bangunan & kamar (auto saat impor penempatan).',
-                        self::adaData(\Modules\Asrama\Models\BlokAsrama::class),
-                        self::resourceUrl(\App\Filament\Resources\Asrama\BlokAsrama\BlokAsramaResource::class)),
-                    self::step('penempatan', 'Penempatan santri', 'Tempatkan santri ke kamar (bisa impor).',
-                        self::adaData(\Modules\Asrama\Models\PenempatanAsrama::class),
-                        self::resourceUrl(\App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource::class)),
+                    self::step('coa', 'Bagan akun (COA)', 'Otomatis ter-seed; tinjau bila perlu.',
+                        self::adaData(\Modules\Ledger\Models\Akun::class),
+                        self::resourceUrl(\App\Filament\Resources\Ledger\AkunResource::class)),
+                    self::step('sumber_dana', 'Sumber dana', 'Klasifikasi sumber dana.',
+                        self::adaData(\Modules\Ledger\Models\SumberDana::class),
+                        self::resourceUrl(\App\Filament\Resources\Ledger\SumberDanaResource::class)),
+                    self::step('periode_akuntansi', 'Periode akuntansi', 'Periode buku berjalan.',
+                        self::adaData(\Modules\Ledger\Models\PeriodeAkuntansi::class),
+                        self::resourceUrl(\App\Filament\Resources\Ledger\PeriodeAkuntansiResource::class)),
                 ],
             ],
-            'tahfidz' => [
-                'label' => 'Tahfidz',
-                'icon' => 'heroicon-o-book-open',
-                'permission' => 'manage_santri',
-                'steps' => [
-                    self::step('halaqah', 'Halaqah', 'Kelompok hafalan + musyrif (bisa impor).',
-                        self::adaData(\Modules\Tahfidz\Models\Halaqah::class),
-                        self::resourceUrl(\App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource::class)),
-                    self::step('hafalan', 'Progres hafalan', 'Data hafalan santri (bisa impor).',
-                        self::adaData(\Modules\Tahfidz\Models\HafalanTahfidz::class),
-                        self::resourceUrl(\App\Filament\Resources\Tahfidz\HafalanTahfidzResource::class)),
-                ],
-            ],
-            'sdm' => [
-                'label' => 'SDM / Pegawai',
+            // 6 — KEPEGAWAIAN (fold: sdm)
+            'kepegawaian' => [
+                'label' => 'Kepegawaian',
                 'icon' => 'heroicon-o-briefcase',
                 'permission' => 'manage_payroll',
                 'steps' => [
+                    self::step('jabatan', 'Jabatan', 'Otomatis ter-seed; sesuaikan bila perlu.',
+                        self::adaData(\Modules\Payroll\Models\Jabatan::class),
+                        self::resourceUrl(\App\Filament\Resources\Payroll\Jabatan\JabatanResource::class)),
                     self::step('pegawai', 'Data pegawai', 'Guru & karyawan (bisa impor).',
                         self::adaData(\Modules\Payroll\Models\Employee::class),
                         self::resourceUrl(\App\Filament\Resources\Payroll\Employee\EmployeeResource::class)),
                 ],
             ],
-            'kesehatan' => [
-                'label' => 'Kesehatan',
-                'icon' => 'heroicon-o-heart',
-                'permission' => 'manage_santri',
+            // 7 — KELEMBAGAAN & KOMUNIKASI
+            'kelembagaan' => [
+                'label' => 'Kelembagaan & Komunikasi',
+                'icon' => 'heroicon-o-building-office-2',
+                'permission' => 'manage_tenant_settings',
                 'steps' => [
-                    self::step('obat', 'Master obat', 'Daftar obat UKS (bisa impor).',
-                        self::adaData(\Modules\Kesehatan\Models\Obat::class),
-                        self::resourceUrl(\App\Filament\Resources\Kesehatan\ObatResource::class)),
+                    self::step('website', 'Konten website', 'Artikel/profil pondok.',
+                        self::adaData(\Modules\CMS\Models\Article::class),
+                        null),
+                    self::step('supplier', 'Supplier', 'Master pemasok (pengadaan).',
+                        self::adaData(\Modules\Pengadaan\Models\Supplier::class),
+                        null),
+                    self::step('aset', 'Aset', 'Daftar aset/inventaris.',
+                        self::adaData(\Modules\Pembiayaan\Models\Aset::class),
+                        null),
+                ],
+            ],
+            // 8 — PENGATURAN & MUTU (fondasi konfigurasi)
+            'pengaturan' => [
+                'label' => 'Pengaturan & Mutu',
+                'icon' => 'heroicon-o-cog-6-tooth',
+                'permission' => 'manage_tenant_settings',
+                'steps' => [
+                    self::step('identitas', 'Identitas & branding', 'Nama, logo, kontak pondok.',
+                        self::settingTerisi('branding_name'),
+                        self::pageUrl(\App\Filament\Pages\PengaturanBranding::class)),
+                    self::step('integrasi', 'Integrasi API/WA', 'Kredensial WhatsApp/notifikasi.',
+                        self::settingTerisi('wa_api_key'),
+                        self::pageUrl(\App\Filament\Pages\IntegrasiApi::class)),
+                    self::step('mutu', 'Sasaran mutu', 'Target/KPI mutu pesantren.',
+                        self::adaData(\Modules\Mutu\Models\MutuSasaran::class),
+                        null),
                 ],
             ],
         ];
