@@ -3,11 +3,19 @@
 namespace App\Services;
 
 use App\Models\Tenant;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Symfony\Component\Process\Process;
 
 /**
- * Backup / restore / export database fisik milik tenant.
+ * Backup / restore / RESET database + file fisik milik SATU tenant.
  * Dipakai dari panel platform (super_admin) untuk monitoring & recovery.
+ *
+ * Semua perintah shell (pg_dump/psql/tar) dijalankan di dalam container app
+ * (punya postgresql-client-16 + tar/gzip). Nama DB SELALU dari
+ * $tenant->database()->getName(); kredensial dari koneksi central (host/user/pass
+ * dibagi, hanya nama DB per-tenant). Password via env PGPASSWORD, tak pernah di argv.
  */
 class TenantRecoveryService
 {
@@ -28,6 +36,14 @@ class TenantRecoveryService
         return $dir;
     }
 
+    /** Direktori file unggahan fisik tenant (konteks central), mis. storage/tenant<id>. */
+    protected function tenantStorageDir(Tenant $tenant): string
+    {
+        $suffix = config('tenancy.filesystem.suffix_base', 'tenant').$tenant->getTenantKey();
+
+        return storage_path($suffix);
+    }
+
     /**
      * Buat backup (gzipped SQL) database tenant. Mengembalikan path file.
      */
@@ -35,7 +51,7 @@ class TenantRecoveryService
     {
         $db = $tenant->database()->getName();
         $c = $this->conn();
-        $file = $this->dir() . '/' . $db . '_' . now()->format('Ymd_His') . '.sql.gz';
+        $file = $this->dir().'/'.$db.'_'.now()->format('Ymd_His').'.sql.gz';
 
         $cmd = sprintf(
             'pg_dump --clean --if-exists -h %s -p %s -U %s %s | gzip > %s',
@@ -47,6 +63,29 @@ class TenantRecoveryService
         );
 
         $this->run($cmd, $c['password']);
+
+        return $file;
+    }
+
+    /**
+     * Backup file unggahan tenant (.tar.gz). NULL bila tenant belum punya file.
+     */
+    public function backupFiles(Tenant $tenant): ?string
+    {
+        $suffix = config('tenancy.filesystem.suffix_base', 'tenant').$tenant->getTenantKey();
+        $dir = storage_path($suffix);
+        if (! is_dir($dir) || $this->dirKosong($dir)) {
+            return null;
+        }
+
+        $file = $this->dir().'/'.$tenant->database()->getName().'_'.now()->format('Ymd_His').'_files.tar.gz';
+        $cmd = sprintf(
+            'tar -czf %s -C %s %s',
+            escapeshellarg($file),
+            escapeshellarg(storage_path()),
+            escapeshellarg($suffix),
+        );
+        $this->run($cmd, null);
 
         return $file;
     }
@@ -69,6 +108,72 @@ class TenantRecoveryService
         );
 
         $this->run($cmd, $c['password'], 600);
+    }
+
+    /**
+     * Restore file unggahan tenant dari .tar.gz. Direktori lama diberi sufiks
+     * .bak-<ts> dulu (tak langsung dihapus), lalu arsip diekstrak.
+     */
+    public function restoreFiles(Tenant $tenant, string $tarPath): void
+    {
+        $dir = $this->tenantStorageDir($tenant);
+        if (is_dir($dir)) {
+            @rename($dir, $dir.'.bak-'.now()->format('Ymd_His'));
+        }
+
+        $cmd = sprintf(
+            'tar -xzf %s -C %s',
+            escapeshellarg($tarPath),
+            escapeshellarg(storage_path()),
+        );
+        $this->run($cmd, null, 600);
+    }
+
+    /**
+     * RESET keseluruhan data SATU tenant ke kondisi awal (kosong + fondasi).
+     *
+     * URUTAN AMAN (backup-first, tak bisa dibatalkan setelah wipe):
+     *  1) Backup pengaman DB + file (selalu) — path dikembalikan utk rollback.
+     *  2) DROP SCHEMA public CASCADE + CREATE SCHEMA (di DB FISIK tenant itu saja)
+     *     + pasang ulang ekstensi vector sebelum migrasi (toleran).
+     *  3) Migrasi ulang skema tenant (tenants:migrate).
+     *  4) Hapus file unggahan (sudah diback-up di langkah 1).
+     *  5) Reseed fondasi via TenantProvisioner (peran, COA/Ledger, branding,
+     *     modul, admin baru) — IDEMPOTEN, sumber tunggal sama spt buat tenant.
+     *
+     * @return array{db_backup:string, files_backup:?string, admin_email:?string, admin_password:?string}
+     */
+    public function reset(Tenant $tenant, ?string $adminEmail = null): array
+    {
+        // 1) Backup pengaman LEBIH DULU (wajib). Lempar bila gagal → wipe batal.
+        $dbBackup = $this->backup($tenant);
+        $filesBackup = $this->backupFiles($tenant);
+
+        // 2) Kosongkan skema DB fisik tenant ini saja.
+        $tenant->run(function (): void {
+            DB::unprepared('DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;');
+            try {
+                DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
+            } catch (\Throwable) {
+                // Server tanpa pgvector → migrasi AI/RAG toleran (pola TenantProvisioner).
+            }
+        });
+
+        // 3) Migrasi ulang skema tenant (pola TenantMigrateAllCommand).
+        Artisan::call('tenants:migrate', ['--tenants' => [$tenant->getKey()]]);
+
+        // 4) Hapus file unggahan (sudah aman di $filesBackup).
+        $this->clearFiles($tenant);
+
+        // 5) Reseed fondasi + admin baru (idempoten, sumber tunggal).
+        $prov = app(TenantProvisioner::class)->provision($tenant, $adminEmail);
+
+        return [
+            'db_backup' => $dbBackup,
+            'files_backup' => $filesBackup,
+            'admin_email' => $prov['email'] ?? null,
+            'admin_password' => $prov['password'] ?? null,
+        ];
     }
 
     /**
@@ -98,6 +203,25 @@ class TenantRecoveryService
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    protected function clearFiles(Tenant $tenant): void
+    {
+        $dir = $this->tenantStorageDir($tenant);
+        if (is_dir($dir)) {
+            File::deleteDirectory($dir);
+        }
+    }
+
+    protected function dirKosong(string $dir): bool
+    {
+        foreach (scandir($dir) ?: [] as $entry) {
+            if ($entry !== '.' && $entry !== '..') {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected function run(string $cmd, ?string $password, int $timeout = 300): void
