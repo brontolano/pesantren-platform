@@ -19,7 +19,19 @@ use UnitEnum;
 
 class PresensiAsramaResource extends Resource
 {
+    use \App\Filament\Concerns\ModuleGate;
+
     protected static ?string $model = PresensiAsrama::class;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+    }
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 

@@ -55,5 +55,13 @@
                 </li>
             @endforeach
         </ul>
+
+        @if (! empty($pusatSetupUrl))
+            <a href="{{ $pusatSetupUrl }}"
+               class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-emerald-700 hover:text-emerald-800 dark:text-emerald-300">
+                Buka Pusat Setup lengkap (per unit)
+                <x-filament::icon icon="heroicon-m-arrow-right" class="h-4 w-4" />
+            </a>
+        @endif
     </div>
 </x-filament-widgets::widget>

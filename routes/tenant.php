@@ -61,6 +61,7 @@ use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
 use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
+use App\Http\Controllers\CetakController;
 use App\Http\Controllers\SantriExportController;
 use App\Http\Controllers\TahfidzExportController;
 use App\Support\TenantBranding;
@@ -469,6 +470,17 @@ Route::middleware([
     Route::middleware('auth')->prefix('admin/kesantrian/santri/export')->name('tenant.kesantrian.santri.export.')->group(function () {
         Route::get('/csv', [SantriExportController::class, 'csv'])->name('csv');
         Route::get('/print', [SantriExportController::class, 'print'])->name('print');
+    });
+
+    // Cetak (print-friendly HTML) dokumen operasional unit.
+    Route::middleware('auth')->prefix('admin/cetak')->name('tenant.cetak.')->group(function () {
+        Route::get('/jadwal-kelas', [CetakController::class, 'jadwalKelas'])->name('jadwal-kelas');
+        Route::get('/nilai-legger', [CetakController::class, 'nilaiLegger'])->name('nilai-legger');
+        Route::get('/penempatan-blok', [CetakController::class, 'penempatanBlok'])->name('penempatan-blok');
+        Route::get('/stok-obat', [CetakController::class, 'stokObat'])->name('stok-obat');
+        Route::get('/halaqah', [CetakController::class, 'halaqah'])->name('halaqah');
+        Route::get('/hafalan', [CetakController::class, 'hafalan'])->name('hafalan');
+        Route::get('/pegawai', [CetakController::class, 'pegawai'])->name('pegawai');
     });
 
     Route::middleware('auth')->prefix('admin/akademik/export')->name('tenant.akademik.export.')->group(function () {
