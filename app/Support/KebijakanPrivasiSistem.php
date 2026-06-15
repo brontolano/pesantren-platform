@@ -47,6 +47,9 @@ Orang tua/wali berhak melihat, memperbaiki, atau meminta penghapusan data anakny
 5. PERSETUJUAN
 Dengan mencentang kotak persetujuan saat pendaftaran, orang tua/wali menyatakan telah membaca dan menyetujui kebijakan ini.
 
+6. PENGHAPUSAN AKUN & DATA
+Anda dapat meminta penghapusan akun dan data pribadi kapan saja. Tata cara, jenis data yang dihapus, dan masa retensi dijelaskan di halaman Penghapusan Akun: /hapus-akun
+
 Kebijakan ini dapat diperbarui; versi terbaru selalu tersedia di halaman ini.
 TEKS;
     }
