@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Kesehatan\Obat\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Kesehatan\ObatResource;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Kesehatan\Services\ObatImportService;
@@ -18,6 +19,13 @@ class ListObat extends ListRecords
     {
         return [
             CreateAction::make(),
+            Action::make('cetakStokObat')
+                ->label('Cetak Stok')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(fn (): string => route('tenant.cetak.stok-obat', [], false))
+                ->openUrlInNewTab()
+                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_santri') ?? false)),
             ...$this->importActions([
                 'entitas' => 'obat',
                 'template' => ['nama', 'satuan', 'stok', 'ambang_menipis'],

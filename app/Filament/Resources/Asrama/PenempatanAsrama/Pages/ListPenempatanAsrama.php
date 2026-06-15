@@ -23,6 +23,13 @@ class ListPenempatanAsrama extends ListRecords
     {
         return [
             CreateAction::make(),
+            Action::make('cetakPenempatanBlok')
+                ->label('Cetak per Blok')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(fn (): string => route('tenant.cetak.penempatan-blok', [], false))
+                ->openUrlInNewTab()
+                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_santri') ?? false)),
             ...$this->importActions([
                 'entitas' => 'asrama',
                 'template' => ['nis', 'nama', 'blok', 'kamar', 'kapasitas', 'gender_blok', 'tanggal_masuk', 'keterangan'],

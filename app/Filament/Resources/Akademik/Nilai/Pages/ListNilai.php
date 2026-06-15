@@ -4,9 +4,13 @@ namespace App\Filament\Resources\Akademik\Nilai\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Akademik\Nilai\NilaiResource;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Services\NilaiImportService;
+use Modules\Kesantrian\Models\Kelas;
 
 class ListNilai extends ListRecords
 {
@@ -18,6 +22,26 @@ class ListNilai extends ListRecords
     {
         return [
             CreateAction::make(),
+            Action::make('cetakDaftarNilai')
+                ->label('Cetak Daftar Nilai')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->canAny(['view_santri', 'manage_akademik']) ?? false))
+                ->schema([
+                    Select::make('kelas_id')
+                        ->label('Kelas')
+                        ->options(fn () => Kelas::query()->orderBy('nama_kelas')->pluck('nama_kelas', 'id'))
+                        ->required()
+                        ->searchable(),
+                    Select::make('periode_id')
+                        ->label('Periode (opsional)')
+                        ->options(fn () => PeriodeAkademik::query()->orderByDesc('tahun_akademik')->pluck('nama', 'id'))
+                        ->searchable(),
+                ])
+                ->action(fn (array $data) => redirect()->route('tenant.cetak.nilai-legger', array_filter([
+                    'kelas_id' => $data['kelas_id'],
+                    'periode_id' => $data['periode_id'] ?? null,
+                ]))),
             ...$this->importActions([
                 'entitas' => 'nilai',
                 'template' => ['nis', 'pelajaran', 'periode', 'kelas', 'nilai_harian', 'nilai_uts', 'nilai_uas', 'nilai_akhir', 'catatan'],
