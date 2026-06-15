@@ -2,15 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\CMS\Article\ArticleResource;
+use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
+use App\Filament\Resources\Mutu\MutuSasaranResource;
+use App\Filament\Resources\Pembiayaan\AsetResource;
+use App\Filament\Resources\Pengadaan\Supplier\SupplierResource;
+use App\Filament\Resources\PPDB\JadwalUjianResource;
+use App\Filament\Resources\PPDB\PaketSoal\PaketSoalResource;
+use App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource;
 use App\Models\Setting;
 use App\Models\Tenant;
-use App\Models\User;
 use App\Support\UnitSetupRegistry;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Modules\Akademik\Models\JadwalPelajaran;
-use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Models\Pelajaran;
-use Modules\Akademik\Models\Lembaga;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -87,5 +91,35 @@ class UnitSetupRegistryTest extends TestCase
             'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'L', 'agama' => 'Islam', 'status' => 'aktif',
         ]);
         $this->assertGreaterThanOrEqual(1, UnitSetupRegistry::progress('kesantrian')['selesai']);
+    }
+
+    public function test_unit_baru_permission_dan_target_resource_valid(): void
+    {
+        $units = UnitSetupRegistry::units();
+
+        // Unit baru hasil penyelarasan ke navigasi 21-grup.
+        $this->assertArrayHasKey('tahfidz', $units, 'unit Tahfidz harus dipisah');
+        $this->assertArrayHasKey('sarana_logistik', $units, 'unit Sarana & Logistik harus ada');
+        $this->assertGreaterThan(0, UnitSetupRegistry::progress('tahfidz')['total']);
+        $this->assertGreaterThan(0, UnitSetupRegistry::progress('sarana_logistik')['total']);
+
+        // Permission kepegawaian harus permission yang TERDAFTAR (run_payroll), bukan manage_payroll.
+        $this->assertSame('run_payroll', $units['kepegawaian']['permission']);
+
+        // Setiap kelas Resource/Page yang DIRUJUK langkah harus ADA — cegah FQCN typo
+        // membuat tautan mati senyap (resourceUrl/pageUrl mengembalikan null bila class tak ada).
+        $targets = [
+            JadwalUjianResource::class,
+            PaketSoalResource::class,
+            MetodePembayaranResource::class,
+            SupplierResource::class,
+            AsetResource::class,
+            MutuSasaranResource::class,
+            HalaqahResource::class,
+            ArticleResource::class,
+        ];
+        foreach ($targets as $cls) {
+            $this->assertTrue(class_exists($cls), "Resource dirujuk UnitSetupRegistry harus ada: {$cls}");
+        }
     }
 }

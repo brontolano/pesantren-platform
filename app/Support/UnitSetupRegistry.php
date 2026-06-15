@@ -2,7 +2,56 @@
 
 namespace App\Support;
 
+use App\Filament\Pages\IntegrasiApi;
+use App\Filament\Pages\PengaturanBranding;
+use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
+use App\Filament\Resources\Akademik\Lembaga\LembagaResource;
+use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
+use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
+use App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource;
+use App\Filament\Resources\CMS\Article\ArticleResource;
+use App\Filament\Resources\Kesehatan\ObatResource;
+use App\Filament\Resources\Ledger\AkunResource;
+use App\Filament\Resources\Ledger\PeriodeAkuntansiResource;
+use App\Filament\Resources\Ledger\SumberDanaResource;
+use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
+use App\Filament\Resources\Mutu\MutuSasaranResource;
+use App\Filament\Resources\Payroll\Employee\EmployeeResource;
+use App\Filament\Resources\Payroll\Jabatan\JabatanResource;
+use App\Filament\Resources\Pembiayaan\AsetResource;
+use App\Filament\Resources\Pengadaan\Supplier\SupplierResource;
+use App\Filament\Resources\PPDB\JadwalUjianResource;
+use App\Filament\Resources\PPDB\PaketSoal\PaketSoalResource;
+use App\Filament\Resources\Santri\SantriResource;
+use App\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
+use App\Filament\Resources\Tagihan\TagihanResource;
+use App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource;
 use App\Models\Setting;
+use App\Models\TenantApiKey;
+use App\Models\User;
+use Modules\Akademik\Models\JadwalPelajaran;
+use Modules\Akademik\Models\Lembaga;
+use Modules\Akademik\Models\Pelajaran;
+use Modules\Akademik\Models\PeriodeAkademik;
+use Modules\Asrama\Models\PenempatanAsrama;
+use Modules\CMS\Models\Article;
+use Modules\CMS\Models\Gallery;
+use Modules\Kesantrian\Models\Santri;
+use Modules\Kesehatan\Models\Obat;
+use Modules\Keuangan\Models\MetodePembayaran;
+use Modules\Keuangan\Models\SkemaBiaya;
+use Modules\Keuangan\Models\Tagihan;
+use Modules\Ledger\Models\Akun;
+use Modules\Ledger\Models\PeriodeAkuntansi;
+use Modules\Ledger\Models\SumberDana;
+use Modules\Mutu\Models\MutuSasaran;
+use Modules\Payroll\Models\Employee;
+use Modules\Payroll\Models\Jabatan;
+use Modules\Pembiayaan\Models\Aset;
+use Modules\Pengadaan\Models\Supplier;
+use Modules\PPDB\Models\JadwalUjian;
+use Modules\PPDB\Models\PaketSoal;
+use Modules\Tahfidz\Models\Halaqah;
 
 /**
  * Sumber kebenaran TUNGGAL untuk "onboarding bertahap" per unit.
@@ -35,17 +84,17 @@ class UnitSetupRegistry
                 'permission' => 'manage_santri',
                 'steps' => [
                     self::step('santri', 'Data santri', 'Impor dari Excel atau tambah manual.',
-                        self::adaData(\Modules\Kesantrian\Models\Santri::class),
-                        self::resourceUrl(\App\Filament\Resources\Santri\SantriResource::class)),
+                        self::adaData(Santri::class),
+                        self::resourceUrl(SantriResource::class)),
                     self::step('wali', 'Akun wali', 'Buat akun wali (login pakai no. HP).',
                         self::adaWali(),
-                        self::resourceUrl(\App\Filament\Resources\Santri\SantriResource::class)),
+                        self::resourceUrl(SantriResource::class)),
                     self::step('asrama', 'Penempatan asrama', 'Blok/kamar + penempatan santri (bisa impor).',
-                        self::adaData(\Modules\Asrama\Models\PenempatanAsrama::class),
-                        self::resourceUrl(\App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource::class)),
+                        self::adaData(PenempatanAsrama::class),
+                        self::resourceUrl(PenempatanAsramaResource::class)),
                     self::step('obat', 'Master obat (UKS)', 'Daftar obat (bisa impor).',
-                        self::adaData(\Modules\Kesehatan\Models\Obat::class),
-                        self::resourceUrl(\App\Filament\Resources\Kesehatan\ObatResource::class)),
+                        self::adaData(Obat::class),
+                        self::resourceUrl(ObatResource::class)),
                 ],
             ],
             // 2 — PPDB
@@ -55,34 +104,42 @@ class UnitSetupRegistry
                 'permission' => 'view_santri',
                 'steps' => [
                     self::step('jadwal_ujian', 'Jadwal ujian', 'Jadwal ujian seleksi.',
-                        self::adaData(\Modules\PPDB\Models\JadwalUjian::class),
-                        self::resourceUrl(\App\Filament\Resources\PPDB\JadwalUjian\JadwalUjianResource::class)),
+                        self::adaData(JadwalUjian::class),
+                        self::resourceUrl(JadwalUjianResource::class)),
                     self::step('bank_soal', 'Bank/paket soal', 'Paket soal ujian masuk.',
-                        self::adaData(\Modules\PPDB\Models\PaketSoal::class),
-                        null),
+                        self::adaData(PaketSoal::class),
+                        self::resourceUrl(PaketSoalResource::class)),
                 ],
             ],
-            // 3 — AKADEMIK & TAHFIDZ (fold: tahfidz)
+            // 3 — AKADEMIK (Tahfidz dipisah, selaras navigasi)
             'akademik' => [
-                'label' => 'Akademik & Tahfidz',
+                'label' => 'Akademik',
                 'icon' => 'heroicon-o-academic-cap',
                 'permission' => 'manage_akademik',
                 'steps' => [
                     self::step('lembaga', 'Lembaga / unit', 'Minimal satu lembaga (mis. Madrasah).',
-                        self::adaData(\Modules\Akademik\Models\Lembaga::class),
-                        self::resourceUrl(\App\Filament\Resources\Akademik\Lembaga\LembagaResource::class)),
+                        self::adaData(Lembaga::class),
+                        self::resourceUrl(LembagaResource::class)),
                     self::step('periode', 'Periode akademik aktif', 'Tahun ajaran yang sedang berjalan.',
                         self::adaPeriodeAktif(),
-                        self::resourceUrl(\App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource::class)),
+                        self::resourceUrl(PeriodeAkademikResource::class)),
                     self::step('pelajaran', 'Pelajaran', 'Daftar mata pelajaran (bisa impor).',
-                        self::adaData(\Modules\Akademik\Models\Pelajaran::class),
-                        self::resourceUrl(\App\Filament\Resources\Akademik\Pelajaran\PelajaranResource::class)),
+                        self::adaData(Pelajaran::class),
+                        self::resourceUrl(PelajaranResource::class)),
                     self::step('jadwal', 'Jadwal pelajaran', 'Jadwal per kelas (bisa impor).',
-                        self::adaData(\Modules\Akademik\Models\JadwalPelajaran::class),
-                        self::resourceUrl(\App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource::class)),
+                        self::adaData(JadwalPelajaran::class),
+                        self::resourceUrl(JadwalPelajaranResource::class)),
+                ],
+            ],
+            // 3b — TAHFIDZ
+            'tahfidz' => [
+                'label' => 'Tahfidz',
+                'icon' => 'heroicon-o-book-open',
+                'permission' => 'manage_akademik',
+                'steps' => [
                     self::step('halaqah', 'Halaqah tahfidz', 'Kelompok hafalan + musyrif (bisa impor).',
-                        self::adaData(\Modules\Tahfidz\Models\Halaqah::class),
-                        self::resourceUrl(\App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource::class)),
+                        self::adaData(Halaqah::class),
+                        self::resourceUrl(HalaqahResource::class)),
                 ],
             ],
             // 4 — KEUANGAN (operasional)
@@ -92,14 +149,14 @@ class UnitSetupRegistry
                 'permission' => 'manage_keuangan',
                 'steps' => [
                     self::step('skema_biaya', 'Skema biaya', 'Template tagihan (SPP, dll).',
-                        self::adaData(\Modules\Keuangan\Models\SkemaBiaya::class),
-                        self::resourceUrl(\App\Filament\Resources\SkemaBiaya\SkemaBiayaResource::class)),
+                        self::adaData(SkemaBiaya::class),
+                        self::resourceUrl(SkemaBiayaResource::class)),
                     self::step('metode', 'Metode pembayaran', 'Tunai/transfer/QRIS, dll.',
-                        self::adaData(\Modules\Keuangan\Models\MetodePembayaran::class),
-                        null),
+                        self::adaData(MetodePembayaran::class),
+                        self::resourceUrl(MetodePembayaranResource::class)),
                     self::step('tagihan', 'Tagihan / SPP', 'Buat atau impor tagihan santri.',
-                        self::adaData(\Modules\Keuangan\Models\Tagihan::class),
-                        self::resourceUrl(\App\Filament\Resources\Tagihan\TagihanResource::class)),
+                        self::adaData(Tagihan::class),
+                        self::resourceUrl(TagihanResource::class)),
                 ],
             ],
             // 5 — AKUNTANSI & PAJAK (fondasi uang)
@@ -109,28 +166,28 @@ class UnitSetupRegistry
                 'permission' => 'manage_ledger',
                 'steps' => [
                     self::step('coa', 'Bagan akun (COA)', 'Otomatis ter-seed; tinjau bila perlu.',
-                        self::adaData(\Modules\Ledger\Models\Akun::class),
-                        self::resourceUrl(\App\Filament\Resources\Ledger\AkunResource::class)),
+                        self::adaData(Akun::class),
+                        self::resourceUrl(AkunResource::class)),
                     self::step('sumber_dana', 'Sumber dana', 'Klasifikasi sumber dana.',
-                        self::adaData(\Modules\Ledger\Models\SumberDana::class),
-                        self::resourceUrl(\App\Filament\Resources\Ledger\SumberDanaResource::class)),
+                        self::adaData(SumberDana::class),
+                        self::resourceUrl(SumberDanaResource::class)),
                     self::step('periode_akuntansi', 'Periode akuntansi', 'Periode buku berjalan.',
-                        self::adaData(\Modules\Ledger\Models\PeriodeAkuntansi::class),
-                        self::resourceUrl(\App\Filament\Resources\Ledger\PeriodeAkuntansiResource::class)),
+                        self::adaData(PeriodeAkuntansi::class),
+                        self::resourceUrl(PeriodeAkuntansiResource::class)),
                 ],
             ],
             // 6 — KEPEGAWAIAN (fold: sdm)
             'kepegawaian' => [
                 'label' => 'Kepegawaian',
                 'icon' => 'heroicon-o-briefcase',
-                'permission' => 'manage_payroll',
+                'permission' => 'run_payroll',
                 'steps' => [
                     self::step('jabatan', 'Jabatan', 'Otomatis ter-seed; sesuaikan bila perlu.',
-                        self::adaData(\Modules\Payroll\Models\Jabatan::class),
-                        self::resourceUrl(\App\Filament\Resources\Payroll\Jabatan\JabatanResource::class)),
+                        self::adaData(Jabatan::class),
+                        self::resourceUrl(JabatanResource::class)),
                     self::step('pegawai', 'Data pegawai', 'Guru & karyawan (bisa impor).',
-                        self::adaData(\Modules\Payroll\Models\Employee::class),
-                        self::resourceUrl(\App\Filament\Resources\Payroll\Employee\EmployeeResource::class)),
+                        self::adaData(Employee::class),
+                        self::resourceUrl(EmployeeResource::class)),
                 ],
             ],
             // 7 — KELEMBAGAAN & KOMUNIKASI
@@ -139,15 +196,23 @@ class UnitSetupRegistry
                 'icon' => 'heroicon-o-building-office-2',
                 'permission' => 'manage_tenant_settings',
                 'steps' => [
-                    self::step('website', 'Konten website', 'Artikel/profil pondok.',
-                        self::adaData(\Modules\CMS\Models\Article::class),
-                        null),
-                    self::step('supplier', 'Supplier', 'Master pemasok (pengadaan).',
-                        self::adaData(\Modules\Pengadaan\Models\Supplier::class),
-                        null),
-                    self::step('aset', 'Aset', 'Daftar aset/inventaris.',
-                        self::adaData(\Modules\Pembiayaan\Models\Aset::class),
-                        null),
+                    self::step('website', 'Konten website', 'Artikel terbit / galeri / profil pondok.',
+                        self::adaKontenWebsite(),
+                        self::resourceUrl(ArticleResource::class)),
+                ],
+            ],
+            // 7b — SARANA & LOGISTIK (selaras grup navigasi baru)
+            'sarana_logistik' => [
+                'label' => 'Sarana & Logistik',
+                'icon' => 'heroicon-o-wrench-screwdriver',
+                'permission' => 'manage_pembiayaan',
+                'steps' => [
+                    self::step('supplier', 'Supplier', 'Master pemasok (bisa impor).',
+                        self::adaData(Supplier::class),
+                        self::resourceUrl(SupplierResource::class)),
+                    self::step('aset', 'Aset', 'Daftar aset/inventaris (bisa impor).',
+                        self::adaData(Aset::class),
+                        self::resourceUrl(AsetResource::class)),
                 ],
             ],
             // 8 — PENGATURAN & MUTU (fondasi konfigurasi)
@@ -158,13 +223,13 @@ class UnitSetupRegistry
                 'steps' => [
                     self::step('identitas', 'Identitas & branding', 'Nama, logo, kontak pondok.',
                         self::settingTerisi('branding_name'),
-                        self::pageUrl(\App\Filament\Pages\PengaturanBranding::class)),
-                    self::step('integrasi', 'Integrasi API/WA', 'Kredensial WhatsApp/notifikasi.',
-                        self::settingTerisi('wa_api_key'),
-                        self::pageUrl(\App\Filament\Pages\IntegrasiApi::class)),
+                        self::pageUrl(PengaturanBranding::class)),
+                    self::step('integrasi', 'Integrasi API/WA', 'Kunci API untuk WhatsApp/notifikasi.',
+                        self::adaKunciApiAktif(),
+                        self::pageUrl(IntegrasiApi::class)),
                     self::step('mutu', 'Sasaran mutu', 'Target/KPI mutu pesantren.',
-                        self::adaData(\Modules\Mutu\Models\MutuSasaran::class),
-                        null),
+                        self::adaData(MutuSasaran::class),
+                        self::resourceUrl(MutuSasaranResource::class)),
                 ],
             ],
         ];
@@ -220,7 +285,7 @@ class UnitSetupRegistry
     private static function adaPeriodeAktif(): bool
     {
         try {
-            $m = \Modules\Akademik\Models\PeriodeAkademik::class;
+            $m = PeriodeAkademik::class;
 
             return class_exists($m) && $m::query()->where('is_active', true)->exists();
         } catch (\Throwable) {
@@ -231,9 +296,35 @@ class UnitSetupRegistry
     private static function adaWali(): bool
     {
         try {
-            return \App\Models\User::query()
+            return User::query()
                 ->whereHas('roles', fn ($q) => $q->where('name', 'wali'))
                 ->exists();
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /** Konten website siap = ada artikel TERBIT atau galeri (selaras OnboardingChecklist). */
+    private static function adaKontenWebsite(): bool
+    {
+        try {
+            $a = Article::class;
+            $g = Gallery::class;
+
+            return (class_exists($a) && $a::query()->where('is_published', true)->exists())
+                || (class_exists($g) && $g::query()->exists());
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /** Integrasi API/WA siap = ada kunci API aktif (sesuai yang dikelola halaman IntegrasiApi). */
+    private static function adaKunciApiAktif(): bool
+    {
+        try {
+            $m = TenantApiKey::class;
+
+            return class_exists($m) && $m::query()->whereNull('revoked_at')->exists();
         } catch (\Throwable) {
             return false;
         }

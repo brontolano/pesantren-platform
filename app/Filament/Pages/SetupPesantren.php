@@ -137,12 +137,13 @@ class SetupPesantren extends Page implements HasForms
 
         Notification::make()
             ->title('Setup pokok selesai')
-            ->body('Identitas, kebijakan, dan periode akademik tersimpan. Lanjut isi data lewat menu Import.')
+            ->body('Identitas, kebijakan, dan periode akademik tersimpan. Lanjutkan ke Pusat Setup untuk melengkapi data tiap unit.')
             ->success()
             ->persistent()
             ->send();
 
-        $this->redirect(route('filament.tenant.resources.santri.santris.index'));
+        // Arahkan ke hub Pusat Setup (lanjutan per unit) — bukan langsung ke index Santri.
+        $this->redirect(SetupUnit::getUrl());
     }
 
     /**
