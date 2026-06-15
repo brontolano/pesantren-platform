@@ -6,6 +6,7 @@ use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Core\Concerns\Auditable;
+use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
 
 /**
@@ -33,5 +34,10 @@ class PresensiSantri extends Model
     public function santri(): BelongsTo
     {
         return $this->belongsTo(Santri::class, 'santri_id');
+    }
+
+    public function kelas(): BelongsTo
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 }
