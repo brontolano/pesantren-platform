@@ -229,11 +229,9 @@ class KebijakanRegistry
                 'deskripsi' => 'Bila aktif, muncul tombol impor entri kalender (libur pondok/ujian/pasaran) dari spreadsheet. Libur nasional sudah terisi otomatis; ini untuk acara khusus pesantren.',
                 'default' => false, 'kelompok' => 'migrasi', 'tipe' => 'bool',
             ],
-            'import.presensi_kegiatan_historis' => [
-                'label' => 'Izinkan impor presensi kegiatan lama',
-                'deskripsi' => 'Bila aktif, muncul tombol impor kehadiran santri pada kegiatan yang sudah tercatat. Umumnya tidak diperlukan saat migrasi awal.',
-                'default' => false, 'kelompok' => 'migrasi', 'tipe' => 'bool',
-            ],
+            // Catatan: presensi KEGIATAN sengaja TIDAK diberi importer/saklar —
+            // tak punya halaman/resource Filament sebagai rumah tombol & bersifat
+            // operasional (bukan data migrasi awal). Ditinjau & dilewati sadar.
         ];
     }
 
