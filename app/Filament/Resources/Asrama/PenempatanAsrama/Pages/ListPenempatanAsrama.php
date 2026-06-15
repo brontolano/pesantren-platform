@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Asrama\PenempatanAsrama\Pages;
 
+use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -9,16 +10,28 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Asrama\Services\AsramaImportService;
 use Modules\Asrama\Services\PenempatanOtomatisService;
 
 class ListPenempatanAsrama extends ListRecords
 {
+    use HasImportAction;
+
     protected static string $resource = PenempatanAsramaResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             CreateAction::make(),
+            $this->buildImportAction([
+                'entitas' => 'asrama',
+                'label' => 'Import Asrama',
+                'service' => AsramaImportService::class,
+                'directory' => 'imports/asrama/uploads',
+                'ability' => 'manage_santri',
+                'petunjuk' => 'Unggah .xlsx/.csv/.ods berisi kolom: nis, blok, kamar, kapasitas, gender_blok (putra/putri/campur), tanggal_masuk, keterangan. Blok & kamar dibuat otomatis. Aman diulang (dry-run dulu).',
+                'extraSummary' => fn (array $s): string => sprintf('Blok baru: %d  •  Kamar baru: %d', $s['created_blok'] ?? 0, $s['created_kamar'] ?? 0),
+            ]),
             Action::make('penempatan_otomatis')
                 ->label('Penempatan Otomatis')
                 ->icon('heroicon-o-sparkles')
