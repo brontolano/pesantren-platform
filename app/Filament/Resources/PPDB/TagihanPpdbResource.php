@@ -27,6 +27,8 @@ class TagihanPpdbResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
+    protected static \UnitEnum|string|null $navigationGroup = 'PPDB';
+
     protected static ?string $slug = 'ppdb/tagihan';
 
     protected static ?int $navigationSort = 3;

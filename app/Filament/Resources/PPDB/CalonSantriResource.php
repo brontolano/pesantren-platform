@@ -40,6 +40,8 @@ class CalonSantriResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
+    protected static \UnitEnum|string|null $navigationGroup = 'PPDB';
+
     protected static ?string $slug = 'ppdb/calon-santri';
 
     protected static ?int $navigationSort = 1;
