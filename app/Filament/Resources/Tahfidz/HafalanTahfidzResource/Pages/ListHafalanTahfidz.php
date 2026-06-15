@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Tahfidz\HafalanTahfidzResource\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Tahfidz\Services\HafalanImportService;
@@ -18,6 +19,13 @@ class ListHafalanTahfidz extends ListRecords
     {
         return [
             CreateAction::make(),
+            Action::make('cetakHafalan')
+                ->label('Cetak Progres')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(fn (): string => route('tenant.cetak.hafalan', [], false))
+                ->openUrlInNewTab()
+                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_santri') ?? false)),
             ...$this->importActions([
                 'entitas' => 'hafalan',
                 'template' => ['nis', 'halaqah', 'surah', 'ayat_awal', 'ayat_akhir', 'status', 'tanggal_target', 'tanggal_selesai', 'catatan'],

@@ -2,6 +2,7 @@
 namespace App\Filament\Resources\Payroll\Employee\Pages;
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Payroll\Employee\EmployeeResource;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Payroll\Services\PegawaiImportService;
@@ -15,6 +16,13 @@ class ListEmployee extends ListRecords
     {
         return [
             CreateAction::make()->label('Tambah Pegawai'),
+            Action::make('cetakPegawai')
+                ->label('Cetak Daftar')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(fn (): string => route('tenant.cetak.pegawai', [], false))
+                ->openUrlInNewTab()
+                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_payroll') ?? false)),
             ...$this->importActions([
                 'entitas' => 'pegawai',
                 'template' => ['nip', 'nama', 'jabatan', 'status_kepegawaian', 'nik', 'nuptk', 'tanggal_masuk', 'email'],

@@ -9,6 +9,9 @@ use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Asrama\Models\PenempatanAsrama;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesehatan\Models\Obat;
+use Modules\Payroll\Models\Employee;
+use Modules\Tahfidz\Models\HafalanTahfidz;
+use Modules\Tahfidz\Models\Halaqah;
 
 /**
  * Cetak (print-friendly HTML) untuk dokumen operasional unit — mengikuti pola
@@ -106,6 +109,49 @@ class CetakController extends Controller
         return response()->view('exports.stok-obat-print', [
             'tenantName' => $this->namaTenant(),
             'obat' => $obat,
+            'printedAt' => now(),
+        ]);
+    }
+
+    public function halaqah()
+    {
+        $this->izinkan(['view_santri', 'manage_santri']);
+
+        $halaqah = Halaqah::query()->with('musyrif')->orderBy('nama')->get();
+
+        return response()->view('exports.halaqah-print', [
+            'tenantName' => $this->namaTenant(),
+            'halaqah' => $halaqah,
+            'printedAt' => now(),
+        ]);
+    }
+
+    public function hafalan()
+    {
+        $this->izinkan(['view_santri', 'manage_santri']);
+
+        $hafalan = HafalanTahfidz::query()
+            ->with(['santri', 'halaqah'])
+            ->get()
+            ->sortBy(fn (HafalanTahfidz $h) => ($h->halaqah?->nama ?? 'zzz').'|'.($h->santri?->nama ?? ''))
+            ->groupBy(fn (HafalanTahfidz $h) => $h->halaqah?->nama ?? '(Tanpa halaqah)');
+
+        return response()->view('exports.hafalan-print', [
+            'tenantName' => $this->namaTenant(),
+            'perHalaqah' => $hafalan,
+            'printedAt' => now(),
+        ]);
+    }
+
+    public function pegawai()
+    {
+        $this->izinkan(['manage_payroll']);
+
+        $pegawai = Employee::query()->orderBy('nama')->get();
+
+        return response()->view('exports.pegawai-print', [
+            'tenantName' => $this->namaTenant(),
+            'pegawai' => $pegawai,
             'printedAt' => now(),
         ]);
     }

@@ -29,6 +29,7 @@ class CetakControllerTest extends TestCase
             'tenants', 'domains', 'users', 'roles', 'permissions', 'model_has_roles', 'model_has_permissions',
             'kelas', 'jadwal_pelajaran', 'pelajaran', 'periode_akademik', 'nilai', 'santri',
             'blok_asrama', 'kamar_asrama', 'penempatan_asrama', 'obat',
+            'halaqah', 'tahfidz_hafalan', 'employee',
         ]);
         $this->truncatePpdbTables(['domains', 'tenants']);
     }
@@ -55,6 +56,9 @@ class CetakControllerTest extends TestCase
             'admin/cetak/penempatan-blok',
             'admin/cetak/jadwal-kelas?kelas_id='.$kelas->id,
             'admin/cetak/nilai-legger?kelas_id='.$kelas->id,
+            'admin/cetak/halaqah',
+            'admin/cetak/hafalan',
+            'admin/cetak/pegawai',
         ];
 
         foreach ($paths as $path) {

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Tahfidz\Halaqah\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Tahfidz\Services\HalaqahImportService;
@@ -18,6 +19,13 @@ class ListHalaqah extends ListRecords
     {
         return [
             CreateAction::make()->label('Tambah Halaqah'),
+            Action::make('cetakHalaqah')
+                ->label('Cetak Daftar')
+                ->icon('heroicon-o-printer')
+                ->color('gray')
+                ->url(fn (): string => route('tenant.cetak.halaqah', [], false))
+                ->openUrlInNewTab()
+                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_santri') ?? false)),
             ...$this->importActions([
                 'entitas' => 'halaqah',
                 'template' => ['nama', 'musyrif', 'jenis'],
