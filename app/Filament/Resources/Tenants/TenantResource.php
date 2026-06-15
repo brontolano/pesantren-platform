@@ -6,22 +6,24 @@ use App\Filament\Resources\Tenants\Pages\CreateTenant;
 use App\Filament\Resources\Tenants\Pages\EditTenant;
 use App\Filament\Resources\Tenants\Pages\ListTenants;
 use App\Models\Tenant;
-use App\Services\BillingService;
+use App\Models\User;
 use App\Services\TenantRecoveryService;
-use Filament\Schemas\Components\Section;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class TenantResource extends Resource
 {
@@ -57,7 +59,7 @@ class TenantResource extends Resource
         return static::userCanManageTenants();
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return static::userCanManageTenants();
     }
@@ -126,7 +128,7 @@ class TenantResource extends Resource
                     ->icon('heroicon-o-play-circle')
                     ->color('success')
                     ->action(fn (Tenant $record) => $record->update(['is_active' => true]))
-                    ->visible(fn (Tenant $record): bool => !$record->is_active),
+                    ->visible(fn (Tenant $record): bool => ! $record->is_active),
 
                 // === Recovery database per tenant ===
                 ActionGroup::make([
@@ -138,7 +140,7 @@ class TenantResource extends Resource
                             $size = app(TenantRecoveryService::class)->size($record);
                             Notification::make()
                                 ->title('Database tenant')
-                                ->body('DB: ' . $record->database()->getName() . ' — Ukuran: ' . ($size ?? 'tidak diketahui'))
+                                ->body('DB: '.$record->database()->getName().' — Ukuran: '.($size ?? 'tidak diketahui'))
                                 ->info()
                                 ->send();
                         }),
@@ -153,12 +155,28 @@ class TenantResource extends Resource
 
                             return response()->download($path)->deleteFileAfterSend();
                         }),
+                    Action::make('backup_files')
+                        ->label('Backup File')
+                        ->icon('heroicon-o-photo')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalDescription('Buat & unduh backup file unggahan tenant ini (.tar.gz): foto santri, dokumen, dll.')
+                        ->action(function (Tenant $record) {
+                            $path = app(TenantRecoveryService::class)->backupFiles($record);
+                            if ($path === null) {
+                                Notification::make()->title('Tidak ada file')->body('Tenant ini belum punya file unggahan.')->info()->send();
+
+                                return null;
+                            }
+
+                            return response()->download($path)->deleteFileAfterSend();
+                        }),
                     Action::make('restore_db')
                         ->label('Restore / Import DB')
                         ->icon('heroicon-o-arrow-up-tray')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalDescription('PERINGATAN: Restore akan menimpa data database tenant ini dengan isi file backup. Tidak bisa dibatalkan.')
+                        ->modalDescription('PERINGATAN: menimpa data DB tenant ini dgn isi file. Backup pengaman dibuat otomatis dulu. Tidak bisa dibatalkan.')
                         ->form([
                             FileUpload::make('file')
                                 ->label('File backup (.sql.gz)')
@@ -168,20 +186,93 @@ class TenantResource extends Resource
                                 ->required(),
                         ])
                         ->action(function (array $data, Tenant $record) {
-                            $path = storage_path('app/' . $data['file']);
+                            abort_unless(static::canRecovery(auth()->user()), 403);
+                            $svc = app(TenantRecoveryService::class);
+                            $path = Storage::disk('local')->path($data['file']);
                             try {
-                                app(TenantRecoveryService::class)->restore($record, $path);
-                                Notification::make()->title('Restore berhasil')->success()->send();
+                                $aman = $svc->backup($record); // backup pengaman dulu
+                                $svc->restore($record, $path);
+                                Notification::make()->title('Restore berhasil')
+                                    ->body('Backup pengaman dibuat: '.basename($aman))
+                                    ->success()->persistent()->send();
                             } catch (\Throwable $e) {
+                                report($e);
                                 Notification::make()->title('Restore gagal')->body($e->getMessage())->danger()->send();
                             } finally {
                                 @unlink($path);
                             }
                         }),
+                    Action::make('restore_files')
+                        ->label('Restore File')
+                        ->icon('heroicon-o-photo')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalDescription('Menimpa file unggahan tenant dgn isi arsip (.tar.gz). Folder lama disisihkan (.bak) dulu.')
+                        ->form([
+                            FileUpload::make('file')
+                                ->label('Arsip file (.tar.gz)')
+                                ->disk('local')
+                                ->directory('tenant-restore-uploads')
+                                ->acceptedFileTypes(['application/gzip', 'application/x-gzip', 'application/octet-stream'])
+                                ->required(),
+                        ])
+                        ->action(function (array $data, Tenant $record) {
+                            abort_unless(static::canRecovery(auth()->user()), 403);
+                            $path = Storage::disk('local')->path($data['file']);
+                            try {
+                                app(TenantRecoveryService::class)->restoreFiles($record, $path);
+                                Notification::make()->title('Restore file berhasil')->success()->send();
+                            } catch (\Throwable $e) {
+                                report($e);
+                                Notification::make()->title('Restore file gagal')->body($e->getMessage())->danger()->send();
+                            } finally {
+                                @unlink($path);
+                            }
+                        }),
+                    Action::make('reset_db')
+                        ->label('RESET Data Pesantren')
+                        ->icon('heroicon-o-exclamation-triangle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Reset SELURUH data pesantren ini')
+                        ->modalDescription('Menghapus SEMUA data (santri, keuangan, presensi, file unggahan, dll) lalu kembalikan ke kondisi awal: kosong + fondasi (peran, COA, branding) + admin BARU. Backup pengaman (DB + file) dibuat otomatis lebih dulu. TIDAK BISA DIBATALKAN.')
+                        ->form([
+                            TextInput::make('konfirmasi')
+                                ->label('Ketik ID pesantren untuk konfirmasi')
+                                ->helperText(fn (Tenant $record): string => 'Ketik persis: '.$record->getKey())
+                                ->required(),
+                        ])
+                        ->action(function (array $data, Tenant $record) {
+                            abort_unless(static::canRecovery(auth()->user()), 403);
+                            if (trim((string) ($data['konfirmasi'] ?? '')) !== (string) $record->getKey()) {
+                                Notification::make()->title('Konfirmasi tidak cocok')
+                                    ->body('Ketik ID pesantren yang benar untuk melanjutkan.')->danger()->send();
+
+                                return;
+                            }
+                            try {
+                                $hasil = app(TenantRecoveryService::class)->reset($record);
+                                $body = 'Backup pengaman DB: '.basename($hasil['db_backup']);
+                                if (! empty($hasil['files_backup'])) {
+                                    $body .= "\nBackup file: ".basename($hasil['files_backup']);
+                                }
+                                if (! empty($hasil['admin_password'])) {
+                                    $body .= "\n\nAdmin baru: ".$hasil['admin_email']
+                                        ."\nPassword (CATAT SEKARANG, hanya tampil sekali): ".$hasil['admin_password'];
+                                }
+                                Notification::make()->title('Reset selesai')->body($body)->success()->persistent()->send();
+                            } catch (\Throwable $e) {
+                                report($e);
+                                Notification::make()->title('Reset GAGAL')
+                                    ->body($e->getMessage().' — backup pengaman mungkin sudah dibuat; cek storage/app/tenant-backups.')
+                                    ->danger()->persistent()->send();
+                            }
+                        }),
                 ])
                     ->label('Recovery')
                     ->icon('heroicon-o-server-stack')
-                    ->button(),
+                    ->button()
+                    ->visible(fn (): bool => static::canRecovery(auth()->user())),
             ]);
     }
 
@@ -201,7 +292,19 @@ class TenantResource extends Resource
 
     protected static function userCanManageTenants(): bool
     {
-        return auth()->user()?->hasRole('super_admin') ?? false;
+        return static::canRecovery(auth()->user());
+    }
+
+    /**
+     * Gerbang aksi platform (kelola tenant + backup/restore/RESET): HANYA
+     * super_admin pemilik platform (tenant_id null). Cek tenant_id LEBIH DULU
+     * agar staf tenant berperan super_admin lokal tetap ditolak (defense-in-depth,
+     * selaras User::canAccessPanel). Pure function dari User → mudah diuji.
+     */
+    public static function canRecovery(?User $user): bool
+    {
+        return $user !== null
+            && $user->tenant_id === null
+            && $user->hasRole('super_admin');
     }
 }
-
