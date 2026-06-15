@@ -22,7 +22,7 @@ class ImportWaliCommand extends Command
         {--update-only : Hanya update wali_user_id di santri, tidak buat akun baru}
         {--send-wa : Kirim notifikasi WA ke wali setelah akun dibuat (butuh WAHA aktif)}';
 
-    protected $description = 'Bulk create akun Portal Wali dari data santri (email_wali + no_hp_wali)';
+    protected $description = 'Bulk create akun Portal Wali dari data santri (kunci: no_hp_wali; login wali pakai no. HP)';
 
     public function handle(): int
     {
@@ -53,7 +53,7 @@ class ImportWaliCommand extends Command
         $this->line("  Santri diproses : {$result['total']}");
         $this->line("  Akun baru dibuat: {$result['created']}");
         $this->line("  Sudah ada       : {$result['existing']}");
-        $this->line("  Tidak ada email : {$result['no_email']}");
+        $this->line("  Tidak ada no HP : {$result['no_hp']}");
         $this->line('  Error           : '.count($result['errors']));
 
         if (! $dryRun && $result['csv_path'] !== null) {

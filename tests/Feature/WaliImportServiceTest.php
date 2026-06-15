@@ -57,13 +57,13 @@ class WaliImportServiceTest extends TestCase
             'agama' => 'Islam',
             'status' => $status,
             'nama_ayah' => 'Ayah '.$nama,
-            'email_wali' => $emailWali,
+            'no_hp_wali' => $emailWali,
         ]);
     }
 
     public function test_dry_run_tidak_membuat_akun(): void
     {
-        $this->santri('001', 'Ahmad', 'wali.ahmad@test.local');
+        $this->santri('001', 'Ahmad', '081234567001');
 
         $sebelum = User::query()->count();
         $hasil = app(WaliImportService::class)->generate((string) $this->tenant->id, true);
@@ -76,15 +76,16 @@ class WaliImportServiceTest extends TestCase
 
     public function test_live_membuat_akun_menautkan_dan_idempoten(): void
     {
-        $santri = $this->santri('002', 'Budi', 'wali.budi@test.local');
-        $this->santri('003', 'Caca', null); // tanpa email → dilewati
+        $santri = $this->santri('002', 'Budi', '081234567002');
+        $this->santri('003', 'Caca', null); // tanpa no HP → dilewati
 
         $hasil = app(WaliImportService::class)->generate((string) $this->tenant->id, false);
 
         $this->assertSame(1, $hasil['created']);
-        $this->assertSame(1, $hasil['total'], 'santri tanpa email tidak masuk query');
+        $this->assertSame(1, $hasil['total'], 'santri tanpa no HP tidak masuk query');
 
-        $user = User::query()->where('email', 'wali.budi@test.local')->first();
+        $phone = \App\Support\PhoneNumber::normalize('081234567002');
+        $user = User::query()->where('phone', $phone)->first();
         $this->assertNotNull($user);
         $this->assertTrue($user->hasRole('wali'));
         $this->assertSame($user->id, $santri->fresh()->wali_user_id);
@@ -94,7 +95,7 @@ class WaliImportServiceTest extends TestCase
         $ulang = app(WaliImportService::class)->generate((string) $this->tenant->id, false);
         $this->assertSame(0, $ulang['created']);
         $this->assertSame(1, $ulang['existing']);
-        $this->assertSame(1, User::query()->where('email', 'wali.budi@test.local')->count());
+        $this->assertSame(1, User::query()->where('phone', $phone)->count());
 
         @unlink((string) $hasil['csv_path']);
     }

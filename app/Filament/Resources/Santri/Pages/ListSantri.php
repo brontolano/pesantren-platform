@@ -92,7 +92,7 @@ class ListSantri extends ListRecords
             ->schema([
                 Placeholder::make('petunjuk')
                     ->label('Petunjuk')
-                    ->content('Membuat akun Portal Wali untuk santri AKTIF yang punya email wali. Santri yang walinya sudah berakun cukup ditautkan (tidak dobel). Setelah dibuat, kredensial sementara tersimpan sebagai CSV di server untuk dibagikan.'),
+                    ->content('Membuat akun Portal Wali untuk santri AKTIF yang punya NOMOR HP wali (login wali pakai no. HP). Santri yang walinya sudah berakun cukup ditautkan (tidak dobel). Setelah dibuat, kredensial sementara tersimpan sebagai CSV di server untuk dibagikan.'),
                 Checkbox::make('dry_run')
                     ->label('Validasi dulu (dry-run) — tidak membuat akun')
                     ->default(true),
@@ -108,12 +108,12 @@ class ListSantri extends ListRecords
                 $result = app(WaliImportService::class)->generate((string) tenant('id'), $dryRun);
 
                 $body = sprintf(
-                    "%s\nDiproses: %d  •  Akun baru: %d  •  Sudah ada: %d  •  Tanpa email: %d  •  Gagal: %d",
+                    "%s\nDiproses: %d  •  Akun baru: %d  •  Sudah ada: %d  •  Tanpa no. HP: %d  •  Gagal: %d",
                     $dryRun ? 'Validasi (dry-run) selesai.' : 'Pembuatan akun wali selesai.',
                     $result['total'],
                     $result['created'],
                     $result['existing'],
-                    $result['no_email'],
+                    $result['no_hp'],
                     $result['failed'],
                 );
 
