@@ -58,6 +58,7 @@ class OnboardingChecklist extends Widget
             'selesai' => $selesai,
             'total' => count($steps),
             'persen' => count($steps) > 0 ? (int) round($selesai / count($steps) * 100) : 0,
+            'pusatSetupUrl' => self::pusatSetupUrl(),
         ];
     }
 
@@ -138,6 +139,17 @@ class OnboardingChecklist extends Widget
             return $artikel || $galeri;
         } catch (\Throwable) {
             return false;
+        }
+    }
+
+    private static function pusatSetupUrl(): ?string
+    {
+        try {
+            return class_exists(\App\Filament\Pages\SetupUnit::class)
+                ? \App\Filament\Pages\SetupUnit::getUrl()
+                : null;
+        } catch (\Throwable) {
+            return null;
         }
     }
 
