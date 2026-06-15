@@ -110,8 +110,9 @@ trait HasImportAction
     }
 
     /**
-     * Aksi "Unduh Template" — CSV berisi header kolom (+ baris contoh opsional)
-     * sesuai yang diterima importer, agar admin tahu format yang benar.
+     * Aksi "Unduh Template" — file .xlsx berisi header kolom (+ baris contoh)
+     * sesuai yang diterima importer, agar admin tahu format yang benar. Memakai
+     * format Excel asli (lebih akrab untuk TU); importer juga menerima .csv/.ods.
      *
      * @param  ImportConfig  $config
      */
@@ -125,7 +126,7 @@ trait HasImportAction
         $entitas = $config['entitas'];
         $ability = $config['ability'] ?? null;
         $contoh = $config['template_contoh'] ?? [];
-        $filename = 'template-import-'.str()->slug($entitas).'.csv';
+        $filename = 'template-import-'.str()->slug($entitas).'.xlsx';
 
         return Action::make(($config['name'] ?? 'import'.str()->studly($entitas)).'Template')
             ->label('Unduh Template')
@@ -134,14 +135,16 @@ trait HasImportAction
             ->visible(fn (): bool => tenancy()->initialized
                 && ($ability === null || (auth()->user()?->can($ability) ?? false)))
             ->action(function () use ($columns, $contoh, $filename) {
-                return response()->streamDownload(function () use ($columns, $contoh): void {
-                    $out = fopen('php://output', 'w');
-                    fputcsv($out, $columns);
-                    if ($contoh !== []) {
-                        fputcsv($out, $contoh);
-                    }
-                    fclose($out);
-                }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+                $tmp = tempnam(sys_get_temp_dir(), 'tmpl').'.xlsx';
+                $writer = new \OpenSpout\Writer\XLSX\Writer;
+                $writer->openToFile($tmp);
+                $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($columns));
+                if ($contoh !== []) {
+                    $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($contoh));
+                }
+                $writer->close();
+
+                return response()->download($tmp, $filename)->deleteFileAfterSend();
             });
     }
 

@@ -56,7 +56,7 @@ class ImportTemplateDownloadTest extends TestCase
     {
         Livewire::test(ListObat::class)
             ->callAction('importObatTemplate')
-            ->assertFileDownloaded('template-import-obat.csv');
+            ->assertFileDownloaded('template-import-obat.xlsx');
     }
 
     public function test_modal_import_dengan_seksi_pemetaan_mount_tanpa_error(): void
