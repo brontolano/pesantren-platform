@@ -115,34 +115,42 @@ class ImportColumnMapper
 
         $tmp = tempnam(sys_get_temp_dir(), 'mapimp').'.csv';
         $out = fopen($tmp, 'w');
-        fputcsv($out, $columns); // header kanonik
+        if ($out === false) {
+            throw new RuntimeException("Gagal membuka file sementara: {$tmp}");
+        }
 
-        $reader = ReaderFactory::createFromFile($path);
-        $reader->open($path);
+        // Outer try-finally menjamin fclose($out) walau pembuatan reader gagal.
         try {
-            $headerDilewati = false;
-            foreach ($reader->getSheetIterator() as $sheet) {
-                foreach ($sheet->getRowIterator() as $row) {
-                    $values = $this->rowValues($row);
-                    if ($this->isEmptyRow($values)) {
-                        continue;
-                    }
-                    if (! $headerDilewati) {
-                        $headerDilewati = true; // baris header
+            fputcsv($out, $columns); // header kanonik
 
-                        continue;
+            $reader = ReaderFactory::createFromFile($path);
+            $reader->open($path);
+            try {
+                $headerDilewati = false;
+                foreach ($reader->getSheetIterator() as $sheet) {
+                    foreach ($sheet->getRowIterator() as $row) {
+                        $values = $this->rowValues($row);
+                        if ($this->isEmptyRow($values)) {
+                            continue;
+                        }
+                        if (! $headerDilewati) {
+                            $headerDilewati = true; // baris header
+
+                            continue;
+                        }
+                        $line = [];
+                        foreach ($columns as $col) {
+                            $idx = $sourceIndex[$col];
+                            $val = $idx !== null ? ($values[$idx] ?? '') : '';
+                            $line[] = $val instanceof \DateTimeInterface ? $val->format('Y-m-d') : (string) $val;
+                        }
+                        fputcsv($out, $line);
                     }
-                    $line = [];
-                    foreach ($columns as $col) {
-                        $idx = $sourceIndex[$col];
-                        $val = $idx !== null ? ($values[$idx] ?? '') : '';
-                        $line[] = $val instanceof \DateTimeInterface ? $val->format('Y-m-d') : (string) $val;
-                    }
-                    fputcsv($out, $line);
                 }
+            } finally {
+                $reader->close();
             }
         } finally {
-            $reader->close();
             fclose($out);
         }
 

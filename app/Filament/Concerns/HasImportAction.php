@@ -258,7 +258,10 @@ trait HasImportAction
             ->visible(fn (): bool => tenancy()->initialized
                 && ($ability === null || (auth()->user()?->can($ability) ?? false)))
             ->schema($schema)
-            ->action(function (array $data) use ($serviceClass, $entitas, $invoke, $extraSummary, $columns): void {
+            ->action(function (array $data) use ($serviceClass, $entitas, $invoke, $extraSummary, $columns, $ability): void {
+                // Defense-in-depth: tegakkan izin di sisi server (bukan hanya visible()).
+                abort_unless($ability === null || (auth()->user()?->can($ability) ?? false), 403);
+
                 $relativePath = $data['file'];
                 $absolutePath = Storage::disk('local')->path($relativePath);
                 $dryRun = (bool) ($data['dry_run'] ?? false);

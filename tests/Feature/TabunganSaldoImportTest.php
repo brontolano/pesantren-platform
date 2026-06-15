@@ -78,6 +78,18 @@ class TabunganSaldoImportTest extends TestCase
         @unlink($file);
     }
 
+    public function test_parsing_nominal_format_indonesia(): void
+    {
+        // "1.500.000" (pemisah ribuan titik) harus jadi 1.500.000, bukan 1.5.
+        $file = $this->csv(['nis,saldo_awal', '001,1.500.000']);
+        app(TabunganSaldoImportService::class)->import($this->tenant, $file, false);
+
+        $santri = Santri::withoutGlobalScopes()->where('nis', '001')->first();
+        $this->assertEqualsWithDelta(1500000.0, app(TabunganService::class)->getSaldo($santri), 0.01);
+
+        @unlink($file);
+    }
+
     public function test_nis_tak_dikenal_ditolak(): void
     {
         $file = $this->csv(['nis,saldo_awal', '999,50000']);

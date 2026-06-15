@@ -98,6 +98,7 @@ class PegawaiImportService
                         'nip' => ['required', 'string', 'max:40'],
                         'nama' => ['required', 'string', 'max:255'],
                         'status_kepegawaian' => ['nullable', 'in:'.implode(',', self::STATUS_VALID)],
+                        'tanggal_masuk' => ['nullable', 'date'],
                         'email' => ['nullable', 'email'],
                     ]);
 

@@ -62,7 +62,12 @@ class SetupUnit extends Page
     public function mount(): void
     {
         $unit = request()->query('unit');
-        $this->unit = is_string($unit) && array_key_exists($unit, UnitSetupRegistry::units()) ? $unit : null;
+        $units = UnitSetupRegistry::units();
+        // Hanya buka tampilan unit bila user punya izin unit itu; selain itu → hub.
+        $this->unit = is_string($unit) && isset($units[$unit])
+            && (auth()->user()?->can($units[$unit]['permission']) ?? false)
+            ? $unit
+            : null;
     }
 
     protected function getViewData(): array

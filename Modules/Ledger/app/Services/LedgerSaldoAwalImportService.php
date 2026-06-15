@@ -151,8 +151,8 @@ class LedgerSaldoAwalImportService
 
         $key = 'saldo-awal:'.$tenant->id;
 
-        // Idempoten: jurnal pembuka sudah ada → lewati.
-        if (Jurnal::where('idempotency_key', $key)->exists()) {
+        // Idempoten: jurnal pembuka sudah ada → lewati (filter tenant eksplisit, defensif).
+        if (Jurnal::where('tenant_id', $tenant->id)->where('idempotency_key', $key)->exists()) {
             $summary['skipped'] = count($baris);
 
             return $summary;

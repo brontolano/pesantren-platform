@@ -91,9 +91,11 @@ class TabunganSaldoImportService
                         continue;
                     }
 
+                    // saldo_awal TIDAK divalidasi 'numeric' karena boleh berformat
+                    // Indonesia ("1.500.000"); parsing & nilai aman ditangani angka().
                     $validator = Validator::make($payload, [
                         'nis' => ['required', 'string', 'max:20'],
-                        'saldo_awal' => ['required', 'numeric', 'min:0'],
+                        'saldo_awal' => ['required'],
                     ]);
 
                     if ($validator->fails()) {
@@ -103,7 +105,7 @@ class TabunganSaldoImportService
                     }
 
                     $nis = trim((string) $payload['nis']);
-                    $nominal = (float) str_replace(',', '.', (string) $payload['saldo_awal']);
+                    $nominal = $this->angka($payload['saldo_awal'] ?? null);
 
                     if (isset($nisFileIni[$nis])) {
                         $summary['skipped']++;
@@ -158,6 +160,20 @@ class TabunganSaldoImportService
         }
 
         return $summary;
+    }
+
+    /** Parsing nominal tahan format Indonesia ("1.000.000,50") + bulatkan 2 desimal. */
+    private function angka(mixed $nilai): float
+    {
+        $teks = trim((string) $nilai);
+        if ($teks === '') {
+            return 0.0;
+        }
+        // Buang pemisah ribuan titik & spasi, jadikan koma desimal → titik.
+        $teks = str_replace(['.', ' '], '', $teks);
+        $teks = str_replace(',', '.', $teks);
+
+        return is_numeric($teks) ? round((float) $teks, 2) : 0.0;
     }
 
     /**
