@@ -56,8 +56,9 @@
     <li>Mengajukan keberatan atas pemrosesan data</li>
 </ul>
 
-<h2>7. Penyimpanan Data</h2>
+<h2>7. Penyimpanan & Penghapusan Data</h2>
 <p>Data disimpan selama pesantren aktif menggunakan Platform. Setelah kontrak berakhir, data disimpan maksimal 90 hari sebelum dihapus permanen, kecuali diwajibkan lain oleh peraturan.</p>
+<p>Anda dapat meminta penghapusan akun dan data pribadi kapan saja. Tata cara, jenis data yang dihapus, dan masa retensi dijelaskan pada halaman <a href="{{ route('legal.account-deletion') }}">Penghapusan Akun &amp; Data</a>.</p>
 
 <h2>8. Cookie</h2>
 <p>Platform menggunakan cookie esensial untuk fungsi login dan keamanan. Lihat <a href="{{ route('legal.cookies') }}">Cookie Policy</a> kami untuk detail lengkap.</p>

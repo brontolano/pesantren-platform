@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\PublicDirectoryApiController;
 use App\Http\Controllers\Api\TenantApiController;
 use App\Http\Controllers\Auth\StaffLoginController;
 use App\Http\Controllers\DonasiPublikController;
+use App\Http\Controllers\HapusAkunController;
 use App\Http\Controllers\LauncherController;
 use App\Http\Controllers\TenantWebsiteController;
 use App\Support\KebijakanPrivasiSistem;
@@ -152,6 +153,14 @@ Route::get('/kebijakan-privasi', function () {
 
     return view('legal.privacy-policy');
 })->name('legal.privacy');
+
+// Penghapusan Akun & Data — WAJIB Google Play (account/data deletion URL).
+// DOMAIN TENANT: halaman bermerek + redaksi (PenghapusanAkun, bisa diedit
+// pesantren) + kanal kontak tenant. Central: versi generik platform.
+// Publik (tanpa login) agar reviewer Play & pengguna bisa mengakses; dipakai
+// sebagai URL "Penghapusan Akun" di formulir Data safety Play Console.
+Route::get('/hapus-akun', HapusAkunController::class)->name('legal.account-deletion');
+
 Route::get('/syarat-layanan', fn () => view('legal.terms-of-service'))->name('legal.terms');
 Route::get('/disclaimer', fn () => view('legal.disclaimer'))->name('legal.disclaimer');
 Route::get('/cookie-policy', fn () => view('legal.cookie-policy'))->name('legal.cookies');
