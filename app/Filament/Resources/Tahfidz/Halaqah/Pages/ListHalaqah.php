@@ -22,6 +22,9 @@ class ListHalaqah extends ListRecords
                 'entitas' => 'halaqah',
                 'template' => ['nama', 'musyrif', 'jenis'],
                 'template_contoh' => ['Halaqah A', 'musyrif@contoh.test', 'tahfidz'],
+                'export' => fn (\App\Models\Tenant $t) => \Modules\Tahfidz\Models\Halaqah::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with('musyrif')->orderBy('nama')->get()
+                    ->map(fn ($h): array => ['nama' => $h->nama, 'musyrif' => $h->musyrif?->email, 'jenis' => $h->jenis]),
                 'label' => 'Import Halaqah',
                 'service' => HalaqahImportService::class,
                 'directory' => 'imports/tahfidz/halaqah/uploads',

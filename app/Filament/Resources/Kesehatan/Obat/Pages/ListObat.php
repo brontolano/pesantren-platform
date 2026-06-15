@@ -22,6 +22,9 @@ class ListObat extends ListRecords
                 'entitas' => 'obat',
                 'template' => ['nama', 'satuan', 'stok', 'ambang_menipis'],
                 'template_contoh' => ['Paracetamol', 'tablet', '100', '20'],
+                'export' => fn (\App\Models\Tenant $t) => \Modules\Kesehatan\Models\Obat::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->orderBy('nama')->get()
+                    ->map(fn ($o): array => ['nama' => $o->nama, 'satuan' => $o->satuan, 'stok' => $o->stok, 'ambang_menipis' => $o->ambang_menipis]),
                 'label' => 'Import Obat',
                 'service' => ObatImportService::class,
                 'directory' => 'imports/kesehatan/obat/uploads',

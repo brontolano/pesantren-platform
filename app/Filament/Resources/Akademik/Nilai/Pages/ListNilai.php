@@ -22,6 +22,9 @@ class ListNilai extends ListRecords
                 'entitas' => 'nilai',
                 'template' => ['nis', 'pelajaran', 'periode', 'kelas', 'nilai_harian', 'nilai_uts', 'nilai_uas', 'nilai_akhir', 'catatan'],
                 'template_contoh' => ['2024001', 'NHW', '2026/2027', 'VII-A', '80', '75', '90', '82', ''],
+                'export' => fn (\App\Models\Tenant $t) => \Modules\Akademik\Models\Nilai::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with(['santri', 'pelajaran', 'periodeAkademik', 'kelas'])->get()
+                    ->map(fn ($n): array => ['nis' => $n->santri?->nis, 'pelajaran' => $n->pelajaran?->kode, 'periode' => $n->periodeAkademik?->tahun_akademik, 'kelas' => $n->kelas?->nama_kelas, 'nilai_harian' => $n->nilai_harian, 'nilai_uts' => $n->nilai_uts, 'nilai_uas' => $n->nilai_uas, 'nilai_akhir' => $n->nilai_akhir, 'catatan' => $n->catatan]),
                 'label' => 'Import Nilai',
                 'service' => NilaiImportService::class,
                 'directory' => 'imports/akademik/nilai/uploads',

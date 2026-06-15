@@ -4,8 +4,10 @@ namespace App\Filament\Resources\Akademik\Pelajaran\Pages;
 
 use App\Filament\Concerns\HasImportAction;
 use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
+use App\Models\Tenant;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Services\PelajaranImportService;
 
 class ListPelajaran extends ListRecords
@@ -22,6 +24,12 @@ class ListPelajaran extends ListRecords
                 'entitas' => 'pelajaran',
                 'template' => ['nama', 'kode', 'sks', 'guru'],
                 'template_contoh' => ['Nahwu', 'NHW', '2', 'ustadz@contoh.test'],
+                'export' => fn (Tenant $t) => Pelajaran::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with('guruPengampu')->orderBy('nama')->get()
+                    ->map(fn (Pelajaran $p): array => [
+                        'nama' => $p->nama, 'kode' => $p->kode, 'sks' => $p->sks,
+                        'guru' => $p->guruPengampu?->email,
+                    ]),
                 'label' => 'Import Pelajaran',
                 'service' => PelajaranImportService::class,
                 'directory' => 'imports/akademik/pelajaran/uploads',

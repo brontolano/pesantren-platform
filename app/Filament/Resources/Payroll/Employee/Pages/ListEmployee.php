@@ -19,6 +19,9 @@ class ListEmployee extends ListRecords
                 'entitas' => 'pegawai',
                 'template' => ['nip', 'nama', 'jabatan', 'status_kepegawaian', 'nik', 'nuptk', 'tanggal_masuk', 'email'],
                 'template_contoh' => ['P001', 'Ustadz Ali', 'Guru', 'tetap', '', '', '2020-07-01', 'ali@contoh.test'],
+                'export' => fn (\App\Models\Tenant $t) => \Modules\Payroll\Models\Employee::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with('user')->orderBy('nama')->get()
+                    ->map(fn ($e): array => ['nip' => $e->nip, 'nama' => $e->nama, 'jabatan' => $e->jabatan, 'status_kepegawaian' => $e->status_kepegawaian, 'nik' => $e->nik, 'nuptk' => $e->nuptk, 'tanggal_masuk' => $e->tanggal_masuk?->format('Y-m-d'), 'email' => $e->user?->email]),
                 'label' => 'Import Pegawai',
                 'service' => PegawaiImportService::class,
                 'directory' => 'imports/payroll/pegawai/uploads',

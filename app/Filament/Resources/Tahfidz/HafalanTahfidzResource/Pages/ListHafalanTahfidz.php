@@ -22,6 +22,9 @@ class ListHafalanTahfidz extends ListRecords
                 'entitas' => 'hafalan',
                 'template' => ['nis', 'halaqah', 'surah', 'ayat_awal', 'ayat_akhir', 'status', 'tanggal_target', 'tanggal_selesai', 'catatan'],
                 'template_contoh' => ['2024001', 'Halaqah A', 'Al-Baqarah', '1', '5', 'proses', '', '', ''],
+                'export' => fn (\App\Models\Tenant $t) => \Modules\Tahfidz\Models\HafalanTahfidz::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with(['santri', 'halaqah'])->get()
+                    ->map(fn ($h): array => ['nis' => $h->santri?->nis, 'halaqah' => $h->halaqah?->nama, 'surah' => $h->surah, 'ayat_awal' => $h->ayat_awal, 'ayat_akhir' => $h->ayat_akhir, 'status' => $h->status, 'tanggal_target' => $h->tanggal_target, 'tanggal_selesai' => $h->tanggal_selesai, 'catatan' => $h->catatan]),
                 'label' => 'Import Hafalan',
                 'service' => HafalanImportService::class,
                 'directory' => 'imports/tahfidz/hafalan/uploads',

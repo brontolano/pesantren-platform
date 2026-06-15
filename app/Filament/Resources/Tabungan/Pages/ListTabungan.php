@@ -20,6 +20,9 @@ class ListTabungan extends ListRecords
                 'entitas' => 'saldo tabungan',
                 'template' => ['nis', 'saldo_awal', 'keterangan'],
                 'template_contoh' => ['2024001', '150000', 'Saldo migrasi'],
+                'export' => fn (\App\Models\Tenant $t) => \Modules\Keuangan\Models\Tabungan::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with('santri')->get()
+                    ->map(fn ($tb): array => ['nis' => $tb->santri?->nis, 'saldo_awal' => $tb->saldo, 'keterangan' => '']),
                 'label' => 'Import Saldo Awal',
                 'service' => TabunganSaldoImportService::class,
                 'directory' => 'imports/keuangan/tabungan/uploads',

@@ -27,6 +27,9 @@ class ListPenempatanAsrama extends ListRecords
                 'entitas' => 'asrama',
                 'template' => ['nis', 'nama', 'blok', 'kamar', 'kapasitas', 'gender_blok', 'tanggal_masuk', 'keterangan'],
                 'template_contoh' => ['2024001', 'Ahmad', 'Blok A', 'A-1', '8', 'putra', '2026-07-14', ''],
+                'export' => fn (\App\Models\Tenant $t) => \Modules\Asrama\Models\PenempatanAsrama::withoutGlobalScopes()
+                    ->where('tenant_id', $t->id)->with(['santri', 'kamar.blok'])->get()
+                    ->map(fn ($p): array => ['nis' => $p->santri?->nis, 'nama' => $p->santri?->nama, 'blok' => $p->kamar?->blok?->nama_blok, 'kamar' => $p->kamar?->nomor_kamar, 'kapasitas' => $p->kamar?->kapasitas, 'gender_blok' => $p->kamar?->blok?->gender, 'tanggal_masuk' => $p->tanggal_masuk, 'keterangan' => $p->keterangan]),
                 'label' => 'Import Asrama',
                 'service' => AsramaImportService::class,
                 'directory' => 'imports/asrama/uploads',

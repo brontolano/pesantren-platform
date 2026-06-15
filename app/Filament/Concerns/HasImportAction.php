@@ -50,9 +50,60 @@ trait HasImportAction
     protected function importActions(array $config): array
     {
         return array_values(array_filter([
+            $this->buildExportAction($config),
             $this->buildTemplateAction($config),
             $this->buildImportAction($config),
         ]));
+    }
+
+    /**
+     * Aksi "Export" round-trip — CSV data unit dalam FORMAT yang sama dengan
+     * import (header = kolom 'template'), sehingga bisa diunduh → koreksi di
+     * Excel → impor ulang. Baris diambil dari closure 'export' (pemetaan
+     * per-unit; trait hanya menstream). Muncul hanya bila config punya keduanya.
+     *
+     * @param  ImportConfig  $config
+     */
+    protected function buildExportAction(array $config): ?Action
+    {
+        $columns = $config['template'] ?? null;
+        $rowsResolver = $config['export'] ?? null;
+        if (empty($columns) || ! is_array($columns) || ! is_callable($rowsResolver)) {
+            return null;
+        }
+
+        $entitas = $config['entitas'];
+        $ability = $config['ability'] ?? null;
+        $filename = 'export-'.str()->slug($entitas).'.csv';
+
+        return Action::make(($config['name'] ?? 'import'.str()->studly($entitas)).'Export')
+            ->label('Export')
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('gray')
+            ->visible(fn (): bool => tenancy()->initialized
+                && ($ability === null || (auth()->user()?->can($ability) ?? false)))
+            ->action(function () use ($columns, $rowsResolver, $filename) {
+                /** @var Tenant|null $tenant */
+                $tenant = Tenant::query()->find(tenant('id'));
+                if ($tenant === null) {
+                    Notification::make()->title('Tenant aktif tidak ditemukan.')->danger()->send();
+
+                    return null;
+                }
+
+                return response()->streamDownload(function () use ($columns, $rowsResolver, $tenant): void {
+                    $out = fopen('php://output', 'w');
+                    fputcsv($out, $columns);
+                    foreach ($rowsResolver($tenant) as $row) {
+                        $line = [];
+                        foreach ($columns as $col) {
+                            $line[] = $row[$col] ?? '';
+                        }
+                        fputcsv($out, $line);
+                    }
+                    fclose($out);
+                }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+            });
     }
 
     /**
