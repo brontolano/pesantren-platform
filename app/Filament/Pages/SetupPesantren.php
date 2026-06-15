@@ -41,7 +41,7 @@ class SetupPesantren extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Setup Pesantren';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = -10;
 

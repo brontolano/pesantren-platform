@@ -2,34 +2,37 @@
 
 namespace App\Filament\Resources\TemplateNotifikasi;
 
-use App\Support\AlbaKidsTenant;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\TemplateNotifikasi\Pages\CreateTemplateNotifikasi;
 use App\Filament\Resources\TemplateNotifikasi\Pages\EditTemplateNotifikasi;
 use App\Filament\Resources\TemplateNotifikasi\Pages\ListTemplateNotifikasi;
+use App\Support\AlbaKidsTenant;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
 
 class TemplateNotifikasiResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = TemplateNotifikasi::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static \UnitEnum|string|null $navigationGroup = 'Komunikasi';
 
     protected static ?int $navigationSort = 1;
 
@@ -48,12 +51,12 @@ class TemplateNotifikasiResource extends Resource
         return auth()->user()?->can('manage_notifikasi') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_notifikasi') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_notifikasi') ?? false;
     }
@@ -131,7 +134,7 @@ class TemplateNotifikasiResource extends Resource
         ];
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();
 

@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Pengadaan;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Pengadaan\Pages\CreateBelanja;
 use App\Filament\Resources\Pengadaan\Pages\ListBelanja;
 use App\Services\AuditLogger;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -17,6 +19,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\DivisiUnit;
 use Modules\Ledger\Models\SumberDana;
@@ -25,7 +28,7 @@ use Modules\Pengadaan\Services\BelanjaService;
 
 class BelanjaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Belanja::class;
 
@@ -37,13 +40,13 @@ class BelanjaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Belanja';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pajak';
 
     protected static ?int $navigationSort = 8;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('pengadaan') && (auth()->user()?->canAny(['view_keuangan', 'input_belanja', 'manage_ledger']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('pengadaan') && (auth()->user()?->canAny(['view_keuangan', 'input_belanja', 'manage_ledger']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -56,12 +59,12 @@ class BelanjaResource extends Resource
         return auth()->user()?->can('input_belanja') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return false; // belanja terbukukan immutable; koreksi via jurnal pembalik.
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return false;
     }

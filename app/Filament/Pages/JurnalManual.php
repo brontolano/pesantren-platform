@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -38,7 +39,7 @@ class JurnalManual extends Page implements HasForms
 
     protected static ?string $title = 'Catat Jurnal Manual';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 7;
 
@@ -65,7 +66,7 @@ class JurnalManual extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public function mount(): void
@@ -152,7 +153,7 @@ class JurnalManual extends Page implements HasForms
             // jurnal tetap terposting (tak memblokir jalur posting).
             $jurnal->ajukanPersetujuan(Auth::id());
 
-            Notification::make()->title('Jurnal tersimpan: ' . $jurnal->nomor)->success()->send();
+            Notification::make()->title('Jurnal tersimpan: '.$jurnal->nomor)->success()->send();
             $this->mount(); // reset form
         } catch (Throwable $e) {
             Notification::make()->title('Gagal menyimpan jurnal')->body($e->getMessage())->danger()->send();

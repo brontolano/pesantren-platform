@@ -2,12 +2,13 @@
 
 namespace App\Filament\Resources\CMS\Gallery;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\CMS\Gallery\Pages\CreateGallery;
 use App\Filament\Resources\CMS\Gallery\Pages\EditGallery;
 use App\Filament\Resources\CMS\Gallery\Pages\ListGalleries;
+use App\Services\StorageQuotaService;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use App\Services\StorageQuotaService;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
@@ -17,21 +18,23 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Modules\CMS\Models\Gallery;
 
 class GalleryResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Gallery::class;
 
@@ -43,7 +46,7 @@ class GalleryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Galeri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
     protected static ?int $navigationSort = 2;
 
@@ -62,12 +65,12 @@ class GalleryResource extends Resource
         return auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->canAny(['manage_santri', 'manage_tenant_settings']) ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_tenant_settings') ?? false;
     }
@@ -161,7 +164,7 @@ class GalleryResource extends Resource
                                     ->deletable()
                                     ->reorderable('sort_order')
                                     ->itemLabel(fn (array $state): ?string => $state['caption'] ?? null)
-                                    ->visible(fn (?\Modules\CMS\Models\Gallery $record): bool => $record !== null && $record->images()->exists()),
+                                    ->visible(fn (?Gallery $record): bool => $record !== null && $record->images()->exists()),
                             ]),
                     ])->columnSpan(['default' => 1, 'lg' => 2]),
 
@@ -228,7 +231,7 @@ class GalleryResource extends Resource
      * Render thumbnail foto via Blade view (robust: ada fallback bila gambar
      * gagal dimuat). URL di-resolve ke /_tenant-storage via resolveMediaUrl.
      */
-    private static function thumbnail(?string $value): \Illuminate\Contracts\View\View
+    private static function thumbnail(?string $value): View
     {
         return view('filament.forms.gallery-thumb', [
             'url' => Gallery::resolveMediaUrl($value),
@@ -244,7 +247,7 @@ class GalleryResource extends Resource
     {
         $slug = Str::slug((string) ($get('slug') ?: $get('title') ?: ''));
 
-        return 'cms/galleries/' . ($slug !== '' ? $slug : 'umum');
+        return 'cms/galleries/'.($slug !== '' ? $slug : 'umum');
     }
 
     public static function table(Table $table): Table
@@ -312,4 +315,3 @@ class GalleryResource extends Resource
         ];
     }
 }
-

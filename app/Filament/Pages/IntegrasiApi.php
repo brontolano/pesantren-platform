@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\TenantApiKey;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
@@ -32,7 +33,7 @@ class IntegrasiApi extends Page implements HasTable
 
     protected static ?string $navigationLabel = 'Integrasi & API';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
 
     protected static ?int $navigationSort = 90;
 
@@ -51,7 +52,7 @@ class IntegrasiApi extends Page implements HasTable
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public function getSubheading(): ?string

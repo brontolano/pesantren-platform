@@ -39,7 +39,7 @@ class PosKategoriResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kategori POS';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas';
 
     protected static ?int $navigationSort = 20;
 

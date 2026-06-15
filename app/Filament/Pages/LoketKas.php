@@ -48,7 +48,7 @@ class LoketKas extends Page implements HasActions, HasForms
 
     protected static ?string $title = 'Loket Kas (Kasir)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas';
 
     protected static ?int $navigationSort = 19;
 

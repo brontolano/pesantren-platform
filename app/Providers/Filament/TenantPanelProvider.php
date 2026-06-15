@@ -247,20 +247,26 @@ class TenantPanelProvider extends PanelProvider
                 // JANGAN beri ->icon() pada grup: Filament v5 melempar 500 bila grup
                 // berikon berisi item berikon (lihat TenantPanelAuthedSmokeTest).
                 NavigationGroup::make('Kesantrian'),
-                NavigationGroup::make('Kepengasuhan & Kedisiplinan')->collapsible(),
-                NavigationGroup::make('UKS & Alumni')->collapsible(),
+                NavigationGroup::make('Kepengasuhan')->collapsible(),
+                NavigationGroup::make('Kedisiplinan')->collapsible(),
+                NavigationGroup::make('UKS')->collapsible(),
+                NavigationGroup::make('Alumni')->collapsible(),
                 NavigationGroup::make('PPDB')->collapsible(),
                 NavigationGroup::make('Akademik')->collapsible(),
                 NavigationGroup::make('Tahfidz')->collapsible(),
                 NavigationGroup::make('Keuangan'),
-                NavigationGroup::make('Kas & Kantin')->collapsible(),
-                NavigationGroup::make('Akuntansi & Pajak')->collapsible(),
+                NavigationGroup::make('Kas')->collapsible(),
+                NavigationGroup::make('Kantin')->collapsible(),
+                NavigationGroup::make('Akuntansi')->collapsible(),
+                NavigationGroup::make('Pajak')->collapsible(),
                 NavigationGroup::make('Kepegawaian')->collapsible(),
                 NavigationGroup::make('AI Khadim Digital')->collapsible(),
-                NavigationGroup::make('Kelembagaan & Komunikasi')->collapsible(),
+                NavigationGroup::make('Kelembagaan')->collapsible(),
+                NavigationGroup::make('Komunikasi')->collapsible(),
                 NavigationGroup::make('Sarana & Logistik')->collapsible(),
                 NavigationGroup::make('Laporan Pimpinan')->collapsible(),
-                NavigationGroup::make('Pengaturan & Mutu')->collapsible(),
+                NavigationGroup::make('Pengaturan')->collapsible(),
+                NavigationGroup::make('Mutu')->collapsible(),
             ]);
 
         if (! $isAlbaKids) {

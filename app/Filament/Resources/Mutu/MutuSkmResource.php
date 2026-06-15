@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Mutu;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Mutu\MutuSkm\Pages\CreateMutuSkm;
 use App\Filament\Resources\Mutu\MutuSkm\Pages\ListMutuSkm;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -18,7 +20,7 @@ use Modules\Mutu\Models\MutuSkm;
 
 class MutuSkmResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = MutuSkm::class;
 
@@ -30,13 +32,13 @@ class MutuSkmResource extends Resource
 
     protected static ?string $pluralModelLabel = 'SKM (Kepuasan Wali)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 5;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
+        return UiMode::advanced() && static::moduleVisible('mutu') && (auth()->user()?->can('manage_mutu') ?? false);
     }
 
     public static function canAccess(): bool

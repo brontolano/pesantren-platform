@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Ledger;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Ledger\Pages\ListJurnal;
 use App\Services\AuditLogger;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
@@ -12,12 +14,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Services\JurnalService;
 
 class JurnalResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Jurnal::class;
 
@@ -29,13 +32,13 @@ class JurnalResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Jurnal Umum';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 6;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->canAny(['view_ledger', 'manage_ledger']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -49,12 +52,12 @@ class JurnalResource extends Resource
         return false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return false;
     }
@@ -94,7 +97,7 @@ class JurnalResource extends Resource
                     ->label('Detail')
                     ->icon('heroicon-o-eye')
                     ->color('gray')
-                    ->modalHeading(fn (Jurnal $record): string => 'Jurnal ' . $record->nomor)
+                    ->modalHeading(fn (Jurnal $record): string => 'Jurnal '.$record->nomor)
                     ->modalContent(fn (Jurnal $record) => view('filament.ledger.jurnal-detail', [
                         'jurnal' => $record->load(['baris.akun', 'baris.divisi', 'baris.sumberDana']),
                     ]))
@@ -119,7 +122,7 @@ class JurnalResource extends Resource
                             subject: $record,
                             metadata: ['asal' => $record->nomor, 'pembalik' => $pembalik->nomor],
                         );
-                        Notification::make()->title('Jurnal pembalik dibuat: ' . $pembalik->nomor)->success()->send();
+                        Notification::make()->title('Jurnal pembalik dibuat: '.$pembalik->nomor)->success()->send();
                     }),
             ]);
     }

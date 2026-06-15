@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages\CMS;
 
+use App\Filament\Concerns\BuiltInWebsiteGate;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -11,7 +13,7 @@ use Modules\CMS\Models\WebsiteSetting;
 
 class WebsiteBuilder extends Page
 {
-    use \App\Filament\Concerns\BuiltInWebsiteGate;
+    use BuiltInWebsiteGate;
 
     protected string $view = 'filament.pages.cms.website-builder';
 
@@ -21,7 +23,7 @@ class WebsiteBuilder extends Page
 
     protected static ?string $title = 'Website Builder';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
     protected static ?int $navigationSort = 3;
 
@@ -38,7 +40,7 @@ class WebsiteBuilder extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::builtInWebsiteEnabled()
+        return UiMode::advanced() && static::builtInWebsiteEnabled()
             && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 

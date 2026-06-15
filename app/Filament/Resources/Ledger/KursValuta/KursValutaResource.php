@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Ledger\KursValuta;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Ledger\KursValuta\Pages\CreateKursValuta;
 use App\Filament\Resources\Ledger\KursValuta\Pages\EditKursValuta;
 use App\Filament\Resources\Ledger\KursValuta\Pages\ListKursValuta;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -20,7 +22,7 @@ use Modules\Ledger\Models\KursValuta;
 
 class KursValutaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = KursValuta::class;
 
@@ -32,13 +34,13 @@ class KursValutaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kurs Valuta (Donor)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 31;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->can('manage_ledger') ?? false);
+        return UiMode::advanced() && static::moduleVisible('ledger') && (auth()->user()?->can('manage_ledger') ?? false);
     }
 
     public static function canAccess(): bool

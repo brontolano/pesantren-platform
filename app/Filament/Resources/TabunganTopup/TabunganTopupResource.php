@@ -29,7 +29,7 @@ class TabunganTopupResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Topup Tabungan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas';
 
     protected static ?int $navigationSort = 5;
 

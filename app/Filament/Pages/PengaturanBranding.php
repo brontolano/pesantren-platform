@@ -45,7 +45,7 @@ class PengaturanBranding extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Settings & Branding';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
 
     protected static ?string $title = 'Settings & Branding';
 

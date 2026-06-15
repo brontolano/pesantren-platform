@@ -30,7 +30,7 @@ class IzinSantriResource extends Resource
 
     protected static ?string $navigationLabel = 'Izin Santri';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
+    protected static UnitEnum|string|null $navigationGroup = 'Kepengasuhan';
 
     protected static ?int $navigationSort = 2;
 
