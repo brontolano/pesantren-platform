@@ -2,43 +2,46 @@
 
 namespace App\Filament\Resources\Tahfidz;
 
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use BackedEnum;
-use UnitEnum;
-use Filament\Forms\Components\TextInput;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource\Pages\CreateHafalanTahfidz;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource\Pages\EditHafalanTahfidz;
 use App\Filament\Resources\Tahfidz\HafalanTahfidzResource\Pages\ListHafalanTahfidz;
+use App\Support\UiMode;
+use BackedEnum;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Modules\Tahfidz\Models\HafalanTahfidz;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Tahfidz\Models\HafalanTahfidz;
+use UnitEnum;
 
 class HafalanTahfidzResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('tahfidz');
+        return UiMode::advanced() && static::moduleVisible('tahfidz');
     }
 
     public static function canAccess(): bool
     {
         return static::moduleVisible('tahfidz');
     }
+
     protected static ?string $model = HafalanTahfidz::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-book-open';
 
     protected static ?string $navigationLabel = 'Hafalan Tahfidz';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static UnitEnum|string|null $navigationGroup = 'Tahfidz';
 
     public static function form(Schema $schema): Schema
     {

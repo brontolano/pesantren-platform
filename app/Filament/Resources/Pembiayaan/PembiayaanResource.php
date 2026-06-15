@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Pembiayaan;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Pembiayaan\Pages\CreatePembiayaan;
 use App\Filament\Resources\Pembiayaan\Pages\ListPembiayaan;
 use App\Services\AuditLogger;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -14,13 +16,14 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Pembiayaan\Models\Aset;
 use Modules\Pembiayaan\Models\PengajuanPembiayaan;
 use Modules\Pembiayaan\Services\PembiayaanService;
 
 class PembiayaanResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PengajuanPembiayaan::class;
 
@@ -32,13 +35,13 @@ class PembiayaanResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pengajuan Pembiayaan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
 
     protected static ?int $navigationSort = 2;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('pembiayaan') && (auth()->user()?->can('manage_pembiayaan') ?? false);
+        return UiMode::advanced() && static::moduleVisible('pembiayaan') && (auth()->user()?->can('manage_pembiayaan') ?? false);
     }
 
     public static function canAccess(): bool
@@ -46,7 +49,7 @@ class PembiayaanResource extends Resource
         return static::shouldRegisterNavigation();
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return false;
     }

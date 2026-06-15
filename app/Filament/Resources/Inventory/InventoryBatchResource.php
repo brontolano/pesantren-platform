@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Inventory;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Inventory\InventoryBatch\Pages\ListInventoryBatch;
+use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -10,6 +12,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Modules\Keuangan\Models\InventoryBatch;
 
 /**
@@ -17,7 +20,7 @@ use Modules\Keuangan\Models\InventoryBatch;
  */
 class InventoryBatchResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = InventoryBatch::class;
 
@@ -29,13 +32,13 @@ class InventoryBatchResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Batch / Kedaluwarsa';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
 
     protected static ?int $navigationSort = 23;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
+        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
     }
 
     public static function canAccess(): bool
@@ -63,7 +66,7 @@ class InventoryBatchResource extends Resource
                 TextColumn::make('qty')->label('Qty')->alignEnd()
                     ->formatStateUsing(fn ($state): string => rtrim(rtrim(number_format((float) $state, 3, ',', '.'), '0'), ',')),
                 TextColumn::make('tanggal_kedaluwarsa')->label('Kedaluwarsa')->date()->placeholder('—')
-                    ->color(fn (?\Illuminate\Support\Carbon $state): string => $state !== null && $state->isPast() ? 'danger' : 'success')
+                    ->color(fn (?Carbon $state): string => $state !== null && $state->isPast() ? 'danger' : 'success')
                     ->sortable(),
                 IconColumn::make('is_active')->label('Aktif')->boolean(),
             ])

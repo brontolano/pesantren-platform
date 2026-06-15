@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Kegiatan\Recurring;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Kegiatan\Recurring\Pages\CreateKegiatanRecurring;
 use App\Filament\Resources\Kegiatan\Recurring\Pages\EditKegiatanRecurring;
 use App\Filament\Resources\Kegiatan\Recurring\Pages\ListKegiatanRecurring;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -25,7 +27,7 @@ use Modules\Kegiatan\Services\KegiatanLanjutService;
 
 class KegiatanRecurringResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = KegiatanRecurring::class;
 
@@ -37,13 +39,13 @@ class KegiatanRecurringResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kegiatan Berulang';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
 
     protected static ?int $navigationSort = 6;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
+        return UiMode::advanced() && static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
     }
 
     public static function canAccess(): bool

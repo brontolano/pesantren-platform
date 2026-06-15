@@ -28,7 +28,7 @@ class HalaqahResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static UnitEnum|string|null $navigationGroup = 'Tahfidz';
 
     public static function getNavigationLabel(): string
     {

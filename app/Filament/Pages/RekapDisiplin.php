@@ -25,7 +25,7 @@ class RekapDisiplin extends Page implements HasTable
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
 
     protected static ?int $navigationSort = 10;
 
@@ -78,13 +78,13 @@ class RekapDisiplin extends Page implements HasTable
         }
 
         $totalPelanggaran = (clone $base)->where('jenis_pelanggaran.poin', '>', 0)->sum('jenis_pelanggaran.poin');
-        $totalPrestasi    = abs((clone $base)->where('jenis_pelanggaran.poin', '<', 0)->sum('jenis_pelanggaran.poin'));
-        $totalNet         = $totalPelanggaran - $totalPrestasi;
+        $totalPrestasi = abs((clone $base)->where('jenis_pelanggaran.poin', '<', 0)->sum('jenis_pelanggaran.poin'));
+        $totalNet = $totalPelanggaran - $totalPrestasi;
 
         return [
             'pelanggaran' => (int) $totalPelanggaran,
-            'prestasi'    => (int) $totalPrestasi,
-            'net'         => (int) $totalNet,
+            'prestasi' => (int) $totalPrestasi,
+            'net' => (int) $totalNet,
         ];
     }
 

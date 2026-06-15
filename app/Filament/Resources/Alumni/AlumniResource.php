@@ -39,7 +39,7 @@ class AlumniResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Alumni';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'UKS & Alumni';
 
     protected static ?int $navigationSort = 5;
 

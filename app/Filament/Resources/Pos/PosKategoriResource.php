@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Pos;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Pos\Pages\CreatePosKategori;
 use App\Filament\Resources\Pos\Pages\EditPosKategori;
 use App\Filament\Resources\Pos\Pages\ListPosKategori;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -25,7 +27,7 @@ use Modules\Ledger\Models\Akun;
  */
 class PosKategoriResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PosKategori::class;
 
@@ -37,13 +39,13 @@ class PosKategoriResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kategori POS';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
 
     protected static ?int $navigationSort = 20;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
+        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
     }
 
     public static function canAccess(): bool

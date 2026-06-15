@@ -2,33 +2,35 @@
 
 namespace App\Filament\Resources\Kegiatan;
 
-use BackedEnum;
-use UnitEnum;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Kegiatan\IzinSantri\Pages\CreateIzinSantri;
 use App\Filament\Resources\Kegiatan\IzinSantri\Pages\EditIzinSantri;
 use App\Filament\Resources\Kegiatan\IzinSantri\Pages\ListIzinSantri;
+use BackedEnum;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Modules\Kegiatan\Models\IzinSantri;
+use UnitEnum;
 
 class IzinSantriResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = IzinSantri::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-check';
 
     protected static ?string $navigationLabel = 'Izin Santri';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kesantrian';
+    protected static UnitEnum|string|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
 
     protected static ?int $navigationSort = 2;
 
@@ -65,8 +67,8 @@ class IzinSantriResource extends Resource
                 TextColumn::make('status')->label('Status')->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'disetujui' => 'success',
-                        'ditolak'   => 'danger',
-                        default     => 'warning',
+                        'ditolak' => 'danger',
+                        default => 'warning',
                     }),
                 IconColumn::make('sudah_kembali')->label('Kembali')->boolean(),
             ])
@@ -81,9 +83,9 @@ class IzinSantriResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListIzinSantri::route('/'),
+            'index' => ListIzinSantri::route('/'),
             'create' => CreateIzinSantri::route('/create'),
-            'edit'   => EditIzinSantri::route('/{record}/edit'),
+            'edit' => EditIzinSantri::route('/{record}/edit'),
         ];
     }
 

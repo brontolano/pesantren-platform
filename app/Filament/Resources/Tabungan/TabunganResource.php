@@ -2,21 +2,23 @@
 
 namespace App\Filament\Resources\Tabungan;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Tabungan\Pages\ListTabungan;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Services\TabunganService;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 
 class TabunganResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Tabungan::class;
 
@@ -28,7 +30,7 @@ class TabunganResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Tabungan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
 
     protected static ?int $navigationSort = 3;
 
@@ -71,7 +73,7 @@ class TabunganResource extends Resource
                     ->money('IDR')
                     ->placeholder('Tanpa limit')
                     ->sortable(),
-                \Filament\Tables\Columns\IconColumn::make('is_frozen')
+                IconColumn::make('is_frozen')
                     ->label('Dibekukan')
                     ->boolean()
                     ->trueIcon('heroicon-o-lock-closed')
@@ -102,7 +104,7 @@ class TabunganResource extends Resource
                             ->rows(2),
                     ])
                     ->action(function (Tabungan $record, array $data): void {
-                        (new TabunganService())->setor(
+                        (new TabunganService)->setor(
                             $record->santri_id,
                             (float) $data['nominal'],
                             [
@@ -128,7 +130,7 @@ class TabunganResource extends Resource
                             ->rows(2),
                     ])
                     ->action(function (Tabungan $record, array $data): void {
-                        (new TabunganService())->tarik(
+                        (new TabunganService)->tarik(
                             $record->santri_id,
                             (float) $data['nominal'],
                             [
@@ -149,7 +151,7 @@ class TabunganResource extends Resource
                             ->prefix('Rp')
                             ->minValue(0)
                             ->helperText('Kosongkan / 0 = tanpa limit. Berlaku utk tarik tunai & bayar dari saldo.'),
-                        \Filament\Forms\Components\Toggle::make('is_frozen')
+                        Toggle::make('is_frozen')
                             ->label('Bekukan tabungan')
                             ->helperText('Saat dibekukan: penarikan & pembayaran dari saldo ditolak; setoran tetap boleh.'),
                     ])
@@ -179,4 +181,3 @@ class TabunganResource extends Resource
         ];
     }
 }
-

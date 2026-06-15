@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\Kegiatan;
 
-use BackedEnum;
-use UnitEnum;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Kegiatan\KunjunganWali\Pages\CreateKunjunganWali;
 use App\Filament\Resources\Kegiatan\KunjunganWali\Pages\EditKunjunganWali;
 use App\Filament\Resources\Kegiatan\KunjunganWali\Pages\ListKunjunganWali;
+use App\Support\UiMode;
+use BackedEnum;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -14,27 +16,28 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Modules\Kegiatan\Models\KunjunganWali;
+use UnitEnum;
 
 class KunjunganWaliResource extends Resource
 {
     /** Mode simple: menu lanjutan disembunyikan (fungsi & route tetap aktif). */
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced();
+        return UiMode::advanced();
     }
 
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = KunjunganWali::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user-group';
 
     protected static ?string $navigationLabel = 'Kunjungan Wali';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kesantrian';
+    protected static UnitEnum|string|null $navigationGroup = 'Kepengasuhan & Kedisiplinan';
 
     protected static ?int $navigationSort = 3;
 
@@ -75,9 +78,9 @@ class KunjunganWaliResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListKunjunganWali::route('/'),
+            'index' => ListKunjunganWali::route('/'),
             'create' => CreateKunjunganWali::route('/create'),
-            'edit'   => EditKunjunganWali::route('/{record}/edit'),
+            'edit' => EditKunjunganWali::route('/{record}/edit'),
         ];
     }
 

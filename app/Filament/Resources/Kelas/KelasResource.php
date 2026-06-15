@@ -6,17 +6,19 @@ use App\Filament\Resources\Kelas\Pages\CreateKelas;
 use App\Filament\Resources\Kelas\Pages\EditKelas;
 use App\Filament\Resources\Kelas\Pages\ListKelas;
 use App\Models\User;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Models\Lembaga;
 use Modules\Kesantrian\Models\Kelas;
 
 class KelasResource extends Resource
@@ -31,7 +33,7 @@ class KelasResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kelas';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 2;
 
@@ -50,7 +52,7 @@ class KelasResource extends Resource
         return auth()->user()?->can('manage_santri') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_santri') ?? false;
     }
@@ -86,7 +88,7 @@ class KelasResource extends Resource
             Select::make('lembaga_id')
                 ->label('Lembaga (opsional)')
                 ->helperText('Kosong = lembaga default tenant.')
-                ->options(fn () => \Modules\Akademik\Models\Lembaga::query()->where('aktif', true)->pluck('nama', 'id'))
+                ->options(fn () => Lembaga::query()->where('aktif', true)->pluck('nama', 'id'))
                 ->searchable()
                 ->nullable(),
             Toggle::make('is_active')
@@ -148,4 +150,3 @@ class KelasResource extends Resource
         ];
     }
 }
-

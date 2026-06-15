@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Akademik\Kitab;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\Kitab\Pages\CreateKitab;
 use App\Filament\Resources\Akademik\Kitab\Pages\EditKitab;
 use App\Filament\Resources\Akademik\Kitab\Pages\ListKitab;
@@ -17,7 +18,7 @@ use UnitEnum;
 
 class KitabResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Kitab::class;
 
@@ -25,7 +26,7 @@ class KitabResource extends Resource
 
     protected static ?string $navigationLabel = 'Kitab';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static UnitEnum|string|null $navigationGroup = 'Akademik';
 
     protected static ?string $modelLabel = 'Kitab';
 

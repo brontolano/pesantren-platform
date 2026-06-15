@@ -2,39 +2,42 @@
 
 namespace App\Filament\Resources\Kesehatan;
 
-use BackedEnum;
-use UnitEnum;
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Kesehatan\SesiKonseling\Pages\CreateSesiKonseling;
 use App\Filament\Resources\Kesehatan\SesiKonseling\Pages\EditSesiKonseling;
 use App\Filament\Resources\Kesehatan\SesiKonseling\Pages\ListSesiKonseling;
+use App\Support\UiMode;
+use BackedEnum;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Modules\Kesehatan\Models\SesiKonseling;
+use UnitEnum;
 
 class SesiKonselingResource extends Resource
 {
     /** Mode simple: menu lanjutan disembunyikan (fungsi & route tetap aktif). */
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced();
+        return UiMode::advanced();
     }
 
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = SesiKonseling::class;
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     protected static ?string $navigationLabel = 'Sesi Konseling';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Kesantrian';
+    protected static UnitEnum|string|null $navigationGroup = 'UKS & Alumni';
 
     protected static ?int $navigationSort = 2;
 
@@ -60,8 +63,8 @@ class SesiKonselingResource extends Resource
             Select::make('status')
                 ->label('Status')
                 ->options([
-                    'terjadwal'  => 'Terjadwal',
-                    'selesai'    => 'Selesai',
+                    'terjadwal' => 'Terjadwal',
+                    'selesai' => 'Selesai',
                     'dibatalkan' => 'Dibatalkan',
                 ])
                 ->required()
@@ -90,9 +93,9 @@ class SesiKonselingResource extends Resource
                 TextColumn::make('topik')->label('Topik')->limit(40),
                 TextColumn::make('status')->label('Status')->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'selesai'    => 'success',
+                        'selesai' => 'success',
                         'dibatalkan' => 'danger',
-                        default      => 'warning',
+                        default => 'warning',
                     }),
                 TextColumn::make('konselor.name')->label('Konselor'),
             ])
@@ -107,9 +110,9 @@ class SesiKonselingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListSesiKonseling::route('/'),
+            'index' => ListSesiKonseling::route('/'),
             'create' => CreateSesiKonseling::route('/create'),
-            'edit'   => EditSesiKonseling::route('/{record}/edit'),
+            'edit' => EditSesiKonseling::route('/{record}/edit'),
         ];
     }
 

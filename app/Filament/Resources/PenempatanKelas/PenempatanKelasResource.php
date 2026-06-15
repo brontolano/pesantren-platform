@@ -31,7 +31,7 @@ class PenempatanKelasResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Penempatan Kelas';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 3;
 
@@ -135,4 +135,3 @@ class PenempatanKelasResource extends Resource
         ];
     }
 }
-

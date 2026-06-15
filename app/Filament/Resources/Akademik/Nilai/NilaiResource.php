@@ -2,21 +2,23 @@
 
 namespace App\Filament\Resources\Akademik\Nilai;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\Nilai\Pages\CreateNilai;
 use App\Filament\Resources\Akademik\Nilai\Pages\EditNilai;
 use App\Filament\Resources\Akademik\Nilai\Pages\ListNilai;
 use App\Models\User;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\Pelajaran;
@@ -26,14 +28,15 @@ use Modules\Kesantrian\Models\Santri;
 
 class NilaiResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = Nilai::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
 
     protected static ?string $navigationLabel = 'Input Nilai';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 4;
 
@@ -52,12 +55,12 @@ class NilaiResource extends Resource
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
@@ -180,4 +183,3 @@ class NilaiResource extends Resource
         return $query->pluck('nama_kelas', 'id')->all();
     }
 }
-

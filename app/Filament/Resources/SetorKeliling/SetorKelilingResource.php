@@ -17,10 +17,11 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SetorKelilingSesi;
 use Modules\Keuangan\Services\SetorKelilingService;
-use Modules\Kesantrian\Models\Santri;
 
 /**
  * Setor Keliling — petugas mencatat setoran tabungan di lapangan (draf, layar
@@ -34,7 +35,7 @@ class SetorKelilingResource extends Resource
 
     protected static ?string $navigationLabel = 'Setor Keliling';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
 
     protected static ?string $modelLabel = 'Sesi Setor Keliling';
 
@@ -150,7 +151,7 @@ class SetorKelilingResource extends Resource
             ]);
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with('petugas');
     }

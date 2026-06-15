@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -26,7 +27,7 @@ class LaporanDanaTerikat extends Page implements HasForms
 
     protected static ?string $title = 'Laporan Dana Terikat (PSAK 112/109)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
 
     protected static ?int $navigationSort = 8;
 
@@ -45,7 +46,7 @@ class LaporanDanaTerikat extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public function mount(): void

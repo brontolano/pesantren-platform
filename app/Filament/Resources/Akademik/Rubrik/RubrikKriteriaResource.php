@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Akademik\Rubrik;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\Rubrik\Pages\CreateRubrikKriteria;
 use App\Filament\Resources\Akademik\Rubrik\Pages\EditRubrikKriteria;
 use App\Filament\Resources\Akademik\Rubrik\Pages\ListRubrikKriteria;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -25,7 +27,7 @@ use Modules\Kesantrian\Models\Santri;
 
 class RubrikKriteriaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = RubrikKriteria::class;
 
@@ -37,13 +39,13 @@ class RubrikKriteriaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Rubrik Kompetensi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 9;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool

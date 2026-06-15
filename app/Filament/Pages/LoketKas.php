@@ -18,13 +18,12 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\PosKategori;
 use Modules\Keuangan\Models\PosSesi;
-use Modules\Keuangan\Models\PosTransaksi;
 use Modules\Keuangan\Services\PosKasService;
-use Modules\Kesantrian\Models\Santri;
 use Throwable;
 
 /**
@@ -49,7 +48,7 @@ class LoketKas extends Page implements HasActions, HasForms
 
     protected static ?string $title = 'Loket Kas (Kasir)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kas & Kantin';
 
     protected static ?int $navigationSort = 19;
 

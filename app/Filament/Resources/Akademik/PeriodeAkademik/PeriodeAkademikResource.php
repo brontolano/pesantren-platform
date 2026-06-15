@@ -2,26 +2,31 @@
 
 namespace App\Filament\Resources\Akademik\PeriodeAkademik;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\PeriodeAkademik\Pages\CreatePeriodeAkademik;
 use App\Filament\Resources\Akademik\PeriodeAkademik\Pages\EditPeriodeAkademik;
 use App\Filament\Resources\Akademik\PeriodeAkademik\Pages\ListPeriodeAkademik;
+use App\Support\UiMode;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Models\Lembaga;
 use Modules\Akademik\Models\PeriodeAkademik;
 
 class PeriodeAkademikResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = PeriodeAkademik::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calendar-days';
@@ -32,13 +37,13 @@ class PeriodeAkademikResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Periode Akademik';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 1;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -51,12 +56,12 @@ class PeriodeAkademikResource extends Resource
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_akademik') ?? false;
     }
@@ -88,7 +93,7 @@ class PeriodeAkademikResource extends Resource
                 Select::make('lembaga_id')
                     ->label('Lembaga (opsional)')
                     ->helperText('Kosong = berlaku untuk lembaga default tenant.')
-                    ->options(fn () => \Modules\Akademik\Models\Lembaga::query()->where('aktif', true)->pluck('nama', 'id'))
+                    ->options(fn () => Lembaga::query()->where('aktif', true)->pluck('nama', 'id'))
                     ->searchable()
                     ->nullable(),
                 Select::make('kalender')
@@ -141,4 +146,3 @@ class PeriodeAkademikResource extends Resource
         ];
     }
 }
-
