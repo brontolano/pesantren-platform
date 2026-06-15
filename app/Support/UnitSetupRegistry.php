@@ -115,6 +115,16 @@ class UnitSetupRegistry
                         self::resourceUrl(\App\Filament\Resources\Payroll\Employee\EmployeeResource::class)),
                 ],
             ],
+            'kesehatan' => [
+                'label' => 'Kesehatan',
+                'icon' => 'heroicon-o-heart',
+                'permission' => 'manage_santri',
+                'steps' => [
+                    self::step('obat', 'Master obat', 'Daftar obat UKS (bisa impor).',
+                        self::adaData(\Modules\Kesehatan\Models\Obat::class),
+                        self::resourceUrl(\App\Filament\Resources\Kesehatan\ObatResource::class)),
+                ],
+            ],
         ];
     }
 
