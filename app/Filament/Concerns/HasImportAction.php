@@ -325,6 +325,28 @@ trait HasImportAction
                     $body .= "\n\nContoh masalah:\n".$errors;
                 }
 
+                // Laporan kegagalan LENGKAP: untuk file besar (notifikasi hanya
+                // memuat 5), tulis semua baris gagal ke CSV agar bisa diunduh &
+                // diperbaiki TU. Disimpan via Storage tenancy-aware.
+                $semuaError = $summary['errors'] ?? [];
+                if (count($semuaError) > 5) {
+                    try {
+                        $buf = fopen('php://temp', 'r+');
+                        fputcsv($buf, ['baris', 'referensi', 'masalah']);
+                        foreach ($semuaError as $e) {
+                            fputcsv($buf, [$e['row'] ?? '', $e['nis'] ?? $e['ref'] ?? '', $e['error'] ?? '']);
+                        }
+                        rewind($buf);
+                        $isi = (string) stream_get_contents($buf);
+                        fclose($buf);
+                        $errFile = 'import-errors/'.str()->slug($entitas).'-'.now()->format('Ymd-His').'.csv';
+                        Storage::disk('local')->put($errFile, $isi);
+                        $body .= "\n\nLaporan lengkap ".count($semuaError)." kegagalan tersimpan: ".basename($errFile);
+                    } catch (\Throwable) {
+                        // gagal menulis laporan tak boleh menggagalkan import
+                    }
+                }
+
                 $notification = Notification::make()
                     ->title($dryRun ? 'Hasil validasi import' : ucfirst($entitas).' selesai diimpor')
                     ->body($body)
