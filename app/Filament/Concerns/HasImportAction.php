@@ -2,6 +2,7 @@
 
 namespace App\Filament\Concerns;
 
+use App\Models\Setting;
 use App\Models\Tenant;
 use App\Support\ImportColumnMapper;
 use Filament\Actions\Action;
@@ -9,9 +10,11 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Section;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Storage;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\XLSX\Writer;
 
 /**
  * Trait pemandu import data lewat panel (self-service migrasi).
@@ -35,6 +38,7 @@ use Illuminate\Support\Facades\Storage;
  *   service: class-string,
  *   directory: string,
  *   ability?: string,
+ *   enabledSetting?: string,
  *   petunjuk?: string,
  *   schema?: array<int, \Filament\Forms\Components\Component>,
  *   invoke?: callable,
@@ -77,6 +81,7 @@ trait HasImportAction
 
         $entitas = $config['entitas'];
         $ability = $config['ability'] ?? null;
+        $enabledSetting = $config['enabledSetting'] ?? null;
         $filename = 'export-'.str()->slug($entitas).'.csv';
 
         return Action::make(($config['name'] ?? 'import'.str()->studly($entitas)).'Export')
@@ -84,7 +89,8 @@ trait HasImportAction
             ->icon('heroicon-o-arrow-down-tray')
             ->color('gray')
             ->visible(fn (): bool => tenancy()->initialized
-                && ($ability === null || (auth()->user()?->can($ability) ?? false)))
+                && ($ability === null || (auth()->user()?->can($ability) ?? false))
+                && ($enabledSetting === null || static::importSettingAktif($enabledSetting)))
             ->action(function () use ($columns, $rowsResolver, $filename) {
                 /** @var Tenant|null $tenant */
                 $tenant = Tenant::query()->find(tenant('id'));
@@ -125,6 +131,7 @@ trait HasImportAction
 
         $entitas = $config['entitas'];
         $ability = $config['ability'] ?? null;
+        $enabledSetting = $config['enabledSetting'] ?? null;
         $contoh = $config['template_contoh'] ?? [];
         $filename = 'template-import-'.str()->slug($entitas).'.xlsx';
 
@@ -133,14 +140,15 @@ trait HasImportAction
             ->icon('heroicon-o-document-arrow-down')
             ->color('gray')
             ->visible(fn (): bool => tenancy()->initialized
-                && ($ability === null || (auth()->user()?->can($ability) ?? false)))
+                && ($ability === null || (auth()->user()?->can($ability) ?? false))
+                && ($enabledSetting === null || static::importSettingAktif($enabledSetting)))
             ->action(function () use ($columns, $contoh, $filename) {
                 $tmp = tempnam(sys_get_temp_dir(), 'tmpl').'.xlsx';
-                $writer = new \OpenSpout\Writer\XLSX\Writer;
+                $writer = new Writer;
                 $writer->openToFile($tmp);
-                $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($columns));
+                $writer->addRow(Row::fromValues($columns));
                 if ($contoh !== []) {
-                    $writer->addRow(\OpenSpout\Common\Entity\Row::fromValues($contoh));
+                    $writer->addRow(Row::fromValues($contoh));
                 }
                 $writer->close();
 
@@ -153,12 +161,37 @@ trait HasImportAction
      *
      * @param  ImportConfig  $config
      */
+    /**
+     * Saklar kebijakan per tenant (KebijakanRegistry) untuk fitur impor opsional.
+     * Baca TOLERAN (bool / "1"/"true"/"ya" / bungkus ['value'=>..]); default mati.
+     */
+    protected static function importSettingAktif(string $key): bool
+    {
+        $raw = Setting::getTenantValue($key, false);
+
+        if (is_array($raw)) {
+            $raw = $raw['value'] ?? $raw['text'] ?? (count($raw) === 1 ? reset($raw) : null);
+        }
+        if (is_bool($raw)) {
+            return $raw;
+        }
+        if (is_int($raw) || is_float($raw)) {
+            return (int) $raw !== 0;
+        }
+        if (is_string($raw)) {
+            return in_array(strtolower(trim($raw)), ['true', '1', 'on', 'ya', 'aktif'], true);
+        }
+
+        return false;
+    }
+
     protected function buildImportAction(array $config): Action
     {
         $entitas = $config['entitas'];
         $serviceClass = $config['service'];
         $directory = $config['directory'];
         $ability = $config['ability'] ?? null;
+        $enabledSetting = $config['enabledSetting'] ?? null;
         $name = $config['name'] ?? 'import'.str()->studly($entitas);
         $label = $config['label'] ?? 'Import '.ucfirst($entitas);
         $petunjuk = $config['petunjuk']
@@ -256,11 +289,13 @@ trait HasImportAction
             ->icon('heroicon-o-arrow-up-tray')
             ->color('gray')
             ->visible(fn (): bool => tenancy()->initialized
-                && ($ability === null || (auth()->user()?->can($ability) ?? false)))
+                && ($ability === null || (auth()->user()?->can($ability) ?? false))
+                && ($enabledSetting === null || static::importSettingAktif($enabledSetting)))
             ->schema($schema)
-            ->action(function (array $data) use ($serviceClass, $entitas, $invoke, $extraSummary, $columns, $ability): void {
-                // Defense-in-depth: tegakkan izin di sisi server (bukan hanya visible()).
+            ->action(function (array $data) use ($serviceClass, $entitas, $invoke, $extraSummary, $columns, $ability, $enabledSetting): void {
+                // Defense-in-depth: tegakkan izin + saklar kebijakan di sisi server (bukan hanya visible()).
                 abort_unless($ability === null || (auth()->user()?->can($ability) ?? false), 403);
+                abort_unless($enabledSetting === null || static::importSettingAktif($enabledSetting), 403, 'Fitur impor ini dinonaktifkan oleh kebijakan pesantren.');
 
                 $relativePath = $data['file'];
                 $absolutePath = Storage::disk('local')->path($relativePath);
@@ -347,7 +382,7 @@ trait HasImportAction
                         fclose($buf);
                         $errFile = 'import-errors/'.str()->slug($entitas).'-'.now()->format('Ymd-His').'.csv';
                         Storage::disk('local')->put($errFile, $isi);
-                        $body .= "\n\nLaporan lengkap ".count($semuaError)." kegagalan tersimpan: ".basename($errFile);
+                        $body .= "\n\nLaporan lengkap ".count($semuaError).' kegagalan tersimpan: '.basename($errFile);
                     } catch (\Throwable) {
                         // gagal menulis laporan tak boleh menggagalkan import
                     }

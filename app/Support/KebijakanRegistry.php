@@ -29,6 +29,7 @@ class KebijakanRegistry
         'kepengasuhan' => 'Kepengasuhan',
         'akademik' => 'Akademik',
         'keuangan' => 'Keuangan & Payroll',
+        'migrasi' => 'Impor & Migrasi Data',
         'umum' => 'Umum',
     ];
 
@@ -208,6 +209,30 @@ class KebijakanRegistry
                 'label' => 'Pemisahan dana halal & syubhat',
                 'deskripsi' => 'Bila aktif, dana syubhat (mis. bunga bank) dipisah sebagai Dana Kebajikan dan dijaga penyalurannya.',
                 'default' => false, 'kelompok' => 'keuangan', 'tipe' => 'bool',
+            ],
+
+            // ---------------- Impor & Migrasi Data ----------------
+            // Fitur impor opsional: default MATI (konservatif) — tiap pesantren
+            // mengaktifkan sesuai kebijakan. Gerbang dibaca trait HasImportAction.
+            'import.pelanggaran_historis' => [
+                'label' => 'Izinkan impor data pelanggaran/prestasi lama',
+                'deskripsi' => 'Bila aktif, muncul tombol impor riwayat pelanggaran. Data lama diimpor TANPA notifikasi wali & TANPA SP otomatis. Biarkan mati bila pesantren memulai catatan disiplin dari nol.',
+                'default' => false, 'kelompok' => 'migrasi', 'tipe' => 'bool',
+            ],
+            'import.presensi_staf_historis' => [
+                'label' => 'Izinkan impor presensi staf/pegawai lama',
+                'deskripsi' => 'Bila aktif, muncul tombol impor presensi pegawai. PERHATIAN: presensi staf ikut menghitung poin Khidmah/Bisyaroh — aktifkan hanya bila paham dampaknya pada penggajian.',
+                'default' => false, 'kelompok' => 'migrasi', 'tipe' => 'bool',
+            ],
+            'import.kalender_kustom' => [
+                'label' => 'Izinkan impor kalender akademik massal',
+                'deskripsi' => 'Bila aktif, muncul tombol impor entri kalender (libur pondok/ujian/pasaran) dari spreadsheet. Libur nasional sudah terisi otomatis; ini untuk acara khusus pesantren.',
+                'default' => false, 'kelompok' => 'migrasi', 'tipe' => 'bool',
+            ],
+            'import.presensi_kegiatan_historis' => [
+                'label' => 'Izinkan impor presensi kegiatan lama',
+                'deskripsi' => 'Bila aktif, muncul tombol impor kehadiran santri pada kegiatan yang sudah tercatat. Umumnya tidak diperlukan saat migrasi awal.',
+                'default' => false, 'kelompok' => 'migrasi', 'tipe' => 'bool',
             ],
         ];
     }
