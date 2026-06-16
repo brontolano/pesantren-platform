@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CMS\Article;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Services\StorageQuotaService;
 use App\Filament\Resources\CMS\Article\Pages\CreateArticle;
 use App\Filament\Resources\CMS\Article\Pages\EditArticle;
 use App\Filament\Resources\CMS\Article\Pages\ListArticles;
@@ -165,6 +166,11 @@ class ArticleResource extends Resource
                                     ->hiddenLabel()
                                     ->image()
                                     ->imageEditor()
+                                    // Disk publik tenant (sama dgn galeri) — DIULANG di sini
+                                    // sebab default Filament = 'local' → file mendarat di
+                                    // app/cms/articles (BUKAN app/public/cms) shg /_tenant-storage
+                                    // (serve dari disk publik) gagal & backup website terlewat.
+                                    ->disk(StorageQuotaService::diskName())
                                     ->directory('cms/articles')
                                     ->maxSize(2048)
                                     ->helperText('Maks 2MB. Rasio 16:9 direkomendasikan.'),
