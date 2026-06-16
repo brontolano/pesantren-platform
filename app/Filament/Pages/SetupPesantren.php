@@ -77,7 +77,11 @@ class SetupPesantren extends Page implements HasForms
             ->mapWithKeys(fn (array $p, string $k): array => [$k => $p['label'].' — '.$p['deskripsi']])
             ->all();
 
-        return $schema->components([
+        // statePath WAJIB di schema (bukan di Wizard): kalau dipasang di Wizard,
+        // state ter-nest di bawah 'data' lagi → getState() tak punya kunci datar
+        // (nama/periode/dst) → persist() melempar "Undefined array key". Pola sama
+        // dengan halaman ber-form lain (mis. AktivasiModulTenant).
+        return $schema->statePath('data')->components([
             Wizard::make([
                 Step::make('Identitas')
                     ->icon('heroicon-o-identification')
@@ -121,7 +125,7 @@ class SetupPesantren extends Page implements HasForms
                         DatePicker::make('tanggal_mulai')->label('Mulai')->required(),
                         DatePicker::make('tanggal_akhir')->label('Selesai')->required()->after('tanggal_mulai'),
                     ]),
-            ])->statePath('data')
+            ])
                 ->submitAction(new HtmlString(
                     '<button type="submit" class="fi-btn fi-btn-size-md fi-color-primary rounded-lg px-4 py-2 bg-primary-600 text-white font-semibold text-sm" wire:loading.attr="disabled">'
                     .'<span wire:loading.remove wire:target="simpan">Selesai &amp; Simpan</span>'
