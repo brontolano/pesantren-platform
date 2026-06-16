@@ -52,7 +52,12 @@
         </div>
     @else
         <div class="flex items-center justify-between gap-4">
-            <a href="{{ $hubUrl }}" class="text-sm text-stone-500 hover:text-emerald-700 dark:text-stone-400">&larr; Semua unit</a>
+            <div class="flex items-center gap-4">
+                @if (! empty($tokoUrl))
+                    <a href="{{ $tokoUrl }}" class="text-sm font-medium text-emerald-700 hover:text-emerald-800 dark:text-emerald-400">&larr; Pusat Modul</a>
+                @endif
+                <a href="{{ $hubUrl }}" class="text-sm text-stone-500 hover:text-emerald-700 dark:text-stone-400">Semua unit</a>
+            </div>
             <span class="text-sm font-semibold {{ $progress['tuntas'] ? 'text-emerald-600' : 'text-stone-400' }}">
                 {{ $progress['persen'] }}% selesai
             </span>

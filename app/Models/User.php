@@ -44,11 +44,23 @@ class User extends Authenticatable implements HasEmailAuthentication, FilamentUs
     {
         if ($panel->getId() === 'admin') {
             // Panel platform (central) — hanya pemilik platform (super_admin tanpa tenant)
-            return $this->hasRole('super_admin') && $this->tenant_id === null;
+            return $this->isPlatformSuperAdmin();
         }
 
         // Panel tenant (staf). Peserta/wali ditolak (portal sendiri).
         return $this->isTenantStaff();
+    }
+
+    /**
+     * Pemilik PLATFORM = super_admin tanpa tenant (mengelola lintas tenant).
+     * Satu-satunya sumber definisi "platform super admin", dipakai ulang oleh
+     * gerbang modul (ModuleGate / CheckModuleActive) agar bypass modul HANYA untuk
+     * platform — super admin PESANTREN ikut aturan modul tenantnya sehingga
+     * navigasi tetap ramping (hanya modul yang tersedia/siap untuk tenant itu).
+     */
+    public function isPlatformSuperAdmin(): bool
+    {
+        return $this->tenant_id === null && $this->hasRole('super_admin');
     }
 
     /**

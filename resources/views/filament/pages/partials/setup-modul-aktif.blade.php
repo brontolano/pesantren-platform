@@ -1,5 +1,5 @@
 <div class="space-y-3 text-sm">
-    <p>Berikut modul yang <strong>aktif</strong> untuk pondok Anda. Aktivasi/penonaktifan modul diatur oleh <strong>admin platform</strong> — hubungi mereka bila ingin mengubah.</p>
+    <p>Berikut modul yang <strong>aktif</strong> untuk pondok Anda saat ini. Setelah fondasi ini selesai, Anda bisa <strong>memasang atau menonaktifkan fitur sendiri</strong> kapan saja lewat halaman <strong>Pusat Modul</strong> — tak perlu menghubungi siapa pun.</p>
 
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
         @foreach ($modul as $m)
@@ -17,5 +17,5 @@
         @endforeach
     </div>
 
-    <p class="text-xs text-gray-500">🔒 = modul inti (selalu aktif). Langkah ini hanya informasi — tak ada yang perlu diisi.</p>
+    <p class="text-xs text-gray-500">🔒 = modul inti (selalu aktif, tak bisa dimatikan). Langkah ini hanya informasi — fitur tambahan Anda atur sendiri nanti di Pusat Modul.</p>
 </div>
