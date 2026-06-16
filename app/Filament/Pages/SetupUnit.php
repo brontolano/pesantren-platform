@@ -94,7 +94,13 @@ class SetupUnit extends Page
             ];
         }
 
-        return ['mode' => 'hub', 'kartu' => $kartu];
+        return [
+            'mode' => 'hub',
+            'kartu' => $kartu,
+            // Indikator fondasi (Setup Pesantren) — pintu UTAMA sebelum isi data.
+            'setup' => SetupPesantren::progress(),
+            'setupUrl' => SetupPesantren::getUrl(),
+        ];
     }
 
     /** Data tampilan satu unit: langkah + sorot langkah berikutnya. */

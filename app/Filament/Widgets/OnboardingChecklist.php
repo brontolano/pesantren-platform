@@ -67,11 +67,11 @@ class OnboardingChecklist extends Widget
     {
         return [
             [
-                'label' => 'Lengkapi profil pondok',
-                'desc' => 'Isi nama, logo, dan kontak pesantren.',
-                'icon' => 'heroicon-o-building-library',
-                'done' => self::profilTerisi(),
-                'url' => self::urlOf(\App\Filament\Resources\CMS\Profile\ProfileResource::class),
+                'label' => 'Selesaikan Setup Pesantren',
+                'desc' => 'Atur fondasi pondok: identitas, lembaga, periode, & kebijakan (wizard terpandu).',
+                'icon' => 'heroicon-o-sparkles',
+                'done' => self::setupSelesai(),
+                'url' => self::pageUrl(\App\Filament\Pages\SetupPesantren::class),
             ],
             [
                 'label' => 'Masukkan data santri',
@@ -97,14 +97,21 @@ class OnboardingChecklist extends Widget
         ];
     }
 
-    private static function profilTerisi(): bool
+    private static function setupSelesai(): bool
     {
         try {
-            $nama = Setting::getTenantStringValue('branding_name');
-
-            return is_string($nama) && trim($nama) !== '';
+            return Setting::getTenantValue('setup.selesai') !== null;
         } catch (\Throwable) {
             return false;
+        }
+    }
+
+    private static function pageUrl(string $page): ?string
+    {
+        try {
+            return class_exists($page) ? $page::getUrl() : null;
+        } catch (\Throwable) {
+            return null;
         }
     }
 
