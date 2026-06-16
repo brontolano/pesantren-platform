@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Santri\Pages;
 
+use App\Filament\Concerns\HasImportAction;
 use App\Filament\Exports\SantriExporter;
 use App\Filament\Resources\Santri\SantriResource;
 use Filament\Actions\Action;
@@ -13,16 +14,36 @@ use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Kesantrian\Models\Kelas;
+use Modules\Kesantrian\Services\SantriImportService;
 use Modules\Kesantrian\Services\WaliImportService;
 
 class ListSantri extends ListRecords
 {
+    use HasImportAction;
+
     protected static string $resource = SantriResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             $this->buatAkunWaliAction(),
+            // Import data santri dari Excel/CSV — memenuhi janji empty-state
+            // ("Mulai dengan mengimpor data dari Excel"). Mesin tetap di
+            // SantriImportService (idempoten: NIS yang sudah ada dilewati,
+            // kelas dibuat otomatis). Hanya Unduh Template + Import yang dipasang;
+            // Export round-trip SENGAJA tak diaktifkan karena halaman ini sudah
+            // punya "Export Santri" + ekspor/cetak per-kelas (hindari dobel).
+            ...$this->importActions([
+                'entitas' => 'santri',
+                'label' => 'Import Santri',
+                'service' => SantriImportService::class,
+                'directory' => 'imports/kesantrian/santri/uploads',
+                'ability' => 'manage_santri',
+                'template' => ['nis', 'nama', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'nik', 'nisn', 'kelas', 'tahun_angkatan', 'status', 'nama_ayah', 'nama_ibu', 'no_hp_wali', 'email_wali', 'alamat'],
+                'template_contoh' => ['2024001', 'Ahmad Fauzi', 'L', 'Bandung', '2010-05-17', '3273010101100001', '0098765432', '7 A', '2024', 'aktif', 'Bapak Fulan', 'Ibu Fulanah', '081234567890', 'wali@contoh.com', 'Jl. Merdeka No. 1'],
+                'extraSummary' => fn (array $s): string => ($s['created_kelas'] ?? 0) > 0 ? 'Kelas baru dibuat: '.$s['created_kelas'] : '',
+                'petunjuk' => 'Impor data santri dari file Excel/CSV. Kolom WAJIB: nis, nama, jenis_kelamin (isi L atau P), tanggal_lahir. Kolom "kelas" akan dibuat otomatis bila belum ada. Baris dengan NIS yang sudah terdaftar akan DILEWATI (aman diulang). Centang "Validasi dulu (dry-run)" untuk mengecek tanpa menyimpan.',
+            ]),
             ExportAction::make()
                 ->exporter(SantriExporter::class)
                 ->label('Export Santri')
