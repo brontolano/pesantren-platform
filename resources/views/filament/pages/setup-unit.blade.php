@@ -1,5 +1,26 @@
 <x-filament-panels::page>
     @if ($mode === 'hub')
+        {{-- Fondasi dulu: Setup Pesantren = pintu UTAMA, halaman ini = lanjutan isi data per unit. --}}
+        <a href="{{ $setupUrl }}"
+           class="flex items-center gap-3 rounded-2xl border px-5 py-4 transition
+               {{ $setup['selesai']
+                   ? 'border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-950/20'
+                   : 'border-amber-300 bg-amber-50/60 hover:bg-amber-50 dark:border-amber-800/50 dark:bg-amber-950/20' }}">
+            <x-filament::icon :icon="$setup['selesai'] ? 'heroicon-m-check-badge' : 'heroicon-o-sparkles'"
+                class="h-6 w-6 shrink-0 {{ $setup['selesai'] ? 'text-emerald-600' : 'text-amber-600' }}" />
+            <div class="min-w-0 flex-1">
+                <span class="block text-sm font-semibold text-stone-900 dark:text-stone-100">
+                    {{ $setup['selesai'] ? 'Fondasi (Setup Pesantren) selesai' : 'Mulai di sini: Setup Pesantren' }}
+                </span>
+                <span class="block text-xs text-stone-500 dark:text-stone-400">
+                    {{ $setup['selesai']
+                        ? 'Lanjutkan mengisi data tiap unit di bawah.'
+                        : 'Atur fondasi (identitas, lembaga, periode, kebijakan) dulu sebelum mengisi data unit.' }}
+                </span>
+            </div>
+            <span class="text-sm font-semibold {{ $setup['selesai'] ? 'text-emerald-600' : 'text-amber-600' }}">{{ $setup['persen'] }}%</span>
+        </a>
+
         <p class="text-sm text-stone-500 dark:text-stone-400">
             Selesaikan setup tiap unit secara bertahap. Klik sebuah unit untuk dipandu langkah demi langkah.
         </p>
