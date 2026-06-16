@@ -33,7 +33,7 @@ class CrmDashboard extends Page
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
-            && static::moduleVisible('keuangan')
+            && static::moduleVisible('crm')
             && (Auth::user()?->canAny(['view_laporan_pimpinan', 'manage_keuangan']) ?? false);
     }
 

@@ -18,9 +18,21 @@ class ModuleRegistrySeederTest extends TestCase
     {
         $this->seed(ModuleRegistrySeeder::class);
 
-        // 18 modul fungsional (5 core + 13 released) + file_storage & ai
-        // (platform/development) = 20.
-        $this->assertSame(20, ModuleRegistry::query()->count());
+        // 20 modul fungsional (5 core + 15 released) + file_storage & ai
+        // (platform/development) = 22.
+        $this->assertSame(22, ModuleRegistry::query()->count());
+    }
+
+    public function test_crm_dan_koperasi_modul_opsional_released_non_core(): void
+    {
+        $this->seed(ModuleRegistrySeeder::class);
+
+        foreach (['crm', 'koperasi'] as $key) {
+            $m = ModuleRegistry::query()->where('key', $key)->first();
+            $this->assertNotNull($m, "Modul {$key} wajib terdaftar (gerbang moduleVisible butuh registry).");
+            $this->assertSame('released', $m->status);
+            $this->assertFalse((bool) $m->is_core, "Modul {$key} harus opsional (non-core, bisa dimatikan).");
+        }
     }
 
     public function test_file_storage_tetap_development_tidak_diubah(): void
@@ -65,8 +77,8 @@ class ModuleRegistrySeederTest extends TestCase
         $this->seed(ModuleRegistrySeeder::class);
         $this->seed(ModuleRegistrySeeder::class);
 
-        $this->assertSame(20, ModuleRegistry::query()->count());
+        $this->assertSame(22, ModuleRegistry::query()->count());
         // Tiap key unik — tak ada duplikat.
-        $this->assertSame(20, ModuleRegistry::query()->distinct()->count('key'));
+        $this->assertSame(22, ModuleRegistry::query()->distinct()->count('key'));
     }
 }
