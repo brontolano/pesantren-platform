@@ -74,6 +74,13 @@ class OnboardingChecklist extends Widget
                 'url' => self::pageUrl(\App\Filament\Pages\SetupPesantren::class),
             ],
             [
+                'label' => 'Pilih & pasang fitur pesantren',
+                'desc' => 'Aktifkan modul yang Anda butuhkan di Pusat Modul, lalu lengkapi datanya.',
+                'icon' => 'heroicon-o-squares-plus',
+                'done' => self::adaFiturDipasang(),
+                'url' => self::pageUrl(\App\Filament\Pages\PusatModul::class),
+            ],
+            [
                 'label' => 'Masukkan data santri',
                 'desc' => 'Impor dari Excel atau tambah satu per satu.',
                 'icon' => 'heroicon-o-user-group',
@@ -119,6 +126,23 @@ class OnboardingChecklist extends Widget
     {
         try {
             return class_exists($model) && $model::query()->exists();
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /** Sudah memasang minimal satu fitur (modul released aktif) lewat Pusat Modul.
+     *  Baca tabel CENTRAL tenant_modules secara eksplisit (selaras ModuleService). */
+    private static function adaFiturDipasang(): bool
+    {
+        try {
+            $conn = config('tenancy.database.central_connection', config('database.default'));
+
+            return \Illuminate\Support\Facades\DB::connection($conn)
+                ->table('tenant_modules')
+                ->where('tenant_id', tenant('id'))
+                ->where('is_active', true)
+                ->exists();
         } catch (\Throwable) {
             return false;
         }

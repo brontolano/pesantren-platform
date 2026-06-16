@@ -117,6 +117,11 @@ class SetupUnit extends Page
             }
         }
 
+        // Datang dari Pusat Modul (?from=toko) → tampilkan tombol kembali ke sana.
+        $tokoUrl = request()->query('from') === 'toko' && PusatModul::canAccess()
+            ? PusatModul::getUrl()
+            : null;
+
         return [
             'mode' => 'unit',
             'label' => $def['label'],
@@ -125,6 +130,7 @@ class SetupUnit extends Page
             'progress' => UnitSetupRegistry::progress($kode),
             'nextKey' => $nextKey,
             'hubUrl' => static::getUrl(),
+            'tokoUrl' => $tokoUrl,
         ];
     }
 }

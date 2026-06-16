@@ -342,9 +342,11 @@ class SetupPesantren extends Page implements HasForms
         if (Setting::getTenantValue('setup.selesai') !== null) {
             Notification::make()
                 ->title('Fondasi pesantren selesai 🎉')
-                ->body('Lanjutkan ke Pusat Setup untuk mengisi data tiap unit.')
+                ->body('Sekarang pilih fitur yang Anda butuhkan di Pusat Modul — bisa nambah kapan saja.')
                 ->success()->persistent()->send();
-            $this->redirect(SetupUnit::getUrl());
+            // Fondasi → Pusat Modul (pilih fitur) → wizard per-fitur. Bukan langsung
+            // ke Pusat Setup; fitur dipasang dulu baru data unit-nya dilengkapi.
+            $this->redirect(PusatModul::canAccess() ? PusatModul::getUrl() : SetupUnit::getUrl());
 
             return;
         }
@@ -365,9 +367,12 @@ class SetupPesantren extends Page implements HasForms
     {
         $selesai = [];
 
-        // 1) Arketipe (opsional).
+        // 1) Arketipe (opsional). Selain menerapkan preset kebijakan, SIMPAN
+        //    pilihannya (setup.preset) → dipakai mesin rekomendasi Pusat Modul
+        //    untuk menyarankan fitur yang cocok dengan profil pesantren.
         if (! empty($data['preset'])) {
             app(KebijakanService::class)->terapkanPreset($data['preset'], auth()->user());
+            Setting::updateOrCreate(['key' => 'setup.preset'], ['value' => ['text' => $data['preset']]]);
             $selesai[] = 'arketipe';
         }
 
