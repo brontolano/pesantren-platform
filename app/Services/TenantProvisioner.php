@@ -219,6 +219,14 @@ class TenantProvisioner
      */
     private function seedModules(Tenant $tenant): void
     {
+        // Default BARU: tenant baru lahir RAMPING — hanya modul INTI yang aktif
+        // (selalu aktif lewat is_core, tak perlu baris). Modul released dipasang
+        // sendiri oleh admin pesantren lewat Pusat Modul (self-installer).
+        // Flag rollback tenant_modules.default_active_released untuk perilaku lama.
+        if (! config('tenant_modules.default_active_released', false)) {
+            return;
+        }
+
         $released = ModuleRegistry::query()
             ->where('status', 'released')
             ->where('is_core', false)
@@ -227,7 +235,7 @@ class TenantProvisioner
         foreach ($released as $key) {
             TenantModule::firstOrCreate(
                 ['tenant_id' => $tenant->getKey(), 'module_name' => $key],
-                ['is_active' => true],
+                ['is_active' => true, 'installed_at' => now(), 'configured_at' => now()],
             );
         }
     }

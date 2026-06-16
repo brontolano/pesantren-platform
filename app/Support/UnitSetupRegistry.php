@@ -235,6 +235,25 @@ class UnitSetupRegistry
         ];
     }
 
+    /**
+     * units() yang di-memo per-request (di-cache di container yang fresh tiap
+     * request/test). Dipakai jalur PANAS (gerbang nav memanggil kesiapan modul
+     * untuk ~115 resource) agar cek DB unit tak diulang berkali-kali.
+     *
+     * @return array<string, array{label:string, icon:string, permission:string, steps: list<array{key:string, label:string, desc:string, done:bool, url:?string}>}>
+     */
+    public static function unitsCached(): array
+    {
+        $key = '__unit_setup_registry_units';
+        if (app()->bound($key)) {
+            return app()->make($key);
+        }
+        $units = self::units();
+        app()->instance($key, $units);
+
+        return $units;
+    }
+
     /** Ringkasan progres satu unit: {selesai, total, persen, tuntas}. */
     public static function progress(string $kode): array
     {

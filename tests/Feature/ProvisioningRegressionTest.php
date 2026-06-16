@@ -32,8 +32,10 @@ class ProvisioningRegressionTest extends TestCase
         $this->seed(ModuleRegistrySeeder::class);
     }
 
-    public function test_provision_mengaktifkan_modul_released_non_core(): void
+    public function test_provision_default_minimal_tidak_mengaktifkan_released(): void
     {
+        // Default BARU (self-installer): tenant baru lahir RAMPING — modul
+        // released TIDAK diaktifkan otomatis (dipasang sendiri lewat Pusat Modul).
         $id = 'regmod-'.str()->lower(str()->random(5));
         $tenant = $this->createProvisionedTenant($id, 'Pesantren Regresi Modul', $id.'.localhost');
 
@@ -43,17 +45,35 @@ class ProvisioningRegressionTest extends TestCase
             ->pluck('module_name')
             ->all();
 
-        // Released non-core → aktif.
+        // Released non-core → TIDAK aktif default (dulu auto-aktif).
+        $this->assertNotContains('ppdb', $aktif);
+        $this->assertNotContains('akademik', $aktif);
+        $this->assertNotContains('mutu', $aktif);
+
+        // Core → tetap tak perlu baris (selalu aktif lewat is_core).
+        $this->assertNotContains('keuangan', $aktif);
+
+        // Development → tetap tak diaktifkan untuk tenant biasa.
+        $this->assertNotContains('file_storage', $aktif);
+    }
+
+    public function test_flag_rollback_mengaktifkan_semua_released_seperti_dulu(): void
+    {
+        // Jalur rollback: config true → perilaku lama (semua released auto-aktif).
+        config(['tenant_modules.default_active_released' => true]);
+
+        $id = 'regflag-'.str()->lower(str()->random(5));
+        $tenant = $this->createProvisionedTenant($id, 'Pesantren Regresi Flag', $id.'.localhost');
+
+        $aktif = TenantModule::query()
+            ->where('tenant_id', $tenant->id)
+            ->where('is_active', true)
+            ->pluck('module_name')
+            ->all();
+
         $this->assertContains('ppdb', $aktif);
         $this->assertContains('akademik', $aktif);
         $this->assertContains('mutu', $aktif);
-
-        // Core → tak perlu baris (selalu aktif lewat is_core).
-        $this->assertNotContains('keuangan', $aktif);
-        $this->assertNotContains('cms', $aktif);
-        $this->assertNotContains('core', $aktif);
-
-        // Development → hanya demo, tak diaktifkan untuk tenant biasa.
         $this->assertNotContains('file_storage', $aktif);
     }
 

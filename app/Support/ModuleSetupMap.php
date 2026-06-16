@@ -88,7 +88,7 @@ class ModuleSetupMap
         }
 
         try {
-            $steps = UnitSetupRegistry::units()[$def['unit']]['steps'] ?? [];
+            $steps = UnitSetupRegistry::unitsCached()[$def['unit']]['steps'] ?? [];
         } catch (\Throwable) {
             return false;
         }
@@ -120,7 +120,7 @@ class ModuleSetupMap
         }
 
         try {
-            $steps = UnitSetupRegistry::units()[$def['unit']]['steps'] ?? [];
+            $steps = UnitSetupRegistry::unitsCached()[$def['unit']]['steps'] ?? [];
         } catch (\Throwable) {
             return [];
         }
