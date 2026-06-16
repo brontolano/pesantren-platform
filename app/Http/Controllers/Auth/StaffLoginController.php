@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Support\AppLauncher;
 use App\Support\TenantBranding;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,22 +17,25 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 /**
- * Login bermerek "satu pintu" untuk domain sistem tenant. Halaman login
- * dirender di ROOT '/' (oleh LauncherController saat tamu); GET /masuk hanya
- * alias yang redirect ke '/'. Form mem-POST ke /masuk (tenant.masuk.store).
+ * Login bermerek "satu pintu" untuk staf tenant. Form dirender di '/' (domain
+ * sistem, oleh LauncherController saat tamu) DAN di '/masuk' (UNIVERSAL, semua
+ * domain tenant — termasuk subdomain yang '/'-nya dipakai website publik).
+ * Form mem-POST ke /masuk (tenant.masuk.store).
  *
- * Mengautentikasi guard `web` yang SAMA dengan panel Filament tenant (yang
- * tanpa MFA), lalu selalu kembali ke '/' agar LauncherController mengarahkan
- * sesuai peran (staf admin → /admin). Akun wali/peserta yang memakai form ini
- * tetap dirutekan benar ke portalnya. CTA sekunder (Wali / PPDB) hanya berupa
- * tautan ke alur login masing-masing — tidak menduplikasi logika auth.
+ * Mengautentikasi guard `web` yang SAMA dengan panel Filament tenant (tanpa
+ * MFA), lalu mengarahkan ke tujuan per peran via AppLauncher (staf → /admin,
+ * wali/peserta → portalnya) — BUKAN selalu '/', supaya staf di tenant subdomain
+ * tak nyangkut di website publik. CTA sekunder (Wali / PPDB) hanya tautan ke
+ * alur login masing-masing — tidak menduplikasi logika auth.
  */
 class StaffLoginController extends Controller
 {
     public function show(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->to('/');
+            $dest = AppLauncher::primaryDestination(Auth::user());
+
+            return redirect()->to($dest['kind'] === 'redirect' ? $dest['url'] : '/');
         }
 
         return view('tenant.login', [
@@ -74,8 +78,14 @@ class StaffLoginController extends Controller
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
-        // Selalu ke '/' → LauncherController memilih tujuan sesuai peran.
-        return redirect()->intended('/');
+        // Tujuan per peran via AppLauncher (staf → /admin, wali → portal, dst) —
+        // BUKAN selalu '/', sebab pada tenant subdomain '/' = website publik
+        // (bukan launcher), sehingga staf akan nyangkut di website. intended()
+        // tetap dihormati untuk deep-link yang memicu login.
+        $dest = AppLauncher::primaryDestination(Auth::user());
+        $tujuan = $dest['kind'] === 'redirect' ? $dest['url'] : '/';
+
+        return redirect()->intended($tujuan);
     }
 
     public function logout(Request $request): RedirectResponse

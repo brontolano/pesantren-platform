@@ -116,23 +116,24 @@ Route::post('/donasi/{ref}/bukti', [DonasiPublikController::class, 'uploadBukti'
 Route::get('/embed/widget.js', [EmbedWidgetController::class, 'script'])->name('tenant.embed.script');
 Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('tenant.embed.data');
 
-// ── Satu pintu login (domain sistem) ──
-// Halaman login bermerek (islami, brand tenant) dirender di ROOT '/' oleh
-// LauncherController saat tamu. GET /masuk = alias lama → redirect ke '/'.
-// Form login mem-POST ke /masuk (store); sukses → '/' lalu LauncherController
-// mengarahkan sesuai peran (staf admin → /admin). Wali/peserta dirutekan benar.
-Route::get('/masuk', fn () => redirect('/'))->name('tenant.masuk.show');
+// ── Satu pintu login: GET /masuk (UNIVERSAL, semua domain tenant) ──
+// GET /masuk merender form login bermerek LANGSUNG (StaffLoginController::show),
+// jadi berlaku di SEMUA domain tenant — termasuk tenant yang '/' nya dipakai
+// WEBSITE publik (mis. subdomain {slug}.pesantren.online) di mana '/' bukan
+// halaman login. (Domain 'sistem' tetap juga menampilkan login di '/'.) Form
+// mem-POST ke /masuk (store); sukses → tujuan per peran (staf → /admin) via
+// AppLauncher, jadi tak nyangkut di website publik.
+Route::get('/masuk', [StaffLoginController::class, 'show'])->name('tenant.masuk.show');
 Route::post('/masuk', [StaffLoginController::class, 'store'])
     ->middleware('throttle:20,1')
     ->name('tenant.masuk.store');
 Route::post('/keluar', [StaffLoginController::class, 'logout'])->name('tenant.masuk.logout');
 
 // Fallback login route untuk middleware 'auth' (termasuk redirect-guest panel
-// Filament tenant) → satu pintu di '/'. Login panel /admin/login DISATUKAN ke
-// '/' lewat kustomisasi Panel Filament (App\Filament\Pages\Auth\Login yang
-// redirect ke '/'), BUKAN shadow route web — menimpa GET /admin/login via route
-// web pernah membuat redirect-guest /admin error 500.
-Route::get('/login', fn () => redirect('/'))->name('login');
+// Filament tenant) → /masuk (form login universal). Login panel /admin/login
+// DISATUKAN ke /masuk lewat App\Filament\Pages\Auth\Login (redirect), BUKAN
+// shadow route web — menimpa GET /admin/login via route web pernah 500.
+Route::get('/login', fn () => redirect('/masuk'))->name('login');
 
 // Portal peserta LAMA (/portal, panel Filament) sudah disatukan ke PWA /spmb.
 // Redirect semua /portal/* ke /spmb/login agar tautan/bookmark lama tetap berfungsi
