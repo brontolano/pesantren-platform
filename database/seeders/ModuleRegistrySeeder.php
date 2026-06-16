@@ -19,12 +19,12 @@ use Illuminate\Database\Seeder;
  *   RELEASED (on/off per tenant via tabel tenant_modules):
  *     sisanya.
  *
- * Catatan anti-regresi: status modul keuangan-engine (ledger/pajak/payroll/
- * pembiayaan/pengadaan) & mutu didaftarkan 'released' untuk kelengkapan
- * katalog, NAMUN gating nav-group mereka SENGAJA tidak diubah di
- * ModuleService::GROUP_TO_MODULE agar tidak menyembunyikan modul yang kini
- * sudah tampil di tenant produksi. Mengaktifkan gating finance terpisah =
- * tugas lanjutan yang butuh backfill tenant_modules massal lebih dulu.
+ * Catatan anti-regresi: gating modul DIPAKSA per-resource lewat
+ * ModuleGate::moduleVisible('<key>') (lihat shouldRegisterNavigation/canAccess
+ * tiap Resource) — BUKAN lewat label navigationGroup. Modul keuangan-engine
+ * (ledger/pajak/payroll/pembiayaan/pengadaan) & mutu terdaftar 'released' dan
+ * tiap resource-nya menggerbang sendiri; super_admin tetap melihat semua.
+ * Mengubah default OFF→ON massal butuh backfill tabel tenant_modules dulu.
  */
 class ModuleRegistrySeeder extends Seeder
 {

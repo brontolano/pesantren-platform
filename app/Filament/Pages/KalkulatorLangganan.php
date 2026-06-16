@@ -27,9 +27,9 @@ class KalkulatorLangganan extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Kalkulator Langganan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Billing SaaS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Langganan & Billing';
 
-    protected static ?int $navigationSort = 0;
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $title = 'Kalkulator Langganan';
 

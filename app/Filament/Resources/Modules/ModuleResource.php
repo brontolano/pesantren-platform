@@ -29,13 +29,13 @@ class ModuleResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static ?string $navigationLabel = 'Modul Platform';
+    protected static ?string $navigationLabel = 'Katalog Modul';
 
     protected static ?string $modelLabel = 'Modul';
 
-    protected static ?string $pluralModelLabel = 'Modul Platform';
+    protected static ?string $pluralModelLabel = 'Katalog Modul';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Billing SaaS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Langganan & Billing';
 
     protected static ?int $navigationSort = 5;
 

@@ -17,6 +17,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -58,7 +59,7 @@ class AdminPanelProvider extends PanelProvider
                 // Role/permission pesantren dikelola di panel tenant masing-masing.
                 TenantResource::class,
                 UserResource::class,
-                // Billing SaaS
+                // Langganan & Billing (paket, langganan, invoice, katalog modul)
                 ModuleResource::class,
                 PlanResource::class,
                 TenantSubscriptionResource::class,
@@ -66,6 +67,15 @@ class AdminPanelProvider extends PanelProvider
                 // Manajemen Proyek (internal — pantau progres pengembangan)
                 DevProjectResource::class,
                 DevTaskResource::class,
+            ])
+            // Struktur menu platform — 3 grup berurutan. JANGAN beri ->icon() pada
+            // grup: Filament v5 melempar 500 bila grup berikon memuat item berikon
+            // (pola sama dengan panel tenant). Dashboard & Users sengaja dibiarkan
+            // tanpa grup → tampil di puncak (selaras gaya panel tenant).
+            ->navigationGroups([
+                NavigationGroup::make('Pesantren'),
+                NavigationGroup::make('Langganan & Billing')->collapsible(),
+                NavigationGroup::make('Manajemen Proyek')->collapsible(),
             ])
             ->pages([
                 Dashboard::class,

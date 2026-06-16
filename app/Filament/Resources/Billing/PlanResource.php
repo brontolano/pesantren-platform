@@ -28,9 +28,9 @@ class PlanResource extends Resource
 
     protected static ?string $navigationLabel = 'Paket Langganan';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Billing SaaS';
+    protected static UnitEnum|string|null $navigationGroup = 'Langganan & Billing';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

@@ -28,9 +28,9 @@ class KelolaKuotaPenyimpanan extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Kuota Penyimpanan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Billing SaaS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pesantren';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $title = 'Kuota Penyimpanan Tenant';
 

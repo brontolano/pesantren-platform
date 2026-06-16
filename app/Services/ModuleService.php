@@ -21,24 +21,6 @@ class ModuleService
     /** Tenant yang dipakai sebagai sandbox pengembangan. */
     public const DEV_TENANTS = ['demo'];
 
-    /** Pemetaan label navigationGroup Filament => key modul. */
-    public const GROUP_TO_MODULE = [
-        'Kesantrian' => 'kesantrian',
-        'Keuangan' => 'keuangan',
-        'PPDB' => 'ppdb',
-        'Notifikasi' => 'notifikasi',
-        'CMS' => 'cms',
-        'Website' => 'cms',
-        'Portal Wali' => 'portal_wali',
-        'Akademik' => 'akademik',
-        'Asrama' => 'asrama',
-        'Tahfidz' => 'tahfidz',
-        'Kesehatan' => 'kesehatan',
-        'Kesehatan & Konseling' => 'kesehatan',
-        'Kegiatan' => 'kegiatan',
-        'Kegiatan & Perizinan' => 'kegiatan',
-    ];
-
     protected ?Collection $cache = null;
 
     protected function centralConnection(): string
@@ -93,28 +75,5 @@ class ModuleService
         }
 
         return $tenant !== null && $this->isEnabledForTenant($moduleKey, $tenant->getKey());
-    }
-
-    /** Modul dari navigationGroup Filament (untuk enforcement resource). */
-    public function moduleForGroup(?string $group): ?string
-    {
-        if (! $group) {
-            return null;
-        }
-
-        return self::GROUP_TO_MODULE[$group] ?? null;
-    }
-
-    /** Apakah navigationGroup tampil untuk tenant aktif sekarang. */
-    public function groupVisibleForCurrentTenant(?string $group): bool
-    {
-        $module = $this->moduleForGroup($group);
-        if (! $module) {
-            return true; // grup non-modul (Core, Tahfidz nav, dll) selalu tampil
-        }
-
-        $tenant = tenancy()->initialized ? tenant() : null;
-
-        return $this->isVisibleForTenant($module, $tenant);
     }
 }

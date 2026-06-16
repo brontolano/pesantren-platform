@@ -46,9 +46,9 @@ class InstalasiTenant extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Instalasi Tenant';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Billing SaaS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pesantren';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $title = 'Instalasi Tenant Baru';
 
