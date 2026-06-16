@@ -68,14 +68,15 @@ class PlatformPanelAuthedSmokeTest extends TestCase
         }
     }
 
-    public function test_sidebar_platform_tepat_tiga_grup_tanpa_orphan(): void
+    public function test_sidebar_platform_grup_terdaftar_lengkap_tanpa_orphan(): void
     {
         $resp = $this->actingAs($this->superAdminPlatform())->get('/platform/aktivasi-modul-tenant');
 
         $resp->assertSuccessful();
-        // Ketiga grup terdaftar tampil...
+        // Keempat grup TERDAFTAR tampil (termasuk 'AI Khadim Digital' dari modul AI)...
         $resp->assertSee('Pesantren');
         $resp->assertSee('Langganan & Billing'); // assertSee meng-escape → cocok dgn &amp; di HTML
+        $resp->assertSee('AI Khadim Digital');
         $resp->assertSee('Manajemen Proyek');
         // ...dan TIDAK ada grup yatim 'Billing SaaS' (regresi item yg lupa dimigrasi).
         $resp->assertDontSee('Billing SaaS');

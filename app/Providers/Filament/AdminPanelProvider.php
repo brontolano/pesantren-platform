@@ -68,13 +68,16 @@ class AdminPanelProvider extends PanelProvider
                 DevProjectResource::class,
                 DevTaskResource::class,
             ])
-            // Struktur menu platform — 3 grup berurutan. JANGAN beri ->icon() pada
+            // Struktur menu platform — 4 grup berurutan. JANGAN beri ->icon() pada
             // grup: Filament v5 melempar 500 bila grup berikon memuat item berikon
             // (pola sama dengan panel tenant). Dashboard & Users sengaja dibiarkan
             // tanpa grup → tampil di puncak (selaras gaya panel tenant).
+            // 'AI Khadim Digital' = halaman Suara Pasar yg didaftarkan modul AI ke
+            // panel admin (Modules/AI AIServiceProvider) → daftarkan agar tak yatim.
             ->navigationGroups([
                 NavigationGroup::make('Pesantren'),
                 NavigationGroup::make('Langganan & Billing')->collapsible(),
+                NavigationGroup::make('AI Khadim Digital')->collapsible(),
                 NavigationGroup::make('Manajemen Proyek')->collapsible(),
             ])
             ->pages([
