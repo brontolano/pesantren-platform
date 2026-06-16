@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Services\Mutu\MutuService;
 use Filament\Pages\Page;
 use Modules\Kesantrian\Models\Santri;
@@ -12,6 +13,8 @@ use Modules\Kesantrian\Models\Santri;
  */
 class ProfilMutuSantri extends Page
 {
+    use ModuleGate;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-identification';
 
     protected static ?string $navigationLabel = 'Profil Mutu Santri';
@@ -30,12 +33,12 @@ class ProfilMutuSantri extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('mutu') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('mutu') && static::canAccess();
     }
 
     protected function getViewData(): array

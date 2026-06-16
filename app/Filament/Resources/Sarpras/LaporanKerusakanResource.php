@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Sarpras;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Sarpras\LaporanKerusakan\Pages\EditLaporanKerusakan;
 use App\Filament\Resources\Sarpras\LaporanKerusakan\Pages\ListLaporanKerusakan;
 use BackedEnum;
@@ -30,6 +31,8 @@ use UnitEnum;
  */
 class LaporanKerusakanResource extends Resource
 {
+    use ModuleGate;
+
     protected static ?string $model = LaporanKerusakan::class;
 
     protected static ?string $slug = 'sarpras/laporan-kerusakan';
@@ -151,8 +154,13 @@ class LaporanKerusakanResource extends Resource
         return false; // Laporan masuk dari PWA Guru, bukan dibuat di panel.
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('pembiayaan') && static::canAccess();
+    }
+
     public static function canAccess(): bool
     {
-        return auth()->check();
+        return static::moduleVisible('pembiayaan') && auth()->check();
     }
 }

@@ -30,13 +30,14 @@ class EksporEmis extends Page
 
     public static function canAccess(): bool
     {
-        return Filament::getCurrentPanel()?->getId() === 'tenant'
+        return static::moduleVisible('akademik')
+            && Filament::getCurrentPanel()?->getId() === 'tenant'
             && (Auth::user()?->canAny(['view_keuangan', 'manage_keuangan', 'view_santri']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::moduleVisible('akademik') && static::canAccess();
     }
 
     protected function getHeaderActions(): array

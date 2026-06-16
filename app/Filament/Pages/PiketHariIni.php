@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -15,6 +16,8 @@ use Modules\Pembiayaan\Services\SarprasService;
  */
 class PiketHariIni extends Page
 {
+    use ModuleGate;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     protected static ?string $navigationLabel = 'Piket Hari Ini';
@@ -29,9 +32,14 @@ class PiketHariIni extends Page
 
     protected string $view = 'filament.pages.piket-hari-ini';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('pembiayaan') && static::canAccess();
+    }
+
     public static function canAccess(): bool
     {
-        return auth()->check();
+        return static::moduleVisible('pembiayaan') && auth()->check();
     }
 
     /** @return array<int, array{area: AreaPiket, ceklis: Collection}> */

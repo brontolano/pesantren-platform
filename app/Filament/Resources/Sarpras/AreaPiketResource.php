@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Sarpras;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Sarpras\AreaPiket\Pages\CreateAreaPiket;
 use App\Filament\Resources\Sarpras\AreaPiket\Pages\EditAreaPiket;
 use App\Filament\Resources\Sarpras\AreaPiket\Pages\ListAreaPiket;
@@ -24,6 +25,8 @@ use UnitEnum;
  */
 class AreaPiketResource extends Resource
 {
+    use ModuleGate;
+
     protected static ?string $model = AreaPiket::class;
 
     protected static ?string $slug = 'sarpras/area-piket';
@@ -76,8 +79,13 @@ class AreaPiketResource extends Resource
         ];
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('pembiayaan') && static::canAccess();
+    }
+
     public static function canAccess(): bool
     {
-        return auth()->check();
+        return static::moduleVisible('pembiayaan') && auth()->check();
     }
 }

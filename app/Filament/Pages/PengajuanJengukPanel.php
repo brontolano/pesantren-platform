@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use InvalidArgumentException;
@@ -15,6 +16,8 @@ use Modules\Kegiatan\Services\PenjengukanService;
  */
 class PengajuanJengukPanel extends Page
 {
+    use ModuleGate;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-hand-raised';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Kepengasuhan';
@@ -40,12 +43,12 @@ class PengajuanJengukPanel extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return static::moduleVisible('kegiatan') && (auth()->user()?->can('manage_santri') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('kegiatan') && static::canAccess();
     }
 
     public function mount(): void

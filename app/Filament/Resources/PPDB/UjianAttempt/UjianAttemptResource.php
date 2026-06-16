@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PPDB\UjianAttempt;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\PPDB\UjianAttempt\Pages\ListUjianAttempt;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
@@ -22,6 +23,8 @@ use Modules\PPDB\Services\UjianOnlineService;
  */
 class UjianAttemptResource extends Resource
 {
+    use ModuleGate;
+
     protected static ?string $model = UjianAttempt::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
@@ -32,9 +35,14 @@ class UjianAttemptResource extends Resource
 
     protected static ?string $modelLabel = 'Attempt Ujian';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('ppdb') && static::canAccess();
+    }
+
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return static::moduleVisible('ppdb') && (Auth::user()?->can('manage_santri') ?? false);
     }
 
     public static function canCreate(): bool

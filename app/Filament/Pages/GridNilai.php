@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -25,6 +26,7 @@ use Modules\Kesantrian\Models\Kelas;
 class GridNilai extends Page implements HasForms
 {
     use InteractsWithForms;
+    use ModuleGate;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-table-cells';
 
@@ -58,12 +60,12 @@ class GridNilai extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('manage_akademik') ?? false;
+        return static::moduleVisible('akademik') && (auth()->user()?->can('manage_akademik') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('akademik') && static::canAccess();
     }
 
     public function getSubheading(): ?string

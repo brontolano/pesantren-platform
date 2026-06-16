@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
@@ -25,6 +26,7 @@ use Modules\Kesantrian\Services\PesanWaliService;
 class ModerasiPesanWali extends Page implements HasTable
 {
     use InteractsWithTable;
+    use ModuleGate;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
@@ -53,7 +55,9 @@ class ModerasiPesanWali extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        // Fitur moderasi pesan ke Portal Wali → digerbang modul portal_wali
+        // (selain izin manage_santri). shouldRegisterNavigation() me-return ini.
+        return static::moduleVisible('portal_wali') && (auth()->user()?->can('manage_santri') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

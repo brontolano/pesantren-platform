@@ -2,11 +2,14 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use Filament\Pages\Page;
 use Modules\PPDB\Models\CalonSantri;
 
 class PpdbReport extends Page
 {
+    use ModuleGate;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $navigationLabel = 'Laporan PPDB';
@@ -21,12 +24,12 @@ class PpdbReport extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('ppdb') && static::canAccess();
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('ppdb') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public function getViewData(): array

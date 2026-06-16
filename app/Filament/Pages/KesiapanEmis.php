@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\Lembaga\LembagaResource;
 use App\Filament\Resources\Payroll\Employee\EmployeeResource;
 use App\Filament\Resources\Santri\SantriResource;
@@ -18,6 +19,8 @@ use Modules\Payroll\Models\Employee;
  */
 class KesiapanEmis extends Page
 {
+    use ModuleGate;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
     protected static ?string $navigationLabel = 'Kesiapan EMIS';
@@ -34,12 +37,12 @@ class KesiapanEmis extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('akademik') && static::canAccess();
     }
 
     /**
