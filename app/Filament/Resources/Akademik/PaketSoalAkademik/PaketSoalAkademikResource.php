@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Akademik\PaketSoalAkademik;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\PaketSoalAkademik\Pages\CreatePaketSoalAkademik;
 use App\Filament\Resources\Akademik\PaketSoalAkademik\Pages\EditPaketSoalAkademik;
 use App\Filament\Resources\Akademik\PaketSoalAkademik\Pages\ListPaketSoalAkademik;
@@ -35,6 +36,8 @@ use Modules\PPDB\Models\PaketSoal;
  */
 class PaketSoalAkademikResource extends Resource
 {
+    use ModuleGate;
+
     protected static ?string $model = PaketSoal::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-pencil-square';
@@ -47,6 +50,11 @@ class PaketSoalAkademikResource extends Resource
 
     protected static ?string $slug = 'akademik/paket-soal-akademik';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('akademik') && static::canAccess();
+    }
+
     public static function canAccess(): bool
     {
         $user = Auth::user();
@@ -54,8 +62,9 @@ class PaketSoalAkademikResource extends Resource
             return false;
         }
 
-        return $user->can('manage_akademik')
-            || Pelajaran::query()->where('guru_pengampu_id', $user->getKey())->exists();
+        return static::moduleVisible('akademik')
+            && ($user->can('manage_akademik')
+                || Pelajaran::query()->where('guru_pengampu_id', $user->getKey())->exists());
     }
 
     /** Hanya paket akademik. Non-manage: milikku / pelajaran ampuanku / bank lembaga. */

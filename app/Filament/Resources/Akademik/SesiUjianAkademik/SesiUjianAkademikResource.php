@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Akademik\SesiUjianAkademik;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\Akademik\SesiUjianAkademik\Pages\CreateSesiUjianAkademik;
 use App\Filament\Resources\Akademik\SesiUjianAkademik\Pages\EditSesiUjianAkademik;
 use App\Filament\Resources\Akademik\SesiUjianAkademik\Pages\ListSesiUjianAkademik;
@@ -33,6 +34,8 @@ use Modules\PPDB\Models\PaketSoal;
  */
 class SesiUjianAkademikResource extends Resource
 {
+    use ModuleGate;
+
     protected static ?string $model = SesiUjianAkademik::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
@@ -45,6 +48,11 @@ class SesiUjianAkademikResource extends Resource
 
     protected static ?string $slug = 'akademik/sesi-ujian-akademik';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('akademik') && static::canAccess();
+    }
+
     public static function canAccess(): bool
     {
         $user = Auth::user();
@@ -52,8 +60,9 @@ class SesiUjianAkademikResource extends Resource
             return false;
         }
 
-        return $user->can('manage_akademik')
-            || Pelajaran::query()->where('guru_pengampu_id', $user->getKey())->exists();
+        return static::moduleVisible('akademik')
+            && ($user->can('manage_akademik')
+                || Pelajaran::query()->where('guru_pengampu_id', $user->getKey())->exists());
     }
 
     public static function form(Schema $schema): Schema

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use Filament\Pages\Page;
 use Modules\Kegiatan\Models\LogGerbang;
 
@@ -13,6 +14,8 @@ use Modules\Kegiatan\Models\LogGerbang;
  */
 class LogGerbangPanel extends Page
 {
+    use ModuleGate;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Kedisiplinan';
@@ -44,12 +47,12 @@ class LogGerbangPanel extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['manage_santri', 'view_santri']) ?? false;
+        return static::moduleVisible('kegiatan') && (auth()->user()?->canAny(['manage_santri', 'view_santri']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('kegiatan') && static::canAccess();
     }
 
     public function mount(): void

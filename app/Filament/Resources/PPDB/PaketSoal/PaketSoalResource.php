@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PPDB\PaketSoal;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Resources\PPDB\PaketSoal\Pages\CreatePaketSoal;
 use App\Filament\Resources\PPDB\PaketSoal\Pages\EditPaketSoal;
 use App\Filament\Resources\PPDB\PaketSoal\Pages\ListPaketSoal;
@@ -29,6 +30,8 @@ use Modules\PPDB\Models\PaketSoal;
  */
 class PaketSoalResource extends Resource
 {
+    use ModuleGate;
+
     protected static ?string $model = PaketSoal::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
@@ -39,9 +42,14 @@ class PaketSoalResource extends Resource
 
     protected static ?string $modelLabel = 'Paket Soal';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('ppdb') && static::canAccess();
+    }
+
     public static function canAccess(): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return static::moduleVisible('ppdb') && (Auth::user()?->can('manage_santri') ?? false);
     }
 
     /**

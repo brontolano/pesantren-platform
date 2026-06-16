@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
 use Filament\Pages\Page;
 use Modules\Akademik\Services\JurnalKbmService;
 
@@ -13,6 +14,8 @@ use Modules\Akademik\Services\JurnalKbmService;
  */
 class RekapJurnalKbm extends Page
 {
+    use ModuleGate;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
@@ -38,12 +41,12 @@ class RekapJurnalKbm extends Page
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['manage_akademik', 'view_akademik']) ?? false;
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['manage_akademik', 'view_akademik']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::canAccess();
+        return static::moduleVisible('akademik') && static::canAccess();
     }
 
     public function mount(): void
