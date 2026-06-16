@@ -31,12 +31,31 @@ class ModuleService
     /** Registry modul (di-cache per request). */
     public function registry(): Collection
     {
-        return $this->cache ??= ModuleRegistry::query()->orderBy('sort')->get()->keyBy('key');
+        if ($this->cache !== null) {
+            return $this->cache;
+        }
+
+        try {
+            return $this->cache = ModuleRegistry::query()->orderBy('sort')->get()->keyBy('key');
+        } catch (\Throwable) {
+            // Tabel registry belum siap (boot awal / konteks minimal) → jangan
+            // sembunyikan apa pun (anggap semua modul bawaan/terlihat). Mencegah
+            // gerbang modul melempar 500 saat registry tak tersedia.
+            return $this->cache = collect();
+        }
     }
 
     public function isDevTenant(?Tenant $tenant): bool
     {
         return $tenant !== null && in_array($tenant->getKey(), self::DEV_TENANTS, true);
+    }
+
+    /** Apakah modul tergolong INTI (selalu aktif, tak bisa dipasang/dimatikan tenant). */
+    public function isCore(string $moduleKey): bool
+    {
+        $mod = $this->registry()->get($moduleKey);
+
+        return $mod !== null && (bool) $mod->is_core;
     }
 
     /** Apakah modul (released) diaktifkan untuk tenant tertentu. */

@@ -14,10 +14,12 @@ trait ModuleGate
 {
     protected static function moduleVisible(string $key): bool
     {
-        // SUPER ADMIN melihat SEMUA modul (mengelola platform/tenant) —
-        // gerbang aktivasi modul hanya berlaku untuk pengguna biasa.
+        // Bypass HANYA untuk pemilik PLATFORM (super_admin tanpa tenant) yang
+        // mengelola lintas tenant. Super admin PESANTREN TIDAK lagi bypass —
+        // ia ikut gerbang modul tenantnya agar navigasi tetap ramping (hanya
+        // modul yang tersedia/aktif untuk tenant itu yang muncul).
         try {
-            if (auth()->user()?->hasRole('super_admin')) {
+            if (auth()->user()?->isPlatformSuperAdmin()) {
                 return true;
             }
         } catch (\Throwable) {
