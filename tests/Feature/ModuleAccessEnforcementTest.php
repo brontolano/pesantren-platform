@@ -36,10 +36,9 @@ class ModuleAccessEnforcementTest extends TestCase
         // asrama = released; belum ada baris tenant_modules → TIDAK terlihat.
         $this->assertFalse($svc->isVisibleForTenant('asrama', $tenant));
 
-        // Aktifkan untuk tenant ini → terlihat.
-        DB::table('tenant_modules')->insert([
+        // Aktifkan untuk tenant ini (lewat model → event membuang cache set modul) → terlihat.
+        \App\Models\TenantModule::create([
             'tenant_id' => 'pesx', 'module_name' => 'asrama', 'is_active' => true,
-            'created_at' => now(), 'updated_at' => now(),
         ]);
         $this->assertTrue($svc->isVisibleForTenant('asrama', $tenant));
 

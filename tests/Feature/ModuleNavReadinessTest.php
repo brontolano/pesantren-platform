@@ -98,10 +98,14 @@ class ModuleNavReadinessTest extends TestCase
         $this->assertSame(ModuleService::STATUS_READY, $svc->moduleStatus('payroll', $this->tenant));
     }
 
-    public function test_nav_sembunyikan_modul_dipasang_belum_siap(): void
+    public function test_nav_tampilkan_modul_aktif_meski_belum_siap(): void
     {
+        // Nav digerbang AKTIF (bukan "siap") agar resource setup (Lembaga/Periode/
+        // Halaqah/Pegawai) tetap terjangkau untuk dilengkapi → cegah deadlock.
+        // Disclosure bertahap dicapai lewat DEFAULT MINIMAL, bukan menyembunyikan
+        // modul aktif. Status "perlu disiapkan" ditampilkan di Pusat Modul.
         $this->aktifkan('payroll'); // aktif, belum siap
-        $this->assertFalse($this->gate()->vis('payroll'), 'released aktif-tapi-belum-siap tak boleh di nav');
+        $this->assertTrue($this->gate()->vis('payroll'), 'modul aktif harus tampil di nav (akses setup terbuka)');
     }
 
     public function test_nav_tampilkan_modul_siap(): void

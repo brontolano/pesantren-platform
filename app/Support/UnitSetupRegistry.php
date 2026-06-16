@@ -244,7 +244,12 @@ class UnitSetupRegistry
      */
     public static function unitsCached(): array
     {
-        $key = '__unit_setup_registry_units';
+        // Ber-tenant-key: stancl tidak membersihkan binding container saat ganti
+        // tenant, jadi tanpa key per-tenant flag "done" tenant A bisa bocor ke
+        // tenant B di proses long-running (queue worker / runForMultiple).
+        $tenantId = tenancy()->initialized ? (tenant('id') ?? 'central') : 'central';
+        $key = '__unit_setup_registry_units_'.$tenantId;
+
         if (app()->bound($key)) {
             return app()->make($key);
         }

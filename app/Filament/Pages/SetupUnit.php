@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Support\UnitSetupRegistry;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 
 /**
@@ -63,11 +64,21 @@ class SetupUnit extends Page
     {
         $unit = request()->query('unit');
         $units = UnitSetupRegistry::units();
-        // Hanya buka tampilan unit bila user punya izin unit itu; selain itu → hub.
-        $this->unit = is_string($unit) && isset($units[$unit])
-            && (auth()->user()?->can($units[$unit]['permission']) ?? false)
-            ? $unit
-            : null;
+        $bolehUnit = is_string($unit) && isset($units[$unit])
+            && (auth()->user()?->can($units[$unit]['permission']) ?? false);
+
+        // Diminta unit valid tapi izin kurang → beri tahu (jangan jatuh DIAM ke hub).
+        // Mis. admin pesantren memasang fitur Keuangan/HR di Pusat Modul tapi belum
+        // punya izin unitnya → tahu harus minta super admin, bukan bingung.
+        if (is_string($unit) && isset($units[$unit]) && ! $bolehUnit) {
+            Notification::make()
+                ->title('Belum bisa menyiapkan fitur ini')
+                ->body('Anda belum punya izin untuk mengisi data "'.$units[$unit]['label'].'". Minta super admin pesantren untuk menyiapkannya atau memberi izin.')
+                ->warning()
+                ->send();
+        }
+
+        $this->unit = $bolehUnit ? $unit : null;
     }
 
     protected function getViewData(): array

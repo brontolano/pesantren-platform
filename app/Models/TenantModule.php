@@ -15,6 +15,18 @@ class TenantModule extends Model
         'configured_at' => 'datetime',
     ];
 
+    protected static function booted(): void
+    {
+        // Buang cache set modul (ModuleService) saat aktivasi berubah, agar baca
+        // SETELAH tulis konsisten dalam request yang sama (tak bergantung redirect).
+        $bust = static function (self $m): void {
+            app()->forgetInstance('__active_modules_'.$m->tenant_id);
+            app()->forgetInstance('__configured_modules_'.$m->tenant_id);
+        };
+        static::saved($bust);
+        static::deleted($bust);
+    }
+
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
@@ -26,14 +38,5 @@ class TenantModule extends Model
             ->where('module_name', $moduleName)
             ->where('is_active', true)
             ->exists();
-    }
-
-    /** Tandai modul "siap pakai" (langkah wajib tuntas) — jejak persisten agar
-     *  navigasi tak berkedip bila data sempat kosong. Idempoten. */
-    public function tandaiSiap(): void
-    {
-        if ($this->configured_at === null) {
-            $this->forceFill(['configured_at' => now()])->save();
-        }
     }
 }

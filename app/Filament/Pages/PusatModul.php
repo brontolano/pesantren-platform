@@ -122,7 +122,6 @@ class PusatModul extends Page
             'perluDisiapkan' => $perluDisiapkan,
             'disarankan' => $disarankan,
             'lainnya' => $lainnya,
-            'adaDisarankan' => $disarankan !== [],
         ];
     }
 
@@ -225,6 +224,8 @@ class PusatModul extends Page
             }
         });
 
+        app()->forgetInstance('__active_modules_'.$tid);
+
         Notification::make()
             ->title('Fitur dinonaktifkan')
             ->body('Menunya disembunyikan. Datanya tetap aman — bisa diaktifkan lagi kapan saja.')
@@ -259,6 +260,11 @@ class PusatModul extends Page
             if ($svc->isCore($k) || ! $svc->isRegistered($k)) {
                 continue; // inti/tak terdaftar tak perlu dipasang
             }
+            // Jangan pasang modul TERKUNCI (development utk tenant non-dev / di luar
+            // paket) — cegah baris orphan yang auto-aktif saat modul dipromosikan.
+            if ($svc->moduleStatus($k, $tenant) === ModuleService::STATUS_LOCKED) {
+                continue;
+            }
             $sudahAktif = $tenant !== null && $svc->isEnabledForTenant($k, $tenant->getKey());
             if (! $sudahAktif) {
                 $baru[] = $k;
@@ -285,6 +291,10 @@ class PusatModul extends Page
                 $row->save();
             }
         });
+
+        // Buang cache set modul (baca-setelah-tulis konsisten tanpa andalkan redirect).
+        app()->forgetInstance('__active_modules_'.$tid);
+        app()->forgetInstance('__configured_modules_'.$tid);
 
         return $baru;
     }

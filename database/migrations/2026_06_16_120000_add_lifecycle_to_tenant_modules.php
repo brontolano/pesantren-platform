@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Schema;
  * kapan SIAP/terkonfigurasi (configured_at). Additive — is_active TETAP sumber
  * visibilitas yang dibaca ModuleService.
  *
- * Backfill SENGAJA hanya installed_at (jejak audit: modul aktif = sudah dipasang).
- * configured_at dibiarkan NULL → kesiapan dihitung LIVE (ModuleSetupMap::ready),
- * sehingga tenant lama otomatis ramping & AMAN: modul yang sudah berisi data
- * tetap tampil, modul aktif-tapi-kosong dirapikan tanpa kehilangan data.
+ * Backfill GRANDFATHER untuk tenant EKSISTING: modul yang SUDAH aktif dianggap
+ * sudah "dipasang & siap" (installed_at + configured_at = created_at). Ini AMAN
+ * untuk tenant LIVE (asy-syifaa, albakids) — modul yang sedang dipakai tidak
+ * berubah status & tetap tampil; perilaku "perlu disiapkan dulu" hanya berlaku
+ * untuk modul yang BARU dipasang sendiri lewat Pusat Modul setelah deploy.
+ * (Default minimal hanya untuk tenant BARU; lihat TenantProvisioner::seedModules.)
  */
 return new class extends Migration
 {
@@ -28,6 +30,11 @@ return new class extends Migration
             ->where('is_active', true)
             ->whereNull('installed_at')
             ->update(['installed_at' => DB::raw('created_at')]);
+
+        DB::table('tenant_modules')
+            ->where('is_active', true)
+            ->whereNull('configured_at')
+            ->update(['configured_at' => DB::raw('created_at')]);
     }
 
     public function down(): void

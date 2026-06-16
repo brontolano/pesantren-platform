@@ -22,6 +22,9 @@ class ModuleService
     /** Tenant yang dipakai sebagai sandbox pengembangan. */
     public const DEV_TENANTS = ['demo'];
 
+    /** Fallback daftar modul inti bila registry tak termuat (cegah fail-open utk inti). */
+    public const CORE_KEYS = ['core', 'kesantrian', 'keuangan', 'notifikasi', 'cms'];
+
     /** Status siklus hidup modul untuk tenant (dipakai Pusat Modul). */
     public const STATUS_CORE = 'core';        // inti, selalu siap
 
@@ -40,21 +43,35 @@ class ModuleService
         return config('tenancy.database.central_connection', config('database.default'));
     }
 
-    /** Registry modul (di-cache per request). */
+    /**
+     * Registry modul. Di-memo di CONTAINER (bukan hanya properti instance) supaya
+     * dibagikan lintas ~115 resource dalam satu request — moduleVisible memanggil
+     * app(ModuleService) (instance baru) per resource, jadi cache instance saja
+     * akan hangus & memicu N+1 query registry.
+     */
     public function registry(): Collection
     {
         if ($this->cache !== null) {
             return $this->cache;
         }
 
+        $cacheKey = '__module_registry';
+        if (app()->bound($cacheKey)) {
+            return $this->cache = app()->make($cacheKey);
+        }
+
         try {
-            return $this->cache = ModuleRegistry::query()->orderBy('sort')->get()->keyBy('key');
+            $reg = ModuleRegistry::query()->orderBy('sort')->get()->keyBy('key');
         } catch (\Throwable) {
             // Tabel registry belum siap (boot awal / konteks minimal) → jangan
             // sembunyikan apa pun (anggap semua modul bawaan/terlihat). Mencegah
             // gerbang modul melempar 500 saat registry tak tersedia.
-            return $this->cache = collect();
+            $reg = collect();
         }
+
+        app()->instance($cacheKey, $reg);
+
+        return $this->cache = $reg;
     }
 
     public function isDevTenant(?Tenant $tenant): bool
@@ -66,8 +83,13 @@ class ModuleService
     public function isCore(string $moduleKey): bool
     {
         $mod = $this->registry()->get($moduleKey);
+        if ($mod !== null) {
+            return (bool) $mod->is_core;
+        }
 
-        return $mod !== null && (bool) $mod->is_core;
+        // Registry tak termuat → fallback daftar inti agar keputusan "inti"
+        // tak fail-open (mis. nonaktif modul inti) saat DB central terganggu.
+        return in_array($moduleKey, self::CORE_KEYS, true);
     }
 
     /** Apakah modul terdaftar di registry (registry kosong/tabel hilang → false → tak digerbang). */
@@ -148,15 +170,30 @@ class ModuleService
         return $this->isReadyForTenant($moduleKey, $tenant) ? self::STATUS_READY : self::STATUS_INSTALLED;
     }
 
-    /** Apakah modul (released) diaktifkan untuk tenant tertentu. */
+    /**
+     * Apakah modul (released) diaktifkan untuk tenant tertentu. Set modul aktif
+     * di-cache per request (container, ber-tenant-key) — jalur panas gerbang nav
+     * memanggil ini per resource; tanpa cache = N+1 ke tenant_modules.
+     */
     public function isEnabledForTenant(string $moduleKey, string $tenantId): bool
     {
-        return DB::connection($this->centralConnection())
-            ->table('tenant_modules')
-            ->where('tenant_id', $tenantId)
-            ->where('module_name', $moduleKey)
-            ->where('is_active', true)
-            ->exists();
+        $cacheKey = '__active_modules_'.$tenantId;
+
+        if (! app()->bound($cacheKey)) {
+            try {
+                $set = DB::connection($this->centralConnection())
+                    ->table('tenant_modules')
+                    ->where('tenant_id', $tenantId)
+                    ->where('is_active', true)
+                    ->pluck('module_name')
+                    ->all();
+            } catch (\Throwable) {
+                $set = [];
+            }
+            app()->instance($cacheKey, $set);
+        }
+
+        return in_array($moduleKey, app()->make($cacheKey), true);
     }
 
     /** Apakah sebuah modul tampil untuk tenant ini. */

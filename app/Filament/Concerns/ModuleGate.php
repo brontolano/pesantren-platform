@@ -25,23 +25,17 @@ trait ModuleGate
             // tabel roles belum siap → lanjut ke gerbang normal
         }
 
-        $svc = app(ModuleService::class);
-        $tenant = tenancy()->initialized ? tenant() : null;
-
-        // Tidak tersedia/diizinkan untuk tenant (mis. released belum dipasang) → sembunyikan.
-        if (! $svc->isVisibleForTenant($key, $tenant)) {
-            return false;
-        }
-
-        // Modul INTI & modul tak-terdaftar (registry kosong/bawaan) selalu tampil —
-        // tak punya siklus pasang/setup.
-        if ($svc->isCore($key) || ! $svc->isRegistered($key)) {
-            return true;
-        }
-
-        // Modul released (tambahan): tampil di navigasi HANYA setelah SIAP
-        // (langkah wajibnya tuntas / sudah ditandai siap). Sebelum itu ia hidup
-        // di "Pusat Modul" sebagai "perlu disiapkan" — inilah disclosure bertahap.
-        return $svc->isReadyForTenant($key, $tenant);
+        // Navigasi menampilkan modul yang DIPASANG (aktif) untuk tenant — bukan
+        // hanya yang "siap". Disclosure bertahap dicapai lewat DEFAULT MINIMAL
+        // (tenant baru hanya modul inti; modul muncul saat dipasang sendiri di
+        // Pusat Modul), BUKAN dengan menyembunyikan modul aktif-belum-siap.
+        //
+        // PENTING: jangan gerbang nav pada "kesiapan" — resource untuk MENGISI
+        // langkah setup (Lembaga, Periode, Halaqah, Pegawai, dll) digerbang oleh
+        // modul yang sama; bila disembunyikan saat belum-siap, admin TAK BISA
+        // membukanya untuk menyiapkan → deadlock. Status "siap/perlu disiapkan"
+        // ditampilkan di Pusat Modul, bukan dijadikan gerbang akses.
+        return app(ModuleService::class)
+            ->isVisibleForTenant($key, tenancy()->initialized ? tenant() : null);
     }
 }
