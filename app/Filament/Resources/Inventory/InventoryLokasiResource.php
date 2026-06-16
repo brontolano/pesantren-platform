@@ -43,7 +43,7 @@ class InventoryLokasiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
+        return UiMode::advanced() && static::moduleVisible('koperasi') && (auth()->user()?->can('operate_pos') ?? false);
     }
 
     public static function canAccess(): bool

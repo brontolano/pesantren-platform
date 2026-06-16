@@ -55,14 +55,20 @@ class ModuleRegistrySeeder extends Seeder
         ['key' => 'kesehatan',   'label' => 'Kesehatan & Konseling', 'status' => 'released', 'is_core' => false, 'sort' => 15],
         ['key' => 'kegiatan',    'label' => 'Kegiatan & Perizinan',  'status' => 'released', 'is_core' => false, 'sort' => 16],
         ['key' => 'mutu',        'label' => 'Mutu / SYAMIL',         'status' => 'released', 'is_core' => false, 'sort' => 17],
+        // CRM/Penawaran (funnel PPDB + quotation) & Koperasi/POS (stok koperasi)
+        // dipisah jadi modul OPSIONAL tersendiri (keputusan owner 2026-06-16):
+        // banyak pesantren tak memakainya → default MATI agar navigasi ramping,
+        // dipasang sendiri lewat Pusat Modul bila perlu.
+        ['key' => 'crm',         'label' => 'CRM & Penawaran',       'status' => 'released', 'is_core' => false, 'sort' => 18],
+        ['key' => 'koperasi',    'label' => 'Koperasi / POS',        'status' => 'released', 'is_core' => false, 'sort' => 19],
 
         // --- PLATFORM / DEVELOPMENT (hanya tenant demo sampai fitur matang) ---
         // file_storage sengaja 'development' (storage tiering belum dirilis) —
         // mempertahankan keputusan migrasi tenant_storage, bukan mengubahnya.
-        ['key' => 'file_storage', 'label' => 'File Storage',         'status' => 'development', 'is_core' => false, 'sort' => 18],
+        ['key' => 'file_storage', 'label' => 'File Storage',         'status' => 'development', 'is_core' => false, 'sort' => 20],
         // Modul AI "Khadim Digital" — development sampai Gate A lulus
         // (blueprint modul AI §8): hanya tampil di tenant demo.
-        ['key' => 'ai',           'label' => 'AI Khadim Digital',    'status' => 'development', 'is_core' => false, 'sort' => 19],
+        ['key' => 'ai',           'label' => 'AI Khadim Digital',    'status' => 'development', 'is_core' => false, 'sort' => 21],
     ];
 
     public function run(): void

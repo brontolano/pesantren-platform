@@ -55,6 +55,8 @@ class PusatModul extends Page
         'payroll' => 'Gaji/bisyaroh pegawai & guru.',
         'pembiayaan' => 'Aset & inventaris pesantren.',
         'pengadaan' => 'Pembelian, stok, & supplier.',
+        'crm' => 'Funnel/pipeline calon santri (PPDB) + penawaran (quotation).',
+        'koperasi' => 'Koperasi/POS: stok barang, lokasi gudang, batch & kedaluwarsa.',
     ];
 
     public static function canAccess(): bool
