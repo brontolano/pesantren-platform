@@ -27,9 +27,9 @@ class PlatformInvoiceResource extends Resource
 
     protected static ?string $navigationLabel = 'Invoice Platform';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Billing SaaS';
+    protected static UnitEnum|string|null $navigationGroup = 'Langganan & Billing';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {

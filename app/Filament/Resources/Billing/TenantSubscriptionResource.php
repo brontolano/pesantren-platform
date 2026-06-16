@@ -28,9 +28,9 @@ class TenantSubscriptionResource extends Resource
 
     protected static ?string $navigationLabel = 'Langganan Tenant';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Billing SaaS';
+    protected static UnitEnum|string|null $navigationGroup = 'Langganan & Billing';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {

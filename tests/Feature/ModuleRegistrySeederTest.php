@@ -18,8 +18,9 @@ class ModuleRegistrySeederTest extends TestCase
     {
         $this->seed(ModuleRegistrySeeder::class);
 
-        // 18 modul fungsional + file_storage (platform) = 19.
-        $this->assertSame(19, ModuleRegistry::query()->count());
+        // 18 modul fungsional (5 core + 13 released) + file_storage & ai
+        // (platform/development) = 20.
+        $this->assertSame(20, ModuleRegistry::query()->count());
     }
 
     public function test_file_storage_tetap_development_tidak_diubah(): void
@@ -64,8 +65,8 @@ class ModuleRegistrySeederTest extends TestCase
         $this->seed(ModuleRegistrySeeder::class);
         $this->seed(ModuleRegistrySeeder::class);
 
-        $this->assertSame(19, ModuleRegistry::query()->count());
+        $this->assertSame(20, ModuleRegistry::query()->count());
         // Tiap key unik — tak ada duplikat.
-        $this->assertSame(19, ModuleRegistry::query()->distinct()->count('key'));
+        $this->assertSame(20, ModuleRegistry::query()->distinct()->count('key'));
     }
 }

@@ -31,11 +31,13 @@ class TenantResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
 
-    protected static ?string $navigationLabel = 'Tenants';
+    protected static ?string $navigationLabel = 'Daftar Pesantren';
 
     protected static ?string $modelLabel = 'Tenant';
 
     protected static ?string $pluralModelLabel = 'Tenants';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Pesantren';
 
     protected static ?int $navigationSort = 1;
 
