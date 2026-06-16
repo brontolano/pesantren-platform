@@ -14,7 +14,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rules\Password;
-use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -78,10 +77,13 @@ class UserResource extends Resource
                 ->maxLength(255),
             Select::make('roles')
                 ->label('Role')
-                ->relationship('roles', 'name')
+                // relationship() menyetir opsi: value = ID role (cocok pivot
+                // model_has_roles.role_id). JANGAN override ->options() dgn nama —
+                // value jadi nama → relationship resolve "where roles.id='<nama>'"
+                // → 500 (bigint vs string). Urutan abjad lewat query relationship.
+                ->relationship('roles', 'name', fn (Builder $query): Builder => $query->orderBy('name'))
                 ->multiple()
                 ->preload()
-                ->options(fn (): array => Role::query()->orderBy('name')->pluck('name', 'name')->all())
                 ->required(),
         ]);
     }
