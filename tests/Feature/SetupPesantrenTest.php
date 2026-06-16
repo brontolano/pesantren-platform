@@ -89,6 +89,35 @@ class SetupPesantrenTest extends TestCase
         $this->assertSame(['jumat'], Setting::getTenantValue('akademik.hari_libur_mingguan'));
     }
 
+    public function test_simpan_lewat_form_livewire_tidak_error_dan_tersimpan(): void
+    {
+        // Regresi: jalur NYATA simpan() → form->getState() → persist(). Test lama
+        // memanggil persist() langsung sehingga LUPUT dari bug statePath di Wizard
+        // (getState() ter-nest → "Undefined array key nama"). Test ini menjamin
+        // bentuk state yang dikirim ke persist() benar.
+        $this->actingAs($this->admin());
+
+        Livewire::test(SetupPesantren::class)
+            ->fillForm([
+                'nama' => 'Pondok Lewat Form',
+                'preset' => 'salafiyah-kecil',
+                'periode_nama' => '2027/2028 Ganjil',
+                'tahun_akademik' => '2027/2028',
+                'semester' => 'ganjil',
+                'tanggal_mulai' => '2027-07-14',
+                'tanggal_akhir' => '2027-12-31',
+            ])
+            ->call('simpan')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('Pondok Lewat Form', Setting::getTenantStringValue('branding_name'));
+        $this->assertNotNull(Setting::getTenantValue('setup.selesai'));
+
+        $periode = PeriodeAkademik::withoutGlobalScopes()
+            ->where('tenant_id', $this->tenant->id)->where('is_active', true)->first();
+        $this->assertSame('2027/2028', $periode?->tahun_akademik);
+    }
+
     public function test_halaman_tergate_untuk_user_tanpa_izin(): void
     {
         $polos = User::withoutGlobalScopes()->create([
