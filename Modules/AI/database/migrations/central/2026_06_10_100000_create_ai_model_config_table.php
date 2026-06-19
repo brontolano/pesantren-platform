@@ -30,11 +30,23 @@ return new class extends Migration
         });
 
         // Unik per kombinasi (tier, agent_key) TERMASUK baris default
-        // (agent_key NULL) — PostgreSQL 15+: NULLS NOT DISTINCT.
-        DB::statement(
-            'CREATE UNIQUE INDEX ai_model_config_tier_agent_unique '
-            .'ON ai_model_config (tier, agent_key) NULLS NOT DISTINCT',
-        );
+        // (agent_key NULL). PostgreSQL 15+ butuh NULLS NOT DISTINCT agar dua
+        // baris default (agent_key NULL) di tier sama tetap ditolak — itu
+        // perilaku PRODUKSI (pgsql) dan TIDAK diubah. Driver lain (sqlite di
+        // harness test, mysql) tak mengenal sintaks itu → pakai unique index
+        // biasa supaya migrasi bisa jalan; keunikan baris default cukup dijaga
+        // di lapisan aplikasi pada konteks non-pgsql.
+        if (DB::connection()->getDriverName() === 'pgsql') {
+            DB::statement(
+                'CREATE UNIQUE INDEX ai_model_config_tier_agent_unique '
+                .'ON ai_model_config (tier, agent_key) NULLS NOT DISTINCT',
+            );
+        } else {
+            DB::statement(
+                'CREATE UNIQUE INDEX ai_model_config_tier_agent_unique '
+                .'ON ai_model_config (tier, agent_key)',
+            );
+        }
     }
 
     public function down(): void
