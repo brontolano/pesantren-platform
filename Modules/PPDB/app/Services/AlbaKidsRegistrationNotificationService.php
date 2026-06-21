@@ -3,6 +3,7 @@
 namespace Modules\PPDB\Services;
 
 use App\Models\Setting;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
@@ -103,16 +104,8 @@ class AlbaKidsRegistrationNotificationService
             'filter_criteria' => [
                 'targets' => [$adminPhone],
                 'variables' => [
-                    'nama_wali' => $candidate->nama_ayah ?: $candidate->nama_ibu ?: 'Bapak/Ibu Wali',
                     'nama_calon' => $candidate->nama,
-                    'nomor_pendaftaran' => $candidate->nomor_pendaftaran,
-                    'program_diminati' => $candidate->program_diminati,
-                    'no_hp_wali' => $candidate->no_hp_wali,
-                    'nama_ayah' => $candidate->nama_ayah ?: '-',
-                    'no_hp_ayah' => (string) (data_get($candidate->data_ortu, 'no_hp_ayah') ?: '-'),
-                    'nama_ibu' => $candidate->nama_ibu ?: '-',
-                    'no_hp_ibu' => (string) (data_get($candidate->data_ortu, 'no_hp_ibu') ?: '-'),
-                    'alamat' => (string) ($candidate->alamat ?: '-'),
+                    'ringkasan' => $this->buildAdminSummary($candidate),
                     'dokumen' => $this->buildDocumentLinks($candidate),
                 ],
             ],
@@ -140,7 +133,7 @@ class AlbaKidsRegistrationNotificationService
         return $this->resolveTemplate(
             'albakids_admin_new_registration',
             'Pendaftar baru Alba Kids',
-            "Pendaftar baru Alba Kids masuk.\nNama: {{nama_calon}}\nNomor: {{nomor_pendaftaran}}\nProgram: {{program_diminati}}\nAyah: {{nama_ayah}} ({{no_hp_ayah}})\nIbu: {{nama_ibu}} ({{no_hp_ibu}})\nAlamat: {{alamat}}\n\nDokumen (file terlampir menyusul; link cadangan):\n{{dokumen}}\n\nSegera verifikasi di panel admin.".self::FOOTER
+            "Pendaftar baru Alba Kids masuk.\n\n{{ringkasan}}\n\nDokumen (file terlampir menyusul; link cadangan):\n{{dokumen}}\n\nSegera verifikasi di panel admin.".self::FOOTER
         );
     }
 
@@ -174,6 +167,7 @@ class AlbaKidsRegistrationNotificationService
                     'no_hp_ibu',
                     'alamat',
                     'dokumen',
+                    'ringkasan',
                     'pesan_tambahan',
                     'isi_pesan',
                 ],
@@ -211,6 +205,79 @@ class AlbaKidsRegistrationNotificationService
         }
 
         return $lines === [] ? '-' : implode("\n", $lines);
+    }
+
+    /**
+     * Ringkasan LENGKAP data pendaftar untuk admin: semua isian formulir +
+     * detail pembayaran (untuk verifikasi). Field kosong ditandai "-".
+     */
+    private function buildAdminSummary(CalonSantri $candidate): string
+    {
+        $d = $candidate->data_ortu ?? [];
+
+        $val = static function ($v): string {
+            $v = is_string($v) ? trim($v) : $v;
+
+            return ($v === null || $v === '') ? '-' : (string) $v;
+        };
+        $date = static function ($v): string {
+            if ($v === null || $v === '') {
+                return '-';
+            }
+            try {
+                return Carbon::parse($v)->translatedFormat('d F Y');
+            } catch (\Throwable $e) {
+                return (string) $v;
+            }
+        };
+
+        $jenisKelamin = match ((string) $candidate->jenis_kelamin) {
+            'L' => 'Laki-laki',
+            'P' => 'Perempuan',
+            default => '-',
+        };
+
+        $lines = [
+            'Nama: '.$val($candidate->nama),
+            'Jenis Kelamin: '.$jenisKelamin,
+            'Anak ke-: '.$val(data_get($d, 'child_order')),
+            'Tempat Lahir: '.$val($candidate->tempat_lahir),
+            'Tanggal Lahir: '.$date($candidate->tanggal_lahir),
+            '',
+            'Nomor: '.$val($candidate->nomor_pendaftaran),
+            'Program: '.$val($candidate->program_diminati),
+            'Kelas: '.$val(data_get($d, 'kelas_tujuan')),
+            '',
+            'Ayah: '.$val($candidate->nama_ayah),
+            'Pekerjaan: '.$val(data_get($d, 'pekerjaan_ayah')),
+            'No. WhatsApp Ayah: '.$val(data_get($d, 'no_hp_ayah')),
+            '',
+            'Ibu: '.$val($candidate->nama_ibu),
+            'Pekerjaan: '.$val(data_get($d, 'pekerjaan_ibu')),
+            'No. WhatsApp Ibu: '.$val(data_get($d, 'no_hp_ibu')),
+        ];
+
+        // Wali hanya bila diisi terpisah (bukan sekadar duplikat Ayah/Ibu).
+        $namaWali = trim((string) data_get($d, 'nama_wali'));
+        if ($namaWali !== '' && $namaWali !== trim((string) $candidate->nama_ayah) && $namaWali !== trim((string) $candidate->nama_ibu)) {
+            $lines[] = '';
+            $lines[] = 'Wali: '.$namaWali.' ('.$val(data_get($d, 'hubungan_wali')).')';
+            $lines[] = 'No. WhatsApp Wali: '.$val($candidate->no_hp_wali);
+        }
+
+        $lines[] = '';
+        $lines[] = 'Alamat Lengkap: '.$val($candidate->alamat);
+
+        $bayar = data_get($d, 'pembayaran', []);
+        $nominal = data_get($bayar, 'nominal_transfer');
+        $lines[] = '';
+        $lines[] = 'Pembayaran:';
+        $lines[] = '- Pengirim: '.$val(data_get($bayar, 'nama_pengirim_transfer'));
+        $lines[] = '- Bank: '.$val(data_get($bayar, 'bank_pengirim'));
+        $lines[] = '- Nominal: '.(is_numeric($nominal) ? 'Rp '.number_format((float) $nominal, 0, ',', '.') : '-');
+        $lines[] = '- Tanggal: '.$date(data_get($bayar, 'tanggal_transfer'));
+
+        return implode("\n", $lines);
     }
 
     /**
