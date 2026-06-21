@@ -12,9 +12,26 @@ mkdir -p "$BACKUP_DIR"
 
 TS=$(date +%Y%m%d_%H%M%S)
 
+# Enkripsi at-rest (Blueprint §9/§16 — data santri = anak di bawah umur).
+# OPT-IN: set env BACKUP_ENC_PASS (mis. di /etc/environment atau baris cron) →
+# tiap file di-enkripsi AES-256 (ekstensi .enc). Bila TIDAK diset, backup tetap
+# polos seperti semula (tanpa kegagalan diam-diam). Dekripsi: lihat
+# docs/RUNBOOK-PEMULIHAN-BENCANA.md. Catatan keamanan: passphrase simetris ada di
+# env VPS → lindungi terhadap eksfiltrasi FILE; untuk tahan kompromi VPS penuh,
+# tingkatkan ke kunci-publik (gpg/age) — lihat runbook.
+ENC_EXT=""
+[ -n "${BACKUP_ENC_PASS:-}" ] && ENC_EXT=".enc"
+maybe_encrypt() {  # stdin -> stdout; enkripsi hanya bila BACKUP_ENC_PASS diset
+  if [ -n "${BACKUP_ENC_PASS:-}" ]; then
+    openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:BACKUP_ENC_PASS
+  else
+    cat
+  fi
+}
+
 # Roles & globals (pg_dumpall --globals-only) — dibutuhkan saat restore dari nol.
 docker exec pesantren-postgres sh -c 'pg_dumpall -U "$POSTGRES_USER" --globals-only' \
-  | gzip > "$BACKUP_DIR/globals_${TS}.sql.gz"
+  | gzip | maybe_encrypt > "$BACKUP_DIR/globals_${TS}.sql.gz${ENC_EXT}"
 
 # Daftar semua DB non-template (central + tenant*), kecuali DB maintenance 'postgres'.
 DBS=$(docker exec pesantren-postgres sh -c \
@@ -23,11 +40,13 @@ DBS=$(docker exec pesantren-postgres sh -c \
 COUNT=0
 for DB in $DBS; do
   docker exec pesantren-postgres sh -c 'pg_dump -U "$POSTGRES_USER" "$1"' _ "$DB" \
-    | gzip > "$BACKUP_DIR/pesantren_${DB}_${TS}.sql.gz"
+    | gzip | maybe_encrypt > "$BACKUP_DIR/pesantren_${DB}_${TS}.sql.gz${ENC_EXT}"
   COUNT=$((COUNT + 1))
 done
 
-# Hapus backup lebih tua dari RETENTION_DAYS hari (pola lama pesantren_* tetap tercakup).
-find "$BACKUP_DIR" \( -name "pesantren_*.sql.gz" -o -name "globals_*.sql.gz" \) -mtime +"$RETENTION_DAYS" -delete
+# Hapus backup lebih tua dari RETENTION_DAYS hari. Glob .sql.gz* mencakup file
+# polos (.sql.gz) MAUPUN terenkripsi (.sql.gz.enc).
+find "$BACKUP_DIR" \( -name "pesantren_*.sql.gz*" -o -name "globals_*.sql.gz*" \) -mtime +"$RETENTION_DAYS" -delete
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') Backup OK: ${COUNT} database + globals -> $BACKUP_DIR (ts ${TS})"
+ENC_NOTE=$([ -n "$ENC_EXT" ] && echo "terenkripsi" || echo "polos (BACKUP_ENC_PASS tak diset)")
+echo "$(date '+%Y-%m-%d %H:%M:%S') Backup OK: ${COUNT} database + globals -> $BACKUP_DIR (ts ${TS}, ${ENC_NOTE})"
