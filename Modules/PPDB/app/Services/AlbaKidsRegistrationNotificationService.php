@@ -2,17 +2,24 @@
 
 namespace Modules\PPDB\Services;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use InvalidArgumentException;
 use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
 use Modules\Notifikasi\Services\BroadcastWaService;
+use Modules\Notifikasi\Services\WaGatewayService;
 use Modules\PPDB\Models\CalonSantri;
+use Modules\PPDB\Models\TagihanPpdb;
 
 class AlbaKidsRegistrationNotificationService
 {
+    /** Footer otomatis: WA dikirim dari nomor perusahaan, bukan atas nama pesantren. */
+    private const FOOTER = "\n\n_Pesan otomatis ini dikirim dari nomor perusahaan PT Rojo Brontolano._";
+
     public function __construct(
         private readonly BroadcastWaService $broadcastWaService,
+        private readonly WaGatewayService $waGateway,
     ) {
     }
 
@@ -24,13 +31,13 @@ class AlbaKidsRegistrationNotificationService
         $registrationTemplate = $this->resolveTemplate(
             'albakids_registration_received',
             'Pendaftaran Alba Kids diterima',
-            'Assalamu alaikum Bapak/Ibu {{nama_wali}}, terima kasih sudah mendaftarkan {{nama_calon}} di Alba Kids Pre-School. Nomor pendaftaran: {{nomor_pendaftaran}}. Bukti transfer sudah kami terima dan sedang diverifikasi. {{pesan_tambahan}}'
+            'Assalamu alaikum Bapak/Ibu {{nama_wali}}, terima kasih sudah mendaftarkan {{nama_calon}} di Alba Kids Pre-School. Nomor pendaftaran: {{nomor_pendaftaran}}. Bukti transfer sudah kami terima dan sedang diverifikasi. {{pesan_tambahan}}'.self::FOOTER
         );
 
         $adminTemplate = $this->resolveTemplate(
             'albakids_admin_new_registration',
             'Pendaftar baru Alba Kids',
-            "Pendaftar baru Alba Kids masuk.\nNama: {{nama_calon}}\nNomor: {{nomor_pendaftaran}}\nProgram: {{program_diminati}}\nAyah: {{nama_ayah}} ({{no_hp_ayah}})\nIbu: {{nama_ibu}} ({{no_hp_ibu}})\nAlamat: {{alamat}}\n\nDokumen (klik untuk lihat):\n{{dokumen}}\n\nSegera verifikasi di panel admin."
+            "Pendaftar baru Alba Kids masuk.\nNama: {{nama_calon}}\nNomor: {{nomor_pendaftaran}}\nProgram: {{program_diminati}}\nAyah: {{nama_ayah}} ({{no_hp_ayah}})\nIbu: {{nama_ibu}} ({{no_hp_ibu}})\nAlamat: {{alamat}}\n\nDokumen (file terlampir menyusul; link cadangan):\n{{dokumen}}\n\nSegera verifikasi di panel admin.".self::FOOTER
         );
 
         $this->resolveTemplate(
@@ -87,6 +94,10 @@ class AlbaKidsRegistrationNotificationService
             ]);
             $this->broadcastWaService->execute($adminBroadcast);
             $result['admin'] = $adminBroadcast->fresh(['logs']);
+
+            // #2: lampirkan FILE dokumen (bukti/KK/akta) ke admin sebagai media WA,
+            // melengkapi ringkasan teks + link cadangan di atas.
+            $this->sendAdminDocuments($candidate, $adminPhone);
         }
 
         return $result;
@@ -148,6 +159,69 @@ class AlbaKidsRegistrationNotificationService
         }
 
         return $lines === [] ? '-' : implode("\n", $lines);
+    }
+
+    /**
+     * Kirim file dokumen (bukti/KK/akta) ke admin sebagai lampiran WhatsApp.
+     * Per-file gagal tidak menggagalkan pendaftaran — teks + link cadangan sudah terkirim.
+     */
+    private function sendAdminDocuments(CalonSantri $candidate, string $adminPhone): void
+    {
+        $disk = config('filesystems.default', 'local');
+        $caption = sprintf('%s — %s', $candidate->nama, $candidate->nomor_pendaftaran);
+
+        foreach ($this->collectDocuments($candidate) as $label => $path) {
+            try {
+                if (! Storage::disk($disk)->exists($path)) {
+                    continue;
+                }
+
+                $contents = Storage::disk($disk)->get($path);
+                if ($contents === null || $contents === '') {
+                    continue;
+                }
+
+                $this->waGateway->sendFile(
+                    $adminPhone,
+                    [
+                        'data' => base64_encode($contents),
+                        'mimetype' => Storage::disk($disk)->mimeType($path) ?: 'application/octet-stream',
+                        'filename' => basename($path),
+                    ],
+                    $label.' — '.$caption,
+                );
+            } catch (\Throwable $e) {
+                // Lewati lampiran yang gagal; jangan ganggu alur utama.
+            }
+        }
+    }
+
+    /**
+     * Peta dokumen pendaftaran: label tampil => path di storage.
+     *
+     * @return array<string, string>
+     */
+    private function collectDocuments(CalonSantri $candidate): array
+    {
+        $docs = [];
+
+        $bukti = TagihanPpdb::query()
+            ->where('calon_santri_id', $candidate->getKey())
+            ->whereNotNull('bukti_transfer')
+            ->latest('id')
+            ->value('bukti_transfer');
+        if (is_string($bukti) && $bukti !== '') {
+            $docs['Bukti Transfer'] = $bukti;
+        }
+
+        if (($kk = data_get($candidate->data_ortu, 'dokumen.kk')) && is_string($kk)) {
+            $docs['Kartu Keluarga'] = $kk;
+        }
+        if (($akta = data_get($candidate->data_ortu, 'dokumen.akta')) && is_string($akta)) {
+            $docs['Akta Kelahiran'] = $akta;
+        }
+
+        return $docs;
     }
 
     /**
