@@ -39,4 +39,14 @@ class TenantModule extends Model
             ->where('is_active', true)
             ->exists();
     }
+
+    /**
+     * Paksa koneksi CENTRAL — tabel tenant_modules hanya ada di DB central.
+     * Tanpa ini, pemanggilan dari konteks tenant (mis. CheckModuleActive)
+     * jatuh ke DB tenant → "relation does not exist". Seragam dgn ModuleRegistry.
+     */
+    public function getConnectionName(): ?string
+    {
+        return config('tenancy.database.central_connection', parent::getConnectionName());
+    }
 }

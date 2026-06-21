@@ -44,4 +44,10 @@ class TenantSubscription extends Model
     {
         return $this->override['modules'] ?? $this->plan->default_modules ?? [];
     }
+
+    /** Paksa koneksi CENTRAL (tabel billing hanya ada di DB central). */
+    public function getConnectionName(): ?string
+    {
+        return config('tenancy.database.central_connection', parent::getConnectionName());
+    }
 }

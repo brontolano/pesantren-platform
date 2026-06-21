@@ -26,4 +26,10 @@ class Plan extends Model
     {
         return $this->hasMany(TenantSubscription::class, 'plan_id');
     }
+
+    /** Paksa koneksi CENTRAL (tabel billing hanya ada di DB central). */
+    public function getConnectionName(): ?string
+    {
+        return config('tenancy.database.central_connection', parent::getConnectionName());
+    }
 }

@@ -65,7 +65,7 @@ class LoketKas extends Page implements HasActions, HasForms
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
-            && static::moduleVisible('keuangan')
+            && static::moduleVisible('koperasi')
             && (Auth::user()?->can('operate_pos') ?? false);
     }
 

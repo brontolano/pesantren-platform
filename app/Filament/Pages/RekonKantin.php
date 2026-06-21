@@ -37,7 +37,7 @@ class RekonKantin extends Page
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
-            && static::moduleVisible('keuangan')
+            && static::moduleVisible('koperasi')
             && ((Auth::user()?->can('manage_keuangan') ?? false)
                 || (Auth::user()?->can('operate_pos') ?? false));
     }

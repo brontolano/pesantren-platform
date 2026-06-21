@@ -201,7 +201,12 @@ class ModuleService
     {
         $mod = $this->registry()->get($moduleKey);
 
-        // Modul tak terdaftar di registry → jangan sembunyikan (mis. core/bawaan)
+        // Modul tak terdaftar di registry → fail-OPEN (jangan sembunyikan). DISENGAJA:
+        // bila registry belum ter-seed (deploy hanya migrate) atau tabel belum siap
+        // (registry() → koleksi kosong), kita TAK ingin seluruh nav hilang / admin blank.
+        // Konsekuensi sadar: key typo/lupa-seed ikut tampil. Mitigasi yang benar =
+        // pastikan registry ter-seed (ModuleRegistrySeeder + backfill PR#224) & key
+        // gating cocok dgn katalog — BUKAN fail-closed di sini (audit #9).
         if (! $mod) {
             return true;
         }

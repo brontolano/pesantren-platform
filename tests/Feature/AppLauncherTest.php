@@ -71,12 +71,15 @@ class AppLauncherTest extends TestCase
         $this->assertStringContainsString('/spmb', $dest['url']);
     }
 
-    public function test_santri_murni_redirect_ke_santri_app(): void
+    public function test_santri_murni_redirect_ke_app_santri_nyata(): void
     {
         $this->boot();
         $dest = AppLauncher::primaryDestination($this->user(['santri']));
         $this->assertSame('redirect', $dest['kind']);
-        $this->assertStringContainsString('/santri-app', $dest['url']);
+        // REGRESI (audit #3): santri murni HARUS ke App Santri nyata (/app,
+        // AppSantriController), BUKAN aplikasi demo /santri-app (SantriDemoController).
+        $this->assertStringContainsString('/app', $dest['url']);
+        $this->assertStringNotContainsString('/santri-app', $dest['url']);
     }
 
     public function test_santri_yang_juga_guru_ke_hub(): void

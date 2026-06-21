@@ -5,38 +5,44 @@ namespace Modules\Keuangan\Services;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Events\PembayaranDiverifikasi;
 use Modules\Keuangan\Models\Pembayaran;
-use Modules\Keuangan\Models\Tabungan;
-use Modules\Keuangan\Models\TabunganTransaksi;
 use Modules\Keuangan\Models\Tagihan;
 use RuntimeException;
 
 /**
- * Bayar tagihan menggunakan saldo tabungan santri (Demo PWA Wali W3).
+ * Bayar tagihan menggunakan saldo tabungan santri (PWA Wali W3).
  *
- * Operasi WAJIB atomik: dibungkus DB::transaction dan baris tabungan
- * dikunci dengan lockForUpdate sebelum saldo dibaca/dimodifikasi.
+ * Operasi WAJIB atomik: dibungkus DB::transaction. Mutasi tabungan dan
+ * pengakuan pendapatan TIDAK ditulis manual di sini — keduanya lewat jalur
+ * kanonik (single business logic → event → Ledger), jadi buku besar SELALU
+ * terbukukan:
+ *   1. TabunganService::tarik()  → TabunganTransaksiDicatat
+ *        → Ledger: D Titipan Tabungan (2-3000) / K Kas.
+ *   2. Pembayaran metode 'saldo_tabungan' AUTO-VERIFIED + PembayaranDiverifikasi
+ *        → Ledger: D Kas / K Pendapatan SPP (4-1000).
+ *   Net dua jurnal: D Titipan Tabungan / K Pendapatan SPP (Kas saling hapus).
+ *   3. Status tagihan via PembayaranService::updateStatusTagihan()
+ *        (single source of truth — TIDAK set status manual).
  *
- * Boleh bayar sebagian sesuai saldo yang tersedia (selama <= sisa tagihan).
- * Membuat:
- *   1. TabunganTransaksi tipe 'tarik' (mutasi keluar) + update saldo tabungan.
- *   2. Pembayaran metode 'saldo_tabungan' yang AUTO-VERIFIED.
- *   3. Update status tagihan via PembayaranService::updateStatusTagihan()
- *      (single source of truth — TIDAK set status secara manual).
+ * Kedua event di-dispatch DI DALAM transaksi → jurnal ikut atomik: bila langkah
+ * mana pun gagal, penarikan saldo + kedua jurnal ikut rollback. Idempoten via
+ * ref (TabunganTransaksi:id, Pembayaran:id) yang tak pernah null.
  */
 class BayarDariSaldoService
 {
     public function __construct(
-        private PembayaranService $pembayaranService = new PembayaranService()
+        private PembayaranService $pembayaranService = new PembayaranService(),
+        private TabunganService $tabunganService = new TabunganService(),
     ) {
     }
 
     /**
-     * Bayar tagihan memakai saldo tabungan. Atomik + lock baris tabungan.
+     * Bayar tagihan memakai saldo tabungan. Atomik + lock baris tagihan/tabungan.
      *
-     * @param  Santri|int  $santri   Santri pemilik tabungan & tagihan.
-     * @param  Tagihan|int $tagihan  Tagihan yang akan dibayar.
-     * @param  float       $nominal  Nominal yang dibayar (> 0, <= sisa tagihan, <= saldo).
+     * @param  Santri|int  $santri    Santri pemilik tabungan & tagihan.
+     * @param  Tagihan|int $tagihan   Tagihan yang akan dibayar.
+     * @param  float       $nominal   Nominal yang dibayar (> 0, <= sisa tagihan, <= saldo).
      * @param  int|null    $createdBy ID user pemicu (wali) untuk audit trail.
      */
     public function bayar(Santri|int $santri, Tagihan|int $tagihan, float $nominal, ?int $createdBy = null): Pembayaran
@@ -65,54 +71,18 @@ class BayarDariSaldoService
                 throw new InvalidArgumentException("Nominal melebihi sisa tagihan ({$sisa}).");
             }
 
-            // 1. LOCK baris tabungan (lockForUpdate) sebelum baca saldo.
-            $tabungan = Tabungan::query()
-                ->where('santri_id', $santriId)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            if ($tabungan->is_frozen) {
-                throw new InvalidArgumentException('Tabungan dibekukan.');
-            }
-
-            // Limit harian (TAB-5) berlaku juga utk pembayaran dari saldo —
-            // konsisten dgn TabunganService (dicek pada baris ter-lock).
-            $limit = (float) ($tabungan->limit_harian ?? 0);
-            if ($limit > 0) {
-                $tarikHariIni = (float) TabunganTransaksi::query()
-                    ->where('tabungan_id', $tabungan->id)
-                    ->where('tipe', 'tarik')
-                    ->whereDate('tanggal', now()->toDateString())
-                    ->sum('nominal');
-                if ($tarikHariIni + $nominal > $limit + 0.001) {
-                    throw new InvalidArgumentException(
-                        "Melebihi limit penarikan harian ({$limit})."
-                    );
-                }
-            }
-
-            $saldoSebelum = (float) $tabungan->saldo;
-            if ($saldoSebelum < $nominal) {
-                throw new InvalidArgumentException('Saldo tidak cukup.');
-            }
-
-            $saldoSesudah = $saldoSebelum - $nominal;
-
-            // 2. Catat mutasi keluar (tipe 'tarik') + update saldo.
-            TabunganTransaksi::create([
-                'tabungan_id' => $tabungan->id,
-                'tipe' => 'tarik',
-                'nominal' => $nominal,
-                'saldo_sebelum' => $saldoSebelum,
-                'saldo_sesudah' => $saldoSesudah,
+            // 1. Tarik saldo lewat TabunganService (single source of truth).
+            //    Service mengunci baris tabungan + memvalidasi saldo/beku/limit,
+            //    mencatat TabunganTransaksi, lalu memancarkan TabunganTransaksiDicatat
+            //    → modul Ledger membukukan D Titipan Tabungan (2-3000) / K Kas.
+            //    Lock tabungan terjadi SETELAH lock tagihan → urutan konsisten
+            //    (Tagihan → tabungan/pembayaran), sama dgn PembayaranService.
+            $this->tabunganService->tarik($santriId, $nominal, [
                 'keterangan' => "Bayar tagihan #{$tagihan->id} ({$tagihan->jenis_tagihan})",
-                'tanggal' => now()->toDateString(),
                 'created_by' => $createdBy,
             ]);
 
-            $tabungan->update(['saldo' => $saldoSesudah]);
-
-            // 3. Buat Pembayaran metode 'saldo_tabungan' AUTO-VERIFIED.
+            // 2. Buat Pembayaran metode 'saldo_tabungan' AUTO-VERIFIED.
             $pembayaran = new Pembayaran([
                 'tagihan_id' => $tagihan->id,
                 'santri_id' => $santriId,
@@ -126,11 +96,15 @@ class BayarDariSaldoService
                 'created_by' => $createdBy,
             ]);
 
-            // G1-01: pagar persetujuan konsisten lintas-metode. NO-OP tanpa ApprovalRule
-            // 'Pembayaran' → tak mengubah alur saldo-tabungan; throw (membatalkan seluruh
-            // transaksi termasuk penarikan saldo) bila tenant mengaktifkan rule nominal.
+            // Pagar persetujuan (F1). NO-OP tanpa ApprovalRule wajib 'Pembayaran';
+            // throw membatalkan SELURUH transaksi (termasuk penarikan saldo di atas).
             $pembayaran->pastikanBolehLanjut();
             $pembayaran->save();
+
+            // 3. Pancarkan event verifikasi → modul Ledger membukukan
+            //    D Kas / K Pendapatan SPP (4-1000). Idempoten via ref Pembayaran:id.
+            //    Dispatch DI DALAM transaksi agar jurnal atomik dengan penarikan.
+            PembayaranDiverifikasi::dispatch($pembayaran, $createdBy);
 
             // 4. Recalculate status tagihan (single source of truth).
             $this->pembayaranService->updateStatusTagihan($tagihan->fresh());

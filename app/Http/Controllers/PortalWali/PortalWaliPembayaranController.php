@@ -8,7 +8,6 @@ use App\Http\Requests\PortalWali\StorePortalWaliPembayaranRequest;
 use App\Services\PortalWali\PortalWaliService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Keuangan\Models\MetodePembayaran;
@@ -67,10 +66,27 @@ class PortalWaliPembayaranController extends Controller
                     'nomor' => $m->nomor,
                     'atasNama' => $m->atas_nama,
                     'instruksi' => $m->instruksi,
-                    'gambarUrl' => $m->gambar ? Storage::url($m->gambar) : null,
+                    'gambarUrl' => self::tenantAssetUrl($m->gambar),
                 ])
                 ->values(),
         ]);
+    }
+
+    /**
+     * URL gambar metode pembayaran (file tenant disk 'public') via route
+     * /_tenant-storage. Storage::url() menghasilkan /storage/... yang 404 di
+     * Docker + stancl/tenancy (audit #7). Pola sama dgn TenantBranding::logoUrl.
+     */
+    private static function tenantAssetUrl(?string $path): ?string
+    {
+        if ($path === null || trim($path) === '') {
+            return null;
+        }
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return url('/_tenant-storage/' . ltrim($path, '/'));
     }
 
     /**

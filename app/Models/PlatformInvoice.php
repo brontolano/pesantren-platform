@@ -36,4 +36,10 @@ class PlatformInvoice extends Model
 
         return $this->fresh();
     }
+
+    /** Paksa koneksi CENTRAL (tabel billing hanya ada di DB central). */
+    public function getConnectionName(): ?string
+    {
+        return config('tenancy.database.central_connection', parent::getConnectionName());
+    }
 }
