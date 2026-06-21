@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\UserOtp;
+use Modules\PPDB\Services\AlbaKidsRegistrationNotificationService;
 use Modules\PPDB\Services\PesertaAccountService;
 use Modules\PPDB\Services\PpdbAdmissionDecisionService;
 use Modules\PPDB\Services\PpdbWhatsappNotifier;
@@ -302,11 +303,13 @@ class CalonSantriResource extends Resource
                 // F1.1.7 — re-issue OTP & koreksi nomor WA (mitigasi R-1, R-2).
                 // Menggantikan aksi legacy "Kirim Kredensial": password TIDAK
                 // pernah dikirim — peserta membuat password sendiri via OTP.
+                // Disembunyikan untuk Alba Kids (hanya website + PPDB, tanpa portal
+                // login peserta) — diganti tombol "Kirim Notifikasi" di bawah.
                 Action::make('kirimUlangOtp')
                     ->label('Kirim Ulang OTP / Koreksi No. WA')
                     ->icon('heroicon-o-key')
                     ->color('warning')
-                    ->visible(fn (): bool => Auth::user()?->can('manage_santri') ?? false)
+                    ->visible(fn (): bool => ! AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_santri') ?? false))
                     ->modalHeading('Kirim Ulang Kode OTP Portal SPMB')
                     ->modalDescription('Untuk peserta yang tidak menerima kode atau salah menulis nomor WA. Perbaiki nomor bila perlu — kode OTP baru dikirim ke nomor di bawah dan blokir percobaan sebelumnya dibuka. Password TIDAK ikut terkirim; peserta membuat password sendiri saat memakai kode.')
                     ->modalSubmitActionLabel('Simpan Nomor & Kirim OTP')
@@ -331,6 +334,46 @@ class CalonSantriResource extends Resource
                             ->body("Kode {$tujuan} dikirim via WhatsApp ke {$result['phone']}. Berlaku ".UserOtp::TTL_MINUTES.' menit.')
                             ->success()
                             ->send();
+                    }),
+                // Khusus Alba Kids: kirim ulang notifikasi WA (pengganti tombol
+                // OTP/kredensial yang tak relevan — Alba Kids hanya website + PPDB).
+                Action::make('kirimNotifOrtu')
+                    ->label('Kirim Notifikasi ke Orang Tua')
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalDescription('Kirim ulang ucapan terima kasih ke nomor Ayah & Ibu (nomor sama/satu dikirim sekali).')
+                    ->visible(fn (): bool => AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->action(function (CalonSantri $record): void {
+                        try {
+                            $sent = app(AlbaKidsRegistrationNotificationService::class)->notifyGuardians($record);
+                            Notification::make()
+                                ->title('Notifikasi terkirim ke '.count($sent).' nomor orang tua')
+                                ->success()
+                                ->send();
+                        } catch (Throwable $e) {
+                            Notification::make()->title('Gagal mengirim notifikasi')->body($e->getMessage())->danger()->send();
+                        }
+                    }),
+                Action::make('kirimNotifAdmin')
+                    ->label('Kirim Notifikasi ke Admin')
+                    ->icon('heroicon-o-inbox-arrow-down')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->modalDescription('Kirim ulang ringkasan pendaftar + lampiran dokumen (Bukti/KK/Akta) ke WhatsApp admin panitia.')
+                    ->visible(fn (): bool => AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->action(function (CalonSantri $record): void {
+                        try {
+                            $broadcast = app(AlbaKidsRegistrationNotificationService::class)->notifyAdmin($record);
+                            if ($broadcast === null) {
+                                Notification::make()->title('Nomor admin belum diatur')->warning()->send();
+
+                                return;
+                            }
+                            Notification::make()->title('Notifikasi + dokumen terkirim ke admin')->success()->send();
+                        } catch (Throwable $e) {
+                            Notification::make()->title('Gagal mengirim notifikasi admin')->body($e->getMessage())->danger()->send();
+                        }
                     }),
                 Action::make('ingatkanDaftarUlang')
                     ->label('Ingatkan Daftar Ulang')
