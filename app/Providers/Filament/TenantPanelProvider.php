@@ -2,9 +2,9 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\GenerateThr;
+use Modules\Payroll\Filament\Pages\GenerateThr;
 use Modules\Akademik\Filament\Pages\GridNilai;
-use App\Filament\Pages\KasirKantin;
+use Modules\Keuangan\Filament\Pages\KasirKantin;
 use App\Filament\Pages\KebijakanPesantren;
 use App\Filament\Pages\KesiapanEmis;
 use Modules\Kegiatan\Filament\Pages\LogGerbangPanel;
@@ -13,10 +13,10 @@ use Modules\Mutu\Filament\Pages\MutuKelas;
 use Modules\Mutu\Filament\Pages\MutuLembaga;
 use Modules\Kegiatan\Filament\Pages\PengajuanJengukPanel;
 use App\Filament\Pages\PiketHariIni;
-use App\Filament\Pages\PratinjauKhidmah;
+use Modules\Payroll\Filament\Pages\PratinjauKhidmah;
 use Modules\Mutu\Filament\Pages\ProfilMutuSantri;
 use Modules\Akademik\Filament\Pages\RekapJurnalKbm;
-use App\Filament\Pages\RekonKantin;
+use Modules\Keuangan\Filament\Pages\RekonKantin;
 use Modules\Akademik\Filament\Pages\SidangKenaikan;
 use App\Filament\Pages\TenantDashboard;
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
