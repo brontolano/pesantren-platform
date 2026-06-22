@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Kegiatan\Filament\Pages;
 
 use Filament\Pages\Page;
 use Modules\Kegiatan\Models\LogGerbang;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\PPDB\Filament\Pages;
 
 use Filament\Pages\Page;
 use Modules\PPDB\Models\CalonSantri;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Kegiatan\Filament\Pages;
 
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;

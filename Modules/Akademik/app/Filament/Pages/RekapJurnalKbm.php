@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Akademik\Filament\Pages;
 
 use Filament\Pages\Page;
 use Modules\Akademik\Services\JurnalKbmService;

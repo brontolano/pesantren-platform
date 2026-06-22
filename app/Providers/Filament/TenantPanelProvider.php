@@ -3,21 +3,21 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\GenerateThr;
-use App\Filament\Pages\GridNilai;
+use Modules\Akademik\Filament\Pages\GridNilai;
 use App\Filament\Pages\KasirKantin;
 use App\Filament\Pages\KebijakanPesantren;
 use App\Filament\Pages\KesiapanEmis;
-use App\Filament\Pages\LogGerbangPanel;
-use App\Filament\Pages\ModerasiPesanWali;
+use Modules\Kegiatan\Filament\Pages\LogGerbangPanel;
+use Modules\Kesantrian\Filament\Pages\ModerasiPesanWali;
 use Modules\Mutu\Filament\Pages\MutuKelas;
 use Modules\Mutu\Filament\Pages\MutuLembaga;
-use App\Filament\Pages\PengajuanJengukPanel;
+use Modules\Kegiatan\Filament\Pages\PengajuanJengukPanel;
 use App\Filament\Pages\PiketHariIni;
 use App\Filament\Pages\PratinjauKhidmah;
 use Modules\Mutu\Filament\Pages\ProfilMutuSantri;
-use App\Filament\Pages\RekapJurnalKbm;
+use Modules\Akademik\Filament\Pages\RekapJurnalKbm;
 use App\Filament\Pages\RekonKantin;
-use App\Filament\Pages\SidangKenaikan;
+use Modules\Akademik\Filament\Pages\SidangKenaikan;
 use App\Filament\Pages\TenantDashboard;
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
