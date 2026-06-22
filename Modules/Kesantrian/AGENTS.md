@@ -7,9 +7,9 @@
 
 **Service/Event inti:** (app/Services/) SantriService, SantriImportService, SantriAccountService, NisGeneratorService, IdCardService, PenempatanKelasService, EnrollmentService, AlumniService, DisiplinService, DisiplinNotifikasiService (lewat Notifikasi\NotifDispatcher), PresensiAsramaService, PesanWaliService (idempoten client_ref). EventServiceProvider $listen kosong. Console: ProvisionAkunSantriCommand, AuditPenempatanCommand.
 
-**UI Filament:** lokasi SEKARANG di app/Filament/ (target Modules/Kesantrian/app/Filament/), semua navigationGroup 'Kesantrian':
-- Resources: Santri/SantriResource.php (TETAP Core/terpusat), Kelas/KelasResource.php, Alumni/AlumniResource.php, PenempatanKelas/PenempatanKelasResource.php, Kesantrian/PelanggaranSantri/PelanggaranSantriResource.php, Kesantrian/JenisPelanggaran/JenisPelanggaranResource.php, Kepengasuhan/PresensiAsrama/PresensiAsramaResource.php.
-- Pages: app/Filament/Pages/ RekapDisiplin.php, TunggakanAlumni.php, PengaturanAppSantri.php.
+**UI Filament:** Resource & Page domain sudah pindah ke Modules/Kesantrian/app/Filament/ (vertical slice), semua navigationGroup 'Kesantrian'. Pengecualian app-level disebut tegas di bawah:
+- Resources (di Modules/Kesantrian/app/Filament/Resources/): Kelas/KelasResource.php, Alumni/AlumniResource.php, PenempatanKelas/PenempatanKelasResource.php, PelanggaranSantri/PelanggaranSantriResource.php, JenisPelanggaran/JenisPelanggaranResource.php, PresensiAsrama/PresensiAsramaResource.php (masing-masing dengan subfolder Pages/). SantriResource.php TETAP app-level (by design): app/Filament/Resources/Santri/SantriResource.php — resource Core/host terpusat, tidak digerbang per-tenant.
+- Pages (di Modules/Kesantrian/app/Filament/Pages/): RekapDisiplin.php, ModerasiPesanWali.php, StasiunPendaftaran.php. PengaturanAppSantri.php TETAP app-level (by design): app/Filament/Pages/PengaturanAppSantri.php — halaman SETELAN. (TunggakanAlumni.php bukan milik modul ini; berada di Modules/Keuangan/app/Filament/Pages/.)
 
 **Endpoint/portal terkait:** API (Modules/Kesantrian/routes/api.php) prefix `pwa/guru/disiplin` name `pwa.guru.disiplin.*` (daftar/catat/{id}/verifikasi/poin), gate `can:akses_pwa_guru`. Portal di routes/tenant.php: PWA Guru `tenant...disiplin.{daftar,catat,poin}` + wali-kelas + pesan wali; App Santri pengurus `tenant.app-santri...pengurus.pelanggaran.*` & presensi; Portal Wali `...santri/{santri}/*`. web.php kosong (Filament).
 

@@ -7,7 +7,7 @@
 
 **Service/Event inti:** (app/Services/) `MesinPajakService` (PPN/PPh22/23/sewa, gate kehalalan), `PajakPenghasilanService` (PPh21 TER+progresif), `SisaLebihService`, `SptMasaService`, `SptBadanService`, `EBupotService` (CSV Coretax), `LaporanIsak35Service`, `LaporanPsak109Service`; Support `KebijakanPajakKehalalan` (titik keputusan tunggal: syubhat/non_halal → pajak negara = 0). Tak ada Event.
 
-**UI Filament:** (lokasi SEKARANG di app/Filament/ root, BELUM dipindah ke Modules/Pajak/app/Filament/) Resource `App\Filament\Resources\Pajak\TarifPajakResource` (+Pages\ListTarifPajak); Page `App\Filament\Pages\KalkulatorPajak`, `KalkulatorPph21`, `BukuPembantuPajak`. Grup nav: "Akuntansi & Pajak" (PPh21 di "Kepegawaian").
+**UI Filament:** (sudah pindah ke modul) Resource `Modules\Pajak\Filament\Resources\TarifPajakResource` (+`Resources\Pages\ListTarifPajak`) di Modules/Pajak/app/Filament/Resources/; Page `Modules\Pajak\Filament\Pages\KalkulatorPajak`, `KalkulatorPph21` di Modules/Pajak/app/Filament/Pages/. Page `BukuPembantuPajak` ada di modul Ledger (`Modules\Ledger\Filament\Pages\BukuPembantuPajak`), bukan Pajak. Grup nav: "Akuntansi & Pajak" (PPh21 di "Kepegawaian").
 
 **Endpoint/portal terkait:** routes/tenant.php (BUKAN Modules/Pajak/routes/* yang masih kosong/reserved) → `tenant.kepala-keuangan.pajak.index`; API `tenant.kepala-keuangan.api.pajak.{spt-masa, spt-masa-tahunan, ebupot, ebupot.csv, ebupot-tahunan, spt-badan, sisa-lebih}` via KepalaKeuanganController/ApiController.
 

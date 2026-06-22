@@ -11,7 +11,7 @@
 
 **Service/Event inti:** `BelanjaService` (buat → hitung pajak via `MesinPajakService` → posting auto-jurnal idempoten via `JurnalService`, guard `AnggaranGuardService`, F1 `pastikanBolehLanjut`), `PurchaseOrderService` (buat/ajukan/setujui/terima→buat Belanja, client_ref `PO:{id}`). Event: `BelanjaDisetujui`.
 
-**UI Filament:** SEKARANG di `app/Filament/Resources/Pengadaan/` → target `Modules/Pengadaan/app/Filament/`:
+**UI Filament:** sudah di `Modules/Pengadaan/app/Filament/Resources/` (vertical slice):
 - `BelanjaResource.php` (grup nav "Akuntansi & Pajak"; create/edit dilarang—immutable, koreksi via jurnal pembalik; aksi Setujui/Tolak/Cetak BKK) + Pages/{List,Create}Belanja
 - `PurchaseOrder/PurchaseOrderResource.php` (grup "Kelembagaan & Komunikasi") + Pages/{List,Create,Edit}
 - `Supplier/SupplierResource.php` (grup "Kelembagaan & Komunikasi") + Pages/{List,Create,Edit}

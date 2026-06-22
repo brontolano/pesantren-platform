@@ -7,7 +7,7 @@
 
 **Service/Event inti:** (app/Services/) `AsramaService` = gerbang tulis tunggal (`assignSantriToKamar`, `createBiayaForSantri`, `getOccupancySummary`); `PenempatanAsramaService::tempatkan` (guard kapasitas + tutup penempatan lama dalam transaksi); `PenempatanOtomatisService::tempatkanOtomatis` (G3-22: gender-match, anti-overflow, idempoten, grouping seangkatan); `BiayaAsramaService::sinkronkan` → `Keuangan\TagihanService`; `AsramaImportService` (impor xlsx/csv). EventServiceProvider kosong (auto-discover; tak ada listener).
 
-**UI Filament:** 4 resource di app/Filament/Resources/Asrama/{BlokAsrama,KamarAsrama,PenempatanAsrama,BiayaAsrama}/{*Resource.php + Pages/} → target Modules/Asrama/app/Filament/. (PresensiAsrama ada di Kepengasuhan, BUKAN modul ini.)
+**UI Filament:** 4 resource di Modules/Asrama/app/Filament/Resources/{BlokAsrama,KamarAsrama,PenempatanAsrama,BiayaAsrama}/{*Resource.php + Pages/} (sudah pindah ke modul, vertical slice). (PresensiAsrama ada di Kepengasuhan, BUKAN modul ini.)
 
 **Endpoint/portal terkait:** routes/web.php + api.php modul = `Route::resource('asramas', AsramaController)` placeholder (nama `asrama.*`, controller scaffold). Tak ada route Asrama khusus di routes/tenant.php. CLI: `app/Console/Commands/AsramaImportCommand.php`.
 

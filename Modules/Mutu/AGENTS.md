@@ -7,7 +7,7 @@
 
 **Service/Event inti:** `MutuService` (approval dokumen draft→diajukan→disetujui|ditolak + revisi/versi), `MutuKpiService` (realisasi, temuan terbuka→tindakan→verifikasi→tutup, SKM, ringkasan). Command `mutu:hitung-lampu` (HitungLampuMutuCommand) hitung lampu harian + notif. Tak ada Event. CATATAN: Dasbor Mutu 2a pakai `App\Services\Mutu\MutuService` (BERBEDA, di app/, bukan modul ini).
 
-**UI Filament:** SEKARANG di `app/Filament/Resources/Mutu/` (DokumenMutuResource, MutuInspeksiResource, MutuSasaranResource, MutuSkmResource, MutuTemuanResource + Pages) & `app/Filament/Pages/` (DashboardMutu, MutuKelas, MutuLembaga, ProfilMutuSantri) → target `Modules/Mutu/app/Filament/`.
+**UI Filament:** di `Modules/Mutu/app/Filament/Resources/` (DokumenMutuResource, MutuInspeksiResource, MutuSasaranResource, MutuSkmResource, MutuTemuanResource + Pages masing-masing) & `Modules/Mutu/app/Filament/Pages/` (DashboardMutu, DosirAsesmen, MutuKelas, MutuLembaga, ProfilMutuSantri). Sudah pindah penuh ke modul (vertical slice); tak ada sisa di `app/Filament/` untuk domain ini.
 
 **Endpoint/portal terkait:** routes/web.php & routes/api.php KOSONG (admin via Filament). Tak ada route di routes/tenant.php.
 

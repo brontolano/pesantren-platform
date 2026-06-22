@@ -7,7 +7,7 @@
 
 **Service/Event inti:** PpdbBillingService (delegasi ke Keuangan\TagihanService), PpdbReregistrationService→Kesantrian\SantriService + Asrama, PpdbAdmissionDecisionService, UjianOnlineService + UjianScoringService/PpdbExamResultService, PpdbWhatsappNotifier, Peserta(Otp|Account|Branding)Service, CrmService. EventServiceProvider kosong (auto-discover); tak ada folder Events.
 
-**UI Filament:** (lokasi SEKARANG app/Filament/… → target Modules/PPDB/app/Filament/) Resources/PPDB/: CalonSantriResource, CalonSantriDokumenResource, TagihanPpdbResource, HasilUjianResource, JadwalUjianResource, SoalUjianResource, PaketSoal/PaketSoalResource, UjianAttempt/UjianAttemptResource; Resources/Crm/CrmPenawaranResource; Pages/CrmDashboard.php + Pages/PpdbReport.php.
+**UI Filament:** (sudah pindah ke Modules/PPDB/app/Filament/) Resources/: CalonSantriResource, CalonSantriDokumenResource, TagihanPpdbResource, HasilUjianResource, JadwalUjianResource, SoalUjianResource, PaketSoal/PaketSoalResource, UjianAttempt/UjianAttemptResource, CrmPenawaranResource (List page di Resources/Pages/ListCrmPenawaran.php); Pages/CrmDashboard.php + Pages/PpdbReport.php.
 
 **Endpoint/portal terkait:** Modules/PPDB/routes/web.php — publik `tenant.ppdb.public.create|store|tracking`; portal peserta PWA prefix `spmb.*` (login/aktivasi/dashboard/ujian/daftar-ulang/tagihan/biodata, guard `web` + alias `peserta`); file privat `ppdb.file.dokumen|bukti`; resource `ppdb.*`. routes/tenant.php hanya showcase demo `tenant.ppdb-panitia.*` (PpdbPanitiaDemoController).
 

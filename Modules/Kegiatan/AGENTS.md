@@ -7,7 +7,7 @@
 
 **Service/Event inti:** (app/Services/) KegiatanService, KegiatanLanjutService (template/clone/recurring/gantt), IzinSantriService (ajukan/setujui/tolak/tandaiKembali), GerbangService (statusSantri/catat), PenjengukanService (jadwal/ajukan/tandaiHadir/walkIn/putuskan/batal), SuratIzinSantriService (suratPdf). Event: tidak ada listener terdaftar (EventServiceProvider->$listen kosong, auto-discover).
 
-**UI Filament:** SEKARANG di app/Filament/ (BUKAN di modul) → target Modules/Kegiatan/app/Filament/. Resource: KegiatanResource, IzinSantriResource, KunjunganWaliResource, Recurring/KegiatanRecurringResource, Template/KegiatanTemplateResource (app/Filament/Resources/Kegiatan/**). Page: LogGerbangPanel, PengajuanJengukPanel (app/Filament/Pages/). Semua grup nav `Kesantrian`, gate `moduleVisible('kegiatan')`.
+**UI Filament:** sudah pindah ke modul (vertical slice) di Modules/Kegiatan/app/Filament/. Resource: KegiatanResource, IzinSantriResource, KunjunganWaliResource, Recurring/KegiatanRecurringResource, Template/KegiatanTemplateResource (Modules/Kegiatan/app/Filament/Resources/**, masing-masing dengan subfolder Pages/ List·Create·Edit). Page: LogGerbangPanel, PengajuanJengukPanel (Modules/Kegiatan/app/Filament/Pages/). Semua grup nav `Kesantrian`, gate `moduleVisible('kegiatan')`.
 
 **Endpoint/portal terkait:** routes/tenant.php — PortalGuru: `tenant.portal-guru.izin.*`, `gerbang.index/catat/izin-aktif`, `gerbang.jenguk.hadir/walk-in`, `presensi.show/store`; PortalWali: `izin`/`izin.store`, `jenguk`/`jenguk.store`/`jenguk.batal`, santri `kegiatan`; AppSantri pengurus `pengurus.kegiatan`+`pengurus.presensi.simpan`. Modul routes/api.php: `pwa.wali.izin.*`, `pwa.guru.izin.*` (auth:sanctum) + apiResource kegiatans.
 

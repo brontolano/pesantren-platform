@@ -7,7 +7,7 @@
 
 **Service/Event inti:** (app/Services/) `DepresiasiService` (garis lurus/saldo menurun, posting D 5-7000 / K 1-2900), `AsetMovementService` (mutasi lokasi + disposal P/L), `PembiayaanService` + `DscrService` (ambang 1,25 via FiturKeuangan), `SarprasService` (kerusakan/piket). Tidak ada folder Events.
 
-**UI Filament:** (lokasi SEKARANG → target Modules/Pembiayaan/app/Filament/) `app/Filament/Resources/Pembiayaan/`: AsetResource, MutasiAsetResource, PembiayaanResource (+Pages). `app/Filament/Resources/Sarpras/`: AreaPiketResource, LaporanKerusakanResource. `app/Filament/Pages/PiketHariIni.php`. Grup nav: "Kelembagaan & Komunikasi".
+**UI Filament:** (sudah di modul, Modules/Pembiayaan/app/Filament/) `Resources/`: AsetResource, MutasiAsetResource, PembiayaanResource (+`Resources/Pages/`). `Resources/Sarpras/`: AreaPiketResource, LaporanKerusakanResource (+`Resources/Sarpras/*/Pages/`). `Pages/PiketHariIni.php`. Grup nav: "Kelembagaan & Komunikasi".
 
 **Endpoint/portal terkait:** PWA Guru Sarpras (Modules/Pembiayaan/routes/api.php): `pwa.guru.sarpras.lapor-kerusakan|laporan-saya|piket.scan` (auth:sanctum, controller PwaGuruSarprasController). Cetak paket kredit: `tenant.pembiayaan.paket.print` (routes/tenant.php:609, PembiayaanExportController). web.php kosong (admin via Filament).
 

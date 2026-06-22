@@ -7,7 +7,7 @@
 
 **Service/Event inti:** (app/Services/) ApprovalService (ajukan idempoten, setujui/tolak, pastikanBolehLanjut), SuratService (penomoran race-safe, retry 23505/23000), DocumentService (versioning per documentable+kategori), ReportExportService. Event: ApprovalDiputuskan(request, disetujui). Exception: PersetujuanBelumLengkapException, ReportPdfUnavailableException.
 
-**UI Filament:** SEKARANG di app/host (bukan modul) → target Modules/Core/app/Filament/. Resource: Approval/ApprovalRequestResource ("Persetujuan Saya"), Approval/ApprovalRuleResource ("Aturan Persetujuan"), Audit/AuditLogResource ("Jejak Audit"), Document/DocumentResource ("Repositori Dokumen") — grup "Pengaturan & Mutu"; Surat/SuratResource ("Surat & Administrasi") — grup "Kelembagaan & Komunikasi" (canCreate=false, lewat aksi "Catat Surat").
+**UI Filament:** TETAP app-level (by design) di app/Filament/Resources/ — Core/host TIDAK direlokasi ke modul (vertical-slice tak berlaku untuk fondasi; lihat "Status rollout"). Resource: Approval/ApprovalRequestResource ("Persetujuan Saya"), Approval/ApprovalRuleResource ("Aturan Persetujuan"), Audit/AuditLogResource ("Jejak Audit"), Document/DocumentResource ("Repositori Dokumen") — grup "Pengaturan & Mutu"; Surat/SuratResource ("Surat & Administrasi") — grup "Kelembagaan & Komunikasi" (canCreate=false, lewat aksi "Catat Surat").
 
 **Endpoint/portal terkait:** routes/tenant.php — `/_tenant-storage/{path}` (serve file Document); approval pimpinan PWA `tenant.pimpinan.approval.setujui|tolak`; approval kepala-keuangan `...approval.setujui|tolak` (semua HANYA via ApprovalService).
 

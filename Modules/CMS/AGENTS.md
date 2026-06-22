@@ -12,9 +12,9 @@
 
 **Service/Event inti:** `Services/TenantWebsiteService` (buildLandingPagePayload + buildArticleSeoPayload, normalisasi tiap section, deteksi tenant albakids). `MediaRegistrar` (App\Services) auto-index cover/foto via hook `booted()` di Gallery/GalleryImage. EventServiceProvider kosong (`$listen=[]`).
 
-**UI Filament:** (SEKARANG di `app/Filament/…`, target pindah `Modules/CMS/app/Filament/`) — grup nav "Kelembagaan & Komunikasi", gate `moduleVisible('cms')`:
-- Resource: `Resources/CMS/Article/ArticleResource`, `Resources/CMS/Gallery/GalleryResource` (+Concerns/SyncsGalleryPhotos), `Resources/CMS/WebsiteSetting/WebsiteSettingResource`, `Resources/CMS/Profile/ProfileResource` (model=WebsiteSection, mode lanjutan)
-- Page: `Pages/CMS/WebsiteBuilder`, `Pages/CMS/WebsiteIdentity`
+**UI Filament:** (di `Modules/CMS/app/Filament/`) — grup nav "Kelembagaan & Komunikasi", gate `moduleVisible('cms')`:
+- Resource: `Resources/Article/ArticleResource`, `Resources/Gallery/GalleryResource` (+Concerns/SyncsGalleryPhotos), `Resources/WebsiteSetting/WebsiteSettingResource`, `Resources/Profile/ProfileResource` (model=WebsiteSection, mode lanjutan)
+- Page: `Pages/WebsiteBuilder`, `Pages/WebsiteIdentity`
 
 **Endpoint/portal terkait:** landing+embed di `routes/web.php` (tenant) — `TenantLandingPageController` (`/`), `EmbedWidgetController` (`tenant.embed.script` `/embed/widget.js`, `tenant.embed.data`). Di `routes/tenant.php`: `tenant.cms.articles.show` (`/artikel/{slug}` → ArticleDetailController), `tenant.cms.sitemap` (`/sitemap.xml`). Route `cms` resource modul (`Modules/CMS/routes/web.php`+`api.php`) belum dipakai UI.
 
