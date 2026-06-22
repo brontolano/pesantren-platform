@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Ledger\AkunResource;
-use App\Filament\Resources\Ledger\JurnalResource;
-use App\Filament\Resources\Ledger\SumberDanaResource;
+use Modules\Ledger\Filament\Resources\AkunResource;
+use Modules\Ledger\Filament\Resources\JurnalResource;
+use Modules\Ledger\Filament\Resources\SumberDanaResource;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;

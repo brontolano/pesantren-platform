@@ -29,7 +29,7 @@ class QuickAccessWidget extends Widget
                     $this->link('Pembayaran', 'heroicon-o-banknotes', 'warning', \Modules\Keuangan\Filament\Resources\Pembayaran\PembayaranResource::class),
                     $this->link('Tabungan', 'heroicon-o-wallet', 'warning', \Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource::class),
                     $this->link('Laporan', 'heroicon-o-chart-bar', 'warning', \Modules\Keuangan\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource::class),
-                    $this->link('Jurnal', 'heroicon-o-book-open', 'warning', \App\Filament\Resources\Ledger\JurnalResource::class),
+                    $this->link('Jurnal', 'heroicon-o-book-open', 'warning', \Modules\Ledger\Filament\Resources\JurnalResource::class),
                     $this->link('Slip Gaji', 'heroicon-o-currency-dollar', 'warning', \App\Filament\Resources\Payroll\SlipGajiResource::class),
                     $this->link('Belanja', 'heroicon-o-shopping-cart', 'warning', \App\Filament\Resources\Pengadaan\BelanjaResource::class),
                 ])),
