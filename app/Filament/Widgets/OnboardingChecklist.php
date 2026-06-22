@@ -70,7 +70,7 @@ class OnboardingChecklist extends Widget
                 'desc' => 'Isi nama, logo, dan kontak pesantren.',
                 'icon' => 'heroicon-o-building-library',
                 'done' => self::profilTerisi(),
-                'url' => self::urlOf(\App\Filament\Resources\CMS\Profile\ProfileResource::class),
+                'url' => self::urlOf(\Modules\CMS\Filament\Resources\Profile\ProfileResource::class),
             ],
             [
                 'label' => 'Masukkan data santri',
@@ -91,7 +91,7 @@ class OnboardingChecklist extends Widget
                 'desc' => 'Tulis artikel atau unggah foto galeri.',
                 'icon' => 'heroicon-o-globe-alt',
                 'done' => self::adaKontenWebsite(),
-                'url' => self::urlOf(\App\Filament\Resources\CMS\Article\ArticleResource::class, 'create'),
+                'url' => self::urlOf(\Modules\CMS\Filament\Resources\Article\ArticleResource::class, 'create'),
             ],
         ];
     }

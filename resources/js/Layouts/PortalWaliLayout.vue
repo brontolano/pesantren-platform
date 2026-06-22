@@ -46,8 +46,7 @@ const isOffline = ref(false)
 const isHomePage = computed(() => page.component === 'PortalWali/Dashboard')
 const homeSummary = computed(() => page.props.summary ?? null)
 
-const _currFmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 })
-function fmtCurrency(v) { return _currFmt.format(v || 0) }
+import { formatRupiah as fmtCurrency } from '@/Shared/format'
 
 
 

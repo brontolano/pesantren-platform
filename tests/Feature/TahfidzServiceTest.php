@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Tahfidz\HafalanTahfidzResource;
-use App\Filament\Resources\Tahfidz\PenilaianTahfidzResource;
+use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
+use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;

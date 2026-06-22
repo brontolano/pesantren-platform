@@ -35,13 +35,7 @@ const props = defineProps({
     },
 })
 
-const rupiah = (value) =>
-    new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(Number(value || 0))
+import { formatRupiah as rupiah } from '@/Shared/format'
 
 const saldo = computed(() => Number(props.savings?.saldo || 0))
 const sisaTagihan = computed(() => Number(props.bill?.sisaTagihan || 0))

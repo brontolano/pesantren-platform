@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Resources\Akademik\Lembaga\LembagaResource;
+use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
 use App\Filament\Resources\Payroll\Employee\EmployeeResource;
 use App\Filament\Resources\Santri\SantriResource;
 use Filament\Pages\Page;

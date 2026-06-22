@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\PortalGuru;
 
+use App\Data\PortalGuru\PresensiJurnalData;
+use App\Data\PortalGuru\PresensiPageData;
+use App\Data\PortalGuru\PresensiSantriItemData;
+use App\Data\PortalGuru\PresensiSesiData;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\PortalGuru\Concerns\ResolvesPortalGuruContext;
 use Illuminate\Http\RedirectResponse;
@@ -37,36 +41,44 @@ class PortalGuruPresensiController extends Controller
 
         $tersimpan = $this->presensiService->statusKelas($sesi, $tanggal);
 
+        // KONTRAK lapisan-2: payload dibungkus DTO App\Data\PortalGuru\* (cermin
+        // resources/js/types/guru.d.ts). Output JSON IDENTIK dgn versi inline.
         $santri = Santri::query()
             ->where('kelas_id', $sesi->kelas_id)
             ->where('status', 'aktif')
             ->orderBy('nama')
             ->get()
-            ->map(fn (Santri $s): array => [
-                'id' => $s->id,
-                'nis' => $s->nis,
-                'nama' => $s->nama,
-                // Default HADIR — guru hanya menandai pengecualian.
-                'status' => $tersimpan[$s->id] ?? 'hadir',
-            ])
+            // Default HADIR — guru hanya menandai pengecualian.
+            ->map(fn (Santri $s): PresensiSantriItemData => PresensiSantriItemData::fromModel($s, $tersimpan[$s->id] ?? 'hadir'))
             ->values();
+
+        // F2-PWA — Jurnal KBM 30-detik: muat jurnal hari ini bila sudah ada.
+        $jurnal = $this->jurnalHariIni($sesi->id, $guru->id, $tanggal);
+
+        $payload = new PresensiPageData(
+            sesi: new PresensiSesiData(
+                id: (int) $sesi->id,
+                pelajaran: $sesi->pelajaran?->nama,
+                kelas: $sesi->kelas?->nama_kelas,
+                jamMulai: $sesi->jam_mulai,
+                jamSelesai: $sesi->jam_selesai,
+            ),
+            tanggal: $tanggal,
+            santri: $santri,
+            statusOptions: PresensiSantri::STATUS,
+            jurnal: $jurnal === null ? null : new PresensiJurnalData(
+                materi: $jurnal['materi'],
+                metode: $jurnal['metode'],
+                status: $jurnal['status'],
+                penggantiId: $jurnal['pengganti_id'],
+                jumlahHadir: $jurnal['jumlah_hadir'],
+            ),
+            jurnalUrl: "/guru/jurnal/{$sesi->id}",
+        );
 
         return Inertia::render('PortalGuru/Presensi', [
             ...$this->sharedProps($request),
-            'sesi' => [
-                'id' => $sesi->id,
-                'pelajaran' => $sesi->pelajaran?->nama,
-                'kelas' => $sesi->kelas?->nama_kelas,
-                'jam_mulai' => $sesi->jam_mulai,
-                'jam_selesai' => $sesi->jam_selesai,
-            ],
-            'tanggal' => $tanggal,
-            'santri' => $santri,
-            'statusOptions' => PresensiSantri::STATUS,
-            // F2-PWA — Jurnal KBM 30-detik menempel di layar presensi:
-            // muat jurnal hari ini bila sudah ada (form mini pre-filled).
-            'jurnal' => $this->jurnalHariIni($sesi->id, $guru->id, $tanggal),
-            'jurnal_url' => "/guru/jurnal/{$sesi->id}",
+            ...$payload->toArray(),
         ]);
     }
 

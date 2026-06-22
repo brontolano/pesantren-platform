@@ -54,6 +54,45 @@ class SantriExportController extends Controller
         ]);
     }
 
+    /**
+     * Unduh template Excel/CSV kosong dengan header yang dikenali importer.
+     * Header memakai nama kanonik HEADER_ALIASES SantriImportService.
+     */
+    public function template(): StreamedResponse
+    {
+        $this->authorizeExport();
+
+        $headers = [
+            'nis', 'nama', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir',
+            'nik', 'nisn', 'agama', 'kelas', 'tingkat', 'jurusan',
+            'tahun_angkatan', 'status', 'asal_sekolah',
+            'alamat', 'rt_rw', 'desa_kelurahan', 'kecamatan', 'kabupaten_kota', 'provinsi', 'kode_pos',
+            'nama_ayah', 'pekerjaan_ayah', 'nama_ibu', 'pekerjaan_ibu',
+            'nama_wali', 'no_hp_wali', 'email_wali',
+        ];
+
+        // Satu baris contoh agar staf paham format isian (terutama tanggal & L/P).
+        $contoh = [
+            '24250001', 'Ahmad Fulan', 'L', 'Bandung', '15/01/2010',
+            '', '', 'Islam', '1-A', '1', '',
+            '2024', 'aktif', 'SDN Contoh',
+            'Jl. Contoh No. 1', '001/002', 'Sukamaju', 'Cibiru', 'Kota Bandung', 'Jawa Barat', '40123',
+            'Bapak Fulan', 'Wiraswasta', 'Ibu Fulanah', 'Ibu Rumah Tangga',
+            'Bapak Fulan', '081234567890', 'wali@example.com',
+        ];
+
+        return response()->streamDownload(function () use ($headers, $contoh): void {
+            $handle = fopen('php://output', 'w');
+            // BOM agar Excel membaca UTF-8 dengan benar.
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, $headers);
+            fputcsv($handle, $contoh);
+            fclose($handle);
+        }, 'template-import-santri.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     public function print(Request $request)
     {
         $this->authorizeExport();

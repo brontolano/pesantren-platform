@@ -8,7 +8,7 @@ defineProps({
     saldo: Number,
 });
 
-const rupiah = (n) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n || 0);
+import { formatRupiah as rupiah } from '@/Shared/format';
 
 function logout() {
     router.post('/app/logout');

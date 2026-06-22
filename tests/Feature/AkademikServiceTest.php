@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Akademik\Nilai\NilaiResource;
-use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
-use App\Filament\Resources\Akademik\Rapor\RaporResource;
+use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
+use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
 use App\Models\Setting;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;

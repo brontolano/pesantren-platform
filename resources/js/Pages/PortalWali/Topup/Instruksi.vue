@@ -28,13 +28,7 @@ const props = defineProps({
     alreadyPaid: { type: Boolean, default: false },
 })
 
-const rupiah = (value) =>
-    new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(Number(value || 0))
+import { formatRupiah as rupiah } from '@/Shared/format'
 
 const method = computed(() => props.payment?.method ?? {})
 const category = computed(() => method.value.category ?? props.topup?.metodeCategory ?? null)

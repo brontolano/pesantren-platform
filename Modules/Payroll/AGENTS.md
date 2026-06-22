@@ -1,0 +1,16 @@
+# Payroll — Peta Modul (AGENTS.md)
+> Orientasi cepat. Untuk tugas di modul ini, muat: folder Modules/Payroll/ + .d.ts terkait + resources/js/Components/Ui/README.md. Acuan: docs/KONVENSI.md, docs/PLAYBOOK-IRISAN.md.
+
+**Domain:** HR/Kepegawaian + Payroll (Baitul Maal) — honor asatidz poin/KPI, slip gaji, PPh21+BPJS, cuti/izin, khidmah, presensi staf, kontrak/SK, kasbon, THR, rekrutmen & penilaian ustadz.
+**Model inti:** (Modules/Payroll/app/Models/) Employee, SlipGaji, Cuti, Khidmah, KomponenGaji, PresensiStaf, KontrakKerja, PinjamanPegawai, Jabatan, PenugasanPegawai (+ TarifKhidmah, SertifikasiPegawai, Pelamar, PenilaianUstadz). Semua pakai BelongsToTenant; SlipGaji & Cuti juga Approvable.
+**Service/Event inti:** PayrollService (slip+jurnal, MONEY), ThrService, CutiService, KasbonService, BpjsService, KhidmahAggregatorService, PresensiStafService, KontrakService, IzinPegawaiService, RekrutmenService, SkPenugasanService, RaporUstadzService. Event: SlipGajiFinal. Observers: Employee/Jabatan/PenugasanPegawai. Command: CekKontrakHabisCommand (kontrak/SK habis, harian).
+**UI Filament:** SEKARANG di app/Filament/Resources/Payroll/** (SlipGajiResource, Employee, Cuti, Khidmah, Jabatan, Kontrak, Pelamar, Penugasan, Pinjaman, PresensiStaf) + Pages app/Filament/Pages/ (GenerateThr, PratinjauKhidmah) + Widget app/Filament/Widgets/KontrakAkanHabisWidget. Target → Modules/Payroll/app/Filament/.
+**Endpoint/portal terkait:** routes/tenant.php — `tenant.payroll.rapor-ustadz`, `tenant.payroll.slip.print`, `tenant.payroll.penugasan.sk` (PayrollExportController); Portal Guru `…slip.index` (slip-saya), `…izin.*`, `…presensi.*`; API Kepala Keuangan `…payroll.periode/slip/proses`. Modul sendiri: routes/web.php & api.php KOSONG (admin via Filament).
+**Migrasi & seeder:** Modules/Payroll/database/migrations/ (slip_gaji, employee, attendance_leave, bpjs, jabatan/penugasan, EMIS, tarif_khidmah, potongan_cuti WP-14, THR WP-15, kontrak WP-16, izin harian WP-17, sertifikasi WP-18, pelamar WP-19, penilaian WP-20, pinjaman WP-23); seeders/JabatanSeeder.
+**Jebakan modul ini:**
+- UANG: semua posting lewat JurnalService (finalisasi); ref_id=SlipGaji#id TAK BOLEH null; slip idempoten per (users_id, periode); jaga keseimbangan D bruto = K pph+bpjs+cuti+kasbon+neto; JANGAN ubah math teruji (TOCTOU re-check cuti/kasbon sebelum final).
+- Policy-first: pembagi hari kerja & formula THR via Setting (`payroll.hari_kerja_pembagi`, `payroll.thr_formula/nominal/pengali`) — JANGAN hardcode.
+- Tenancy: model BelongsToTenant; PayrollService ensureTenantContext (tolak tanpa tenant aktif); DB-per-tenant fisik.
+- Filament v5: grup+item berikon → panel authed 500; WAJIB TenantPanelAuthedSmokeTest tiap ubah Resource/Page Payroll.
+- File tenant (CV/ijazah pelamar, kontrak/SK): serve via /_tenant-storage, BUKAN Storage::url; gerbang hak run_payroll/manage_payroll/manage_keuangan.
+**Status rollout 5-lapisan:** G8 — UANG (slip+THR+kasbon real money). Wajib smoke authed + adversarial uang sebelum deploy; CI test.yml merah karena DB-per-tenant (bukan gate).

@@ -22,13 +22,7 @@ const props = defineProps({
     tabunganUrl: { type: String, required: true },
 })
 
-const rupiah = (value) =>
-    new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(Number(value || 0))
+import { formatRupiah as rupiah } from '@/Shared/format'
 
 const mutasiUrl = computed(() => `/wali/santri/${props.child.id}/tabungan`)
 </script>

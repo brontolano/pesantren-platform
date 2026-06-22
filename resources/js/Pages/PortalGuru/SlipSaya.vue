@@ -12,9 +12,7 @@ defineProps({
     bisaCetak: { type: Boolean, default: false },
 })
 
-function rupiah(n) {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(n || 0)
-}
+import { formatRupiah as rupiah } from '@/Shared/format'
 </script>
 
 <template>

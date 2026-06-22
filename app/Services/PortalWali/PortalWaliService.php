@@ -15,6 +15,9 @@ use Modules\Kegiatan\Models\KunjunganWali;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesehatan\Models\RiwayatKesehatan;
 use Modules\Kesehatan\Models\SesiKonseling;
+use Modules\Keuangan\Data\PembayaranWaliData;
+use Modules\Keuangan\Data\TagihanWaliData;
+use Modules\Keuangan\Data\WaliFinancialData;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Models\Tagihan;
@@ -228,22 +231,17 @@ class PortalWaliService
 
     public function getFinancialPayload(Santri $santri): array
     {
+        // KONTRAK lapisan-2: payload dibungkus DTO (Modules\Keuangan\Data),
+        // cermin TS resources/js/types/wali.d.ts. Output JSON IDENTIK dgn versi
+        // map-array inline sebelumnya (camelCase sama) → frontend tak berubah.
+        // $tagihan tetap Collection DTO: whereIn/sum di summary pakai data_get
+        // pada properti DTO (sisaTagihan/status), jadi hitungannya tak berubah.
         $tagihan = Tagihan::query()
             ->where('santri_id', $santri->getKey())
             ->with('pembayaran')
             ->latest('jatuh_tempo')
             ->get()
-            ->map(fn (Tagihan $item): array => [
-                'id' => $item->id,
-                'jenisTagihan' => $item->jenis_tagihan,
-                'keterangan' => $item->keterangan,
-                'nominalAkhir' => (float) $item->nominal_akhir,
-                'totalDibayar' => (float) $item->total_dibayar,
-                'sisaTagihan' => (float) $item->sisa_tagihan,
-                'status' => $item->status,
-                'jatuhTempo' => optional($item->jatuh_tempo)?->format('Y-m-d'),
-                'periodeAkademik' => $item->periode_akademik,
-            ])
+            ->map(fn (Tagihan $item): TagihanWaliData => TagihanWaliData::fromModel($item))
             ->values();
 
         $pembayaran = Pembayaran::query()
@@ -251,15 +249,7 @@ class PortalWaliService
             ->with('tagihan')
             ->latest('tanggal_pembayaran')
             ->get()
-            ->map(fn (Pembayaran $item): array => [
-                'id' => $item->id,
-                'tagihan' => $item->tagihan?->jenis_tagihan,
-                'nominal' => (float) $item->nominal,
-                'metode' => $item->metode,
-                'tanggalPembayaran' => optional($item->tanggal_pembayaran)?->format('Y-m-d'),
-                'isVerified' => (bool) $item->is_verified,
-                'nomorBukti' => $item->nomor_bukti,
-            ])
+            ->map(fn (Pembayaran $item): PembayaranWaliData => PembayaranWaliData::fromModel($item))
             ->values();
 
         $tabungan = Tabungan::query()
@@ -267,10 +257,10 @@ class PortalWaliService
             ->with(['transaksi' => fn ($query) => $query->latest('tanggal')->latest('id')])
             ->first();
 
-        return [
-            'bills' => $tagihan,
-            'payments' => $pembayaran,
-            'savings' => [
+        return (new WaliFinancialData(
+            bills: $tagihan,
+            payments: $pembayaran,
+            savings: [
                 'saldo' => (float) ($tabungan?->saldo ?? 0),
                 'transactions' => collect($tabungan?->transaksi ?? [])
                     ->map(fn ($item): array => [
@@ -282,13 +272,14 @@ class PortalWaliService
                         'keterangan' => $item->keterangan,
                         'tanggal' => optional($item->tanggal)?->format('Y-m-d'),
                     ])
-                    ->values(),
+                    ->values()
+                    ->all(),
             ],
-            'summary' => [
+            summary: [
                 'tagihanBelumLunas' => $tagihan->whereIn('status', ['belum_bayar', 'sebagian'])->count(),
                 'totalOutstanding' => round($tagihan->sum('sisaTagihan'), 2),
             ],
-        ];
+        ))->toArray();
     }
 
     public function getNotificationPayload(User $user): array
