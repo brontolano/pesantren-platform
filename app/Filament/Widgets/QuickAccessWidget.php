@@ -31,7 +31,7 @@ class QuickAccessWidget extends Widget
                     $this->link('Laporan', 'heroicon-o-chart-bar', 'warning', \Modules\Keuangan\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource::class),
                     $this->link('Jurnal', 'heroicon-o-book-open', 'warning', \Modules\Ledger\Filament\Resources\JurnalResource::class),
                     $this->link('Slip Gaji', 'heroicon-o-currency-dollar', 'warning', \Modules\Payroll\Filament\Resources\SlipGajiResource::class),
-                    $this->link('Belanja', 'heroicon-o-shopping-cart', 'warning', \App\Filament\Resources\Pengadaan\BelanjaResource::class),
+                    $this->link('Belanja', 'heroicon-o-shopping-cart', 'warning', \Modules\Pengadaan\Filament\Resources\BelanjaResource::class),
                 ])),
                 $this->group('Akademik', array_filter([
                     $this->link('Pelajaran', 'heroicon-o-book-open', 'info', \Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource::class),
