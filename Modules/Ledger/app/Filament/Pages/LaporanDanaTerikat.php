@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Ledger\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use Filament\Facades\Filament;
@@ -13,30 +13,26 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Modules\Ledger\Services\LaporanService;
-use Modules\Ledger\Support\FiturKeuangan;
 
-/**
- * Laporan Sumber & Penggunaan Dana Kebajikan (uang syubhat) — terpisah dari surplus.
- * Hanya relevan bila pemisahan kehalalan aktif.
- */
-class LaporanDanaKebajikan extends Page implements HasForms
+/** Segregation of Funds — Dana Wakaf (PSAK 112) & ZIS (PSAK 109) disajikan terpisah. */
+class LaporanDanaTerikat extends Page implements HasForms
 {
     use InteractsWithForms;
     use ModuleGate;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-scale';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
 
-    protected static ?string $navigationLabel = 'Dana Kebajikan (Pembersihan)';
+    protected static ?string $navigationLabel = 'Dana Terikat (Wakaf/ZIS)';
 
-    protected static ?string $title = 'Laporan Sumber & Penggunaan Dana Kebajikan';
+    protected static ?string $title = 'Laporan Dana Terikat (PSAK 112/109)';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 8;
 
-    protected static ?string $slug = 'laporan/dana-kebajikan';
+    protected static ?string $slug = 'laporan/dana-terikat';
 
-    protected string $view = 'filament.pages.laporan-dana-kebajikan';
+    protected string $view = 'filament.pages.laporan-dana-terikat';
 
     public ?array $data = [];
 
@@ -44,8 +40,7 @@ class LaporanDanaKebajikan extends Page implements HasForms
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
             && static::moduleVisible('ledger')
-            && FiturKeuangan::pemisahanKehalalanAktif()
-            && (Auth::user()?->canAny(['view_ledger', 'manage_ledger', 'manage_dana_kebajikan']) ?? false);
+            && (Auth::user()?->canAny(['view_ledger', 'manage_ledger', 'view_laporan_pimpinan']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -72,8 +67,8 @@ class LaporanDanaKebajikan extends Page implements HasForms
     }
 
     #[Computed]
-    public function laporan(): array
+    public function dana(): array
     {
-        return app(LaporanService::class)->danaKebajikan($this->data['from'] ?? null, $this->data['to'] ?? null);
+        return app(LaporanService::class)->laporanDanaTerikat($this->data['from'] ?? null, $this->data['to'] ?? null);
     }
 }

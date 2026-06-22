@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Ledger\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use Filament\Facades\Filament;
@@ -14,25 +14,25 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Modules\Ledger\Services\LaporanService;
 
-/** L5 — RAB/RKAM & Realisasi (realisasi = akumulasi beban per divisi dari jurnal). */
-class LaporanRkam extends Page implements HasForms
+/** L2 — Laporan Dana BOS / BOP (penerimaan vs penggunaan per sumber dana negara). */
+class LaporanDanaBosBop extends Page implements HasForms
 {
     use InteractsWithForms;
     use ModuleGate;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $navigationLabel = 'L5 — RKAM & Realisasi';
+    protected static ?string $navigationLabel = 'L2 — Dana BOS / BOP';
 
-    protected static ?string $title = 'L5 — RAB / RKAM & Realisasi Anggaran';
+    protected static ?string $title = 'L2 — Laporan Dana BOS / BOP';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 2;
 
-    protected static ?string $slug = 'laporan/rkam';
+    protected static ?string $slug = 'laporan/dana-bos-bop';
 
-    protected string $view = 'filament.pages.laporan-rkam';
+    protected string $view = 'filament.pages.laporan-dana-bos-bop';
 
     public ?array $data = [];
 
@@ -69,6 +69,6 @@ class LaporanRkam extends Page implements HasForms
     #[Computed]
     public function rows(): array
     {
-        return app(LaporanService::class)->realisasiPerDivisi($this->data['from'] ?? null, $this->data['to'] ?? null);
+        return app(LaporanService::class)->danaBosBop($this->data['from'] ?? null, $this->data['to'] ?? null);
     }
 }

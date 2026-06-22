@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\LaporanKehalalan;
+use Modules\Ledger\Filament\Pages\LaporanKehalalan;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;

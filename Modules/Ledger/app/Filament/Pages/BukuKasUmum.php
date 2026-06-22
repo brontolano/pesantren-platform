@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Ledger\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use Filament\Facades\Filament;
@@ -15,26 +15,26 @@ use Livewire\Attributes\Computed;
 use Modules\Ledger\Services\BukuBesarService;
 
 /**
- * Neraca Saldo (trial balance) — Σdebit = Σkredit, dasar Neraca & Laba-Rugi.
+ * Buku Kas Umum (BKU) — akumulasi baris akun kas/bank (proyeksi, rekonsiliasi 100%).
  */
-class NeracaSaldo extends Page implements HasForms
+class BukuKasUmum extends Page implements HasForms
 {
     use InteractsWithForms;
     use ModuleGate;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-scale';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static ?string $navigationLabel = 'Neraca Saldo';
+    protected static ?string $navigationLabel = 'Buku Kas Umum (BKU)';
 
-    protected static ?string $title = 'Neraca Saldo (Trial Balance)';
+    protected static ?string $title = 'Buku Kas Umum (BKU)';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi & Pajak';
 
-    protected static ?int $navigationSort = 12;
+    protected static ?int $navigationSort = 11;
 
-    protected static ?string $slug = 'ledger/neraca-saldo';
+    protected static ?string $slug = 'ledger/bku';
 
-    protected string $view = 'filament.pages.neraca-saldo';
+    protected string $view = 'filament.pages.buku-kas-umum';
 
     public ?array $data = [];
 
@@ -52,7 +52,10 @@ class NeracaSaldo extends Page implements HasForms
 
     public function mount(): void
     {
-        $this->form->fill(['to' => now()->endOfMonth()->toDateString()]);
+        $this->form->fill([
+            'from' => now()->startOfMonth()->toDateString(),
+            'to' => now()->endOfMonth()->toDateString(),
+        ]);
     }
 
     public function form(Schema $schema): Schema
@@ -60,15 +63,19 @@ class NeracaSaldo extends Page implements HasForms
         return $schema
             ->statePath('data')
             ->components([
-                Section::make('Per Tanggal')->schema([
-                    DatePicker::make('to')->label('Sampai Tanggal')->live(),
-                ]),
+                Section::make('Rentang Tanggal')->schema([
+                    DatePicker::make('from')->label('Dari')->live(),
+                    DatePicker::make('to')->label('Sampai')->live(),
+                ])->columns(2),
             ]);
     }
 
     #[Computed]
-    public function rows(): \Illuminate\Support\Collection
+    public function hasil(): array
     {
-        return app(BukuBesarService::class)->neracaSaldo($this->data['to'] ?? null);
+        return app(BukuBesarService::class)->bku(
+            $this->data['from'] ?? null,
+            $this->data['to'] ?? null,
+        );
     }
 }

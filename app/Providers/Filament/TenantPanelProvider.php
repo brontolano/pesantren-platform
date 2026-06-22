@@ -258,8 +258,12 @@ class TenantPanelProvider extends PanelProvider
 
         if (! $isAlbaKids) {
             $panel->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages');
-            // Halaman Filament yang sudah pindah ke modulnya (vertical slice).
-            $panel->discoverPages(in: base_path('Modules/Mutu/app/Filament/Pages'), for: 'Modules\Mutu\Filament\Pages');
+            // Halaman Filament yang sudah pindah ke modulnya (vertical slice) —
+            // daftarkan otomatis dari tiap Modules/{X}/app/Filament/Pages.
+            foreach (glob(base_path('Modules/*/app/Filament/Pages'), GLOB_ONLYDIR) as $modulePagesDir) {
+                $module = basename(dirname($modulePagesDir, 3));
+                $panel->discoverPages(in: $modulePagesDir, for: "Modules\\{$module}\\Filament\\Pages");
+            }
         }
 
         return $panel

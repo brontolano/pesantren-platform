@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Ledger\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use Filament\Facades\Filament;
@@ -13,26 +13,30 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Modules\Ledger\Services\LaporanService;
+use Modules\Ledger\Support\FiturKeuangan;
 
-/** L2 — Laporan Dana BOS / BOP (penerimaan vs penggunaan per sumber dana negara). */
-class LaporanDanaBosBop extends Page implements HasForms
+/**
+ * Laporan Sumber & Penggunaan Dana Kebajikan (uang syubhat) — terpisah dari surplus.
+ * Hanya relevan bila pemisahan kehalalan aktif.
+ */
+class LaporanDanaKebajikan extends Page implements HasForms
 {
     use InteractsWithForms;
     use ModuleGate;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-scale';
 
-    protected static ?string $navigationLabel = 'L2 — Dana BOS / BOP';
+    protected static ?string $navigationLabel = 'Dana Kebajikan (Pembersihan)';
 
-    protected static ?string $title = 'L2 — Laporan Dana BOS / BOP';
+    protected static ?string $title = 'Laporan Sumber & Penggunaan Dana Kebajikan';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 7;
 
-    protected static ?string $slug = 'laporan/dana-bos-bop';
+    protected static ?string $slug = 'laporan/dana-kebajikan';
 
-    protected string $view = 'filament.pages.laporan-dana-bos-bop';
+    protected string $view = 'filament.pages.laporan-dana-kebajikan';
 
     public ?array $data = [];
 
@@ -40,7 +44,8 @@ class LaporanDanaBosBop extends Page implements HasForms
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
             && static::moduleVisible('ledger')
-            && (Auth::user()?->canAny(['view_ledger', 'manage_ledger', 'view_laporan_pimpinan']) ?? false);
+            && FiturKeuangan::pemisahanKehalalanAktif()
+            && (Auth::user()?->canAny(['view_ledger', 'manage_ledger', 'manage_dana_kebajikan']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -67,8 +72,8 @@ class LaporanDanaBosBop extends Page implements HasForms
     }
 
     #[Computed]
-    public function rows(): array
+    public function laporan(): array
     {
-        return app(LaporanService::class)->danaBosBop($this->data['from'] ?? null, $this->data['to'] ?? null);
+        return app(LaporanService::class)->danaKebajikan($this->data['from'] ?? null, $this->data['to'] ?? null);
     }
 }

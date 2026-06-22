@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Ledger\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use Filament\Facades\Filament;
@@ -14,25 +14,25 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Modules\Ledger\Services\LaporanService;
 
-/** Segregation of Funds — Dana Wakaf (PSAK 112) & ZIS (PSAK 109) disajikan terpisah. */
-class LaporanDanaTerikat extends Page implements HasForms
+/** L5 — RAB/RKAM & Realisasi (realisasi = akumulasi beban per divisi dari jurnal). */
+class LaporanRkam extends Page implements HasForms
 {
     use InteractsWithForms;
     use ModuleGate;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 
-    protected static ?string $navigationLabel = 'Dana Terikat (Wakaf/ZIS)';
+    protected static ?string $navigationLabel = 'L5 — RKAM & Realisasi';
 
-    protected static ?string $title = 'Laporan Dana Terikat (PSAK 112/109)';
+    protected static ?string $title = 'L5 — RAB / RKAM & Realisasi Anggaran';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan & Mutu';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 5;
 
-    protected static ?string $slug = 'laporan/dana-terikat';
+    protected static ?string $slug = 'laporan/rkam';
 
-    protected string $view = 'filament.pages.laporan-dana-terikat';
+    protected string $view = 'filament.pages.laporan-rkam';
 
     public ?array $data = [];
 
@@ -67,8 +67,8 @@ class LaporanDanaTerikat extends Page implements HasForms
     }
 
     #[Computed]
-    public function dana(): array
+    public function rows(): array
     {
-        return app(LaporanService::class)->laporanDanaTerikat($this->data['from'] ?? null, $this->data['to'] ?? null);
+        return app(LaporanService::class)->realisasiPerDivisi($this->data['from'] ?? null, $this->data['to'] ?? null);
     }
 }
