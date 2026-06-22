@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages\CMS;
+namespace Modules\CMS\Filament\Pages;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;

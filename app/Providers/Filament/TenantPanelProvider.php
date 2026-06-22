@@ -12,7 +12,7 @@ use Modules\Kesantrian\Filament\Pages\ModerasiPesanWali;
 use Modules\Mutu\Filament\Pages\MutuKelas;
 use Modules\Mutu\Filament\Pages\MutuLembaga;
 use Modules\Kegiatan\Filament\Pages\PengajuanJengukPanel;
-use App\Filament\Pages\PiketHariIni;
+use Modules\Pembiayaan\Filament\Pages\PiketHariIni;
 use Modules\Payroll\Filament\Pages\PratinjauKhidmah;
 use Modules\Mutu\Filament\Pages\ProfilMutuSantri;
 use Modules\Akademik\Filament\Pages\RekapJurnalKbm;

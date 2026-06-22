@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Pembiayaan\Filament\Pages;
 
 use Filament\Pages\Page;
 use Illuminate\Support\Collection;
