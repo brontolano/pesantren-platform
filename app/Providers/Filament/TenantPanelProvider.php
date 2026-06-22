@@ -9,12 +9,12 @@ use App\Filament\Pages\KebijakanPesantren;
 use App\Filament\Pages\KesiapanEmis;
 use App\Filament\Pages\LogGerbangPanel;
 use App\Filament\Pages\ModerasiPesanWali;
-use App\Filament\Pages\MutuKelas;
-use App\Filament\Pages\MutuLembaga;
+use Modules\Mutu\Filament\Pages\MutuKelas;
+use Modules\Mutu\Filament\Pages\MutuLembaga;
 use App\Filament\Pages\PengajuanJengukPanel;
 use App\Filament\Pages\PiketHariIni;
 use App\Filament\Pages\PratinjauKhidmah;
-use App\Filament\Pages\ProfilMutuSantri;
+use Modules\Mutu\Filament\Pages\ProfilMutuSantri;
 use App\Filament\Pages\RekapJurnalKbm;
 use App\Filament\Pages\RekonKantin;
 use App\Filament\Pages\SidangKenaikan;
@@ -258,6 +258,8 @@ class TenantPanelProvider extends PanelProvider
 
         if (! $isAlbaKids) {
             $panel->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages');
+            // Halaman Filament yang sudah pindah ke modulnya (vertical slice).
+            $panel->discoverPages(in: base_path('Modules/Mutu/app/Filament/Pages'), for: 'Modules\Mutu\Filament\Pages');
         }
 
         return $panel
