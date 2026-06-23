@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\PengajuanJengukPanel;
+use Modules\Kegiatan\Filament\Pages\PengajuanJengukPanel;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
