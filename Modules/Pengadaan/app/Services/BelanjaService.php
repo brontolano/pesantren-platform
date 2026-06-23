@@ -147,7 +147,21 @@ class BelanjaService
         $akunKas = $belanja->akun_kas_id ? Akun::find($belanja->akun_kas_id) : $this->akunKasDefault();
 
         if ($akunBeban === null || $akunKas === null) {
-            throw new RuntimeException('Akun beban / kas belum tersedia (COA belum di-seed).');
+            // Pesan ramah (tetap RuntimeException agar pemanggil yang menangkap
+            // tipe ini tidak pecah). Sebut bagian COA yang belum siap.
+            $kurang = [];
+            if ($akunBeban === null) {
+                $kurang[] = 'akun beban (' . ($belanja->akun_beban_id ? 'akun beban terpilih tidak ditemukan' : 'beban default 5-4000 belum ada') . ')';
+            }
+            if ($akunKas === null) {
+                $kurang[] = 'akun kas/bank yang bisa diposting';
+            }
+
+            throw new RuntimeException(
+                'Bagan Akun (COA) belum lengkap untuk memposting belanja ini: '
+                . implode(' dan ', $kurang)
+                . '. Mohon lengkapi/seed Bagan Akun pesantren (menu Keuangan → Bagan Akun) sebelum mencairkan belanja.'
+            );
         }
 
         $dpp = (float) $belanja->dpp;
@@ -180,6 +194,35 @@ class BelanjaService
             'dibuat_oleh' => $dibuatOleh,
             'baris' => array_values(array_filter($baris, fn ($b) => $b['akun_id'] !== null)),
         ]);
+    }
+
+    /**
+     * Pra-cek OPSIONAL (tidak mengubah posting/total/pajak): apakah akun beban &
+     * kas yang diperlukan untuk memposting belanja ini sudah tersedia di COA?
+     * Mengembalikan null bila siap, atau pesan ramah bila ada yang belum ada.
+     * Dipakai UI/aksi uang untuk memberi peringatan dini sebelum mencairkan.
+     */
+    public function alasanCoaBelumSiap(Belanja $belanja): ?string
+    {
+        $akunBeban = $belanja->akun_beban_id
+            ? Akun::find($belanja->akun_beban_id)
+            : Akun::where('kode', '5-4000')->first();
+        $akunKas = $belanja->akun_kas_id ? Akun::find($belanja->akun_kas_id) : $this->akunKasDefault();
+
+        if ($akunBeban !== null && $akunKas !== null) {
+            return null;
+        }
+
+        $kurang = [];
+        if ($akunBeban === null) {
+            $kurang[] = 'akun beban';
+        }
+        if ($akunKas === null) {
+            $kurang[] = 'akun kas/bank';
+        }
+
+        return 'Bagan Akun (COA) belum lengkap: ' . implode(' dan ', $kurang)
+            . ' belum tersedia. Lengkapi Bagan Akun (menu Keuangan → Bagan Akun) sebelum mencairkan belanja.';
     }
 
     private function baris(?int $akunId, Belanja $belanja, float $debit, float $kredit, string $memo): array

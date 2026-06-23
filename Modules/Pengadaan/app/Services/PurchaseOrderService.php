@@ -45,9 +45,9 @@ class PurchaseOrderService
 
             $total = 0.0;
             foreach ($items as $row) {
-                $qty = (float) ($row['qty'] ?? 1);
-                $harga = (float) ($row['harga_satuan'] ?? 0);
-                $subtotal = round($qty * $harga, 2);
+                $qty = $this->qtyDari($row);
+                $harga = $this->hargaDari($row);
+                $subtotal = $this->subtotalItem($qty, $harga);
                 $total += $subtotal;
                 $po->items()->create([
                     'uraian' => $row['uraian'] ?? 'Item',
@@ -57,10 +57,72 @@ class PurchaseOrderService
                     'qty_diterima' => 0,
                 ]);
             }
-            $po->update(['total' => round($total, 2)]);
+            $po->update(['total' => $this->bulatkanTotal($total)]);
 
             return $po->fresh('items');
         });
+    }
+
+    /**
+     * gap-95 — Ganti seluruh item PO yang masih DRAFT lalu hitung ulang total
+     * dengan rumus YANG SAMA seperti buat() (tidak ada rumus baru). PO non-draft
+     * ditolak agar nilai yang sudah disetujui/diterima tidak berubah.
+     *
+     * @param  array<int, array{uraian?:string, qty?:mixed, harga_satuan?:mixed}>  $items
+     */
+    public function ubahItem(PurchaseOrder $po, array $items): PurchaseOrder
+    {
+        $this->ensureTenantContext();
+        if ($po->status !== 'draft') {
+            throw new InvalidArgumentException('Item hanya dapat diubah selama PO masih draft.');
+        }
+        if ($items === []) {
+            throw new InvalidArgumentException('PO harus punya minimal 1 item.');
+        }
+
+        return DB::transaction(function () use ($po, $items): PurchaseOrder {
+            $po->items()->delete();
+
+            $total = 0.0;
+            foreach ($items as $row) {
+                $qty = $this->qtyDari($row);
+                $harga = $this->hargaDari($row);
+                $subtotal = $this->subtotalItem($qty, $harga);
+                $total += $subtotal;
+                $po->items()->create([
+                    'uraian' => $row['uraian'] ?? 'Item',
+                    'qty' => $qty,
+                    'harga_satuan' => $harga,
+                    'subtotal' => $subtotal,
+                    'qty_diterima' => 0,
+                ]);
+            }
+            $po->update(['total' => $this->bulatkanTotal($total)]);
+
+            return $po->fresh('items');
+        });
+    }
+
+    private function qtyDari(array $row): float
+    {
+        return (float) ($row['qty'] ?? 1);
+    }
+
+    private function hargaDari(array $row): float
+    {
+        return (float) ($row['harga_satuan'] ?? 0);
+    }
+
+    /** Rumus subtotal per baris (dipakai buat() & ubahItem()). */
+    private function subtotalItem(float $qty, float $harga): float
+    {
+        return round($qty * $harga, 2);
+    }
+
+    /** Rumus pembulatan total PO (dipakai buat() & ubahItem()). */
+    private function bulatkanTotal(float $total): float
+    {
+        return round($total, 2);
     }
 
     /** Ajukan persetujuan (status draft→diajukan + F1; no-op tanpa rule). */

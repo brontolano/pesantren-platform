@@ -23,6 +23,7 @@ use Modules\Keuangan\Filament\Pages\RekonKantin;
 use Modules\Akademik\Filament\Pages\SidangKenaikan;
 use App\Filament\Pages\TenantDashboard;
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
+use Modules\Akademik\Filament\Resources\KomponenNilai\KomponenNilaiResource;
 use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
 use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
 use Modules\Akademik\Filament\Resources\Kurikulum\KurikulumResource;
@@ -426,6 +427,7 @@ class TenantPanelProvider extends PanelProvider
             PelajaranResource::class,
             ProgramStudiResource::class,
             JadwalPelajaranResource::class,
+            KomponenNilaiResource::class, // gap-85 — bobot nilai per pelajaran (configurable)
             NilaiResource::class,
             PaketSoalAkademikResource::class, // F4 — Bank Soal Akademik
             SesiUjianAkademikResource::class, // F4 — Sesi Ujian Online per rombel

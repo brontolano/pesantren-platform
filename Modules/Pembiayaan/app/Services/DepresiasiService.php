@@ -165,7 +165,8 @@ class DepresiasiService
         $bebanAkun = Akun::where('kode', '5-7000')->first();
         $akumAkun = Akun::where('kode', '1-2900')->first();
         if ($bebanAkun === null || $akumAkun === null) {
-            throw new RuntimeException('Akun penyusutan (5-7000 / 1-2900) belum di-seed.');
+            // gap-96 — pesan ramah (tipe RuntimeException dipertahankan agar pemanggil tak pecah).
+            throw new RuntimeException('Bagan akun keuangan belum siap untuk mencatat penyusutan (akun Beban Penyusutan 5-7000 / Akumulasi Penyusutan 1-2900 belum tersedia). Minta admin keuangan menyiapkan Bagan Akun di Pengaturan Keuangan, lalu ulangi.');
         }
 
         return DB::transaction(function () use ($jadwal, $aset, $beban, $bebanAkun, $akumAkun, $dibuatOleh): JadwalPenyusutan {
