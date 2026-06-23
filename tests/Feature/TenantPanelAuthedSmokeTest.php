@@ -65,7 +65,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         // tenant non-dev. Promosikan ke released + aktifkan agar halaman/resource-nya
         // benar-benar ter-render (assert 200 di bawah), bukan 403 yang lolos diam-diam.
         // Ditulis SEBELUM request pertama agar cache modul memuat nilai terbaru.
-        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz'] as $modul) {
+        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu'] as $modul) {
             DB::connection('pgsql')->table('module_registry')->where('key', $modul)->update(['status' => 'released']);
             DB::connection('pgsql')->table('tenant_modules')->insert([
                 'tenant_id' => $tenant->id, 'module_name' => $modul, 'is_active' => true,
@@ -147,6 +147,13 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $tazirReq->headers->set('Host', $host);
         $tazirStatus = $kernel->handle($tazirReq)->getStatusCode();
         $this->assertSame(200, $tazirStatus, "Daftar Ta'zir (aksi siklus status) status {$tazirStatus}, harusnya 200.");
+
+        // Mutu per Kelas WAJIB 200 → bukti empty-state instruktif (tanpa kelas dipilih)
+        // ter-render, bukan halaman kosong/rusak (gap 119).
+        $mutuKelasReq = Request::create("http://{$host}/admin/mutu-kelas", 'GET');
+        $mutuKelasReq->headers->set('Host', $host);
+        $mutuKelasStatus = $kernel->handle($mutuKelasReq)->getStatusCode();
+        $this->assertSame(200, $mutuKelasStatus, "Mutu per Kelas (empty-state) status {$mutuKelasStatus}, harusnya 200.");
 
         tenancy()->end();
     }

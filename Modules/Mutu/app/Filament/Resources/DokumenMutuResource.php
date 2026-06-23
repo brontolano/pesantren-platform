@@ -106,8 +106,12 @@ class DokumenMutuResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn (DokumenMutu $record): bool => $record->status_approval === 'draft' && (auth()->user()?->can('manage_mutu') ?? false))
                     ->action(function (DokumenMutu $record): void {
-                        app(MutuService::class)->ajukan($record, (int) auth()->id());
-                        Notification::make()->title('Dokumen diajukan untuk persetujuan')->success()->send();
+                        try {
+                            app(MutuService::class)->ajukan($record, (int) auth()->id());
+                            Notification::make()->title('Dokumen diajukan untuk persetujuan')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Gagal mengajukan dokumen')->body($e->getMessage())->danger()->send();
+                        }
                     }),
                 // Setujui: diajukan → disetujui (penyetuju, approve_mutu — segregasi tugas).
                 Action::make('setujui')
@@ -117,8 +121,12 @@ class DokumenMutuResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn (DokumenMutu $record): bool => $record->status_approval === 'diajukan' && (auth()->user()?->can('approve_mutu') ?? false))
                     ->action(function (DokumenMutu $record): void {
-                        app(MutuService::class)->setujui($record, (int) auth()->id());
-                        Notification::make()->title('Dokumen disetujui')->success()->send();
+                        try {
+                            app(MutuService::class)->setujui($record, (int) auth()->id());
+                            Notification::make()->title('Dokumen disetujui')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Gagal menyetujui dokumen')->body($e->getMessage())->danger()->send();
+                        }
                     }),
                 // Tolak: diajukan → ditolak (approve_mutu). Alasan rinci = enhancement form.
                 Action::make('tolak')
@@ -136,8 +144,12 @@ class DokumenMutuResource extends Resource
                     ])
                     ->visible(fn (DokumenMutu $record): bool => $record->status_approval === 'diajukan' && (auth()->user()?->can('approve_mutu') ?? false))
                     ->action(function (array $data, DokumenMutu $record): void {
-                        app(MutuService::class)->tolak($record, (int) auth()->id(), $data['alasan']);
-                        Notification::make()->title('Dokumen ditolak')->warning()->send();
+                        try {
+                            app(MutuService::class)->tolak($record, (int) auth()->id(), $data['alasan']);
+                            Notification::make()->title('Dokumen ditolak')->warning()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Gagal menolak dokumen')->body($e->getMessage())->danger()->send();
+                        }
                     }),
                 EditAction::make(),
                 DeleteAction::make(),
