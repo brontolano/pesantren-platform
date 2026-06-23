@@ -73,7 +73,10 @@ use Modules\CMS\Http\Controllers\SitemapController;
 use Modules\Keuangan\Models\Donasi;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\KontrakKerja;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Modules\Payroll\Services\RaporUstadzService;
+use Modules\Pembiayaan\Models\AreaPiket;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -279,6 +282,31 @@ Route::middleware([
             'namaPesantren' => TenantBranding::name(tenant('name') ?? 'Pesantren'),
         ]);
     })->middleware('auth')->name('tenant.payroll.rapor-ustadz');
+
+    // gap-121 — Cetak stiker QR Area Piket (print blade; QR di-scan via
+    // keyboard-wedge di PWA Guru). ?area={id} = satu area; tanpa query = semua aktif.
+    Route::get('/sarpras/area-piket/cetak-qr', function () {
+        $query = AreaPiket::query()->where('aktif', true)->orderBy('nama');
+        if (($id = request()->integer('area')) > 0) {
+            $query->whereKey($id);
+        }
+        $areas = $query->get();
+        abort_if($areas->isEmpty(), 404);
+
+        $qr = new QRCode(new QROptions([
+            'outputBase64' => true, // data-URI → langsung dipakai <img src>
+            'scale' => 6,
+        ]));
+
+        return view('exports.area-piket-qr-print', [
+            'namaPesantren' => TenantBranding::name(tenant('name') ?? 'Pesantren'),
+            'areas' => $areas->map(fn (AreaPiket $a): array => [
+                'nama' => (string) $a->nama,
+                'kode' => (string) $a->kode_qr,
+                'qr' => $qr->render((string) $a->kode_qr),
+            ])->all(),
+        ]);
+    })->middleware('auth')->name('tenant.sarpras.area-piket.cetak-qr');
 
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
