@@ -19,9 +19,9 @@ class WebsiteBuilder extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-paint-brush';
 
-    protected static ?string $navigationLabel = 'Website Builder';
+    protected static ?string $navigationLabel = 'Pengaturan Tampilan Website';
 
-    protected static ?string $title = 'Website Builder';
+    protected static ?string $title = 'Pengaturan Tampilan Website';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
 
