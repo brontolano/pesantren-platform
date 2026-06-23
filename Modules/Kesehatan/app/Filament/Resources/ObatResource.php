@@ -6,6 +6,7 @@ use App\Filament\Concerns\ModuleGate;
 use Modules\Kesehatan\Filament\Resources\Obat\Pages\CreateObat;
 use Modules\Kesehatan\Filament\Resources\Obat\Pages\EditObat;
 use Modules\Kesehatan\Filament\Resources\Obat\Pages\ListObat;
+use Modules\Kesehatan\Filament\Resources\Obat\RelationManagers\MutasiRelationManager;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -151,6 +152,13 @@ class ObatResource extends Resource
                 EditAction::make(),
             ])
             ->defaultSort('nama');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            MutasiRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
