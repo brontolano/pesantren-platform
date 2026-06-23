@@ -114,6 +114,7 @@ use Modules\Keuangan\Filament\Resources\Pos\PosKategoriResource;
 use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use Modules\PPDB\Filament\Resources\CalonSantriDokumenResource;
 use Modules\PPDB\Filament\Resources\CalonSantriResource;
+use Modules\PPDB\Filament\Resources\GelombangPpdbResource;
 use Modules\PPDB\Filament\Resources\HasilUjianResource;
 use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
 use Modules\PPDB\Filament\Resources\TagihanPpdbResource;
@@ -415,6 +416,7 @@ class TenantPanelProvider extends PanelProvider
             LogNotifikasiResource::class,
             CalonSantriResource::class,
             CalonSantriDokumenResource::class,
+            GelombangPpdbResource::class,
             HasilUjianResource::class,
             ArticleResource::class,
             GalleryResource::class,
