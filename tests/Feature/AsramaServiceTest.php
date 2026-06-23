@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Asrama\BiayaAsrama\BiayaAsramaResource;
-use App\Filament\Resources\Asrama\BlokAsrama\BlokAsramaResource;
-use App\Filament\Resources\Asrama\KamarAsrama\KamarAsramaResource;
-use App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource;
+use Modules\Asrama\Filament\Resources\BiayaAsrama\BiayaAsramaResource;
+use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
+use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\PenempatanAsramaResource;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Route;

@@ -9,7 +9,7 @@ use App\Filament\Resources\Pembiayaan\AsetResource;
 use App\Filament\Resources\Pengadaan\Supplier\SupplierResource;
 use App\Filament\Resources\PPDB\JadwalUjianResource;
 use App\Filament\Resources\PPDB\PaketSoal\PaketSoalResource;
-use App\Filament\Resources\Tahfidz\Halaqah\HalaqahResource;
+use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Support\UnitSetupRegistry;
