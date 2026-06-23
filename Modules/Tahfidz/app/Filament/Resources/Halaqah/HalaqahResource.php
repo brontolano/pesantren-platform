@@ -6,6 +6,7 @@ use App\Filament\Concerns\ModuleGate;
 use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\CreateHalaqah;
 use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\EditHalaqah;
 use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\ListHalaqah;
+use Modules\Tahfidz\Filament\Resources\Halaqah\RelationManagers\KeanggotaanRelationManager;
 use App\Models\User;
 use BackedEnum;
 use Filament\Forms\Components\Select;
@@ -104,6 +105,13 @@ class HalaqahResource extends Resource
                 IconColumn::make('aktif')->label('Aktif')->boolean(),
                 TextColumn::make('updated_at')->label('Diubah')->since(),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            KeanggotaanRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
