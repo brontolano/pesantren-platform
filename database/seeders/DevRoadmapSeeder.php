@@ -31,6 +31,7 @@ class DevRoadmapSeeder extends Seeder
         $this->seedModulSdmHrd();
         $this->seedOperasionalLapangan();
         $this->seedMutuEkosistem();
+        $this->seedPenyempurnaanLive();
 
         $this->normalizeProjectStatus();
     }
@@ -48,6 +49,133 @@ class DevRoadmapSeeder extends Seeder
                 $project->update(['status' => 'done']);
             }
         });
+    }
+
+    /**
+     * Program "Penyempurnaan Live — Kesiapan User Nyata". Hasil audit menyeluruh
+     * 17 modul + UX + pengaturan + dokumentasi (2026-06-23, via workflow 21 agen):
+     * rata-rata readiness 67/100, 72 gap fungsional, 9 blocker. Goal owner: semua
+     * modul lengkap & tak membingungkan untuk tenant pesantren NYATA. Idempotent.
+     */
+    private function seedPenyempurnaanLive(): void
+    {
+        $project = DevProject::updateOrCreate(
+            ['slug' => 'penyempurnaan-live-kesiapan-user'],
+            [
+                'name' => 'Penyempurnaan Live — Kesiapan User Nyata',
+                'description' => 'Roadmap hasil audit kesiapan-produksi 17 modul + UX + pengaturan + dokumentasi (2026-06-23). Rata-rata readiness 67/100, 72 gap fungsional, 9 blocker. Prioritas teratas = blocker "modul mati out-of-the-box" (seeder tak ter-wire → dropdown kosong → buntu hari pertama). Tema: A=kelengkapan modul, B=UX & kejelasan, C=pengaturan sistem, D=dokumentasi.',
+                'status' => 'in_progress',
+                'color' => 'warning',
+                'icon' => 'heroicon-o-sparkles',
+                'sort' => 20,
+            ]
+        );
+
+        // [phase, title, detail, priority, effort]
+        $items = [
+            // A. Kelengkapan modul
+            ['A. Kelengkapan modul', 'Perbaiki bug channel Notifikasi whatsapp→wa + wire seeder', 'Ubah 23 entri TemplateNotifikasiSeeder dari channel "whatsapp" ke "wa" + wire ke TenantProvisioner; tanpa ini semua template tak muncul & dropdown Broadcast kosong (modul mati out-of-the-box).', 'critical', 'S'],
+            ['A. Kelengkapan modul', 'Wire seeder tarif Pajak ke TenantProvisioner', 'Daftarkan PajakSeeder + TerPph21Seeder ke pipeline provisioning (idempoten, --force, jalankan via tenant:reprovision); tanpa ini MesinPajak selalu 0 & Tarif Pajak kosong-buntu (canCreate=false).', 'critical', 'M'],
+            ['A. Kelengkapan modul', 'Seed kategori POS untuk tenant baru', 'Tambah PosKategoriSeeder ke TenantProvisioner + tenant:reprovision + aksi "Pulihkan kategori bawaan"; agar Loket Kas/Kasir Kantin tak buntu hari pertama (dropdown kategori kosong).', 'critical', 'S'],
+            ['A. Kelengkapan modul', 'Satukan kosakata status izin santri (panel↔PWA)', 'Pilih satu nilai ("diajukan" atau "pending") lintas migration, IzinSantriResource, KegiatanService, IzinSantriService, PwaGuruIzinController; agar izin panel admin masuk antrean persetujuan PWA & sebaliknya. Blocker fungsional.', 'critical', 'M'],
+            ['A. Kelengkapan modul', 'Buat UI panel admin Kunjungan UKS', 'Filament Resource/Page yang membungkus KesehatanService (daftar istirahat, catat kunjungan, tutup, rujukan); kini operasi UKS tersering hanya bisa via API PWA Guru — petugas UKS di panel tak bisa kerja.', 'high', 'M'],
+            ['A. Kelengkapan modul', 'Perbaiki RBAC modul Mutu', 'Beri manage_mutu & approve_mutu (terpisah) ke peran relevan atau tambah peran penjamin_mutu; agar 5 resource SPMI + Dashboard muncul saat onboarding, bukan tersembunyi.', 'high', 'M'],
+            ['A. Kelengkapan modul', 'Putuskan pintu rilis AI: development→released + seed GATE-3', 'Promosikan status registry "ai" + aktifkan tenant_modules DAN tuntaskan seed GATE-3 (whitelist_kitab/blacklist_topik hasil tinjauan ustadz); dua prasyarat mutlak agar AI dipakai tenant nyata.', 'high', 'M'],
+            ['A. Kelengkapan modul', 'Samakan kosakata STATUS hafalan jadi satu sumber', 'Enum/config tunggal untuk direncanakan/proses/selesai vs "berjalan" agar form, importer, ringkasan & Portal Wali konsisten; hilangkan bug data impor tak terhitung & gagal re-import.', 'high', 'M'],
+            ['A. Kelengkapan modul', 'Satukan bobot nilai akademik (KomponenNilai)', 'Buat Resource/UI KomponenNilai (komponen + bobot per pelajaran) & samakan/hapus default ganda akademik_grade_weights (40/30/30 vs 30/30/40) agar perubahan bobot staf benar-benar berefek.', 'high', 'M'],
+            ['A. Kelengkapan modul', 'Tambah UI presensi kegiatan', 'RelationManager "Kehadiran" pada KegiatanResource atau halaman presensi membungkus catatPresensi() agar staf bisa catat kehadiran lewat panel, bukan hanya API.', 'high', 'M'],
+            ['A. Kelengkapan modul', 'Wire Tagihan Per Kelas ke UI Filament', 'Hubungkan TagihanService::buatTagihanPerKelas() ke aksi/halaman massal (atau koreksi doc ke Import Excel) agar bendahara bisa menagih 1 kelas tanpa Excel.', 'medium', 'M'],
+            ['A. Kelengkapan modul', 'Sediakan UI panel laporan Pajak inti', 'UI untuk SPT Masa PPh21, e-Bupot (CSV Coretax) + setelan NPWP/penandatangan, SPT Badan & Sisa Lebih Yayasan; kini hanya ada di PWA/Service.', 'medium', 'L'],
+            ['A. Kelengkapan modul', 'Pengelolaan anggota Halaqah + Select di form Hafalan', 'RelationManager santri di HalaqahResource (tambah/keluarkan anggota) + Select halaqah_id pada Create Hafalan agar tak harus selalu Import Excel.', 'medium', 'M'],
+            ['A. Kelengkapan modul', 'Buat Resource panel Sima\'an', 'Resource Filament untuk lihat/koreksi data Sima\'an (kini hanya ditulis dari PWA Guru) agar bisa diaudit/diperbaiki staf di panel.', 'medium', 'S'],
+            ['A. Kelengkapan modul', 'Lengkapi siklus status Ta\'zir di panel web', 'Tambah aksi "Sanksi Dijalankan" & "Selesai" di PelanggaranSantriResource (atau dokumentasikan transisi via PWA) agar staf panel tak mentok di "diverifikasi".', 'medium', 'S'],
+            ['A. Kelengkapan modul', 'Tombol Buat + UI Log Notifikasi', 'Tambah getHeaderActions(CreateAction) di ListTemplateNotifikasi & ListBroadcastWa + Resource Log Notifikasi agar staf bisa membuat data & melihat status terkirim/gagal.', 'medium', 'M'],
+            ['A. Kelengkapan modul', 'Perbaiki gateway WA "simulated" lapor sukses palsu', 'WaGatewayService kembalikan "simulated" yang dicatat "sent" tanpa konfigurasi WAHA; jadikan status jujur agar staf tak mengira pesan terkirim.', 'medium', 'S'],
+            ['A. Kelengkapan modul', 'Samakan kosakata status broadcast', 'Selaraskan selesai/sebagian (NotifDispatcher) dengan sent/partial_failed/processing (form/service/badge) agar broadcast event-driven tampil status dikenali.', 'medium', 'S'],
+            ['A. Kelengkapan modul', 'Edit PO draft harus bisa ubah item', 'Repeater items diset visibleOn(create) sehingga Edit PO draft kehilangan daftar item; izinkan edit + recompute total.', 'medium', 'S'],
+            ['A. Kelengkapan modul', 'Guard ramah COA belum-seed sebelum aksi uang', 'Ganti RuntimeException teknis di BelanjaService/DepresiasiService/AsetMovementService dengan pesan "Aktifkan & setup modul Akuntansi dulu" + cek pra-aksi.', 'medium', 'S'],
+            ['A. Kelengkapan modul', 'Putuskan nasib fitur audit GPS Pengadaan', 'LaporanJasaDanBarang (foto+GPS) diiklankan di module.json tapi tak ada UI; bangun UI atau hapus model+migration & koreksi deskripsi.', 'medium', 'M'],
+            ['A. Kelengkapan modul', 'Deteksi bentrok jadwal guru/ruangan', 'JadwalPelajaranService hanya cek jam_selesai>jam_mulai; tambah cek tumpang-tindih guru/ruangan/kelas (atau koreksi doc index.html:94 yang menjanjikannya).', 'medium', 'M'],
+            ['A. Kelengkapan modul', 'Bersihkan scaffold route rusak (cms/ppdbs/asramas/kegiatans/kesehatans/tahfidzs)', 'Hapus Route::resource + Controller boilerplate + view stub yang return 500 ke user login (UI asli sudah di Filament).', 'medium', 'S'],
+            ['A. Kelengkapan modul', 'GRN penerimaan parsial di UI', 'Action "terima" selalu full receipt; tambah form qty diterima per item agar 3-way match parsial bisa dipakai dari panel.', 'low', 'S'],
+            ['A. Kelengkapan modul', 'DSCR/EBITDA: tarik otomatis atau panduan input', 'Pembiayaan/DSCR menuntut input EBITDA manual tanpa panduan; beri penjelasan atau tarik dari Ledger agar DSCR tak keliru/0.', 'low', 'M'],
+            ['A. Kelengkapan modul', 'Tampilkan jejak mutasi stok obat & okupansi asrama', 'ObatMutasi (audit) & occupancySummary asrama sudah dihitung di service tapi tak punya UI/widget; tampilkan.', 'low', 'S'],
+
+            // B. UX & kejelasan
+            ['B. UX & kejelasan', 'Konsolidasi 21 grup nav jadi 6-8 "aplikasi"', 'Gabung via penamaan+urutan: Kesantrian+Kepengasuhan+Kedisiplinan+UKS+Alumni→"Santri & Pengasuhan"; Keuangan+Kas+Kantin+Akuntansi+Pajak→"Keuangan"; Akademik+Tahfidz→"Akademik". Friksi terbesar staf awam.', 'high', 'M'],
+            ['B. UX & kejelasan', 'Pindahkan menu Belanja dari grup Pajak', 'BelanjaResource.navigationGroup="Pajak" menyesatkan; pindah ke grup pembelian/keuangan bersama Supplier & PurchaseOrder.', 'high', 'S'],
+            ['B. UX & kejelasan', 'Perbaiki prioritas megamenu topNav', 'Ganti $prioritas [Kesantrian,Keuangan] jadi grup jalur-adopsi (Santri & Pengasuhan, PPDB); kelompokkan "Semua Menu" per aplikasi, bukan 21 grup mentah.', 'high', 'S'],
+            ['B. UX & kejelasan', 'Indonesiakan label Website Builder', 'Eyebrow→"Teks kecil di atas judul", Primary CTA Label/Link→"Teks/Tautan Tombol", sembunyikan slug section mentah, nav "Website Builder"→"Pengaturan Tampilan Website".', 'high', 'S'],
+            ['B. UX & kejelasan', 'Konsolidasi 4 tempat edit identitas/profil CMS + fix key profil/profile', 'Satukan sumber kebenaran (Website Builder, Identitas & Kontak, Profil, Pengaturan Website) + perbaiki key "profil" vs "profile" agar editor tak jatuh ke JSON mentah.', 'high', 'M'],
+            ['B. UX & kejelasan', 'Indonesiakan label navigasi Kepegawaian', 'Payroll Asatidz→"Slip Gaji", Pegawai (HR)→"Data Pegawai", Cuti/Leave→"Cuti", Pratinjau Bisyaroh→istilah umum agar staf gaptek paham.', 'high', 'S'],
+            ['B. UX & kejelasan', 'Label awam + tooltip jargon Arab/akuntansi', 'Khidmah→"Pengabdian (Khidmah)", Munaqasyah→"Ujian Hafalan", Alokasi Biaya→"Pembagian Biaya", SKM→"Survei Kepuasan"; sembunyikan Jurnal/Kurs/Kehalalan di Mode Lanjutan.', 'medium', 'M'],
+            ['B. UX & kejelasan', 'Atasi modul tersembunyi di Mode Sederhana', 'Munculkan/onboarding menu inti yang kini gated advanced: Ledger, Kesehatan (Riwayat/Konseling), Akademik (Periode/Pelajaran/Jadwal), Pajak; + banner saat prasyarat kosong (dead-end setup).', 'medium', 'M'],
+            ['B. UX & kejelasan', 'Perbaiki label Page Buku Besar Ledger', 'BukuBesar.php menampilkan judul "Akuntansi dan Pajak" yang bentrok dengan nama grup nav & doc yang menyuruh klik "Buku Besar".', 'medium', 'S'],
+            ['B. UX & kejelasan', 'Empty-state ramah pada resource jalur-adopsi', 'Pola heading Indonesia + deskripsi + ikon + tombol Impor/Tambah pada ~88 resource polos; prioritaskan Pembayaran, Kelas, Penempatan, Pelajaran, Jadwal, Kegiatan, Pegawai, Tabungan.', 'medium', 'M'],
+            ['B. UX & kejelasan', 'Global search Tagihan & Pembayaran', 'Tambah getGloballySearchableAttributes + getGlobalSearchResultDetails di TagihanResource & PembayaranResource (cari per nama/NIS santri).', 'medium', 'S'],
+            ['B. UX & kejelasan', 'Ganti TextInput ID Tagihan/Transaksi dengan picker', 'LoketKas & KasirKantin minta ketik nomor ID internal manual; ganti dengan picker dapat dicari (nama santri/tagihan) agar kasir awam tak salah.', 'medium', 'S'],
+            ['B. UX & kejelasan', 'Perjelas identitas modul Pembiayaan', 'Satukan nama/deskripsi Pusat Modul ("Aset & inventaris" vs nama "Pembiayaan") & grup nav; pisahkan DSCR bank dari Aset/Inventaris + Sarpras/Piket.', 'medium', 'M'],
+            ['B. UX & kejelasan', 'Bungkus error service jadi notifikasi ramah (Mutu)', 'Aksi mulai_tindakan/ajukan_verifikasi tak membungkus InvalidArgumentException; tampilkan notifikasi ramah, bukan HTTP 500.', 'low', 'S'],
+            ['B. UX & kejelasan', 'Empty-state instruktif "Mutu per Kelas"', 'Sebelum pilih kelas heatmap disembunyikan tanpa instruksi; tampilkan dropdown + ajakan agar tak terkesan rusak.', 'low', 'S'],
+            ['B. UX & kejelasan', 'Selaraskan label status Periode Akademik', 'Form pakai Aktif/Nonaktif sedang doc Aktif/Selesai; samakan istilah agar staf tak ragu saat tutup semester.', 'low', 'S'],
+            ['B. UX & kejelasan', 'Cetak QR Area Piket dari panel', 'QR Area Piket di-generate tapi tak ada tombol cetak; staf harus salin manual & buat stiker sendiri.', 'low', 'S'],
+
+            // C. Pengaturan sistem
+            ['C. Pengaturan sistem', 'Tambah halaman indeks Pusat Pengaturan tunggal', 'Setting tersebar di 6 grup nav; buat indeks "Semua Pengaturan" agar staf awam menemukan toggle WA/pemisahan dana/dll.', 'high', 'M'],
+            ['C. Pengaturan sistem', 'Pisahkan setting PPDB dari PengaturanBranding', 'ppdb_form_fields & blok admission (tahun ajaran, WA admin, bank, nominal, pesan) ada di halaman bernama Branding; buat halaman Pengaturan PPDB tersendiri.', 'high', 'M'],
+            ['C. Pengaturan sistem', 'KebijakanPesantren sumber tunggal parameter keuangan', 'dscr ambang, tarif poin, pph21, jenis lembaga, pemisahan kehalalan terduplikasi di PengaturanKeuangan/KebijakanPesantren/SetupPesantren; konsolidasi & cek value-wrapper vs mentah.', 'high', 'M'],
+            ['C. Pengaturan sistem', 'Seed Periode Akuntansi pertama saat provisioning', 'Periode Akuntansi wajib untuk Ledger tapi tak ter-seed default; sediakan otomatis agar posting jurnal tak mentok.', 'medium', 'S'],
+            ['C. Pengaturan sistem', 'Setelan kode lembaga & format nomor surat keluar', 'SuratService hardcode pola (default PES) tak konsisten dengan format ijazah konfigurabel; tambah ke KebijakanRegistry.', 'medium', 'S'],
+            ['C. Pengaturan sistem', 'Setelan identitas pemotong pajak per-tenant', 'EBupotService terima $npwpPemotong yang tak pernah diisi UI (CSV Coretax tak lengkap); tambah setelan NPWP/nama penandatangan/kode KPP.', 'medium', 'S'],
+            ['C. Pengaturan sistem', 'Master gelombang PPDB terstruktur', 'Gelombang diketik bebas tanpa tanggal buka-tutup/kuota/biaya; sediakan resource gelombang di halaman Pengaturan PPDB.', 'medium', 'M'],
+            ['C. Pengaturan sistem', 'admission_academic_year ambil default dari PeriodeAkademik', 'Tahun ajaran PPDB disimpan teks bebas terpisah dari PeriodeAkademik aktif → bisa berseberangan; ambil dari periode aktif.', 'medium', 'S'],
+            ['C. Pengaturan sistem', 'Seragamkan visibilitas halaman setting di Mode Sederhana', 'PengaturanKeuangan & Notifikasi tersembunyi di Sederhana (toggle WA hilang) sementara Tampilan/AppSantri tampil; samakan kebijakan.', 'medium', 'S'],
+            ['C. Pengaturan sistem', 'Periode biaya asrama terkontrol (bukan teks bebas)', 'Periode biaya diketik bebas ("2026-07" vs "Juli 2026"); pakai pilihan terkontrol/default tahun ajaran aktif + auto-prefill nominal dari kamar/tipe.', 'medium', 'S'],
+            ['C. Pengaturan sistem', 'Pastikan kuota/H-min izin & template SK terekspos di Kebijakan', 'kesantrian.approval_h_minimum, maks_izin_bulan, payroll.template_sk & payroll_admin_whatsapp dibaca dari Setting tapi perlu dipastikan ada UI di halaman Kebijakan.', 'medium', 'S'],
+            ['C. Pengaturan sistem', 'Toggle mode_uji WA AI di panel (bukan env)', 'Chatbot WA default mode_uji=true (balas template statis), hanya bisa dimatikan via env; tambah toggle di Pengaturan AI.', 'medium', 'S'],
+            ['C. Pengaturan sistem', 'Provision budget AI per tenant + self-check infra di panel', 'AiTenantBudget harus diprovision; ekspos status ringkas (Ollama up, model ter-pull, queue, budget) di panel, bukan hanya CLI ai:health.', 'medium', 'M'],
+            ['C. Pengaturan sistem', 'Pindahkan editor Kebijakan Privasi ke setting legal', 'Teks privasi global (PPDB consent & situs publik) kini di grup Kesantrian (App Santri); pindah ke setting legal atau tautkan dari KebijakanPesantren.', 'low', 'S'],
+            ['C. Pengaturan sistem', 'Tampilkan status SMTP untuk toggle Email', 'Hanya toggle notif_email_enabled tanpa visibilitas SMTP global; tampilkan status/helper agar ON tak gagal diam-diam.', 'low', 'S'],
+            ['C. Pengaturan sistem', 'Ganti favicon TextInput URL ke FileUpload', 'Logo pakai FileUpload tervalidasi tapi favicon hanya TextInput URL rawan 404; ganti ke FileUpload ico/png.', 'low', 'S'],
+            ['C. Pengaturan sistem', 'Dorong pengisian Skema Biaya saat setup', 'SyahriyyahImportService pakai fallback hardcode 700rb bila Skema Biaya kosong; dorong tenant mengisi saat setup.', 'low', 'S'],
+
+            // D. Dokumentasi
+            ['D. Dokumentasi', 'Tulis Manual SANTRI (pengguna app sendiri)', 'App Santri sudah LIVE (login NIS+PIN/QR/fingerprint) tapi nol panduan untuk santri sebagai end-user: cara buka app, login, lihat tagihan/tabungan/jadwal/rapor. Populasi terbesar & paling gaptek.', 'high', 'M'],
+            ['D. Dokumentasi', 'Tetapkan urutan prioritas pengisian dokumentasi', 'Fokus MENAMBAH halaman baru (akurasi existing baik): (1) Manual Santri, (2) Broadcast WA, (3) Pembiayaan/Baitul Maal & Pengadaan, (4) pisah Kesehatan/UKS & Kegiatan.', 'high', 'S'],
+            ['D. Dokumentasi', 'Koreksi doc bendahara "Tagihan Per Kelas"', 'Bagian 3 mengajari tombol massal "Per Kelas" yang tak ada di UI; arahkan ke Import Excel yang nyata (atau perbarui setelah fitur di-wire).', 'high', 'S'],
+            ['D. Dokumentasi', 'Tulis manual Notifikasi / Broadcast WA', 'Belum ada how-to broadcast pengumuman massal (template, target, placeholder {{...}}); operator dipakai harian tanpa rujukan.', 'medium', 'S'],
+            ['D. Dokumentasi', 'Tulis manual PPDB untuk panitia', 'Alur verifikasi berkas→ujian→luluskan/cadangan/tolak→daftar ulang + cara atur tahun ajaran/bank/form fields; modul paling bercabang tanpa manual.', 'medium', 'M'],
+            ['D. Dokumentasi', 'Tulis manual modul Mutu untuk admin', 'Cara isi Sasaran/KPI, kelola Temuan (terbuka→tindakan→verifikasi→tutup), Inspeksi, SKM, baca Dashboard KPI + glosarium (SPMI, Non-Conformance, Severity, SKM).', 'medium', 'M'],
+            ['D. Dokumentasi', 'Tulis manual Kesehatan/UKS', 'Petugas UKS: catat pemeriksaan, kelola stok obat + import, alur kunjungan/rujukan PWA, konseling. Kini nol manual padahal 2 fitur inti tersembunyi.', 'medium', 'M'],
+            ['D. Dokumentasi', 'Tulis manual Pengadaan + glosarium', 'Alur Supplier→PO→Terima→Belanja→Setujui & Cairkan→Cetak BKK + glosarium (DPP, PKP, BKK, GRN, Syubhat, Akun Beban/Kas).', 'medium', 'M'],
+            ['D. Dokumentasi', 'Tulis manual Pembiayaan/Aset/Baitul Maal', 'Aset (input, penyusutan, pelepasan), Pembiayaan/DSCR, Baitul Maal (zakat/infak/beasiswa, PSAK 109); fitur uang/aset paling berisiko tanpa panduan.', 'medium', 'M'],
+            ['D. Dokumentasi', 'Perbaiki dokumentasi Pajak agar akurat', 'Pisahkan "Kalkulator Pajak (belanja PPN/PPh)" vs "Kalkulator PPh21 pegawai (Kepegawaian)", luruskan deskripsi "Buku Pembantu Pajak".', 'medium', 'S'],
+            ['D. Dokumentasi', 'Selaraskan dokumentasi Payroll dengan UI aktual', 'Koreksi nama tombol/status (Finalisasi & Jurnal bukan Terbitkan), jelaskan generate massal via Pratinjau Bisyaroh & Generate THR, cocokkan field Tambah Pegawai.', 'medium', 'S'],
+            ['D. Dokumentasi', 'Selaraskan label doc Kegiatan dengan menu nyata', 'Manual sebut grup "Kegiatan & Perizinan"/"Asrama" padahal menu di grup "Kepengasuhan" label "Izin Santri"; tambah walkthrough Kegiatan/Kunjungan Wali.', 'medium', 'S'],
+            ['D. Dokumentasi', 'Tandai menu mode "Lanjutan" di manual Akademik', 'Langkah doc mengarah ke menu (Periode/Pelajaran/Jadwal) yang hanya muncul di Mode Lanjutan; tandai agar staf awam tak bingung.', 'medium', 'S'],
+            ['D. Dokumentasi', 'Dokumentasikan 3 fitur tersembunyi Asrama', 'Penempatan Otomatis (per-gender, idempoten), Import Asrama Excel (dry-run), field Gender Blok; user nyata tak tahu fitur ini ada.', 'medium', 'S'],
+            ['D. Dokumentasi', 'Tulis panduan ta\'zir poin & Stasiun Pendaftaran', 'Disiplin/Ta\'zir berbasis poin (ambang SP, verifikasi anti-bully, poin prestasi) & Stasiun Pendaftaran loket (foto/TTD/NFC/PIN/cetak kartu) — fitur tercanggih paling tipis dokumentasinya.', 'medium', 'M'],
+            ['D. Dokumentasi', 'Beri banner "segera hadir" di manual AI Khadim', 'ai-khadim/index.html lengkap tapi /tanya-ustadz 404 (gated GATE-3); beri banner agar staf tak salah harap modul langsung bisa dipakai.', 'low', 'S'],
+            ['D. Dokumentasi', 'Catat di doc modul yang masih digerbang/butuh prasyarat', 'Tambah catatan kesiapan (Mode Lanjutan, GATE-3, infra) di manual agar staf tak salah harap fitur langsung jalan.', 'low', 'S'],
+        ];
+
+        $sort = 0;
+        foreach ($items as [$phase, $title, $detail, $priority, $effort]) {
+            $sort++;
+            DevTask::updateOrCreate(
+                ['dev_project_id' => $project->id, 'title' => $title],
+                [
+                    'phase' => $phase,
+                    'detail' => $detail,
+                    'current_state' => 'BELUM — temuan audit kesiapan 2026-06-23.',
+                    'status' => 'todo',
+                    'priority' => $priority,
+                    'progress' => 0,
+                    'effort' => $effort,
+                    'sort' => $sort,
+                ]
+            );
+        }
     }
 
     /**
