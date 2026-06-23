@@ -6,6 +6,7 @@ use App\Filament\Concerns\ModuleGate;
 use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\CreateKegiatan;
 use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\EditKegiatan;
 use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\ListKegiatan;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\RelationManagers\PresensiRelationManager;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -101,6 +102,13 @@ class KegiatanResource extends Resource
             ->filters([SelectFilter::make('status')->options(['terjadwal' => 'Terjadwal', 'berlangsung' => 'Berlangsung', 'selesai' => 'Selesai'])])
             ->actions([EditAction::make()])
             ->defaultSort('mulai', 'desc');
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            PresensiRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

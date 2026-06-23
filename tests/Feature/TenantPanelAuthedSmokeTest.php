@@ -61,6 +61,25 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $host = $tenant->id.'.localhost';
         $kernel = app(Kernel::class);
 
+        // Modul 'kegiatan' default 'development' di registry test → tersembunyi utk
+        // tenant non-dev. Promosikan ke released + aktifkan agar halaman edit (yang
+        // merender PresensiRelationManager, WP-26) bisa di-render & benar-benar teruji.
+        // Ditulis SEBELUM request pertama agar cache modul memuat nilai terbaru.
+        DB::connection('pgsql')->table('module_registry')->where('key', 'kegiatan')->update(['status' => 'released']);
+        DB::connection('pgsql')->table('tenant_modules')->insert([
+            'tenant_id' => $tenant->id, 'module_name' => 'kegiatan', 'is_active' => true,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        // 1 kegiatan agar halaman EDIT-nya (yang merender PresensiRelationManager,
+        // WP-26) ikut ter-render. RelationManager TAK tampil di halaman list → tanpa
+        // ini tak teruji. Diuji terpisah dengan assert 200 di bawah.
+        $kegId = DB::connection('tenant')->table('kegiatan')->insertGetId([
+            'tenant_id' => $tenant->id, 'nama' => 'Kegiatan Smoke', 'jenis' => 'umum',
+            'mulai' => now(), 'status' => 'terjadwal',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
         $paths = ['admin', 'admin/santri/santris', 'admin/asrama/penempatan-asrama/penempatan-asramas', 'admin/tagihan/tagihans', 'admin/tahfidz/halaqah/halaqahs', 'admin/tahfidz/munaqasyah/munaqasyahs', 'admin/tahfidz/hafalan-tahfidzs', 'admin/akademik/kitab/kitabs', 'admin/akademik/lembaga/lembagas', 'admin/akademik/pelajaran/pelajarans', 'admin/akademik/jadwal-pelajaran/jadwal-pelajarans', 'admin/akademik/nilai/nilais', 'admin/akademik/kurikulum/kurikulums', 'admin/akademik/kalender-akademik/kalender-akademiks', 'admin/payroll/jabatan/jabatans', 'admin/payroll/penugasan/penugasan-pegawais', 'admin/payroll/employee/employees', 'admin/kesantrian/jenis-pelanggaran/jenis-pelanggarans', 'admin/kesantrian/pelanggaran-santri/pelanggaran-santris', 'admin/rekap-disiplin', 'admin/kesiapan-emis', 'admin/sidang-kenaikan', 'admin/grid-nilai', 'admin/rekap-jurnal-kbm', 'admin/alumni/alumnis', 'admin/payroll/generate-thr', 'admin/akademik/rapor-diniyah', 'admin/akademik/rapor-diniyah/isi-rubrik', 'admin/payroll/kontrak/kontrak-kerjas', 'admin/payroll/pinjaman/pinjaman-pegawais', 'admin/log-gerbang', 'admin/pengajuan-jenguk', 'admin/moderasi-pesan-wali', 'admin/profil-mutu-santri', 'admin/mutu-kelas', 'admin/mutu-lembaga', 'admin/pengaturan/kebijakan', 'admin/pusat-modul', 'admin/setup-pesantren', 'admin/setup-unit', 'admin/setup-unit?unit=kesantrian', 'admin/setup-unit?unit=ppdb', 'admin/setup-unit?unit=akademik', 'admin/setup-unit?unit=keuangan', 'admin/setup-unit?unit=akuntansi', 'admin/setup-unit?unit=kepegawaian', 'admin/setup-unit?unit=kelembagaan', 'admin/setup-unit?unit=pengaturan', 'admin/tabungan/tabungans', 'admin/ledger/akuns', 'admin/keuangan/kasir-kantin', 'admin/keuangan/rekon-kantin', 'admin/akademik/paket-soal-akademik', 'admin/akademik/sesi-ujian-akademik', 'admin/kesehatan/obat', 'admin/kesehatan/kunjungan-uks', 'admin/sarpras/laporan-kerusakan', 'admin/sarpras/area-piket', 'admin/sarpras/piket-hari-ini', 'admin/laporan', 'admin/ledger/buku-besar', 'admin/ledger/bku', 'admin/ledger/jurnal-manual', 'admin/ledger/neraca-saldo', 'admin/ledger/varians-anggaran', 'admin/ledger/buku-pembantu-pihak', 'admin/ledger/laporan-kehalalan', 'admin/pajak/buku-pembantu', 'admin/laporan/rkam', 'admin/laporan/dana-bos-bop', 'admin/laporan/dana-terikat', 'admin/laporan/dana-kebajikan', 'admin/laporan/keuangan-pokok', 'admin/keuangan/loket-kas', 'admin/tunggakan-alumni', 'admin/pajak/kalkulator', 'admin/pajak/kalkulator-pph21', 'admin/payroll/pratinjau-khidmah'];
         foreach ($paths as $path) {
             $req = Request::create("http://{$host}/{$path}", 'GET');
@@ -69,6 +88,14 @@ class TenantPanelAuthedSmokeTest extends TestCase
 
             $this->assertLessThan(500, $status, "Render /{$path} mengembalikan {$status} (>=500). Panel rusak utk user login.");
         }
+
+        // Halaman edit kegiatan WAJIB 200 (super_admin lolos gerbang) → bukti
+        // PresensiRelationManager ter-mount tanpa error (bukan sekadar <500, agar
+        // slug salah/akses ditolak/RM rusak benar-benar tertangkap).
+        $editReq = Request::create("http://{$host}/admin/kegiatans/{$kegId}/edit", 'GET');
+        $editReq->headers->set('Host', $host);
+        $editStatus = $kernel->handle($editReq)->getStatusCode();
+        $this->assertSame(200, $editStatus, "Edit kegiatan (PresensiRelationManager) status {$editStatus}, harusnya 200.");
 
         tenancy()->end();
     }
