@@ -9,6 +9,7 @@ use Modules\Core\Services\SuratService;
 use Modules\Kesantrian\Services\DisiplinService;
 use Modules\Kesantrian\Services\PresensiAsramaService;
 use Modules\Payroll\Models\KontrakKerja;
+use Modules\Payroll\Services\SkPenugasanService;
 
 /**
  * WP-34 — Registry SEMUA kebijakan (Setting policy) yang sudah dibuka modul
@@ -168,6 +169,18 @@ class KebijakanRegistry
                 'label' => 'Pengingat kontrak habis (hari)',
                 'deskripsi' => 'Berapa hari sebelum kontrak/SK berakhir sistem mulai mengingatkan.',
                 'default' => KontrakKerja::DEFAULT_REMINDER_HARI, 'kelompok' => 'keuangan', 'tipe' => 'number', 'min' => 1, 'max' => 365,
+            ],
+            // gap-134: ekspos setelan Kepegawaian yang sebelumnya hanya dibaca dari
+            // Setting tanpa UI di halaman Kebijakan (registry-driven → otomatis muncul).
+            'payroll_admin_whatsapp' => [
+                'label' => 'WhatsApp admin Kepegawaian',
+                'deskripsi' => 'Nomor WhatsApp penerima pengingat kontrak/SK akan habis. Kosong = ikut WhatsApp admin pendaftaran.',
+                'default' => null, 'kelompok' => 'keuangan', 'tipe' => 'text',
+            ],
+            SkPenugasanService::SETTING_KEY => [
+                'label' => 'Template SK Penugasan',
+                'deskripsi' => 'Template surat keputusan penugasan pegawai (boleh memuat placeholder). Kosong = pakai template bawaan modul.',
+                'default' => null, 'kelompok' => 'keuangan', 'tipe' => 'textarea',
             ],
             'payroll.thr_formula' => [
                 'label' => 'Rumus THR',
