@@ -90,6 +90,12 @@ class TenantPanelAuthedSmokeTest extends TestCase
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
+        // 1 obat agar halaman EDIT-nya (merender MutasiRelationManager, gap 102) teruji.
+        $obatId = DB::connection('tenant')->table('obat')->insertGetId([
+            'tenant_id' => $tenant->id, 'nama' => 'Obat Smoke',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
         $paths = ['admin', 'admin/santri/santris', 'admin/asrama/penempatan-asrama/penempatan-asramas', 'admin/tagihan/tagihans', 'admin/halaqah/halaqahs', 'admin/tahfidz/munaqasyah/munaqasyahs', 'admin/hafalan-tahfidzs', 'admin/akademik/kitab/kitabs', 'admin/akademik/lembaga/lembagas', 'admin/akademik/pelajaran/pelajarans', 'admin/akademik/jadwal-pelajaran/jadwal-pelajarans', 'admin/akademik/nilai/nilais', 'admin/akademik/kurikulum/kurikulums', 'admin/akademik/kalender-akademik/kalender-akademiks', 'admin/payroll/jabatan/jabatans', 'admin/payroll/penugasan/penugasan-pegawais', 'admin/payroll/employee/employees', 'admin/jenis-pelanggaran/jenis-pelanggarans', 'admin/pelanggaran-santri/pelanggaran-santris', 'admin/rekap-disiplin', 'admin/kesiapan-emis', 'admin/sidang-kenaikan', 'admin/grid-nilai', 'admin/rekap-jurnal-kbm', 'admin/alumni/alumnis', 'admin/payroll/generate-thr', 'admin/akademik/rapor-diniyah', 'admin/akademik/rapor-diniyah/isi-rubrik', 'admin/payroll/kontrak/kontrak-kerjas', 'admin/payroll/pinjaman/pinjaman-pegawais', 'admin/log-gerbang', 'admin/pengajuan-jenguk', 'admin/moderasi-pesan-wali', 'admin/profil-mutu-santri', 'admin/mutu-kelas', 'admin/mutu-lembaga', 'admin/pengaturan/kebijakan', 'admin/notifikasi/pengaturan', 'admin/pusat-modul', 'admin/setup-pesantren', 'admin/setup-unit', 'admin/setup-unit?unit=kesantrian', 'admin/setup-unit?unit=ppdb', 'admin/setup-unit?unit=akademik', 'admin/setup-unit?unit=keuangan', 'admin/setup-unit?unit=akuntansi', 'admin/setup-unit?unit=kepegawaian', 'admin/setup-unit?unit=kelembagaan', 'admin/setup-unit?unit=pengaturan', 'admin/tabungan/tabungans', 'admin/ledger/akuns', 'admin/keuangan/kasir-kantin', 'admin/keuangan/rekon-kantin', 'admin/akademik/paket-soal-akademik', 'admin/akademik/sesi-ujian-akademik', 'admin/kesehatan/obat', 'admin/kesehatan/kunjungan-uks', 'admin/sarpras/laporan-kerusakan', 'admin/sarpras/area-piket', 'admin/sarpras/piket-hari-ini', 'admin/laporan', 'admin/ledger/buku-besar', 'admin/ledger/bku', 'admin/ledger/jurnal-manual', 'admin/ledger/neraca-saldo', 'admin/ledger/varians-anggaran', 'admin/ledger/buku-pembantu-pihak', 'admin/ledger/laporan-kehalalan', 'admin/pajak/buku-pembantu', 'admin/laporan/rkam', 'admin/laporan/dana-bos-bop', 'admin/laporan/dana-terikat', 'admin/laporan/dana-kebajikan', 'admin/laporan/keuangan-pokok', 'admin/keuangan/loket-kas', 'admin/tunggakan-alumni', 'admin/pajak/kalkulator', 'admin/pajak/kalkulator-pph21', 'admin/payroll/pratinjau-khidmah'];
         foreach ($paths as $path) {
             $req = Request::create("http://{$host}/{$path}", 'GET');
@@ -154,6 +160,13 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $mutuKelasReq->headers->set('Host', $host);
         $mutuKelasStatus = $kernel->handle($mutuKelasReq)->getStatusCode();
         $this->assertSame(200, $mutuKelasStatus, "Mutu per Kelas (empty-state) status {$mutuKelasStatus}, harusnya 200.");
+
+        // Edit Obat WAJIB 200 → bukti MutasiRelationManager (riwayat stok, gap 102)
+        // ter-mount tanpa error (RM hanya tampil di halaman edit).
+        $obatReq = Request::create("http://{$host}/admin/kesehatan/obat/{$obatId}/edit", 'GET');
+        $obatReq->headers->set('Host', $host);
+        $obatStatus = $kernel->handle($obatReq)->getStatusCode();
+        $this->assertSame(200, $obatStatus, "Edit Obat (MutasiRelationManager) status {$obatStatus}, harusnya 200.");
 
         tenancy()->end();
     }
