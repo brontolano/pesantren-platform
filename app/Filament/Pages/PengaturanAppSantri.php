@@ -86,14 +86,22 @@ class PengaturanAppSantri extends Page implements HasForms
                     ]),
 
                 Section::make('Kebijakan Privasi Sistem')
-                    ->description('Dipublikasikan di /kebijakan-privasi dan disetujui wali (checkbox) saat mendaftar PPDB. Redaksi default disediakan platform — sesuaikan bila perlu.')
+                    ->description('Editor redaksi privasi kini berada di Pusat Kebijakan (Kebijakan Pesantren → kelompok Umum), bersama setelan legal lainnya. Editor di sini tetap berfungsi & menyimpan ke tempat yang SAMA — silakan gunakan salah satu.')
                     ->icon('heroicon-o-shield-check')
+                    ->headerActions([
+                        \Filament\Actions\Action::make('buka_pusat_kebijakan')
+                            ->label('Buka di Pusat Kebijakan')
+                            ->icon('heroicon-o-scale')
+                            ->color('gray')
+                            ->url(fn (): string => KebijakanPesantren::getUrl())
+                            ->openUrlInNewTab(),
+                    ])
                     ->collapsed()
                     ->schema([
                         \Filament\Forms\Components\Textarea::make('kebijakan')
                             ->label('')
                             ->rows(16)
-                            ->helperText('Wajib tetap menyebut: data yang dikumpulkan, tujuan (termasuk contoh tulisan utk teknologi internal), hak wali menarik persetujuan.'),
+                            ->helperText('Dipublikasikan di /kebijakan-privasi dan disetujui wali (checkbox) saat mendaftar PPDB. Wajib tetap menyebut: data yang dikumpulkan, tujuan (termasuk contoh tulisan utk teknologi internal), hak wali menarik persetujuan.'),
                     ]),
             ]);
     }
