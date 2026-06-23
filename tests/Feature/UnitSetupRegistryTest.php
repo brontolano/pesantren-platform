@@ -6,7 +6,7 @@ use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 use App\Filament\Resources\Pembiayaan\AsetResource;
-use App\Filament\Resources\Pengadaan\Supplier\SupplierResource;
+use Modules\Pengadaan\Filament\Resources\Supplier\SupplierResource;
 use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
 use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
