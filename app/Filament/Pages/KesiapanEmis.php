@@ -4,7 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
-use App\Filament\Resources\Payroll\Employee\EmployeeResource;
+use Modules\Payroll\Filament\Resources\Employee\EmployeeResource;
 use App\Filament\Resources\Santri\SantriResource;
 use Filament\Pages\Page;
 use Modules\Akademik\Models\Lembaga;

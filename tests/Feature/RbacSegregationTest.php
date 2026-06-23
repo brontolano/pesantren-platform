@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use Modules\Ledger\Filament\Resources\PeriodeAkuntansiResource;
-use App\Filament\Resources\Payroll\SlipGajiResource;
-use App\Filament\Resources\Pengadaan\BelanjaResource;
+use Modules\Payroll\Filament\Resources\SlipGajiResource;
+use Modules\Pengadaan\Filament\Resources\BelanjaResource;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;

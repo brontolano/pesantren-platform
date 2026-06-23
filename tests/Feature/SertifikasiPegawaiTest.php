@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Payroll\Employee\EmployeeResource;
-use App\Filament\Resources\Payroll\Employee\Pages\CreateEmployee;
+use Modules\Payroll\Filament\Resources\Employee\EmployeeResource;
+use Modules\Payroll\Filament\Resources\Employee\Pages\CreateEmployee;
 use App\Models\Tenant;
 use App\Models\User;
 use Filament\Forms\Components\BaseFileUpload;

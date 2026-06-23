@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Payroll\Kontrak\KontrakKerjaResource;
-use App\Filament\Resources\Payroll\Kontrak\Pages\CreateKontrakKerja;
+use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
+use Modules\Payroll\Filament\Resources\Kontrak\Pages\CreateKontrakKerja;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
