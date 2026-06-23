@@ -134,6 +134,13 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $halaqahStatus = $kernel->handle($halaqahReq)->getStatusCode();
         $this->assertSame(200, $halaqahStatus, "Edit Halaqah (KeanggotaanRelationManager) status {$halaqahStatus}, harusnya 200.");
 
+        // Sima'an (SimaAnResource baru, slug eksplisit tahfidz/simaan) WAJIB 200 →
+        // bukti resource TERDAFTAR di panel.
+        $simaanReq = Request::create("http://{$host}/admin/tahfidz/simaan", 'GET');
+        $simaanReq->headers->set('Host', $host);
+        $simaanStatus = $kernel->handle($simaanReq)->getStatusCode();
+        $this->assertSame(200, $simaanStatus, "Sima'an (SimaAnResource) status {$simaanStatus}, harusnya 200.");
+
         tenancy()->end();
     }
 }
