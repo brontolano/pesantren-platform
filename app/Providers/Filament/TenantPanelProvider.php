@@ -49,6 +49,7 @@ use Modules\Keuangan\Filament\Resources\BaitulMaal\BeasiswaResource;
 use Modules\Keuangan\Filament\Resources\BaitulMaal\DonasiResource;
 use Modules\Keuangan\Filament\Resources\BaitulMaal\ProgramDonasiResource;
 use Modules\Notifikasi\Filament\Resources\BroadcastWa\BroadcastWaResource;
+use Modules\Notifikasi\Filament\Resources\LogNotifikasi\LogNotifikasiResource;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
 use Modules\CMS\Filament\Resources\Profile\ProfileResource;
@@ -407,6 +408,7 @@ class TenantPanelProvider extends PanelProvider
             MutuSkmResource::class,
             TemplateNotifikasiResource::class,
             BroadcastWaResource::class,
+            LogNotifikasiResource::class,
             CalonSantriResource::class,
             CalonSantriDokumenResource::class,
             HasilUjianResource::class,
