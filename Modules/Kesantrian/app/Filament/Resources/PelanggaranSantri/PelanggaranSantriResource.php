@@ -9,6 +9,7 @@ use App\Services\StorageQuotaService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -210,6 +211,49 @@ class PelanggaranSantriResource extends Resource
                             Notification::make()->success()->title('Pelanggaran diverifikasi — poin berlaku.')->send();
                         } catch (Throwable $e) {
                             Notification::make()->danger()->title('Gagal verifikasi')->body($e->getMessage())->send();
+                        }
+                    }),
+                Action::make('catatSanksi')
+                    ->label('Catat Sanksi')
+                    ->icon('heroicon-o-clipboard-document-check')
+                    ->color('primary')
+                    ->visible(fn (PelanggaranSantri $record): bool => in_array($record->status, ['diverifikasi', 'sanksi_dijalankan'], true)
+                        && (auth()->user()?->can('manage_santri') ?? false))
+                    ->schema([
+                        TextInput::make('jenis_sanksi')
+                            ->label('Jenis Sanksi')
+                            ->maxLength(255)
+                            ->placeholder('Kosongkan = sanksi default jenis pelanggaran')
+                            ->helperText('mis. Pembinaan, membersihkan masjid, panggil wali.'),
+                        DatePicker::make('tanggal')->label('Tanggal Pelaksanaan')->default(now()),
+                        Textarea::make('catatan')->label('Catatan')->rows(2),
+                    ])
+                    ->action(function (PelanggaranSantri $record, array $data): void {
+                        try {
+                            $payload = ['tanggal' => $data['tanggal'] ?? null, 'catatan' => $data['catatan'] ?? null];
+                            if (filled($data['jenis_sanksi'] ?? null)) {
+                                $payload['jenis_sanksi'] = $data['jenis_sanksi'];
+                            }
+                            app(DisiplinService::class)->catatSanksi($record, auth()->user(), $payload);
+                            Notification::make()->success()->title('Sanksi tercatat — status: Sanksi Dijalankan.')->send();
+                        } catch (Throwable $e) {
+                            Notification::make()->danger()->title('Gagal mencatat sanksi')->body($e->getMessage())->send();
+                        }
+                    }),
+                Action::make('selesaikan')
+                    ->label('Selesai')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalDescription('Tandai kasus disiplin ini selesai (sanksi tuntas / ditutup).')
+                    ->visible(fn (PelanggaranSantri $record): bool => in_array($record->status, ['diverifikasi', 'sanksi_dijalankan'], true)
+                        && (auth()->user()?->can('manage_santri') ?? false))
+                    ->action(function (PelanggaranSantri $record): void {
+                        try {
+                            app(DisiplinService::class)->selesaikan($record);
+                            Notification::make()->success()->title('Kasus disiplin ditandai selesai.')->send();
+                        } catch (Throwable $e) {
+                            Notification::make()->danger()->title('Gagal menyelesaikan')->body($e->getMessage())->send();
                         }
                     }),
                 Action::make('batalkan')
