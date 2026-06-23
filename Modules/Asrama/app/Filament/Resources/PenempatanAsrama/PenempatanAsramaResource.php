@@ -5,6 +5,7 @@ namespace Modules\Asrama\Filament\Resources\PenempatanAsrama;
 use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\CreatePenempatanAsrama;
 use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\EditPenempatanAsrama;
 use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\ListPenempatanAsrama;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -77,6 +78,16 @@ class PenempatanAsramaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada penempatan')
+            ->emptyStateDescription('Tempatkan santri ke kamar asrama untuk mulai mengelola hunian.')
+            ->emptyStateIcon('heroicon-o-user-group')
+            ->emptyStateActions([
+                Action::make('tambah')
+                    ->label('Tambah Penempatan')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn (): bool => static::canCreate())
+                    ->url(fn (): string => static::getUrl('create')),
+            ])
             ->columns([
                 TextColumn::make('santri.nama')->label('Santri')->searchable()->sortable(),
                 TextColumn::make('kamar.blok.nama_blok')->label('Blok'),

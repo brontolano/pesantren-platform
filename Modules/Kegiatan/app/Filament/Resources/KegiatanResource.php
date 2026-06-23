@@ -9,6 +9,7 @@ use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\ListKegiatan;
 use Modules\Kegiatan\Filament\Resources\Kegiatan\RelationManagers\PresensiRelationManager;
 use App\Support\UiMode;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
@@ -86,6 +87,16 @@ class KegiatanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada kegiatan')
+            ->emptyStateDescription('Jadwalkan kegiatan pesantren agar kehadiran santri bisa dicatat.')
+            ->emptyStateIcon('heroicon-o-calendar-days')
+            ->emptyStateActions([
+                Action::make('tambah')
+                    ->label('Tambah Kegiatan')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn (): bool => static::canCreate())
+                    ->url(fn (): string => static::getUrl('create')),
+            ])
             ->columns([
                 TextColumn::make('nama')->label('Nama')->searchable()->sortable(),
                 TextColumn::make('jenis')->label('Jenis')->badge(),
