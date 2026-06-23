@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Tagihan\Pages\CreateTagihan;
+use Modules\Keuangan\Filament\Resources\Tagihan\Pages\CreateTagihan;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Artisan;
