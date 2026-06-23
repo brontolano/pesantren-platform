@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Crm\Pages;
+namespace Modules\PPDB\Filament\Resources\Crm\Pages;
 
-use App\Filament\Resources\Crm\CrmPenawaranResource;
+use Modules\PPDB\Filament\Resources\Crm\CrmPenawaranResource;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\BroadcastWa\Pages;
+namespace Modules\Notifikasi\Filament\Resources\BroadcastWa\Pages;
 
-use App\Filament\Resources\BroadcastWa\BroadcastWaResource;
+use Modules\Notifikasi\Filament\Resources\BroadcastWa\BroadcastWaResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListBroadcastWa extends ListRecords

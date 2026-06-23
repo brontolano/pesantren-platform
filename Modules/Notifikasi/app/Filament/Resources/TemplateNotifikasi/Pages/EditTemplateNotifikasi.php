@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\TemplateNotifikasi\Pages;
+namespace Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages;
 
-use App\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource;
+use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource;
 use Filament\Resources\Pages\EditRecord;
 
 class EditTemplateNotifikasi extends EditRecord
