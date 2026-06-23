@@ -61,15 +61,17 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $host = $tenant->id.'.localhost';
         $kernel = app(Kernel::class);
 
-        // Modul 'kegiatan' default 'development' di registry test → tersembunyi utk
-        // tenant non-dev. Promosikan ke released + aktifkan agar halaman edit (yang
-        // merender PresensiRelationManager, WP-26) bisa di-render & benar-benar teruji.
+        // Sebagian modul default 'development' di registry test → tersembunyi utk
+        // tenant non-dev. Promosikan ke released + aktifkan agar halaman/resource-nya
+        // benar-benar ter-render (assert 200 di bawah), bukan 403 yang lolos diam-diam.
         // Ditulis SEBELUM request pertama agar cache modul memuat nilai terbaru.
-        DB::connection('pgsql')->table('module_registry')->where('key', 'kegiatan')->update(['status' => 'released']);
-        DB::connection('pgsql')->table('tenant_modules')->insert([
-            'tenant_id' => $tenant->id, 'module_name' => 'kegiatan', 'is_active' => true,
-            'created_at' => now(), 'updated_at' => now(),
-        ]);
+        foreach (['kegiatan', 'notifikasi'] as $modul) {
+            DB::connection('pgsql')->table('module_registry')->where('key', $modul)->update(['status' => 'released']);
+            DB::connection('pgsql')->table('tenant_modules')->insert([
+                'tenant_id' => $tenant->id, 'module_name' => $modul, 'is_active' => true,
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+        }
 
         // 1 kegiatan agar halaman EDIT-nya (yang merender PresensiRelationManager,
         // WP-26) ikut ter-render. RelationManager TAK tampil di halaman list → tanpa
@@ -96,6 +98,12 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $editReq->headers->set('Host', $host);
         $editStatus = $kernel->handle($editReq)->getStatusCode();
         $this->assertSame(200, $editStatus, "Edit kegiatan (PresensiRelationManager) status {$editStatus}, harusnya 200.");
+
+        // Log Notifikasi (resource read-only baru) WAJIB 200 → bukti resource ter-render.
+        $logReq = Request::create("http://{$host}/admin/komunikasi/log-notifikasi", 'GET');
+        $logReq->headers->set('Host', $host);
+        $logStatus = $kernel->handle($logReq)->getStatusCode();
+        $this->assertSame(200, $logStatus, "Log Notifikasi (LogNotifikasiResource) status {$logStatus}, harusnya 200.");
 
         tenancy()->end();
     }
