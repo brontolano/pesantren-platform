@@ -7,6 +7,7 @@ use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\CreateJadwalPelaja
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\EditJadwalPelajaran;
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\ListJadwalPelajaran;
 use App\Support\UiMode;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -138,6 +139,16 @@ class JadwalPelajaranResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada jadwal pelajaran')
+            ->emptyStateDescription('Pastikan Kelas dan Pelajaran sudah dibuat, lalu susun jadwal mingguan di sini.')
+            ->emptyStateIcon('heroicon-o-clock')
+            ->emptyStateActions([
+                Action::make('tambah')
+                    ->label('Tambah Jadwal')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn (): bool => static::canCreate())
+                    ->url(fn (): string => static::getUrl('create')),
+            ])
             ->columns([
                 TextColumn::make('kelas.nama_kelas')->label('Kelas')->sortable(),
                 TextColumn::make('pelajaran.nama')->label('Pelajaran')->searchable(),
