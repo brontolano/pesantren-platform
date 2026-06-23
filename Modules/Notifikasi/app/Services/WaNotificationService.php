@@ -30,6 +30,16 @@ class WaNotificationService
                 'variables' => $variables,
             ]);
 
+            // Gateway tak benar-benar mengirim — 'simulated' (WA belum dikonfigurasi)
+            // atau 'disabled' (WA dimatikan). JANGAN catat 'sent': log jujur + hitung
+            // sebagai TIDAK terkirim agar staf tak salah kira pesan sampai.
+            $status = is_array($response) ? ($response['status'] ?? null) : null;
+            if (in_array($status, ['simulated', 'disabled'], true)) {
+                $this->logService->forUndelivered($broadcast, $target, $status, is_array($response) ? $response : []);
+
+                return false;
+            }
+
             $this->logService->forSuccess($broadcast, $target, $response);
 
             return true;

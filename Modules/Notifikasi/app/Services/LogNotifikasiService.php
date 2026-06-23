@@ -55,6 +55,26 @@ class LogNotifikasiService
         ]);
     }
 
+    /**
+     * Pesan TAK terkirim karena gateway belum siap: 'simulated' (WA belum
+     * dikonfigurasi) / 'disabled' (WA dimatikan). Dicatat JUJUR — bukan 'sent'.
+     */
+    public function forUndelivered(BroadcastWa $broadcast, string $target, string $status, array $payload = []): LogNotifikasi
+    {
+        return $this->create([
+            'broadcast_id' => $broadcast->id,
+            'template_id' => $broadcast->template_id,
+            'jenis' => 'broadcast',
+            'channel' => $broadcast->template->channel,
+            'target' => $target,
+            'status' => $status,
+            'error_message' => $status === 'disabled'
+                ? 'WhatsApp dinonaktifkan di Pengaturan Notifikasi — pesan tidak dikirim.'
+                : 'WhatsApp belum dikonfigurasi (endpoint kosong) — pesan tidak dikirim.',
+            'payload' => $payload,
+        ]);
+    }
+
     public function forEmail(TemplateNotifikasi $template, string $target, array $payload = []): LogNotifikasi
     {
         return $this->create([

@@ -134,7 +134,9 @@ class NotifDispatcher
                 $ok ? $hasil['terkirim']++ : $hasil['gagal']++;
             }
 
-            $broadcast->update(['status' => $hasil['gagal'] === 0 ? 'selesai' : 'sebagian']);
+            // Kosakata status KANONIK = sent/partial_failed (samakan dgn BroadcastWaService
+            // & BroadcastWaResource). Sebelumnya 'selesai'/'sebagian' → tak dikenali UI/badge.
+            $broadcast->update(['status' => $hasil['gagal'] === 0 ? 'sent' : 'partial_failed']);
 
             return $hasil;
         } catch (Throwable $e) {
