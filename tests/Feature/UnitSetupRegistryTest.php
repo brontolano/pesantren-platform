@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
-use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
+use Modules\Keuangan\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 use Modules\Pembiayaan\Filament\Resources\AsetResource;
 use Modules\Pengadaan\Filament\Resources\Supplier\SupplierResource;

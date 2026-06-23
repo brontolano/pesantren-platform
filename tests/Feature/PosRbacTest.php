@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Pos\PosKategoriResource;
+use Modules\Keuangan\Filament\Resources\Pos\PosKategoriResource;
 use App\Models\TenantModule;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
