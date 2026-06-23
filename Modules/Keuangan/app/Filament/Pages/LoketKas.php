@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\PosKategori;
 use Modules\Keuangan\Models\PosSesi;
+use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\PosKasService;
 use Throwable;
 
@@ -140,10 +141,12 @@ class LoketKas extends Page implements HasActions, HasForms
                             ->searchable()
                             ->visible(fn (Get $get): bool => $this->kategoriButuhSantri($get('kategori_id')))
                             ->required(fn (Get $get): bool => $this->kategoriButuhSantri($get('kategori_id'))),
-                        TextInput::make('tagihan_id')
-                            ->label('ID Tagihan')
-                            ->numeric()
-                            ->helperText('Nomor tagihan yang akan dibayar.')
+                        Select::make('tagihan_id')
+                            ->label('Tagihan')
+                            ->helperText('Cari tagihan via nama/NIS santri. Nilai tetap ID tagihan yang sama.')
+                            ->searchable()
+                            ->getSearchResultsUsing(fn (string $search): array => $this->tagihanOptions($search))
+                            ->getOptionLabelUsing(fn ($value): ?string => $this->tagihanOptionLabel($value))
                             ->visible(fn (Get $get): bool => $this->kategoriButuhTagihan($get('kategori_id')))
                             ->required(fn (Get $get): bool => $this->kategoriButuhTagihan($get('kategori_id'))),
                         Textarea::make('keterangan')
@@ -258,6 +261,55 @@ class LoketKas extends Page implements HasActions, HasForms
         } catch (Throwable $e) {
             Notification::make()->title('Gagal mencatat transaksi')->body($e->getMessage())->danger()->send();
         }
+    }
+
+    /**
+     * Opsi picker tagihan dapat-dicari (nama/NIS santri / jenis), resolve ke ID tagihan.
+     * Hanya tagihan belum lunas. Read-only — tak menyentuh logika bayar/posting.
+     *
+     * @return array<int, string>
+     */
+    private function tagihanOptions(string $search): array
+    {
+        $search = trim($search);
+
+        return Tagihan::query()
+            ->belumLunas()
+            ->with('santri')
+            ->when($search !== '', fn ($q) => $q
+                ->where(fn ($w) => $w
+                    ->whereHas('santri', fn ($s) => $s
+                        ->where('nama', 'like', "%{$search}%")
+                        ->orWhere('nis', 'like', "%{$search}%"))
+                    ->orWhere('jenis_tagihan', 'like', "%{$search}%")))
+            ->latest('jatuh_tempo')
+            ->limit(50)
+            ->get()
+            ->mapWithKeys(fn (Tagihan $t): array => [$t->id => $this->labelTagihan($t)])
+            ->all();
+    }
+
+    /** Label untuk nilai tagihan terpilih (pre-fill / render). */
+    private function tagihanOptionLabel(mixed $value): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        $tagihan = Tagihan::query()->with('santri')->find($value);
+
+        return $tagihan ? $this->labelTagihan($tagihan) : null;
+    }
+
+    /** Teks tampilan satu tagihan: santri (NIS) — jenis (sisa). */
+    private function labelTagihan(Tagihan $tagihan): string
+    {
+        $santri = $tagihan->santri;
+        $nis = $santri?->nis ? $santri->nis.' — ' : '';
+        $nama = $santri?->nama ?? 'Santri';
+
+        return $nis.$nama.' • '.$tagihan->jenis_tagihan
+            .' (sisa Rp '.number_format((float) $tagihan->sisa_tagihan, 0, ',', '.').')';
     }
 
     private function kategoriButuhSantri(mixed $kategoriId): bool

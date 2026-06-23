@@ -153,6 +153,22 @@ class KebijakanRegistry
                 'deskripsi' => 'Bila aktif, aksi "Terima (GRN)" pada Purchase Order menampilkan form jumlah-diterima per item (boleh kurang dari qty PO). Bila mati (bawaan), penerimaan selalu penuh sekaligus seperti sebelumnya.',
                 'default' => false, 'kelompok' => 'keuangan', 'tipe' => 'bool',
             ],
+            // gap-129 — identitas pemotong pajak per-tenant (dipakai EBupotService utk CSV e-Bupot Coretax).
+            'pajak.npwp_pemotong' => [
+                'label' => 'NPWP Pemotong Pajak',
+                'deskripsi' => 'NPWP badan/yayasan sebagai pemotong PPh 21 (kolom npwp_pemotong CSV e-Bupot Coretax). Kosongkan bila belum ada.',
+                'default' => '', 'kelompok' => 'keuangan', 'tipe' => 'text',
+            ],
+            'pajak.nama_penandatangan' => [
+                'label' => 'Nama Penandatangan Bukti Potong',
+                'deskripsi' => 'Nama pejabat penandatangan bukti potong PPh 21 (e-Bupot Coretax).',
+                'default' => '', 'kelompok' => 'keuangan', 'tipe' => 'text',
+            ],
+            'pajak.kode_kpp' => [
+                'label' => 'Kode KPP Terdaftar',
+                'deskripsi' => 'Kode Kantor Pelayanan Pajak tempat pemotong terdaftar (melengkapi identitas CSV e-Bupot).',
+                'default' => '', 'kelompok' => 'keuangan', 'tipe' => 'text',
+            ],
             'akademik_kehadiran_minimal' => [
                 'label' => 'Ambang kehadiran minimal (%)',
                 'deskripsi' => 'Persentase kehadiran minimum santri sebelum ditandai bermasalah pada KPI akademik.',

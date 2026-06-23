@@ -7,8 +7,8 @@ use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -162,6 +162,49 @@ class KasirKantin extends Page implements HasActions, HasForms
         return Auth::user()?->can('manage_keuangan') ?? false;
     }
 
+    /**
+     * Opsi picker refund: transaksi belanja kantin yang BELUM di-refund,
+     * dilabeli nama santri + nominal + tanggal + #ID. Hanya membantu kasir
+     * menemukan transaksi (search by nama) — eligibility refund tetap divalidasi
+     * ulang oleh KantinService::refund (sekali-saja, race-safe). Tidak mengubah
+     * logika/posting apa pun.
+     *
+     * @return array<int, string> ID transaksi → label
+     */
+    public function opsiTransaksiRefund(?string $search = null): array
+    {
+        $query = TabunganTransaksi::query()
+            ->where('tipe', 'belanja_kantin')
+            ->whereNotExists(function ($sub): void {
+                $sub->selectRaw('1')
+                    ->from('tabungan_transaksi as r')
+                    ->whereColumn('r.ref_transaksi_id', 'tabungan_transaksi.id')
+                    ->where('r.tipe', 'refund_kantin');
+            })
+            ->with('tabungan.santri')
+            ->latest('id')
+            ->limit(50);
+
+        if ($search !== null && trim($search) !== '') {
+            $term = trim($search);
+            $query->where(function ($q) use ($term): void {
+                $q->whereHas('tabungan.santri', fn ($s) => $s->where('nama', 'like', '%'.$term.'%')
+                    ->orWhere('nis', 'like', '%'.$term.'%'))
+                    ->orWhere('nominal', 'like', '%'.$term.'%');
+            });
+        }
+
+        return $query->get()
+            ->mapWithKeys(function (TabunganTransaksi $trx): array {
+                $nama = $trx->tabungan?->santri?->nama ?? 'Santri';
+                $nominal = number_format((float) $trx->nominal, 0, ',', '.');
+                $tanggal = optional($trx->tanggal)->format('d/m/Y') ?? '-';
+
+                return [$trx->id => $nama.' — Rp '.$nominal.' · '.$tanggal.' · #'.$trx->id];
+            })
+            ->all();
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -171,10 +214,15 @@ class KasirKantin extends Page implements HasActions, HasForms
                 ->color('danger')
                 ->visible(fn (): bool => $this->canRefund())
                 ->schema([
-                    TextInput::make('transaksi_id')
-                        ->label('ID Transaksi Belanja')
-                        ->numeric()->required()
-                        ->helperText('Nomor transaksi belanja kantin yang akan dikembalikan (refund penuh, sekali saja).'),
+                    Select::make('transaksi_id')
+                        ->label('Transaksi Belanja')
+                        ->required()
+                        ->searchable()
+                        ->placeholder('Cari nama santri / nominal transaksi belanja…')
+                        ->options(fn (): array => $this->opsiTransaksiRefund())
+                        ->getSearchResultsUsing(fn (string $search): array => $this->opsiTransaksiRefund($search))
+                        ->getOptionLabelUsing(fn ($value): ?string => $this->opsiTransaksiRefund()[(int) $value] ?? null)
+                        ->helperText('Pilih transaksi belanja kantin yang akan dikembalikan (refund penuh, sekali saja). Telusuri dengan nama santri.'),
                     Textarea::make('alasan')->label('Alasan')->rows(2),
                 ])
                 ->requiresConfirmation()
