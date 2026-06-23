@@ -1,8 +1,4 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Akademik\Http\Controllers\AkademikController;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('akademiks', AkademikController::class)->names('akademik');
-});
+// UI modul Akademik disajikan via panel Filament — tak ada rute web kustom.
+// (Scaffold nwidart Route::resource dihapus: cegah 500/404 di /akademiks utk user login.)

@@ -1,8 +1,4 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Tahfidz\Http\Controllers\TahfidzController;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('tahfidzs', TahfidzController::class)->names('tahfidz');
-});
+// UI modul Tahfidz disajikan via panel Filament — tak ada rute web kustom.
+// (Scaffold nwidart Route::resource dihapus: cegah 500/404 di /tahfidzs utk user login.)

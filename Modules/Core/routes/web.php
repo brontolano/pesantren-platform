@@ -1,8 +1,4 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Core\Http\Controllers\CoreController;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('cores', CoreController::class)->names('core');
-});
+// UI modul Core disajikan via panel Filament — tak ada rute web kustom.
+// (Scaffold nwidart Route::resource dihapus: cegah 500/404 di /cores utk user login.)
