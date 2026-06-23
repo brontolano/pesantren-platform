@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Sarpras;
+namespace Modules\Pembiayaan\Filament\Resources\Sarpras;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Sarpras\LaporanKerusakan\Pages\EditLaporanKerusakan;
-use App\Filament\Resources\Sarpras\LaporanKerusakan\Pages\ListLaporanKerusakan;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakan\Pages\EditLaporanKerusakan;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakan\Pages\ListLaporanKerusakan;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;

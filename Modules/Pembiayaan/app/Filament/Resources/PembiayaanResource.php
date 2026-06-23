@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Pembiayaan;
+namespace Modules\Pembiayaan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Pembiayaan\Pages\CreatePembiayaan;
-use App\Filament\Resources\Pembiayaan\Pages\ListPembiayaan;
+use Modules\Pembiayaan\Filament\Resources\Pages\CreatePembiayaan;
+use Modules\Pembiayaan\Filament\Resources\Pages\ListPembiayaan;
 use App\Services\AuditLogger;
 use App\Support\UiMode;
 use Filament\Actions\Action;

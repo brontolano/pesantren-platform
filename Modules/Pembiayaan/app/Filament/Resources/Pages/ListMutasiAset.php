@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Pembiayaan\Pages;
+namespace Modules\Pembiayaan\Filament\Resources\Pages;
 
-use App\Filament\Resources\Pembiayaan\MutasiAsetResource;
+use Modules\Pembiayaan\Filament\Resources\MutasiAsetResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListMutasiAset extends ListRecords

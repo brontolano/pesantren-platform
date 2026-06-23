@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Pembiayaan\Pages;
+namespace Modules\Pembiayaan\Filament\Resources\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use App\Filament\Resources\Pembiayaan\AsetResource;
+use Modules\Pembiayaan\Filament\Resources\AsetResource;
 use App\Models\Tenant;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
