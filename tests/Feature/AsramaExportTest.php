@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Asrama\PenempatanAsrama\Pages\ListPenempatanAsrama;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\ListPenempatanAsrama;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
