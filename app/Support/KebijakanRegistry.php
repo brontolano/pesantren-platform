@@ -169,6 +169,12 @@ class KebijakanRegistry
                 'deskripsi' => 'Kode Kantor Pelayanan Pajak tempat pemotong terdaftar (melengkapi identitas CSV e-Bupot).',
                 'default' => '', 'kelompok' => 'keuangan', 'tipe' => 'text',
             ],
+            // gap-137 — redaksi Kebijakan Privasi (rumah legal kanonik; key SAMA dgn editor lama).
+            'kebijakan_privasi_sistem' => [
+                'label' => 'Redaksi Kebijakan Privasi Sistem',
+                'deskripsi' => 'Teks kebijakan privasi pesantren — tampil di /kebijakan-privasi & disetujui wali saat daftar PPDB. Kosong = pakai redaksi bawaan platform.',
+                'default' => '', 'kelompok' => 'umum', 'tipe' => 'textarea',
+            ],
             'akademik_kehadiran_minimal' => [
                 'label' => 'Ambang kehadiran minimal (%)',
                 'deskripsi' => 'Persentase kehadiran minimum santri sebelum ditandai bermasalah pada KPI akademik.',
