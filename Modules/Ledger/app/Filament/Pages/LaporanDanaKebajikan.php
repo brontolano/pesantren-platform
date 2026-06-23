@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Ledger\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use App\Support\UiMode;
@@ -14,26 +14,30 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Modules\Ledger\Services\LaporanService;
+use Modules\Ledger\Support\FiturKeuangan;
 
-/** L5 — RAB/RKAM & Realisasi (realisasi = akumulasi beban per divisi dari jurnal). */
-class LaporanRkam extends Page implements HasForms
+/**
+ * Laporan Sumber & Penggunaan Dana Kebajikan (uang syubhat) — terpisah dari surplus.
+ * Hanya relevan bila pemisahan kehalalan aktif.
+ */
+class LaporanDanaKebajikan extends Page implements HasForms
 {
     use InteractsWithForms;
     use ModuleGate;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-scale';
 
-    protected static ?string $navigationLabel = 'L5 — RKAM & Realisasi';
+    protected static ?string $navigationLabel = 'Dana Kebajikan (Pembersihan)';
 
-    protected static ?string $title = 'L5 — RAB / RKAM & Realisasi Anggaran';
+    protected static ?string $title = 'Laporan Sumber & Penggunaan Dana Kebajikan';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 7;
 
-    protected static ?string $slug = 'laporan/rkam';
+    protected static ?string $slug = 'laporan/dana-kebajikan';
 
-    protected string $view = 'filament.pages.laporan-rkam';
+    protected string $view = 'filament.pages.laporan-dana-kebajikan';
 
     public ?array $data = [];
 
@@ -41,7 +45,8 @@ class LaporanRkam extends Page implements HasForms
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
             && static::moduleVisible('ledger')
-            && (Auth::user()?->canAny(['view_ledger', 'manage_ledger', 'view_laporan_pimpinan']) ?? false);
+            && FiturKeuangan::pemisahanKehalalanAktif()
+            && (Auth::user()?->canAny(['view_ledger', 'manage_ledger', 'manage_dana_kebajikan']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -68,8 +73,8 @@ class LaporanRkam extends Page implements HasForms
     }
 
     #[Computed]
-    public function rows(): array
+    public function laporan(): array
     {
-        return app(LaporanService::class)->realisasiPerDivisi($this->data['from'] ?? null, $this->data['to'] ?? null);
+        return app(LaporanService::class)->danaKebajikan($this->data['from'] ?? null, $this->data['to'] ?? null);
     }
 }

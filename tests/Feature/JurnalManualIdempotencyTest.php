@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\JurnalManual;
+use Modules\Ledger\Filament\Pages\JurnalManual;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;

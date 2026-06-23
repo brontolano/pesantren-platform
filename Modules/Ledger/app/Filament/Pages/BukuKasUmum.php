@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Ledger\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
@@ -14,30 +13,29 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
-use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Services\BukuBesarService;
 
 /**
- * Buku Besar per akun — proyeksi read-only dari jurnal_baris (BukuBesarService).
+ * Buku Kas Umum (BKU) — akumulasi baris akun kas/bank (proyeksi, rekonsiliasi 100%).
  */
-class BukuBesar extends Page implements HasForms
+class BukuKasUmum extends Page implements HasForms
 {
     use InteractsWithForms;
     use ModuleGate;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-table-cells';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static ?string $navigationLabel = 'Akuntansi & Pajak';
+    protected static ?string $navigationLabel = 'Buku Kas Umum (BKU)';
 
-    protected static ?string $title = 'Akuntansi & Pajak';
+    protected static ?string $title = 'Buku Kas Umum (BKU)';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 11;
 
-    protected static ?string $slug = 'ledger/buku-besar';
+    protected static ?string $slug = 'ledger/bku';
 
-    protected string $view = 'filament.pages.buku-besar';
+    protected string $view = 'filament.pages.buku-kas-umum';
 
     public ?array $data = [];
 
@@ -66,27 +64,17 @@ class BukuBesar extends Page implements HasForms
         return $schema
             ->statePath('data')
             ->components([
-                Section::make('Filter')->schema([
-                    Select::make('akun_id')->label('Akun')
-                        ->options(fn () => Akun::where('is_postable', true)->orderBy('kode')
-                            ->get()->mapWithKeys(fn ($a) => [$a->id => "{$a->kode} — {$a->nama}"]))
-                        ->searchable()->live()->required(),
+                Section::make('Rentang Tanggal')->schema([
                     DatePicker::make('from')->label('Dari')->live(),
                     DatePicker::make('to')->label('Sampai')->live(),
-                ])->columns(3),
+                ])->columns(2),
             ]);
     }
 
     #[Computed]
-    public function hasil(): ?array
+    public function hasil(): array
     {
-        $akunId = $this->data['akun_id'] ?? null;
-        if (! $akunId) {
-            return null;
-        }
-
-        return app(BukuBesarService::class)->bukuBesar(
-            (int) $akunId,
+        return app(BukuBesarService::class)->bku(
             $this->data['from'] ?? null,
             $this->data['to'] ?? null,
         );
