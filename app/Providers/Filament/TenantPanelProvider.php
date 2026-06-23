@@ -129,6 +129,7 @@ use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
 use Modules\Keuangan\Filament\Resources\TabunganTopup\TabunganTopupResource;
 use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
 use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
+use Modules\Tahfidz\Filament\Resources\SimaAnResource;
 use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
 use Modules\Tahfidz\Filament\Resources\Munaqasyah\MunaqasyahResource;
 use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
@@ -437,6 +438,7 @@ class TenantPanelProvider extends PanelProvider
             PenempatanAsramaResource::class,
             BiayaAsramaResource::class,
             HafalanTahfidzResource::class,
+            SimaAnResource::class, // WP-11 — Sima'an (lihat/koreksi dari panel)
             // F0-PWA Guru: halaqah + kitab
             HalaqahResource::class,
             KitabResource::class,
