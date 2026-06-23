@@ -182,6 +182,13 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $biayaStatus = $kernel->handle($biayaReq)->getStatusCode();
         $this->assertSame(200, $biayaStatus, "Buat Biaya Asrama (Select periode) status {$biayaStatus}, harusnya 200.");
 
+        // Pusat Pengaturan (Page indeks baru, gap 124) WAJIB 200 → bukti Page TERDAFTAR
+        // (auto-discover app/Filament/Pages) & getGroups() resolve tanpa error.
+        $pusatReq = Request::create("http://{$host}/admin/pusat-pengaturan", 'GET');
+        $pusatReq->headers->set('Host', $host);
+        $pusatStatus = $kernel->handle($pusatReq)->getStatusCode();
+        $this->assertSame(200, $pusatStatus, "Pusat Pengaturan (PusatPengaturan Page) status {$pusatStatus}, harusnya 200.");
+
         tenancy()->end();
     }
 }
