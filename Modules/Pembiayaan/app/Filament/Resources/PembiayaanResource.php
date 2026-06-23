@@ -29,13 +29,13 @@ class PembiayaanResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
 
-    protected static ?string $navigationLabel = 'Pengajuan Pembiayaan';
+    protected static ?string $navigationLabel = 'Pengajuan Pembiayaan (DSCR)';
 
-    protected static ?string $modelLabel = 'Pengajuan Pembiayaan';
+    protected static ?string $modelLabel = 'Pengajuan Pembiayaan (DSCR)';
 
-    protected static ?string $pluralModelLabel = 'Pengajuan Pembiayaan';
+    protected static ?string $pluralModelLabel = 'Pengajuan Pembiayaan (DSCR)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pembiayaan (DSCR)';
 
     protected static ?int $navigationSort = 2;
 

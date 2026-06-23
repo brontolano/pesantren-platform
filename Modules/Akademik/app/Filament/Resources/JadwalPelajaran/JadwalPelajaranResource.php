@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\PeriodeAkademik;
+use Modules\Akademik\Services\JadwalPelajaranService;
 use Modules\Akademik\Services\KurikulumService;
 use Modules\Kesantrian\Models\Kelas;
 
@@ -84,6 +85,43 @@ class JadwalPelajaranResource extends Resource
             : null;
     }
 
+    /**
+     * gap-98: pesan peringatan LUNAK bila jadwal bentrok dengan jadwal lain
+     * (kelas/guru/ruangan sama, hari sama, jam tumpang-tindih); null bila aman
+     * atau data belum lengkap. TIDAK pernah memblokir simpan. Record yang
+     * sedang diedit diabaikan via $ignoreId.
+     */
+    public static function bentrokWarning(Get $get, mixed $ignoreId = null): ?string
+    {
+        return JadwalPelajaranService::cekBentrok(
+            $get('hari'),
+            $get('jam_mulai'),
+            $get('jam_selesai'),
+            $get('kelas_id'),
+            $get('pelajaran_id'),
+            $get('ruangan'),
+            $ignoreId !== null ? (int) $ignoreId : null,
+        );
+    }
+
+    /**
+     * gap-98: closure afterStateUpdated yang menampilkan Notification warning
+     * bila terdeteksi bentrok jadwal. NON-BLOKIR — simpan tetap berjalan.
+     */
+    protected static function peringatanBentrok(): \Closure
+    {
+        return function (Get $get, ?Model $record): void {
+            $warning = self::bentrokWarning($get, $record?->getKey());
+            if ($warning !== null) {
+                Notification::make()
+                    ->title('Bentrok jadwal terdeteksi')
+                    ->body($warning.' Jadwal tetap bisa disimpan.')
+                    ->warning()
+                    ->send();
+            }
+        };
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -128,10 +166,27 @@ class JadwalPelajaranResource extends Resource
                         'sabtu' => 'Sabtu',
                         'ahad' => 'Ahad',
                     ])
+                    ->live()
+                    ->afterStateUpdated(self::peringatanBentrok())
                     ->required(),
-                TextInput::make('jam_mulai')->type('time')->required(),
-                TextInput::make('jam_selesai')->type('time')->required(),
-                TextInput::make('ruangan')->maxLength(255),
+                TextInput::make('jam_mulai')
+                    ->type('time')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(self::peringatanBentrok())
+                    ->required(),
+                TextInput::make('jam_selesai')
+                    ->type('time')
+                    ->live(onBlur: true)
+                    // gap-98: peringatan LUNAK bentrok jadwal — hanya hint,
+                    // simpan TIDAK pernah diblokir.
+                    ->hint(fn (Get $get, ?Model $record): ?string => self::bentrokWarning($get, $record?->getKey()))
+                    ->hintColor('warning')
+                    ->afterStateUpdated(self::peringatanBentrok())
+                    ->required(),
+                TextInput::make('ruangan')
+                    ->maxLength(255)
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(self::peringatanBentrok()),
             ])->columns(2),
         ]);
     }
