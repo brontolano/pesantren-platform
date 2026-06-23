@@ -49,7 +49,7 @@ class LaporanKehalalan extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::canAccess();
+        return UiMode::navAdvanced('ledger') && static::canAccess();
     }
 
     public function mount(): void

@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting;
-use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -50,7 +49,9 @@ class PengaturanNotifikasi extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::canAccess();
+        // gap-132: halaman setting harus SELALU terjangkau (samakan dgn
+        // PengaturanBranding) — tak digerbang Mode Sederhana.
+        return static::canAccess();
     }
 
     public function mount(): void

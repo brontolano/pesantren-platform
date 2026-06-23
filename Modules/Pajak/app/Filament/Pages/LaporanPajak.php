@@ -64,7 +64,7 @@ class LaporanPajak extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::canAccess();
+        return UiMode::navAdvanced('pajak') && static::canAccess();
     }
 
     public function mount(): void
