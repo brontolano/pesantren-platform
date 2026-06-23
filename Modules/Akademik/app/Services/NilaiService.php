@@ -16,6 +16,20 @@ use RuntimeException;
 class NilaiService
 {
     /**
+     * SATU-SATUNYA bobot fallback netral untuk nilai_harian/uts/uas.
+     *
+     * Sama persis dengan default komponen yang di-seed
+     * (KomponenNilaiSeeder::DEFAULTS = Harian 40 / UTS 30 / UAS 30) dan
+     * dengan default registry 'akademik_grade_weights' di Pusat Kebijakan.
+     * Satu angka, dipakai hanya bila tenant TIDAK menyetel bobot sendiri.
+     */
+    public const DEFAULT_GRADE_WEIGHTS = [
+        'harian' => 40,
+        'uts' => 30,
+        'uas' => 30,
+    ];
+
+    /**
      * @throws ValidationException
      */
     public function simpan(array $data, ?User $actor = null, ?Nilai $nilai = null): Nilai
@@ -170,6 +184,15 @@ class NilaiService
     }
 
     /**
+     * Bobot nilai_harian/uts/uas dengan urutan baca:
+     *   1) Setting tenant 'akademik_grade_weights' (diekspos di Pusat Kebijakan)
+     *      — dipakai hanya bila jumlah harian+uts+uas tepat 100.
+     *   2) ELSE konstanta fallback netral self::DEFAULT_GRADE_WEIGHTS
+     *      (SATU sumber, sama dengan komponen yang di-seed & default registry).
+     *
+     * Catatan: bobot per-pelajaran (komponen_nilai) ditangani lebih dahulu di
+     * hitungNilaiAkhir() sebelum metode ini dipanggil.
+     *
      * @return array{harian:int,uts:int,uas:int}
      */
     public function getGradeWeights(): array
@@ -177,20 +200,16 @@ class NilaiService
         $value = Setting::getTenantValue('akademik_grade_weights', null);
 
         if (is_array($value)) {
-            $harian = (int) ($value['harian'] ?? 30);
-            $uts = (int) ($value['uts'] ?? 30);
-            $uas = (int) ($value['uas'] ?? 40);
+            $harian = (int) ($value['harian'] ?? self::DEFAULT_GRADE_WEIGHTS['harian']);
+            $uts = (int) ($value['uts'] ?? self::DEFAULT_GRADE_WEIGHTS['uts']);
+            $uas = (int) ($value['uas'] ?? self::DEFAULT_GRADE_WEIGHTS['uas']);
 
             if ($harian + $uts + $uas === 100) {
                 return compact('harian', 'uts', 'uas');
             }
         }
 
-        return [
-            'harian' => 30,
-            'uts' => 30,
-            'uas' => 40,
-        ];
+        return self::DEFAULT_GRADE_WEIGHTS;
     }
 
     private function assertActorCanInputNilai(?User $actor, Pelajaran $pelajaran, int $kelasId): void

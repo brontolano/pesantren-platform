@@ -3,9 +3,7 @@
 namespace Modules\Pengadaan\Filament\Resources\PurchaseOrder;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Pengadaan\Filament\Resources\PurchaseOrder\Pages\CreatePurchaseOrder;
-use Modules\Pengadaan\Filament\Resources\PurchaseOrder\Pages\EditPurchaseOrder;
-use Modules\Pengadaan\Filament\Resources\PurchaseOrder\Pages\ListPurchaseOrder;
+use App\Models\Setting;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -24,6 +22,9 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\DivisiUnit;
 use Modules\Ledger\Models\SumberDana;
+use Modules\Pengadaan\Filament\Resources\PurchaseOrder\Pages\CreatePurchaseOrder;
+use Modules\Pengadaan\Filament\Resources\PurchaseOrder\Pages\EditPurchaseOrder;
+use Modules\Pengadaan\Filament\Resources\PurchaseOrder\Pages\ListPurchaseOrder;
 use Modules\Pengadaan\Models\PurchaseOrder;
 use Modules\Pengadaan\Models\Supplier;
 use Modules\Pengadaan\Services\PurchaseOrderService;
@@ -88,6 +89,9 @@ class PurchaseOrderResource extends Resource
                     ->options(fn () => SumberDana::query()->orderBy('kode_dana')->pluck('nama_sumber', 'id')),
                 TextInput::make('keterangan')->label('Keterangan')->maxLength(255)->columnSpanFull(),
             ])->columns(2),
+            // gap-95: item PO tampil & editable saat Buat, dan saat Edit PO yang
+            // masih DRAFT. PO non-draft tetap dikunci (canEdit menolak; repeater
+            // disembunyikan agar nilai yang sudah disetujui/diterima tak berubah).
             Section::make('Item')->schema([
                 Repeater::make('items')->label('Item PO')
                     ->schema([
@@ -95,8 +99,10 @@ class PurchaseOrderResource extends Resource
                         TextInput::make('qty')->label('Qty')->numeric()->required()->default(1),
                         TextInput::make('harga_satuan')->label('Harga Satuan')->numeric()->required()->prefix('Rp'),
                     ])->columns(4)->defaultItems(1)->addActionLabel('Tambah Item')
-                    ->visibleOn('create'),
-            ]),
+                    ->visible(fn (string $operation, ?PurchaseOrder $record): bool => $operation === 'create'
+                        || ($operation === 'edit' && $record?->status === 'draft')),
+            ])->visible(fn (string $operation, ?PurchaseOrder $record): bool => $operation === 'create'
+                || ($operation === 'edit' && $record?->status === 'draft')),
         ]);
     }
 
@@ -133,13 +139,53 @@ class PurchaseOrderResource extends Resource
                             Notification::make()->title('Gagal menyetujui')->body($e->getMessage())->danger()->send();
                         }
                     }),
+                // gap-100: penerimaan parsial JADI SETELAN. Bila Setting tenant
+                // 'pengadaan.izinkan_terima_sebagian' = true → tampilkan form
+                // qty-per-item (service sudah dukung map parsial). Bila false
+                // (DEFAULT) → terima penuh seperti perilaku sebelumnya.
                 Action::make('terima')->label('Terima (GRN)')->icon('heroicon-o-truck')->color('info')
-                    ->requiresConfirmation()
-                    ->modalDescription('Menerima seluruh item PO → membuat Belanja (invoice) untuk diposting ke Buku Besar.')
+                    // Mode penuh (default): konfirmasi sederhana. Mode parsial:
+                    // modal form qty-per-item (form itu sendiri jadi langkah konfirmasi).
+                    ->requiresConfirmation(fn (): bool => ! static::izinkanTerimaSebagian())
+                    ->modalHeading('Terima Barang (GRN)')
+                    ->modalDescription(fn (): string => static::izinkanTerimaSebagian()
+                        ? 'Isi jumlah yang benar-benar diterima per item. Bila semua diterima penuh, Belanja (invoice) dibuat untuk diposting ke Buku Besar.'
+                        : 'Menerima seluruh item PO → membuat Belanja (invoice) untuk diposting ke Buku Besar.')
+                    ->fillForm(function (PurchaseOrder $r): array {
+                        if (! static::izinkanTerimaSebagian()) {
+                            return [];
+                        }
+
+                        return [
+                            'penerimaan' => $r->items->map(fn ($i) => [
+                                'item_id' => $i->id,
+                                'uraian' => $i->uraian,
+                                'qty_po' => (float) $i->qty,
+                                'qty_diterima' => (float) $i->qty,
+                            ])->all(),
+                        ];
+                    })
+                    ->schema(fn (): array => static::izinkanTerimaSebagian() ? [
+                        Repeater::make('penerimaan')->label('Jumlah diterima per item')
+                            ->schema([
+                                TextInput::make('uraian')->label('Item')->disabled()->dehydrated(false)->columnSpan(2),
+                                TextInput::make('qty_po')->label('Qty PO')->disabled()->dehydrated(false),
+                                TextInput::make('qty_diterima')->label('Qty Diterima')->numeric()->minValue(0)->required(),
+                                TextInput::make('item_id')->hidden()->dehydrated(),
+                            ])->columns(4)->addable(false)->deletable(false)->reorderable(false),
+                    ] : [])
                     ->visible(fn (PurchaseOrder $r): bool => $r->status === 'disetujui' && (auth()->user()?->can('input_belanja') ?? false))
-                    ->action(function (PurchaseOrder $r): void {
+                    ->action(function (PurchaseOrder $r, array $data): void {
                         try {
-                            $po = app(PurchaseOrderService::class)->terima($r, [], auth()->id());
+                            $penerimaan = [];
+                            if (static::izinkanTerimaSebagian()) {
+                                foreach ($data['penerimaan'] ?? [] as $row) {
+                                    if (isset($row['item_id'])) {
+                                        $penerimaan[(int) $row['item_id']] = (float) ($row['qty_diterima'] ?? 0);
+                                    }
+                                }
+                            }
+                            $po = app(PurchaseOrderService::class)->terima($r, $penerimaan, auth()->id());
                             Notification::make()->title($po->status === 'diterima' ? 'Barang diterima & Belanja dibuat' : 'Penerimaan dicatat')->success()->send();
                         } catch (\Throwable $e) {
                             Notification::make()->title('Gagal menerima')->body($e->getMessage())->danger()->send();
@@ -147,6 +193,31 @@ class PurchaseOrderResource extends Resource
                     }),
                 EditAction::make(),
             ]);
+    }
+
+    /**
+     * gap-100: setelan tenant 'pengadaan.izinkan_terima_sebagian'. DEFAULT false
+     * (perilaku sekarang: terima penuh). Pembacaan toleran: bool asli, string
+     * 'true'/'1'/'ya', atau bungkus ['value'=>..]/['enabled'=>..].
+     */
+    public static function izinkanTerimaSebagian(): bool
+    {
+        $raw = Setting::getTenantValue('pengadaan.izinkan_terima_sebagian');
+
+        if (is_array($raw)) {
+            $raw = $raw['value'] ?? $raw['enabled'] ?? (count($raw) === 1 ? reset($raw) : null);
+        }
+        if (is_bool($raw)) {
+            return $raw;
+        }
+        if (is_int($raw) || is_float($raw)) {
+            return (int) $raw !== 0;
+        }
+        if (is_string($raw)) {
+            return in_array(strtolower(trim($raw)), ['true', '1', 'on', 'ya', 'aktif'], true);
+        }
+
+        return false;
     }
 
     public static function getPages(): array

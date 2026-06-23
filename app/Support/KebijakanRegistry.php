@@ -145,8 +145,13 @@ class KebijakanRegistry
             ],
             'akademik_grade_weights' => [
                 'label' => 'Bobot nilai harian / UTS / UAS',
-                'deskripsi' => 'Persentase bobot nilai akhir bila tidak memakai komponen nilai kustom.',
-                'default' => ['harian' => 30, 'uts' => 30, 'uas' => 40], 'kelompok' => 'akademik', 'tipe' => 'json',
+                'deskripsi' => 'Persentase bobot nilai akhir bila pesantren tidak memakai komponen nilai kustom per pelajaran. Total harian+UTS+UAS harus 100.',
+                'default' => ['harian' => 40, 'uts' => 30, 'uas' => 30], 'kelompok' => 'akademik', 'tipe' => 'json',
+            ],
+            'pengadaan.izinkan_terima_sebagian' => [
+                'label' => 'Izinkan penerimaan barang sebagian (GRN parsial)',
+                'deskripsi' => 'Bila aktif, aksi "Terima (GRN)" pada Purchase Order menampilkan form jumlah-diterima per item (boleh kurang dari qty PO). Bila mati (bawaan), penerimaan selalu penuh sekaligus seperti sebelumnya.',
+                'default' => false, 'kelompok' => 'keuangan', 'tipe' => 'bool',
             ],
             'akademik_kehadiran_minimal' => [
                 'label' => 'Ambang kehadiran minimal (%)',
