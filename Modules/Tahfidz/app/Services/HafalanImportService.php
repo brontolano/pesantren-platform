@@ -35,7 +35,7 @@ class HafalanImportService
         'catatan' => ['catatan', 'keterangan'],
     ];
 
-    private const STATUS_VALID = ['direncanakan', 'proses', 'selesai'];
+    private const STATUS_VALID = ['direncanakan', 'berjalan', 'selesai'];
 
     /**
      * @return array{tenant_id:string, source:string, dry_run:bool, imported:int, skipped:int, failed:int, errors:list<array{row:int, ref:?string, error:string}>}

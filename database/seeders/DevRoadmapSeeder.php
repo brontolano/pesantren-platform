@@ -182,7 +182,8 @@ class DevRoadmapSeeder extends Seeder
             'Perbaiki bug channel Notifikasi whatsapp→wa + wire seeder' => 'SELESAI 2026-06-24: 23 nilai seeder channel→wa + migrasi normalisasi tenant lama + TemplateNotifikasiSeeder ter-wire ke TenantProvisioner.',
             'Wire seeder tarif Pajak ke TenantProvisioner' => 'SELESAI 2026-06-24: PajakSeeder + TerPph21Seeder ter-wire ke TenantProvisioner (idempoten, --force).',
             'Seed kategori POS untuk tenant baru' => 'SELESAI 2026-06-24: PosKategoriSeeder ter-wire ke TenantProvisioner.',
-            'Satukan kosakata status izin santri' => 'SELESAI 2026-06-24: kosakata izin disatukan jadi "diajukan" lintas IzinSantriResource + KegiatanService (ajukanIzin/getIzinPending) + IzinSantriService + migrasi normalisasi izin_santri (pending→diajukan) & ALTER default. Izin dari panel admin kini masuk antrean persetujuan PWA.',
+            'Satukan kosakata status izin santri (panel↔PWA)' => 'SELESAI 2026-06-24: kosakata izin disatukan jadi "diajukan" lintas IzinSantriResource + KegiatanService (ajukanIzin/getIzinPending) + IzinSantriService + migrasi normalisasi izin_santri (pending→diajukan) & ALTER default. Izin dari panel admin kini masuk antrean persetujuan PWA.',
+            'Samakan kosakata STATUS hafalan jadi satu sumber' => 'SELESAI 2026-06-24: status hafalan disatukan jadi "berjalan" (importer STATUS_VALID + template + petunjuk: proses→berjalan) + migrasi normalisasi tahfidz_hafalan (proses→berjalan). Hafalan impor kini terhitung di ringkasan & lolos re-import.',
         ];
         foreach ($selesai as $judul => $state) {
             DevTask::where('dev_project_id', $project->id)
