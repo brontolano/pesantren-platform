@@ -55,7 +55,7 @@ class KegiatanService
             'tanggal_mulai'  => $data['tanggal_mulai'],
             'tanggal_selesai'=> $data['tanggal_selesai'],
             'alasan'         => $data['alasan'],
-            'status'         => 'pending',
+            'status'         => 'diajukan',
         ]);
     }
 
@@ -94,7 +94,7 @@ class KegiatanService
     public function getIzinPending(): Collection
     {
         return IzinSantri::query()
-            ->where('status', 'pending')
+            ->where('status', 'diajukan')
             ->with('santri')
             ->orderByDesc('tanggal_mulai')
             ->get();

@@ -133,7 +133,7 @@ class IzinSantriService
             throw new InvalidArgumentException('tanggal_selesai tidak boleh sebelum tanggal_mulai.');
         }
 
-        // Cek overlap dengan izin pending/disetujui lain pada santri yang sama
+        // Cek overlap dengan izin diajukan/disetujui lain pada santri yang sama
         $ada = IzinSantri::where('tenant_id', tenant('id'))
             ->where('santri_id', $santri->id)
             ->whereIn('status', ['diajukan', 'disetujui'])
@@ -148,7 +148,7 @@ class IzinSantriService
             ->exists();
 
         if ($ada) {
-            throw new InvalidArgumentException('Tanggal izin ini tumpang-tindih dengan izin lain yang masih pending/disetujui.');
+            throw new InvalidArgumentException('Tanggal izin ini tumpang-tindih dengan izin lain yang masih diajukan/disetujui.');
         }
 
         // Cek H-minimum sebelum izin mulai

@@ -50,8 +50,8 @@ class IzinSantriResource extends Resource
             Textarea::make('alasan')->label('Alasan')->required()->rows(3),
             Select::make('status')
                 ->label('Status')
-                ->options(['pending' => 'Pending', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak'])
-                ->required()->default('pending'),
+                ->options(['diajukan' => 'Diajukan', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak'])
+                ->required()->default('diajukan'),
             Textarea::make('catatan_pengurus')->label('Catatan Pengurus')->rows(2),
         ]);
     }
@@ -73,7 +73,7 @@ class IzinSantriResource extends Resource
                 IconColumn::make('sudah_kembali')->label('Kembali')->boolean(),
             ])
             ->filters([
-                SelectFilter::make('status')->options(['pending' => 'Pending', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak']),
+                SelectFilter::make('status')->options(['diajukan' => 'Diajukan', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak']),
                 SelectFilter::make('jenis_izin')->options(['pulang' => 'Pulang', 'sakit' => 'Sakit', 'keluar_kota' => 'Keluar Kota']),
             ])
             ->actions([EditAction::make()])
