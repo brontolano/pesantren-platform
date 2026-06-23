@@ -170,6 +170,16 @@ class EmployeeResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada data pegawai')
+            ->emptyStateDescription('Tambahkan data ustadz/pegawai untuk mulai mengelola kepegawaian & gaji.')
+            ->emptyStateIcon('heroicon-o-identification')
+            ->emptyStateActions([
+                Action::make('tambah')
+                    ->label('Tambah Pegawai')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn (): bool => static::canCreate())
+                    ->url(fn (): string => static::getUrl('create')),
+            ])
             ->columns([
                 TextColumn::make('nama')->label('Nama')->searchable()->sortable(),
                 TextColumn::make('nip')->label('NIP')->placeholder('—'),
