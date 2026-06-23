@@ -399,6 +399,15 @@ class PengaturanAi extends Page implements HasForms
             ->description('Kapan asisten melayani, dan apa pesannya di luar jam itu')
             ->afterValidation(fn () => $this->simpanLangkah())
             ->schema([
+                Section::make('Chatbot WhatsApp')
+                    ->description('Atur perilaku balasan otomatis asisten di WhatsApp.')
+                    ->schema([
+                        Toggle::make('mode_uji_wa')
+                            ->label('Mode uji coba WhatsApp (balasan template, tanpa AI)')
+                            ->helperText('AKTIF: setiap pesan masuk dibalas pesan template singkat tanpa melibatkan AI — aman untuk uji coba. NONAKTIF: asisten menjawab sungguhan (verifikasi wali, intent, lalu tanya-jawab). Disarankan tetap AKTIF sampai pesantren siap melayani lewat WhatsApp.')
+                            ->inline(false),
+                    ])
+                    ->columnSpanFull(),
                 TimePicker::make('jam_layanan.mulai')
                     ->label('Jam mulai layanan')
                     ->seconds(false)
@@ -496,6 +505,9 @@ class PengaturanAi extends Page implements HasForms
         $payload['ambang_alert_persen'] = (int) $payload['ambang_alert_persen'];
         $payload['consent_ortu'] = (bool) $payload['consent_ortu'];
         $payload['optin_riset'] = (bool) $payload['optin_riset'];
+        // gap-135 — toggle mode uji WA (fallback default true bila absen pada
+        // payload dasar tenant lama → kompat-mundur, perilaku tak berubah).
+        $payload['mode_uji_wa'] = (bool) ($payload['mode_uji_wa'] ?? true);
 
         $anggaran = $payload['anggaran_kredit_bulanan'] ?? null;
         $payload['anggaran_kredit_bulanan'] = ($anggaran === null || $anggaran === '')

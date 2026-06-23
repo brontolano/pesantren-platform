@@ -80,6 +80,12 @@ class AiTenantSettingDefaults
             'bahasa' => 'id',
             'gaya' => 'formal_santun',
 
+            // gap-135 — mode uji chatbot WA: true = balas template statis
+            // (tanpa LLM), false = pipeline intent/RAG aktif. Default true
+            // = perilaku teraman & sama dengan env AI_WA_MODE_UJI bawaan.
+            // Field NON-sensitif: perubahan langsung aktif tanpa approval kyai.
+            'mode_uji_wa' => true,
+
             // 24 jam: di luar jam tidak pernah terjadi; pesan tetap tersedia.
             'jam_layanan' => ['mulai' => '00:00', 'selesai' => '23:59'],
             'pesan_di_luar_jam' => 'Mohon maaf, layanan asisten sedang di luar jam operasional. Pertanyaan Anda kami catat dan akan ditindaklanjuti pada jam layanan. Terima kasih atas pengertiannya.',

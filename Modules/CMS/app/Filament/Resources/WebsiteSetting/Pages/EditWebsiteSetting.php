@@ -58,7 +58,11 @@ class EditWebsiteSetting extends EditRecord
                             ->maxLength(50),
                     ])->columns(2),
                 ],
-                $key === 'profil' => [
+                // Kunci kanonik modul ini = 'profile' (selaras WebsiteSection
+                // section_type 'profile', ProfileResource, WebsiteBuilder,
+                // TenantWebsiteService). Kunci lama 'profil' tetap diterima
+                // (kompat-mundur) agar data lama tak jatuh ke editor JSON mentah.
+                in_array($key, ['profile', 'profil'], true) => [
                     Section::make('Profil Pesantren')->schema([
                         TextInput::make('value.title')
                             ->label('Judul Section')
