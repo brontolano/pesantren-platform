@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
+use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use App\Models\Tenant;
 use App\Services\ModuleService;
 use Database\Seeders\ModuleRegistrySeeder;
