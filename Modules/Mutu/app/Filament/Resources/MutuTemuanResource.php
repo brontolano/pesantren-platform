@@ -102,8 +102,12 @@ class MutuTemuanResource extends Resource
                         Textarea::make('tindakan')->label('Tindakan korektif')->required()->rows(3),
                     ])
                     ->action(function (array $data, MutuTemuan $record): void {
-                        app(MutuKpiService::class)->mulaiTindakan($record, $data['tindakan'], auth()->id());
-                        Notification::make()->title('Tindakan korektif dicatat')->success()->send();
+                        try {
+                            app(MutuKpiService::class)->mulaiTindakan($record, $data['tindakan'], auth()->id());
+                            Notification::make()->title('Tindakan korektif dicatat')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Gagal mencatat tindakan')->body($e->getMessage())->danger()->send();
+                        }
                     }),
                 Action::make('ajukan_verifikasi')
                     ->label('Ajukan Verifikasi')
@@ -112,8 +116,12 @@ class MutuTemuanResource extends Resource
                     ->requiresConfirmation()
                     ->visible(fn (MutuTemuan $r): bool => $r->status === 'tindakan')
                     ->action(function (MutuTemuan $record): void {
-                        app(MutuKpiService::class)->ajukanVerifikasi($record, auth()->id());
-                        Notification::make()->title('Diajukan untuk verifikasi')->success()->send();
+                        try {
+                            app(MutuKpiService::class)->ajukanVerifikasi($record, auth()->id());
+                            Notification::make()->title('Diajukan untuk verifikasi')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Gagal mengajukan verifikasi')->body($e->getMessage())->danger()->send();
+                        }
                     }),
                 Action::make('tutup')
                     ->label('Tutup (Verifikasi)')

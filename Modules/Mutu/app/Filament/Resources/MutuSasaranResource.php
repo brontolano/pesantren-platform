@@ -97,8 +97,12 @@ class MutuSasaranResource extends Resource
                     ])
                     ->fillForm(fn (MutuSasaran $record): array => ['realisasi' => $record->realisasi])
                     ->action(function (array $data, MutuSasaran $record): void {
-                        app(MutuKpiService::class)->catatRealisasi($record, (float) $data['realisasi']);
-                        Notification::make()->title('Realisasi diperbarui')->success()->send();
+                        try {
+                            app(MutuKpiService::class)->catatRealisasi($record, (float) $data['realisasi']);
+                            Notification::make()->title('Realisasi diperbarui')->success()->send();
+                        } catch (\Throwable $e) {
+                            Notification::make()->title('Gagal mencatat realisasi')->body($e->getMessage())->danger()->send();
+                        }
                     }),
                 EditAction::make(),
                 DeleteAction::make(),
