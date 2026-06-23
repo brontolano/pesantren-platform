@@ -7,6 +7,10 @@ use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
+use Modules\Ledger\Filament\Pages\LaporanDanaBosBop;
+use Modules\Ledger\Filament\Pages\LaporanDanaKebajikan;
+use Modules\Ledger\Filament\Pages\LaporanKeuanganPokok;
+use Modules\Ledger\Filament\Pages\LaporanRkam;
 use Modules\Ledger\Support\FiturKeuangan;
 
 /** Pusat Laporan — indeks tautan ke seluruh laporan keuangan (L1–L7). */

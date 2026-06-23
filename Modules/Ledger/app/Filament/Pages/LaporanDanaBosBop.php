@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Ledger\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use App\Support\UiMode;
@@ -15,25 +15,25 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Modules\Ledger\Services\LaporanService;
 
-/** Segregation of Funds — Dana Wakaf (PSAK 112) & ZIS (PSAK 109) disajikan terpisah. */
-class LaporanDanaTerikat extends Page implements HasForms
+/** L2 — Laporan Dana BOS / BOP (penerimaan vs penggunaan per sumber dana negara). */
+class LaporanDanaBosBop extends Page implements HasForms
 {
     use InteractsWithForms;
     use ModuleGate;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-library';
 
-    protected static ?string $navigationLabel = 'Dana Terikat (Wakaf/ZIS)';
+    protected static ?string $navigationLabel = 'L2 — Dana BOS / BOP';
 
-    protected static ?string $title = 'Laporan Dana Terikat (PSAK 112/109)';
+    protected static ?string $title = 'L2 — Laporan Dana BOS / BOP';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 2;
 
-    protected static ?string $slug = 'laporan/dana-terikat';
+    protected static ?string $slug = 'laporan/dana-bos-bop';
 
-    protected string $view = 'filament.pages.laporan-dana-terikat';
+    protected string $view = 'filament.pages.laporan-dana-bos-bop';
 
     public ?array $data = [];
 
@@ -68,8 +68,8 @@ class LaporanDanaTerikat extends Page implements HasForms
     }
 
     #[Computed]
-    public function dana(): array
+    public function rows(): array
     {
-        return app(LaporanService::class)->laporanDanaTerikat($this->data['from'] ?? null, $this->data['to'] ?? null);
+        return app(LaporanService::class)->danaBosBop($this->data['from'] ?? null, $this->data['to'] ?? null);
     }
 }
