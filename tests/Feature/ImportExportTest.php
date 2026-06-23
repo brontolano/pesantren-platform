@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Akademik\Pelajaran\Pages\ListPelajaran;
+use Modules\Akademik\Filament\Resources\Pelajaran\Pages\ListPelajaran;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
