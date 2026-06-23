@@ -85,6 +85,33 @@ class TagihanResource extends Resource
         return auth()->user()?->can('manage_keuangan') ?? false;
     }
 
+    /**
+     * Atribut global search: cari tagihan via nama / NIS santri (relasi),
+     * plus jenis tagihan. Read-only — tak menyentuh logika uang.
+     *
+     * @return array<string>
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['santri.nama', 'santri.nis', 'jenis_tagihan'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) ($record->santri?->nama ?? 'Tagihan');
+    }
+
+    /** @return array<string, string> */
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'NIS' => (string) ($record->santri?->nis ?? '—'),
+            'Jenis' => (string) ($record->jenis_tagihan ?? '—'),
+            'Nominal' => 'Rp '.number_format((float) ($record->nominal_akhir ?? 0), 0, ',', '.'),
+            'Status' => (string) ($record->status ?? '—'),
+        ];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([

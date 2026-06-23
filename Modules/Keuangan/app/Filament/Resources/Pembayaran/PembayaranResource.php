@@ -83,6 +83,33 @@ class PembayaranResource extends Resource
         return auth()->user()?->can('manage_keuangan') ?? false;
     }
 
+    /**
+     * Atribut global search: cari pembayaran via nama / NIS santri (relasi),
+     * nomor bukti, dan jenis tagihan terkait. Read-only — tak menyentuh logika uang.
+     *
+     * @return array<string>
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['santri.nama', 'santri.nis', 'nomor_bukti', 'tagihan.jenis_tagihan'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    {
+        return (string) ($record->santri?->nama ?? 'Pembayaran');
+    }
+
+    /** @return array<string, string> */
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'NIS' => (string) ($record->santri?->nis ?? '—'),
+            'Jenis' => (string) ($record->tagihan?->jenis_tagihan ?? '—'),
+            'Nominal' => 'Rp '.number_format((float) ($record->nominal ?? 0), 0, ',', '.'),
+            'Verifikasi' => $record->is_verified ? 'Terverifikasi' : 'Menunggu',
+        ];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
