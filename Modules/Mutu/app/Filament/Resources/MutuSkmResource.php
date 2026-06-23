@@ -26,9 +26,9 @@ class MutuSkmResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-face-smile';
 
-    protected static ?string $navigationLabel = 'SKM (Kepuasan Wali)';
+    protected static ?string $navigationLabel = 'Survei Kepuasan (SKM)';
 
-    protected static ?string $modelLabel = 'SKM';
+    protected static ?string $modelLabel = 'Survei Kepuasan';
 
     protected static ?string $pluralModelLabel = 'SKM (Kepuasan Wali)';
 
