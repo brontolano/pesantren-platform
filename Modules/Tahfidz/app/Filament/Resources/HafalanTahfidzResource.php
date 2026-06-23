@@ -52,6 +52,12 @@ class HafalanTahfidzResource extends Resource
                         ->label('Santri')
                         ->options(Santri::query()->pluck('nama', 'id'))
                         ->required(),
+                    Select::make('halaqah_id')
+                        ->label('Halaqah (opsional)')
+                        ->relationship('halaqah', 'nama')
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Tautkan setoran ke halaqah/kelompok tahfidz. Boleh dikosongkan; tak perlu Import Excel.'),
                     TextInput::make('surah')
                         ->label('Surah')
                         ->required()
