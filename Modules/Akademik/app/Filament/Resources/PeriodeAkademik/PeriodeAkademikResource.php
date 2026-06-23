@@ -106,8 +106,9 @@ class PeriodeAkademikResource extends Resource
                     ->placeholder('1448/1449')
                     ->maxLength(20),
                 Select::make('is_active')
-                    ->label('Status Aktif')
-                    ->options([1 => 'Aktif', 0 => 'Nonaktif'])
+                    ->label('Status Periode')
+                    ->options([1 => 'Aktif (periode berjalan)', 0 => 'Nonaktif (belum / sudah selesai)'])
+                    ->helperText('Hanya satu periode yang berstatus Aktif. Set ke Nonaktif saat semester sudah selesai.')
                     ->default(0)
                     ->required(),
             ])->columns(2),

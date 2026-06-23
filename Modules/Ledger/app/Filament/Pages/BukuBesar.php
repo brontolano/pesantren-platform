@@ -27,9 +27,9 @@ class BukuBesar extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-table-cells';
 
-    protected static ?string $navigationLabel = 'Akuntansi & Pajak';
+    protected static ?string $navigationLabel = 'Buku Besar';
 
-    protected static ?string $title = 'Akuntansi & Pajak';
+    protected static ?string $title = 'Buku Besar';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
