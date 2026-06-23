@@ -7,6 +7,7 @@ use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\CreateAreaPike
 use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\EditAreaPiket;
 use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\ListAreaPiket;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -66,7 +67,15 @@ class AreaPiketResource extends Resource
                 TextColumn::make('kode_qr')->label('Kode QR')->copyable(),
                 IconColumn::make('aktif')->label('Aktif')->boolean(),
             ])
-            ->actions([EditAction::make()])
+            ->actions([
+                EditAction::make(),
+                // gap-121 — cetak stiker QR (buka tab print, auto window.print).
+                Action::make('cetak_qr')
+                    ->label('Cetak QR')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray')
+                    ->url(fn (AreaPiket $record): string => route('tenant.sarpras.area-piket.cetak-qr', ['area' => $record->id]), true),
+            ])
             ->defaultSort('nama');
     }
 
