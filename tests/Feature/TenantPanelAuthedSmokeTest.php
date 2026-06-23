@@ -175,6 +175,13 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $kamarStatus = $kernel->handle($kamarReq)->getStatusCode();
         $this->assertSame(200, $kamarStatus, "Kamar Asrama (OkupansiAsramaWidget) status {$kamarStatus}, harusnya 200.");
 
+        // Form Buat Biaya Asrama WAJIB 200 → bukti Select periode terkontrol (gap 133)
+        // + opsi periode ter-bangun tanpa error (form hanya di halaman create/edit).
+        $biayaReq = Request::create("http://{$host}/admin/biaya-asrama/biaya-asramas/create", 'GET');
+        $biayaReq->headers->set('Host', $host);
+        $biayaStatus = $kernel->handle($biayaReq)->getStatusCode();
+        $this->assertSame(200, $biayaStatus, "Buat Biaya Asrama (Select periode) status {$biayaStatus}, harusnya 200.");
+
         tenancy()->end();
     }
 }

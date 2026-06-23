@@ -66,9 +66,24 @@ class BiayaAsramaResource extends Resource
                     ->get()
                     ->mapWithKeys(fn (KamarAsrama $kamar) => [$kamar->id => $kamar->blok->nama_blok . ' - ' . $kamar->nomor_kamar]))
                 ->searchable()
+                ->live()
+                ->afterStateUpdated(function ($state, $set): void {
+                    // Prefill nominal dari biaya/bulan kamar agar staf tak salah ketik.
+                    $biaya = $state ? KamarAsrama::find($state)?->biaya_per_bulan : null;
+                    if ($biaya !== null) {
+                        $set('nominal', (string) $biaya);
+                    }
+                })
                 ->nullable(),
-            TextInput::make('periode')->required()->placeholder('2026-07'),
-            TextInput::make('nominal')->numeric()->required()->minValue(0),
+            Select::make('periode')
+                ->label('Periode (bulan)')
+                ->options(fn (?BiayaAsrama $record): array => static::periodeOptions($record?->periode))
+                ->default(now()->format('Y-m'))
+                ->required()
+                ->searchable()
+                ->helperText('Pilih bulan tagihan — format seragam YYYY-MM agar laporan rapi.'),
+            TextInput::make('nominal')->label('Nominal (Rp)')->numeric()->required()->minValue(0)
+                ->helperText('Terisi otomatis dari biaya/bulan kamar saat kamar dipilih; boleh disesuaikan.'),
             Select::make('status_pembayaran')
                 ->options([
                     'belum_bayar' => 'Belum Bayar',
@@ -79,6 +94,35 @@ class BiayaAsramaResource extends Resource
                 ->required(),
             DatePicker::make('jatuh_tempo'),
         ])->columns(2);
+    }
+
+    /**
+     * Opsi periode bulanan SERAGAM (YYYY-MM) — jendela -6..+11 bulan dari sekarang.
+     * Nilai lama (mis. teks bebas legacy "Juli 2026") dipertahankan agar tak hilang saat edit.
+     *
+     * @return array<string, string>
+     */
+    protected static function periodeOptions(?string $current = null): array
+    {
+        $bulan = [
+            '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
+            '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus',
+            '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember',
+        ];
+
+        $opts = [];
+        $mulai = now()->startOfMonth()->subMonths(6);
+        for ($i = 0; $i < 18; $i++) {
+            $d = $mulai->copy()->addMonths($i);
+            $opts[$d->format('Y-m')] = $bulan[$d->format('m')].' '.$d->format('Y');
+        }
+
+        if ($current !== null && $current !== '' && ! isset($opts[$current])) {
+            $opts[$current] = $current.' (lama)';
+            ksort($opts);
+        }
+
+        return $opts;
     }
 
     public static function table(Table $table): Table
