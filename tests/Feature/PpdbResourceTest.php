@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Filament\Pages\PpdbReport;
-use App\Filament\Resources\PPDB\CalonSantriDokumenResource;
-use App\Filament\Resources\PPDB\CalonSantriResource;
-use App\Filament\Resources\PPDB\HasilUjianResource;
+use Modules\PPDB\Filament\Resources\CalonSantriDokumenResource;
+use Modules\PPDB\Filament\Resources\CalonSantriResource;
+use Modules\PPDB\Filament\Resources\HasilUjianResource;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;

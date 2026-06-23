@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\CMS\Article\ArticleResource;
-use App\Filament\Resources\CMS\Gallery\GalleryResource;
-use App\Filament\Resources\CMS\Profile\ProfileResource;
-use App\Filament\Resources\CMS\WebsiteSetting\WebsiteSettingResource;
+use Modules\CMS\Filament\Resources\Article\ArticleResource;
+use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
+use Modules\CMS\Filament\Resources\Profile\ProfileResource;
+use Modules\CMS\Filament\Resources\WebsiteSetting\WebsiteSettingResource;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;

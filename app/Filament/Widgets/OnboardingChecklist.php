@@ -99,7 +99,7 @@ class OnboardingChecklist extends Widget
                 'desc' => 'Tulis artikel atau unggah foto galeri.',
                 'icon' => 'heroicon-o-globe-alt',
                 'done' => self::adaKontenWebsite(),
-                'url' => self::urlOf(\App\Filament\Resources\CMS\Article\ArticleResource::class, 'create'),
+                'url' => self::urlOf(\Modules\CMS\Filament\Resources\Article\ArticleResource::class, 'create'),
             ],
         ];
     }
