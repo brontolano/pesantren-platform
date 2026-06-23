@@ -269,6 +269,7 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Kelembagaan')->collapsible(),
                 NavigationGroup::make('Komunikasi')->collapsible(),
                 NavigationGroup::make('Sarana & Logistik')->collapsible(),
+                NavigationGroup::make('Pembiayaan (DSCR)')->collapsible(),
                 NavigationGroup::make('Laporan Pimpinan')->collapsible(),
                 NavigationGroup::make('Pengaturan')->collapsible(),
                 NavigationGroup::make('Mutu')->collapsible(),

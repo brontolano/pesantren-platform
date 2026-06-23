@@ -36,11 +36,11 @@ class AsetResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
 
-    protected static ?string $navigationLabel = 'Aset';
+    protected static ?string $navigationLabel = 'Aset & Inventaris';
 
-    protected static ?string $modelLabel = 'Aset';
+    protected static ?string $modelLabel = 'Aset & Inventaris';
 
-    protected static ?string $pluralModelLabel = 'Aset';
+    protected static ?string $pluralModelLabel = 'Aset & Inventaris';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
 

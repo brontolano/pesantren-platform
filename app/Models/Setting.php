@@ -43,7 +43,7 @@ class Setting extends Model
         $value = static::getTenantValue($key, null);
 
         if (is_array($value)) {
-            foreach (['text', 'logo_path', 'path', 'url', 'value', 'color'] as $candidate) {
+            foreach (['text', 'logo_path', 'favicon_path', 'path', 'url', 'value', 'color'] as $candidate) {
                 if (isset($value[$candidate]) && is_string($value[$candidate]) && trim($value[$candidate]) !== '') {
                     return $value[$candidate];
                 }

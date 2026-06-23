@@ -21,6 +21,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Modules\Akademik\Models\PeriodeAkademik;
 
 // NOTE: FileUpload SENGAJA tidak di-fill dengan logo path yang tersimpan.
 // Alasan: Filament v5 FileUpload yang diisi path existing akan memanggil
@@ -65,6 +66,13 @@ class PengaturanBranding extends Page implements HasForms
      */
     public ?string $currentLogoPath = null;
 
+    /**
+     * Path favicon yang sudah tersimpan di disk 'public' tenant.
+     * Diisi di mount() dari value lama (kunci 'favicon_path'); dipertahankan
+     * saat save bila user tidak mengunggah favicon baru. Pola sama dengan logo.
+     */
+    public ?string $currentFaviconPath = null;
+
     /** Pilihan font branding (key => label). */
     public const FONTS = [
         'default' => 'Default Sans',
@@ -97,19 +105,37 @@ class PengaturanBranding extends Page implements HasForms
         // Blade template akan menampilkan preview via route /_tenant-storage/{path}.
         $this->currentLogoPath = data_get($settings->get('branding_logo')?->value, 'logo_path');
 
+        // Favicon kini disimpan sebagai file (kunci 'favicon_path'). Pola sama
+        // dengan logo: path tersimpan dipegang property terpisah, FileUpload null.
+        // KOMPAT-MUNDUR: favicon lama tersimpan di kunci 'text' (URL/path) — pakai
+        // 'favicon_path' bila ada, jika tidak jatuh ke 'text' agar favicon lama
+        // TIDAK hilang saat admin menyimpan tanpa mengunggah favicon baru.
+        $this->currentFaviconPath = data_get($settings->get('branding_favicon')?->value, 'favicon_path')
+            ?? data_get($settings->get('branding_favicon')?->value, 'text');
+
+        // gap-131: default Tahun Ajaran mengikuti PeriodeAkademik aktif bila ada,
+        // fallback ke nilai tersimpan, lalu '2026/2027'.
+        $defaultAcademicYear = data_get($settings->get('admission_academic_year')?->value, 'text', '2026/2027');
+        $activeAcademicYear = PeriodeAkademik::query()
+            ->where('is_active', true)
+            ->value('tahun_akademik');
+        if (is_string($activeAcademicYear) && trim($activeAcademicYear) !== '') {
+            $defaultAcademicYear = $activeAcademicYear;
+        }
+
         $this->form->fill([
             'branding_name' => data_get($settings->get('branding_name')?->value, 'text'),
             'branding_tagline' => data_get($settings->get('branding_tagline')?->value, 'text'),
             'branding_primary_color' => data_get($settings->get('branding_primary_color')?->value, 'color', self::DEFAULT_PRIMARY),
             'branding_secondary_color' => data_get($settings->get('branding_secondary_color')?->value, 'color', self::DEFAULT_SECONDARY),
             'branding_logo' => null,   // SENGAJA null — lihat komentar di atas
-            'branding_favicon' => data_get($settings->get('branding_favicon')?->value, 'text'),
+            'branding_favicon' => null,   // SENGAJA null — pola sama dengan logo
             'branding_font' => data_get($settings->get('branding_font')?->value, 'text', 'default'),
             'branding_latitude' => data_get($settings->get('branding_latitude')?->value, 'text'),
             'branding_longitude' => data_get($settings->get('branding_longitude')?->value, 'text'),
             'ppdb_form_fields' => data_get($settings->get('ppdb_form_fields')?->value, 'fields', []),
             'admission_inline_enabled' => (bool) data_get($settings->get('admission_inline_enabled')?->value, 'enabled', false),
-            'admission_academic_year' => data_get($settings->get('admission_academic_year')?->value, 'text', '2026/2027'),
+            'admission_academic_year' => $defaultAcademicYear,
             'admission_admin_whatsapp' => data_get($settings->get('admission_admin_whatsapp')?->value, 'text'),
             'admission_bank_name' => data_get($settings->get('admission_bank_name')?->value, 'text'),
             'admission_account_number' => data_get($settings->get('admission_account_number')?->value, 'text'),
@@ -166,10 +192,15 @@ class PengaturanBranding extends Page implements HasForms
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
                             ->maxSize(2048)
                             ->helperText('JPG/PNG/WebP/SVG, maks 2 MB. Logo lama tetap aktif sampai ada yang baru.'),
-                        TextInput::make('branding_favicon')
-                            ->label('Favicon URL / Path')
-                            ->helperText('Boleh URL absolut atau path file publik.')
-                            ->maxLength(255),
+                        FileUpload::make('branding_favicon')
+                            ->label('Upload Favicon Baru')
+                            ->disk(StorageQuotaService::diskName())
+                            ->directory('branding')
+                            // JANGAN ->image(): .ico bukan image-mime standar yang
+                            // dikenali validasi image Filament/Laravel.
+                            ->acceptedFileTypes(['image/x-icon', 'image/vnd.microsoft.icon', 'image/png'])
+                            ->maxSize(512)
+                            ->helperText('ICO/PNG, maks 512 KB. Favicon lama tetap aktif sampai ada yang baru.'),
                     ])
                     ->columns(2),
 
@@ -250,13 +281,23 @@ class PengaturanBranding extends Page implements HasForms
             $this->currentLogoPath = $newLogoPath;
         }
 
+        // Favicon: pola sama dengan logo. Upload baru → pakai; jika tidak →
+        // pertahankan favicon lama. Disimpan sebagai 'favicon_path'.
+        $newFaviconPath = $data['branding_favicon'] ?? null;
+        $faviconPath = $newFaviconPath ?: $this->currentFaviconPath;
+
+        if ($newFaviconPath) {
+            $this->registerLogoAsMediaFile($newFaviconPath);
+            $this->currentFaviconPath = $newFaviconPath;
+        }
+
         $payloads = [
             'branding_name' => ['text' => $data['branding_name'] ?? null],
             'branding_tagline' => ['text' => $data['branding_tagline'] ?? null],
             'branding_primary_color' => ['color' => $data['branding_primary_color'] ?? null],
             'branding_secondary_color' => ['color' => $data['branding_secondary_color'] ?? null],
             'branding_logo' => ['logo_path' => $logoPath],
-            'branding_favicon' => ['text' => $data['branding_favicon'] ?? null],
+            'branding_favicon' => ['favicon_path' => $faviconPath],
             'branding_font' => ['text' => $data['branding_font'] ?? 'default'],
             'branding_latitude' => ['text' => $data['branding_latitude'] ?? null],
             'branding_longitude' => ['text' => $data['branding_longitude'] ?? null],
@@ -284,7 +325,7 @@ class PengaturanBranding extends Page implements HasForms
             'branding_primary_color' => $data['branding_primary_color'] ?? null,
             'branding_secondary_color' => $data['branding_secondary_color'] ?? null,
             'branding_logo' => null,   // Selalu kosong pasca-save
-            'branding_favicon' => $data['branding_favicon'] ?? null,
+            'branding_favicon' => null,   // Selalu kosong pasca-save (pola logo)
             'branding_font' => $data['branding_font'] ?? 'default',
             'branding_latitude' => $data['branding_latitude'] ?? null,
             'branding_longitude' => $data['branding_longitude'] ?? null,
