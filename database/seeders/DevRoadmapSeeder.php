@@ -176,6 +176,18 @@ class DevRoadmapSeeder extends Seeder
                 ]
             );
         }
+
+        // Status task yang SUDAH dikerjakan (diperbarui tiap PR fix selesai).
+        $selesai = [
+            'Perbaiki bug channel Notifikasi whatsapp→wa + wire seeder' => 'SELESAI 2026-06-24: 23 nilai seeder channel→wa + migrasi normalisasi tenant lama + TemplateNotifikasiSeeder ter-wire ke TenantProvisioner.',
+            'Wire seeder tarif Pajak ke TenantProvisioner' => 'SELESAI 2026-06-24: PajakSeeder + TerPph21Seeder ter-wire ke TenantProvisioner (idempoten, --force).',
+            'Seed kategori POS untuk tenant baru' => 'SELESAI 2026-06-24: PosKategoriSeeder ter-wire ke TenantProvisioner.',
+        ];
+        foreach ($selesai as $judul => $state) {
+            DevTask::where('dev_project_id', $project->id)
+                ->where('title', $judul)
+                ->update(['status' => 'done', 'progress' => 100, 'current_state' => $state]);
+        }
     }
 
     /**
