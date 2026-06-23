@@ -23,14 +23,20 @@ use Filament\Schemas\Schema;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Modules\AI\Models\AiApproval;
+use Modules\AI\Models\AiTenantBudget;
 use Modules\AI\Models\AiTenantSetting;
+use Modules\AI\Services\Gateway\AiGateway;
+use Modules\AI\Services\Metering\AiBudgetProvisioner;
+use Modules\AI\Services\Metering\BudgetGuard;
 use Modules\AI\Services\Settings\AiTenantSettingDefaults;
 use Modules\AI\Services\Settings\RingkasanKebijakan;
 use Modules\AI\Services\Settings\TenantSettingService;
+use Throwable;
 
 /**
  * T-A011 — Wizard "Wawancara Digital" 6 langkah (PRD §6.2–6.3).
@@ -632,5 +638,202 @@ class PengaturanAi extends Page implements HasForms
     public function tautanRingkasanJam(): int
     {
         return max(1, (int) config('ai.settings.tautan_ringkasan_jam', 72));
+    }
+
+    // ------------------------------------------------------------------
+    // gap-136 — Status Infrastruktur AI (READ-ONLY swa-periksa di panel)
+    //
+    // Menampilkan ringkasan yang sebelumnya hanya tersedia lewat CLI
+    // `php artisan ai:health`: Ollama terjangkau + model, kedalaman antrian
+    // queue 'ai', dan sisa anggaran kredit tenant. SEMUA logika memanggil
+    // service yang SUDAH ADA (AiGateway::providerHealth, BudgetGuard::cek,
+    // AiTenantBudget) — halaman ini hanya merangkai & menampilkan, TIDAK
+    // mengubah logika kesehatan/anggaran/inferensi.
+    //
+    // Provisioning baris anggaran dilakukan idempoten (AiBudgetProvisioner
+    // memakai insertOrIgnore) HANYA bila baris tenant belum ada — sehingga
+    // status "BELUM ADA" tidak menetap untuk tenant yang valid.
+    // ------------------------------------------------------------------
+
+    /** Id tenant aktif (panel tenant) atau null bila konteks central. */
+    protected function tenantIdKini(): ?string
+    {
+        return tenancy()->initialized ? (string) tenant()?->getTenantKey() : null;
+    }
+
+    /**
+     * Ringkasan status infrastruktur AI untuk ditampilkan di blade.
+     * Tiap blok toleran: kegagalan satu pemeriksaan tidak menggugurkan
+     * blok lainnya maupun render halaman.
+     *
+     * @return array{
+     *     provider: list<array{nama: string, ok: bool, detail: string, model: list<string>}>,
+     *     antrian: array{label: string, ok: bool, detail: string},
+     *     anggaran: array{tersedia: bool, ok: bool, killSwitch: bool, detail: string},
+     * }
+     */
+    public function statusInfra(): array
+    {
+        return [
+            'provider' => $this->statusProvider(),
+            'antrian' => $this->statusAntrian(),
+            'anggaran' => $this->statusAnggaran(),
+        ];
+    }
+
+    /**
+     * Kesehatan provider nyata (Ollama dst) + daftar model — memanggil
+     * AiGateway::providerHealth() yang sama dengan ai:health.
+     *
+     * @return list<array{nama: string, ok: bool, detail: string, model: list<string>}>
+     */
+    protected function statusProvider(): array
+    {
+        try {
+            $laporan = [];
+            foreach (app(AiGateway::class)->providerHealth() as $nama => $health) {
+                $laporan[] = [
+                    'nama' => (string) $nama,
+                    'ok' => (bool) ($health['ok'] ?? false),
+                    'detail' => (string) ($health['detail'] ?? ''),
+                    'model' => array_values(array_map('strval', (array) ($health['models'] ?? []))),
+                ];
+            }
+
+            return $laporan;
+        } catch (Throwable $e) {
+            return [[
+                'nama' => 'Provider AI',
+                'ok' => false,
+                'detail' => 'Tidak dapat diperiksa: '.$e->getMessage(),
+                'model' => [],
+            ]];
+        }
+    }
+
+    /**
+     * Kedalaman antrian queue 'ai' di Redis — read-only, meniru logika
+     * laporan AiHealthCommand tanpa memodifikasi apa pun.
+     *
+     * @return array{label: string, ok: bool, detail: string}
+     */
+    protected function statusAntrian(): array
+    {
+        $queue = (string) config('ai.queue.name', 'ai');
+        $queueConnection = (string) config('ai.queue.connection', 'redis-ai');
+
+        if (! is_array(config("queue.connections.{$queueConnection}"))) {
+            return [
+                'label' => "Antrian '{$queue}'",
+                'ok' => false,
+                'detail' => "Koneksi queue '{$queueConnection}' belum dikonfigurasi.",
+            ];
+        }
+
+        $connection = (string) config("queue.connections.{$queueConnection}.connection", 'default');
+
+        try {
+            $redis = Redis::connection($connection);
+            $pending = (int) $redis->llen("queues:{$queue}");
+            $delayed = (int) $redis->zcard("queues:{$queue}:delayed");
+            $reserved = (int) $redis->zcard("queues:{$queue}:reserved");
+
+            return [
+                'label' => "Antrian '{$queue}'",
+                'ok' => true,
+                'detail' => sprintf('%d menunggu, %d tertunda, %d diproses', $pending, $delayed, $reserved),
+            ];
+        } catch (Throwable $e) {
+            return [
+                'label' => "Antrian '{$queue}'",
+                'ok' => false,
+                'detail' => 'Tidak terjangkau: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Sisa anggaran kredit AI tenant. Memanggil BudgetGuard::cek() &
+     * membaca AiTenantBudget (central) — sama dengan baris anggaran
+     * ai:health. Bila baris belum ada, provisioning idempoten dijalankan
+     * sekali (AiBudgetProvisioner) lalu dibaca ulang; tetap toleran.
+     *
+     * @return array{tersedia: bool, ok: bool, killSwitch: bool, detail: string}
+     */
+    protected function statusAnggaran(): array
+    {
+        $tenantId = $this->tenantIdKini();
+
+        if ($tenantId === null) {
+            return [
+                'tersedia' => false,
+                'ok' => false,
+                'killSwitch' => false,
+                'detail' => 'Konteks tenant tidak terdeteksi.',
+            ];
+        }
+
+        try {
+            $budget = AiTenantBudget::query()->where('tenant_id', $tenantId)->first();
+
+            // Provisioning idempoten: hanya bila baris belum ada. Provisioner
+            // memakai insertOrIgnore + tidak mengubah riwayat ledger berjalan.
+            if ($budget === null) {
+                app(AiBudgetProvisioner::class)->provision($tenantId);
+                $budget = AiTenantBudget::query()->where('tenant_id', $tenantId)->first();
+            }
+
+            if ($budget === null) {
+                return [
+                    'tersedia' => false,
+                    'ok' => false,
+                    'killSwitch' => false,
+                    'detail' => 'Baris anggaran belum dapat disiapkan (tabel metering AI mungkin belum termigrasi).',
+                ];
+            }
+
+            $status = app(BudgetGuard::class)->cek($tenantId);
+
+            if ($status->killSwitch) {
+                return [
+                    'tersedia' => true,
+                    'ok' => false,
+                    'killSwitch' => true,
+                    'detail' => sprintf(
+                        'Anggaran bulan ini habis (terpakai %s%%) — panggilan AI dibalas pesan top-up.',
+                        number_format($status->persenTerpakai, 1, ',', '.'),
+                    ),
+                ];
+            }
+
+            $detail = $budget->anggaran_kredit_bulanan === null
+                ? sprintf('Tanpa batas anggaran — terpakai %s kredit periode ini.', $this->angkaKredit($budget->terpakai_periode))
+                : sprintf(
+                    'Terpakai %s dari %s kredit (%s%%), peringatan di %d%%.',
+                    $this->angkaKredit($budget->terpakai_periode),
+                    $this->angkaKredit($budget->anggaran_kredit_bulanan),
+                    number_format($status->persenTerpakai, 1, ',', '.'),
+                    (int) $budget->ambang_alert_persen,
+                );
+
+            return [
+                'tersedia' => true,
+                'ok' => true,
+                'killSwitch' => false,
+                'detail' => $detail,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'tersedia' => false,
+                'ok' => false,
+                'killSwitch' => false,
+                'detail' => 'Tidak dapat diperiksa: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    private function angkaKredit(int|float|string|null $n): string
+    {
+        return number_format((float) $n, 0, ',', '.');
     }
 }
