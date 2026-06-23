@@ -36,7 +36,7 @@ class MunaqasyahResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationLabel = 'Munaqasyah';
+    protected static ?string $navigationLabel = 'Ujian Hafalan (Munaqasyah)';
 
     protected static UnitEnum|string|null $navigationGroup = 'Tahfidz';
 
