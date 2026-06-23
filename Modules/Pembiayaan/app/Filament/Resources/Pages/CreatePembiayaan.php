@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Pembiayaan\Pages;
+namespace Modules\Pembiayaan\Filament\Resources\Pages;
 
-use App\Filament\Resources\Pembiayaan\PembiayaanResource;
+use Modules\Pembiayaan\Filament\Resources\PembiayaanResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Pembiayaan\Services\PembiayaanService;

@@ -18,7 +18,7 @@ use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 use Modules\Payroll\Filament\Resources\Employee\EmployeeResource;
 use Modules\Payroll\Filament\Resources\Jabatan\JabatanResource;
-use App\Filament\Resources\Pembiayaan\AsetResource;
+use Modules\Pembiayaan\Filament\Resources\AsetResource;
 use Modules\Pengadaan\Filament\Resources\Supplier\SupplierResource;
 use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;

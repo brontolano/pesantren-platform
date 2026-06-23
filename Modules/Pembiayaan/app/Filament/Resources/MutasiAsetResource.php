@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Pembiayaan;
+namespace Modules\Pembiayaan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Pembiayaan\Pages\ListMutasiAset;
+use Modules\Pembiayaan\Filament\Resources\Pages\ListMutasiAset;
 use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;

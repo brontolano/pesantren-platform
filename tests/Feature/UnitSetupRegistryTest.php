@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use App\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use Modules\Mutu\Filament\Resources\MutuSasaranResource;
-use App\Filament\Resources\Pembiayaan\AsetResource;
+use Modules\Pembiayaan\Filament\Resources\AsetResource;
 use Modules\Pengadaan\Filament\Resources\Supplier\SupplierResource;
 use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;

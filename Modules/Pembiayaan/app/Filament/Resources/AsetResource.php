@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Pembiayaan;
+namespace Modules\Pembiayaan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Pembiayaan\Pages\CreateAset;
-use App\Filament\Resources\Pembiayaan\Pages\EditAset;
-use App\Filament\Resources\Pembiayaan\Pages\ListAset;
+use Modules\Pembiayaan\Filament\Resources\Pages\CreateAset;
+use Modules\Pembiayaan\Filament\Resources\Pages\EditAset;
+use Modules\Pembiayaan\Filament\Resources\Pages\ListAset;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;

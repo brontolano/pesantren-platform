@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Pembiayaan\Pages;
+namespace Modules\Pembiayaan\Filament\Resources\Pages;
 
-use App\Filament\Resources\Pembiayaan\AsetResource;
+use Modules\Pembiayaan\Filament\Resources\AsetResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 

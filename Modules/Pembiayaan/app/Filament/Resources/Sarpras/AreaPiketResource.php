@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Sarpras;
+namespace Modules\Pembiayaan\Filament\Resources\Sarpras;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Sarpras\AreaPiket\Pages\CreateAreaPiket;
-use App\Filament\Resources\Sarpras\AreaPiket\Pages\EditAreaPiket;
-use App\Filament\Resources\Sarpras\AreaPiket\Pages\ListAreaPiket;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\CreateAreaPiket;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\EditAreaPiket;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\ListAreaPiket;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;

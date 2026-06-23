@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Sarpras\LaporanKerusakan\Pages;
+namespace Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakan\Pages;
 
-use App\Filament\Resources\Sarpras\LaporanKerusakanResource;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakanResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListLaporanKerusakan extends ListRecords
