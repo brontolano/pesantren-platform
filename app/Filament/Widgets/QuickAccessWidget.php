@@ -20,7 +20,7 @@ use Modules\Kesantrian\Filament\Resources\Kelas\KelasResource;
 use Modules\Kesehatan\Filament\Resources\RiwayatKesehatanResource;
 use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
 use App\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
-use App\Filament\Resources\Ledger\JurnalResource;
+use Modules\Ledger\Filament\Resources\JurnalResource;
 use App\Filament\Resources\Media\MediaFileResource;
 use App\Filament\Resources\Payroll\SlipGajiResource;
 use App\Filament\Resources\Pembayaran\PembayaranResource;
