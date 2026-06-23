@@ -65,7 +65,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         // tenant non-dev. Promosikan ke released + aktifkan agar halaman/resource-nya
         // benar-benar ter-render (assert 200 di bawah), bukan 403 yang lolos diam-diam.
         // Ditulis SEBELUM request pertama agar cache modul memuat nilai terbaru.
-        foreach (['kegiatan', 'notifikasi'] as $modul) {
+        foreach (['kegiatan', 'notifikasi', 'kesehatan'] as $modul) {
             DB::connection('pgsql')->table('module_registry')->where('key', $modul)->update(['status' => 'released']);
             DB::connection('pgsql')->table('tenant_modules')->insert([
                 'tenant_id' => $tenant->id, 'module_name' => $modul, 'is_active' => true,
@@ -104,6 +104,13 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $logReq->headers->set('Host', $host);
         $logStatus = $kernel->handle($logReq)->getStatusCode();
         $this->assertSame(200, $logStatus, "Log Notifikasi (LogNotifikasiResource) status {$logStatus}, harusnya 200.");
+
+        // Kunjungan UKS (KunjunganUksResource) WAJIB 200 → bukti resource TERDAFTAR di
+        // panel (panel pakai daftar eksplisit; resource tak terdaftar = 404 senyap).
+        $uksReq = Request::create("http://{$host}/admin/kesehatan/kunjungan-uks", 'GET');
+        $uksReq->headers->set('Host', $host);
+        $uksStatus = $kernel->handle($uksReq)->getStatusCode();
+        $this->assertSame(200, $uksStatus, "Kunjungan UKS (KunjunganUksResource) status {$uksStatus}, harusnya 200.");
 
         tenancy()->end();
     }

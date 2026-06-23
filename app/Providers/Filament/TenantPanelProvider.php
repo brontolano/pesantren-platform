@@ -68,6 +68,7 @@ use Modules\Kesantrian\Filament\Resources\Kelas\KelasResource;
 use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\JenisPelanggaranResource;
 use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
+use Modules\Kesehatan\Filament\Resources\KunjunganUksResource;
 use Modules\Kesehatan\Filament\Resources\ObatResource;
 use Modules\Kesehatan\Filament\Resources\RiwayatKesehatanResource;
 use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
@@ -445,6 +446,7 @@ class TenantPanelProvider extends PanelProvider
             MunaqasyahResource::class,
             RiwayatKesehatanResource::class,
             SesiKonselingResource::class,
+            KunjunganUksResource::class, // WP-27 — Kunjungan UKS (registrasi tertinggal)
             ObatResource::class, // WP-28 — Stok Obat UKS
             LaporanKerusakanResource::class, // WP-33 — Sarpras
             AreaPiketResource::class, // WP-33 — Sarpras
