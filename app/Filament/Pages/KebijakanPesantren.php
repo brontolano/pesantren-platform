@@ -139,6 +139,7 @@ class KebijakanPesantren extends Page implements HasForms
             'select' => Select::make($name)->label($label)->options($entry['options'] ?? [])->native(false),
             'json' => Textarea::make($name)->label($label)->rows(5)
                 ->helperText($entry['deskripsi'].' (Format JSON — biarkan kosong untuk ikut bawaan.)'),
+            'textarea' => Textarea::make($name)->label($label)->rows(4),
             default => TextInput::make($name)->label($label),
         };
 
