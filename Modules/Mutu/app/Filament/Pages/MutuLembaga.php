@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Mutu\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use App\Services\Mutu\MutuService;

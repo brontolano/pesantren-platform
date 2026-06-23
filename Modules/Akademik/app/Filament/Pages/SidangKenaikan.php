@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Akademik\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use Filament\Forms\Components\Select;

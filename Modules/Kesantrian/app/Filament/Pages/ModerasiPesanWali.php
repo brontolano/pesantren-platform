@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Kesantrian\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use Filament\Actions\Action;

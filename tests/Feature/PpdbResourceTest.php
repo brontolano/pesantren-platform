@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\PpdbReport;
+use Modules\PPDB\Filament\Pages\PpdbReport;
 use Modules\PPDB\Filament\Resources\CalonSantriDokumenResource;
 use Modules\PPDB\Filament\Resources\CalonSantriResource;
 use Modules\PPDB\Filament\Resources\HasilUjianResource;

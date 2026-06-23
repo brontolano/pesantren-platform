@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Kesantrian\Filament\Pages;
 
 use Filament\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
