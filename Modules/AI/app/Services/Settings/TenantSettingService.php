@@ -453,6 +453,8 @@ class TenantSettingService
             'scope_data.*' => ['boolean'],
             'bahasa' => ['required', 'string', 'in:id,id_jawa,id_sunda'],
             'gaya' => ['required', 'string', 'in:formal_santun,hangat'],
+            // gap-135 — toggle mode uji chatbot WA (non-sensitif).
+            'mode_uji_wa' => ['required', 'boolean'],
             'jam_layanan' => ['required', 'array'],
             'jam_layanan.mulai' => ['required', 'date_format:H:i'],
             'jam_layanan.selesai' => ['required', 'date_format:H:i'],

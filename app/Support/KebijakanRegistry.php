@@ -5,6 +5,7 @@ namespace App\Support;
 use Modules\Akademik\Services\KalenderService;
 use Modules\Akademik\Services\KelulusanService;
 use Modules\Akademik\Services\KenaikanKelasService;
+use Modules\Core\Services\SuratService;
 use Modules\Kesantrian\Services\DisiplinService;
 use Modules\Kesantrian\Services\PresensiAsramaService;
 use Modules\Payroll\Models\KontrakKerja;
@@ -209,6 +210,18 @@ class KebijakanRegistry
                 'label' => 'Pemisahan dana halal & syubhat',
                 'deskripsi' => 'Bila aktif, dana syubhat (mis. bunga bank) dipisah sebagai Dana Kebajikan dan dijaga penyalurannya.',
                 'default' => false, 'kelompok' => 'keuangan', 'tipe' => 'bool',
+            ],
+
+            // ---------------- Umum (Administrasi Surat) ----------------
+            SuratService::SETTING_KODE_LEMBAGA => [
+                'label' => 'Kode lembaga pada nomor surat keluar',
+                'deskripsi' => 'Singkatan lembaga yang muncul di nomor surat keluar, mis. PES/MA/MTS (kosong = bawaan "PES").',
+                'default' => SuratService::DEFAULT_KODE_LEMBAGA, 'kelompok' => 'umum', 'tipe' => 'text',
+            ],
+            SuratService::SETTING_FORMAT_NOMOR => [
+                'label' => 'Format nomor surat keluar',
+                'deskripsi' => 'Pola penomoran surat keluar; {urut}, {kode}, {bulan} (romawi), {tahun} diganti otomatis.',
+                'default' => SuratService::DEFAULT_FORMAT_NOMOR, 'kelompok' => 'umum', 'tipe' => 'text',
             ],
 
             // ---------------- Impor & Migrasi Data ----------------
