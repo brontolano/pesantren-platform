@@ -40,7 +40,7 @@ class TarifPajakResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('pajak') && (auth()->user()?->can('manage_pajak') ?? false);
+        return UiMode::navAdvanced('pajak') && static::moduleVisible('pajak') && (auth()->user()?->can('manage_pajak') ?? false);
     }
 
     public static function canAccess(): bool

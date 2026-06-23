@@ -41,7 +41,7 @@ class BukuPembantuPihak extends Page
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::canAccess();
+        return UiMode::navAdvanced('ledger') && static::canAccess();
     }
 
     protected function getViewData(): array

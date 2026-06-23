@@ -3,9 +3,6 @@
 namespace Modules\Kesehatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\CreateRiwayatKesehatan;
-use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\EditRiwayatKesehatan;
-use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\ListRiwayatKesehatan;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -18,6 +15,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\CreateRiwayatKesehatan;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\EditRiwayatKesehatan;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\ListRiwayatKesehatan;
 use Modules\Kesehatan\Models\RiwayatKesehatan;
 use UnitEnum;
 
@@ -26,7 +26,7 @@ class RiwayatKesehatanResource extends Resource
     /** Mode simple: menu lanjutan disembunyikan (fungsi & route tetap aktif). */
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced();
+        return UiMode::navAdvanced('kesehatan_lanjut');
     }
 
     use ModuleGate;

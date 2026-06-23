@@ -48,7 +48,7 @@ class KalkulatorPph21 extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return \App\Support\UiMode::navAdvanced('pajak') && static::canAccess();
     }
 
     public function mount(): void

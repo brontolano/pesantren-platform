@@ -175,6 +175,28 @@ class KebijakanRegistry
                 'deskripsi' => 'Teks kebijakan privasi pesantren — tampil di /kebijakan-privasi & disetujui wali saat daftar PPDB. Kosong = pakai redaksi bawaan platform.',
                 'default' => '', 'kelompok' => 'umum', 'tipe' => 'textarea',
             ],
+            // gap-112 — toggle munculkan menu inti di Mode Sederhana (default false = perilaku lama,
+            // menu disembunyikan; UiMode::navAdvanced(key) baca key-key ini).
+            'ui.sederhana_tampilkan_ledger' => [
+                'label' => 'Tampilkan menu Buku Besar/Laporan Keuangan di Mode Sederhana',
+                'deskripsi' => 'Saat aktif, menu modul Ledger (Buku Besar, Neraca Saldo, Jurnal Manual, semua Laporan Keuangan/Dana/RKAM) tetap muncul walau pengguna memakai Mode Sederhana. Default nonaktif = perilaku lama.',
+                'default' => false, 'kelompok' => 'umum', 'tipe' => 'bool',
+            ],
+            'ui.sederhana_tampilkan_akademik_inti' => [
+                'label' => 'Tampilkan menu Akademik inti di Mode Sederhana',
+                'deskripsi' => 'Saat aktif, menu Periode Akademik, Pelajaran, dan Jadwal Pelajaran tetap muncul di Mode Sederhana. Default nonaktif = perilaku lama.',
+                'default' => false, 'kelompok' => 'umum', 'tipe' => 'bool',
+            ],
+            'ui.sederhana_tampilkan_kesehatan_lanjut' => [
+                'label' => 'Tampilkan menu Kesehatan lanjutan di Mode Sederhana',
+                'deskripsi' => 'Saat aktif, menu Riwayat Kesehatan dan Sesi Konseling (UKS) tetap muncul di Mode Sederhana. Default nonaktif = perilaku lama.',
+                'default' => false, 'kelompok' => 'umum', 'tipe' => 'bool',
+            ],
+            'ui.sederhana_tampilkan_pajak' => [
+                'label' => 'Tampilkan menu Pajak di Mode Sederhana',
+                'deskripsi' => 'Saat aktif, menu Tarif Pajak, Laporan Pajak, dan Kalkulator Pajak/PPh21 tetap muncul di Mode Sederhana. Default nonaktif = perilaku lama.',
+                'default' => false, 'kelompok' => 'umum', 'tipe' => 'bool',
+            ],
             'akademik_kehadiran_minimal' => [
                 'label' => 'Ambang kehadiran minimal (%)',
                 'deskripsi' => 'Persentase kehadiran minimum santri sebelum ditandai bermasalah pada KPI akademik.',
