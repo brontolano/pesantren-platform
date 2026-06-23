@@ -3,9 +3,11 @@
 namespace Modules\Ledger\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\DivisiUnit;
 use Modules\Ledger\Models\KebijakanKehalalan;
+use Modules\Ledger\Models\PeriodeAkuntansi;
 use Modules\Ledger\Models\SumberDana;
 
 /**
@@ -26,6 +28,38 @@ class LedgerSeeder extends Seeder
         $this->seedDivisiUnit();
         $this->seedAkun();
         $this->seedKebijakanKehalalan();
+        $this->seedPeriodeAkuntansi();
+    }
+
+    /**
+     * Seed SATU periode akuntansi default (bulan berjalan, status 'open') agar
+     * tenant baru langsung punya periode untuk UI/dropdown/laporan modul Ledger.
+     *
+     * IDEMPOTEN + tidak destruktif: hanya dibuat bila BELUM ADA periode sama sekali.
+     * Bila tenant sudah memiliki periode (mis. dibuat manual / hasil tutup buku /
+     * fixture test), seeder TIDAK menyentuhnya sama sekali — tak meng-overwrite,
+     * tak menambah periode tumpang-tindih.
+     *
+     * Catatan rancang: periode hanya MENGUNCI posting saat status 'closed'
+     * (lihat JurnalService::resolvePeriode + gerbang periode-terkunci). Periode
+     * 'open' default ini TIDAK mengubah perilaku posting — murni ketersediaan
+     * data untuk UI/laporan.
+     */
+    private function seedPeriodeAkuntansi(): void
+    {
+        if (PeriodeAkuntansi::query()->exists()) {
+            return;
+        }
+
+        $awal = Carbon::now()->startOfMonth();
+        $akhir = Carbon::now()->endOfMonth();
+
+        PeriodeAkuntansi::create([
+            'nama' => 'Periode '.$awal->translatedFormat('F Y'),
+            'tgl_mulai' => $awal->toDateString(),
+            'tgl_selesai' => $akhir->toDateString(),
+            'status' => 'open',
+        ]);
     }
 
     private function seedSumberDana(): void
