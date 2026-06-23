@@ -184,6 +184,7 @@ class DevRoadmapSeeder extends Seeder
             'Seed kategori POS untuk tenant baru' => 'SELESAI 2026-06-24: PosKategoriSeeder ter-wire ke TenantProvisioner.',
             'Satukan kosakata status izin santri (panel↔PWA)' => 'SELESAI 2026-06-24: kosakata izin disatukan jadi "diajukan" lintas IzinSantriResource + KegiatanService (ajukanIzin/getIzinPending) + IzinSantriService + migrasi normalisasi izin_santri (pending→diajukan) & ALTER default. Izin dari panel admin kini masuk antrean persetujuan PWA.',
             'Samakan kosakata STATUS hafalan jadi satu sumber' => 'SELESAI 2026-06-24: status hafalan disatukan jadi "berjalan" (importer STATUS_VALID + template + petunjuk: proses→berjalan) + migrasi normalisasi tahfidz_hafalan (proses→berjalan). Hafalan impor kini terhitung di ringkasan & lolos re-import.',
+            'Perbaiki RBAC modul Mutu' => 'SELESAI 2026-06-24: admin_pesantren diberi manage_mutu (penyusun → 5 resource SPMI + Dashboard tampil saat onboarding); kepala diberi manage_mutu + approve_mutu (penyetuju). Segregasi: admin tak punya approve_mutu, jadi tak bisa menyetujui dokumennya sendiri. syncPermissions idempoten → tenant:reprovision menerapkan ke tenant lama.',
         ];
         foreach ($selesai as $judul => $state) {
             DevTask::where('dev_project_id', $project->id)

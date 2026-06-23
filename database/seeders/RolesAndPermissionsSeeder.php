@@ -113,6 +113,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'manage_notifikasi',
                 'view_akademik',
                 'manage_akademik',
+                'manage_mutu',
                 'kelola_approval',
                 'lihat_audit',
                 'ai.setting.kelola',
@@ -245,6 +246,10 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_notifikasi',
                 'view_akademik',
                 'manage_tenant_settings',
+                // SPMI — kepala melihat & MENYETUJUI mutu (segregasi: admin_pesantren
+                // hanya menyusun/manage, tak punya approve_mutu).
+                'manage_mutu',
+                'approve_mutu',
                 // Kyai/pimpinan — menyetujui kebijakan AI (T-A010).
                 'ai.setting.setujui',
                 'ai.setting.lihat',
