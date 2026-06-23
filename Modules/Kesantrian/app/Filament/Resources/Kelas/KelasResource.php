@@ -6,6 +6,7 @@ use Modules\Kesantrian\Filament\Resources\Kelas\Pages\CreateKelas;
 use Modules\Kesantrian\Filament\Resources\Kelas\Pages\EditKelas;
 use Modules\Kesantrian\Filament\Resources\Kelas\Pages\ListKelas;
 use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -103,6 +104,13 @@ class KelasResource extends Resource
             ->emptyStateHeading('Belum ada kelas')
             ->emptyStateDescription('Tambahkan kelas terlebih dahulu untuk mulai menempatkan santri.')
             ->emptyStateIcon('heroicon-o-rectangle-stack')
+            ->emptyStateActions([
+                Action::make('tambah')
+                    ->label('Tambah Kelas')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn (): bool => static::canCreate())
+                    ->url(fn (): string => static::getUrl('create')),
+            ])
             ->columns([
                 TextColumn::make('nama_kelas')
                     ->label('Nama Kelas')

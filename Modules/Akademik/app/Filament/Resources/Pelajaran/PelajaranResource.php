@@ -8,6 +8,7 @@ use Modules\Akademik\Filament\Resources\Pelajaran\Pages\EditPelajaran;
 use Modules\Akademik\Filament\Resources\Pelajaran\Pages\ListPelajaran;
 use App\Models\User;
 use App\Support\UiMode;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -81,6 +82,16 @@ class PelajaranResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Belum ada pelajaran')
+            ->emptyStateDescription('Tambahkan mata pelajaran agar bisa menyusun jadwal dan menilai santri.')
+            ->emptyStateIcon('heroicon-o-book-open')
+            ->emptyStateActions([
+                Action::make('tambah')
+                    ->label('Tambah Pelajaran')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn (): bool => static::canCreate())
+                    ->url(fn (): string => static::getUrl('create')),
+            ])
             ->columns([
                 TextColumn::make('nama')->searchable()->sortable(),
                 TextColumn::make('kode')->searchable()->sortable(),
