@@ -4,10 +4,10 @@ namespace App\Support;
 
 use App\Filament\Pages\IntegrasiApi;
 use App\Filament\Pages\PengaturanBranding;
-use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
-use App\Filament\Resources\Akademik\Lembaga\LembagaResource;
-use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
-use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
+use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
+use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
 use Modules\Asrama\Filament\Resources\PenempatanAsrama\PenempatanAsramaResource;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use Modules\Kesehatan\Filament\Resources\ObatResource;

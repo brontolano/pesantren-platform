@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use App\Models\Tenant;
 use Illuminate\Database\QueryException;
 use Modules\Akademik\Models\JadwalPelajaran;

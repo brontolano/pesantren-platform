@@ -3,10 +3,10 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Pages\SetupUnit;
-use App\Filament\Resources\Akademik\JadwalPelajaran\JadwalPelajaranResource;
-use App\Filament\Resources\Akademik\Nilai\NilaiResource;
-use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
-use App\Filament\Resources\Akademik\Rapor\RaporResource;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
+use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
+use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
+use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
 use App\Filament\Resources\Alumni\AlumniResource;
 use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
 use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
