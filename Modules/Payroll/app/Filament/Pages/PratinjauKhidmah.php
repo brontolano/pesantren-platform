@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace Modules\Payroll\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
 use App\Support\UiMode;

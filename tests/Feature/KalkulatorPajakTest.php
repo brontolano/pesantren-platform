@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\KalkulatorPajak;
+use Modules\Pajak\Filament\Pages\KalkulatorPajak;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Pajak\Database\Seeders\PajakSeeder;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
