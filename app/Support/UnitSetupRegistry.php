@@ -10,7 +10,7 @@ use App\Filament\Resources\Akademik\Pelajaran\PelajaranResource;
 use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
 use App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource;
 use App\Filament\Resources\CMS\Article\ArticleResource;
-use App\Filament\Resources\Kesehatan\ObatResource;
+use Modules\Kesehatan\Filament\Resources\ObatResource;
 use App\Filament\Resources\Ledger\AkunResource;
 use App\Filament\Resources\Ledger\PeriodeAkuntansiResource;
 use App\Filament\Resources\Ledger\SumberDanaResource;

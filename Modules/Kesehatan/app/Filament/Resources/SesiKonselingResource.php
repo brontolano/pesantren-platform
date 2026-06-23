@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Kesehatan;
+namespace Modules\Kesehatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Kesehatan\SesiKonseling\Pages\CreateSesiKonseling;
-use App\Filament\Resources\Kesehatan\SesiKonseling\Pages\EditSesiKonseling;
-use App\Filament\Resources\Kesehatan\SesiKonseling\Pages\ListSesiKonseling;
+use Modules\Kesehatan\Filament\Resources\SesiKonseling\Pages\CreateSesiKonseling;
+use Modules\Kesehatan\Filament\Resources\SesiKonseling\Pages\EditSesiKonseling;
+use Modules\Kesehatan\Filament\Resources\SesiKonseling\Pages\ListSesiKonseling;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\EditAction;

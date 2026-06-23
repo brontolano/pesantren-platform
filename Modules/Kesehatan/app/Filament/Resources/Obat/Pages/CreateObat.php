@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Kesehatan\Obat\Pages;
+namespace Modules\Kesehatan\Filament\Resources\Obat\Pages;
 
-use App\Filament\Resources\Kesehatan\ObatResource;
+use Modules\Kesehatan\Filament\Resources\ObatResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateObat extends CreateRecord

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Kesehatan\RiwayatKesehatan\Pages;
+namespace Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages;
 
-use App\Filament\Resources\Kesehatan\RiwayatKesehatanResource;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatanResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateRiwayatKesehatan extends CreateRecord

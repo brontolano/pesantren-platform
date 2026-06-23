@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Kesehatan;
+namespace Modules\Kesehatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Kesehatan\RiwayatKesehatan\Pages\CreateRiwayatKesehatan;
-use App\Filament\Resources\Kesehatan\RiwayatKesehatan\Pages\EditRiwayatKesehatan;
-use App\Filament\Resources\Kesehatan\RiwayatKesehatan\Pages\ListRiwayatKesehatan;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\CreateRiwayatKesehatan;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\EditRiwayatKesehatan;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\ListRiwayatKesehatan;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\EditAction;
