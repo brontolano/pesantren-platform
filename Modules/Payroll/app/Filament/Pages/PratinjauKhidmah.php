@@ -26,7 +26,7 @@ class PratinjauKhidmah extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    protected static ?string $navigationLabel = 'Pratinjau Bisyaroh';
+    protected static ?string $navigationLabel = 'Pratinjau Gaji (Bisyaroh)';
 
     protected static ?string $title = 'Pratinjau Bisyaroh (Khidmah)';
 

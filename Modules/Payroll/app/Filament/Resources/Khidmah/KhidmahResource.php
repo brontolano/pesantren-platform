@@ -27,7 +27,7 @@ class KhidmahResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-hand-raised';
 
-    protected static ?string $navigationLabel = 'Khidmah';
+    protected static ?string $navigationLabel = 'Pengabdian (Khidmah)';
 
     protected static ?string $modelLabel = 'Khidmah';
 

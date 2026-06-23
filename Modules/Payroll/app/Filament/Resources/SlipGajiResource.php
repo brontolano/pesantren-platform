@@ -27,7 +27,7 @@ class SlipGajiResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static ?string $navigationLabel = 'Payroll Asatidz';
+    protected static ?string $navigationLabel = 'Slip Gaji';
 
     protected static ?string $modelLabel = 'Slip Gaji';
 

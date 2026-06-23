@@ -25,7 +25,7 @@ class GenerateThr extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
 
-    protected static ?string $navigationLabel = 'Generate THR';
+    protected static ?string $navigationLabel = 'Buat THR';
 
     protected static ?string $title = 'Generate THR';
 
