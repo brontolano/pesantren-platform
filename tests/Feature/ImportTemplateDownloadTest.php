@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Kesehatan\Obat\Pages\ListObat;
+use Modules\Kesehatan\Filament\Resources\Obat\Pages\ListObat;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Kesehatan;
+namespace Modules\Kesehatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Kesehatan\Obat\Pages\CreateObat;
-use App\Filament\Resources\Kesehatan\Obat\Pages\EditObat;
-use App\Filament\Resources\Kesehatan\Obat\Pages\ListObat;
+use Modules\Kesehatan\Filament\Resources\Obat\Pages\CreateObat;
+use Modules\Kesehatan\Filament\Resources\Obat\Pages\EditObat;
+use Modules\Kesehatan\Filament\Resources\Obat\Pages\ListObat;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;

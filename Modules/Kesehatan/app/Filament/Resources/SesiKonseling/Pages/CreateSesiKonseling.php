@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Kesehatan\SesiKonseling\Pages;
+namespace Modules\Kesehatan\Filament\Resources\SesiKonseling\Pages;
 
-use App\Filament\Resources\Kesehatan\SesiKonselingResource;
+use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateSesiKonseling extends CreateRecord
