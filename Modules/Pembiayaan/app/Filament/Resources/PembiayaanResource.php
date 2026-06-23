@@ -63,7 +63,8 @@ class PembiayaanResource extends Resource
                 TextInput::make('plafon')->label('Plafon')->numeric()->prefix('Rp')->required(),
                 TextInput::make('tenor')->label('Tenor (bulan)')->numeric()->default(36),
                 TextInput::make('margin')->label('Margin/Imbal Hasil Tahunan')->numeric()->prefix('Rp')->default(0),
-                TextInput::make('ebitda_tahunan')->label('EBITDA Tahunan (unit komersial)')->numeric()->prefix('Rp')->default(0),
+                TextInput::make('ebitda_tahunan')->label('EBITDA Tahunan (unit komersial)')->numeric()->prefix('Rp')->default(0)
+                    ->helperText('EBITDA = laba/surplus operasional sebelum bunga, pajak, penyusutan & amortisasi. Patokan: lihat Laporan Laba Rugi (surplus operasional) di modul Keuangan, lalu tambahkan kembali beban penyusutan/bunga bila ada. Angka ini bersifat advisory untuk simulasi DSCR — tidak memposting jurnal.'),
                 TextInput::make('angsuran_pokok')->label('Angsuran Pokok Tahunan')->numeric()->prefix('Rp')->default(0)
                     ->helperText('DSCR = EBITDA ÷ (Angsuran Pokok + Margin). Ambang 1,25×.'),
                 Select::make('aset_agunan_id')->label('Agunan (hanya non-wakaf)')

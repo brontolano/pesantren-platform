@@ -65,7 +65,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         // tenant non-dev. Promosikan ke released + aktifkan agar halaman/resource-nya
         // benar-benar ter-render (assert 200 di bawah), bukan 403 yang lolos diam-diam.
         // Ditulis SEBELUM request pertama agar cache modul memuat nilai terbaru.
-        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu', 'asrama'] as $modul) {
+        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu', 'asrama', 'pajak'] as $modul) {
             DB::connection('pgsql')->table('module_registry')->where('key', $modul)->update(['status' => 'released']);
             DB::connection('pgsql')->table('tenant_modules')->insert([
                 'tenant_id' => $tenant->id, 'module_name' => $modul, 'is_active' => true,
@@ -188,6 +188,14 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $pusatReq->headers->set('Host', $host);
         $pusatStatus = $kernel->handle($pusatReq)->getStatusCode();
         $this->assertSame(200, $pusatStatus, "Pusat Pengaturan (PusatPengaturan Page) status {$pusatStatus}, harusnya 200.");
+
+        // Laporan Pajak (Page read-only baru, gap 88) WAJIB 200 → bukti Page render
+        // tanpa error pada tenant kosong (delegasi ke service pajak existing) + modul
+        // pajak diaktifkan di test. Page auto-discover Modules/Pajak/app/Filament/Pages.
+        $pajakReq = Request::create("http://{$host}/admin/pajak/laporan", 'GET');
+        $pajakReq->headers->set('Host', $host);
+        $pajakStatus = $kernel->handle($pajakReq)->getStatusCode();
+        $this->assertSame(200, $pajakStatus, "Laporan Pajak (LaporanPajak Page) status {$pajakStatus}, harusnya 200.");
 
         tenancy()->end();
     }
