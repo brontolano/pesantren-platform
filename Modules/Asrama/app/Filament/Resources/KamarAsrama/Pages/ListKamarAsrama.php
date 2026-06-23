@@ -2,9 +2,10 @@
 
 namespace Modules\Asrama\Filament\Resources\KamarAsrama\Pages;
 
-use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
+use Modules\Asrama\Filament\Widgets\OkupansiAsramaWidget;
 
 class ListKamarAsrama extends ListRecords
 {
@@ -16,5 +17,11 @@ class ListKamarAsrama extends ListRecords
             CreateAction::make(),
         ];
     }
-}
 
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            OkupansiAsramaWidget::class,
+        ];
+    }
+}
