@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\TemplateNotifikasi;
+namespace Modules\Notifikasi\Filament\Resources\TemplateNotifikasi;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\TemplateNotifikasi\Pages\CreateTemplateNotifikasi;
-use App\Filament\Resources\TemplateNotifikasi\Pages\EditTemplateNotifikasi;
-use App\Filament\Resources\TemplateNotifikasi\Pages\ListTemplateNotifikasi;
+use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\CreateTemplateNotifikasi;
+use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\EditTemplateNotifikasi;
+use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\ListTemplateNotifikasi;
 use App\Support\AlbaKidsTenant;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;

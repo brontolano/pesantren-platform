@@ -10,7 +10,7 @@ use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
 use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
 use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
-use App\Filament\Resources\BroadcastWa\BroadcastWaResource;
+use Modules\Notifikasi\Filament\Resources\BroadcastWa\BroadcastWaResource;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
 use Modules\Kegiatan\Filament\Resources\IzinSantriResource;

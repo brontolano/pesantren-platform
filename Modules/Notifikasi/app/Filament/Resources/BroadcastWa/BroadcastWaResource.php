@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\BroadcastWa;
+namespace Modules\Notifikasi\Filament\Resources\BroadcastWa;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\BroadcastWa\Pages\CreateBroadcastWa;
-use App\Filament\Resources\BroadcastWa\Pages\EditBroadcastWa;
-use App\Filament\Resources\BroadcastWa\Pages\ListBroadcastWa;
+use Modules\Notifikasi\Filament\Resources\BroadcastWa\Pages\CreateBroadcastWa;
+use Modules\Notifikasi\Filament\Resources\BroadcastWa\Pages\EditBroadcastWa;
+use Modules\Notifikasi\Filament\Resources\BroadcastWa\Pages\ListBroadcastWa;
 use App\Support\AlbaKidsTenant;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;

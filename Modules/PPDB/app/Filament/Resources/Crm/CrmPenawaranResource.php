@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Crm;
+namespace Modules\PPDB\Filament\Resources\Crm;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Filament\Resources\Crm\Pages\ListCrmPenawaran;
+use Modules\PPDB\Filament\Resources\Crm\Pages\ListCrmPenawaran;
 use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
