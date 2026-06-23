@@ -29,7 +29,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $this->withoutVite();
         $this->ensurePpdbTestingSchemaReady([
             'tenants', 'domains', 'users', 'roles', 'permissions', 'model_has_roles', 'model_has_permissions',
-            'santri', 'tagihan', 'pembayaran', 'calon_santri',
+            'santri', 'tagihan', 'pembayaran', 'calon_santri', 'gelombang_ppdb',
             'jenis_pelanggaran', 'pelanggaran_santri', 'sanksi_santri', 'eskalasi_disiplin',
         ]);
         $this->truncatePpdbTables(['domains', 'tenants']);
@@ -65,7 +65,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         // tenant non-dev. Promosikan ke released + aktifkan agar halaman/resource-nya
         // benar-benar ter-render (assert 200 di bawah), bukan 403 yang lolos diam-diam.
         // Ditulis SEBELUM request pertama agar cache modul memuat nilai terbaru.
-        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu', 'asrama', 'pajak', 'akademik'] as $modul) {
+        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu', 'asrama', 'pajak', 'akademik', 'ppdb'] as $modul) {
             DB::connection('pgsql')->table('module_registry')->where('key', $modul)->update(['status' => 'released']);
             DB::connection('pgsql')->table('tenant_modules')->insert([
                 'tenant_id' => $tenant->id, 'module_name' => $modul, 'is_active' => true,
@@ -167,6 +167,21 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $obatReq->headers->set('Host', $host);
         $obatStatus = $kernel->handle($obatReq)->getStatusCode();
         $this->assertSame(200, $obatStatus, "Edit Obat (MutasiRelationManager) status {$obatStatus}, harusnya 200.");
+
+        // Gelombang PPDB (GelombangPpdbResource baru, slug eksplisit gelombang-ppdb,
+        // gap-130) WAJIB 200 → bukti resource TERDAFTAR di panel + tabel master ada
+        // (panel pakai daftar eksplisit; resource tak terdaftar = 404 senyap).
+        $gelombangReq = Request::create("http://{$host}/admin/gelombang-ppdb", 'GET');
+        $gelombangReq->headers->set('Host', $host);
+        $gelombangStatus = $kernel->handle($gelombangReq)->getStatusCode();
+        $this->assertSame(200, $gelombangStatus, "Gelombang PPDB (GelombangPpdbResource) status {$gelombangStatus}, harusnya 200.");
+
+        // Pengaturan PPDB (Page baru, slug pengaturan-ppdb, gap-125) WAJIB 200 →
+        // bukti halaman rumah-kanonik PPDB ter-render (membaca Setting admission_*).
+        $pengaturanPpdbReq = Request::create("http://{$host}/admin/pengaturan-ppdb", 'GET');
+        $pengaturanPpdbReq->headers->set('Host', $host);
+        $pengaturanPpdbStatus = $kernel->handle($pengaturanPpdbReq)->getStatusCode();
+        $this->assertSame(200, $pengaturanPpdbStatus, "Pengaturan PPDB (PengaturanPpdb) status {$pengaturanPpdbStatus}, harusnya 200.");
 
         // Daftar Kamar Asrama WAJIB 200 → bukti OkupansiAsramaWidget (getStats →
         // getOccupancySummary, gap 102) ter-render di header tanpa error.
