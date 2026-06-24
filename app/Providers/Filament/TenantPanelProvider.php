@@ -252,20 +252,29 @@ class TenantPanelProvider extends PanelProvider
             ->pages($pages)
             ->widgets($widgets)
             ->navigationGroups([
-                // gap-105 — konsolidasi 22 grup lama menjadi 9 "aplikasi", diurut
-                // sesuai jalur-adopsi (PPDB → operasional santri → akademik →
-                // keuangan → SDM → sarana → mutu → komunikasi → pengaturan).
-                // JANGAN beri ->icon() pada grup: Filament v5 melempar 500 bila grup
-                // berikon berisi item berikon (lihat TenantPanelAuthedSmokeTest).
+                // Atomisasi grup nav: tiap grup = 1 konsep tunggal (Santri,
+                // Pengasuhan, Kesehatan, dst.) — dirilis bertahap per blok.
+                // FASE 1 (blok kesantrian): "Santri & Pengasuhan" lama dipecah jadi
+                // 7 grup atomik di bawah. Blok lain (Keuangan, Akademik, dll) masih
+                // gabungan, dipecah di fase berikutnya. RBAC menyembunyikan grup yg
+                // itemnya tak boleh diakses peran → tiap staf lihat segelintir grup.
+                // JANGAN beri ->icon() pada grup: Filament v5.6.6 melempar 500 bila
+                // grup berikon + sidebar collapsible + item berikon (lihat
+                // TenantPanelAuthedSmokeTest + insiden prod 13 Jun).
                 //
                 // Fitur ②: tiap grup ->collapsed(closure) DINAMIS per peran —
                 // grup sekunder utk peran login mulai TER-CIUT (tetap bisa dibuka),
-                // grup primer terbuka. RBAC tetap pagar keras (grup tanpa item
-                // boleh-akses disembunyikan Filament). Peran luas (admin/super)
-                // & tak-terpetakan → semua terbuka (perilaku lama). Closure
-                // dievaluasi per-request (NavigationGroup::isCollapsed → evaluate()).
+                // grup primer terbuka. Peran luas (admin/super) & tak-terpetakan →
+                // semua terbuka. Closure dievaluasi per-request (isCollapsed →
+                // evaluate()). Urutan grup statis; reorder-by-frekuensi di fase akhir.
                 NavigationGroup::make('PPDB')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('PPDB')),
-                NavigationGroup::make('Santri & Pengasuhan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Santri & Pengasuhan')),
+                NavigationGroup::make('Santri')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Santri')),
+                NavigationGroup::make('Asrama & Pengasuhan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Asrama & Pengasuhan')),
+                NavigationGroup::make('Kedisiplinan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kedisiplinan')),
+                NavigationGroup::make('Kegiatan & Perizinan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kegiatan & Perizinan')),
+                NavigationGroup::make('Kesehatan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kesehatan')),
+                NavigationGroup::make('Konseling')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Konseling')),
+                NavigationGroup::make('Alumni')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Alumni')),
                 NavigationGroup::make('Akademik & Tahfidz')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akademik & Tahfidz')),
                 NavigationGroup::make('Keuangan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Keuangan')),
                 NavigationGroup::make('Kepegawaian')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kepegawaian')),
@@ -364,11 +373,15 @@ class TenantPanelProvider extends PanelProvider
      * @var array<string, list<string>>
      */
     private const NAV_PRIMER_PER_PERAN = [
-        'guru' => ['Akademik & Tahfidz', 'Santri & Pengasuhan'],
-        'asatidz' => ['Akademik & Tahfidz', 'Santri & Pengasuhan'],
+        'guru' => ['Akademik & Tahfidz', 'Santri'],
+        'asatidz' => ['Akademik & Tahfidz', 'Santri'],
         'bendahara' => ['Keuangan'],
-        'tu' => ['Santri & Pengasuhan', 'PPDB', 'Kelembagaan & Pengaturan'],
+        'tu' => ['Santri', 'PPDB', 'Kelembagaan & Pengaturan'],
         'kepala' => ['Mutu & Laporan', 'Keuangan'],
+        // Blok kesantrian atomik (Fase 1) — peran pengasuhan/kesehatan/konseling.
+        'pengelola_asrama' => ['Asrama & Pengasuhan', 'Kedisiplinan'],
+        'pengelola_uks' => ['Kesehatan'],
+        'konselor' => ['Konseling'],
     ];
 
     /**

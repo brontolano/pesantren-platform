@@ -110,12 +110,23 @@ class SuperAdminAccessTest extends TestCase
         ]);
         $bendahara->assignRole('bendahara');
 
+        // Peran blok kesantrian atomik (Fase 1).
+        $konselor = User::withoutGlobalScopes()->create([
+            'tenant_id' => $super->tenant_id, 'name' => 'Konselor', 'email' => 'navrole-konselor@t.local', 'password' => 'password',
+        ]);
+        $konselor->assignRole('konselor');
+
+        $uks = User::withoutGlobalScopes()->create([
+            'tenant_id' => $super->tenant_id, 'name' => 'UKS', 'email' => 'navrole-uks@t.local', 'password' => 'password',
+        ]);
+        $uks->assignRole('pengelola_uks');
+
         $ciut = fn (string $g): bool => \App\Providers\Filament\TenantPanelProvider::grupTerciutUntukPeran($g);
 
         // Guru: Akademik & Santri primer (terbuka), Keuangan/Mutu sekunder (terciut).
         Auth::login($guru);
         $this->assertFalse($ciut('Akademik & Tahfidz'), 'guru: Akademik primer harus terbuka');
-        $this->assertFalse($ciut('Santri & Pengasuhan'), 'guru: Santri primer harus terbuka');
+        $this->assertFalse($ciut('Santri'), 'guru: Santri primer harus terbuka');
         $this->assertTrue($ciut('Keuangan'), 'guru: Keuangan sekunder harus terciut');
         $this->assertTrue($ciut('Mutu & Laporan'), 'guru: Mutu sekunder harus terciut');
 
@@ -123,6 +134,16 @@ class SuperAdminAccessTest extends TestCase
         Auth::login($bendahara);
         $this->assertFalse($ciut('Keuangan'), 'bendahara: Keuangan primer harus terbuka');
         $this->assertTrue($ciut('Akademik & Tahfidz'), 'bendahara: Akademik sekunder harus terciut');
+
+        // Konselor: Konseling primer (terbuka), grup lain sekunder (terciut).
+        Auth::login($konselor);
+        $this->assertFalse($ciut('Konseling'), 'konselor: Konseling primer harus terbuka');
+        $this->assertTrue($ciut('Keuangan'), 'konselor: Keuangan sekunder harus terciut');
+
+        // Pengelola UKS: Kesehatan primer (terbuka), grup lain sekunder (terciut).
+        Auth::login($uks);
+        $this->assertFalse($ciut('Kesehatan'), 'uks: Kesehatan primer harus terbuka');
+        $this->assertTrue($ciut('Akademik & Tahfidz'), 'uks: Akademik sekunder harus terciut');
 
         // Super_admin (peran luas) → semua grup terbuka.
         Auth::login($super);

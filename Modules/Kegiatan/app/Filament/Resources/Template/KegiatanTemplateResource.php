@@ -39,7 +39,7 @@ class KegiatanTemplateResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Template Kegiatan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kegiatan & Perizinan';
 
     protected static ?int $navigationSort = 5;
 

@@ -55,7 +55,7 @@ class SantriResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Santri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Santri';
 
     protected static ?int $navigationSort = 1;
 

@@ -35,7 +35,7 @@ class PresensiAsramaResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Santri & Pengasuhan';
+    protected static UnitEnum|string|null $navigationGroup = 'Asrama & Pengasuhan';
 
     protected static ?int $navigationSort = 1;
 
