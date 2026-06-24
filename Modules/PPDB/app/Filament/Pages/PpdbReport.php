@@ -14,7 +14,7 @@ class PpdbReport extends Page
 
     protected static ?string $navigationLabel = 'Laporan PPDB';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pendaftaran';
 
     protected static ?string $slug = 'ppdb/report';
 

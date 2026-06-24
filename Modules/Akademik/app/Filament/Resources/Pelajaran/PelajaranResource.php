@@ -31,7 +31,7 @@ class PelajaranResource extends Resource
 
     protected static ?string $navigationLabel = 'Pelajaran';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Master Akademik';
 
     protected static ?int $navigationSort = 2;
 

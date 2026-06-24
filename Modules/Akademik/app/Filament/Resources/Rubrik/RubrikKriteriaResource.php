@@ -39,7 +39,7 @@ class RubrikKriteriaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Rubrik Kompetensi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Nilai & Rapor';
 
     protected static ?int $navigationSort = 9;
 

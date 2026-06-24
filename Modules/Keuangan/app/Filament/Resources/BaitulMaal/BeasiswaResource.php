@@ -41,7 +41,7 @@ class BeasiswaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Beasiswa';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Donasi & Beasiswa';
+    protected static string|\UnitEnum|null $navigationGroup = 'Beasiswa';
 
     protected static ?int $navigationSort = 32;
 

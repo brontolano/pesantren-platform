@@ -30,7 +30,7 @@ class TabunganResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Tabungan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tabungan Santri';
 
     protected static ?int $navigationSort = 3;
 

@@ -24,7 +24,7 @@ class BukuPembantuPihak extends Page
 
     protected static ?string $title = 'Buku Besar Pembantu — Piutang Santri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Buku Besar';
 
     protected static ?int $navigationSort = 10;
 

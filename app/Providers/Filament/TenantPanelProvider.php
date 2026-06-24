@@ -252,11 +252,10 @@ class TenantPanelProvider extends PanelProvider
             ->pages($pages)
             ->widgets($widgets)
             ->navigationGroups([
-                // Atomisasi grup nav: tiap grup = 1 konsep tunggal. 9 grup gabungan
-                // lama dipecah jadi 25 grup atomik, diurut by-FREKUENSI (operasional
-                // harian di atas, pengaturan paling bawah). RBAC menyembunyikan grup
-                // yg itemnya tak boleh diakses peran → tiap staf hanya melihat
-                // segelintir grup berlabel pendek-jelas.
+                // Atomisasi PENUH grup nav: tiap grup = 1 konsep tunggal (41 grup),
+                // disusun BLOK BERDEKATAN (grup serumpun bersebelahan → minim scroll).
+                // RBAC menyembunyikan grup yg itemnya tak boleh diakses peran → tiap
+                // staf hanya melihat segelintir grup berlabel pendek-jelas.
                 // JANGAN beri ->icon() pada grup: Filament v5.6.6 melempar 500 bila
                 // grup berikon + sidebar collapsible + item berikon (lihat
                 // TenantPanelAuthedSmokeTest + insiden prod 13 Jun).
@@ -265,37 +264,57 @@ class TenantPanelProvider extends PanelProvider
                 // sekunder utk peran login mulai TER-CIUT (tetap bisa dibuka), grup
                 // primer terbuka. Peran luas (admin/super) & tak-terpetakan → semua
                 // terbuka. Closure dievaluasi per-request (isCollapsed → evaluate()).
-                // Kesantrian (harian)
+                // ── Blok Kesantrian ──
                 NavigationGroup::make('Santri')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Santri')),
                 NavigationGroup::make('Asrama & Pengasuhan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Asrama & Pengasuhan')),
                 NavigationGroup::make('Kedisiplinan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kedisiplinan')),
-                NavigationGroup::make('Kegiatan & Perizinan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kegiatan & Perizinan')),
+                NavigationGroup::make('Kegiatan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kegiatan')),
+                NavigationGroup::make('Perizinan & Kunjungan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Perizinan & Kunjungan')),
                 NavigationGroup::make('Kesehatan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kesehatan')),
                 NavigationGroup::make('Konseling')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Konseling')),
                 NavigationGroup::make('Alumni')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Alumni')),
-                // Pembelajaran (harian)
-                NavigationGroup::make('Akademik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akademik')),
+                // ── Blok Akademik ──
+                NavigationGroup::make('Pembelajaran')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pembelajaran')),
+                NavigationGroup::make('Nilai & Rapor')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Nilai & Rapor')),
+                NavigationGroup::make('Ujian Online')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Ujian Online')),
                 NavigationGroup::make('Tahfidz')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tahfidz')),
-                // Keuangan (harian)
-                NavigationGroup::make('Tagihan & Pembayaran')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tagihan & Pembayaran')),
-                NavigationGroup::make('Akuntansi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akuntansi')),
+                NavigationGroup::make('Master Akademik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Master Akademik')),
+                // ── Blok PPDB ──
+                NavigationGroup::make('Pendaftaran')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pendaftaran')),
+                NavigationGroup::make('Ujian Seleksi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Ujian Seleksi')),
+                NavigationGroup::make('CRM')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('CRM')),
+                // ── Blok Keuangan (kas operasional) ──
+                NavigationGroup::make('Tagihan Santri')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tagihan Santri')),
+                NavigationGroup::make('Tabungan Santri')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tabungan Santri')),
+                NavigationGroup::make('Kasir Kantin')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kasir Kantin')),
+                NavigationGroup::make('Donasi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Donasi')),
+                NavigationGroup::make('Beasiswa')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Beasiswa')),
+                // ── Blok Akuntansi ──
+                NavigationGroup::make('Buku Besar')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Buku Besar')),
+                NavigationGroup::make('Laporan Keuangan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Laporan Keuangan')),
+                NavigationGroup::make('Pajak')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pajak')),
+                NavigationGroup::make('Pembiayaan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pembiayaan')),
                 NavigationGroup::make('Anggaran & Perencanaan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Anggaran & Perencanaan')),
-                NavigationGroup::make('Donasi & Beasiswa')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Donasi & Beasiswa')),
-                NavigationGroup::make('Koperasi & POS')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Koperasi & POS')),
-                // Operasional & SDM (musiman/periodik)
-                NavigationGroup::make('PPDB')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('PPDB')),
+                // ── Blok Koperasi & Logistik ──
+                NavigationGroup::make('Stok Barang')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Stok Barang')),
+                NavigationGroup::make('Pengaturan Koperasi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pengaturan Koperasi')),
+                NavigationGroup::make('Aset & Sarpras')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Aset & Sarpras')),
+                NavigationGroup::make('Pengadaan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pengadaan')),
+                // ── Blok SDM ──
                 NavigationGroup::make('Kepegawaian')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kepegawaian')),
                 NavigationGroup::make('Penggajian')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Penggajian')),
-                NavigationGroup::make('Sarana & Logistik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Sarana & Logistik')),
+                // ── Blok Komunikasi ──
                 NavigationGroup::make('Komunikasi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Komunikasi')),
                 NavigationGroup::make('AI Khadim')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('AI Khadim')),
-                // Mutu & pelaporan (periodik)
+                // ── Blok Mutu & Laporan ──
                 NavigationGroup::make('Mutu')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Mutu')),
                 NavigationGroup::make('Laporan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Laporan')),
-                // Pengaturan & tata kelola (paling jarang)
+                // ── Blok Pengaturan & Tata Kelola ──
                 NavigationGroup::make('Website & Konten')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Website & Konten')),
                 NavigationGroup::make('Pengaturan Sistem')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pengaturan Sistem')),
-                NavigationGroup::make('Tata Kelola & Audit')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tata Kelola & Audit')),
+                NavigationGroup::make('Persetujuan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Persetujuan')),
+                NavigationGroup::make('Audit & Arsip')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Audit & Arsip')),
+                NavigationGroup::make('Cadangan & Integrasi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Cadangan & Integrasi')),
             ]);
 
         if (! $isAlbaKids) {
@@ -388,14 +407,14 @@ class TenantPanelProvider extends PanelProvider
      */
     private const NAV_PRIMER_PER_PERAN = [
         // Label WAJIB persis sama dgn navigationGroups([...]) di atas.
-        'guru' => ['Akademik', 'Santri'],
-        'asatidz' => ['Akademik', 'Tahfidz'],
+        'guru' => ['Pembelajaran', 'Nilai & Rapor', 'Santri'],
+        'asatidz' => ['Pembelajaran', 'Nilai & Rapor', 'Tahfidz'],
         'guru_tahfidz' => ['Tahfidz'],
-        'bendahara' => ['Tagihan & Pembayaran'],
-        'kasir' => ['Tagihan & Pembayaran', 'Koperasi & POS'],
-        'kepala_keuangan' => ['Akuntansi', 'Anggaran & Perencanaan', 'Laporan'],
-        'bendahara_pusat' => ['Akuntansi', 'Anggaran & Perencanaan'],
-        'tu' => ['Santri', 'PPDB', 'Pengaturan Sistem'],
+        'bendahara' => ['Tagihan Santri', 'Tabungan Santri'],
+        'kasir' => ['Kasir Kantin', 'Tagihan Santri', 'Stok Barang'],
+        'kepala_keuangan' => ['Buku Besar', 'Laporan Keuangan', 'Anggaran & Perencanaan', 'Laporan'],
+        'bendahara_pusat' => ['Buku Besar', 'Laporan Keuangan', 'Anggaran & Perencanaan'],
+        'tu' => ['Santri', 'Pendaftaran', 'Pengaturan Sistem'],
         'kepala' => ['Mutu', 'Laporan'],
         'pengelola_asrama' => ['Asrama & Pengasuhan', 'Kedisiplinan'],
         'pengelola_uks' => ['Kesehatan'],

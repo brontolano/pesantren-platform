@@ -35,7 +35,7 @@ class SetorKelilingResource extends Resource
 
     protected static ?string $navigationLabel = 'Setor Keliling';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tabungan Santri';
 
     protected static ?string $modelLabel = 'Sesi Setor Keliling';
 

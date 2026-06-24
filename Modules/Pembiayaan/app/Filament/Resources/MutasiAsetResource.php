@@ -31,7 +31,7 @@ class MutasiAsetResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Mutasi / Pelepasan Aset';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Aset & Sarpras';
 
     protected static ?int $navigationSort = 2;
 

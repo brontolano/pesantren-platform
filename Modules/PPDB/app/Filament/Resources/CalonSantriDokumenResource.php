@@ -37,7 +37,7 @@ class CalonSantriDokumenResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Dokumen PPDB';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pendaftaran';
 
     protected static ?string $slug = 'ppdb/dokumen';
 

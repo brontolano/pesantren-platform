@@ -34,7 +34,7 @@ class KelasResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kelas';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Master Akademik';
 
     protected static ?int $navigationSort = 2;
 

@@ -29,7 +29,7 @@ class SidangKenaikan extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Nilai & Rapor';
 
     protected static ?int $navigationSort = 40;
 

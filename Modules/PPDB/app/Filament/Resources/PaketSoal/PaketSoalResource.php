@@ -38,7 +38,7 @@ class PaketSoalResource extends Resource
 
     protected static ?string $navigationLabel = 'Bank Soal';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
+    protected static string|\UnitEnum|null $navigationGroup = 'Ujian Seleksi';
 
     protected static ?string $modelLabel = 'Paket Soal';
 

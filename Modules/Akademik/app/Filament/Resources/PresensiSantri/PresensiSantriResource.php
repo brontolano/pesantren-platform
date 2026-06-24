@@ -34,7 +34,7 @@ class PresensiSantriResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Presensi Harian';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pembelajaran';
 
     protected static ?int $navigationSort = 8;
 

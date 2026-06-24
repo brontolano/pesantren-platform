@@ -24,7 +24,7 @@ class PiketHariIni extends Page
 
     protected static ?string $title = 'Piket Hari Ini';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Aset & Sarpras';
 
     protected static ?int $navigationSort = 3;
 

@@ -41,7 +41,7 @@ class CalonSantriResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'PPDB';
+    protected static \UnitEnum|string|null $navigationGroup = 'Pendaftaran';
 
     protected static ?string $slug = 'ppdb/calon-santri';
 
@@ -499,6 +499,6 @@ class CalonSantriResource extends Resource
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return AlbaKidsTenant::isActive() ? 'PPDB Custom' : 'PPDB';
+        return AlbaKidsTenant::isActive() ? 'PPDB Custom' : 'Pendaftaran';
     }
 }

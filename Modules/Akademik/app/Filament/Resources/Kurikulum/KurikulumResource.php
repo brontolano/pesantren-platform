@@ -52,7 +52,7 @@ class KurikulumResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kurikulum';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik';
+    protected static UnitEnum|string|null $navigationGroup = 'Master Akademik';
 
     protected static ?int $navigationSort = 2;
 

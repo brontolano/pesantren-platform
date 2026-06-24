@@ -40,7 +40,7 @@ class GelombangPpdbResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'PPDB';
+    protected static \UnitEnum|string|null $navigationGroup = 'Pendaftaran';
 
     protected static ?string $slug = 'gelombang-ppdb';
 
