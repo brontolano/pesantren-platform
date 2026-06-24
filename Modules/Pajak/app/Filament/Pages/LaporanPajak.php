@@ -45,7 +45,7 @@ class LaporanPajak extends Page implements HasForms
 
     protected static ?string $title = 'Laporan Pajak (SPT Masa, e-Bupot, SPT Badan, Sisa Lebih)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 16;
 

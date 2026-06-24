@@ -31,7 +31,7 @@ class BukuPembantuPajak extends Page implements HasForms
 
     protected static ?string $title = 'Buku Pembantu Pajak';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 13;
 

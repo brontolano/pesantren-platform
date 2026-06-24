@@ -39,7 +39,7 @@ class PembayaranResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pembayaran';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
 
     protected static ?int $navigationSort = 2;
 

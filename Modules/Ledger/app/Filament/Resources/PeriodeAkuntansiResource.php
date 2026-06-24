@@ -37,7 +37,7 @@ class PeriodeAkuntansiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Periode Akuntansi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Anggaran & Perencanaan';
 
     protected static ?int $navigationSort = 5;
 

@@ -42,7 +42,7 @@ class BankStatementResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Rekonsiliasi Bank';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 7;
 

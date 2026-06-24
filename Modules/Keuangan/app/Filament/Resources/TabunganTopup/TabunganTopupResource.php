@@ -29,7 +29,7 @@ class TabunganTopupResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Topup Tabungan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
 
     protected static ?int $navigationSort = 5;
 

@@ -36,7 +36,7 @@ class SumberDanaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Sumber Dana';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
 
     protected static ?int $navigationSort = 2;
 

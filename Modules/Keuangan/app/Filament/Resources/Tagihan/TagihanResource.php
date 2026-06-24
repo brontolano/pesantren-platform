@@ -34,7 +34,7 @@ class TagihanResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Tagihan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
 
     protected static ?int $navigationSort = 1;
 
