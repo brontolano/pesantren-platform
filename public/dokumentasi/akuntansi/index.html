@@ -228,27 +228,35 @@ Modul ini untuk staf yang mengurus pembukuan resmi pesantren — bukan hanya cat
 </ul>
 <hr>
 <h2 id="9-perpajakan-tarif-kalkulator-buku-pembantu">9. Perpajakan: Tarif, Kalkulator, Buku Pembantu<a class="anchor" href="#9-perpajakan-tarif-kalkulator-buku-pembantu" aria-hidden="true">#</a></h2>
-<p><strong>Kapan dipakai:</strong> setiap bulan saat menghitung pajak penghasilan pegawai (PPh 21), atau saat perlu laporan pajak tahunan.</p>
-<p><strong>Apa saja yang ada?</strong></p>
+<p><strong>Kapan dipakai:</strong> saat berbelanja/membayar vendor dan perlu menghitung PPN/PPh, atau saat ingin merekap utang pajak yang sudah dipungut vs yang sudah disetor.</p>
+<blockquote>
+<p>⚠️ <strong>Jangan tertukar — ada DUA kalkulator pajak yang berbeda:</strong></p>
 <ul>
-<li><strong>Tarif Pajak (TER)</strong> — tabel tarif efektif rata-rata PPh 21 yang sudah diisi sesuai aturan terbaru. Bapak/Ibu tidak perlu menghafal — aplikasi yang menghitung.</li>
-<li><strong>Kalkulator Pajak</strong> — masukkan gaji kotor pegawai, status PTKP (TK/0, K/1, dst.), dan tunjangan. Aplikasi menghitung PPh 21 yang harus dipotong.</li>
-<li><strong>Buku Pembantu Pajak</strong> — catatan pajak per pegawai per bulan. Bisa dicetak untuk bukti potong tahunan (1721-A1).</li>
+<li><strong>Kalkulator Pajak</strong> (di modul ini, <strong>Akuntansi &amp; Pajak</strong>) → untuk <strong>belanja/transaksi</strong>. Menghitung <strong>PPN &amp; PPh</strong> atas pembelian barang/jasa/sewa dari vendor.</li>
+<li><strong>Kalkulator PPh21 &amp; BPJS</strong> (di modul <strong>Kepegawaian</strong>, bukan di sini) → untuk <strong>gaji pegawai</strong>. Menghitung potongan <strong>PPh 21</strong> dan iuran <strong>BPJS</strong> dari penghasilan bulanan pegawai. Lihat panduan <a href="../kepegawaian/">👔 Kepegawaian</a>.</li>
 </ul>
-<p><strong>Langkahnya (menghitung pajak pegawai):</strong></p>
+</blockquote>
+<p><strong>Apa saja yang ada di modul Akuntansi &amp; Pajak?</strong></p>
+<ul>
+<li><strong>Tarif Pajak</strong> — tabel tarif PPN/PPh yang sudah diisi sesuai aturan terbaru. Bapak/Ibu tidak perlu menghafal — aplikasi yang menghitung.</li>
+<li><strong>Kalkulator Pajak</strong> — untuk <strong>belanja/transaksi</strong>. Masukkan DPP (nilai sebelum pajak), jenis (Barang/Jasa/Sewa), apakah pakai Dana BOS/BOP, apakah vendor ber-NPWP, dan status kehalalan sumber dana. Aplikasi langsung menghitung <strong>PPN &amp; PPh</strong> yang berlaku. Ini hitungan cepat (preview) — tidak menyimpan apa pun.</li>
+<li><strong>Buku Pembantu Pajak</strong> — rekap <strong>utang PPN &amp; PPh per jenis</strong>: berapa yang sudah <strong>dipungut</strong> dan berapa yang sudah <strong>disetor</strong> ke negara dalam satu periode, beserta sisa saldonya. Diambil otomatis dari jurnal akun Utang Pajak. Bukan catatan pajak per pegawai.</li>
+</ul>
+<p><strong>Langkahnya (menghitung PPN/PPh belanja):</strong></p>
 <ol>
 <li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Kalkulator Pajak</strong>.</li>
-<li>Pilih pegawai (atau ketik manual gaji kotor).</li>
-<li>Pastikan status PTKP benar (misal: K/2 = kawin, 2 tanggungan).</li>
-<li>Klik <strong>Hitung</strong>.</li>
-<li>Lihat hasil: PPh 21 per bulan yang harus dipotong.</li>
+<li>Isi <strong>DPP (Rp)</strong> — nilai transaksi sebelum pajak.</li>
+<li>Pilih <strong>Jenis</strong> (Barang / Jasa / Sewa).</li>
+<li>Nyalakan <strong>Dana BOS/BOP</strong> bila uangnya dari dana negara, dan <strong>Vendor ber-NPWP</strong> bila vendor punya NPWP.</li>
+<li>Pilih <strong>Kehalalan Sumber Dana</strong> (Halal / Syubhat / Non-halal).</li>
+<li>Hasil <strong>PPN &amp; PPh</strong> langsung muncul di bawah begitu kolom diisi.</li>
 </ol>
-<p>✅ <strong>Tanda berhasil:</strong> angka pajak muncul dan bisa dicetak.</p>
+<p>✅ <strong>Tanda berhasil:</strong> angka PPN, PPh, dan total tampil otomatis sesuai isian.</p>
 <p><strong>Langkahnya (melihat buku pembantu pajak):</strong></p>
 <ol>
 <li>Menu kiri → <strong>Akuntansi &amp; Pajak</strong> → <strong>Buku Pembantu Pajak</strong>.</li>
-<li>Pilih pegawai dan tahun.</li>
-<li>Tabel 12 bulan: gaji kotor, potongan pajak, gaji bersih.</li>
+<li>Pilih periode: <strong>Dari</strong> dan <strong>Sampai</strong>.</li>
+<li>Tabel menampilkan per jenis pajak: jumlah <strong>dipungut</strong>, jumlah <strong>disetor</strong>, dan <strong>saldo</strong> (utang pajak yang belum disetor).</li>
 </ol>
 <blockquote>
 <p>💡 Kalau tarif pajak berubah (biasanya awal Januari), admin akan memperbarui tabel tarif. Bapak/Ibu tidak perlu mengubah sendiri.</p>
@@ -264,8 +272,6 @@ Modul ini untuk staf yang mengurus pembukuan resmi pesantren — bukan hanya cat
 <tr><td>Laba Rugi</td><td>Pendapatan dikurangi beban = surplus/defisit</td></tr>
 <tr><td>Arus Kas</td><td>Uang masuk dan keluar dikelompokkan: operasi, investasi, pendanaan</td></tr>
 <tr><td>PSAK 109</td><td>Laporan khusus zakat, infaq, sedekah (standar akuntansi syariah)</td></tr>
-<tr><td>ISAK 35</td><td>Laporan untuk entitas nirlaba (yayasan/pesantren)</td></tr>
-<tr><td>Rekap Tahunan</td><td>Ringkasan setahun penuh untuk rapat yayasan</td></tr>
 </tbody>
 </table>
 <p><strong>Langkahnya:</strong></p>
@@ -351,8 +357,9 @@ Modul ini untuk staf yang mengurus pembukuan resmi pesantren — bukan hanya cat
 <tr><td>Buat anggaran</td><td>Akuntansi &amp; Pajak → Anggaran → + Tambah</td></tr>
 <tr><td>Cek neraca seimbang</td><td>Akuntansi &amp; Pajak → Neraca Saldo</td></tr>
 <tr><td>Tutup buku bulan ini</td><td>Akuntansi &amp; Pajak → Periode Akuntansi → Tutup Periode</td></tr>
-<tr><td>Hitung pajak pegawai</td><td>Akuntansi &amp; Pajak → Kalkulator Pajak</td></tr>
-<tr><td>Lihat pajak per pegawai</td><td>Akuntansi &amp; Pajak → Buku Pembantu Pajak</td></tr>
+<tr><td>Hitung PPN/PPh belanja</td><td>Akuntansi &amp; Pajak → Kalkulator Pajak</td></tr>
+<tr><td>Hitung PPh 21 gaji pegawai</td><td>Kepegawaian → Kalkulator PPh21 &amp; BPJS</td></tr>
+<tr><td>Rekap utang PPN/PPh (dipungut vs disetor)</td><td>Akuntansi &amp; Pajak → Buku Pembantu Pajak</td></tr>
 <tr><td>Cetak laporan neraca</td><td>Akuntansi &amp; Pajak → Laporan Keuangan → Neraca</td></tr>
 <tr><td>Cetak laba rugi</td><td>Akuntansi &amp; Pajak → Laporan Keuangan → Laba Rugi</td></tr>
 <tr><td>Cetak laporan PSAK 109</td><td>Akuntansi &amp; Pajak → Laporan Keuangan → PSAK 109</td></tr>

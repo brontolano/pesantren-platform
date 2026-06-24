@@ -75,7 +75,7 @@ Semua angka yang Bapak/Ibu catat otomatis masuk pembukuan — tidak perlu menyal
 <li>Ketuk <strong>Simpan</strong>.</li>
 </ol>
 <figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir tagihan dengan kotak Nominal dilingkari + contoh angka <span class="soon">(gambar menyusul)</span></figcaption></figure>
-✅ **Tanda berhasil:** tagihan muncul di tabel dengan status **belum**. Wali santri menerima pemberitahuan WA otomatis (kalau nomor HP wali terisi dan template WA sudah disetel).
+<p>✅ <strong>Tanda berhasil:</strong> tagihan muncul di tabel dengan status <strong>belum</strong>. Wali santri menerima pemberitahuan WA otomatis (kalau nomor HP wali terisi dan template WA sudah disetel).</p>
 
 <p>⚠️ <strong>Kalau ada masalah:</strong></p>
 <ul>
@@ -84,17 +84,32 @@ Semua angka yang Bapak/Ibu catat otomatis masuk pembukuan — tidak perlu menyal
 <hr>
 <h2 id="3-membuat-tagihan-satu-kelas-sekaligus-massal">3. Membuat Tagihan Satu Kelas Sekaligus (Massal)<a class="anchor" href="#3-membuat-tagihan-satu-kelas-sekaligus-massal" aria-hidden="true">#</a></h2>
 <p><strong>Kapan dipakai:</strong> tagihan rutin bulanan (SPP, makan) — tidak perlu mengetik 30 kali untuk 30 santri.</p>
+<p>Di halaman <strong>Tagihan</strong> ada tombol <strong>Buat Tagihan per Kelas</strong> (bergambar dua orang) di pojok kanan atas, di sebelah tombol <strong>+ Tambah</strong>. Tombol inilah yang membuat tagihan untuk satu kelas penuh sekaligus.</p>
 <p><strong>Langkahnya:</strong></p>
 <ol>
-<li><strong>Keuangan</strong> → <strong>Tagihan</strong> → <strong>+ Tambah</strong>.</li>
-<li>Pilih cara <strong>Per Kelas</strong>.</li>
-<li>Pilih <strong>kelasnya</strong>.</li>
-<li>Isi jenis tagihan, nominal, jatuh tempo, periode (sama seperti Bagian 2).</li>
-<li>Ketuk <strong>Buat untuk Semua Santri Kelas Ini</strong>.</li>
+<li>Menu kiri → <strong>Keuangan</strong> → <strong>Tagihan</strong>.</li>
+<li>Ketuk tombol <strong>Buat Tagihan per Kelas</strong> (di kanan atas, sebelah <strong>+ Tambah</strong>). Muncul kotak isian.</li>
+<li>Isi kotak itu:<ul>
+<li><strong>Kelas</strong> — ketik sebagian nama kelas, pilih dari daftar.</li>
+<li><strong>Jenis Tagihan</strong> — pilih (SPP / Infaq / Seragam / Kitab / Daftar Ulang / Lainnya).</li>
+<li><strong>Keterangan</strong> — (boleh dikosongkan) catatan singkat, mis. "SPP Juli".</li>
+<li><strong>Nominal</strong> — ketik angka TANPA titik. Contoh: tiga ratus ribu → <code>300000</code>.</li>
+<li><strong>Diskon</strong> — (boleh dikosongkan) potongan dalam rupiah, biarkan <code>0</code> bila tak ada.</li>
+<li><strong>Jatuh Tempo</strong> — ketuk, pilih tanggal dari kalender.</li>
+<li><strong>Periode Akademik</strong> — (boleh dikosongkan) tahun ajaran, mis. <code>2026/2027</code>.</li>
+<li><strong>Bulan Masehi</strong> — (boleh dikosongkan) bulan tagihan, mis. <code>2026-07</code>.</li>
+<li><strong>Bulan Hijriah</strong> — mis. <code>Dzulhijjah 1447</code>. <em>Wajib diisi</em> bila pesantren memakai mode penanggalan Hijriah.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Buat Tagihan</strong>.</li>
 </ol>
-<p>✅ <strong>Tanda berhasil:</strong> tabel tagihan bertambah sebanyak jumlah santri aktif di kelas itu, semuanya berstatus <strong>belum</strong>.</p>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> tombol <b>Buat Tagihan per Kelas</b> di kanan atas + kotak isian Kelas dan Nominal <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pesan hijau "Tagihan per kelas berhasil dibuat" dengan jumlah tagihan yang dibuat, dan tabel tagihan bertambah sebanyak jumlah santri aktif di kelas itu — semuanya berstatus <strong>belum</strong>.</p>
 <blockquote>
-<p>💡 Santri berstatus cuti/keluar TIDAK ikut dibuatkan tagihan — hanya yang aktif.</p>
+<p>💡 Santri berstatus cuti/keluar TIDAK ikut dibuatkan tagihan — hanya yang aktif. Kalau kelas terpilih tidak punya santri aktif, aplikasi memberi tahu bahwa tidak ada tagihan yang dibuat.</p>
+</blockquote>
+<blockquote>
+<p>📦 <strong>Catatan:</strong> menu <strong>Import Tagihan/SPP</strong> (unggah file Excel) tetap ada untuk kebutuhan lain — mis. memindahkan data tagihan lama dari Excel atau menandai tagihan yang sudah lunas. Untuk tagihan rutin satu kelas, pakai tombol <strong>Buat Tagihan per Kelas</strong> di atas; jauh lebih cepat dan tidak perlu menyiapkan file.</p>
 </blockquote>
 <hr>
 <h2 id="4-mencatat-pembayaran">4. Mencatat Pembayaran<a class="anchor" href="#4-mencatat-pembayaran" aria-hidden="true">#</a></h2>
@@ -227,7 +242,7 @@ Bagian akuntansi lanjutan ini sebaiknya dipelajari bersama admin saat training l
 </tr>
 <tr>
 <td>Buat tagihan 1 kelas</td>
-<td>Keuangan → Tagihan → + Tambah → Per Kelas</td>
+<td>Keuangan → Tagihan → tombol Buat Tagihan per Kelas</td>
 </tr>
 <tr>
 <td>Catat pembayaran</td>
