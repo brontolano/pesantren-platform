@@ -95,6 +95,9 @@ class RolesAndPermissionsSeeder extends Seeder
             // password): boleh berkomentar di konten Beranda publik. Tamu (tanpa
             // login) read-only tak punya izin ini. Moderasi komentar tetap di staf.
             'komentar',
+            // 1-aplikasi (Fase 2c) — moderasi komentar publik (setujui/tolak
+            // antrean). Hanya staf moderator (admin/TU/kepala).
+            'moderasi_komentar',
         ];
 
         foreach ($permissions as $permission) {
@@ -129,6 +132,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'ai.template.kelola',
                 'ai.generator.ikhtisar',
                 'ai.chat.kelola',
+                // 1-aplikasi (Fase 2c) — moderasi komentar publik.
+                'moderasi_komentar',
             ],
             'santri' => [
                 'view_dashboard',
@@ -141,6 +146,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_akademik',
                 // T-A052 — TU ikut melayani Kotak Masuk WA chatbot.
                 'ai.chat.kelola',
+                // 1-aplikasi (Fase 2c) — moderasi komentar publik.
+                'moderasi_komentar',
             ],
             'keuangan' => [
                 'view_dashboard',
@@ -261,6 +268,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'akses_pwa_guru',
                 // WP-35 — dasbor & approval pimpinan dari HP.
                 'akses_pimpinan',
+                // 1-aplikasi (Fase 2c) — moderasi komentar publik.
+                'moderasi_komentar',
             ],
             'wali' => [
                 'view_own_children',
@@ -278,6 +287,20 @@ class RolesAndPermissionsSeeder extends Seeder
                 'komentar',
             ],
         ];
+
+        // 1-aplikasi (Fase 2c) — izin 'komentar' untuk SEMUA peran komunitas
+        // (staf internal + wali + santri + jemaah). DIKECUALIKAN: 'peserta'
+        // (calon santri EKSTERNAL, di luar ruang komunitas) & 'super_admin'
+        // (sudah punya semua izin). Programatik agar tak terlewat saat peran
+        // baru ditambahkan.
+        foreach (array_keys($rolePermissions) as $roleName) {
+            if (in_array($roleName, ['peserta', 'super_admin'], true)) {
+                continue;
+            }
+            if (! in_array('komentar', $rolePermissions[$roleName], true)) {
+                $rolePermissions[$roleName][] = 'komentar';
+            }
+        }
 
         foreach ($rolePermissions as $roleName => $grants) {
             $role = Role::firstOrCreate(['name' => $roleName]);
