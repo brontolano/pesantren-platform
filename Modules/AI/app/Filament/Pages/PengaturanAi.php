@@ -73,8 +73,10 @@ class PengaturanAi extends Page implements HasForms
 
     /**
      * Payload dasar tempat nilai form ditimpakan. Menjaga field yang TIDAK
-     * diedit lewat form (mis. whitelist_kitab — menunggu seed tinjauan
-     * Dewan Ustadz, GATE-3) agar tidak hilang saat draf disimpan.
+     * diedit lewat form (mis. matriks fitur_per_peran preset) agar tidak
+     * hilang saat draf disimpan. whitelist_kitab kini DIKELOLA MANDIRI oleh
+     * pesantren lewat form (gap-83) — perubahannya tergolong sensitif →
+     * menunggu persetujuan Kyai/Mudir (config ai.settings.sensitive_fields).
      */
     public array $payloadDasar = [];
 
@@ -226,9 +228,17 @@ class PengaturanAi extends Page implements HasForms
                     ])
                     ->required()
                     ->columnSpanFull(),
-                Section::make('Daftar rujukan (whitelist kitab)')
-                    ->description($this->keteranganWhitelist())
-                    ->schema([])
+                TagsInput::make('whitelist_kitab')
+                    ->label('Daftar rujukan yang diizinkan (whitelist kitab)')
+                    ->helperText(new HtmlString(
+                        'Daftar kitab/rujukan yang BOLEH dirujuk asisten saat menjawab pertanyaan keagamaan. '
+                        .'Disusun dan menjadi tanggung jawab pesantren (mis. atas arahan Dewan Asatidz) — '
+                        .'asisten tetap tidak pernah mengarang isi keagamaan, hanya merujuk daftar ini. '
+                        .'Kosongkan bila asisten cukup mempersilakan bertanya langsung kepada Asatidz. '
+                        .'Unggah dokumen rujukannya di menu <strong>Sumber Pengetahuan</strong>. '
+                        .'Perubahan daftar ini menunggu persetujuan Kyai/Mudir sebelum berlaku.'
+                    ))
+                    ->placeholder('Ketik nama kitab/rujukan lalu tekan Enter')
                     ->columnSpanFull(),
                 TagsInput::make('blacklist_topik')
                     ->label('Topik yang dilarang dibahas')
@@ -256,15 +266,6 @@ class PengaturanAi extends Page implements HasForms
                     ->columns(3)
                     ->columnSpanFull(),
             ]);
-    }
-
-    protected function keteranganWhitelist(): string
-    {
-        $whitelist = (array) ($this->payloadDasar['whitelist_kitab'] ?? []);
-
-        return $whitelist === []
-            ? 'Daftar rujukan akan tersedia setelah ditinjau Dewan Ustadz. Selama daftar masih kosong, asisten menjawab pertanyaan keagamaan dengan mempersilakan bertanya langsung kepada Asatidz.'
-            : 'Saat ini terdaftar '.count($whitelist).' rujukan hasil tinjauan Dewan Ustadz. Perubahan daftar dilakukan melalui proses tinjauan, bukan dari halaman ini.';
     }
 
     // ------------------------------------------------------------------
@@ -482,6 +483,13 @@ class PengaturanAi extends Page implements HasForms
         $payload['blacklist_topik'] = array_values(array_filter(array_map(
             'strval',
             (array) ($payload['blacklist_topik'] ?? []),
+        ), fn (string $t): bool => $t !== ''));
+
+        // whitelist_kitab (gap-83 — dikelola mandiri pesantren): array string
+        // rujukan, buang entri kosong agar lolos validasi (string, max:255).
+        $payload['whitelist_kitab'] = array_values(array_filter(array_map(
+            'strval',
+            (array) ($payload['whitelist_kitab'] ?? []),
         ), fn (string $t): bool => $t !== ''));
 
         $payload['eskalasi_tujuan'] = [

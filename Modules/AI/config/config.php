@@ -255,6 +255,7 @@ return [
     'settings' => [
         'sensitive_fields' => [
             'level_fatwa',
+            'whitelist_kitab',
             'blacklist_topik',
             'mode_akses_santri',
             'scope_data',
