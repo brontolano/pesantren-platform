@@ -36,13 +36,21 @@ class StatsPesantren extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        return [
+        // Statistik umum (santri, pengurus) tampil utk semua staf. Statistik
+        // KEUANGAN (kas masuk/keluar, tagihan) HANYA utk yg punya view_keuangan
+        // — cegah bocornya angka kas/tagihan ke guru & tu (tak punya izin uang).
+        $stats = [
             $this->statSantri(),
             $this->statPengurus(),
-            $this->statKasMasuk(),
-            $this->statKasKeluar(),
-            $this->statTagihan(),
         ];
+
+        if (auth()->user()?->can('view_keuangan')) {
+            $stats[] = $this->statKasMasuk();
+            $stats[] = $this->statKasKeluar();
+            $stats[] = $this->statTagihan();
+        }
+
+        return $stats;
     }
 
     private function statSantri(): Stat

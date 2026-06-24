@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Widgets\KategoriPengeluaranChart;
+use App\Filament\Widgets\KeuanganAreaChart;
+use App\Filament\Widgets\KeuanganOverviewWidget;
+use App\Filament\Widgets\TransaksiTerbaru;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Auth;
@@ -149,6 +153,45 @@ class SuperAdminAccessTest extends TestCase
         Auth::login($super);
         $this->assertFalse($ciut('Buku Besar'), 'super_admin: semua grup terbuka');
         $this->assertFalse($ciut('Mutu'), 'super_admin: semua grup terbuka');
+
+        tenancy()->end();
+    }
+
+    /**
+     * Fase 1 — widget keuangan WAJIB tergerbang per peran: guru (tanpa
+     * view_keuangan) TIDAK melihat angka kas/tagihan; bendahara melihatnya.
+     */
+    public function test_widget_keuangan_tergerbang_per_peran(): void
+    {
+        [$super] = $this->bootUsers('widgetuang');
+
+        $guru = User::withoutGlobalScopes()->create([
+            'tenant_id' => $super->tenant_id, 'name' => 'Guru', 'email' => 'widgetuang-guru@t.local', 'password' => 'password',
+        ]);
+        $guru->assignRole('guru');
+
+        $bendahara = User::withoutGlobalScopes()->create([
+            'tenant_id' => $super->tenant_id, 'name' => 'Bendahara', 'email' => 'widgetuang-bdh@t.local', 'password' => 'password',
+        ]);
+        $bendahara->assignRole('bendahara');
+
+        // Guru: keempat widget keuangan tersembunyi (tutup kebocoran).
+        Auth::login($guru);
+        $this->assertFalse(KeuanganAreaChart::canView(), 'guru tak boleh lihat grafik keuangan');
+        $this->assertFalse(KategoriPengeluaranChart::canView(), 'guru tak boleh lihat kategori pengeluaran');
+        $this->assertFalse(TransaksiTerbaru::canView(), 'guru tak boleh lihat transaksi');
+        $this->assertFalse(KeuanganOverviewWidget::canView(), 'guru tak boleh lihat ringkasan keuangan');
+
+        // Bendahara: keempat widget keuangan tampil.
+        Auth::login($bendahara);
+        $this->assertTrue(KeuanganAreaChart::canView(), 'bendahara lihat grafik keuangan');
+        $this->assertTrue(KategoriPengeluaranChart::canView());
+        $this->assertTrue(TransaksiTerbaru::canView());
+        $this->assertTrue(KeuanganOverviewWidget::canView());
+
+        // Super_admin: tampil (bypass Gate::before).
+        Auth::login($super);
+        $this->assertTrue(KeuanganAreaChart::canView(), 'super_admin lihat semua widget');
 
         tenancy()->end();
     }

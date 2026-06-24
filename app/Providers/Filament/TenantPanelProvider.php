@@ -142,7 +142,9 @@ use App\Filament\Widgets\AgendaPengumuman;
 use App\Filament\Widgets\GreetingBanner;
 use App\Filament\Widgets\KasOverviewWidget;
 use App\Filament\Widgets\KategoriPengeluaranChart;
+use App\Filament\Widgets\KesantrianOverviewWidget;
 use App\Filament\Widgets\KeuanganAreaChart;
+use App\Filament\Widgets\KeuanganOverviewWidget;
 use App\Filament\Widgets\KontrakAkanHabisWidget;
 use App\Filament\Widgets\OnboardingChecklist;
 use App\Filament\Widgets\PengajuanTerbaru;
@@ -198,6 +200,9 @@ class TenantPanelProvider extends PanelProvider
                 KeuanganAreaChart::class,
                 KategoriPengeluaranChart::class,
                 TransaksiTerbaru::class,
+                // Ringkasan per-domain (gerbang canView per-permission: santri/keuangan)
+                KesantrianOverviewWidget::class,
+                KeuanganOverviewWidget::class,
                 // Penekanan keuangan tema Baitul Maal (canView = tema aktif saja)
                 KasOverviewWidget::class,
                 PengajuanTerbaru::class,
