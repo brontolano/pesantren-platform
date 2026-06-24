@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pembiayaan, Aset & Baitul Maal · Panduan Pesantren.online</title>
+<meta name="description" content="Mencatat aset & inventaris, menghitung penyusutan, melepas aset, mengajukan pembiayaan dengan simulasi DSCR, serta mengelola Baitul Maal: donasi, zakat/infak, dan beasiswa.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama & Kehidupan Santri</a><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a><a class="nav-item active" href="../pembiayaan-baitulmaal/">🏦 Pembiayaan, Aset & Baitul Maal</a><div class="nav-sub"><a href="#1-mencatat-aset-amp-inventaris">1. Mencatat Aset &amp; Inventaris</a><a href="#2-menghitung-amp-memposting-penyusutan">2. Menghitung &amp; Memposting Penyusutan</a><a href="#3-melepas-aset-disposal">3. Melepas Aset (Disposal)</a><a href="#4-mengajukan-pembiayaan-amp-simulasi-dscr">4. Mengajukan Pembiayaan &amp; Simulasi DSCR</a><a href="#5-baitul-maal-program-amp-donasi">5. Baitul Maal: Program &amp; Donasi</a><a href="#6-beasiswa-potong-spp">6. Beasiswa (Potong SPP)</a><a href="#7-pengingat-penting">7. Pengingat Penting</a><a href="#contekan-cepat-pembiayaan">Contekan Cepat</a></div></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">🏦</div>
+        <div>
+
+          <h1>Pembiayaan, Aset & Baitul Maal</h1>
+          <p class="lead">Mencatat aset & inventaris, menghitung penyusutan, melepas aset, mengajukan pembiayaan dengan simulasi DSCR, serta mengelola Baitul Maal: donasi, zakat/infak, dan beasiswa.</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>, dan modul <strong>Keuangan</strong> sudah aktif (Bagan Akun sudah disiapkan — lihat <a href="../akuntansi/">panduan Akuntansi</a>).
+Untuk menu <strong>Aset</strong> dan <strong>Pengajuan Pembiayaan</strong>, panel harus dalam <strong>Mode Lanjutan</strong> (bukan Mode Sederhana) dan Bapak/Ibu punya hak <em>kelola pembiayaan</em>.
+Halaman ini untuk <strong>bendahara / pengurus harta (nazhir) / pimpinan</strong>.</p>
+</blockquote>
+<blockquote>
+<p>⚠️ <strong>Penting soal pencatatan ke buku besar (jurnal).</strong> Tidak semua angka di sini langsung tercatat sebagai jurnal keuangan. Sebagian hanya <strong>angka referensi/simulasi</strong>. Di setiap bagian akan ditegaskan: <em>kapan jurnal benar-benar terbentuk</em> dan <em>kapan hanya hitungan bantu</em>. Mohon dibaca pelan-pelan — bagian ini menyangkut uang dan aset.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Mencatat aset & inventaris</li>
+<li>Menghitung & memposting penyusutan</li>
+<li>Melepas aset (disposal)</li>
+<li>Mengajukan pembiayaan & simulasi DSCR</li>
+<li>Baitul Maal: program & donasi</li>
+<li>Beasiswa (potong SPP)</li>
+<li>Pengingat penting</li>
+</ol>
+<hr>
+<h2 id="1-mencatat-aset-amp-inventaris">1. Mencatat Aset &amp; Inventaris<a class="anchor" href="#1-mencatat-aset-amp-inventaris" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> mendata harta tetap pesantren — tanah, bangunan/gedung, kendaraan, peralatan, atau aset wakaf — agar tercatat rapi dan bisa disusutkan.</p>
+<p><strong>Siapkan dulu:</strong> nama aset, jenisnya, tanggal & harga perolehan (dari nota/akta bila ada), lokasi, dan keterangan apakah aset ini <strong>wakaf</strong>.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Sarana &amp; Logistik</strong> → <strong>Aset &amp; Inventaris</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong> (atau <strong>New</strong>).</li>
+<li>Isi bagian <strong>Data Aset</strong>:<ul>
+<li><strong>Nama Aset</strong> — wajib. Contoh: <code>Mobil Operasional L300</code>.</li>
+<li><strong>Jenis</strong> — ketik bebas, mis. <code>Tanah</code>, <code>Bangunan</code>, <code>Kendaraan</code>. Jenis ini membantu sistem memilih akun yang tepat saat aset dilepas.</li>
+<li><strong>Nilai Buku Saat Ini (Rp)</strong> — nilai aset sekarang. Kotak ini akan <strong>diperbarui otomatis</strong> setiap kali penyusutan diposting, jadi tidak perlu diubah manual nanti.</li>
+<li><strong>Nomor Sertifikat</strong> — bila ada (mis. nomor BPKB / sertifikat tanah).</li>
+<li><strong>Aset Wakaf</strong> — geser nyala bila ini harta wakaf. Aset wakaf <strong>otomatis terkunci</strong>: tidak bisa dijadikan agunan pembiayaan dan <strong>tidak disusutkan</strong> (sesuai UU 41/2004).</li>
+</ul>
+</li>
+<li>Isi bagian <strong>Penyusutan &amp; Lokasi</strong> (boleh dikosongkan bila aset tidak disusutkan):<ul>
+<li><strong>Tanggal Perolehan</strong> — kapan aset dibeli/diterima.</li>
+<li><strong>Nilai Perolehan (Rp)</strong> — harga beli asli. Inilah dasar perhitungan penyusutan. Bila dikosongkan, sistem memakai Nilai Buku.</li>
+<li><strong>Lokasi</strong> & <strong>Kategori / Kelompok</strong> — untuk memudahkan pencarian.</li>
+<li><strong>Metode Penyusutan</strong> — pilih <code>Tanpa Penyusutan</code> (default), <code>Garis Lurus</code>, atau <code>Saldo Menurun</code>. Untuk aset wakaf, kotak ini terkunci di Tanpa Penyusutan.</li>
+<li><strong>Nilai Residu (Rp)</strong> — perkiraan nilai sisa di akhir umur manfaat (boleh 0).</li>
+<li><strong>Umur Manfaat (bulan)</strong> — berapa bulan aset dipakai. Contoh: kendaraan <code>96</code> (8 tahun).</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong> (<strong>Create</strong>).</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Aset & Inventaris dengan tombol Aset Wakaf dan pilihan Metode Penyusutan <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> aset muncul di tabel beserta kolom Nilai Buku, Metode, dan tanda Wakaf. <strong>Mencatat aset di sini belum membuat jurnal apa pun</strong> — ini baru pendataan. Jurnal baru terbentuk saat penyusutan diposting (Bagian 2) atau aset dilepas (Bagian 3).</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Menu "Aset &amp; Inventaris" tidak kelihatan</em> → kemungkinan panel sedang dalam <strong>Mode Sederhana</strong>, atau akun Bapak/Ibu belum diberi hak kelola pembiayaan. Minta admin mengaktifkan Mode Lanjutan / menambah hak akses.</li>
+<li><em>Kotak Metode Penyusutan terkunci</em> → biasanya karena tombol <strong>Aset Wakaf</strong> menyala. Itu memang disengaja: wakaf tidak disusutkan.</li>
+</ul>
+<hr>
+<h2 id="2-menghitung-amp-memposting-penyusutan">2. Menghitung &amp; Memposting Penyusutan<a class="anchor" href="#2-menghitung-amp-memposting-penyusutan" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Penyusutan adalah mencatat berkurangnya nilai aset secara bertahap setiap bulan (kecuali wakaf/tanah). Sistem menyusun jadwalnya otomatis, lalu Bapak/Ibu memposting periode yang sudah jatuh tempo.</p>
+<p><strong>Kapan dipakai:</strong> umumnya di akhir bulan/akhir periode, untuk mencatat beban penyusutan bulan-bulan yang sudah berjalan.</p>
+<p><strong>Siapkan dulu:</strong> pastikan aset sudah punya <strong>Metode Penyusutan</strong> (Garis Lurus / Saldo Menurun), <strong>Nilai Perolehan</strong>, dan <strong>Umur Manfaat (bulan)</strong> yang terisi (Bagian 1).</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Buka <strong>Sarana &amp; Logistik → Aset &amp; Inventaris</strong>.</li>
+<li>Cari baris aset yang mau disusutkan.</li>
+<li>Ketuk aksi <strong>Posting Penyusutan</strong> (ikon kalkulator) di baris itu.</li>
+<li>Isi <strong>Posting s/d Periode (YYYY-MM)</strong> — sampai bulan apa mau dicatat. Contoh: <code>2026-06</code> berarti posting semua bulan yang jatuh tempo sampai Juni 2026. Biasanya sudah terisi bulan berjalan.</li>
+<li>Ketuk tombol konfirmasi aksi.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> kotak aksi Posting Penyusutan dengan isian Periode YYYY-MM <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pesan berapa periode penyusutan yang diposting, dan kolom <strong>Nilai Buku</strong> aset otomatis turun. <strong>Di sinilah jurnal benar-benar terbentuk:</strong> Debit <em>Beban Penyusutan</em> / Kredit <em>Akumulasi Penyusutan</em>, satu jurnal per bulan jatuh tempo. Proses ini <strong>idempoten</strong> — bila Bapak/Ibu memposting ulang periode yang sama, jurnal tidak digandakan.</p>
+<blockquote>
+<p>💡 Bila pada bulan tertentu beban penyusutannya 0, periode itu ditandai selesai <strong>tanpa</strong> membuat jurnal. Itu normal.</p>
+</blockquote>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Pesan "Bagan akun belum siap…" / akun 5-7000 atau 1-2900 belum ada</em> → Bagan Akun keuangan belum lengkap. Minta admin keuangan menyiapkan Bagan Akun di <strong>Pengaturan Keuangan</strong> dulu, lalu ulangi.</li>
+<li><em>"Tidak ada periode jatuh tempo"</em> → semua bulan sampai periode yang Bapak/Ibu pilih sudah pernah diposting, atau tanggal perolehannya masih di masa depan. Tidak perlu khawatir.</li>
+<li><em>Aksi Posting Penyusutan tidak muncul</em> → aset itu tidak bisa disusutkan (wakaf, tanpa metode, atau sudah dilepas).</li>
+</ul>
+<hr>
+<h2 id="3-melepas-aset-disposal">3. Melepas Aset (Disposal)<a class="anchor" href="#3-melepas-aset-disposal" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Melepas aset = mencatat bahwa aset dijual, dihibahkan, atau dihapus dari daftar. Untuk aset biasa (non-wakaf), sistem menghitung laba/rugi pelepasan dan mencatatnya ke buku besar. Untuk aset <strong>wakaf</strong>, pelepasan dicatat <strong>tanpa</strong> mengakui laba/rugi (pokok wakaf tidak boleh berkurang nilainya — UU 41/2004).</p>
+<p><strong>Kapan dipakai:</strong> aset dijual, rusak total, atau dipindahtangankan.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Buka <strong>Sarana &amp; Logistik → Aset &amp; Inventaris</strong>.</li>
+<li>Ketuk aksi <strong>Pelepasan</strong> (ikon panah keluar, berwarna merah) di baris aset.</li>
+<li>Isi:<ul>
+<li><strong>Harga Jual / Pelepasan (Rp)</strong> — uang yang diterima. Bila aset dihibahkan/dibuang tanpa hasil, isi <code>0</code>.</li>
+<li><strong>Keterangan</strong> — alasan singkat. Contoh: <code>Dijual ke Pak Ahmad, mobil sudah uzur</code>.</li>
+</ul>
+</li>
+<li>Ketuk konfirmasi.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> kotak aksi Pelepasan dengan isian Harga Jual dan Keterangan <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> status aset berubah menjadi <strong>Dilepas</strong> dan riwayatnya tercatat di <strong>Sarana &amp; Logistik → Mutasi / Pelepasan Aset</strong> (halaman riwayat, hanya baca).</p>
+<ul>
+<li><strong>Aset biasa (non-wakaf):</strong> jurnal laba/rugi pelepasan diposting — kas yang diterima, penghapusan akumulasi penyusutan dan harga perolehan, serta laba atau rugi selisihnya.</li>
+<li><strong>Aset wakaf:</strong> muncul pesan "dilepas tanpa pengakuan laba/rugi" — <strong>tidak ada jurnal laba/rugi</strong>, hanya catatan pelepasan.</li>
+</ul>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Pesan "Bagan akun belum siap…" (akun Kas / Aset Tetap / 1-2900 / 4-6000 / 5-8000)</em> → Bagan Akun belum lengkap. Minta admin keuangan menyiapkan Bagan Akun lebih dulu, lalu ulangi pelepasan.</li>
+<li><em>"Nilai perolehan aset 0…"</em> → aset non-wakaf wajib punya Nilai Perolehan agar jurnal bisa dibentuk. Lengkapi dulu di Edit aset (Bagian 1).</li>
+<li><em>"Aset sudah dilepas"</em> → aset ini sebelumnya sudah dilepas; sistem mencegah pelepasan ganda. Aman.</li>
+</ul>
+<blockquote>
+<p>💡 Pelepasan bersifat <strong>final</strong> dan berdampak ke buku besar. Periksa Harga Jual dengan teliti sebelum konfirmasi.</p>
+</blockquote>
+<hr>
+<h2 id="4-mengajukan-pembiayaan-amp-simulasi-dscr">4. Mengajukan Pembiayaan &amp; Simulasi DSCR<a class="anchor" href="#4-mengajukan-pembiayaan-amp-simulasi-dscr" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Tempat menyiapkan pengajuan pembiayaan ke bank/lembaga keuangan syariah, lengkap dengan simulasi <strong>DSCR</strong> (Debt Service Coverage Ratio) — ukuran apakah kemampuan keuangan unit usaha cukup untuk membayar cicilan.</p>
+<blockquote>
+<p>⚠️ <strong>Semua angka di bagian ini adalah simulasi/referensi.</strong> Mengisi formulir DSCR <strong>tidak</strong> memposting jurnal apa pun ke buku besar. Ini alat bantu pengambilan keputusan dan penyusunan berkas, bukan pencatatan kas.</p>
+</blockquote>
+<p><strong>Siapkan dulu:</strong> nama bank tujuan, nama produk pembiayaan, plafon (jumlah pinjaman) yang diinginkan, perkiraan tenor, margin/imbal hasil, dan gambaran EBITDA unit usaha.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Pembiayaan (DSCR)</strong> → <strong>Pengajuan Pembiayaan (DSCR)</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi bagian <strong>Pengajuan &amp; Simulasi DSCR</strong>:<ul>
+<li><strong>Bank Tujuan</strong> & <strong>Produk</strong> — contoh: <code>BSI Mitra Edu</code>.</li>
+<li><strong>Plafon</strong> — jumlah pembiayaan yang diajukan (wajib).</li>
+<li><strong>Tenor (bulan)</strong> — lama cicilan, default <code>36</code>.</li>
+<li><strong>Margin/Imbal Hasil Tahunan</strong> — porsi imbal hasil per tahun.</li>
+<li><strong>EBITDA Tahunan (unit komersial)</strong> — laba/surplus operasional sebelum bunga, pajak, penyusutan, dan amortisasi. Patokan yang disebut aplikasi: lihat <strong>Laporan Laba Rugi (surplus operasional)</strong> di modul Keuangan, lalu tambahkan kembali beban penyusutan/bunga bila ada. <em>Angka ini bersifat saran untuk simulasi — tidak memposting jurnal.</em></li>
+<li><strong>Angsuran Pokok Tahunan</strong> — cicilan pokok per tahun. Rumusnya: <strong>DSCR = EBITDA ÷ (Angsuran Pokok + Margin)</strong>, dengan ambang sehat <strong>1,25×</strong>.</li>
+<li><strong>Agunan (hanya non-wakaf)</strong> — pilih aset jaminan. Aset wakaf <strong>tidak</strong> muncul di daftar ini karena tidak boleh diagunkan.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>. Sistem menghitung DSCR dan zonanya otomatis.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Pengajuan Pembiayaan dengan kolom EBITDA, Angsuran Pokok, dan pilihan Agunan <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> baris pengajuan muncul di tabel dengan kolom <strong>DSCR</strong> dan <strong>Zona</strong>:</p>
+<ul>
+<li><span style="color:#16a34a"><strong>Aman</strong></span> (hijau) — DSCR ≥ 1,25× : kemampuan bayar memadai.</li>
+<li><span style="color:#ca8a04"><strong>Waspada</strong></span> (kuning) — DSCR 1,0–1,25× : masih bisa lanjut, tapi hati-hati. <strong>Tidak otomatis ditolak.</strong></li>
+<li><span style="color:#dc2626"><strong>Bahaya</strong></span> (merah) — DSCR &lt; 1,0× : cicilan melebihi kemampuan.</li>
+</ul>
+<p><strong>Setelah disimpan</strong>, di baris pengajuan tersedia tindakan lanjutan:</p>
+<ol>
+<li><strong>Ajukan ke Pembina</strong> — muncul bila status masih <em>draft</em> dan sudah memilih agunan. Status berubah menunggu persetujuan.</li>
+<li><strong>Setujui (Pembina)</strong> — khusus Pembina; mengisi <strong>E-Signature (TTE)</strong> sebagai tanda persetujuan.</li>
+<li><strong>Cetak Paket Kredit (L3)</strong> — mencetak berkas pengajuan untuk dibawa ke bank.</li>
+</ol>
+<blockquote>
+<p>💡 Kolom <strong>EBITDA</strong> bisa Bapak/Ibu isi mengikuti estimasi dari buku besar (surplus operasional Laporan Laba Rugi). Estimasi itu bersifat <strong>konservatif</strong> (belum menambahkan kembali penyusutan/bunga), jadi boleh disesuaikan manual sesuai data riil.</p>
+</blockquote>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Aset jaminan tidak ada di pilihan Agunan</em> → aset itu berstatus wakaf (tidak boleh diagunkan) atau belum dicatat. Daftarkan dulu sebagai aset non-wakaf di Bagian 1.</li>
+<li><em>Tombol "Ajukan ke Pembina" tidak muncul</em> → pastikan pengajuan masih draft <strong>dan</strong> sudah memilih agunan.</li>
+</ul>
+<hr>
+<h2 id="5-baitul-maal-program-amp-donasi">5. Baitul Maal: Program &amp; Donasi<a class="anchor" href="#5-baitul-maal-program-amp-donasi" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Baitul Maal mengelola dana umat — zakat, infak, sedekah, dan wakaf. Bapak/Ibu membuat <strong>Program Donasi</strong> yang tampil di halaman publik <code>/donasi</code>, lalu donatur berdonasi dari sana. Donasi yang masuk <strong>menunggu konfirmasi</strong> bendahara sebelum tercatat sebagai penerimaan.</p>
+<p>Menu-menu ini ada di grup <strong>Keuangan</strong> (tidak perlu Mode Lanjutan, cukup hak akses Keuangan).</p>
+<h3>5a. Membuat Program Donasi</h3>
+<ol>
+<li>Menu kiri → grup <strong>Keuangan</strong> → <strong>Program Donasi</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Nama Program</strong> — contoh: <code>Beasiswa Yatim</code>, <code>Infak Pembangunan Masjid</code>, <code>Zakat Maal</code>.</li>
+<li><strong>Sumber Dana</strong> — wajib. Pilihan ini menentukan <strong>dimensi sumber dana</strong> pada jurnal saat donasi nanti dikonfirmasi, dan apakah dana ini wakaf atau zakat/infak. Pilih dengan benar agar pelaporan PSAK 109 (zakat/infak/sedekah) rapi.</li>
+<li><strong>Target (Rp, opsional)</strong> — target penggalangan, boleh dikosongkan.</li>
+<li><strong>Aktif</strong> — nyalakan agar tampil di halaman publik <code>/donasi</code>.</li>
+<li><strong>Deskripsi</strong> — penjelasan program untuk donatur.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ Program aktif langsung tampil di halaman donasi publik. <strong>Membuat program belum membuat jurnal</strong> — jurnal baru muncul saat donasi dikonfirmasi (5b).</p>
+<h3>5b. Mengonfirmasi Donasi Masuk</h3>
+<p><strong>Apa ini?</strong> Donatur berdonasi lewat <code>/donasi</code> dan mengunggah bukti transfer. Donasi itu masuk berstatus <em>Menunggu Transfer</em>. Tugas bendahara: mencocokkan bukti transfer dengan mutasi rekening, lalu <strong>Konfirmasi</strong> atau <strong>Tolak</strong>.</p>
+<ol>
+<li>Menu kiri → grup <strong>Keuangan</strong> → <strong>Donasi Masuk</strong>.</li>
+<li>Lihat daftar donasi. Yang baru berstatus <strong>Menunggu Transfer</strong> (kuning).</li>
+<li>Ketuk <strong>Bukti</strong> untuk membuka foto bukti transfer, lalu cocokkan dengan rekening pesantren.</li>
+<li>Bila benar dananya masuk: ketuk <strong>Konfirmasi</strong> → konfirmasi sekali lagi pada kotak peringatan.</li>
+<li>Bila tidak valid: ketuk <strong>Tolak</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> daftar Donasi Masuk dengan tombol Bukti, Konfirmasi, dan Tolak <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil (Konfirmasi):</strong> status berubah <strong>Dikonfirmasi</strong> (hijau) dan <strong>baru di sinilah jurnal terbentuk</strong> — Debit <em>Kas</em> / Kredit akun penerimaan sesuai Sumber Dana program (Penerimaan Wakaf untuk dana wakaf, atau Penerimaan Zakat/Infak untuk lainnya). Nomor kuitansi otomatis dibuat dan bisa dicetak lewat tombol <strong>Kuitansi</strong>. Proses ini <strong>idempoten</strong> — menekan Konfirmasi dua kali tidak menggandakan jurnal.</p>
+<p>✅ <strong>Tanda berhasil (Tolak):</strong> status menjadi <strong>Ditolak</strong> — <strong>tidak ada jurnal</strong> yang dibuat.</p>
+<blockquote>
+<p>💡 Donasi <strong>tidak bisa dibuat manual</strong> dari panel — semuanya lahir dari halaman publik <code>/donasi</code>. Tugas panel hanya mengonfirmasi atau menolak.</p>
+</blockquote>
+<p>⚠️ <em>Pesan "COA belum di-seed…"</em> → akun Kas / akun penerimaan dana belum ada di Bagan Akun. Minta admin keuangan menyiapkan Bagan Akun dulu, lalu ulangi konfirmasi.</p>
+<hr>
+<h2 id="6-beasiswa-potong-spp">6. Beasiswa (Potong SPP)<a class="anchor" href="#6-beasiswa-potong-spp" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Memberi keringanan SPP kepada santri yang dibiayai dana Baitul Maal (zakat/infak/wakaf). Potongan diterapkan sebagai <strong>diskon pada tagihan</strong> santri secara otomatis setiap bulan.</p>
+<p><strong>Kapan dipakai:</strong> santri ditetapkan menerima beasiswa/keringanan dengan sumber dana tertentu.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Keuangan</strong> → <strong>Beasiswa</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Santri</strong> — pilih santri aktif penerima.</li>
+<li><strong>Sumber Dana Penanggung</strong> — dana yang menanggung potongan (mis. Zakat, Infak, Wakaf).</li>
+<li><strong>Potongan per Bulan (Rp)</strong> — besar keringanan tiap bulan.</li>
+<li><strong>Aktif</strong> — nyalakan agar potongan berjalan.</li>
+<li><strong>Mulai</strong> & <strong>Selesai (opsional)</strong> — rentang waktu beasiswa.</li>
+<li><strong>Keterangan</strong> — catatan bila perlu.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> beasiswa tercatat dan potongan akan otomatis diterapkan pada tagihan SPP santri selama periode aktif. <strong>Mencatat beasiswa di sini bukan posting jurnal kas</strong> — ia bekerja lewat mekanisme <em>diskon tagihan</em> yang sudah ada di modul Keuangan; dampak ke buku besar mengikuti pencatatan tagihan/pembayaran.</p>
+<p>⚠️ <em>Santri tidak ada di daftar</em> → pastikan santri berstatus <strong>aktif</strong>. Santri non-aktif tidak muncul.</p>
+<hr>
+<h2 id="7-pengingat-penting">7. Pengingat Penting<a class="anchor" href="#7-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>🧾 <strong>Bagan Akun harus siap dulu.</strong> Penyusutan, pelepasan, dan konfirmasi donasi sama-sama butuh Bagan Akun. Bila muncul pesan "akun belum siap/di-seed", minta admin menyiapkan Bagan Akun di Pengaturan Keuangan.</li>
+<li>🕌 <strong>Aset wakaf diperlakukan khusus.</strong> Tidak disusutkan, tidak boleh jadi agunan, dan saat dilepas tidak mengakui laba/rugi (UU 41/2004). Tandai status wakaf dengan benar sejak awal.</li>
+<li>📊 <strong>DSCR hanya simulasi.</strong> Mengisi pengajuan pembiayaan tidak mencatat uang ke buku besar — itu alat bantu keputusan & berkas, bukan transaksi kas.</li>
+<li>🤲 <strong>Donasi baru tercatat setelah dikonfirmasi.</strong> Selama masih "Menunggu Transfer", belum ada jurnal. Cek bukti transfer dengan teliti sebelum Konfirmasi.</li>
+<li>🔁 <strong>Aman dari dobel.</strong> Posting penyusutan dan konfirmasi donasi bersifat idempoten — tidak menggandakan jurnal bila ditekan ulang. Tetap, kerjakan dengan tenang.</li>
+<li>🚪 <strong>Keluar (logout)</strong> bila memakai komputer kantor bersama.</li>
+</ol>
+<hr>
+<h2 id="contekan-cepat-pembiayaan">Contekan Cepat<a class="anchor" href="#contekan-cepat-pembiayaan" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+<th>Bikin jurnal?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Catat aset / inventaris</td>
+<td>Sarana &amp; Logistik → Aset &amp; Inventaris → + Tambah</td>
+<td>Belum (baru pendataan)</td>
+</tr>
+<tr>
+<td>Posting penyusutan</td>
+<td>Aset &amp; Inventaris → aksi <em>Posting Penyusutan</em></td>
+<td>Ya (D Beban / K Akumulasi)</td>
+</tr>
+<tr>
+<td>Lepas / jual aset</td>
+<td>Aset &amp; Inventaris → aksi <em>Pelepasan</em></td>
+<td>Ya non-wakaf · wakaf tanpa P/L</td>
+</tr>
+<tr>
+<td>Lihat riwayat mutasi/pelepasan</td>
+<td>Sarana &amp; Logistik → Mutasi / Pelepasan Aset</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Ajukan pembiayaan + DSCR</td>
+<td>Pembiayaan (DSCR) → Pengajuan Pembiayaan (DSCR) → + Tambah</td>
+<td>Tidak (simulasi)</td>
+</tr>
+<tr>
+<td>Buat program donasi</td>
+<td>Keuangan → Program Donasi → + Tambah</td>
+<td>Tidak</td>
+</tr>
+<tr>
+<td>Konfirmasi donasi masuk</td>
+<td>Keuangan → Donasi Masuk → <em>Konfirmasi</em></td>
+<td>Ya (D Kas / K Penerimaan)</td>
+</tr>
+<tr>
+<td>Beri beasiswa potong SPP</td>
+<td>Keuangan → Beasiswa → + Tambah</td>
+<td>Lewat diskon tagihan</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../akademik/"><span>‹ Sebelumnya</span><b>Akademik Lanjutan</b></a>
+      <a class="pager-link next" href="../wali-santri/"><span>Berikutnya ›</span><b>Wali Santri</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-mencatat-aset-amp-inventaris">1. Mencatat Aset &amp; Inventaris</a><a href="#2-menghitung-amp-memposting-penyusutan">2. Menghitung &amp; Memposting Penyusutan</a><a href="#3-melepas-aset-disposal">3. Melepas Aset (Disposal)</a><a href="#4-mengajukan-pembiayaan-amp-simulasi-dscr">4. Mengajukan Pembiayaan &amp; Simulasi DSCR</a><a href="#5-baitul-maal-program-amp-donasi">5. Baitul Maal: Program &amp; Donasi</a><a href="#6-beasiswa-potong-spp">6. Beasiswa (Potong SPP)</a><a href="#7-pengingat-penting">7. Pengingat Penting</a><a href="#contekan-cepat-pembiayaan">Contekan Cepat</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
