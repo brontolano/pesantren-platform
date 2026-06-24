@@ -20,7 +20,7 @@ class EksporEmis extends Page
 
     protected static ?string $title = 'Ekspor Terformat EMIS';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Santri';
 
     protected static ?int $navigationSort = 10;
 

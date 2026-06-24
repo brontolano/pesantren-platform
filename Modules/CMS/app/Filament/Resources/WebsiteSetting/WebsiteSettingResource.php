@@ -30,7 +30,7 @@ class WebsiteSettingResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pengaturan Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website & Konten';
 
     protected static ?int $navigationSort = 10;
 

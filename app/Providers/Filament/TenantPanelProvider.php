@@ -285,7 +285,9 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Sarana & Logistik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Sarana & Logistik')),
                 NavigationGroup::make('Mutu & Laporan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Mutu & Laporan')),
                 NavigationGroup::make('Komunikasi & AI')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Komunikasi & AI')),
-                NavigationGroup::make('Kelembagaan & Pengaturan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kelembagaan & Pengaturan')),
+                NavigationGroup::make('Website & Konten')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Website & Konten')),
+                NavigationGroup::make('Pengaturan Sistem')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pengaturan Sistem')),
+                NavigationGroup::make('Tata Kelola & Audit')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tata Kelola & Audit')),
             ]);
 
         if (! $isAlbaKids) {
@@ -380,7 +382,7 @@ class TenantPanelProvider extends PanelProvider
         'guru' => ['Akademik & Tahfidz', 'Santri'],
         'asatidz' => ['Akademik & Tahfidz', 'Santri'],
         'bendahara' => ['Tagihan & Pembayaran'],
-        'tu' => ['Santri', 'PPDB', 'Kelembagaan & Pengaturan'],
+        'tu' => ['Santri', 'PPDB', 'Pengaturan Sistem'],
         'kepala' => ['Mutu & Laporan', 'Akuntansi'],
         // Blok kesantrian atomik (Fase 1) — peran pengasuhan/kesehatan/konseling.
         'pengelola_asrama' => ['Asrama & Pengasuhan', 'Kedisiplinan'],
