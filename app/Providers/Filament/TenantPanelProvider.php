@@ -285,6 +285,11 @@ class TenantPanelProvider extends PanelProvider
             ->passwordReset()
             ->profile()
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            // Sidebar dapat diciutkan jadi ikon-saja (minimize/expand) di desktop;
+            // pilihan pengguna diingat browser. Hanya berdampak pada tema sidebar
+            // (tema navigasi-atas tak punya sidebar). Grup TETAP tanpa ->icon()
+            // (hindari 500-trap); saat menciut yang tampil ikon item.
+            ->sidebarCollapsibleOnDesktop()
             ->spa()
             ->viteTheme('resources/css/filament/pesantren/theme.css')
             ->brandLogo(fn () => view('filament.brand', [
