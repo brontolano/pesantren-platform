@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Broadcast &amp; Notifikasi WhatsApp · Panduan Pesantren.online</title>
+<meta name="description" content="Membuat template pesan, mengirim broadcast WhatsApp massal ke wali/santri/staf, memantau status terkirim/gagal di Log Notifikasi, dan mengatur saklar WhatsApp.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item active" href="../broadcast-wa/">📢 Broadcast &amp; Notifikasi WA</a><div class="nav-sub"><a href="#1-mengenal-bagiannya">1. Mengenal Bagiannya</a><a href="#2-membuat-template-notifikasi">2. Membuat Template Notifikasi</a><a href="#3-memakai-placeholder">3. Memakai Placeholder {{…}}</a><a href="#4-mengirim-broadcast-wa">4. Mengirim Broadcast WA Massal</a><a href="#5-memantau-log-notifikasi">5. Memantau Log Notifikasi</a><a href="#6-arti-status">6. Arti Status Pengiriman</a><a href="#7-pengaturan-notifikasi">7. Pengaturan Notifikasi (Saklar WA)</a><a href="#8-pengingat-penting">8. Pengingat Penting</a><a href="#contekan-cepat">Contekan Cepat</a></div><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama & Kehidupan Santri</a><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">📢</div>
+        <div>
+          <h1>Broadcast &amp; Notifikasi WhatsApp</h1>
+          <p class="lead">Membuat template pesan, mengirim WhatsApp massal ke wali/santri/staf, memantau yang terkirim &amp; gagal, dan menyalakan/mematikan saluran WhatsApp.</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>, dan akun Bapak/Ibu punya hak <strong>kelola notifikasi</strong> (biasanya TU/admin pesantren). Bila menu di bawah tidak muncul, mintalah admin memberi hak akses.</p>
+<p>Semua menu di panduan ini ada di grup menu kiri <strong>Komunikasi</strong>. Pesan WhatsApp dikirim lewat pipa pesan bawaan platform — Bapak/Ibu tidak perlu memegang HP atau menyalin nomor satu per satu.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Mengenal bagiannya</li>
+<li>Membuat template notifikasi</li>
+<li>Memakai placeholder <code>{{…}}</code></li>
+<li>Mengirim broadcast WA massal</li>
+<li>Memantau Log Notifikasi</li>
+<li>Arti status pengiriman</li>
+<li>Pengaturan Notifikasi (saklar WA)</li>
+<li>Pengingat penting</li>
+</ol>
+<hr>
+<h2 id="1-mengenal-bagiannya">1. Mengenal Bagiannya<a class="anchor" href="#1-mengenal-bagiannya" aria-hidden="true">#</a></h2>
+<p>Sebelum mulai, kenali empat menu di grup <strong>Komunikasi</strong> (menu kiri). Masing-masing punya tugas berbeda:</p>
+<table>
+<thead>
+<tr>
+<th>Menu</th>
+<th>Gunanya</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Template Notifikasi</strong></td>
+<td>Naskah pesan siap pakai (mis. "Tagihan Baru", "Pengumuman"). Dibuat sekali, dipakai berulang.</td>
+</tr>
+<tr>
+<td><strong>Broadcast WA</strong></td>
+<td>Mengirim satu template ke banyak penerima sekaligus (wali, santri, atau staf).</td>
+</tr>
+<tr>
+<td><strong>Log Notifikasi</strong></td>
+<td>Buku riwayat: pesan apa yang terkirim, ke siapa, berhasil atau gagal. Hanya untuk dilihat (tidak bisa diubah).</td>
+</tr>
+<tr>
+<td><strong>Pengaturan Notifikasi</strong></td>
+<td>Saklar utama: menyalakan/mematikan WhatsApp, jeda antar-pesan, dan tanda tangan pesan.</td>
+</tr>
+</tbody></table>
+<p>Alur normalnya: <strong>buat/pilih template → kirim broadcast → cek hasilnya di Log</strong>.</p>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> grup menu <b>Komunikasi</b> dengan keempat menu tersebut <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<hr>
+<h2 id="2-membuat-template-notifikasi">2. Membuat Template Notifikasi<a class="anchor" href="#2-membuat-template-notifikasi" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> saat Bapak/Ibu butuh naskah pesan baru yang akan sering dikirim — misalnya pengumuman libur, pengingat rapat wali, atau info kegiatan.</p>
+<p><strong>Siapkan dulu:</strong> teks pesan yang ingin dikirim (boleh diketik dulu di catatan), dan daftar bagian yang berubah-ubah per penerima (mis. nama santri).</p>
+<blockquote>
+<p>💡 Pesantren Bapak/Ibu biasanya <strong>sudah punya banyak template bawaan</strong> (Tagihan Baru, Pembayaran Diterima, Izin Disetujui, Pengumuman, dan lain-lain). Cek dulu daftarnya sebelum membuat baru — mungkin yang Bapak/Ibu butuhkan sudah ada.</p>
+</blockquote>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Komunikasi</strong> → <strong>Template Notifikasi</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong> (atau buka template lama lalu <strong>Edit</strong> untuk meniru).</li>
+<li>Isi formulir:<ul>
+<li><strong>Kode Template</strong> — penanda singkat tanpa spasi, huruf besar. Contoh: <code>PENGUMUMAN_LIBUR</code>. Ini hanya untuk sistem, wali tidak melihatnya.</li>
+<li><strong>Judul</strong> — nama yang mudah dikenali. Contoh: <code>Pengumuman Libur Akhir Tahun</code>. Inilah yang muncul saat memilih template di Broadcast.</li>
+<li><strong>Channel</strong> — pilih <strong>WhatsApp</strong> (untuk broadcast WA, channel harus WhatsApp).</li>
+<li><strong>Aktif</strong> — biarkan menyala. Template yang dimatikan tidak akan muncul di pilihan Broadcast.</li>
+<li><strong>Isi Pesan</strong> — ketik naskah pesannya. Di sini Bapak/Ibu boleh menyelipkan placeholder seperti <code>{{nama_santri}}</code> (lihat Bagian 3).</li>
+<li><strong>Variabel Dinamis</strong> — (opsional) daftar placeholder yang dipakai beserta contoh nilainya, sebagai catatan/pengingat untuk diri sendiri.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Template dengan kotak <b>Isi Pesan</b> berisi placeholder <code>{{nama_santri}}</code> <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> template muncul di tabel dengan tanda <strong>Aktif</strong> bercentang. Template ini sekarang bisa dipilih saat membuat Broadcast.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Template tidak muncul di pilihan Broadcast</em> → pastikan <strong>Channel = WhatsApp</strong> dan tombol <strong>Aktif</strong> menyala. Broadcast WA hanya menampilkan template WhatsApp yang aktif.</li>
+<li><em>Salah ketik isi</em> → buka kembali, ketuk <strong>Edit</strong> (pensil), betulkan, lalu <strong>Simpan</strong>.</li>
+</ul>
+<hr>
+<h2 id="3-memakai-placeholder">3. Memakai Placeholder <code>{{…}}</code><a class="anchor" href="#3-memakai-placeholder" aria-hidden="true">#</a></h2>
+<p><strong>Apa itu placeholder?</strong> Bagian pesan yang ditulis di antara <strong>dua kurung kurawal</strong>, seperti <code>{{nama_santri}}</code>. Saat pesan dikirim, sistem otomatis mengganti placeholder itu dengan data asli tiap penerima. Jadi satu template bisa terasa pribadi untuk ratusan wali sekaligus.</p>
+<p><strong>Contoh:</strong> Bapak/Ibu menulis di Isi Pesan:</p>
+<blockquote>
+<p>Assalamu'alaikum Wali Santri <code>{{nama_santri}}</code>, ada pengumuman penting dari pesantren.</p>
+</blockquote>
+<p>Maka wali dari santri bernama Ahmad menerima:</p>
+<blockquote>
+<p>Assalamu'alaikum Wali Santri <strong>Ahmad</strong>, ada pengumuman penting dari pesantren.</p>
+</blockquote>
+<p><strong>Placeholder yang umum tersedia</strong> (tergantung Target yang dipilih saat broadcast):</p>
+<table>
+<thead>
+<tr>
+<th>Placeholder</th>
+<th>Berisi apa</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>{{nama_santri}}</code></td>
+<td>Nama santri</td>
+</tr>
+<tr>
+<td><code>{{nama_wali}}</code></td>
+<td>Nama wali (untuk target Wali Santri)</td>
+</tr>
+<tr>
+<td><code>{{nis}}</code></td>
+<td>Nomor induk santri</td>
+</tr>
+<tr>
+<td><code>{{nama_user}}</code></td>
+<td>Nama staf/pegawai (untuk target Staff)</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>💡 Template bawaan juga memakai placeholder seperti <code>{{nominal}}</code>, <code>{{jatuh_tempo}}</code>, atau <code>{{nama_pesantren}}</code>. Placeholder itu terisi otomatis ketika pesan dikirim oleh sistem (mis. dari modul Keuangan). Untuk broadcast manual, pakailah placeholder yang sesuai datanya tersedia — bila ragu, cukup pakai <code>{{nama_santri}}</code> atau tulis pesan tanpa placeholder.</p>
+</blockquote>
+<p>⚠️ <strong>Tulis persis:</strong> placeholder peka huruf dan ejaan. <code>{{nama_santri}}</code> benar; <code>{{ Nama Santri }}</code> atau <code>{nama_santri}</code> (satu kurung) <strong>tidak</strong> akan terganti dan akan terkirim apa adanya ke wali.</p>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> isi pesan dengan placeholder dilingkari, berdampingan dengan hasil terkirim <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<hr>
+<h2 id="4-mengirim-broadcast-wa">4. Mengirim Broadcast WA Massal<a class="anchor" href="#4-mengirim-broadcast-wa" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> mengirim satu pesan yang sama ke banyak penerima — misalnya pengumuman libur ke seluruh wali, atau info kegiatan ke santri satu kelas.</p>
+<p><strong>Siapkan dulu:</strong> template WhatsApp yang aktif (Bagian 2), dan kejelasan siapa penerimanya (semua wali? satu kelas? hanya staf?).</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Komunikasi</strong> → <strong>Broadcast WA</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi formulir:<ul>
+<li><strong>Template</strong> — pilih naskah pesan yang akan dikirim (hanya template WhatsApp aktif yang muncul).</li>
+<li><strong>Target Group</strong> — pilih siapa penerimanya:
+<ul>
+<li><strong>Wali Santri</strong> — nomor WA wali tiap santri.</li>
+<li><strong>Santri</strong> — dikirim ke nomor WA wali yang terdaftar pada santri.</li>
+<li><strong>Staff</strong> — staf/pegawai.</li>
+<li><strong>Custom Manual</strong> — Bapak/Ibu mengetik sendiri daftar nomornya (lihat catatan di bawah).</li>
+</ul>
+</li>
+<li><strong>Status</strong> — biarkan <strong>Draft</strong> dulu. Belum dikirim sampai Bapak/Ibu menekan tombol Kirim (Queue) di langkah berikutnya.</li>
+<li><strong>Jadwal Kirim</strong> — boleh dikosongkan (terisi otomatis saat dikirim).</li>
+<li><strong>Filter / Target</strong> — (opsional) untuk mempersempit penerima. Diisi berpasangan Kunci–Nilai. Contoh: Kunci <code>kelas_id</code>, Nilai <code>1</code> → hanya santri/wali kelas itu. Untuk target <strong>Custom Manual</strong>, isi Kunci <code>targets</code> dengan Nilai berupa daftar nomor dipisah koma, mis. <code>0812xxxx,0813xxxx</code>.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>. Broadcast tersimpan sebagai <strong>Draft</strong> — <strong>belum terkirim</strong>.</li>
+<li>Kembali ke tabel Broadcast WA. Pada baris broadcast tadi, ketuk tombol <strong>Queue</strong> <span aria-hidden="true">✈️</span> (kirim). Sistem akan memproses dan mengirim pesan satu per satu dengan jeda aman.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> tabel Broadcast WA dengan tombol <b>Queue</b> dilingkari pada baris berstatus Draft <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> status baris berubah dari <strong>Draft</strong> → <strong>Queued</strong> → <strong>Processing</strong> → <strong>Sent</strong>. Pesan sudah dikirim. Rincian per penerima bisa dilihat di <strong>Log Notifikasi</strong> (Bagian 5).</p>
+<blockquote>
+<p>⏳ <strong>Sabar saat banyak penerima.</strong> Sistem sengaja memberi <strong>jeda antar-pesan</strong> (bawaan 10 detik) supaya nomor WhatsApp tidak diblokir. Mengirim ke 100 wali bisa memakan beberapa menit — itu normal, biarkan berjalan.</p>
+</blockquote>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Status menjadi <strong>Partial Failed</strong></em> → sebagian penerima gagal (lihat alasannya di Log Notifikasi). Ketuk tombol <strong>Retry</strong> <span aria-hidden="true">🔁</span> pada baris itu untuk mencoba ulang.</li>
+<li><em>Status menjadi <strong>Failed</strong></em> → seluruh pengiriman gagal. Cek Log Notifikasi, lalu ketuk <strong>Retry</strong>. Bila tetap gagal, periksa <strong>Pengaturan Notifikasi</strong> (Bagian 7) — mungkin WhatsApp sedang dimatikan.</li>
+<li><em>Tidak ada penerima terkirim padahal status Sent</em> → kemungkinan target tidak punya nomor WA terdaftar, atau WA dalam mode simulasi. Lihat Log Notifikasi untuk memastikan.</li>
+</ul>
+<hr>
+<h2 id="5-memantau-log-notifikasi">5. Memantau Log Notifikasi<a class="anchor" href="#5-memantau-log-notifikasi" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Buku riwayat semua pesan yang dikirim sistem — siapa, kapan, lewat WhatsApp atau Email, dan <strong>terkirim atau gagal</strong>. Inilah cara membuktikan pesan benar-benar sampai, bukan sekadar berasumsi. Halaman ini <strong>hanya untuk dilihat</strong>: baris dibuat otomatis oleh sistem dan tidak bisa diubah atau dihapus.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Komunikasi</strong> → <strong>Log Notifikasi</strong>.</li>
+<li>Muncul daftar terbaru di atas. Tiap baris memuat: <strong>Waktu</strong>, <strong>Kanal</strong> (WhatsApp/Email), <strong>Tujuan</strong> (nomor/email), <strong>Status</strong>, <strong>Keterangan / Error</strong>, dan <strong>Template</strong>.</li>
+<li>Pakai <strong>filter</strong> di atas tabel untuk menyaring: berdasarkan <strong>Kanal</strong> (WhatsApp/Email) atau berdasarkan <strong>Status</strong> (Terkirim, Gagal, Simulasi, Dinonaktifkan).</li>
+<li>Untuk mencari satu wali, ketik nomornya di kotak <strong>Cari</strong> 🔍 pada kolom Tujuan.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> Log Notifikasi dengan filter Status terbuka dan baris berstatus Terkirim/Gagal <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Cara membaca cepat:</strong> baris <strong>hijau (Terkirim)</strong> = sampai; <strong>merah (Gagal)</strong> = tidak sampai, lihat kolom Keterangan/Error untuk alasannya; <strong>abu-abu</strong> = pesan tidak benar-benar dikirim (simulasi/dinonaktifkan).</p>
+<hr>
+<h2 id="6-arti-status">6. Arti Status Pengiriman<a class="anchor" href="#6-arti-status" aria-hidden="true">#</a></h2>
+<p>Status muncul di dua tempat: pada <strong>baris Broadcast</strong> (status keseluruhan) dan pada tiap baris <strong>Log Notifikasi</strong> (per penerima). Berikut artinya:</p>
+<p><strong>Status broadcast (keseluruhan):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Artinya</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Draft</strong></td>
+<td>Tersimpan, <em>belum</em> dikirim. Tekan <strong>Queue</strong> untuk mengirim.</td>
+</tr>
+<tr>
+<td><strong>Queued</strong></td>
+<td>Sudah masuk antrean kirim, menunggu giliran diproses.</td>
+</tr>
+<tr>
+<td><strong>Processing</strong></td>
+<td>Sedang dikirim satu per satu (dengan jeda antar-pesan).</td>
+</tr>
+<tr>
+<td><strong>Sent</strong></td>
+<td>Selesai — <strong>semua</strong> penerima berhasil dikirimi.</td>
+</tr>
+<tr>
+<td><strong>Partial Failed</strong></td>
+<td>Selesai, tapi <strong>sebagian</strong> penerima gagal. Gunakan <strong>Retry</strong>.</td>
+</tr>
+<tr>
+<td><strong>Failed</strong></td>
+<td>Gagal seluruhnya. Cek Log, periksa Pengaturan, lalu <strong>Retry</strong>.</td>
+</tr>
+</tbody></table>
+<p><strong>Status per penerima (di Log Notifikasi):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Artinya</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Terkirim</strong> (sent)</td>
+<td>Pesan berhasil diserahkan ke pipa WhatsApp. ✅</td>
+</tr>
+<tr>
+<td><strong>Gagal</strong> (failed)</td>
+<td>Tidak terkirim. Lihat kolom Keterangan/Error.</td>
+</tr>
+<tr>
+<td><strong>Simulasi</strong> (simulated)</td>
+<td>WhatsApp <strong>belum dikonfigurasi</strong> di server, jadi pesan hanya "berpura-pura" terkirim — wali <strong>tidak</strong> menerima apa pun. Hubungi admin platform.</td>
+</tr>
+<tr>
+<td><strong>Dinonaktifkan</strong> (disabled)</td>
+<td>Saluran WhatsApp sedang <strong>dimatikan</strong> di Pengaturan Notifikasi. Pesan tidak dikirim. Nyalakan kembali bila perlu (Bagian 7).</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>⚠️ Penting: status <strong>Simulasi</strong> dan <strong>Dinonaktifkan</strong> dihitung sebagai <strong>tidak terkirim</strong> — jangan dikira pesan sudah sampai. Sistem sengaja jujur mencatatnya agar Bapak/Ibu tidak salah kira.</p>
+</blockquote>
+<hr>
+<h2 id="7-pengaturan-notifikasi">7. Pengaturan Notifikasi (Saklar WA)<a class="anchor" href="#7-pengaturan-notifikasi" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> menghentikan sementara semua WhatsApp (mis. saat ada masalah nomor), mengatur jeda antar-pesan broadcast, atau menambah tanda tangan di akhir pesan.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Komunikasi</strong> → <strong>Pengaturan Notifikasi</strong>.</li>
+<li>Atur yang diperlukan:<ul>
+<li><strong>Aktifkan notifikasi WhatsApp</strong> — saklar utama. <strong>Jika dimatikan:</strong> OTP, pemberitahuan, dan broadcast WA <strong>tidak</strong> dikirim. Nyalakan kembali untuk melanjutkan.</li>
+<li><strong>URL webhook n8n khusus tenant</strong> — (opsional, lanjutan) kosongkan untuk memakai pipa WhatsApp bawaan platform. Hanya diisi bila pesantren punya jalur WA/nomor pengirim sendiri (tanya admin platform).</li>
+<li><strong>Tanda tangan / footer pesan</strong> — (opsional) teks pendek yang ditambahkan di akhir setiap pesan WhatsApp. Contoh: <code>-- Pondok Pesantren Asy-Syifaa</code>.</li>
+<li><strong>Jeda antar-pesan (detik)</strong> — jarak waktu antar-pengiriman saat broadcast. Rekomendasi <strong>10 detik</strong> (maksimal 300). Jangan terlalu kecil agar nomor tidak diblokir WhatsApp.</li>
+<li><strong>Aktifkan notifikasi email</strong> — saklar untuk saluran Email (terpisah dari WhatsApp). Perhatikan keterangan di bawahnya: jika server email belum diatur, menyalakan ini tidak mengirim email apa pun.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> halaman Pengaturan Notifikasi dengan saklar <b>Aktifkan notifikasi WhatsApp</b> dilingkari <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pemberitahuan <em>"Pengaturan notifikasi disimpan"</em>. Pengaturan langsung berlaku untuk pengiriman berikutnya.</p>
+<p>⚠️ <em>Broadcast tiba-tiba semua gagal/dinonaktifkan?</em> → cek halaman ini lebih dulu: kemungkinan saklar <strong>Aktifkan notifikasi WhatsApp</strong> tidak sengaja dimatikan.</p>
+<hr>
+<h2 id="8-pengingat-penting">8. Pengingat Penting<a class="anchor" href="#8-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>📝 <strong>Periksa naskah sebelum Queue.</strong> Sekali ditekan kirim, pesan langsung menuju ratusan wali — tidak bisa ditarik kembali.</li>
+<li>🔤 <strong>Tulis placeholder persis</strong> <code>{{nama_santri}}</code> — dua kurung, tanpa spasi di dalam. Salah tulis = terkirim apa adanya ke wali.</li>
+<li>⏳ <strong>Broadcast butuh waktu.</strong> Jeda antar-pesan itu disengaja agar nomor aman. Jangan menekan Queue berkali-kali karena merasa lambat.</li>
+<li>🔎 <strong>Selalu cek Log Notifikasi</strong> setelah broadcast untuk memastikan benar-benar terkirim — bukan hanya "Simulasi".</li>
+<li>🟢 <strong>Pakai template bawaan</strong> bila sudah ada yang cocok, daripada membuat baru dari nol.</li>
+<li>🤝 <strong>Pesan dibaca wali.</strong> Gunakan bahasa santun dan jelas; sertakan nama pesantren agar wali tahu sumbernya.</li>
+</ol>
+<hr>
+<h2 id="contekan-cepat">Contekan Cepat<a class="anchor" href="#contekan-cepat" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Buat naskah pesan baru</td>
+<td>Komunikasi → Template Notifikasi → + Tambah</td>
+</tr>
+<tr>
+<td>Kirim WA ke banyak wali</td>
+<td>Komunikasi → Broadcast WA → + Tambah → Simpan → Queue</td>
+</tr>
+<tr>
+<td>Coba ulang yang gagal</td>
+<td>Komunikasi → Broadcast WA → tombol Retry pada baris</td>
+</tr>
+<tr>
+<td>Cek pesan terkirim / gagal</td>
+<td>Komunikasi → Log Notifikasi</td>
+</tr>
+<tr>
+<td>Matikan/nyalakan WhatsApp</td>
+<td>Komunikasi → Pengaturan Notifikasi</td>
+</tr>
+<tr>
+<td>Atur jeda antar-pesan</td>
+<td>Komunikasi → Pengaturan Notifikasi → Jeda antar-pesan</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../kepegawaian/"><span>‹ Sebelumnya</span><b>Kepegawaian / SDM</b></a>
+      <a class="pager-link next" href="../pimpinan/"><span>Berikutnya ›</span><b>Pimpinan</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-mengenal-bagiannya">1. Mengenal Bagiannya</a><a href="#2-membuat-template-notifikasi">2. Membuat Template Notifikasi</a><a href="#3-memakai-placeholder">3. Memakai Placeholder {{…}}</a><a href="#4-mengirim-broadcast-wa">4. Mengirim Broadcast WA Massal</a><a href="#5-memantau-log-notifikasi">5. Memantau Log Notifikasi</a><a href="#6-arti-status">6. Arti Status Pengiriman</a><a href="#7-pengaturan-notifikasi">7. Pengaturan Notifikasi (Saklar WA)</a><a href="#8-pengingat-penting">8. Pengingat Penting</a><a href="#contekan-cepat">Contekan Cepat</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
