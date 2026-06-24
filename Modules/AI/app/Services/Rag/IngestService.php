@@ -15,6 +15,7 @@ use Modules\AI\Models\AiChunk;
 use Modules\AI\Models\AiKnowledgeSource;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Privacy\ContentSanitizer;
+use Smalot\PdfParser\Parser;
 use ZipArchive;
 
 /**
@@ -266,11 +267,9 @@ class IngestService
             in_array($ekstensi, ['txt', 'md', 'markdown', 'csv'], true)
                 => (string) $disk->get($source->path_file),
             $ekstensi === 'docx' => $this->ekstrakDocx($disk->path($source->path_file)),
-            $ekstensi === 'pdf' => throw new \RuntimeException(
-                'Mohon maaf, berkas PDF belum didukung. Silakan unggah versi teks (.txt/.md) atau Word (.docx) dari dokumen ini.',
-            ),
+            $ekstensi === 'pdf' => $this->ekstrakPdf($disk->path($source->path_file)),
             default => throw new \RuntimeException(
-                "Mohon maaf, format berkas .{$ekstensi} belum didukung. Format yang didukung: .txt, .md, .docx.",
+                "Mohon maaf, format berkas .{$ekstensi} belum didukung. Format yang didukung: .txt, .md, .docx, .pdf.",
             ),
         };
     }
@@ -299,6 +298,34 @@ class IngestService
         $teks = html_entity_decode(strip_tags($xml), ENT_QUOTES | ENT_XML1, 'UTF-8');
 
         return trim((string) preg_replace("/\n{3,}/", "\n\n", $teks));
+    }
+
+    /**
+     * PDF = ekstrak teks via smalot/pdfparser (pustaka pure-PHP, tanpa
+     * ekstensi sistem). PDF hasil pindai/gambar (tanpa lapisan teks) atau
+     * terenkripsi → ditolak dengan pesan jelas (bukan chunk kosong).
+     */
+    private function ekstrakPdf(string $absolutePath): string
+    {
+        try {
+            $teks = (new Parser)->parseFile($absolutePath)->getText();
+        } catch (\Throwable $e) {
+            throw new \RuntimeException(
+                'Berkas PDF tidak dapat dibaca (mungkin terenkripsi/berpassword atau rusak). '
+                .'Silakan unggah versi teks (.txt/.md) atau Word (.docx) dari dokumen ini.',
+            );
+        }
+
+        $teks = trim((string) preg_replace("/\n{3,}/", "\n\n", str_replace("\r\n", "\n", $teks)));
+
+        if ($teks === '') {
+            throw new \RuntimeException(
+                'PDF ini tidak memuat lapisan teks yang dapat dibaca (kemungkinan hasil pindai/foto). '
+                .'Silakan unggah versi teks (.txt/.md/.docx) atau ketik ulang isinya di kotak teks.',
+            );
+        }
+
+        return $teks;
     }
 
     // ------------------------------------------------------------------

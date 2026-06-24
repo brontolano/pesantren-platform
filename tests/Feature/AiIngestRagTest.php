@@ -279,7 +279,46 @@ class AiIngestRagTest extends TestCase
         $this->assertSame(0, AiChunk::query()->where('source_id', $source->getKey())->count());
     }
 
-    public function test_berkas_pdf_ditolak_dengan_pesan_jelas(): void
+    /**
+     * gap-83 — PDF berlapis teks kini DIDUKUNG (smalot/pdfparser): teks
+     * diekstrak lalu di-chunk seperti dokumen lain → status siap.
+     */
+    public function test_pdf_berlapis_teks_diekstrak_jadi_pengetahuan(): void
+    {
+        $this->siapkanTenant('ragpdfok');
+        Storage::fake(StorageQuotaService::diskName());
+        Queue::fake();
+        $this->fakeEmbedSukses();
+
+        // PDF minimal VALID (xref byte-offset terhitung) berisi teks
+        // "Halo Pesantren PDF Uji" — dibangun inline agar tak ada risiko
+        // transkripsi base64.
+        $pdfValid = $this->bangunPdfBerteks('Halo Pesantren PDF Uji');
+
+        $disk = Storage::disk(StorageQuotaService::diskName());
+        $disk->put('ai-pengetahuan/kitab.pdf', $pdfValid);
+
+        $source = AiKnowledgeSource::create([
+            'judul' => 'Kitab PDF',
+            'kategori' => 'kurikulum',
+            'path_file' => 'ai-pengetahuan/kitab.pdf',
+            'mime' => 'application/pdf',
+            'status' => AiKnowledgeSource::STATUS_DIUNGGAH,
+            'versi_ingest' => 1,
+        ]);
+
+        $this->service()->prosesSumber((int) $source->getKey());
+
+        $source->refresh();
+        $this->assertSame(AiKnowledgeSource::STATUS_SIAP, $source->status, 'PDF berteks harus terproses → siap');
+        $this->assertGreaterThan(0, AiChunk::query()->where('source_id', $source->getKey())->count());
+    }
+
+    /**
+     * PDF yang tak terbaca (hasil pindai/foto, terenkripsi, atau rusak)
+     * DITOLAK dengan pesan jelas — bukan chunk kosong diam-diam.
+     */
+    public function test_berkas_pdf_takterbaca_ditolak_dengan_pesan_jelas(): void
     {
         $this->siapkanTenant('ragpdf');
         Storage::fake(StorageQuotaService::diskName());
@@ -298,9 +337,37 @@ class AiIngestRagTest extends TestCase
         ]);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('/PDF belum didukung/');
+        $this->expectExceptionMessageMatches('/PDF (tidak dapat dibaca|ini tidak memuat)/');
 
         $this->service()->prosesSumber((int) $source->getKey());
+    }
+
+    /** Bangun PDF minimal VALID berlapis teks (xref byte-offset terhitung benar). */
+    private function bangunPdfBerteks(string $isi): string
+    {
+        $objs = [
+            1 => '<</Type/Catalog/Pages 2 0 R>>',
+            2 => '<</Type/Pages/Kids[3 0 R]/Count 1>>',
+            3 => '<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 144]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>',
+        ];
+        $stream = 'BT /F1 18 Tf 20 100 Td ('.$isi.') Tj ET';
+        $objs[4] = '<</Length '.strlen($stream).'>>stream'."\n".$stream."\nendstream";
+        $objs[5] = '<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>';
+
+        $pdf = "%PDF-1.4\n";
+        $offsets = [];
+        foreach ($objs as $i => $body) {
+            $offsets[$i] = strlen($pdf);
+            $pdf .= $i." 0 obj\n".$body."\nendobj\n";
+        }
+        $xrefPos = strlen($pdf);
+        $pdf .= "xref\n0 ".(count($objs) + 1)."\n0000000000 65535 f \n";
+        foreach ($offsets as $off) {
+            $pdf .= sprintf("%010d 00000 n \n", $off);
+        }
+        $pdf .= "trailer\n<</Root 1 0 R/Size ".(count($objs) + 1).">>\nstartxref\n".$xrefPos."\n%%EOF";
+
+        return $pdf;
     }
 
     // ------------------------------------------------------------------
