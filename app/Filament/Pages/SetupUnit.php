@@ -25,7 +25,7 @@ class SetupUnit extends Page
 
     protected static ?string $navigationLabel = 'Pusat Setup';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
 
     protected static ?int $navigationSort = -11;
 

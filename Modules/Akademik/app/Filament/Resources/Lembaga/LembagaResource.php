@@ -42,7 +42,7 @@ class LembagaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Lembaga';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik';
+    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
 
     protected static ?int $navigationSort = 0;
 

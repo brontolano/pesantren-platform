@@ -25,7 +25,7 @@ class StasiunPendaftaran extends Page
 
     protected static ?string $title = 'Stasiun Pendaftaran Santri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
 
     protected static ?int $navigationSort = 19;
 

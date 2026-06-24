@@ -43,7 +43,7 @@ class AnggaranResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Anggaran (RKAM)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
 
     protected static ?int $navigationSort = 8;
 

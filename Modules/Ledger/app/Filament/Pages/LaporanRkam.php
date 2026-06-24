@@ -27,7 +27,7 @@ class LaporanRkam extends Page implements HasForms
 
     protected static ?string $title = 'L5 — RAB / RKAM & Realisasi Anggaran';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
 
     protected static ?int $navigationSort = 5;
 

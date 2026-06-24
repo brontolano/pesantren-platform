@@ -37,7 +37,7 @@ class MutuSasaranResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Sasaran Mutu (KPI)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
 
     protected static ?int $navigationSort = 2;
 

@@ -37,7 +37,7 @@ class DokumenMutuResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Dokumen Mutu';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
 
     protected static ?int $navigationSort = 1;
 

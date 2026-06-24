@@ -39,7 +39,7 @@ class IkhtisarKitab extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim Digital';
+    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
 
     protected static ?string $navigationLabel = 'Ikhtisar Kitab';
 

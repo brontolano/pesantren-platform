@@ -28,7 +28,7 @@ class PengaturanAppSantri extends Page implements HasForms
 
     protected static ?string $title = 'Pengaturan App Santri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
 
     protected static ?int $navigationSort = 20;
 

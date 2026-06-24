@@ -29,7 +29,7 @@ class CrmPenawaranResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Penawaran (Quotation)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
 
     protected static ?int $navigationSort = 30;
 

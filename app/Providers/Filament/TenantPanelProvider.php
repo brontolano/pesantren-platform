@@ -251,30 +251,20 @@ class TenantPanelProvider extends PanelProvider
             ->pages($pages)
             ->widgets($widgets)
             ->navigationGroups([
+                // gap-105 — konsolidasi 22 grup lama menjadi 9 "aplikasi", diurut
+                // sesuai jalur-adopsi (PPDB → operasional santri → akademik →
+                // keuangan → SDM → sarana → mutu → komunikasi → pengaturan).
                 // JANGAN beri ->icon() pada grup: Filament v5 melempar 500 bila grup
                 // berikon berisi item berikon (lihat TenantPanelAuthedSmokeTest).
-                NavigationGroup::make('Kesantrian'),
-                NavigationGroup::make('Kepengasuhan')->collapsible(),
-                NavigationGroup::make('Kedisiplinan')->collapsible(),
-                NavigationGroup::make('UKS')->collapsible(),
-                NavigationGroup::make('Alumni')->collapsible(),
-                NavigationGroup::make('PPDB')->collapsible(),
-                NavigationGroup::make('Akademik')->collapsible(),
-                NavigationGroup::make('Tahfidz')->collapsible(),
-                NavigationGroup::make('Keuangan'),
-                NavigationGroup::make('Kas')->collapsible(),
-                NavigationGroup::make('Kantin')->collapsible(),
-                NavigationGroup::make('Akuntansi')->collapsible(),
-                NavigationGroup::make('Pajak')->collapsible(),
+                NavigationGroup::make('PPDB'),
+                NavigationGroup::make('Santri & Pengasuhan')->collapsible(),
+                NavigationGroup::make('Akademik & Tahfidz')->collapsible(),
+                NavigationGroup::make('Keuangan')->collapsible(),
                 NavigationGroup::make('Kepegawaian')->collapsible(),
-                NavigationGroup::make('AI Khadim Digital')->collapsible(),
-                NavigationGroup::make('Kelembagaan')->collapsible(),
-                NavigationGroup::make('Komunikasi')->collapsible(),
                 NavigationGroup::make('Sarana & Logistik')->collapsible(),
-                NavigationGroup::make('Pembiayaan (DSCR)')->collapsible(),
-                NavigationGroup::make('Laporan Pimpinan')->collapsible(),
-                NavigationGroup::make('Pengaturan')->collapsible(),
-                NavigationGroup::make('Mutu')->collapsible(),
+                NavigationGroup::make('Mutu & Laporan')->collapsible(),
+                NavigationGroup::make('Komunikasi & AI')->collapsible(),
+                NavigationGroup::make('Kelembagaan & Pengaturan')->collapsible(),
             ]);
 
         if (! $isAlbaKids) {

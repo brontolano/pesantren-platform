@@ -30,7 +30,7 @@ class NeracaSaldo extends Page implements HasForms
 
     protected static ?string $title = 'Neraca Saldo (Trial Balance)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
 
     protected static ?int $navigationSort = 12;
 

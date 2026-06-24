@@ -24,7 +24,7 @@ class PusatLaporan extends Page
 
     protected static ?string $title = 'Pusat Laporan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
 
     protected static ?int $navigationSort = 1;
 

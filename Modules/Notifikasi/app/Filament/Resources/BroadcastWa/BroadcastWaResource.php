@@ -31,7 +31,7 @@ class BroadcastWaResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-megaphone';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Komunikasi';
+    protected static \UnitEnum|string|null $navigationGroup = 'Komunikasi & AI';
 
     protected static ?int $navigationSort = 2;
 
@@ -176,6 +176,6 @@ class BroadcastWaResource extends Resource
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Komunikasi';
+        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Komunikasi & AI';
     }
 }

@@ -29,7 +29,7 @@ class AlokasiBiayaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Alokasi Biaya';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
 
     protected static ?int $navigationSort = 30;
 

@@ -39,7 +39,7 @@ class DocumentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Repositori Dokumen';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
 
     protected static ?int $navigationSort = 32;
 

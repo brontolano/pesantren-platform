@@ -37,7 +37,7 @@ class ProfileResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Profil Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
 
     protected static ?int $navigationSort = 9;
 

@@ -33,7 +33,7 @@ class IntegrasiApi extends Page implements HasTable
 
     protected static ?string $navigationLabel = 'Integrasi & API';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
 
     protected static ?int $navigationSort = 90;
 
