@@ -31,7 +31,7 @@ class LaporanDanaKebajikan extends Page implements HasForms
 
     protected static ?string $title = 'Laporan Sumber & Penggunaan Dana Kebajikan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Laporan';
 
     protected static ?int $navigationSort = 7;
 

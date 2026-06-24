@@ -33,7 +33,7 @@ class SlipGajiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Slip Gaji';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Penggajian';
 
     protected static ?int $navigationSort = 9;
 

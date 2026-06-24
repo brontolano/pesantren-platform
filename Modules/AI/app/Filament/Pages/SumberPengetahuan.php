@@ -36,7 +36,7 @@ class SumberPengetahuan extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
+    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim';
 
     protected static ?string $navigationLabel = 'Sumber Pengetahuan';
 

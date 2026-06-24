@@ -53,7 +53,7 @@ class PengaturanAi extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
+    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim';
 
     protected static ?string $navigationLabel = 'Pengaturan Asisten AI';
 

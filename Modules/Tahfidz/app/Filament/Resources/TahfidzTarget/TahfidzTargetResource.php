@@ -34,7 +34,7 @@ class TahfidzTargetResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Target Tahfidz (KPI)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tahfidz';
 
     protected static ?int $navigationSort = 6;
 

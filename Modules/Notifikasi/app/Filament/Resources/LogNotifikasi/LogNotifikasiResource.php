@@ -36,7 +36,7 @@ class LogNotifikasiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Log Notifikasi';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Komunikasi & AI';
+    protected static UnitEnum|string|null $navigationGroup = 'Komunikasi';
 
     protected static ?int $navigationSort = 3;
 
