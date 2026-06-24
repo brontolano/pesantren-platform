@@ -30,7 +30,7 @@ class ModerasiPesanWali extends Page implements HasTable
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
 
     protected static ?int $navigationSort = 11;
 

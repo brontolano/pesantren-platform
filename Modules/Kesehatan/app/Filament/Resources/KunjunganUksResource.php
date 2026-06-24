@@ -46,7 +46,7 @@ class KunjunganUksResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kunjungan UKS';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Santri & Pengasuhan';
+    protected static UnitEnum|string|null $navigationGroup = 'Kesehatan';
 
     protected static ?int $navigationSort = 2;
 

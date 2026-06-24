@@ -27,7 +27,7 @@ class BiayaAsramaResource extends Resource
 
     protected static ?string $navigationLabel = 'Biaya Asrama';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Asrama & Pengasuhan';
 
     protected static ?int $navigationSort = 4;
 

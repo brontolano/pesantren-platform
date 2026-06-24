@@ -45,7 +45,7 @@ class PelanggaranSantriResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-exclamation-triangle';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Santri & Pengasuhan';
+    protected static UnitEnum|string|null $navigationGroup = 'Kedisiplinan';
 
     protected static ?int $navigationSort = 9;
 

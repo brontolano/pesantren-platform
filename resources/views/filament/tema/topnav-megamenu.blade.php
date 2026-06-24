@@ -9,7 +9,7 @@
     $nav = $aktifTopnav ? filament()->getNavigation() : [];
 
     // Bar minimalis: grup jalur-adopsi harian — sisanya via Semua Menu.
-    $prioritas = ['PPDB', 'Santri & Pengasuhan', 'Keuangan'];
+    $prioritas = ['PPDB', 'Santri', 'Akademik & Tahfidz', 'Keuangan'];
     $barGroups = [];      // grup prioritas (dropdown di bar)
     $barItems = [];       // item tanpa grup utk bar (Dasbor saja)
     foreach ($nav as $group) {
