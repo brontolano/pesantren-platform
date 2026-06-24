@@ -91,6 +91,10 @@ class RolesAndPermissionsSeeder extends Seeder
             // balas manual via jalur outbound resmi, kembalikan ke bot,
             // tutup; juga penerima notifikasi handoff baru.
             'ai.chat.kelola',
+            // 1-aplikasi (Fase 2b/2c) — peran publik 'jemaah' (login no-WA +
+            // password): boleh berkomentar di konten Beranda publik. Tamu (tanpa
+            // login) read-only tak punya izin ini. Moderasi komentar tetap di staf.
+            'komentar',
         ];
 
         foreach ($permissions as $permission) {
@@ -266,6 +270,12 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_own_ppdb_status',
                 'complete_own_ppdb',
                 'upload_own_ppdb_docs',
+            ],
+            // 1-aplikasi (Fase 2b) — jemaah publik: login no-WA + password (registrasi
+            // mandiri). TIDAK punya akses panel/dashboard staf; hanya 'komentar' di
+            // Beranda publik. Tamu (tanpa login) tetap read-only tanpa izin apa pun.
+            'jemaah' => [
+                'komentar',
             ],
         ];
 
