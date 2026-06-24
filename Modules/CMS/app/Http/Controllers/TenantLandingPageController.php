@@ -3,6 +3,7 @@
 namespace Modules\CMS\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Services\PrayerTimesService;
 use App\Services\QiblaService;
 use App\Support\AlbaKidsTenant;
@@ -52,25 +53,32 @@ class TenantLandingPageController extends Controller
     {
         $lat = TenantBranding::latitude();
         $lng = TenantBranding::longitude();
+        $adaLokasi = $lat !== 0.0 || $lng !== 0.0;
 
         $jadwalSholat = [];
         $arahKiblat = null;
 
-        if ($lat !== 0.0 || $lng !== 0.0) {
+        if ($adaLokasi) {
             try {
-                $jadwalSholat = app(PrayerTimesService::class)
-                    ->fivePrayers($lat, $lng, TenantBranding::timezoneOffset());
-                $arahKiblat = (int) round(app(QiblaService::class)->bearing($lat, $lng));
+                if ((bool) Setting::getTenantValue('beranda.tampil_jadwal_sholat', true)) {
+                    $jadwalSholat = app(PrayerTimesService::class)
+                        ->fivePrayers($lat, $lng, TenantBranding::timezoneOffset());
+                }
+                if ((bool) Setting::getTenantValue('beranda.tampil_arah_kiblat', true)) {
+                    $arahKiblat = (int) round(app(QiblaService::class)->bearing($lat, $lng));
+                }
             } catch (\Throwable $e) {
                 $jadwalSholat = [];
                 $arahKiblat = null;
             }
         }
 
+        $tampilDonasi = (bool) Setting::getTenantValue('beranda.tampil_donasi', true);
+
         return [
             'jadwalSholat' => $jadwalSholat,
             'arahKiblat' => $arahKiblat,
-            'donasiUrl' => '/donasi',
+            'donasiUrl' => $tampilDonasi ? '/donasi' : null,
         ];
     }
 }
