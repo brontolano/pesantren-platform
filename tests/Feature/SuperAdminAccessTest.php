@@ -69,8 +69,10 @@ class SuperAdminAccessTest extends TestCase
     {
         [$super, $biasa] = $this->bootUsers('sa2');
 
-        // Gerbang modul: modul 'development' (file_storage/ai) normalnya
+        // Gerbang modul: modul 'development' (file_storage) normalnya
         // tersembunyi utk tenant non-dev — super_admin tetap melihat.
+        // (Catatan: 'ai' kini 'released' sejak 2026-06-25, jadi contoh modul
+        // development memakai file_storage.)
         $gate = new class
         {
             use \App\Filament\Concerns\ModuleGate;
@@ -82,7 +84,7 @@ class SuperAdminAccessTest extends TestCase
         };
 
         Auth::login($super);
-        $this->assertTrue($gate::uji('ai'), 'super_admin melihat modul development.');
+        $this->assertTrue($gate::uji('file_storage'), 'super_admin melihat modul development.');
         $this->assertSame('advanced', \App\Support\UiMode::current(), 'super_admin default Mode Lengkap.');
 
         Auth::login($biasa);
