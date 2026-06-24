@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'module' => \App\Http\Middleware\CheckModuleActive::class,
             'wali' => \App\Http\Middleware\EnsureUserIsWali::class,
+            'jemaah' => \App\Http\Middleware\EnsureUserIsJemaah::class,
             'api.key' => \App\Http\Middleware\AuthenticateTenantApiKey::class,
         ]);
 

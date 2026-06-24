@@ -48,6 +48,24 @@ class LauncherController extends Controller
 
         /** @var User $user */
         $user = Auth::user();
+
+        // Jemaah (peran publik) berlabuh di Beranda publik. JANGAN ikuti
+        // redirect('/') dari AppLauncher di sini: route ini SENDIRI adalah '/'
+        // pada domain 'sistem' → akan loop tak berujung (ERR_TOO_MANY_REDIRECTS).
+        // Render landing langsung (sama seperti jalur tamu). AlbaKids (custom)
+        // tidak punya peran jemaah → fallback login.
+        if ($user->hasRole('jemaah')) {
+            if (AlbaKidsTenant::isActive()) {
+                return app(StaffLoginController::class)->show();
+            }
+
+            try {
+                return app()->call([app(TenantLandingPageController::class), '__invoke']);
+            } catch (\Throwable $e) {
+                return app(StaffLoginController::class)->show();
+            }
+        }
+
         $dest = AppLauncher::primaryDestination($user);
 
         if ($dest['kind'] === 'redirect') {

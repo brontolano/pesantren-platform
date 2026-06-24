@@ -44,6 +44,7 @@ use App\Http\Controllers\PortalGuru\PortalGuruTahfidzLanjutanController;
 use App\Http\Controllers\PortalGuru\PortalGuruUjianController;
 use App\Http\Controllers\PortalGuru\PortalGuruWaliKelasController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
+use App\Http\Controllers\Jemaah\JemaahAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
 use App\Http\Controllers\PortalWali\PortalWaliFinancialController;
@@ -450,6 +451,27 @@ Route::middleware([
         Route::post('/aktivasi/kirim-ulang', [PortalWaliAuthController::class, 'kirimUlang'])->middleware('throttle:3,15')->name('activation.resend');
         Route::post('/lupa-password', [PortalWaliAuthController::class, 'lupaPassword'])->middleware('throttle:5,15')->name('password.request');
         Route::post('/lupa-password/reset', [PortalWaliAuthController::class, 'resetPassword'])->middleware('throttle:10,15')->name('password.reset');
+    });
+
+    // 1-aplikasi (Fase 2b) — auth peran publik "jemaah" (registrasi mandiri
+    // No. WA + password via OTP). Publik (tanpa middleware role); berlabuh ke
+    // Beranda '/' setelah masuk. Throttle a la /wali & /spmb.
+    Route::prefix('jemaah')->name('tenant.jemaah.auth.')->group(function () {
+        Route::get('/login', [JemaahAuthController::class, 'showLogin'])->name('login');
+        Route::get('/daftar', [JemaahAuthController::class, 'showDaftar'])->name('register');
+        Route::get('/aktivasi', [JemaahAuthController::class, 'showAktivasi'])->name('activation');
+        Route::get('/lupa-password', [JemaahAuthController::class, 'showLupaPassword'])->name('password.forgot');
+        Route::post('/daftar', [JemaahAuthController::class, 'daftar'])->middleware('throttle:5,15')->name('register.submit');
+        Route::post('/login', [JemaahAuthController::class, 'login'])->middleware('throttle:10,1')->name('login.attempt');
+        Route::post('/aktivasi', [JemaahAuthController::class, 'aktivasi'])->middleware('throttle:10,15')->name('activation.verify');
+        Route::post('/aktivasi/kirim-ulang', [JemaahAuthController::class, 'kirimUlang'])->middleware('throttle:3,15')->name('activation.resend');
+        Route::post('/lupa-password', [JemaahAuthController::class, 'lupaPassword'])->middleware('throttle:5,15')->name('password.request');
+        Route::post('/lupa-password/reset', [JemaahAuthController::class, 'resetPassword'])->middleware('throttle:10,15')->name('password.reset');
+    });
+
+    Route::middleware('jemaah')->prefix('jemaah')->name('tenant.jemaah.')->group(function () {
+        Route::post('/logout', [JemaahAuthController::class, 'logout'])->name('logout');
+        // Endpoint area-jemaah (mis. komentar) menyusul di Fase 2c.
     });
 
     Route::middleware('wali')->prefix('wali')->name('tenant.portal-wali.')->group(function () {
