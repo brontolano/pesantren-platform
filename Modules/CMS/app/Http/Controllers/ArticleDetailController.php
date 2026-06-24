@@ -4,6 +4,7 @@ namespace Modules\CMS\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\CMS\Models\Article;
@@ -40,18 +41,22 @@ class ArticleDetailController extends Controller
             'seo' => $websiteService->buildArticleSeoPayload($article),
             'homeUrl' => '/',
             // 1-aplikasi (Fase 2c) — komentar publik (approved saja). Body
-            // di-escape oleh Vue ({{ }}) — JANGAN v-html.
-            'comments' => Comment::query()
-                ->where('article_id', $article->id)
-                ->approved()
-                ->orderByDesc('created_at')
-                ->get()
-                ->map(fn (Comment $c): array => [
-                    'id' => $c->id,
-                    'author' => (string) $c->author_name,
-                    'body' => (string) $c->body,
-                    'createdAt' => optional($c->created_at)?->toDateString(),
-                ])->all(),
+            // di-escape oleh Vue ({{ }}) — JANGAN v-html. Guard Schema::hasTable:
+            // bila deploy mendahului `tenants:migrate` di tenant lama, halaman
+            // artikel TETAP tampil (komentar kosong) — anti 500 (pelajaran PPDB).
+            'comments' => Schema::hasTable('comments')
+                ? Comment::query()
+                    ->where('article_id', $article->id)
+                    ->approved()
+                    ->orderByDesc('created_at')
+                    ->get()
+                    ->map(fn (Comment $c): array => [
+                        'id' => $c->id,
+                        'author' => (string) $c->author_name,
+                        'body' => (string) $c->body,
+                        'createdAt' => optional($c->created_at)?->toDateString(),
+                    ])->all()
+                : [],
             'comment' => [
                 'isLoggedIn' => $request->user() !== null,
                 'authorName' => $request->user()?->name,
