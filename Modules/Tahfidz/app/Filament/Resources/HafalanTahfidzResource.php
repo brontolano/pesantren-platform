@@ -41,7 +41,7 @@ class HafalanTahfidzResource extends Resource
 
     protected static ?string $navigationLabel = 'Hafalan Tahfidz';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static UnitEnum|string|null $navigationGroup = 'Tahfidz';
 
     public static function form(Schema $schema): Schema
     {

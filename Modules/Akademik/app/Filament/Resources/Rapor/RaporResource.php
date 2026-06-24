@@ -25,7 +25,7 @@ class RaporResource extends Resource
 
     protected static ?string $navigationLabel = 'Rapor';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 5;
 

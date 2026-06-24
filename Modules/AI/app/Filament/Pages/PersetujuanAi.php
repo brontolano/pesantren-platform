@@ -24,7 +24,7 @@ class PersetujuanAi extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-check-badge';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
+    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim';
 
     protected static ?string $navigationLabel = 'Persetujuan Pimpinan';
 

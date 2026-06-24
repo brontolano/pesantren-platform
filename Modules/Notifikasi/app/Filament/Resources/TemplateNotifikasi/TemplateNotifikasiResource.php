@@ -32,7 +32,7 @@ class TemplateNotifikasiResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Komunikasi & AI';
+    protected static \UnitEnum|string|null $navigationGroup = 'Komunikasi';
 
     protected static ?int $navigationSort = 1;
 
@@ -162,6 +162,6 @@ class TemplateNotifikasiResource extends Resource
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Komunikasi & AI';
+        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Komunikasi';
     }
 }

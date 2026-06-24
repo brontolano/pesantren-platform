@@ -35,7 +35,7 @@ class MutuInspeksiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Inspeksi / Audit Mutu';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 4;
 

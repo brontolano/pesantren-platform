@@ -30,7 +30,7 @@ class PratinjauKhidmah extends Page
 
     protected static ?string $title = 'Pratinjau Bisyaroh (Khidmah)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kepegawaian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Penggajian';
 
     protected static ?int $navigationSort = 27;
 

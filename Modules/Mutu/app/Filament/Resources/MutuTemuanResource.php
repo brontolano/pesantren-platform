@@ -39,7 +39,7 @@ class MutuTemuanResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Temuan (Non-Conformance)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
 
     protected static ?int $navigationSort = 3;
 

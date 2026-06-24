@@ -42,7 +42,7 @@ class SimaAnResource extends Resource
 
     protected static ?string $pluralModelLabel = "Sima'an";
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static UnitEnum|string|null $navigationGroup = 'Tahfidz';
 
     protected static ?int $navigationSort = 5;
 

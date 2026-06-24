@@ -125,15 +125,15 @@ class SuperAdminAccessTest extends TestCase
 
         // Guru: Akademik & Santri primer (terbuka), Keuangan/Mutu sekunder (terciut).
         Auth::login($guru);
-        $this->assertFalse($ciut('Akademik & Tahfidz'), 'guru: Akademik primer harus terbuka');
+        $this->assertFalse($ciut('Akademik'), 'guru: Akademik primer harus terbuka');
         $this->assertFalse($ciut('Santri'), 'guru: Santri primer harus terbuka');
         $this->assertTrue($ciut('Akuntansi'), 'guru: Akuntansi sekunder harus terciut');
-        $this->assertTrue($ciut('Mutu & Laporan'), 'guru: Mutu sekunder harus terciut');
+        $this->assertTrue($ciut('Mutu'), 'guru: Mutu sekunder harus terciut');
 
         // Bendahara: Tagihan & Pembayaran primer (terbuka), Akademik sekunder (terciut).
         Auth::login($bendahara);
         $this->assertFalse($ciut('Tagihan & Pembayaran'), 'bendahara: Tagihan & Pembayaran primer harus terbuka');
-        $this->assertTrue($ciut('Akademik & Tahfidz'), 'bendahara: Akademik sekunder harus terciut');
+        $this->assertTrue($ciut('Akademik'), 'bendahara: Akademik sekunder harus terciut');
 
         // Konselor: Konseling primer (terbuka), grup lain sekunder (terciut).
         Auth::login($konselor);
@@ -143,12 +143,12 @@ class SuperAdminAccessTest extends TestCase
         // Pengelola UKS: Kesehatan primer (terbuka), grup lain sekunder (terciut).
         Auth::login($uks);
         $this->assertFalse($ciut('Kesehatan'), 'uks: Kesehatan primer harus terbuka');
-        $this->assertTrue($ciut('Akademik & Tahfidz'), 'uks: Akademik sekunder harus terciut');
+        $this->assertTrue($ciut('Akademik'), 'uks: Akademik sekunder harus terciut');
 
         // Super_admin (peran luas) → semua grup terbuka.
         Auth::login($super);
         $this->assertFalse($ciut('Akuntansi'), 'super_admin: semua grup terbuka');
-        $this->assertFalse($ciut('Mutu & Laporan'), 'super_admin: semua grup terbuka');
+        $this->assertFalse($ciut('Mutu'), 'super_admin: semua grup terbuka');
 
         tenancy()->end();
     }

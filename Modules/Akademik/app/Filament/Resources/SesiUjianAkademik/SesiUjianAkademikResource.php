@@ -42,7 +42,7 @@ class SesiUjianAkademikResource extends Resource
 
     protected static ?string $navigationLabel = 'Sesi Ujian Online';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?string $modelLabel = 'Sesi Ujian';
 

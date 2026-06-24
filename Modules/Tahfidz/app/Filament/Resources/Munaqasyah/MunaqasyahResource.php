@@ -38,7 +38,7 @@ class MunaqasyahResource extends Resource
 
     protected static ?string $navigationLabel = 'Ujian Hafalan (Munaqasyah)';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static UnitEnum|string|null $navigationGroup = 'Tahfidz';
 
     public static function shouldRegisterNavigation(): bool
     {

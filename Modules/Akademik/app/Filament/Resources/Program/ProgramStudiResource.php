@@ -35,7 +35,7 @@ class ProgramStudiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Program & Kurikulum';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
 
     protected static ?int $navigationSort = 10;
 

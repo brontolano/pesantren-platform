@@ -252,22 +252,20 @@ class TenantPanelProvider extends PanelProvider
             ->pages($pages)
             ->widgets($widgets)
             ->navigationGroups([
-                // Atomisasi grup nav: tiap grup = 1 konsep tunggal (Santri,
-                // Pengasuhan, Kesehatan, dst.) — dirilis bertahap per blok.
-                // FASE 1 (blok kesantrian): "Santri & Pengasuhan" lama dipecah jadi
-                // 7 grup atomik di bawah. Blok lain (Keuangan, Akademik, dll) masih
-                // gabungan, dipecah di fase berikutnya. RBAC menyembunyikan grup yg
-                // itemnya tak boleh diakses peran → tiap staf lihat segelintir grup.
+                // Atomisasi grup nav: tiap grup = 1 konsep tunggal. 9 grup gabungan
+                // lama dipecah jadi 25 grup atomik, diurut by-FREKUENSI (operasional
+                // harian di atas, pengaturan paling bawah). RBAC menyembunyikan grup
+                // yg itemnya tak boleh diakses peran → tiap staf hanya melihat
+                // segelintir grup berlabel pendek-jelas.
                 // JANGAN beri ->icon() pada grup: Filament v5.6.6 melempar 500 bila
                 // grup berikon + sidebar collapsible + item berikon (lihat
                 // TenantPanelAuthedSmokeTest + insiden prod 13 Jun).
                 //
-                // Fitur ②: tiap grup ->collapsed(closure) DINAMIS per peran —
-                // grup sekunder utk peran login mulai TER-CIUT (tetap bisa dibuka),
-                // grup primer terbuka. Peran luas (admin/super) & tak-terpetakan →
-                // semua terbuka. Closure dievaluasi per-request (isCollapsed →
-                // evaluate()). Urutan grup statis; reorder-by-frekuensi di fase akhir.
-                NavigationGroup::make('PPDB')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('PPDB')),
+                // Fitur ②: tiap grup ->collapsed(closure) DINAMIS per peran — grup
+                // sekunder utk peran login mulai TER-CIUT (tetap bisa dibuka), grup
+                // primer terbuka. Peran luas (admin/super) & tak-terpetakan → semua
+                // terbuka. Closure dievaluasi per-request (isCollapsed → evaluate()).
+                // Kesantrian (harian)
                 NavigationGroup::make('Santri')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Santri')),
                 NavigationGroup::make('Asrama & Pengasuhan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Asrama & Pengasuhan')),
                 NavigationGroup::make('Kedisiplinan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kedisiplinan')),
@@ -275,16 +273,26 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Kesehatan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kesehatan')),
                 NavigationGroup::make('Konseling')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Konseling')),
                 NavigationGroup::make('Alumni')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Alumni')),
-                NavigationGroup::make('Akademik & Tahfidz')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akademik & Tahfidz')),
+                // Pembelajaran (harian)
+                NavigationGroup::make('Akademik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akademik')),
+                NavigationGroup::make('Tahfidz')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tahfidz')),
+                // Keuangan (harian)
                 NavigationGroup::make('Tagihan & Pembayaran')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tagihan & Pembayaran')),
                 NavigationGroup::make('Akuntansi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akuntansi')),
                 NavigationGroup::make('Anggaran & Perencanaan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Anggaran & Perencanaan')),
                 NavigationGroup::make('Donasi & Beasiswa')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Donasi & Beasiswa')),
                 NavigationGroup::make('Koperasi & POS')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Koperasi & POS')),
+                // Operasional & SDM (musiman/periodik)
+                NavigationGroup::make('PPDB')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('PPDB')),
                 NavigationGroup::make('Kepegawaian')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kepegawaian')),
+                NavigationGroup::make('Penggajian')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Penggajian')),
                 NavigationGroup::make('Sarana & Logistik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Sarana & Logistik')),
-                NavigationGroup::make('Mutu & Laporan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Mutu & Laporan')),
-                NavigationGroup::make('Komunikasi & AI')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Komunikasi & AI')),
+                NavigationGroup::make('Komunikasi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Komunikasi')),
+                NavigationGroup::make('AI Khadim')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('AI Khadim')),
+                // Mutu & pelaporan (periodik)
+                NavigationGroup::make('Mutu')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Mutu')),
+                NavigationGroup::make('Laporan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Laporan')),
+                // Pengaturan & tata kelola (paling jarang)
                 NavigationGroup::make('Website & Konten')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Website & Konten')),
                 NavigationGroup::make('Pengaturan Sistem')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pengaturan Sistem')),
                 NavigationGroup::make('Tata Kelola & Audit')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tata Kelola & Audit')),
@@ -379,19 +387,19 @@ class TenantPanelProvider extends PanelProvider
      * @var array<string, list<string>>
      */
     private const NAV_PRIMER_PER_PERAN = [
-        'guru' => ['Akademik & Tahfidz', 'Santri'],
-        'asatidz' => ['Akademik & Tahfidz', 'Santri'],
+        // Label WAJIB persis sama dgn navigationGroups([...]) di atas.
+        'guru' => ['Akademik', 'Santri'],
+        'asatidz' => ['Akademik', 'Tahfidz'],
+        'guru_tahfidz' => ['Tahfidz'],
         'bendahara' => ['Tagihan & Pembayaran'],
+        'kasir' => ['Tagihan & Pembayaran', 'Koperasi & POS'],
+        'kepala_keuangan' => ['Akuntansi', 'Anggaran & Perencanaan', 'Laporan'],
+        'bendahara_pusat' => ['Akuntansi', 'Anggaran & Perencanaan'],
         'tu' => ['Santri', 'PPDB', 'Pengaturan Sistem'],
-        'kepala' => ['Mutu & Laporan', 'Akuntansi'],
-        // Blok kesantrian atomik (Fase 1) — peran pengasuhan/kesehatan/konseling.
+        'kepala' => ['Mutu', 'Laporan'],
         'pengelola_asrama' => ['Asrama & Pengasuhan', 'Kedisiplinan'],
         'pengelola_uks' => ['Kesehatan'],
-        'konselor' => ['Konseling'],
-        // Blok keuangan atomik (Fase 2) — peran kas/akuntansi.
-        'kasir' => ['Tagihan & Pembayaran', 'Koperasi & POS'],
-        'kepala_keuangan' => ['Akuntansi', 'Anggaran & Perencanaan'],
-        'bendahara_pusat' => ['Akuntansi', 'Anggaran & Perencanaan'],
+        'konselor' => ['Konseling', 'Santri'],
     ];
 
     /**

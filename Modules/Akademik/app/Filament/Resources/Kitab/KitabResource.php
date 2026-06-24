@@ -26,7 +26,7 @@ class KitabResource extends Resource
 
     protected static ?string $navigationLabel = 'Kitab';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Akademik & Tahfidz';
+    protected static UnitEnum|string|null $navigationGroup = 'Akademik';
 
     protected static ?string $modelLabel = 'Kitab';
 

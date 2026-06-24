@@ -37,7 +37,7 @@ class GeneratorSoal extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-pencil-square';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
+    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim';
 
     protected static ?string $navigationLabel = 'Generator Soal';
 
