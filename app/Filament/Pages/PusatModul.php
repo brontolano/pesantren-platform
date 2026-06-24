@@ -32,7 +32,7 @@ class PusatModul extends Page
 
     protected static ?string $navigationLabel = 'Pusat Modul';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
     protected static ?int $navigationSort = -10;
 

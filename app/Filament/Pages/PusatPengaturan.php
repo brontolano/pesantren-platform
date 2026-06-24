@@ -19,7 +19,7 @@ class PusatPengaturan extends Page
 
     protected static ?string $title = 'Pusat Pengaturan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
     // Negatif agar muncul paling atas di grup Pengaturan (pintu masuk tunggal).
     protected static ?int $navigationSort = -10;
