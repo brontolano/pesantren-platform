@@ -171,6 +171,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
@@ -256,15 +257,22 @@ class TenantPanelProvider extends PanelProvider
                 // keuangan → SDM → sarana → mutu → komunikasi → pengaturan).
                 // JANGAN beri ->icon() pada grup: Filament v5 melempar 500 bila grup
                 // berikon berisi item berikon (lihat TenantPanelAuthedSmokeTest).
-                NavigationGroup::make('PPDB'),
-                NavigationGroup::make('Santri & Pengasuhan')->collapsible(),
-                NavigationGroup::make('Akademik & Tahfidz')->collapsible(),
-                NavigationGroup::make('Keuangan')->collapsible(),
-                NavigationGroup::make('Kepegawaian')->collapsible(),
-                NavigationGroup::make('Sarana & Logistik')->collapsible(),
-                NavigationGroup::make('Mutu & Laporan')->collapsible(),
-                NavigationGroup::make('Komunikasi & AI')->collapsible(),
-                NavigationGroup::make('Kelembagaan & Pengaturan')->collapsible(),
+                //
+                // Fitur ②: tiap grup ->collapsed(closure) DINAMIS per peran —
+                // grup sekunder utk peran login mulai TER-CIUT (tetap bisa dibuka),
+                // grup primer terbuka. RBAC tetap pagar keras (grup tanpa item
+                // boleh-akses disembunyikan Filament). Peran luas (admin/super)
+                // & tak-terpetakan → semua terbuka (perilaku lama). Closure
+                // dievaluasi per-request (NavigationGroup::isCollapsed → evaluate()).
+                NavigationGroup::make('PPDB')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('PPDB')),
+                NavigationGroup::make('Santri & Pengasuhan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Santri & Pengasuhan')),
+                NavigationGroup::make('Akademik & Tahfidz')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akademik & Tahfidz')),
+                NavigationGroup::make('Keuangan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Keuangan')),
+                NavigationGroup::make('Kepegawaian')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kepegawaian')),
+                NavigationGroup::make('Sarana & Logistik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Sarana & Logistik')),
+                NavigationGroup::make('Mutu & Laporan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Mutu & Laporan')),
+                NavigationGroup::make('Komunikasi & AI')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Komunikasi & AI')),
+                NavigationGroup::make('Kelembagaan & Pengaturan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kelembagaan & Pengaturan')),
             ]);
 
         if (! $isAlbaKids) {
@@ -345,6 +353,54 @@ class TenantPanelProvider extends PanelProvider
         }
 
         return (string) (tenant()->name ?? 'Pesantren') ?: 'Pesantren';
+    }
+
+    /**
+     * Fitur ② — peta peran → grup nav PRIMER (mulai TERBUKA). Grup di luar
+     * daftar peran tersebut mulai TER-CIUT demi tampilan ramping per peran.
+     * Peran luas (admin_pesantren/super_admin) & peran tak-terpetakan → semua
+     * terbuka.
+     *
+     * @var array<string, list<string>>
+     */
+    private const NAV_PRIMER_PER_PERAN = [
+        'guru' => ['Akademik & Tahfidz', 'Santri & Pengasuhan'],
+        'asatidz' => ['Akademik & Tahfidz', 'Santri & Pengasuhan'],
+        'bendahara' => ['Keuangan'],
+        'tu' => ['Santri & Pengasuhan', 'PPDB', 'Kelembagaan & Pengaturan'],
+        'kepala' => ['Mutu & Laporan', 'Keuangan'],
+    ];
+
+    /**
+     * Fitur ② — apakah grup nav mulai TER-CIUT untuk peran pengguna login?
+     * Dievaluasi per-request oleh NavigationGroup::isCollapsed() (evaluate()).
+     * Defensif: tanpa user / peran luas / peran tak-terpetakan / error → false
+     * (terbuka = perilaku lama). Grup TETAP collapsible (pengguna bisa buka);
+     * RBAC & visibilitas item TIDAK disentuh.
+     */
+    public static function grupTerciutUntukPeran(string $grup): bool
+    {
+        $user = Auth::user();
+
+        if ($user === null || ! method_exists($user, 'hasRole')) {
+            return false;
+        }
+
+        try {
+            if ($user->hasRole('super_admin') || $user->hasRole('admin_pesantren')) {
+                return false;
+            }
+
+            foreach (self::NAV_PRIMER_PER_PERAN as $peran => $primer) {
+                if ($user->hasRole($peran)) {
+                    return ! in_array($grup, $primer, true);
+                }
+            }
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return false;
     }
 
     /**
