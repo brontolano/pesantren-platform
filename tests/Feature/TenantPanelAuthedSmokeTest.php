@@ -96,6 +96,16 @@ class TenantPanelAuthedSmokeTest extends TestCase
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
+        // Regresi gap-126: PengaturanKeuangan menyimpan keuangan.jenis_lembaga
+        // TER-BUNGKUS (['text'=>..]). Halaman Pusat Kebijakan (admin/pengaturan/
+        // kebijakan, di $paths) membangun Select dari nilai ini — tanpa unwrap
+        // defensif di stateDariSetting() → "Array to string conversion" 500.
+        // Seed nilai ter-bungkus agar render Kebijakan menguji jalur ini.
+        \App\Models\Setting::updateOrCreate(
+            ['key' => 'keuangan.jenis_lembaga'],
+            ['value' => ['text' => 'madrasah']],
+        );
+
         $paths = ['admin', 'admin/santri/santris', 'admin/penempatan-asrama/penempatan-asramas', 'admin/tagihan/tagihans', 'admin/halaqah/halaqahs', 'admin/tahfidz/munaqasyah/munaqasyahs', 'admin/hafalan-tahfidzs', 'admin/akademik/kitab/kitabs', 'admin/akademik/lembaga/lembagas', 'admin/akademik/pelajaran/pelajarans', 'admin/akademik/jadwal-pelajaran/jadwal-pelajarans', 'admin/akademik/nilai/nilais', 'admin/akademik/kurikulum/kurikulums', 'admin/akademik/kalender-akademik/kalender-akademiks', 'admin/payroll/jabatan/jabatans', 'admin/payroll/penugasan/penugasan-pegawais', 'admin/payroll/employee/employees', 'admin/jenis-pelanggaran/jenis-pelanggarans', 'admin/pelanggaran-santri/pelanggaran-santris', 'admin/rekap-disiplin', 'admin/kesiapan-emis', 'admin/sidang-kenaikan', 'admin/grid-nilai', 'admin/rekap-jurnal-kbm', 'admin/alumni/alumnis', 'admin/payroll/generate-thr', 'admin/akademik/rapor-diniyah', 'admin/akademik/rapor-diniyah/isi-rubrik', 'admin/payroll/kontrak/kontrak-kerjas', 'admin/payroll/pinjaman/pinjaman-pegawais', 'admin/log-gerbang', 'admin/pengajuan-jenguk', 'admin/moderasi-pesan-wali', 'admin/profil-mutu-santri', 'admin/mutu-kelas', 'admin/mutu-lembaga', 'admin/pengaturan/kebijakan', 'admin/notifikasi/pengaturan', 'admin/pusat-modul', 'admin/setup-pesantren', 'admin/setup-unit', 'admin/setup-unit?unit=kesantrian', 'admin/setup-unit?unit=ppdb', 'admin/setup-unit?unit=akademik', 'admin/setup-unit?unit=keuangan', 'admin/setup-unit?unit=akuntansi', 'admin/setup-unit?unit=kepegawaian', 'admin/setup-unit?unit=kelembagaan', 'admin/setup-unit?unit=pengaturan', 'admin/tabungan/tabungans', 'admin/ledger/akuns', 'admin/keuangan/kasir-kantin', 'admin/keuangan/rekon-kantin', 'admin/akademik/paket-soal-akademik', 'admin/akademik/sesi-ujian-akademik', 'admin/kesehatan/obat', 'admin/kesehatan/kunjungan-uks', 'admin/sarpras/laporan-kerusakan', 'admin/sarpras/area-piket', 'admin/sarpras/piket-hari-ini', 'admin/laporan', 'admin/ledger/buku-besar', 'admin/ledger/bku', 'admin/ledger/jurnal-manual', 'admin/ledger/neraca-saldo', 'admin/ledger/varians-anggaran', 'admin/ledger/buku-pembantu-pihak', 'admin/ledger/laporan-kehalalan', 'admin/pajak/buku-pembantu', 'admin/laporan/rkam', 'admin/laporan/dana-bos-bop', 'admin/laporan/dana-terikat', 'admin/laporan/dana-kebajikan', 'admin/laporan/keuangan-pokok', 'admin/keuangan/loket-kas', 'admin/tunggakan-alumni', 'admin/pajak/kalkulator', 'admin/pajak/kalkulator-pph21', 'admin/payroll/pratinjau-khidmah'];
         foreach ($paths as $path) {
             $req = Request::create("http://{$host}/{$path}", 'GET');
