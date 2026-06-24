@@ -100,6 +100,12 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
                             <a href="#kontak" class="transition hover:text-[color:var(--brand-primary)]">Kontak</a>
                         </div>
                         <a
+                            href="/masuk"
+                            class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300"
+                        >
+                            Masuk
+                        </a>
+                        <a
                             href="/ppdb"
                             class="rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:opacity-95"
                             :style="{ backgroundColor: 'var(--brand-primary)' }"

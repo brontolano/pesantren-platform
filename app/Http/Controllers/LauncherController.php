@@ -6,11 +6,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Auth\StaffLoginController;
 use App\Models\User;
+use App\Support\AlbaKidsTenant;
 use App\Support\AppLauncher;
 use App\Support\TenantBranding;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Inertia\Response as InertiaResponse;
+use Modules\CMS\Http\Controllers\TenantLandingPageController;
 
 /**
  * Otak "launcher" untuk domain tenant bertipe `sistem` (mis.
@@ -23,13 +26,24 @@ use Illuminate\View\View;
  */
 class LauncherController extends Controller
 {
-    public function __invoke(): RedirectResponse|View
+    public function __invoke(): RedirectResponse|View|InertiaResponse
     {
         if (! Auth::check()) {
-            // Login terpusat di "/" — render halaman login bermerek langsung di
-            // sini (tidak redirect ke /masuk). StaffLoginController::show()
-            // mengembalikan view yang sama (untuk tamu).
-            return app(StaffLoginController::class)->show();
+            // Satu pintu: TAMU melihat Beranda publik (landing CMS) dengan tombol
+            // "Masuk" → /masuk; tidak lagi dipaksa login di "/". AlbaKids (custom)
+            // dipertahankan: tamu langsung ke form login bermerek.
+            // Fallback defensif: bila landing gagal render (mis. modul CMS belum
+            // siap di tenant) → form login (perilaku lama) agar tak pernah 500.
+            // Login tetap selalu terjangkau di /masuk (route universal).
+            if (AlbaKidsTenant::isActive()) {
+                return app(StaffLoginController::class)->show();
+            }
+
+            try {
+                return app()->call([app(TenantLandingPageController::class), '__invoke']);
+            } catch (\Throwable $e) {
+                return app(StaffLoginController::class)->show();
+            }
         }
 
         /** @var User $user */
