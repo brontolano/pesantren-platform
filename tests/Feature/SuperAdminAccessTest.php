@@ -91,4 +91,44 @@ class SuperAdminAccessTest extends TestCase
         $this->assertSame('simple', \App\Support\UiMode::current(), 'user biasa default Mode Sederhana.');
         tenancy()->end();
     }
+
+    /**
+     * Fitur ② — grup nav mulai ter-ciut per peran (primer terbuka, sekunder
+     * terciut); peran luas (super_admin) → semua terbuka. RBAC tak terdampak.
+     */
+    public function test_grup_nav_terciut_sesuai_peran(): void
+    {
+        [$super] = $this->bootUsers('navrole');
+
+        $guru = User::withoutGlobalScopes()->create([
+            'tenant_id' => $super->tenant_id, 'name' => 'Guru', 'email' => 'navrole-guru@t.local', 'password' => 'password',
+        ]);
+        $guru->assignRole('guru');
+
+        $bendahara = User::withoutGlobalScopes()->create([
+            'tenant_id' => $super->tenant_id, 'name' => 'Bendahara', 'email' => 'navrole-bdh@t.local', 'password' => 'password',
+        ]);
+        $bendahara->assignRole('bendahara');
+
+        $ciut = fn (string $g): bool => \App\Providers\Filament\TenantPanelProvider::grupTerciutUntukPeran($g);
+
+        // Guru: Akademik & Santri primer (terbuka), Keuangan/Mutu sekunder (terciut).
+        Auth::login($guru);
+        $this->assertFalse($ciut('Akademik & Tahfidz'), 'guru: Akademik primer harus terbuka');
+        $this->assertFalse($ciut('Santri & Pengasuhan'), 'guru: Santri primer harus terbuka');
+        $this->assertTrue($ciut('Keuangan'), 'guru: Keuangan sekunder harus terciut');
+        $this->assertTrue($ciut('Mutu & Laporan'), 'guru: Mutu sekunder harus terciut');
+
+        // Bendahara: Keuangan primer (terbuka), Akademik sekunder (terciut).
+        Auth::login($bendahara);
+        $this->assertFalse($ciut('Keuangan'), 'bendahara: Keuangan primer harus terbuka');
+        $this->assertTrue($ciut('Akademik & Tahfidz'), 'bendahara: Akademik sekunder harus terciut');
+
+        // Super_admin (peran luas) → semua grup terbuka.
+        Auth::login($super);
+        $this->assertFalse($ciut('Keuangan'), 'super_admin: semua grup terbuka');
+        $this->assertFalse($ciut('Mutu & Laporan'), 'super_admin: semua grup terbuka');
+
+        tenancy()->end();
+    }
 }
