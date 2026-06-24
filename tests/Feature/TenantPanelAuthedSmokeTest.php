@@ -65,7 +65,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         // tenant non-dev. Promosikan ke released + aktifkan agar halaman/resource-nya
         // benar-benar ter-render (assert 200 di bawah), bukan 403 yang lolos diam-diam.
         // Ditulis SEBELUM request pertama agar cache modul memuat nilai terbaru.
-        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu', 'asrama', 'pajak', 'akademik', 'ppdb'] as $modul) {
+        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu', 'asrama', 'pajak', 'akademik', 'ppdb', 'ai'] as $modul) {
             DB::connection('pgsql')->table('module_registry')->where('key', $modul)->update(['status' => 'released']);
             DB::connection('pgsql')->table('tenant_modules')->insert([
                 'tenant_id' => $tenant->id, 'module_name' => $modul, 'is_active' => true,
@@ -219,6 +219,27 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $komponenReq->headers->set('Host', $host);
         $komponenStatus = $kernel->handle($komponenReq)->getStatusCode();
         $this->assertSame(200, $komponenStatus, "Komponen Nilai (KomponenNilaiResource) status {$komponenStatus}, harusnya 200.");
+
+        // Halaman modul AI Khadim (dirilis 2026-06-25, gap-83) WAJIB benar-benar
+        // RENDER 200 untuk tenant yang mengaktifkan AI — bukan cuma route terdaftar.
+        // Menangkap error render (mis. status infra Ollama tak tertangkap, dependensi
+        // hilang) pada halaman yang kini LIVE. statusInfra() toleran bila Ollama mati.
+        foreach ([
+            'admin/pengaturan-ai',
+            'admin/sumber-pengetahuan-ai',
+            'admin/persetujuan-ai',
+            'admin/eskalasi-tanya-ustadz',
+            'admin/kotak-masuk-wa',
+            'admin/usulan-faq-ai',
+            'admin/ikhtisar-kitab-ai',
+            'admin/generator-soal-ai',
+            'admin/generator-rpp-ai',
+        ] as $aiPath) {
+            $aiReq = Request::create("http://{$host}/{$aiPath}", 'GET');
+            $aiReq->headers->set('Host', $host);
+            $aiStatus = $kernel->handle($aiReq)->getStatusCode();
+            $this->assertSame(200, $aiStatus, "Halaman AI /{$aiPath} status {$aiStatus}, harusnya 200 (modul AI released).");
+        }
 
         tenancy()->end();
     }
