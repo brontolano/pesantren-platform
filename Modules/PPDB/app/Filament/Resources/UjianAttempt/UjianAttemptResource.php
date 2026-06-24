@@ -31,7 +31,7 @@ class UjianAttemptResource extends Resource
 
     protected static ?string $navigationLabel = 'Hasil Ujian Online';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
+    protected static string|\UnitEnum|null $navigationGroup = 'Ujian Seleksi';
 
     protected static ?string $modelLabel = 'Attempt Ujian';
 

@@ -34,7 +34,7 @@ class RaporDiniyahResource extends Resource
 
     protected static ?string $navigationLabel = 'Rapor Diniyah';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Nilai & Rapor';
 
     protected static ?int $navigationSort = 6;
 

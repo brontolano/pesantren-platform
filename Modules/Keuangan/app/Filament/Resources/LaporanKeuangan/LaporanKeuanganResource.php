@@ -23,7 +23,7 @@ class LaporanKeuanganResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Laporan Keuangan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Laporan Keuangan';
 
     protected static ?int $navigationSort = 4;
 

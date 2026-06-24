@@ -32,7 +32,7 @@ class KalkulatorPajak extends Page implements HasForms
 
     protected static ?string $title = 'Kalkulator Pajak (PPN/PPh)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pajak';
 
     protected static ?int $navigationSort = 15;
 

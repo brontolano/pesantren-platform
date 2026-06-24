@@ -46,7 +46,7 @@ class InventoryItemResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Inventory Koperasi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Koperasi & POS';
+    protected static string|\UnitEnum|null $navigationGroup = 'Stok Barang';
 
     protected static ?int $navigationSort = 21;
 

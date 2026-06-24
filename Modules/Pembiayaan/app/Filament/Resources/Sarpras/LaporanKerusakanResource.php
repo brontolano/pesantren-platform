@@ -43,7 +43,7 @@ class LaporanKerusakanResource extends Resource
 
     protected static ?string $modelLabel = 'Laporan Kerusakan';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Sarana & Logistik';
+    protected static UnitEnum|string|null $navigationGroup = 'Aset & Sarpras';
 
     protected static ?int $navigationSort = 1;
 

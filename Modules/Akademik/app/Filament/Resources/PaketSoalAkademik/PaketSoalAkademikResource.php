@@ -44,7 +44,7 @@ class PaketSoalAkademikResource extends Resource
 
     protected static ?string $navigationLabel = 'Bank Soal Akademik';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Ujian Online';
 
     protected static ?string $modelLabel = 'Paket Soal Akademik';
 

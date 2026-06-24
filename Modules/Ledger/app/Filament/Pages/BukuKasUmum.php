@@ -29,7 +29,7 @@ class BukuKasUmum extends Page implements HasForms
 
     protected static ?string $title = 'Buku Kas Umum (BKU)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Buku Besar';
 
     protected static ?int $navigationSort = 11;
 

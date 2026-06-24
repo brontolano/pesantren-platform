@@ -33,7 +33,7 @@ class DonasiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Donasi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Donasi & Beasiswa';
+    protected static string|\UnitEnum|null $navigationGroup = 'Donasi';
 
     protected static ?int $navigationSort = 31;
 

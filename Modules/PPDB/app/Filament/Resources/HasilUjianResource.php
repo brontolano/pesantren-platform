@@ -34,7 +34,7 @@ class HasilUjianResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Hasil Ujian';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
+    protected static string|\UnitEnum|null $navigationGroup = 'Ujian Seleksi';
 
     protected static ?string $slug = 'ppdb/hasil-ujian';
 

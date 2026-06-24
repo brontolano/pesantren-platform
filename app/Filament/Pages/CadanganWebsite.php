@@ -27,7 +27,7 @@ class CadanganWebsite extends Page
 
     protected static ?string $navigationLabel = 'Cadangan Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Tata Kelola & Audit';
+    protected static string|\UnitEnum|null $navigationGroup = 'Cadangan & Integrasi';
 
     protected static ?int $navigationSort = 90;
 

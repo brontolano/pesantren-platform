@@ -40,7 +40,7 @@ class CadanganPemulihan extends Page
 
     protected static ?string $navigationLabel = 'Cadangan & Pemulihan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Tata Kelola & Audit';
+    protected static string|\UnitEnum|null $navigationGroup = 'Cadangan & Integrasi';
 
     protected static ?int $navigationSort = 95;
 

@@ -23,7 +23,7 @@ class RekonKantin extends Page
 
     protected static ?string $title = 'Rekonsiliasi Kantin Harian';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kasir Kantin';
 
     protected static ?int $navigationSort = 21;
 

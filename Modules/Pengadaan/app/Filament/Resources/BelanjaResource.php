@@ -40,7 +40,7 @@ class BelanjaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Belanja';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Sarana & Logistik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengadaan';
 
     protected static ?int $navigationSort = 8;
 

@@ -33,7 +33,7 @@ class ApprovalRequestResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Persetujuan Saya';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Tata Kelola & Audit';
+    protected static string|\UnitEnum|null $navigationGroup = 'Persetujuan';
 
     protected static ?int $navigationSort = 29;
 

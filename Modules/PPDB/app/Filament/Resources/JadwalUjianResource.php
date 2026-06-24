@@ -37,7 +37,7 @@ class JadwalUjianResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Jadwal Ujian';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
+    protected static string|\UnitEnum|null $navigationGroup = 'Ujian Seleksi';
 
     protected static ?string $slug = 'ppdb/jadwal-ujian';
 

@@ -41,7 +41,7 @@ class PengaturanPpdb extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Pengaturan PPDB';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'PPDB';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pendaftaran';
 
     protected static ?string $title = 'Pengaturan PPDB';
 
