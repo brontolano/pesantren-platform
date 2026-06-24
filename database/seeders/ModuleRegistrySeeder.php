@@ -66,9 +66,12 @@ class ModuleRegistrySeeder extends Seeder
         // file_storage sengaja 'development' (storage tiering belum dirilis) —
         // mempertahankan keputusan migrasi tenant_storage, bukan mengubahnya.
         ['key' => 'file_storage', 'label' => 'File Storage',         'status' => 'development', 'is_core' => false, 'sort' => 20],
-        // Modul AI "Khadim Digital" — development sampai Gate A lulus
-        // (blueprint modul AI §8): hanya tampil di tenant demo.
-        ['key' => 'ai',           'label' => 'AI Khadim Digital',    'status' => 'development', 'is_core' => false, 'sort' => 21],
+        // Modul AI "Khadim Digital" — DIRILIS 2026-06-25 (owner go-live, gap-83):
+        // konten whitelist swa-layan + governance approval Kyai + unggah PDF +
+        // provider Ollama prod sehat + pagar anggaran/kill-switch semua siap.
+        // 'released' = TERSEDIA untuk diaktifkan per pesantren (opt-in via Pusat
+        // Modul; tidak auto-aktif — MODULES_DEFAULT_ACTIVE_RELEASED default false).
+        ['key' => 'ai',           'label' => 'AI Khadim Digital',    'status' => 'released',    'is_core' => false, 'sort' => 21],
     ];
 
     public function run(): void
