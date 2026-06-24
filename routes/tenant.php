@@ -70,6 +70,7 @@ use App\Support\UiMode;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
+use Modules\CMS\Http\Controllers\CommentController;
 use Modules\CMS\Http\Controllers\SitemapController;
 use Modules\Keuangan\Models\Donasi;
 use Modules\Payroll\Models\Employee;
@@ -311,6 +312,13 @@ Route::middleware([
 
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
+
+    // 1-aplikasi (Fase 2c) — kirim komentar artikel. Gerbang izin 'komentar'
+    // (jemaah + semua peran internal/komunitas; calon santri 'peserta' eksternal
+    // TIDAK punya izin ini); tamu read-only. Limiter ber-prefix tenant (anti-spam).
+    Route::post('/artikel/{slug}/komentar', [CommentController::class, 'store'])
+        ->middleware(['auth', 'can:komentar', 'throttle:komentar'])
+        ->name('tenant.cms.comments.store');
 
     // Switch mode tampilan panel (simple <-> advanced) — preferensi per user.
     Route::post('/ui-mode/toggle', function () {

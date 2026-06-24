@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\CMS\Models\Article;
+use Modules\CMS\Models\Comment;
 use Modules\CMS\Services\TenantWebsiteService;
 
 class ArticleDetailController extends Controller
@@ -38,6 +39,25 @@ class ArticleDetailController extends Controller
             ],
             'seo' => $websiteService->buildArticleSeoPayload($article),
             'homeUrl' => '/',
+            // 1-aplikasi (Fase 2c) — komentar publik (approved saja). Body
+            // di-escape oleh Vue ({{ }}) — JANGAN v-html.
+            'comments' => Comment::query()
+                ->where('article_id', $article->id)
+                ->approved()
+                ->orderByDesc('created_at')
+                ->get()
+                ->map(fn (Comment $c): array => [
+                    'id' => $c->id,
+                    'author' => (string) $c->author_name,
+                    'body' => (string) $c->body,
+                    'createdAt' => optional($c->created_at)?->toDateString(),
+                ])->all(),
+            'comment' => [
+                'isLoggedIn' => $request->user() !== null,
+                'authorName' => $request->user()?->name,
+                'storeUrl' => '/artikel/'.$article->slug.'/komentar',
+                'loginUrl' => '/jemaah/login',
+            ],
         ]);
     }
 }

@@ -61,6 +61,11 @@ class KebijakanRegistry
                 'deskripsi' => 'Bila aktif, kartu Donasi/Infaq/Zakat dengan tautan ke halaman donasi muncul di Beranda.',
                 'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
             ],
+            'komentar.moderasi_dulu' => [
+                'label' => 'Komentar perlu disetujui dulu sebelum tampil (pra-moderasi)',
+                'deskripsi' => 'Bila AKTIF (disarankan): komentar masuk berstatus "menunggu" dan baru tampil setelah staf menyetujui. Bila non-aktif: komentar langsung tampil dan staf bisa menyembunyikan belakangan.',
+                'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
             // ---------------- Disiplin ----------------
             DisiplinService::SETTING_WAJIB_VERIFIKASI => [
                 'label' => 'Catatan pelanggaran wajib diverifikasi ustadz',

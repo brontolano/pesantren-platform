@@ -52,6 +52,7 @@ use Modules\Keuangan\Filament\Resources\BaitulMaal\ProgramDonasiResource;
 use Modules\Notifikasi\Filament\Resources\BroadcastWa\BroadcastWaResource;
 use Modules\Notifikasi\Filament\Resources\LogNotifikasi\LogNotifikasiResource;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
+use Modules\CMS\Filament\Resources\Comment\CommentResource;
 use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
 use Modules\CMS\Filament\Resources\Profile\ProfileResource;
 use Modules\CMS\Filament\Resources\WebsiteSetting\WebsiteSettingResource;
@@ -525,6 +526,7 @@ class TenantPanelProvider extends PanelProvider
             GelombangPpdbResource::class,
             HasilUjianResource::class,
             ArticleResource::class,
+            CommentResource::class,
             GalleryResource::class,
             ProfileResource::class,
             WebsiteSettingResource::class,

@@ -76,6 +76,16 @@ class AppServiceProvider extends ServiceProvider
                 ->by('ppdb-submit:'.$tenantId.':'.$request->ip());
         });
 
+        // 1-aplikasi (Fase 2c) — kirim komentar artikel. Kunci di-prefix tenant +
+        // user agar id numerik yang sama lintas tenant (DB-per-tenant) TIDAK saling
+        // menggerus jatah. Pola sama dgn throttleKey JemaahAuthController.
+        RateLimiter::for('komentar', function (Request $request) {
+            $tenantId = tenant()?->getTenantKey() ?? 'central';
+            $by = $request->user()?->getAuthIdentifier() ?? $request->ip();
+
+            return Limit::perMinute(10)->by('komentar:'.$tenantId.':'.$by);
+        });
+
         Event::listen(Login::class, function (Login $event): void {
             app(AuditLogger::class)->log(
                 action: 'auth.login',
