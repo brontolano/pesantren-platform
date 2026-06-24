@@ -21,6 +21,16 @@ class UserOtp extends Model
 
     public const PURPOSE_RESET = 'reset';
 
+    /**
+     * Purpose OTP peran publik "jemaah" (1-aplikasi, Fase 2b). Sengaja terpisah
+     * dari aktivasi/reset peserta agar kode aktivasi jemaah tak bisa dipakai
+     * lintas-tujuan; verify() menyaring per purpose. Penyimpanan/TTL/attempts
+     * tetap sama (kolom purpose VARCHAR(20) muat string ini).
+     */
+    public const PURPOSE_JEMAAH_AKTIVASI = 'jemaah_aktivasi';
+
+    public const PURPOSE_JEMAAH_RESET = 'jemaah_reset';
+
     /** Masa berlaku OTP dalam menit (AUTH-2). */
     public const TTL_MINUTES = 5;
 

@@ -110,6 +110,7 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
                             <a v-if="has('gallery')" href="#galeri" class="transition hover:text-[color:var(--brand-primary)]">Galeri</a>
                             <a v-if="has('faq')" href="#faq" class="transition hover:text-[color:var(--brand-primary)]">FAQ</a>
                             <a href="#kontak" class="transition hover:text-[color:var(--brand-primary)]">Kontak</a>
+                            <a href="/jemaah/login" class="transition hover:text-[color:var(--brand-primary)]">Jemaah</a>
                         </div>
                         <a
                             href="/masuk"

@@ -65,13 +65,14 @@ class User extends Authenticatable implements HasEmailAuthentication, FilamentUs
 
     /**
      * Staf tenant = terhubung ke sebuah tenant DAN bukan akun eksternal. Peserta
-     * (PPDB) & wali memakai portalnya sendiri (PWA /spmb, /wali) dan tidak boleh
-     * masuk panel staf. Dipakai ulang oleh canAccessPanel() & App\Support\AppLauncher
-     * sebagai satu-satunya sumber definisi "staf".
+     * (PPDB), wali, & jemaah (publik) memakai portal/halaman sendiri (PWA /spmb,
+     * /wali, Beranda publik) dan tidak boleh masuk panel staf. Dipakai ulang oleh
+     * canAccessPanel() & App\Support\AppLauncher sebagai satu-satunya sumber
+     * definisi "staf".
      */
     public function isTenantStaff(): bool
     {
-        return $this->tenant_id !== null && ! $this->hasAnyRole(['peserta', 'wali']);
+        return $this->tenant_id !== null && ! $this->hasAnyRole(['peserta', 'wali', 'jemaah']);
     }
 
     public function hasEmailAuthentication(): bool
