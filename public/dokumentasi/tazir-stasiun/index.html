@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ta'zir (Poin Disiplin) &amp; Stasiun Pendaftaran · Panduan Pesantren.online</title>
+<meta name="description" content="Mencatat pelanggaran &amp; prestasi santri berbasis poin, siklus sanksi, ambang Surat Peringatan, dan loket Stasiun Pendaftaran: foto, tanda tangan, kartu NFC, PIN, cetak kartu santri.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama &amp; Kehidupan Santri</a><a class="nav-item active" href="../tazir-stasiun/">⚖️ Ta'zir &amp; Stasiun Pendaftaran</a><div class="nav-sub"><a href="#1-menyiapkan-jenis-tazir">1. Menyiapkan Jenis Ta'zir</a><a href="#2-mencatat-pelanggaran-prestasi">2. Mencatat Pelanggaran / Prestasi</a><a href="#3-verifikasi-anti-bully">3. Verifikasi (Anti-Bully)</a><a href="#4-catat-sanksi-selesai">4. Catat Sanksi &amp; Selesai</a><a href="#5-ambang-sp-rekap-poin">5. Ambang SP &amp; Rekap Poin</a><a href="#6-membatalkan-catatan">6. Membatalkan Catatan</a><a href="#7-stasiun-pendaftaran">7. Stasiun Pendaftaran (Loket)</a><a href="#8-pengingat-penting">8. Pengingat Penting</a><a href="#contekan-cepat">Contekan Cepat</a></div><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">⚖️</div>
+        <div>
+          <h1>Ta'zir (Poin Disiplin) &amp; Stasiun Pendaftaran</h1>
+          <p class="lead">Mencatat pelanggaran &amp; prestasi santri dengan poin, mengelola siklus sanksi sampai Surat Peringatan otomatis, dan menjalankan loket Stasiun Pendaftaran (foto, tanda tangan, kartu NFC, PIN, cetak kartu).</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>, dan akun Bapak/Ibu punya wewenang <em>mengelola santri</em> (biasanya pengasuhan, wali kelas, atau TU).
+Aplikasi ini menggantikan: buku pelanggaran santri dan loket pendaftaran manual.
+Istilah <strong>Ta'zir</strong> di layar bisa berbeda di pesantren Bapak/Ibu (mis. "Pelanggaran" atau "Kedisiplinan") — itu hanya beda nama, fiturnya sama.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Menyiapkan jenis Ta'zir (master poin)</li>
+<li>Mencatat pelanggaran / prestasi</li>
+<li>Verifikasi (anti-bully)</li>
+<li>Catat sanksi &amp; selesai</li>
+<li>Ambang SP &amp; Rekap Poin</li>
+<li>Membatalkan catatan</li>
+<li>Stasiun Pendaftaran (loket)</li>
+<li>Pengingat penting</li>
+</ol>
+<hr>
+<h2 id="1-menyiapkan-jenis-tazir">1. Menyiapkan Jenis Ta'zir (Master Poin)<a class="anchor" href="#1-menyiapkan-jenis-tazir" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> sekali di awal, lalu sesekali saat ingin menambah/menyesuaikan daftar pelanggaran dan poinnya. Saat pesantren pertama dibuat, daftar contoh sudah terisi otomatis — Bapak/Ibu tinggal menyesuaikan.</p>
+<p><strong>Siapkan dulu:</strong> kesepakatan pengurus tentang jenis pelanggaran, poin masing-masing, dan sanksi standarnya.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Kedisiplinan</strong> → <strong>Jenis Ta'zir</strong>.</li>
+<li>Untuk menambah baru, ketuk <strong>+ Tambah</strong> (atau ketuk barisnya lalu <strong>Edit</strong> untuk mengubah).</li>
+<li>Isi formulir:<ul>
+<li><strong>Nama</strong> — contoh: <code>Terlambat sholat berjamaah</code>.</li>
+<li><strong>Kategori</strong> — pilih <strong>Ringan</strong>, <strong>Sedang</strong>, <strong>Berat</strong>, atau <strong>Prestasi (poin negatif)</strong>.</li>
+<li><strong>Poin</strong> — untuk pelanggaran isi angka <em>positif</em> (contoh <code>5</code>, <code>20</code>, <code>50</code>). Untuk <strong>Prestasi</strong> isi angka <em>negatif</em> (contoh <code>-10</code>) supaya mengurangi total poin santri.</li>
+<li><strong>Sanksi Default</strong> — sanksi yang otomatis dipakai bila tidak diisi manual, contoh: <code>Teguran + istighfar</code>.</li>
+<li><strong>Aktif</strong> — biarkan menyala agar jenis ini bisa dipilih saat mencatat.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Jenis Ta'zir dengan pilihan Kategori dan kotak Poin <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> jenis baru muncul di tabel dengan lencana warna kategori (Ringan biru, Sedang kuning, Berat merah, Prestasi hijau).</p>
+<blockquote>
+<p>💡 <strong>Contoh bawaan yang sudah tersedia:</strong> Terlambat sholat berjamaah (5), Membawa HP tanpa izin (20), Merokok (50), Berkelahi (50), Mencuri (75); dan prestasi seperti Hafalan melampaui target (-10), Juara lomba (-25). Angka ini hanya <em>contoh</em> — bebas Bapak/Ibu ubah sesuai kebijakan pondok.</p>
+</blockquote>
+<hr>
+<h2 id="2-mencatat-pelanggaran-prestasi">2. Mencatat Pelanggaran / Prestasi<a class="anchor" href="#2-mencatat-pelanggaran-prestasi" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setiap kali ada santri melanggar, atau berprestasi (untuk poin positif/prestasi).</p>
+<p><strong>Siapkan dulu:</strong> nama santri, jenis kejadian, dan kalau ada — foto bukti.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Kedisiplinan</strong> → <strong>Catatan Ta'zir</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi formulir:<ul>
+<li><strong>Santri</strong> — ketik sebagian nama atau NIS, pilih dari daftar.</li>
+<li><strong>Jenis</strong> — pilih jenis pelanggaran/prestasi. Di daftar tampil kategori dan poinnya, contoh: <code>Merokok (berat, 50 poin)</code>.</li>
+<li><strong>Waktu Kejadian</strong> — sudah terisi waktu sekarang; ubah bila kejadiannya kemarin.</li>
+<li><strong>Lokasi</strong> — opsional, contoh: <code>Asrama putra blok B</code>.</li>
+<li><strong>Kronologi</strong> — wajib. Ceritakan singkat apa yang terjadi.</li>
+<li><strong>Foto Bukti</strong> — opsional, boleh unggah foto (maks 4 MB).</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Catat Kejadian dengan kotak Santri dan Jenis <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> catatan muncul di tabel dengan status <strong>Dicatat</strong> (warna kuning). Poin <em>belum</em> berlaku sampai diverifikasi (lihat Bagian 3).</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Jenis prestasi tidak muncul di pilihan</em> → pencatatan poin prestasi mungkin dimatikan kebijakan pesantren. Aktifkan dari <strong>Setelan</strong> bersama pengurus, atau lewati.</li>
+<li><em>Salah satu kolom merah</em> → kolom <strong>Santri</strong>, <strong>Jenis</strong>, <strong>Waktu Kejadian</strong>, dan <strong>Kronologi</strong> wajib diisi.</li>
+</ul>
+<hr>
+<h2 id="3-verifikasi-anti-bully">3. Verifikasi (Anti-Bully)<a class="anchor" href="#3-verifikasi-anti-bully" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Supaya catatan tidak disalahgunakan (mis. antar santri saling melaporkan), poin sebuah catatan baru <strong>benar-benar berlaku setelah diverifikasi</strong> oleh ustadz/pengasuhan. Aturannya: <strong>yang mencatat tidak boleh memverifikasi catatannya sendiri.</strong></p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Buka <strong>Kedisiplinan → Catatan Ta'zir</strong>. Cari baris berstatus <strong>Dicatat</strong>.</li>
+<li>Ketuk tombol <strong>Verifikasi</strong> (ikon centang hijau) di baris itu, lalu konfirmasi.</li>
+<li>Status berubah menjadi <strong>Diverifikasi</strong> — poin santri kini dihitung.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pesan <em>"Pelanggaran diverifikasi — poin berlaku."</em> Wali bisa menerima pemberitahuan sesuai kebijakan pesantren (mis. hanya saat naik Surat Peringatan).</p>
+<blockquote>
+<p>💡 Kalau pesantren mematikan kewajiban verifikasi, catatan dari ustadz bisa langsung <strong>Diverifikasi</strong> tanpa langkah ini. Tombol Verifikasi hanya tampil saat memang dibutuhkan dan untuk orang yang <em>berbeda</em> dari pencatat.</p>
+</blockquote>
+<p>⚠️ <em>Tombol Verifikasi tidak muncul?</em> → kemungkinan Bapak/Ibu sendiri yang mencatat (tidak boleh verifikasi catatan sendiri), atau statusnya bukan lagi "Dicatat". Minta ustadz/pengasuh lain memverifikasi.</p>
+<hr>
+<h2 id="4-catat-sanksi-selesai">4. Catat Sanksi &amp; Selesai<a class="anchor" href="#4-catat-sanksi-selesai" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setelah catatan <strong>Diverifikasi</strong>, dan santri menjalani sanksi.</p>
+<p><strong>Langkahnya — mencatat sanksi:</strong></p>
+<ol>
+<li>Di <strong>Catatan Ta'zir</strong>, pada baris berstatus <strong>Diverifikasi</strong>, ketuk <strong>Catat Sanksi</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Jenis Sanksi</strong> — kosongkan untuk memakai sanksi default jenis pelanggaran, atau tulis sendiri, contoh: <code>Membersihkan masjid</code>.</li>
+<li><strong>Tanggal Pelaksanaan</strong> — kapan sanksi dijalankan.</li>
+<li><strong>Catatan</strong> — keterangan singkat bila perlu.</li>
+</ul>
+</li>
+<li>Ketuk simpan pada jendela itu. Status berubah menjadi <strong>Sanksi Dijalankan</strong>.</li>
+</ol>
+<p><strong>Langkahnya — menutup kasus:</strong></p>
+<ol>
+<li>Kalau sanksi sudah tuntas atau kasus selesai, ketuk <strong>Selesai</strong> pada baris itu, lalu konfirmasi.</li>
+<li>Status berubah menjadi <strong>Selesai</strong> (warna hijau).</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> baris catatan dengan tombol Verifikasi, Catat Sanksi, Selesai, dan Batalkan <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Urutan status:</strong> Dicatat → Diverifikasi → Sanksi Dijalankan → Selesai. (Atau dibatalkan, lihat Bagian 6.)</p>
+<blockquote>
+<p>💡 Catatan disiplin <strong>tidak bisa dihapus</strong> dan <strong>tidak bisa diedit isinya</strong> — ini sengaja, agar jejak adil dan tidak bisa dimanipulasi. Untuk kekeliruan, gunakan <strong>Batalkan</strong> (Bagian 6).</p>
+</blockquote>
+<hr>
+<h2 id="5-ambang-sp-rekap-poin">5. Ambang SP &amp; Rekap Poin<a class="anchor" href="#5-ambang-sp-rekap-poin" aria-hidden="true">#</a></h2>
+<p><strong>Apa yang otomatis?</strong> Setiap catatan yang diverifikasi menambah poin santri. Saat total poin santri menembus <strong>ambang</strong> tertentu dalam satu periode, aplikasi otomatis menerbitkan <strong>Surat Peringatan (SP)</strong> dan (sesuai kebijakan) memberi tahu wali. Ambang bawaan: <strong>SP1 = 50 poin</strong>, <strong>SP2 = 100 poin</strong>. Angka ini bisa diubah pengurus lewat Setelan.</p>
+<p><strong>Melihat rekap:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Kedisiplinan</strong> → <strong>Rekap Disiplin</strong>.</li>
+<li>Muncul tabel semua santri aktif beserta:<ul>
+<li><strong>⊕ Pelanggaran</strong> — total poin pelanggaran.</li>
+<li><strong>⊖ Prestasi</strong> — total poin prestasi (mengurangi).</li>
+<li><strong>Total Bersih</strong> — hasil akhir (merah bila ≥ 50).</li>
+<li><strong>Eskalasi</strong> — SP yang sudah diterbitkan periode ini.</li>
+</ul>
+</li>
+<li>Di bawah judul tertera periode poin berjalan dan daftar ambang yang aktif.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> poin terhitung sendiri — Bapak/Ibu tidak perlu menjumlah manual. Poin dihitung per <strong>periode</strong> (bawaannya per <em>semester</em>) sehingga santri mulai bersih lagi tiap periode (sesuai kebijakan masa berlaku poin).</p>
+<hr>
+<h2 id="6-membatalkan-catatan">6. Membatalkan Catatan<a class="anchor" href="#6-membatalkan-catatan" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> catatan ternyata keliru, salah orang, atau dobel.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Di <strong>Catatan Ta'zir</strong>, ketuk <strong>Batalkan</strong> (ikon silang merah) pada baris yang keliru.</li>
+<li>Tulis <strong>Alasan Pembatalan</strong> (wajib), contoh: <code>Salah santri, sudah diperbaiki</code>.</li>
+<li>Simpan pada jendela itu.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> status menjadi <strong>Dibatalkan</strong> (abu-abu) dan <strong>poinnya otomatis tidak lagi dihitung</strong>. Catatan tetap tersimpan beserta alasan — sebagai jejak yang jujur.</p>
+<p>⚠️ Catatan berstatus <strong>Selesai</strong> atau <strong>Dibatalkan</strong> tidak bisa dibatalkan lagi.</p>
+<hr>
+<h2 id="7-stasiun-pendaftaran">7. Stasiun Pendaftaran (Loket)<a class="anchor" href="#7-stasiun-pendaftaran" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Satu halaman "loket" gaya pembuatan e-KTP untuk melengkapi data santri satu per satu: ambil foto lewat kamera, rekam tanda tangan, tautkan kartu NFC, atur PIN login, ambil sampel tulisan, dan cetak kartu santri. Cocok dipakai petugas di meja pendaftaran saat tahun ajaran baru.</p>
+<p><strong>Siapkan dulu:</strong> komputer/HP berkamera, kartu NFC kosong (bila pakai), dan printer kartu (bila ingin cetak langsung).</p>
+<p><strong>Cara membuka:</strong> Menu kiri → grup <strong>Kesantrian</strong> → <strong>Stasiun Pendaftaran</strong>.</p>
+<p><strong>Langkahnya — memilih santri:</strong></p>
+<ol>
+<li>Di kotak <strong>Panggil Santri</strong>, ketik NIS atau nama, lalu ketuk santri yang muncul.</li>
+<li>Atau untuk santri yang benar-benar baru, isi <strong>Santri Baru</strong> (Nama lengkap, Laki-laki/Perempuan, Tanggal lahir) lalu ketuk <strong>Terbitkan NIS &amp; Mulai</strong>. NIS akan dibuat otomatis (nomor berikutnya tertera di layar).</li>
+</ol>
+<p><strong>Langkahnya — melengkapi data (kerjakan yang dibutuhkan, urutan bebas):</strong></p>
+<ol>
+<li><strong>📷 Foto</strong> — ketuk <strong>Buka Kamera</strong>, arahkan wajah santri, lalu <strong>Jepret &amp; Simpan</strong>. Foto otomatis terpasang ke profil santri.</li>
+<li><strong>✍️ Tanda Tangan</strong> — minta santri menggoreskan tanda tangan di kotak putih (pakai jari/stylus/mouse), lalu <strong>Simpan TTD</strong>. Salah? Ketuk <strong>Ulangi</strong>.</li>
+<li><strong>💳 Kartu NFC</strong> — tempelkan kartu ke pembaca (alat reader). UID kartu akan terisi sendiri di kotaknya, lalu ketuk <strong>Tautkan</strong>. Tidak pakai NFC? Ketuk <strong>Lewati</strong>.</li>
+<li><strong>🔑 PIN Login</strong> — ketik <strong>PIN 6 angka</strong> lalu <strong>Simpan PIN</strong>. Dengan ini santri bisa masuk Aplikasi Santri memakai NIS + PIN.</li>
+<li><strong>📝 Tulisan Arab</strong> dan <strong>📝 Tulisan Indonesia</strong> — foto lembar contoh tulisan tangan santri lalu unggah. Tidak perlu? Ketuk <strong>Lewati</strong>.</li>
+<li><strong>🖨️ Cetak Kartu Santri (QR)</strong> — ketuk untuk mengunduh/cetak kartu identitas santri ber-QR.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> halaman Stasiun Pendaftaran — kolom pencarian santri di kiri, kartu Foto / Tanda Tangan / NFC / PIN di kanan <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> tiap kartu langkah menampilkan lencana <strong>done</strong> (hijau) saat selesai. Di pojok ada ringkasan kelengkapan, contoh <code>5/8 langkah</code>, dan di kotak <strong>Antrian hari ini</strong> tampak santri yang sudah diproses hari ini.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>"Kamera tidak tersedia"</em> → izinkan akses kamera di browser, atau coba perangkat lain. Saat diminta izin kamera oleh browser, ketuk <strong>Izinkan</strong>.</li>
+<li><em>"Kartu sudah terpakai…"</em> → kartu NFC itu sudah ditautkan ke santri lain. Pakai kartu kosong lain.</li>
+<li><em>PIN ditolak</em> → PIN harus tepat <strong>6 angka</strong>, tanpa huruf.</li>
+<li><em>Belum memilih santri</em> → muncul peringatan "Pilih santri dulu". Panggil/daftarkan santri di kolom kiri terlebih dulu.</li>
+</ul>
+<hr>
+<h2 id="8-pengingat-penting">8. Pengingat Penting<a class="anchor" href="#8-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>⚖️ <strong>Poin baru berlaku setelah diverifikasi.</strong> Jangan lupa langkah Verifikasi, atau poin tidak terhitung di rekap.</li>
+<li>🤝 <strong>Pencatat ≠ Verifikator.</strong> Ini melindungi santri dari laporan sepihak — biarkan ustadz/pengasuh lain yang memverifikasi.</li>
+<li>🗒️ <strong>Tulis kronologi yang adil &amp; sopan.</strong> Catatan ini menyangkut nama baik santri.</li>
+<li>🚫 <strong>Catatan tidak dihapus, hanya dibatalkan (dengan alasan).</strong> Demi jejak yang jujur.</li>
+<li>🆔 <strong>Di Stasiun Pendaftaran, simpan tiap langkah satu per satu.</strong> Foto, TTD, PIN — masing-masing ada tombol Simpan sendiri.</li>
+<li>🚪 <strong>Keluar (logout)</strong> bila memakai komputer loket bersama.</li>
+</ol>
+<hr>
+<h2 id="contekan-cepat">Contekan Cepat<a class="anchor" href="#contekan-cepat" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Atur daftar &amp; poin pelanggaran</td>
+<td>Kedisiplinan → Jenis Ta'zir</td>
+</tr>
+<tr>
+<td>Catat pelanggaran / prestasi</td>
+<td>Kedisiplinan → Catatan Ta'zir → + Tambah</td>
+</tr>
+<tr>
+<td>Verifikasi catatan (poin berlaku)</td>
+<td>Kedisiplinan → Catatan Ta'zir → Verifikasi</td>
+</tr>
+<tr>
+<td>Catat sanksi</td>
+<td>Kedisiplinan → Catatan Ta'zir → Catat Sanksi</td>
+</tr>
+<tr>
+<td>Tutup kasus</td>
+<td>Kedisiplinan → Catatan Ta'zir → Selesai</td>
+</tr>
+<tr>
+<td>Batalkan catatan keliru</td>
+<td>Kedisiplinan → Catatan Ta'zir → Batalkan</td>
+</tr>
+<tr>
+<td>Lihat total poin &amp; SP per santri</td>
+<td>Kedisiplinan → Rekap Disiplin</td>
+</tr>
+<tr>
+<td>Foto / TTD / NFC / PIN / cetak kartu</td>
+<td>Kesantrian → Stasiun Pendaftaran</td>
+</tr>
+<tr>
+<td>Daftarkan santri baru + NIS otomatis</td>
+<td>Kesantrian → Stasiun Pendaftaran → Terbitkan NIS &amp; Mulai</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../asrama/"><span>‹ Sebelumnya</span><b>Asrama &amp; Kehidupan Santri</b></a>
+      <a class="pager-link next" href="../akademik/"><span>Berikutnya ›</span><b>Akademik Lanjutan</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-menyiapkan-jenis-tazir">1. Menyiapkan Jenis Ta'zir</a><a href="#2-mencatat-pelanggaran-prestasi">2. Mencatat Pelanggaran / Prestasi</a><a href="#3-verifikasi-anti-bully">3. Verifikasi (Anti-Bully)</a><a href="#4-catat-sanksi-selesai">4. Catat Sanksi &amp; Selesai</a><a href="#5-ambang-sp-rekap-poin">5. Ambang SP &amp; Rekap Poin</a><a href="#6-membatalkan-catatan">6. Membatalkan Catatan</a><a href="#7-stasiun-pendaftaran">7. Stasiun Pendaftaran (Loket)</a><a href="#8-pengingat-penting">8. Pengingat Penting</a><a href="#contekan-cepat">Contekan Cepat</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>
