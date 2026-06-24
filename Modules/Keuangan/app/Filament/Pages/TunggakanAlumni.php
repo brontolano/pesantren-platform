@@ -30,7 +30,7 @@ class TunggakanAlumni extends Page implements HasTable
 
     protected static ?string $navigationLabel = 'Tunggakan Alumni';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
 
     protected static ?int $navigationSort = 8;
 

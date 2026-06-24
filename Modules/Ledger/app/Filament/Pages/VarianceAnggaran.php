@@ -22,7 +22,7 @@ class VarianceAnggaran extends Page
 
     protected static ?string $title = 'Anggaran vs Realisasi (RKAM)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Anggaran & Perencanaan';
 
     protected static ?int $navigationSort = 10;
 

@@ -49,7 +49,7 @@ class LoketKas extends Page implements HasActions, HasForms
 
     protected static ?string $title = 'Loket Kas (Kasir)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
 
     protected static ?int $navigationSort = 19;
 

@@ -276,7 +276,11 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Konseling')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Konseling')),
                 NavigationGroup::make('Alumni')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Alumni')),
                 NavigationGroup::make('Akademik & Tahfidz')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akademik & Tahfidz')),
-                NavigationGroup::make('Keuangan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Keuangan')),
+                NavigationGroup::make('Tagihan & Pembayaran')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tagihan & Pembayaran')),
+                NavigationGroup::make('Akuntansi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Akuntansi')),
+                NavigationGroup::make('Anggaran & Perencanaan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Anggaran & Perencanaan')),
+                NavigationGroup::make('Donasi & Beasiswa')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Donasi & Beasiswa')),
+                NavigationGroup::make('Koperasi & POS')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Koperasi & POS')),
                 NavigationGroup::make('Kepegawaian')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Kepegawaian')),
                 NavigationGroup::make('Sarana & Logistik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Sarana & Logistik')),
                 NavigationGroup::make('Mutu & Laporan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Mutu & Laporan')),
@@ -375,13 +379,17 @@ class TenantPanelProvider extends PanelProvider
     private const NAV_PRIMER_PER_PERAN = [
         'guru' => ['Akademik & Tahfidz', 'Santri'],
         'asatidz' => ['Akademik & Tahfidz', 'Santri'],
-        'bendahara' => ['Keuangan'],
+        'bendahara' => ['Tagihan & Pembayaran'],
         'tu' => ['Santri', 'PPDB', 'Kelembagaan & Pengaturan'],
-        'kepala' => ['Mutu & Laporan', 'Keuangan'],
+        'kepala' => ['Mutu & Laporan', 'Akuntansi'],
         // Blok kesantrian atomik (Fase 1) — peran pengasuhan/kesehatan/konseling.
         'pengelola_asrama' => ['Asrama & Pengasuhan', 'Kedisiplinan'],
         'pengelola_uks' => ['Kesehatan'],
         'konselor' => ['Konseling'],
+        // Blok keuangan atomik (Fase 2) — peran kas/akuntansi.
+        'kasir' => ['Tagihan & Pembayaran', 'Koperasi & POS'],
+        'kepala_keuangan' => ['Akuntansi', 'Anggaran & Perencanaan'],
+        'bendahara_pusat' => ['Akuntansi', 'Anggaran & Perencanaan'],
     ];
 
     /**

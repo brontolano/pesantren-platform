@@ -41,7 +41,7 @@ class KasirKantin extends Page implements HasActions, HasForms
 
     protected static ?string $title = 'Kasir Kantin (Tabungan)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tagihan & Pembayaran';
 
     protected static ?int $navigationSort = 20;
 

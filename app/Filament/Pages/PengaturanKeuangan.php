@@ -30,7 +30,7 @@ class PengaturanKeuangan extends Page implements HasForms
 
     protected static ?string $title = 'Pengaturan Keuangan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
 
     protected static ?int $navigationSort = 20;
 

@@ -127,18 +127,18 @@ class SuperAdminAccessTest extends TestCase
         Auth::login($guru);
         $this->assertFalse($ciut('Akademik & Tahfidz'), 'guru: Akademik primer harus terbuka');
         $this->assertFalse($ciut('Santri'), 'guru: Santri primer harus terbuka');
-        $this->assertTrue($ciut('Keuangan'), 'guru: Keuangan sekunder harus terciut');
+        $this->assertTrue($ciut('Akuntansi'), 'guru: Akuntansi sekunder harus terciut');
         $this->assertTrue($ciut('Mutu & Laporan'), 'guru: Mutu sekunder harus terciut');
 
-        // Bendahara: Keuangan primer (terbuka), Akademik sekunder (terciut).
+        // Bendahara: Tagihan & Pembayaran primer (terbuka), Akademik sekunder (terciut).
         Auth::login($bendahara);
-        $this->assertFalse($ciut('Keuangan'), 'bendahara: Keuangan primer harus terbuka');
+        $this->assertFalse($ciut('Tagihan & Pembayaran'), 'bendahara: Tagihan & Pembayaran primer harus terbuka');
         $this->assertTrue($ciut('Akademik & Tahfidz'), 'bendahara: Akademik sekunder harus terciut');
 
         // Konselor: Konseling primer (terbuka), grup lain sekunder (terciut).
         Auth::login($konselor);
         $this->assertFalse($ciut('Konseling'), 'konselor: Konseling primer harus terbuka');
-        $this->assertTrue($ciut('Keuangan'), 'konselor: Keuangan sekunder harus terciut');
+        $this->assertTrue($ciut('Akuntansi'), 'konselor: Akuntansi sekunder harus terciut');
 
         // Pengelola UKS: Kesehatan primer (terbuka), grup lain sekunder (terciut).
         Auth::login($uks);
@@ -147,7 +147,7 @@ class SuperAdminAccessTest extends TestCase
 
         // Super_admin (peran luas) → semua grup terbuka.
         Auth::login($super);
-        $this->assertFalse($ciut('Keuangan'), 'super_admin: semua grup terbuka');
+        $this->assertFalse($ciut('Akuntansi'), 'super_admin: semua grup terbuka');
         $this->assertFalse($ciut('Mutu & Laporan'), 'super_admin: semua grup terbuka');
 
         tenancy()->end();
