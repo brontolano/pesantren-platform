@@ -16,6 +16,11 @@ class KeuanganAreaChart extends ChartWidget
 
     protected ?string $description = 'Pemasukan vs pengeluaran bulan ini';
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->can('view_keuangan') ?? false;
+    }
+
     protected static ?int $sort = -6;
 
     protected int|string|array $columnSpan = 4;

@@ -9,6 +9,11 @@ use Modules\Keuangan\Models\Tagihan;
 
 class KeuanganOverviewWidget extends StatsOverviewWidget
 {
+    public static function canView(): bool
+    {
+        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false;
+    }
+
     protected static ?int $sort = 2;
 
     protected function getStats(): array

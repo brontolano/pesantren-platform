@@ -14,6 +14,11 @@ use Modules\Keuangan\Models\Pembayaran;
  */
 class TransaksiTerbaru extends TableWidget
 {
+    public static function canView(): bool
+    {
+        return auth()->user()?->can('view_keuangan') ?? false;
+    }
+
     protected static ?int $sort = -4;
 
     protected int|string|array $columnSpan = 4;
