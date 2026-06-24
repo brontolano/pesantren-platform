@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Contracts\Http\Kernel;
@@ -101,7 +102,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         // kebijakan, di $paths) membangun Select dari nilai ini — tanpa unwrap
         // defensif di stateDariSetting() → "Array to string conversion" 500.
         // Seed nilai ter-bungkus agar render Kebijakan menguji jalur ini.
-        \App\Models\Setting::updateOrCreate(
+        Setting::updateOrCreate(
             ['key' => 'keuangan.jenis_lembaga'],
             ['value' => ['text' => 'madrasah']],
         );
