@@ -69,14 +69,16 @@ class SuperAdminAccessTest extends TestCase
         tenancy()->end();
     }
 
-    public function test_super_admin_bypass_gerbang_modul_dan_default_mode_lengkap(): void
+    public function test_super_admin_pesantren_ikut_gerbang_modul_dan_default_mode_lengkap(): void
     {
         [$super, $biasa] = $this->bootUsers('sa2');
 
-        // Gerbang modul: modul 'development' (file_storage) normalnya
-        // tersembunyi utk tenant non-dev — super_admin tetap melihat.
-        // (Catatan: 'ai' kini 'released' sejak 2026-06-25, jadi contoh modul
-        // development memakai file_storage.)
+        // Registry modul DETERMINISTIK. `module_registry` ada di koneksi CENTRAL
+        // (ModuleRegistry::getConnectionName) dan PERSISTEN lintas test (setUp
+        // hanya truncate domains+tenants), jadi tanpa seed eksplisit test ini
+        // bergantung pada apakah baris file_storage kebetulan ada — sumber drift.
+        $this->seed(\Database\Seeders\ModuleRegistrySeeder::class);
+
         $gate = new class
         {
             use \App\Filament\Concerns\ModuleGate;
@@ -87,8 +89,14 @@ class SuperAdminAccessTest extends TestCase
             }
         };
 
+        // Super admin PESANTREN (punya tenant, non-demo) IKUT gerbang modul agar
+        // navigasi tetap ramping — bypass HANYA untuk pemilik PLATFORM (super_admin
+        // tanpa tenant), lihat App\Filament\Concerns\ModuleGate::moduleVisible.
+        // Maka modul 'development' (file_storage) TETAP tersembunyi untuknya,
+        // sementara modul INTI (kesantrian) tetap tampil.
         Auth::login($super);
-        $this->assertTrue($gate::uji('file_storage'), 'super_admin melihat modul development.');
+        $this->assertFalse($gate::uji('file_storage'), 'super_admin pesantren TIDAK melihat modul development (nav ramping).');
+        $this->assertTrue($gate::uji('kesantrian'), 'modul inti selalu terlihat.');
         $this->assertSame('advanced', \App\Support\UiMode::current(), 'super_admin default Mode Lengkap.');
 
         Auth::login($biasa);
