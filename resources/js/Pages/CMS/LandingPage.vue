@@ -17,6 +17,18 @@ const props = defineProps({
             hasPublishedArticles: false,
         }),
     },
+    jadwalSholat: {
+        type: Array,
+        default: () => [],
+    },
+    arahKiblat: {
+        type: [Number, null],
+        default: null,
+    },
+    donasiUrl: {
+        type: [String, null],
+        default: null,
+    },
 })
 
 const seo = props.website.seo ?? {}
@@ -158,6 +170,38 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
                     </div>
                 </div>
             </header>
+
+            <!-- IBADAH: jadwal sholat + arah kiblat + donasi (Beranda publik, 1-aplikasi) -->
+            <section v-if="jadwalSholat.length || donasiUrl" id="ibadah" class="bg-white">
+                <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+                    <div class="grid gap-6 lg:grid-cols-[1.5fr_1fr] lg:items-stretch">
+                        <div v-if="jadwalSholat.length" class="rounded-2xl border border-slate-100 bg-[#fafbfc] p-6 sm:p-7">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <p class="text-xs font-bold uppercase tracking-[0.2em]" :style="{ color: 'var(--brand-primary)' }">Jadwal Sholat Hari Ini</p>
+                                <span v-if="arahKiblat !== null" class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+                                    Arah kiblat {{ arahKiblat }}° dari utara
+                                </span>
+                            </div>
+                            <div class="mt-5 grid grid-cols-5 gap-2 text-center sm:gap-3">
+                                <div v-for="p in jadwalSholat" :key="p.key" class="rounded-xl bg-white p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+                                    <p class="text-[11px] font-medium text-slate-500">{{ p.label }}</p>
+                                    <p class="mt-1 text-base font-extrabold text-slate-900 sm:text-lg">{{ p.time }}</p>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-xs text-slate-400">Dihitung otomatis dari lokasi pesantren (metode standar Kemenag).</p>
+                        </div>
+
+                        <div v-if="donasiUrl" class="flex flex-col justify-center rounded-2xl p-6 text-white sm:p-7" :style="{ backgroundColor: 'var(--brand-primary)' }">
+                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-white/70">Donasi · Infaq · Zakat</p>
+                            <h3 class="mt-2 text-2xl font-extrabold leading-tight">Salurkan kebaikan Anda</h3>
+                            <p class="mt-2 text-sm leading-relaxed text-white/85">Dukung program &amp; operasional pondok. Setiap donasi tercatat dan dikonfirmasi pengurus.</p>
+                            <a :href="donasiUrl" class="mt-5 inline-flex w-fit items-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold shadow-sm transition hover:-translate-y-0.5" :style="{ color: 'var(--brand-primary)' }">
+                                Donasi Sekarang
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <!-- CONTENT SECTIONS -->
             <template v-for="section in contentSections" :key="`${section.type}-${section.order}`">
