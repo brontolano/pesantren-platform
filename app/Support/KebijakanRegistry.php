@@ -32,6 +32,7 @@ class KebijakanRegistry
         'akademik' => 'Akademik',
         'keuangan' => 'Keuangan & Payroll',
         'migrasi' => 'Impor & Migrasi Data',
+        'beranda' => 'Beranda Publik & Jemaah',
         'umum' => 'Umum',
     ];
 
@@ -44,6 +45,22 @@ class KebijakanRegistry
     public static function entries(): array
     {
         return [
+            // ---------------- Beranda Publik (1-aplikasi) ----------------
+            'beranda.tampil_jadwal_sholat' => [
+                'label' => 'Tampilkan jadwal sholat di Beranda publik',
+                'deskripsi' => 'Bila aktif, lima waktu sholat hari ini muncul di halaman depan (Beranda) yang dilihat tamu/umum. Dihitung otomatis dari lokasi pesantren.',
+                'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
+            'beranda.tampil_arah_kiblat' => [
+                'label' => 'Tampilkan arah kiblat di Beranda publik',
+                'deskripsi' => 'Bila aktif, arah kiblat (derajat dari utara) muncul bersama jadwal sholat di Beranda.',
+                'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
+            'beranda.tampil_donasi' => [
+                'label' => 'Tampilkan ajakan donasi di Beranda publik',
+                'deskripsi' => 'Bila aktif, kartu Donasi/Infaq/Zakat dengan tautan ke halaman donasi muncul di Beranda.',
+                'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
             // ---------------- Disiplin ----------------
             DisiplinService::SETTING_WAJIB_VERIFIKASI => [
                 'label' => 'Catatan pelanggaran wajib diverifikasi ustadz',
