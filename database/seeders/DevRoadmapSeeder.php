@@ -179,6 +179,7 @@ class DevRoadmapSeeder extends Seeder
 
         // Status task yang SUDAH dikerjakan (diperbarui tiap PR fix selesai).
         $selesai = [
+            'Putuskan pintu rilis AI: development→released + seed GATE-3' => 'SELESAI 2026-06-25 (owner go-live): modul AI dirilis (ModuleRegistry ai development→released, opt-in per pesantren via Pusat Modul; MODULES_DEFAULT_ACTIVE_RELEASED false=nol auto-aktif/surprise-cost) + GATE-3 konten JADI SWA-LAYAN (bukan seed pusat): whitelist_kitab dikelola pesantren sendiri di Wizard PengaturanAi (TagsInput, +sensitive_fields=approval Kyai, #289), unggah dokumen rujukan txt/md/docx/PDF di SumberPengetahuan (smalot/pdfparser, #290). Provider Ollama prod SEHAT (ai:health 2 model, generate OK), pagar anggaran+kill-switch+governance approval siap. Demo tenant diaktifkan (tenant_modules ai aktif) sbg pilot. Isi keagamaan tetap dari otoritas pesantren (pantang dikarang dev/AI). AI domain 59+10 test hijau. **ROADMAP 77/77 TUNTAS.**',
             'Perbaiki bug channel Notifikasi whatsapp→wa + wire seeder' => 'SELESAI 2026-06-24: 23 nilai seeder channel→wa + migrasi normalisasi tenant lama + TemplateNotifikasiSeeder ter-wire ke TenantProvisioner.',
             'Wire seeder tarif Pajak ke TenantProvisioner' => 'SELESAI 2026-06-24: PajakSeeder + TerPph21Seeder ter-wire ke TenantProvisioner (idempoten, --force).',
             'Seed kategori POS untuk tenant baru' => 'SELESAI 2026-06-24: PosKategoriSeeder ter-wire ke TenantProvisioner.',
