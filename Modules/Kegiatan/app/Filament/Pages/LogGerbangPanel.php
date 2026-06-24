@@ -18,7 +18,7 @@ class LogGerbangPanel extends Page
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kedisiplinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
 
     protected static ?int $navigationSort = 60;
 

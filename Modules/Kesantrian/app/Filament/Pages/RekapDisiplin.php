@@ -25,7 +25,7 @@ class RekapDisiplin extends Page implements HasTable
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kedisiplinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
 
     protected static ?int $navigationSort = 10;
 

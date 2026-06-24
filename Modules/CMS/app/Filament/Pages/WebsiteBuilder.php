@@ -23,7 +23,7 @@ class WebsiteBuilder extends Page
 
     protected static ?string $title = 'Pengaturan Tampilan Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
 
     protected static ?int $navigationSort = 3;
 

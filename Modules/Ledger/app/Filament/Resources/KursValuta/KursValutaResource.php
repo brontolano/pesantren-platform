@@ -34,7 +34,7 @@ class KursValutaResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kurs Valuta (Donor)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
 
     protected static ?int $navigationSort = 31;
 

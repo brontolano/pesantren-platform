@@ -37,7 +37,7 @@ class SesiKonselingResource extends Resource
 
     protected static ?string $navigationLabel = 'Sesi Konseling';
 
-    protected static UnitEnum|string|null $navigationGroup = 'UKS';
+    protected static UnitEnum|string|null $navigationGroup = 'Santri & Pengasuhan';
 
     protected static ?int $navigationSort = 2;
 

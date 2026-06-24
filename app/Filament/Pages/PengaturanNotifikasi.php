@@ -31,7 +31,7 @@ class PengaturanNotifikasi extends Page implements HasForms
 
     protected static ?string $title = 'Pengaturan Notifikasi';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
 
     protected static ?int $navigationSort = 3;
 

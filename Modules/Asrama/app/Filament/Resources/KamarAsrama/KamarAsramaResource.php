@@ -26,7 +26,7 @@ class KamarAsramaResource extends Resource
 
     protected static ?string $navigationLabel = 'Kamar Asrama';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Santri & Pengasuhan';
 
     protected static ?int $navigationSort = 2;
 

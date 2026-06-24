@@ -30,7 +30,7 @@ class GridNilai extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-table-cells';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
 
     protected static ?int $navigationSort = 35;
 

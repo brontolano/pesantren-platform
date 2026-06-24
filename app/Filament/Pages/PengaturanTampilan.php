@@ -29,7 +29,7 @@ class PengaturanTampilan extends Page implements HasForms
 
     protected static ?string $title = 'Tampilan & Tema';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan & Pengaturan';
 
     protected static ?int $navigationSort = 15;
 

@@ -21,7 +21,7 @@ class ProfilMutuSantri extends Page
 
     protected static ?string $title = 'Profil Mutu Santri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Mutu';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
 
     protected static ?int $navigationSort = 30;
 

@@ -29,7 +29,7 @@ class EskalasiTanyaUstadz extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-inbox-arrow-down';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim Digital';
+    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
 
     protected static ?string $navigationLabel = 'Eskalasi Tanya Ustadz';
 

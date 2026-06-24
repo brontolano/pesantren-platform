@@ -34,7 +34,7 @@ class TarifPajakResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Tarif Pajak';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pajak';
+    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
 
     protected static ?int $navigationSort = 14;
 

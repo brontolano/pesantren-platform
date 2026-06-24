@@ -29,7 +29,7 @@ class LaporanKeuanganPokok extends Page implements HasForms
 
     protected static ?string $title = 'L6 — Laporan Keuangan Pokok';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
 
     protected static ?int $navigationSort = 6;
 

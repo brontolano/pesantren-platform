@@ -35,7 +35,7 @@ class PembiayaanResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pengajuan Pembiayaan (DSCR)';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pembiayaan (DSCR)';
+    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
 
     protected static ?int $navigationSort = 2;
 

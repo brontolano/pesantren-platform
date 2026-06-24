@@ -33,7 +33,7 @@ class KotakMasukWa extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim Digital';
+    protected static string|\UnitEnum|null $navigationGroup = 'Komunikasi & AI';
 
     protected static ?string $navigationLabel = 'Kotak Masuk WA';
 

@@ -23,7 +23,7 @@ class DosirAsesmen extends Page
 
     protected static ?string $title = 'L4 Dosir Asesmen & L7 Operasional';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Mutu & Laporan';
 
     protected static ?int $navigationSort = 9;
 

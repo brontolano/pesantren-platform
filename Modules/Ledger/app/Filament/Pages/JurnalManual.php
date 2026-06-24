@@ -39,7 +39,7 @@ class JurnalManual extends Page implements HasForms
 
     protected static ?string $title = 'Catat Jurnal Manual';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akuntansi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
 
     protected static ?int $navigationSort = 7;
 

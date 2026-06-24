@@ -37,7 +37,7 @@ class PeriodeAkademikResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Periode Akademik';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Akademik';
+    protected static string|\UnitEnum|null $navigationGroup = 'Akademik & Tahfidz';
 
     protected static ?int $navigationSort = 1;
 
