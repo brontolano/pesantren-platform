@@ -1,10 +1,11 @@
 # ============================================================
 # start-dev.ps1 — Jalankan Platform Pesantren di lokal
-# Double-click file ini atau run di PowerShell dari folder project
+# Dobel-klik file ini (di folder scripts/) atau run di PowerShell.
 # ============================================================
 
 $ErrorActionPreference = "Stop"
-$ProjectPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Skrip ada di scripts/, naik 1 level ke ROOT project (tempat docker-compose.yml).
+$ProjectPath = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $ProjectPath
 
 Write-Host "================================================" -ForegroundColor Cyan
