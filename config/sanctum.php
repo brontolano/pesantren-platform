@@ -1,0 +1,45 @@
+<?php
+
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
+use Laravel\Sanctum\Http\Middleware\AuthenticateSession;
+use Laravel\Sanctum\Sanctum;
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stateful Domains
+    |--------------------------------------------------------------------------
+    | Aplikasi native memakai token Bearer (stateless), bukan SPA cookie — daftar
+    | stateful ini hanya relevan bila ada SPA same-domain. Default aman.
+    */
+    'stateful' => explode(',', (string) env('SANCTUM_STATEFUL_DOMAINS', sprintf(
+        '%s%s',
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
+        Sanctum::currentApplicationUrlWithPort(),
+    ))),
+
+    'guard' => ['web'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expiration Minutes  (HARDENING — red-team AUTH-1 / MEDIUM-010)
+    |--------------------------------------------------------------------------
+    | Token aplikasi native KEDALUWARSA setelah jangka ini (default 90 hari).
+    | Tanpa ini Sanctum default = null = token hidup SELAMANYA (lemah: token
+    | tercuri tetap sah meski password ganti / akun di-suspend). Guard menolak
+    | token bila created_at lebih lama dari jangka ini. Atur via SANCTUM_EXPIRATION
+    | (menit). Bersihkan baris kedaluwarsa berkala: `sanctum:prune-expired`.
+    */
+    'expiration' => (int) env('SANCTUM_EXPIRATION', 60 * 24 * 90),
+
+    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
+
+    'middleware' => [
+        'authenticate_session' => AuthenticateSession::class,
+        'encrypt_cookies' => EncryptCookies::class,
+        'validate_csrf_token' => ValidateCsrfToken::class,
+    ],
+
+];

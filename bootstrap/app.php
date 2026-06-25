@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureUserIsJemaah;
 use App\Http\Middleware\EnsureUserIsWali;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InitializeTenancyForWebRequests;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -31,8 +32,13 @@ return Application::configure(basePath: dirname(__DIR__))
             ],
             append: [
                 HandleInertiaRequests::class,
+                // Header keamanan global aman (nosniff/HSTS/Referrer-Policy).
+                SecurityHeaders::class,
             ],
         );
+        $middleware->api(append: [
+            SecurityHeaders::class,
+        ]);
         $middleware->alias([
             'module' => CheckModuleActive::class,
             'wali' => EnsureUserIsWali::class,
