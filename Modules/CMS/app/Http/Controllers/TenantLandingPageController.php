@@ -39,6 +39,11 @@ class TenantLandingPageController extends Controller
                     ->exists(),
             ],
             ...$this->ibadahPayload(),
+            // Etalase demo: tombol "Coba Demo" hanya muncul di tenant demo + flag ON.
+            'demoPickerUrl' => (config('demo.autologin_enabled')
+                && tenant()?->getTenantKey() === config('demo.autologin_tenant'))
+                ? '/coba'
+                : null,
         ];
     }
 

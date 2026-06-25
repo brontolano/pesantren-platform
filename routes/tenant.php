@@ -7,6 +7,7 @@ use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\DemoAutoLoginController;
+use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\DemoApps\UksDemoController;
 use App\Http\Controllers\DemoApps\TuDemoController;
 use App\Http\Controllers\DemoApps\HumasDemoController;
@@ -147,6 +148,11 @@ Route::middleware([
      */
     Route::get('/demo-masuk/{peran}', DemoAutoLoginController::class)
         ->name('tenant.demo.autologin');
+
+    // Etalase demo — pemilih peran (satu klik login per peran). Gerbang sama:
+    // hanya tenant demo + DEMO_AUTOLOGIN (selain itu 404).
+    Route::get('/coba', [DemoPickerController::class, 'show'])->name('tenant.demo.picker');
+    Route::get('/demo', [DemoPickerController::class, 'show'])->name('tenant.demo.picker.alias');
 
     /*
      * ── App PWA demo peran (controller-dummy, gate auth saja) ──

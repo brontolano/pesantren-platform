@@ -125,6 +125,25 @@ class DemoAutoLoginController extends Controller
             'role' => 'santri',
             'route' => 'tenant.santri-app.beranda',
         ],
+        // Admin & publik (1-aplikasi) — pakai 'url' (bukan named-route PWA).
+        'admin' => [
+            'email' => 'admin.demo@demo.pesantren.online',
+            'name' => 'Admin Pesantren Demo',
+            'role' => 'admin_pesantren',
+            'url' => '/admin',
+        ],
+        'super-admin' => [
+            'email' => 'superadmin.demo@demo.pesantren.online',
+            'name' => 'Super Admin Demo',
+            'role' => 'super_admin',
+            'url' => '/admin',
+        ],
+        'jemaah' => [
+            'email' => 'jemaah.demo@demo.pesantren.online',
+            'name' => 'Jemaah Demo',
+            'role' => 'jemaah',
+            'url' => '/',
+        ],
     ];
 
     public function __invoke(string $peran): RedirectResponse
@@ -152,6 +171,8 @@ class DemoAutoLoginController extends Controller
 
         Auth::login($user, remember: true);
 
-        return redirect()->route($cfg['route']);
+        return isset($cfg['url'])
+            ? redirect($cfg['url'])
+            : redirect()->route($cfg['route']);
     }
 }
