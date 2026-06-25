@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\CmsPublicApiController;
 use App\Http\Controllers\Api\IbadahApiController;
+use App\Http\Controllers\Api\KomentarApiController;
 use App\Http\Controllers\Api\PpdbPublicApiController;
 use App\Http\Controllers\Api\PublicDirectoryApiController;
 use App\Http\Controllers\Api\TenantApiController;
@@ -189,6 +190,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/api/v1/auth/me', [AuthApiController::class, 'me']);
     Route::post('/api/v1/auth/logout', [AuthApiController::class, 'logout']);
 });
+
+// Komentar artikel (native): baca publik (approved) + kirim (token + izin komentar).
+// Gerbang sama dgn web CommentController: auth + can:komentar + throttle:komentar.
+Route::get('/api/v1/posts/{slug}/komentar', [KomentarApiController::class, 'index']);
+Route::post('/api/v1/posts/{slug}/komentar', [KomentarApiController::class, 'store'])
+    ->middleware(['auth:sanctum', 'can:komentar', 'throttle:komentar']);
 
 // PPDB publik — terima pendaftaran dari form website (Fase minimal: simpan + e-tiket).
 // Anti-spam: rate-limit ketat per tenant+IP (honeypot ditangani di controller).
