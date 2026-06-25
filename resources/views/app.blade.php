@@ -3,6 +3,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{-- 1-aplikasi (Fase 4 fondasi) — PWA scope root: installable dari Beranda + dasar TWA.
+         Hanya di konteks tenant; di domain central endpoint ini 404 (diabaikan browser). --}}
+    @if (tenant())
+        <link rel="manifest" href="/manifest.webmanifest">
+        <meta name="theme-color" content="{{ \App\Models\Setting::getTenantStringValue('branding_primary_color', '#0f5132') }}">
+        <link rel="apple-touch-icon" href="/icon.svg?size=192">
+    @endif
     <title inertia>{{ tenant()?->name ?? config('app.name', '') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @inertiaHead

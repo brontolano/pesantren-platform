@@ -28,6 +28,7 @@ use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
 use App\Http\Controllers\PimpinanPwaController;
+use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
 use App\Http\Controllers\PortalGuru\PortalGuruGerbangController;
@@ -312,6 +313,13 @@ Route::middleware([
 
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
+
+    // 1-aplikasi (Fase 4 fondasi) — PWA scope ROOT "/": manifest + ikon untuk
+    // SELURUH aplikasi (Beranda publik/Jemaah) agar installable & jadi dasar TWA
+    // root per tenant. Publik, pasif (JSON/SVG). Service worker root menyusul
+    // (Fase 3, butuh uji-perangkat sebelum deploy).
+    Route::get('/manifest.webmanifest', [RootPwaController::class, 'manifest'])->name('tenant.pwa.manifest');
+    Route::get('/icon.svg', [RootPwaController::class, 'icon'])->name('tenant.pwa.icon');
 
     // 1-aplikasi (Fase 2c) — kirim komentar artikel. Gerbang izin 'komentar'
     // (jemaah + semua peran internal/komunitas; calon santri 'peserta' eksternal
