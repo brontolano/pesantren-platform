@@ -74,6 +74,25 @@ class RootPwaTest extends TestCase
         $this->assertStringContainsString('<svg', $resp->getContent());
     }
 
+    public function test_service_worker_shell_only_allowlist_aman(): void
+    {
+        [, $host] = $this->boot('sw');
+
+        $resp = $this->get("http://{$host}/sw.js", $this->headers($host));
+
+        $resp->assertOk();
+        $resp->assertHeader('Service-Worker-Allowed', '/');
+        $js = $resp->getContent();
+
+        // Shell allow-list HANYA manifest + ikon (3 URL); tak ada area dinamis/sensitif.
+        $this->assertStringContainsString('const SHELL_URLS = ["\/manifest.webmanifest","\/icon.svg?size=192","\/icon.svg?size=512"]', $js);
+        // Penjaga keamanan: non-GET dilewati, lintas-origin dilewati, non-shell dilewati
+        // (allow-list → /admin /platform /livewire /api & halaman ber-auth TAK PERNAH di-cache).
+        $this->assertStringContainsString("method !== 'GET'", $js);
+        $this->assertStringContainsString('self.location.origin', $js);
+        $this->assertStringContainsString('if (!isShellUrl)', $js);
+    }
+
     public function test_manifest_pakai_branding_tenant(): void
     {
         [$tenant, $host] = $this->boot('br');

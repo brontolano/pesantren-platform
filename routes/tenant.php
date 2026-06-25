@@ -320,6 +320,10 @@ Route::middleware([
     // (Fase 3, butuh uji-perangkat sebelum deploy).
     Route::get('/manifest.webmanifest', [RootPwaController::class, 'manifest'])->name('tenant.pwa.manifest');
     Route::get('/icon.svg', [RootPwaController::class, 'icon'])->name('tenant.pwa.icon');
+    // Service worker scope "/" (Fase 3) — shell-only allow-list. Endpoint selalu
+    // tersedia, TAPI registrasi di app.blade.php digerbang flag pwa.root_sw_enabled
+    // (default OFF) → aktif hanya setelah owner uji-perangkat.
+    Route::get('/sw.js', [RootPwaController::class, 'serviceWorker'])->name('tenant.pwa.sw');
 
     // 1-aplikasi (Fase 2c) — kirim komentar artikel. Gerbang izin 'komentar'
     // (jemaah + semua peran internal/komunitas; calon santri 'peserta' eksternal

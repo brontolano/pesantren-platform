@@ -108,6 +108,108 @@ class RootPwaController extends Controller
     }
 
     /**
+     * Service worker scope ROOT "/" (Fase 3). Pola ALLOW-LIST aman a la PWA Guru:
+     * HANYA shell statis publik (manifest + ikon) yang di-intercept & di-cache.
+     * SEMUA permintaan lain (Beranda dinamis, /admin, /platform, /livewire,
+     * halaman ber-auth, non-GET, lintas-origin) DILEWATKAN ke jaringan apa adanya
+     * — TIDAK PERNAH masuk Cache Storage. Ini mencegah data ber-auth/keuangan
+     * basi atau halaman admin ter-cache.
+     *
+     * KEAMANAN deploy: registrasi SW di app.blade.php DIGERBANG flag
+     * 'pwa.root_sw_enabled' (default OFF) → deploy AMAN (SW tak aktif sampai
+     * owner mengaktifkan SETELAH uji-perangkat). SW yang salah bisa membuat app
+     * blank/uninstallable, maka WAJIB uji-perangkat sebelum flag dinyalakan.
+     */
+    public function serviceWorker(): Response
+    {
+        $b = $this->branding();
+        $versionSeed = implode('|', [$b['tenantId'], $b['name'], $b['primaryColor'], $b['secondaryColor']]);
+        $cacheName = 'root-shell-'.$b['tenantId'].'-'.substr(sha1($versionSeed), 0, 12);
+        $shellUrls = [
+            '/manifest.webmanifest',
+            '/icon.svg?size=192',
+            '/icon.svg?size=512',
+        ];
+
+        $script = <<<'JS'
+        const CACHE_NAME = %s;
+        const SHELL_URLS = %s;
+
+        self.addEventListener('install', (event) => {
+            event.waitUntil((async () => {
+                const cache = await caches.open(CACHE_NAME);
+                await cache.addAll(SHELL_URLS.map((url) => new Request(url, { cache: 'reload' })));
+                await self.skipWaiting();
+            })());
+        });
+
+        self.addEventListener('activate', (event) => {
+            event.waitUntil((async () => {
+                const keys = await caches.keys();
+                await Promise.all(
+                    keys
+                        .filter((key) => key.startsWith('root-shell-') && key !== CACHE_NAME)
+                        .map((key) => caches.delete(key)),
+                );
+                await self.clients.claim();
+            })());
+        });
+
+        self.addEventListener('fetch', (event) => {
+            // ALLOW-LIST ketat: hanya GET shell publik same-origin yang ditangani.
+            if (event.request.method !== 'GET') {
+                return;
+            }
+
+            const url = new URL(event.request.url);
+
+            if (url.origin !== self.location.origin) {
+                return;
+            }
+
+            // Hanya manifest + ikon. Beranda dinamis, /admin, /platform, /livewire,
+            // /api, halaman ber-auth: DILEWATKAN ke jaringan (tak di-cache).
+            const isShellUrl = SHELL_URLS.includes(url.pathname + url.search);
+
+            if (!isShellUrl) {
+                return;
+            }
+
+            event.respondWith((async () => {
+                const cache = await caches.open(CACHE_NAME);
+                const cached = await cache.match(event.request);
+
+                try {
+                    const response = await fetch(event.request);
+
+                    if (response.ok) {
+                        await cache.put(event.request, response.clone());
+                    }
+
+                    return response;
+                } catch (error) {
+                    if (cached) {
+                        return cached;
+                    }
+
+                    return new Response('', { status: 503, statusText: 'Offline' });
+                }
+            })());
+        });
+        JS;
+
+        return response(sprintf(
+            $script,
+            json_encode($cacheName, JSON_THROW_ON_ERROR),
+            json_encode($shellUrls, JSON_THROW_ON_ERROR),
+        ), 200, [
+            'Content-Type' => 'application/javascript; charset=UTF-8',
+            'Cache-Control' => 'no-cache, must-revalidate',
+            'Service-Worker-Allowed' => '/',
+        ]);
+    }
+
+    /**
      * @return array{tenantId:string,name:string,shortName:string,description:string,primaryColor:string,secondaryColor:string,backgroundColor:string,icon192Url:string,icon512Url:string}
      */
     private function branding(): array
