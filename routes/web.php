@@ -186,6 +186,10 @@ Route::get('/api/v1/jadwal-sholat', IbadahApiController::class);
 // Throttle kasar per-IP di route + RateLimiter per-identifier di controller.
 Route::post('/api/v1/auth/login', [AuthApiController::class, 'login'])->middleware('throttle:20,1');
 Route::post('/api/v1/auth/demo/{peran}', [AuthApiController::class, 'demoLogin'])->middleware('throttle:30,1');
+// Registrasi mandiri jemaah (No.WA + OTP WhatsApp), mirror JemaahAuthController.
+Route::post('/api/v1/auth/daftar', [AuthApiController::class, 'daftar'])->middleware('throttle:10,1');
+Route::post('/api/v1/auth/aktivasi', [AuthApiController::class, 'aktivasi'])->middleware('throttle:15,1');
+Route::post('/api/v1/auth/kirim-ulang', [AuthApiController::class, 'kirimUlang'])->middleware('throttle:6,1');
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/api/v1/auth/me', [AuthApiController::class, 'me']);
     Route::post('/api/v1/auth/logout', [AuthApiController::class, 'logout']);
