@@ -173,14 +173,18 @@ Route::get('/kontak', fn () => view('legal.contact'))->name('legal.contact');
 // ── API publik konten CMS untuk website tenant (mis. api.asy-syifaa.com) ──
 // Tenant di-resolve dari domain oleh middleware tenancy web. CORS: config/cors.php.
 // Kontrak: docs/SPEC-API-WEBSITE-ASY-SYIFAA.md
-Route::get('/api/v1/posts', [CmsPublicApiController::class, 'posts']);
-Route::get('/api/v1/posts/{slug}', [CmsPublicApiController::class, 'post']);
-Route::get('/api/public/content/gallery', [CmsPublicApiController::class, 'gallery']);
-Route::get('/api/public/content/gallery/{slug}', [CmsPublicApiController::class, 'galleryItem']);
-Route::get('/api/public/content/profile', [CmsPublicApiController::class, 'profile']);
-Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'settings']);
-// Ibadah publik (1-aplikasi / native Android): jadwal sholat + arah kiblat + donasi.
-Route::get('/api/v1/jadwal-sholat', IbadahApiController::class);
+// HARDENING (red-team RATE-002): semua endpoint baca publik di-throttle per
+// tenant+IP (limiter 'public-api') agar tak bisa di-scrape/DoS tanpa batas.
+Route::middleware('throttle:public-api')->group(function () {
+    Route::get('/api/v1/posts', [CmsPublicApiController::class, 'posts']);
+    Route::get('/api/v1/posts/{slug}', [CmsPublicApiController::class, 'post']);
+    Route::get('/api/public/content/gallery', [CmsPublicApiController::class, 'gallery']);
+    Route::get('/api/public/content/gallery/{slug}', [CmsPublicApiController::class, 'galleryItem']);
+    Route::get('/api/public/content/profile', [CmsPublicApiController::class, 'profile']);
+    Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'settings']);
+    // Ibadah publik (1-aplikasi / native Android): jadwal sholat + arah kiblat + donasi.
+    Route::get('/api/v1/jadwal-sholat', IbadahApiController::class);
+});
 
 // Auth aplikasi NATIVE (token Sanctum). login=jemaah; demo=per-peran (gerbang demo).
 // Throttle kasar per-IP di route + RateLimiter per-identifier di controller.
@@ -190,14 +194,15 @@ Route::post('/api/v1/auth/demo/{peran}', [AuthApiController::class, 'demoLogin']
 Route::post('/api/v1/auth/daftar', [AuthApiController::class, 'daftar'])->middleware('throttle:10,1');
 Route::post('/api/v1/auth/aktivasi', [AuthApiController::class, 'aktivasi'])->middleware('throttle:15,1');
 Route::post('/api/v1/auth/kirim-ulang', [AuthApiController::class, 'kirimUlang'])->middleware('throttle:6,1');
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:public-api'])->group(function () {
     Route::get('/api/v1/auth/me', [AuthApiController::class, 'me']);
     Route::post('/api/v1/auth/logout', [AuthApiController::class, 'logout']);
 });
 
 // Komentar artikel (native): baca publik (approved) + kirim (token + izin komentar).
 // Gerbang sama dgn web CommentController: auth + can:komentar + throttle:komentar.
-Route::get('/api/v1/posts/{slug}/komentar', [KomentarApiController::class, 'index']);
+Route::get('/api/v1/posts/{slug}/komentar', [KomentarApiController::class, 'index'])
+    ->middleware('throttle:public-api');
 Route::post('/api/v1/posts/{slug}/komentar', [KomentarApiController::class, 'store'])
     ->middleware(['auth:sanctum', 'can:komentar', 'throttle:komentar']);
 
