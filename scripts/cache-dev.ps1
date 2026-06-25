@@ -1,9 +1,11 @@
 # ============================================================
 # cache-dev.ps1 — Jalankan setelah container sudah UP
 # Gunakan ini saat: panel admin lambat / ada error setelah update kode
+# Lokasi: scripts/ — boleh dobel-klik dari sini.
 # ============================================================
 
-$ProjectPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+# Skrip ada di scripts/, naik 1 level ke ROOT project (tempat docker-compose.yml).
+$ProjectPath = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $ProjectPath
 
 Write-Host "Clearing and rebuilding all caches..." -ForegroundColor Yellow
