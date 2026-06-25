@@ -146,6 +146,17 @@ class DemoAutoLoginController extends Controller
         ],
     ];
 
+    /**
+     * Peta persona demo (dibaca ulang oleh AuthApiController utk demo-login TOKEN
+     * aplikasi native). Sumber tunggal agar persona demo konsisten lintas kanal.
+     *
+     * @return array<string, array{email:string, name:string, role:string, route?:string, url?:string}>
+     */
+    public static function personas(): array
+    {
+        return self::PERAN;
+    }
+
     public function __invoke(string $peran): RedirectResponse
     {
         abort_unless((bool) config('demo.autologin_enabled'), 404);

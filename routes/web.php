@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\CmsPublicApiController;
 use App\Http\Controllers\Api\IbadahApiController;
 use App\Http\Controllers\Api\PpdbPublicApiController;
@@ -179,6 +180,15 @@ Route::get('/api/public/content/profile', [CmsPublicApiController::class, 'profi
 Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'settings']);
 // Ibadah publik (1-aplikasi / native Android): jadwal sholat + arah kiblat + donasi.
 Route::get('/api/v1/jadwal-sholat', IbadahApiController::class);
+
+// Auth aplikasi NATIVE (token Sanctum). login=jemaah; demo=per-peran (gerbang demo).
+// Throttle kasar per-IP di route + RateLimiter per-identifier di controller.
+Route::post('/api/v1/auth/login', [AuthApiController::class, 'login'])->middleware('throttle:20,1');
+Route::post('/api/v1/auth/demo/{peran}', [AuthApiController::class, 'demoLogin'])->middleware('throttle:30,1');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/api/v1/auth/me', [AuthApiController::class, 'me']);
+    Route::post('/api/v1/auth/logout', [AuthApiController::class, 'logout']);
+});
 
 // PPDB publik — terima pendaftaran dari form website (Fase minimal: simpan + e-tiket).
 // Anti-spam: rate-limit ketat per tenant+IP (honeypot ditangani di controller).
