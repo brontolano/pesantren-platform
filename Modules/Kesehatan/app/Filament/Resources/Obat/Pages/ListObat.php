@@ -3,11 +3,11 @@
 namespace Modules\Kesehatan\Filament\Resources\Obat\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use Modules\Kesehatan\Filament\Resources\ObatResource;
 use App\Models\Tenant;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Kesehatan\Filament\Resources\ObatResource;
 use Modules\Kesehatan\Models\Obat;
 use Modules\Kesehatan\Services\ObatImportService;
 

@@ -9,7 +9,6 @@ use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Models\SumberDana;
 use Modules\Pajak\Database\Seeders\PajakSeeder;
 use Modules\Pajak\Services\MesinPajakService;
-use Modules\Pengadaan\Models\Belanja;
 use Modules\Pengadaan\Services\BelanjaService;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;

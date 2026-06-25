@@ -57,7 +57,7 @@ class ModuleNavReadinessTest extends TestCase
 
             public function vis(string $key): bool
             {
-                return static::moduleVisible($key);
+                return self::moduleVisible($key);
             }
         };
     }

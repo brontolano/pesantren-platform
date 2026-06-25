@@ -3,12 +3,12 @@
 namespace Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
 use App\Models\Tenant;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
 use Modules\Kesantrian\Models\PelanggaranSantri;
 use Modules\Kesantrian\Services\PelanggaranImportService;
 

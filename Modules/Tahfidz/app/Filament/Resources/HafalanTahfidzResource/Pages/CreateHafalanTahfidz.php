@@ -2,8 +2,8 @@
 
 namespace Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource\Pages;
 
-use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
 
 class CreateHafalanTahfidz extends CreateRecord
 {

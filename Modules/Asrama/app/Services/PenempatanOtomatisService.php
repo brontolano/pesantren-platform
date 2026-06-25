@@ -19,9 +19,7 @@ use RuntimeException;
  */
 class PenempatanOtomatisService
 {
-    public function __construct(private readonly PenempatanAsramaService $penempatan)
-    {
-    }
+    public function __construct(private readonly PenempatanAsramaService $penempatan) {}
 
     /**
      * Tempatkan santri yang belum punya kamar aktif.

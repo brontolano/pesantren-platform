@@ -2,9 +2,9 @@
 
 namespace Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages;
 
-use Modules\Tahfidz\Filament\Resources\TahfidzTarget\TahfidzTargetResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Tahfidz\Filament\Resources\TahfidzTarget\TahfidzTargetResource;
 
 class ListTahfidzTarget extends ListRecords
 {

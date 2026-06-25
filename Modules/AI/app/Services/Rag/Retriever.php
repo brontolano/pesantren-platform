@@ -36,9 +36,9 @@ class Retriever
 
     /**
      * @param  array{kategori?: string|null, topK?: int, minSkor?: float|null, sourceId?: int|null}  $opsi
-     *         sourceId (T-A040): batasi retrieval pada SATU sumber pengetahuan
-     *         pilihan pengguna (Generator Soal) — additive, pemanggil lama
-     *         tidak terpengaruh.
+     *                                                                                                      sourceId (T-A040): batasi retrieval pada SATU sumber pengetahuan
+     *                                                                                                      pilihan pengguna (Generator Soal) — additive, pemanggil lama
+     *                                                                                                      tidak terpengaruh.
      */
     public function cari(
         string $query,

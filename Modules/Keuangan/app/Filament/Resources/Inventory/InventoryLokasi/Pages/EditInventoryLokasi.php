@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Inventory\InventoryLokasi\Pages;
 
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryLokasiResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryLokasiResource;
 
 class EditInventoryLokasi extends EditRecord
 {

@@ -2,9 +2,9 @@
 
 namespace Modules\Mutu\Filament\Resources\MutuInspeksi\Pages;
 
-use Modules\Mutu\Filament\Resources\MutuInspeksiResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Mutu\Filament\Resources\MutuInspeksiResource;
 
 class ListMutuInspeksi extends ListRecords
 {

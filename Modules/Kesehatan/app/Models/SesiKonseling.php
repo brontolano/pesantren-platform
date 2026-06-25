@@ -2,8 +2,8 @@
 
 namespace Modules\Kesehatan\Models;
 
-use App\Traits\BelongsToTenant;
 use App\Models\User;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Kesantrian\Models\Santri;

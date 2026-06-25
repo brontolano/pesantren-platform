@@ -24,9 +24,7 @@ class PosEnrichmentService
 {
     public const METODE = ['tunai', 'transfer', 'qris'];
 
-    public function __construct(private readonly PosKasService $posKas)
-    {
-    }
+    public function __construct(private readonly PosKasService $posKas) {}
 
     /** Buka sesi memakai profil loket (pos_jenis + profil_id). */
     public function bukaSesiProfil(PosProfil|int $profil, array $data = []): PosSesi

@@ -6,7 +6,6 @@ use App\Models\Tenant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesehatan\Models\RiwayatKesehatan;
-use Modules\Kesehatan\Models\SesiKonseling;
 use Modules\Kesehatan\Services\KesehatanService;
 use Tests\TestCase;
 
@@ -15,25 +14,28 @@ class KesehatanServiceTest extends TestCase
     use RefreshDatabase;
 
     private KesehatanService $service;
+
     private Tenant $tenantA;
+
     private Tenant $tenantB;
+
     private Santri $santriA;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new KesehatanService();
+        $this->service = new KesehatanService;
 
         $this->tenantA = Tenant::create(['id' => 'pesantren-a', 'name' => 'Pesantren A', 'is_active' => true]);
         $this->tenantB = Tenant::create(['id' => 'pesantren-b', 'name' => 'Pesantren B', 'is_active' => true]);
 
         tenancy()->initialize($this->tenantA);
         $this->santriA = Santri::create([
-            'tenant_id'     => 'pesantren-a',
-            'nis'           => '2024001',
-            'nama'          => 'Ahmad Fulan',
+            'tenant_id' => 'pesantren-a',
+            'nis' => '2024001',
+            'nama' => 'Ahmad Fulan',
             'jenis_kelamin' => 'L',
-            'status'        => 'aktif',
+            'status' => 'aktif',
         ]);
         tenancy()->end();
     }
@@ -45,7 +47,7 @@ class KesehatanServiceTest extends TestCase
         $riwayat = $this->service->catatKesehatan($this->santriA, [
             'tanggal' => today()->toDateString(),
             'keluhan' => 'Demam',
-            'diagnosa'=> 'ISPA ringan',
+            'diagnosa' => 'ISPA ringan',
             'kondisi' => 'sakit',
             'petugas' => 'Bidan Siti',
         ]);
@@ -63,13 +65,13 @@ class KesehatanServiceTest extends TestCase
 
         $sesi = $this->service->jadwalkanKonseling($this->santriA, [
             'tanggal' => today()->toDateString(),
-            'topik'   => 'Masalah adaptasi',
+            'topik' => 'Masalah adaptasi',
         ]);
 
         $this->assertEquals('terjadwal', $sesi->status);
 
         $selesai = $this->service->selesaikanKonseling($sesi, [
-            'rekomendasi'      => 'Pantau selama 1 minggu',
+            'rekomendasi' => 'Pantau selama 1 minggu',
             'catatan_lanjutan' => 'Santri sudah lebih tenang',
         ]);
 

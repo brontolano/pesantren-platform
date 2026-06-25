@@ -3,38 +3,38 @@
 namespace App\Filament\Widgets;
 
 use App\Filament\Pages\SetupUnit;
+use App\Filament\Resources\Media\MediaFileResource;
+use App\Filament\Resources\Santri\SantriResource;
+use App\Filament\Resources\Users\UserResource;
+use App\Services\ModuleService;
+use Filament\Widgets\Widget;
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
 use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
 use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
-use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
 use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
-use Modules\Notifikasi\Filament\Resources\BroadcastWa\BroadcastWaResource;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
 use Modules\Kegiatan\Filament\Resources\IzinSantriResource;
 use Modules\Kegiatan\Filament\Resources\KegiatanResource;
 use Modules\Kegiatan\Filament\Resources\KunjunganWaliResource;
+use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use Modules\Kesantrian\Filament\Resources\Kelas\KelasResource;
 use Modules\Kesehatan\Filament\Resources\RiwayatKesehatanResource;
 use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
 use Modules\Keuangan\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
-use Modules\Ledger\Filament\Resources\JurnalResource;
-use App\Filament\Resources\Media\MediaFileResource;
-use Modules\Payroll\Filament\Resources\SlipGajiResource;
 use Modules\Keuangan\Filament\Resources\Pembayaran\PembayaranResource;
+use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
+use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
+use Modules\Ledger\Filament\Resources\JurnalResource;
+use Modules\Notifikasi\Filament\Resources\BroadcastWa\BroadcastWaResource;
+use Modules\Payroll\Filament\Resources\SlipGajiResource;
 use Modules\Pengadaan\Filament\Resources\BelanjaResource;
 use Modules\PPDB\Filament\Resources\CalonSantriResource;
 use Modules\PPDB\Filament\Resources\HasilUjianResource;
-use App\Filament\Resources\Santri\SantriResource;
-use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
-use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
 use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
 use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
-use App\Filament\Resources\Users\UserResource;
-use App\Services\ModuleService;
-use Filament\Widgets\Widget;
 
 /**
  * "Akses Cepat" — grid ikon pintasan ke menu/aksi tersering di dasbor tenant.

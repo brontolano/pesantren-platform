@@ -2,9 +2,9 @@
 
 namespace Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages;
 
-use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
 use Modules\Kesantrian\Models\JenisPelanggaran;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Services\DisiplinService;

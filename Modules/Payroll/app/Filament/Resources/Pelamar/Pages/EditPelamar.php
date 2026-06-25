@@ -2,8 +2,8 @@
 
 namespace Modules\Payroll\Filament\Resources\Pelamar\Pages;
 
-use Modules\Payroll\Filament\Resources\Pelamar\PelamarResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Payroll\Filament\Resources\Pelamar\PelamarResource;
 
 class EditPelamar extends EditRecord
 {

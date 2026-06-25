@@ -4,7 +4,6 @@ namespace Tests\Unit;
 
 use Modules\Kesehatan\Models\KunjunganUks;
 use Modules\Kesehatan\Services\KesehatanService;
-use Modules\Kesantrian\Models\Santri;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,7 +16,7 @@ class WP27UksServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new KesehatanService();
+        $this->service = new KesehatanService;
     }
 
     public function test_service_instantiated(): void
@@ -27,7 +26,7 @@ class WP27UksServiceTest extends TestCase
 
     public function test_kunjungan_uks_has_expected_table_name(): void
     {
-        $model = new KunjunganUks();
+        $model = new KunjunganUks;
         $this->assertEquals('kunjungan_uks', $model->getTable());
     }
 

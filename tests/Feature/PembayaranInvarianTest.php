@@ -63,7 +63,7 @@ class PembayaranInvarianTest extends TestCase
             'status' => 'aktif',
         ]);
 
-        return (new TagihanService())->buatTagihanUntukSantri($santri, [
+        return (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'nominal' => $nominal,
             'jatuh_tempo' => '2026-07-10',
@@ -90,7 +90,7 @@ class PembayaranInvarianTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('dibatalkan');
 
-        (new PembayaranService())->inputPembayaran($tagihan->fresh(), ['nominal' => 50000]);
+        (new PembayaranService)->inputPembayaran($tagihan->fresh(), ['nominal' => 50000]);
     }
 
     public function test_i3_input_melebihi_sisa_tagihan_ditolak(): void
@@ -100,7 +100,7 @@ class PembayaranInvarianTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('melebihi sisa tagihan');
 
-        (new PembayaranService())->inputPembayaran($tagihan, ['nominal' => 400000]);
+        (new PembayaranService)->inputPembayaran($tagihan, ['nominal' => 400000]);
     }
 
     public function test_i3_input_nominal_nol_ditolak(): void
@@ -109,13 +109,13 @@ class PembayaranInvarianTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
 
-        (new PembayaranService())->inputPembayaran($tagihan, ['nominal' => 0]);
+        (new PembayaranService)->inputPembayaran($tagihan, ['nominal' => 0]);
     }
 
     public function test_i3_tolak_pembayaran_yang_sudah_terverifikasi_ditolak(): void
     {
         $tagihan = $this->tagihan(300000);
-        $svc = new PembayaranService();
+        $svc = new PembayaranService;
         $verifier = $this->verifier();
 
         $bayar = $svc->inputPembayaran($tagihan, ['nominal' => 100000]);
@@ -129,7 +129,7 @@ class PembayaranInvarianTest extends TestCase
     public function test_i3_batalkan_pembayaran_terverifikasi_ditolak_record_tetap_ada(): void
     {
         $tagihan = $this->tagihan(300000);
-        $svc = new PembayaranService();
+        $svc = new PembayaranService;
         $verifier = $this->verifier();
 
         $bayar = $svc->inputPembayaran($tagihan, ['nominal' => 100000]);
@@ -156,7 +156,7 @@ class PembayaranInvarianTest extends TestCase
     public function test_i4_verifikasi_dua_kali_ditolak_tanpa_duplikasi(): void
     {
         $tagihan = $this->tagihan(300000);
-        $svc = new PembayaranService();
+        $svc = new PembayaranService;
         $verifier = $this->verifier();
 
         $bayar = $svc->inputPembayaran($tagihan, ['nominal' => 300000]);

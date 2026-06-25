@@ -63,7 +63,7 @@ class PpdbDocumentTypes
      * Dokumen WAJIB yang belum diunggah, dari daftar jenis yang sudah ada.
      *
      * @param  iterable<string>  $uploadedTypes  jenis_dokumen yang sudah terunggah
-     * @return list<string>  kunci wajib yang masih kurang
+     * @return list<string> kunci wajib yang masih kurang
      */
     public static function missingRequired(iterable $uploadedTypes): array
     {

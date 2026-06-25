@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\JadwalPelajaran;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\CreateJadwalPelajaran;
-use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\EditJadwalPelajaran;
-use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\ListJadwalPelajaran;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -20,6 +17,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\CreateJadwalPelajaran;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\EditJadwalPelajaran;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\ListJadwalPelajaran;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\PeriodeAkademik;

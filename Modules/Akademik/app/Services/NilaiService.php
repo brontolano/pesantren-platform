@@ -4,6 +4,7 @@ namespace Modules\Akademik\Services;
 
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Modules\Akademik\Models\JadwalPelajaran;
@@ -162,9 +163,9 @@ class NilaiService
      * Komponen nilai berlaku untuk satu pelajaran: baris spesifik pelajaran
      * bila ada, kalau tidak default tenant (pelajaran_id NULL).
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, KomponenNilai>
+     * @return Collection<int, KomponenNilai>
      */
-    public function komponenUntukPelajaran(?int $pelajaranId): \Illuminate\Database\Eloquent\Collection
+    public function komponenUntukPelajaran(?int $pelajaranId): Collection
     {
         if ($pelajaranId !== null) {
             $spesifik = KomponenNilai::query()

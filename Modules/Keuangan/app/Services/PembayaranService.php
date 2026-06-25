@@ -2,13 +2,14 @@
 
 namespace Modules\Keuangan\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Events\PembayaranDiverifikasi;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use RuntimeException;
-use InvalidArgumentException;
 
 class PembayaranService
 {
@@ -287,7 +288,7 @@ class PembayaranService
     /**
      * List pembayaran untuk satu tagihan.
      */
-    public function listPembayaranTagihan(Tagihan|int $tagihan): \Illuminate\Database\Eloquent\Collection
+    public function listPembayaranTagihan(Tagihan|int $tagihan): Collection
     {
         $this->ensureTenantContext();
 

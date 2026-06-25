@@ -152,4 +152,3 @@ class ListSantri extends ListRecords
             });
     }
 }
-

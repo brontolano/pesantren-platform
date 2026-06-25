@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages;
 
-use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 
 class EditPosProfil extends EditRecord
 {

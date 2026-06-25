@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\PresensiSantri\Pages;
 
-use Modules\Akademik\Filament\Resources\PresensiSantri\PresensiSantriResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Akademik\Filament\Resources\PresensiSantri\PresensiSantriResource;
 
 class EditPresensiSantri extends EditRecord
 {

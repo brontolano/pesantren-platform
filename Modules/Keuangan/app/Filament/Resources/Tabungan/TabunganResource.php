@@ -3,7 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\Tabungan;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\Tabungan\Pages\ListTabungan;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -13,6 +12,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Keuangan\Filament\Resources\Tabungan\Pages\ListTabungan;
 use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Services\TabunganService;
 

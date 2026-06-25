@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\Kurikulum;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\Kurikulum\Pages\CreateKurikulum;
-use Modules\Akademik\Filament\Resources\Kurikulum\Pages\EditKurikulum;
-use Modules\Akademik\Filament\Resources\Kurikulum\Pages\ListKurikulum;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -25,6 +22,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Modules\Akademik\Filament\Resources\Kurikulum\Pages\CreateKurikulum;
+use Modules\Akademik\Filament\Resources\Kurikulum\Pages\EditKurikulum;
+use Modules\Akademik\Filament\Resources\Kurikulum\Pages\ListKurikulum;
 use Modules\Akademik\Models\Kitab;
 use Modules\Akademik\Models\Kurikulum;
 use Modules\Akademik\Models\Lembaga;

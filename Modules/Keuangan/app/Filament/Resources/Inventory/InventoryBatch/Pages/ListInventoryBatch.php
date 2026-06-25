@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\Inventory\InventoryBatch\Pages;
 
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryBatchResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryBatchResource;
 
 class ListInventoryBatch extends ListRecords
 {

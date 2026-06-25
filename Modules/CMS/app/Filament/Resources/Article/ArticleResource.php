@@ -4,9 +4,6 @@ namespace Modules\CMS\Filament\Resources\Article;
 
 use App\Filament\Concerns\ModuleGate;
 use App\Services\StorageQuotaService;
-use Modules\CMS\Filament\Resources\Article\Pages\CreateArticle;
-use Modules\CMS\Filament\Resources\Article\Pages\EditArticle;
-use Modules\CMS\Filament\Resources\Article\Pages\ListArticles;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -28,6 +25,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Modules\CMS\Filament\Resources\Article\Pages\CreateArticle;
+use Modules\CMS\Filament\Resources\Article\Pages\EditArticle;
+use Modules\CMS\Filament\Resources\Article\Pages\ListArticles;
 use Modules\CMS\Models\Article;
 
 class ArticleResource extends Resource

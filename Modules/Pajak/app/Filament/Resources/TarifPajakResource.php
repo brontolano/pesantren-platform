@@ -3,7 +3,6 @@
 namespace Modules\Pajak\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Pajak\Filament\Resources\Pages\ListTarifPajak;
 use App\Support\UiMode;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
@@ -15,6 +14,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Pajak\Filament\Resources\Pages\ListTarifPajak;
 use Modules\Pajak\Models\TarifPajak;
 
 /**

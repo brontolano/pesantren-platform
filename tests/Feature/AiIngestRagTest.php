@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tenant;
 use App\Models\User;
 use App\Services\StorageQuotaService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -51,7 +53,7 @@ class AiIngestRagTest extends TestCase
         // DB test persisten lintas-run: kosongkan registry modul agar baseline
         // = "modul tak terdaftar → tampil" (pola ModuleService, sama dgn
         // AiWizardPengaturanTest).
-        \Illuminate\Support\Facades\DB::table('module_registry')->delete();
+        DB::table('module_registry')->delete();
     }
 
     protected function tearDown(): void
@@ -63,7 +65,7 @@ class AiIngestRagTest extends TestCase
         parent::tearDown();
     }
 
-    private function siapkanTenant(string $prefix): \App\Models\Tenant
+    private function siapkanTenant(string $prefix): Tenant
     {
         $tenant = $this->createRuntimeTenant($prefix, 'Pesantren '.$prefix);
         tenancy()->initialize($tenant);
@@ -436,7 +438,7 @@ class AiIngestRagTest extends TestCase
     // Regresi: chunker tidak boleh merayap di ekor teks (teks pendek = 1 chunk).
     public function test_teks_pendek_menghasilkan_satu_chunk(): void
     {
-        $svc = app(\Modules\AI\Services\Rag\IngestService::class);
+        $svc = app(IngestService::class);
         $m = new \ReflectionMethod($svc, 'chunk');
 
         $pendek = $m->invoke($svc, str_repeat('Kalimat uji pendek. ', 12)); // ~240 char

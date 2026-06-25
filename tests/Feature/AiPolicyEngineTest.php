@@ -7,6 +7,7 @@ use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Modules\AI\Models\AiApproval;
 use Modules\AI\Models\AiAuditLog;
@@ -50,7 +51,7 @@ class AiPolicyEngineTest extends TestCase
         ]);
         $this->truncatePpdbTables(['domains', 'tenants', 'ai_credit_ledger', 'ai_tenant_budget']);
         // Baseline gating modul T-A012: registry kosong = modul tampil.
-        \Illuminate\Support\Facades\DB::table('module_registry')->delete();
+        DB::table('module_registry')->delete();
         Cache::flush();
     }
 
@@ -500,7 +501,7 @@ class AiPolicyEngineTest extends TestCase
 
         // Simulasi rule korup yang lolos masuk DB (bypass model event) —
         // mis. data lama / tulisan manual. Evaluasi HARUS fail-closed.
-        \Illuminate\Support\Facades\DB::table('ai_policy_rule')->insert([
+        DB::table('ai_policy_rule')->insert([
             'policy_id' => $policy->id,
             'tipe' => AiPolicyRule::TIPE_BLACKLIST_TOPIK,
             'pola' => json_encode(['keyword' => [], 'regex' => ['/rusak(/iu']]),

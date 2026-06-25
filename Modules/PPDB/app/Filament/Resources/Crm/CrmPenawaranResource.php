@@ -3,12 +3,12 @@
 namespace Modules\PPDB\Filament\Resources\Crm;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\PPDB\Filament\Resources\Crm\Pages\ListCrmPenawaran;
 use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\PPDB\Filament\Resources\Crm\Pages\ListCrmPenawaran;
 use Modules\PPDB\Models\CrmPenawaran;
 
 /**

@@ -2,9 +2,9 @@
 
 namespace Modules\Payroll\Filament\Resources\Pages;
 
-use Modules\Payroll\Filament\Resources\SlipGajiResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Payroll\Filament\Resources\SlipGajiResource;
 
 class ListSlipGaji extends ListRecords
 {

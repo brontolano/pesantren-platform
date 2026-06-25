@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\PeriodeAkademik\Pages;
 
-use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
 
 class ListPeriodeAkademik extends ListRecords
 {
@@ -17,4 +17,3 @@ class ListPeriodeAkademik extends ListRecords
         ];
     }
 }
-

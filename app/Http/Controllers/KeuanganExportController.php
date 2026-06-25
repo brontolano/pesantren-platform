@@ -18,13 +18,13 @@ class KeuanganExportController extends Controller
         $query = $this->buildTagihanQuery($request);
         $tagihan = $query->get();
 
-        $filename = 'laporan-tagihan-' . now()->format('Y-m-d') . '.csv';
+        $filename = 'laporan-tagihan-'.now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($tagihan): void {
             $handle = fopen('php://output', 'w');
 
             // BOM for Excel UTF-8 compatibility
-            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
             fputcsv($handle, [
                 'NIS',
@@ -77,11 +77,11 @@ class KeuanganExportController extends Controller
         $query = $this->buildPembayaranQuery($request);
         $pembayaran = $query->get();
 
-        $filename = 'laporan-pembayaran-' . now()->format('Y-m-d') . '.csv';
+        $filename = 'laporan-pembayaran-'.now()->format('Y-m-d').'.csv';
 
         return response()->streamDownload(function () use ($pembayaran): void {
             $handle = fopen('php://output', 'w');
-            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
             fputcsv($handle, [
                 'Tanggal Bayar',

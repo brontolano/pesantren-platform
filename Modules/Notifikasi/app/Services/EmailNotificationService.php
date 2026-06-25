@@ -12,8 +12,7 @@ class EmailNotificationService
     public function __construct(
         private readonly TemplateRenderer $renderer,
         private readonly LogNotifikasiService $logService,
-    ) {
-    }
+    ) {}
 
     public function send(TemplateNotifikasi $template, string $email, array $variables = []): void
     {

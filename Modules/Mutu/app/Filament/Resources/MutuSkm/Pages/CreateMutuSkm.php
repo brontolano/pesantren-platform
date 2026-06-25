@@ -2,8 +2,8 @@
 
 namespace Modules\Mutu\Filament\Resources\MutuSkm\Pages;
 
-use Modules\Mutu\Filament\Resources\MutuSkmResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Mutu\Filament\Resources\MutuSkmResource;
 
 class CreateMutuSkm extends CreateRecord
 {

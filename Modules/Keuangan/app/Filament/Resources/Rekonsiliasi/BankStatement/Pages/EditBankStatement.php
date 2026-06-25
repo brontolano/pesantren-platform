@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatement\Pages;
 
-use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatementResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatementResource;
 
 class EditBankStatement extends EditRecord
 {

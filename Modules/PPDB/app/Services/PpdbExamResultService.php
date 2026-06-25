@@ -20,7 +20,7 @@ class PpdbExamResultService
         // KUNCI HASIL (F3): nilai tak boleh diubah setelah keputusan terbit —
         // hasil ujian adalah dasar keputusan; koreksi butuh pencabutan keputusan.
         if ($candidate->tanggal_keputusan !== null) {
-            throw new \InvalidArgumentException('Hasil ujian terkunci — keputusan sudah diterbitkan.');
+            throw new InvalidArgumentException('Hasil ujian terkunci — keputusan sudah diterbitkan.');
         }
 
         $kategori = $this->normalizeKategori((string) ($payload['kategori_ujian'] ?? ''));

@@ -2,20 +2,24 @@
 
 namespace Modules\Payroll\Filament\Resources\Jabatan;
 
-use Modules\Payroll\Filament\Resources\Jabatan\Pages\CreateJabatan;
-use Modules\Payroll\Filament\Resources\Jabatan\Pages\EditJabatan;
-use Modules\Payroll\Filament\Resources\Jabatan\Pages\ListJabatan;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Payroll\Filament\Resources\Jabatan\Pages\CreateJabatan;
+use Modules\Payroll\Filament\Resources\Jabatan\Pages\EditJabatan;
+use Modules\Payroll\Filament\Resources\Jabatan\Pages\ListJabatan;
 use Modules\Payroll\Models\Jabatan;
 use Spatie\Permission\Models\Role;
 
@@ -25,7 +29,7 @@ use Spatie\Permission\Models\Role;
  */
 class JabatanResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Jabatan::class;
 
@@ -43,7 +47,7 @@ class JabatanResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
+        return UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
     }
 
     public static function canAccess(): bool
@@ -56,7 +60,7 @@ class JabatanResource extends Resource
         return auth()->user()?->can('run_payroll') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('run_payroll') ?? false;
     }
@@ -103,7 +107,7 @@ class JabatanResource extends Resource
         return DeleteAction::make()
             ->before(function (DeleteAction $action, Jabatan $record): void {
                 if ($record->penugasan()->exists()) {
-                    \Filament\Notifications\Notification::make()
+                    Notification::make()
                         ->danger()
                         ->title('Jabatan tidak bisa dihapus')
                         ->body('Masih ada penugasan (aktif atau riwayat) yang memakai jabatan ini. Nonaktifkan jabatan sebagai gantinya.')

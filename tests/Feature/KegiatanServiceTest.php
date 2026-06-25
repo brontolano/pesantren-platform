@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Kesantrian\Models\Santri;
-use Modules\Kegiatan\Models\Kegiatan;
 use Modules\Kegiatan\Models\IzinSantri;
+use Modules\Kegiatan\Models\Kegiatan;
 use Modules\Kegiatan\Models\KunjunganWali;
 use Modules\Kegiatan\Services\KegiatanService;
+use Modules\Kesantrian\Models\Santri;
 use Tests\TestCase;
 
 class KegiatanServiceTest extends TestCase
@@ -17,25 +17,28 @@ class KegiatanServiceTest extends TestCase
     use RefreshDatabase;
 
     private KegiatanService $service;
+
     private Tenant $tenantA;
+
     private Tenant $tenantB;
+
     private Santri $santriA;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new KegiatanService();
+        $this->service = new KegiatanService;
 
         $this->tenantA = Tenant::create(['id' => 'pesantren-a', 'name' => 'Pesantren A', 'is_active' => true]);
         $this->tenantB = Tenant::create(['id' => 'pesantren-b', 'name' => 'Pesantren B', 'is_active' => true]);
 
         tenancy()->initialize($this->tenantA);
         $this->santriA = Santri::create([
-            'tenant_id'     => 'pesantren-a',
-            'nis'           => '2024001',
-            'nama'          => 'Ahmad Fulan',
+            'tenant_id' => 'pesantren-a',
+            'nis' => '2024001',
+            'nama' => 'Ahmad Fulan',
             'jenis_kelamin' => 'L',
-            'status'        => 'aktif',
+            'status' => 'aktif',
         ]);
         tenancy()->end();
     }
@@ -45,7 +48,7 @@ class KegiatanServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
 
         $kegiatan = $this->service->buatKegiatan('pesantren-a', [
-            'nama'  => 'Shalat Berjama\'ah Subuh',
+            'nama' => 'Shalat Berjama\'ah Subuh',
             'jenis' => 'wajib',
             'mulai' => now()->toDateTimeString(),
         ]);
@@ -62,7 +65,7 @@ class KegiatanServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
 
         $kegiatan = $this->service->buatKegiatan('pesantren-a', [
-            'nama'  => 'Pengajian Rutin',
+            'nama' => 'Pengajian Rutin',
             'jenis' => 'wajib',
             'mulai' => now()->toDateTimeString(),
         ]);
@@ -84,10 +87,10 @@ class KegiatanServiceTest extends TestCase
         $user = User::factory()->create(['tenant_id' => 'pesantren-a']);
 
         $izin = $this->service->ajukanIzin($this->santriA, [
-            'jenis_izin'      => 'pulang',
-            'tanggal_mulai'   => today()->toDateString(),
+            'jenis_izin' => 'pulang',
+            'tanggal_mulai' => today()->toDateString(),
             'tanggal_selesai' => today()->addDays(2)->toDateString(),
-            'alasan'          => 'Acara keluarga',
+            'alasan' => 'Acara keluarga',
         ]);
 
         $this->assertEquals('pending', $izin->status);
@@ -104,10 +107,10 @@ class KegiatanServiceTest extends TestCase
 
         $user = User::factory()->create(['tenant_id' => 'pesantren-a']);
         $izin = $this->service->ajukanIzin($this->santriA, [
-            'jenis_izin'      => 'pulang',
-            'tanggal_mulai'   => today()->toDateString(),
+            'jenis_izin' => 'pulang',
+            'tanggal_mulai' => today()->toDateString(),
             'tanggal_selesai' => today()->addDays(1)->toDateString(),
-            'alasan'          => 'Pengobatan',
+            'alasan' => 'Pengobatan',
         ]);
         $this->service->setujuiIzin($izin, $user->id);
         $kembali = $this->service->konfirmasiKembali($izin);
@@ -122,10 +125,10 @@ class KegiatanServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenantA);
         $this->service->ajukanIzin($this->santriA, [
-            'jenis_izin'      => 'sakit',
-            'tanggal_mulai'   => today()->toDateString(),
+            'jenis_izin' => 'sakit',
+            'tanggal_mulai' => today()->toDateString(),
             'tanggal_selesai' => today()->toDateString(),
-            'alasan'          => 'Demam',
+            'alasan' => 'Demam',
         ]);
         tenancy()->end();
 
@@ -140,9 +143,9 @@ class KegiatanServiceTest extends TestCase
 
         $kunjungan = $this->service->catatKunjungan($this->santriA, [
             'nama_pengunjung' => 'Bapak Usman',
-            'hubungan'        => 'ayah',
-            'tanggal'         => today()->toDateString(),
-            'keperluan'       => 'Mengantarkan perlengkapan',
+            'hubungan' => 'ayah',
+            'tanggal' => today()->toDateString(),
+            'keperluan' => 'Mengantarkan perlengkapan',
         ]);
 
         $this->assertInstanceOf(KunjunganWali::class, $kunjungan);

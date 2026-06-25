@@ -19,9 +19,7 @@ use RuntimeException;
  */
 class IdCardService
 {
-    public function __construct(private readonly ReportExportService $exporter)
-    {
-    }
+    public function __construct(private readonly ReportExportService $exporter) {}
 
     /** Render kartu untuk kumpulan santri sebagai HTML siap-cetak. */
     public function html(Collection $santri): string

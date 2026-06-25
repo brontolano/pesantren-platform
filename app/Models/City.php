@@ -9,8 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class City extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
+
     protected $keyType = 'string';
+
     protected $fillable = ['id', 'province_id', 'name'];
 
     public function province(): BelongsTo

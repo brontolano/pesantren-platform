@@ -2,24 +2,25 @@
 
 namespace Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama;
 
-use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\Pages\IsiPresensi;
-use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\Pages\ListPresensiAsrama;
-use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\Pages\RekapPresensi;
+use App\Filament\Concerns\ModuleGate;
 use BackedEnum;
+use Filament\Forms\Components\DatePicker;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\Pages\IsiPresensi;
+use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\Pages\ListPresensiAsrama;
+use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\Pages\RekapPresensi;
 use Modules\Kesantrian\Models\PresensiAsrama;
 use Modules\Kesantrian\Services\PresensiAsramaService;
 use UnitEnum;
 
 class PresensiAsramaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PresensiAsrama::class;
 
@@ -83,7 +84,7 @@ class PresensiAsramaResource extends Resource
             ->filters([
                 Filter::make('tanggal')
                     ->form([
-                        \Filament\Forms\Components\DatePicker::make('tanggal')
+                        DatePicker::make('tanggal')
                             ->default(now()),
                     ])
                     ->query(fn (Builder $query, array $data) => $query->when(

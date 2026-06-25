@@ -3,9 +3,6 @@
 namespace Modules\Ledger\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Ledger\Filament\Resources\Pages\CreateDivisiUnit;
-use Modules\Ledger\Filament\Resources\Pages\EditDivisiUnit;
-use Modules\Ledger\Filament\Resources\Pages\ListDivisiUnit;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -19,6 +16,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Ledger\Filament\Resources\Pages\CreateDivisiUnit;
+use Modules\Ledger\Filament\Resources\Pages\EditDivisiUnit;
+use Modules\Ledger\Filament\Resources\Pages\ListDivisiUnit;
 use Modules\Ledger\Models\DivisiUnit;
 
 class DivisiUnitResource extends Resource

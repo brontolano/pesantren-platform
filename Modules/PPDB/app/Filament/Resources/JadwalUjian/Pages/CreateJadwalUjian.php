@@ -2,8 +2,8 @@
 
 namespace Modules\PPDB\Filament\Resources\JadwalUjian\Pages;
 
-use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 
 class CreateJadwalUjian extends CreateRecord
 {

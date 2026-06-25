@@ -58,7 +58,7 @@ class RekonsiliasiAnomaliTest extends TestCase
             'status' => 'aktif',
         ]);
 
-        return (new TagihanService())->buatTagihanUntukSantri($santri, [
+        return (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'nominal' => $nominal,
             'jatuh_tempo' => '2026-07-10',
@@ -78,7 +78,7 @@ class RekonsiliasiAnomaliTest extends TestCase
     public function test_data_konsisten_tidak_ada_anomali(): void
     {
         $tagihan = $this->tagihan(300000);
-        $svc = new PembayaranService();
+        $svc = new PembayaranService;
         $verifier = $this->verifier();
 
         $bayar = $svc->inputPembayaran($tagihan, ['nominal' => 300000]);
@@ -87,7 +87,7 @@ class RekonsiliasiAnomaliTest extends TestCase
         $tagihan->refresh();
         $this->assertSame('lunas', $tagihan->status);
 
-        $this->assertSame([], (new RekonsiliasiService())->deteksiAnomaliStatus());
+        $this->assertSame([], (new RekonsiliasiService)->deteksiAnomaliStatus());
     }
 
     public function test_status_drift_terdeteksi(): void
@@ -97,7 +97,7 @@ class RekonsiliasiAnomaliTest extends TestCase
         // Paksa drift: tandai lunas TANPA pembayaran (mensimulasikan bypass/data manual).
         $tagihan->update(['status' => 'lunas']);
 
-        $anomali = (new RekonsiliasiService())->deteksiAnomaliStatus();
+        $anomali = (new RekonsiliasiService)->deteksiAnomaliStatus();
 
         $this->assertCount(1, $anomali);
         $this->assertSame($tagihan->id, $anomali[0]['tagihan_id']);

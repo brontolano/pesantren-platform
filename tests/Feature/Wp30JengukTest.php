@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Modules\Kegiatan\Filament\Pages\PengajuanJengukPanel;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use Livewire\Livewire;
+use Modules\Kegiatan\Filament\Pages\PengajuanJengukPanel;
 use Modules\Kegiatan\Models\KunjunganWali;
 use Modules\Kegiatan\Models\PengajuanJenguk;
 use Modules\Kegiatan\Services\PenjengukanService;

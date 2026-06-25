@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Modules\Akademik\Models\PresensiSantri;
@@ -217,7 +218,7 @@ class PenempatanKelasSyncTest extends TestCase
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             // HARUS unique violation (23505) dari index parsial — bukan
             // error lain yang kebetulan lolos (false positive).
             $this->assertSame('23505', $e->errorInfo[0] ?? null, 'Harus unique_violation dari index parsial: '.$e->getMessage());

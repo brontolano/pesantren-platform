@@ -2,9 +2,9 @@
 
 namespace Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages;
 
-use Modules\Asrama\Filament\Resources\PenempatanAsrama\PenempatanAsramaResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\PenempatanAsramaResource;
 
 class EditPenempatanAsrama extends EditRecord
 {
@@ -17,4 +17,3 @@ class EditPenempatanAsrama extends EditRecord
         ];
     }
 }
-

@@ -9,7 +9,6 @@ use InvalidArgumentException;
 use Modules\Ledger\Exceptions\JurnalTidakSeimbangException;
 use Modules\Ledger\Exceptions\PeriodeTerkunciException;
 use Modules\Ledger\Models\Jurnal;
-use Modules\Ledger\Models\JurnalBaris;
 use Modules\Ledger\Models\PeriodeAkuntansi;
 use RuntimeException;
 
@@ -28,9 +27,7 @@ class JurnalService
     /** Toleransi pembulatan saat membandingkan total debit vs kredit. */
     private const EPSILON = 0.001;
 
-    public function __construct(private readonly KehalalanGuard $kehalalanGuard = new KehalalanGuard)
-    {
-    }
+    public function __construct(private readonly KehalalanGuard $kehalalanGuard = new KehalalanGuard) {}
 
     /**
      * Posting satu jurnal seimbang secara atomik & idempoten.
@@ -170,11 +167,11 @@ class JurnalService
             $pembalik = Jurnal::create([
                 'nomor' => $this->generateNomor($tanggal),
                 'tanggal' => $tanggal,
-                'deskripsi' => 'Pembalik #' . $jurnal->nomor . ($alasan ? ' — ' . $alasan : ''),
+                'deskripsi' => 'Pembalik #'.$jurnal->nomor.($alasan ? ' — '.$alasan : ''),
                 'tipe_sumber' => 'pembalik',
                 'ref_type' => $jurnal->ref_type,
                 'ref_id' => $jurnal->ref_id,
-                'idempotency_key' => 'reversal:' . $jurnal->id,
+                'idempotency_key' => 'reversal:'.$jurnal->id,
                 'periode_id' => $periode?->id,
                 'status' => 'posted',
                 'reversal_of_id' => $jurnal->id,
@@ -190,7 +187,7 @@ class JurnalService
                     'party_id' => $row->party_id,
                     'debit' => $row->kredit, // ditukar
                     'kredit' => $row->debit,
-                    'memo' => 'Pembalik: ' . ($row->memo ?? ''),
+                    'memo' => 'Pembalik: '.($row->memo ?? ''),
                 ]);
             }
 
@@ -252,7 +249,7 @@ class JurnalService
     private function deriveIdempotencyKey(?string $refType, ?string $refId): ?string
     {
         if ($refType !== null && $refId !== null) {
-            return $refType . ':' . $refId;
+            return $refType.':'.$refId;
         }
 
         return null;
@@ -271,7 +268,7 @@ class JurnalService
     {
         $prefix = sprintf('JRN/%04d/%02d/', $tanggal->year, $tanggal->month);
 
-        $last = Jurnal::where('nomor', 'like', $prefix . '%')
+        $last = Jurnal::where('nomor', 'like', $prefix.'%')
             ->orderByDesc('nomor')
             ->lockForUpdate()
             ->value('nomor');
@@ -281,7 +278,7 @@ class JurnalService
             $next = ((int) substr($last, strlen($prefix))) + 1;
         }
 
-        return $prefix . str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
 
     private function ensureTenantContext(): void

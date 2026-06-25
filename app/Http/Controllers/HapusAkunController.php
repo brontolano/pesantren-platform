@@ -6,6 +6,7 @@ use App\Models\Setting;
 use App\Support\PenghapusanAkun;
 use App\Support\TenantBranding;
 use Illuminate\View\View;
+use Modules\CMS\Models\WebsiteSetting;
 
 /**
  * Halaman publik "Penghapusan Akun & Data" (/hapus-akun) — wajib Google Play.
@@ -40,7 +41,7 @@ class HapusAkunController extends Controller
     {
         $contact = [];
         try {
-            $raw = \Modules\CMS\Models\WebsiteSetting::getTenantValue('contact', []);
+            $raw = WebsiteSetting::getTenantValue('contact', []);
             $contact = is_array($raw) ? $raw : [];
         } catch (\Throwable) {
             $contact = [];

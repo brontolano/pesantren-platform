@@ -18,6 +18,5 @@ class ApprovalDiputuskan
     public function __construct(
         public ApprovalRequest $request,
         public bool $disetujui,
-    ) {
-    }
+    ) {}
 }

@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Village extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
+
     protected $keyType = 'string';
+
     protected $fillable = ['id', 'district_id', 'name'];
 
     public function district(): BelongsTo

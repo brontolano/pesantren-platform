@@ -2,8 +2,8 @@
 
 namespace Modules\Kegiatan\Filament\Resources\KunjunganWali\Pages;
 
-use Modules\Kegiatan\Filament\Resources\KunjunganWaliResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Kegiatan\Filament\Resources\KunjunganWaliResource;
 
 class CreateKunjunganWali extends CreateRecord
 {

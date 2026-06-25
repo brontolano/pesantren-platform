@@ -18,9 +18,7 @@ use Throwable;
  */
 class PostingPembayaranListener
 {
-    public function __construct(private readonly JurnalService $jurnalService)
-    {
-    }
+    public function __construct(private readonly JurnalService $jurnalService) {}
 
     public function handle(PembayaranDiverifikasi $event): void
     {
@@ -47,7 +45,7 @@ class PostingPembayaranListener
         try {
             $this->jurnalService->postJurnal([
                 'tanggal' => $pembayaran->verified_at ?? $pembayaran->tanggal_pembayaran ?? now(),
-                'deskripsi' => 'Pembayaran SPP/syahriyah — bukti #' . $pembayaran->id,
+                'deskripsi' => 'Pembayaran SPP/syahriyah — bukti #'.$pembayaran->id,
                 'tipe_sumber' => 'syahriyah',
                 'ref_type' => 'Pembayaran',
                 'ref_id' => (string) $pembayaran->id,

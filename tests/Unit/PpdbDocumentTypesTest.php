@@ -23,7 +23,7 @@ class PpdbDocumentTypesTest extends TestCase
         $this->assertContains('rapor', PpdbDocumentTypes::optional());
     }
 
-    public function test_isKnown_isRequired_label(): void
+    public function test_is_known_is_required_label(): void
     {
         $this->assertTrue(PpdbDocumentTypes::isKnown('foto'));
         $this->assertFalse(PpdbDocumentTypes::isKnown('paspor'));

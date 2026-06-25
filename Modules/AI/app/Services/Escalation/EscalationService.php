@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
 use Modules\AI\Models\AiEscalation;
+use Modules\AI\Services\Privacy\PiiRedactor;
+use Modules\AI\Services\Research\ResearchTelemetry;
 use Modules\AI\Services\Settings\TenantSettingService;
 use Modules\Notifikasi\Models\LogNotifikasi;
 use Throwable;
@@ -101,7 +103,7 @@ class EscalationService
         }
 
         $maks = (int) config('ai.guardrails.eskalasi_ringkas_max', 300);
-        $terredaksi = app(\Modules\AI\Services\Privacy\PiiRedactor::class)
+        $terredaksi = app(PiiRedactor::class)
             ->redactPaksa($pertanyaan)->text;
 
         // Normalisasi sebelum hash: huruf kecil + spasi rapat — variasi
@@ -121,7 +123,7 @@ class EscalationService
         );
 
         if ($eskalasi->wasRecentlyCreated && tenancy()->initialized) {
-            app(\Modules\AI\Services\Research\ResearchTelemetry::class)
+            app(ResearchTelemetry::class)
                 ->rekamEskalasiKategori((string) tenant()->getKey(), self::KATEGORI_MANUAL);
         }
 

@@ -3,9 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\Inventory;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages\CreateInventoryItem;
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages\EditInventoryItem;
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages\ListInventoryItem;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -21,6 +18,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages\CreateInventoryItem;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages\EditInventoryItem;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages\ListInventoryItem;
 use Modules\Keuangan\Models\InventoryItem;
 use Modules\Keuangan\Models\InventoryLokasi;
 use Modules\Keuangan\Services\InventoryLokasiService;

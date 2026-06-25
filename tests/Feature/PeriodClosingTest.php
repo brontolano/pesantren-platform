@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\DB;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Exceptions\PeriodeTerkunciException;
 use Modules\Ledger\Models\Akun;
@@ -71,7 +72,7 @@ class PeriodClosingTest extends TestCase
         return (float) JurnalBaris::where('akun_id', $this->akunId($kode))
             ->whereHas('jurnal', fn ($j) => $j->where('status', 'posted')
                 ->whereBetween('tanggal', ['2025-01-01 00:00:00', '2025-12-31 23:59:59']))
-            ->sum(\Illuminate\Support\Facades\DB::raw('debit - kredit'));
+            ->sum(DB::raw('debit - kredit'));
     }
 
     public function test_tutup_buku_surplus_dan_nol_kan_nominal(): void

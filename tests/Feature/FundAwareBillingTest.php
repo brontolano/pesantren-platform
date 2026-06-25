@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SkemaBiaya;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\FundAwareBillingService;
 use Modules\Keuangan\Services\SkemaBiayaService;
 use Modules\Keuangan\Services\TagihanService;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Models\SumberDana;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;

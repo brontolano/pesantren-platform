@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\ListPenempatanAsrama;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
 use Livewire\Livewire;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\ListPenempatanAsrama;
 use Modules\Asrama\Models\BlokAsrama;
 use Modules\Asrama\Models\KamarAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;

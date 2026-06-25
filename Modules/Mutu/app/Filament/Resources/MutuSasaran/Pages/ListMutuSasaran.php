@@ -2,9 +2,9 @@
 
 namespace Modules\Mutu\Filament\Resources\MutuSasaran\Pages;
 
-use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 
 class ListMutuSasaran extends ListRecords
 {

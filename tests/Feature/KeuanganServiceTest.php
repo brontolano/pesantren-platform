@@ -2,15 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tabungan;
-use Modules\Keuangan\Models\TabunganTransaksi;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\LaporanKeuanganService;
 use Modules\Keuangan\Services\PembayaranService;
@@ -24,6 +21,7 @@ class KeuanganServiceTest extends TestCase
     use RefreshDatabase;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void
@@ -50,7 +48,7 @@ class KeuanganServiceTest extends TestCase
 
     private function createTagihanForSantri(Santri $santri, float $nominal = 500000): Tagihan
     {
-        return (new TagihanService())->buatTagihanUntukSantri($santri, [
+        return (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'nominal' => $nominal,
             'jatuh_tempo' => '2026-07-10',
@@ -74,7 +72,7 @@ class KeuanganServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
 
         $santri = $this->createSantri();
-        $tagihan = (new TagihanService())->buatTagihanUntukSantri($santri, [
+        $tagihan = (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'keterangan' => 'SPP Juli',
             'nominal' => 400000,
@@ -103,7 +101,7 @@ class KeuanganServiceTest extends TestCase
 
         $this->assertSame('belum_bayar', $tagihan->status);
 
-        $svc = new PembayaranService();
+        $svc = new PembayaranService;
         $verifier = $this->createVerifier();
 
         // Bayar sebagian
@@ -138,12 +136,12 @@ class KeuanganServiceTest extends TestCase
         $santri = $this->createSantri();
         $tagihan = $this->createTagihanForSantri($santri, 500000);
 
-        $svc = new PembayaranService();
+        $svc = new PembayaranService;
         $verifier = $this->createVerifier('bendahara-rekon@example.test');
         $bayar = $svc->inputPembayaran($tagihan, ['nominal' => 200000]);
         $svc->verifikasiPembayaran($bayar, $verifier->id);
 
-        $rekon = (new RekonsiliasiService())->rekonsiliasiPeriode(null, '2026-07');
+        $rekon = (new RekonsiliasiService)->rekonsiliasiPeriode(null, '2026-07');
 
         $this->assertEquals(500000.0, $rekon['total_tagihan']);
         $this->assertEquals(200000.0, $rekon['total_terkumpul_verified']);
@@ -161,7 +159,7 @@ class KeuanganServiceTest extends TestCase
 
         // Default mode = masehi
         $santri = $this->createSantri();
-        $tagihan = (new TagihanService())->buatTagihanUntukSantri($santri, [
+        $tagihan = (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'nominal' => 100000,
             'jatuh_tempo' => '2026-07-10',
@@ -177,14 +175,14 @@ class KeuanganServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenantA);
 
-        (new TagihanService())->setPeriodeKeuangan('hijriah');
+        (new TagihanService)->setPeriodeKeuangan('hijriah');
 
         $santri = $this->createSantri('KEU002');
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('bulan_hijriah');
 
-        (new TagihanService())->buatTagihanUntukSantri($santri, [
+        (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'nominal' => 100000,
             'jatuh_tempo' => '2026-07-10',
@@ -197,10 +195,10 @@ class KeuanganServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenantA);
 
-        (new TagihanService())->setPeriodeKeuangan('keduanya');
+        (new TagihanService)->setPeriodeKeuangan('keduanya');
 
         $santri = $this->createSantri('KEU003');
-        $tagihan = (new TagihanService())->buatTagihanUntukSantri($santri, [
+        $tagihan = (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'nominal' => 100000,
             'jatuh_tempo' => '2026-07-10',
@@ -240,7 +238,7 @@ class KeuanganServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
 
         $santri = $this->createSantri('TAB001');
-        $svc = new TabunganService();
+        $svc = new TabunganService;
 
         // Setor
         $trx1 = $svc->setor($santri, 500000, ['keterangan' => 'Setoran awal']);
@@ -262,7 +260,7 @@ class KeuanganServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
 
         $santri = $this->createSantri('TAB002');
-        $svc = new TabunganService();
+        $svc = new TabunganService;
         $svc->setor($santri, 100000);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -282,7 +280,7 @@ class KeuanganServiceTest extends TestCase
         $santri = $this->createSantri('LAP001');
         $tagihan = $this->createTagihanForSantri($santri, 300000);
 
-        $svc = new PembayaranService();
+        $svc = new PembayaranService;
         $verifier = $this->createVerifier('bendahara-laporan@example.test');
         $bayar = $svc->inputPembayaran($tagihan, [
             'nominal' => 100000,
@@ -296,7 +294,7 @@ class KeuanganServiceTest extends TestCase
             'tanggal_pembayaran' => now()->toDateString(),
         ]);
 
-        $laporan = (new LaporanKeuanganService())->laporanHarian();
+        $laporan = (new LaporanKeuanganService)->laporanHarian();
 
         $this->assertEquals(100000.0, $laporan['total_pembayaran']);
         $this->assertSame(1, $laporan['jumlah_transaksi']);
@@ -313,7 +311,7 @@ class KeuanganServiceTest extends TestCase
         $santri = $this->createSantri('TOL001');
         $tagihan = $this->createTagihanForSantri($santri, 100000);
 
-        $svc = new PembayaranService();
+        $svc = new PembayaranService;
         $verifier = $this->createVerifier('bendahara-lunas@example.test');
         $bayar = $svc->inputPembayaran($tagihan, ['nominal' => 100000]);
         $svc->verifikasiPembayaran($bayar, $verifier->id);

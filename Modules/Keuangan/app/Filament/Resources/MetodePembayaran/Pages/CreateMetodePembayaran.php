@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\MetodePembayaran\Pages;
 
-use Modules\Keuangan\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Keuangan\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 
 class CreateMetodePembayaran extends CreateRecord
 {

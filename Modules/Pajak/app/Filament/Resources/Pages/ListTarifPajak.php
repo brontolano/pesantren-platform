@@ -2,8 +2,8 @@
 
 namespace Modules\Pajak\Filament\Resources\Pages;
 
-use Modules\Pajak\Filament\Resources\TarifPajakResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Pajak\Filament\Resources\TarifPajakResource;
 
 class ListTarifPajak extends ListRecords
 {

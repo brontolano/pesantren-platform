@@ -3,6 +3,7 @@
 namespace Modules\Core\Services;
 
 use App\Models\Setting;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -88,7 +89,7 @@ class SuratService
 
         try {
             return $simpan();
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             // Unique (tenant, jenis, tahun, nomor_urut) kena saat balapan → retry sekali.
             if (in_array($e->getCode(), ['23505', '23000'], true)) {
                 return $simpan();

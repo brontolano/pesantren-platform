@@ -3,9 +3,9 @@
 namespace Modules\Kesantrian\Services;
 
 use App\Models\Setting;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Modules\Kesantrian\Models\Santri;
-use RuntimeException;
 
 /**
  * Auto-NIS berformat standar (default ala Kemenag) — template per tenant via
@@ -42,6 +42,7 @@ class NisGeneratorService
 
                     return substr((string) $tahunMasuk, -$digits);
                 }
+
                 // URUT:n
                 return str_pad((string) $urut, (int) $m[3], '0', STR_PAD_LEFT);
             },
@@ -79,7 +80,7 @@ class NisGeneratorService
 
         try {
             return $coba();
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             // Backstop unique(tenant,nis): bentrok antar-loket → coba sekali lagi.
             if (in_array((string) $e->getCode(), ['23505', '23000'], true)) {
                 return $coba();

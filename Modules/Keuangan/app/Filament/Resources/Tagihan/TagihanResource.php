@@ -2,27 +2,29 @@
 
 namespace Modules\Keuangan\Filament\Resources\Tagihan;
 
-use Modules\Keuangan\Filament\Resources\Tagihan\Pages\CreateTagihan;
-use Modules\Keuangan\Filament\Resources\Tagihan\Pages\EditTagihan;
-use Modules\Keuangan\Filament\Resources\Tagihan\Pages\ListTagihan;
+use App\Filament\Concerns\ModuleGate;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Filament\Resources\Tagihan\Pages\CreateTagihan;
+use Modules\Keuangan\Filament\Resources\Tagihan\Pages\EditTagihan;
+use Modules\Keuangan\Filament\Resources\Tagihan\Pages\ListTagihan;
 use Modules\Keuangan\Models\Tagihan;
 
 class TagihanResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Tagihan::class;
 
@@ -75,12 +77,12 @@ class TagihanResource extends Resource
         return auth()->user()?->can('manage_keuangan') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_keuangan') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return auth()->user()?->can('manage_keuangan') ?? false;
     }
@@ -96,13 +98,13 @@ class TagihanResource extends Resource
         return ['santri.nama', 'santri.nis', 'jenis_tagihan'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return (string) ($record->santri?->nama ?? 'Tagihan');
     }
 
     /** @return array<string, string> */
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
             'NIS' => (string) ($record->santri?->nis ?? '—'),
@@ -255,4 +257,3 @@ class TagihanResource extends Resource
         ];
     }
 }
-

@@ -6,6 +6,7 @@ use App\Models\MediaFile;
 use App\Models\TenantStorage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Modules\PPDB\Models\CalonSantriDokumen;
 
 /**
  * Sumber kebenaran kuota penyimpanan per tenant.
@@ -104,12 +105,12 @@ class StorageQuotaService
      */
     public function ppdbBytes(): int
     {
-        if (! class_exists(\Modules\PPDB\Models\CalonSantriDokumen::class)) {
+        if (! class_exists(CalonSantriDokumen::class)) {
             return 0;
         }
 
         try {
-            return (int) \Modules\PPDB\Models\CalonSantriDokumen::query()
+            return (int) CalonSantriDokumen::query()
                 ->sum(DB::raw("COALESCE((metadata->>'size')::bigint, 0)"));
         } catch (\Throwable $e) {
             return 0;

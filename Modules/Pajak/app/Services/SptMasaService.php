@@ -106,6 +106,7 @@ class SptMasaService
         if (! $emp) {
             return true;
         }
+
         return in_array($emp->status_kepegawaian, ['gty', 'pns_dpk', 'pppk'], true);
     }
 }

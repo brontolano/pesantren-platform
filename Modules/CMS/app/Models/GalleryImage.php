@@ -2,6 +2,7 @@
 
 namespace Modules\CMS\Models;
 
+use App\Services\MediaRegistrar;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,7 +40,7 @@ class GalleryImage extends Model
             $title = $img->relationLoaded('gallery')
                 ? optional($img->gallery)->title
                 : optional($img->gallery()->first())->title;
-            app(\App\Services\MediaRegistrar::class)
+            app(MediaRegistrar::class)
                 ->register($img->image_url, $title ? 'Galeri/'.$title : 'Galeri');
         });
     }

@@ -3,9 +3,6 @@
 namespace Modules\Tahfidz\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\CreatePenilaianTahfidz;
-use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\EditPenilaianTahfidz;
-use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\ListPenilaianTahfidz;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
@@ -18,6 +15,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\CreatePenilaianTahfidz;
+use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\EditPenilaianTahfidz;
+use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\ListPenilaianTahfidz;
 use Modules\Tahfidz\Models\HafalanTahfidz;
 use Modules\Tahfidz\Models\PenilaianTahfidz;
 use UnitEnum;

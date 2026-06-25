@@ -5,6 +5,7 @@ namespace Modules\PPDB\Services;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Kesantrian\Services\SantriAccountService;
 use Modules\PPDB\Models\CalonSantri;
 use RuntimeException;
 
@@ -56,7 +57,7 @@ class DaftarUlangService
             // kegagalan akun TIDAK menggagalkan daftar ulang. PIN dikirim TERPISAH
             // oleh staf lewat tombol "Kirim Kredensial".
             try {
-                $akun = app(\Modules\Kesantrian\Services\SantriAccountService::class);
+                $akun = app(SantriAccountService::class);
                 $akun->provision($santri->fresh());
                 $akun->tautkanWali($santri->fresh());
             } catch (\Throwable $e) {

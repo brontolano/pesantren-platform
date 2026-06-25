@@ -2,7 +2,6 @@
 
 namespace Modules\PPDB\Services;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\Keuangan\Models\Tagihan;
@@ -21,8 +20,7 @@ class PpdbBillingService
 
     public function __construct(
         private readonly TagihanService $tagihanService,
-    ) {
-    }
+    ) {}
 
     public function createOrSyncTagihan(CalonSantri|int $calonSantri, array $payload): TagihanPpdb
     {

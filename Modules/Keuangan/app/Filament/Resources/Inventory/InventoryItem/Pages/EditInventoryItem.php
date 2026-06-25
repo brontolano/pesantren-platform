@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages;
 
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryItemResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryItemResource;
 
 class EditInventoryItem extends EditRecord
 {

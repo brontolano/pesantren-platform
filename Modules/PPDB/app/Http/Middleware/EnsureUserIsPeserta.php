@@ -5,6 +5,7 @@ namespace Modules\PPDB\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Modules\PPDB\Database\Seeders\PesertaRoleSeeder;
+use Modules\PPDB\Policies\CalonSantriPolicy;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
  *    panel Filament sendiri; portal /spmb khusus calon santri.
  *
  * Batas data per-record (peserta hanya `calon_santri` miliknya) ditegakkan
- * oleh {@see \Modules\PPDB\Policies\CalonSantriPolicy}, bukan di sini.
+ * oleh {@see CalonSantriPolicy}, bukan di sini.
  * Isolasi antar-tenant bersifat FISIK (database-per-tenant, Blueprint §3).
  */
 class EnsureUserIsPeserta

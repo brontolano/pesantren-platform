@@ -6,9 +6,9 @@ use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Akademik\Models\PresensiSantri;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Kesehatan\Models\KunjunganUks;
 use Modules\Kesehatan\Services\KesehatanService;
-use Modules\Kesantrian\Models\Santri;
 use Tests\TestCase;
 
 /**
@@ -24,15 +24,19 @@ class WP27UksRegisterTest extends TestCase
     use RefreshDatabase;
 
     private KesehatanService $service;
+
     private Tenant $tenant;
+
     private User $guru;
+
     private Santri $santri1;
+
     private Santri $santri2;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new KesehatanService();
+        $this->service = new KesehatanService;
 
         // Setup tenant & users
         $this->tenant = Tenant::create([

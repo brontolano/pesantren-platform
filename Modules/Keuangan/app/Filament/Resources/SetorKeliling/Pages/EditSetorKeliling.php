@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\SetorKeliling\Pages;
 
-use Modules\Keuangan\Filament\Resources\SetorKeliling\SetorKelilingResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\SetorKeliling\SetorKelilingResource;
 
 class EditSetorKeliling extends EditRecord
 {

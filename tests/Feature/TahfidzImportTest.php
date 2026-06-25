@@ -4,11 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use App\Models\User;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Tahfidz\Models\HafalanTahfidz;
 use Modules\Tahfidz\Models\Halaqah;
 use Modules\Tahfidz\Services\HafalanImportService;
 use Modules\Tahfidz\Services\HalaqahImportService;
-use Modules\Kesantrian\Models\Santri;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 

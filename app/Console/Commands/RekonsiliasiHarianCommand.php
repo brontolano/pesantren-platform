@@ -44,7 +44,7 @@ class RekonsiliasiHarianCommand extends Command
 
         foreach ($tenants as $tenant) {
             try {
-                $anomali = $tenant->run(fn (): array => (new RekonsiliasiService())->deteksiAnomaliStatus());
+                $anomali = $tenant->run(fn (): array => (new RekonsiliasiService)->deteksiAnomaliStatus());
                 $jumlah = count($anomali);
                 $totalAnomali += $jumlah;
 

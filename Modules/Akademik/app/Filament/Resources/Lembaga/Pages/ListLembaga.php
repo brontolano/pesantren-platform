@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\Lembaga\Pages;
 
-use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
 
 class ListLembaga extends ListRecords
 {

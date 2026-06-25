@@ -2,9 +2,9 @@
 
 namespace Modules\Payroll\Filament\Resources\Pages;
 
-use Modules\Payroll\Filament\Resources\SlipGajiResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Payroll\Filament\Resources\SlipGajiResource;
 use Modules\Payroll\Services\PayrollService;
 
 class CreateSlipGaji extends CreateRecord

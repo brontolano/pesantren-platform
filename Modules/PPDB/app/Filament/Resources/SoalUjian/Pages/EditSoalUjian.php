@@ -2,9 +2,9 @@
 
 namespace Modules\PPDB\Filament\Resources\SoalUjian\Pages;
 
-use Modules\PPDB\Filament\Resources\SoalUjianResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\PPDB\Filament\Resources\SoalUjianResource;
 
 class EditSoalUjian extends EditRecord
 {

@@ -2,8 +2,8 @@
 
 namespace Modules\PPDB\Filament\Resources;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Support\AlbaKidsTenant;
-use Modules\PPDB\Filament\Resources\TagihanPpdb\Pages\ListTagihanPpdb;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
@@ -12,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Modules\PPDB\Filament\Resources\TagihanPpdb\Pages\ListTagihanPpdb;
 use Modules\PPDB\Models\TagihanPpdb;
 use Modules\PPDB\Services\PpdbWhatsappNotifier;
 
@@ -21,7 +22,7 @@ use Modules\PPDB\Services\PpdbWhatsappNotifier;
  */
 class TagihanPpdbResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = TagihanPpdb::class;
 

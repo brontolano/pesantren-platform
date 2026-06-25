@@ -62,10 +62,10 @@ class DemoPesantrenTerpaduSeeder extends Seeder
                 $upd['pekerjaan_ibu'] = 'Ibu Rumah Tangga';
             }
             if (empty($s->no_hp_wali)) {
-                $upd['no_hp_wali'] = '0852' . str_pad((string) (10000000 + $i * 137), 8, '0');
+                $upd['no_hp_wali'] = '0852'.str_pad((string) (10000000 + $i * 137), 8, '0');
             }
             if (empty($s->alamat)) {
-                $upd['alamat'] = 'Dusun ' . $desa[$i % count($desa)] . ' RT 0' . (($i % 5) + 1) . '/RW 0' . (($i % 3) + 1);
+                $upd['alamat'] = 'Dusun '.$desa[$i % count($desa)].' RT 0'.(($i % 5) + 1).'/RW 0'.(($i % 3) + 1);
             }
             if (empty($s->desa_kelurahan)) {
                 $upd['desa_kelurahan'] = $desa[$i % count($desa)];
@@ -112,12 +112,12 @@ class DemoPesantrenTerpaduSeeder extends Seeder
             if ($shareWith && $shareWith->wali_user_id) {
                 $waliId = $shareWith->wali_user_id;
             } else {
-                $email = 'wali.' . strtolower(preg_replace('/[^a-z0-9]/i', '', $s->nis ?: ('s' . $s->id))) . '@demo.pesantren.online';
+                $email = 'wali.'.strtolower(preg_replace('/[^a-z0-9]/i', '', $s->nis ?: ('s'.$s->id))).'@demo.pesantren.online';
                 $waliId = DB::table('users')->where('email', $email)->value('id');
                 if (! $waliId) {
                     $waliId = DB::table('users')->insertGetId([
                         'tenant_id' => $this->tid,
-                        'name' => 'Bpk. ' . ($s->nama_ayah ?: 'Wali ' . $s->nama),
+                        'name' => 'Bpk. '.($s->nama_ayah ?: 'Wali '.$s->nama),
                         'email' => $email,
                         'password' => Hash::make('password'),
                         'created_at' => now(),
@@ -185,7 +185,7 @@ class DemoPesantrenTerpaduSeeder extends Seeder
                     DB::table('kamar_asrama')->insert([
                         'tenant_id' => $this->tid,
                         'blok_id' => $blokId,
-                        'nomor_kamar' => chr(65 + $b) . '-' . str_pad((string) $n, 2, '0', STR_PAD_LEFT),
+                        'nomor_kamar' => chr(65 + $b).'-'.str_pad((string) $n, 2, '0', STR_PAD_LEFT),
                         'kapasitas' => 8,
                         'tipe' => 'regular',
                         'biaya_per_bulan' => 150000,
@@ -244,7 +244,7 @@ class DemoPesantrenTerpaduSeeder extends Seeder
             $empId = DB::table('employee')->insertGetId([
                 'tenant_id' => $this->tid,
                 'users_id' => $u->id,
-                'nip' => 'PEG-2026-' . str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
+                'nip' => 'PEG-2026-'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
                 'nama' => $u->name,
                 'status_kepegawaian' => $jabatanMap[$i % 7]['status'],
                 'ptkp_status' => $i % 2 === 0 ? 'K1' : 'TK0',
@@ -255,7 +255,7 @@ class DemoPesantrenTerpaduSeeder extends Seeder
             ]);
 
             $jabatanId = DB::table('jabatan')
-                ->where('nama', 'ilike', '%' . $jabatanMap[$i % 7]['cari'] . '%')
+                ->where('nama', 'ilike', '%'.$jabatanMap[$i % 7]['cari'].'%')
                 ->value('id') ?? DB::table('jabatan')->value('id');
 
             if ($jabatanId) {
@@ -265,7 +265,7 @@ class DemoPesantrenTerpaduSeeder extends Seeder
                     'jabatan_id' => $jabatanId,
                     'lembaga_id' => $lembagaId,
                     'tanggal_mulai' => '2026-07-01',
-                    'nomor_sk' => 'SK/DEMO/2026/' . str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
+                    'nomor_sk' => 'SK/DEMO/2026/'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
                     'is_primary' => true,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -276,7 +276,7 @@ class DemoPesantrenTerpaduSeeder extends Seeder
                 'tenant_id' => $this->tid,
                 'employee_id' => $empId,
                 'jenis' => $jabatanMap[$i % 7]['status'] === 'tetap' ? 'sk_gty' : 'kontrak',
-                'nomor' => 'KK/DEMO/2026/' . str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
+                'nomor' => 'KK/DEMO/2026/'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
                 'mulai' => '2026-07-01',
                 'selesai' => $jabatanMap[$i % 7]['status'] === 'tetap' ? null : '2027-06-30',
                 'status' => 'aktif',
@@ -327,7 +327,7 @@ class DemoPesantrenTerpaduSeeder extends Seeder
                     'hari' => $h,
                     'jam_mulai' => $s[0],
                     'jam_selesai' => $s[1],
-                    'ruangan' => 'R-' . ($k + 1) . '0' . (($i % 3) + 1),
+                    'ruangan' => 'R-'.($k + 1).'0'.(($i % 3) + 1),
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -567,8 +567,8 @@ class DemoPesantrenTerpaduSeeder extends Seeder
                     'employee_id' => $eid,
                     'tanggal' => $tgl->toDateString(),
                     'status' => $status,
-                    'jam_masuk' => $status === 'hadir' ? '07:0' . ($i % 6) : null,
-                    'jam_keluar' => $status === 'hadir' ? '15:3' . ($i % 6) : null,
+                    'jam_masuk' => $status === 'hadir' ? '07:0'.($i % 6) : null,
+                    'jam_keluar' => $status === 'hadir' ? '15:3'.($i % 6) : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

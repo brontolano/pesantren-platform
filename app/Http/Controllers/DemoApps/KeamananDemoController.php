@@ -127,7 +127,7 @@ class KeamananDemoController extends Controller
                 ['id' => 8, 'nama' => 'Yusuf Abdullah', 'kelas' => '3 Tsanawiyah', 'arah' => 'masuk', 'izin' => true, 'jam' => '10:35', 'ket' => 'Kembali dari rumah'],
                 ['id' => 9, 'nama' => 'Bpk. Hasan (tamu)', 'kelas' => 'Paman Yusuf', 'arah' => 'masuk', 'izin' => true, 'jam' => '10:30', 'ket' => 'Tamu terdaftar'],
                 ['id' => 10, 'nama' => 'Utsman Affan', 'kelas' => '2 Tsanawiyah', 'arah' => 'keluar', 'izin' => true, 'jam' => '09:55', 'ket' => 'Izin lomba'],
-                ['id' => 11, 'nama' => 'Anas Malik', 'kelas' => '1 Tsanawiyah', 'arah' => 'masuk', 'izin' => true, 'jam' => '09:20', 'ket' => 'Kembali dari izin' ],
+                ['id' => 11, 'nama' => 'Anas Malik', 'kelas' => '1 Tsanawiyah', 'arah' => 'masuk', 'izin' => true, 'jam' => '09:20', 'ket' => 'Kembali dari izin'],
                 ['id' => 12, 'nama' => 'Abu Bakar', 'kelas' => '3 Aliyah', 'arah' => 'keluar', 'izin' => true, 'jam' => '08:15', 'ket' => 'Izin keperluan keluarga'],
             ],
         ]);

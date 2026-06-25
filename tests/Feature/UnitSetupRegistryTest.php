@@ -2,7 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
+use App\Models\Tenant;
+use App\Support\UnitSetupRegistry;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Modules\Akademik\Models\Pelajaran;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
+use Modules\Kesantrian\Models\Kelas;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 use Modules\Pembiayaan\Filament\Resources\AsetResource;
@@ -10,13 +17,6 @@ use Modules\Pengadaan\Filament\Resources\Supplier\SupplierResource;
 use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
 use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
-use App\Models\Setting;
-use App\Models\Tenant;
-use App\Support\UnitSetupRegistry;
-use Database\Seeders\RolesAndPermissionsSeeder;
-use Modules\Akademik\Models\Pelajaran;
-use Modules\Kesantrian\Models\Kelas;
-use Modules\Kesantrian\Models\Santri;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Database\QueryException;
 use Modules\Akademik\Models\ProgramStudi;
 use Modules\Akademik\Services\TranskripService;
 use Modules\Asrama\Models\BlokAsrama;
@@ -135,7 +136,7 @@ class AsramaOtomatisTest extends TestCase
         PenempatanAsrama::create(['santri_id' => $s->id, 'kamar_id' => $k->id, 'tanggal_masuk' => now()->toDateString(), 'status' => 'aktif', 'is_current' => true]);
 
         // Jaring DB: penempatan is_current kedua untuk santri sama DITOLAK.
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
         PenempatanAsrama::create(['santri_id' => $s->id, 'kamar_id' => $k->id, 'tanggal_masuk' => now()->toDateString(), 'status' => 'aktif', 'is_current' => true]);
         tenancy()->end();
     }

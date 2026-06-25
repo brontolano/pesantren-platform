@@ -76,7 +76,7 @@ class SyahriyyahImportCommand extends Command
             }
         }
 
-        $this->info(strtoupper($summary['mode'])." syahriyyah selesai.");
+        $this->info(strtoupper($summary['mode']).' syahriyyah selesai.');
         $this->table(['Metric', 'Value'], [
             ['Sheet terbaca', (string) $summary['sheets']],
             ['Baris transaksi', (string) $summary['baris_dibaca']],

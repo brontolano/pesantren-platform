@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal\Pages;
 
-use Modules\Keuangan\Filament\Resources\BaitulMaal\BeasiswaResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\BeasiswaResource;
 
 class EditBeasiswa extends EditRecord
 {

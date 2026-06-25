@@ -2,8 +2,18 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Pages\PusatModul;
+use App\Filament\Pages\SetupPesantren;
+use App\Filament\Pages\SetupUnit;
+use App\Filament\Resources\Santri\SantriResource;
 use App\Models\Setting;
+use App\Models\User;
 use Filament\Widgets\Widget;
+use Illuminate\Support\Facades\DB;
+use Modules\CMS\Filament\Resources\Article\ArticleResource;
+use Modules\CMS\Models\Article;
+use Modules\CMS\Models\Gallery;
+use Modules\Kesantrian\Models\Santri;
 
 /**
  * Checklist Onboarding — memandu pengurus baru menyelesaikan langkah pertama
@@ -71,35 +81,35 @@ class OnboardingChecklist extends Widget
                 'desc' => 'Atur fondasi pondok: identitas, lembaga, periode, & kebijakan (wizard terpandu).',
                 'icon' => 'heroicon-o-sparkles',
                 'done' => self::setupSelesai(),
-                'url' => self::pageUrl(\App\Filament\Pages\SetupPesantren::class),
+                'url' => self::pageUrl(SetupPesantren::class),
             ],
             [
                 'label' => 'Pilih & pasang fitur pesantren',
                 'desc' => 'Aktifkan modul yang Anda butuhkan di Pusat Modul, lalu lengkapi datanya.',
                 'icon' => 'heroicon-o-squares-plus',
                 'done' => self::adaFiturDipasang(),
-                'url' => self::pageUrl(\App\Filament\Pages\PusatModul::class),
+                'url' => self::pageUrl(PusatModul::class),
             ],
             [
                 'label' => 'Masukkan data santri',
                 'desc' => 'Impor dari Excel atau tambah satu per satu.',
                 'icon' => 'heroicon-o-user-group',
-                'done' => self::adaData(\Modules\Kesantrian\Models\Santri::class),
-                'url' => self::urlOf(\App\Filament\Resources\Santri\SantriResource::class, 'create'),
+                'done' => self::adaData(Santri::class),
+                'url' => self::urlOf(SantriResource::class, 'create'),
             ],
             [
                 'label' => 'Tautkan akun wali',
                 'desc' => 'Agar wali bisa pantau tagihan & tabungan lewat HP.',
                 'icon' => 'heroicon-o-users',
                 'done' => self::adaWali(),
-                'url' => self::urlOf(\App\Filament\Resources\Santri\SantriResource::class),
+                'url' => self::urlOf(SantriResource::class),
             ],
             [
                 'label' => 'Tampilkan website pondok',
                 'desc' => 'Tulis artikel atau unggah foto galeri.',
                 'icon' => 'heroicon-o-globe-alt',
                 'done' => self::adaKontenWebsite(),
-                'url' => self::urlOf(\Modules\CMS\Filament\Resources\Article\ArticleResource::class, 'create'),
+                'url' => self::urlOf(ArticleResource::class, 'create'),
             ],
         ];
     }
@@ -138,7 +148,7 @@ class OnboardingChecklist extends Widget
         try {
             $conn = config('tenancy.database.central_connection', config('database.default'));
 
-            return \Illuminate\Support\Facades\DB::connection($conn)
+            return DB::connection($conn)
                 ->table('tenant_modules')
                 ->where('tenant_id', tenant('id'))
                 ->where('is_active', true)
@@ -151,7 +161,7 @@ class OnboardingChecklist extends Widget
     private static function adaWali(): bool
     {
         try {
-            return \App\Models\User::query()
+            return User::query()
                 ->whereHas('roles', fn ($q) => $q->where('name', 'wali'))
                 ->exists();
         } catch (\Throwable) {
@@ -162,10 +172,10 @@ class OnboardingChecklist extends Widget
     private static function adaKontenWebsite(): bool
     {
         try {
-            $artikel = class_exists(\Modules\CMS\Models\Article::class)
-                && \Modules\CMS\Models\Article::query()->where('is_published', true)->exists();
-            $galeri = class_exists(\Modules\CMS\Models\Gallery::class)
-                && \Modules\CMS\Models\Gallery::query()->exists();
+            $artikel = class_exists(Article::class)
+                && Article::query()->where('is_published', true)->exists();
+            $galeri = class_exists(Gallery::class)
+                && Gallery::query()->exists();
 
             return $artikel || $galeri;
         } catch (\Throwable) {
@@ -176,8 +186,8 @@ class OnboardingChecklist extends Widget
     private static function pusatSetupUrl(): ?string
     {
         try {
-            return class_exists(\App\Filament\Pages\SetupUnit::class)
-                ? \App\Filament\Pages\SetupUnit::getUrl()
+            return class_exists(SetupUnit::class)
+                ? SetupUnit::getUrl()
                 : null;
         } catch (\Throwable) {
             return null;

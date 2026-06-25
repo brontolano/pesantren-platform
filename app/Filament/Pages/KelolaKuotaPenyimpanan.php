@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\MediaFile;
 use App\Models\Tenant;
 use App\Services\StorageQuotaService;
 use Filament\Facades\Filament;

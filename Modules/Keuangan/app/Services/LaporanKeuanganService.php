@@ -2,7 +2,6 @@
 
 namespace Modules\Keuangan\Services;
 
-use Illuminate\Support\Facades\DB;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use RuntimeException;
@@ -78,7 +77,7 @@ class LaporanKeuanganService
         $this->ensureTenantContext();
 
         // bulanMasehi format: 2026-07
-        $awal = $bulanMasehi . '-01';
+        $awal = $bulanMasehi.'-01';
         $akhir = now()->parse($awal)->endOfMonth()->toDateString();
 
         $totalTagihan = (float) Tagihan::query()

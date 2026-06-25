@@ -3,15 +3,17 @@
 namespace Modules\PPDB\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
+use App\Models\User;
 use App\Services\StorageQuotaService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\Notifikasi\Services\NotifDispatcher;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\JadwalUjian;
 use Modules\PPDB\Services\DaftarUlangService;
@@ -28,8 +30,7 @@ class PesertaPortalController extends Controller
     public function __construct(
         private readonly PpdbFormFieldConfigurationService $fieldConfigurationService,
         private readonly PpdbStatusTrackingService $statusTrackingService,
-    ) {
-    }
+    ) {}
 
     public function dashboard(Request $request): Response
     {
@@ -188,12 +189,12 @@ class PesertaPortalController extends Controller
         }
 
         // Notif WA admin (NOTIF-1): berkas baru menunggu verifikasi. Fire-and-forget.
-        app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('berkas_ppdb_masuk', [
-            'wa' => array_filter([\App\Models\Setting::getTenantStringValue('admission_admin_whatsapp')]),
+        app(NotifDispatcher::class)->kirim('berkas_ppdb_masuk', [
+            'wa' => array_filter([Setting::getTenantStringValue('admission_admin_whatsapp')]),
             'data' => [
                 'jenis' => 'Dokumen '.PpdbDocumentTypes::label($validated['jenis_dokumen']),
                 'nama_calon' => $calon->nama_lengkap ?? $calon->nama ?? '-',
-                'nama_pesantren' => \App\Models\Setting::getTenantStringValue('branding_name') ?? (tenant('name') ?? 'Pesantren'),
+                'nama_pesantren' => Setting::getTenantStringValue('branding_name') ?? (tenant('name') ?? 'Pesantren'),
             ],
         ]);
 
@@ -291,12 +292,12 @@ class PesertaPortalController extends Controller
         ]);
 
         // Notif WA admin (NOTIF-1/BILL-3): bukti tagihan PPDB baru. Fire-and-forget.
-        app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('berkas_ppdb_masuk', [
-            'wa' => array_filter([\App\Models\Setting::getTenantStringValue('admission_admin_whatsapp')]),
+        app(NotifDispatcher::class)->kirim('berkas_ppdb_masuk', [
+            'wa' => array_filter([Setting::getTenantStringValue('admission_admin_whatsapp')]),
             'data' => [
                 'jenis' => 'Bukti pembayaran tagihan PPDB',
                 'nama_calon' => $calon->nama_lengkap ?? $calon->nama ?? '-',
-                'nama_pesantren' => \App\Models\Setting::getTenantStringValue('branding_name') ?? (tenant('name') ?? 'Pesantren'),
+                'nama_pesantren' => Setting::getTenantStringValue('branding_name') ?? (tenant('name') ?? 'Pesantren'),
             ],
         ]);
 

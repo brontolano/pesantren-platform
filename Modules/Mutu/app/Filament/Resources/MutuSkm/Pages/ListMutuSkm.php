@@ -2,9 +2,9 @@
 
 namespace Modules\Mutu\Filament\Resources\MutuSkm\Pages;
 
-use Modules\Mutu\Filament\Resources\MutuSkmResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Mutu\Filament\Resources\MutuSkmResource;
 
 class ListMutuSkm extends ListRecords
 {

@@ -4,9 +4,9 @@ namespace Modules\Keuangan\Services;
 
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SetorKelilingItem;
 use Modules\Keuangan\Models\SetorKelilingSesi;
-use Modules\Kesantrian\Models\Santri;
 
 /**
  * Setor keliling — petugas mencatat setoran di lapangan sebagai DRAF (tidak
@@ -21,8 +21,7 @@ class SetorKelilingService
     public function __construct(
         private readonly TabunganService $tabungan,
         private readonly KeuanganNotifikasiService $notifikasi,
-    ) {
-    }
+    ) {}
 
     public function buatSesi(int $petugasId, ?string $lokasi = null, ?string $tanggal = null): SetorKelilingSesi
     {

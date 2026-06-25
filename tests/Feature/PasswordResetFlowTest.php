@@ -20,6 +20,7 @@ class PasswordResetFlowTest extends TestCase
     use DatabaseTransactions;
 
     private Tenant $tenant;
+
     private User $user;
 
     protected function setUp(): void

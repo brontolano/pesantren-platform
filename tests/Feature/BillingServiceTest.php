@@ -16,20 +16,22 @@ class BillingServiceTest extends TestCase
     use RefreshDatabase;
 
     private BillingService $billing;
+
     private Tenant $tenant;
+
     private Plan $plan;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->billing = new BillingService();
-        $this->tenant  = Tenant::create(['id' => 'pesantren-a', 'name' => 'Pesantren A', 'is_active' => true]);
-        $this->plan    = Plan::create([
-            'name'            => 'Paket Standar',
-            'billing_type'    => 'flat',
-            'default_price'   => 500000,
+        $this->billing = new BillingService;
+        $this->tenant = Tenant::create(['id' => 'pesantren-a', 'name' => 'Pesantren A', 'is_active' => true]);
+        $this->plan = Plan::create([
+            'name' => 'Paket Standar',
+            'billing_type' => 'flat',
+            'default_price' => 500000,
             'default_modules' => ['Kesantrian', 'Keuangan', 'CMS'],
-            'is_active'       => true,
+            'is_active' => true,
         ]);
     }
 

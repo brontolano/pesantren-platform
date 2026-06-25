@@ -2,10 +2,10 @@
 
 namespace Modules\Payroll\Filament\Resources\Cuti\Pages;
 
-use Modules\Payroll\Filament\Resources\Cuti\CutiResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Modules\Payroll\Filament\Resources\Cuti\CutiResource;
 use Modules\Payroll\Services\CutiService;
 
 class CreateCuti extends CreateRecord

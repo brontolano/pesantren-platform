@@ -2,10 +2,9 @@
 
 namespace Modules\Payroll\Filament\Resources\Penugasan;
 
-use Modules\Payroll\Filament\Resources\Penugasan\Pages\CreatePenugasanPegawai;
-use Modules\Payroll\Filament\Resources\Penugasan\Pages\EditPenugasanPegawai;
-use Modules\Payroll\Filament\Resources\Penugasan\Pages\ListPenugasanPegawai;
+use App\Filament\Concerns\ModuleGate;
 use App\Services\StorageQuotaService;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -23,7 +22,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\Lembaga;
+use Modules\Payroll\Filament\Resources\Penugasan\Pages\CreatePenugasanPegawai;
+use Modules\Payroll\Filament\Resources\Penugasan\Pages\EditPenugasanPegawai;
+use Modules\Payroll\Filament\Resources\Penugasan\Pages\ListPenugasanPegawai;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\Jabatan;
 use Modules\Payroll\Models\PenugasanPegawai;
@@ -35,7 +38,7 @@ use Modules\Payroll\Models\PenugasanPegawai;
  */
 class PenugasanPegawaiResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PenugasanPegawai::class;
 
@@ -53,7 +56,7 @@ class PenugasanPegawaiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
+        return UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
     }
 
     public static function canAccess(): bool
@@ -66,7 +69,7 @@ class PenugasanPegawaiResource extends Resource
         return auth()->user()?->can('run_payroll') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('run_payroll') ?? false;
     }

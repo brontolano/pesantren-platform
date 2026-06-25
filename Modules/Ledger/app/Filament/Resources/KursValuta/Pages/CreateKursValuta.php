@@ -2,8 +2,8 @@
 
 namespace Modules\Ledger\Filament\Resources\KursValuta\Pages;
 
-use Modules\Ledger\Filament\Resources\KursValuta\KursValutaResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Ledger\Filament\Resources\KursValuta\KursValutaResource;
 
 class CreateKursValuta extends CreateRecord
 {

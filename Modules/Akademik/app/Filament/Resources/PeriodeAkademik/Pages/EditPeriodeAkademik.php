@@ -2,9 +2,10 @@
 
 namespace Modules\Akademik\Filament\Resources\PeriodeAkademik\Pages;
 
-use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
 use Modules\Akademik\Services\PeriodeAkademikService;
 
 class EditPeriodeAkademik extends EditRecord
@@ -18,9 +19,8 @@ class EditPeriodeAkademik extends EditRecord
         ];
     }
 
-    protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(PeriodeAkademikService::class)->simpan($data, $record);
     }
 }
-

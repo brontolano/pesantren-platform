@@ -3,9 +3,6 @@
 namespace Modules\Ledger\Filament\Resources\KursValuta;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Ledger\Filament\Resources\KursValuta\Pages\CreateKursValuta;
-use Modules\Ledger\Filament\Resources\KursValuta\Pages\EditKursValuta;
-use Modules\Ledger\Filament\Resources\KursValuta\Pages\ListKursValuta;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -18,6 +15,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Ledger\Filament\Resources\KursValuta\Pages\CreateKursValuta;
+use Modules\Ledger\Filament\Resources\KursValuta\Pages\EditKursValuta;
+use Modules\Ledger\Filament\Resources\KursValuta\Pages\ListKursValuta;
 use Modules\Ledger\Models\KursValuta;
 
 class KursValutaResource extends Resource

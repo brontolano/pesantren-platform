@@ -13,6 +13,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Keuangan\Models\MetodePembayaran;
 use Modules\Keuangan\Models\Tagihan;
+use Modules\Keuangan\Services\KeuanganNotifikasiService;
 use Modules\Keuangan\Services\PembayaranService;
 
 class PortalWaliPembayaranController extends Controller
@@ -102,7 +103,7 @@ class PortalWaliPembayaranController extends Controller
         ]);
 
         // Notif WA admin: ada bukti baru di antrean verifikasi (fire-and-forget).
-        app(\Modules\Keuangan\Services\KeuanganNotifikasiService::class)
+        app(KeuanganNotifikasiService::class)
             ->buktiMasuk('Bukti pembayaran tagihan', $child->nama, (float) $validated['nominal']);
 
         return redirect()

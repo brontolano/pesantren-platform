@@ -2,17 +2,19 @@
 
 namespace Modules\Payroll\Filament\Resources\Khidmah;
 
-use Modules\Payroll\Filament\Resources\Khidmah\Pages\ListKhidmah;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Payroll\Filament\Resources\Khidmah\Pages\ListKhidmah;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\Khidmah;
 
@@ -21,7 +23,7 @@ use Modules\Payroll\Models\Khidmah;
  */
 class KhidmahResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Khidmah::class;
 
@@ -39,7 +41,7 @@ class KhidmahResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
+        return UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
     }
 
     public static function canAccess(): bool

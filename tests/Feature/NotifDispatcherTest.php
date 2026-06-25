@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Modules\Notifikasi\Mail\GenericNotificationMail;
@@ -9,6 +10,7 @@ use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\LogNotifikasi;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
 use Modules\Notifikasi\Services\NotifDispatcher;
+use Modules\Notifikasi\Support\NotifikasiSettings;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -161,21 +163,21 @@ class NotifDispatcherTest extends TestCase
         config(['notifikasi.n8n_webhook_url' => 'http://n8n:5678/webhook/global']);
 
         // Tanpa setting → fallback config global.
-        $this->assertSame('http://n8n:5678/webhook/global', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+        $this->assertSame('http://n8n:5678/webhook/global', NotifikasiSettings::webhookUrl());
 
         // Dengan setting tenant → override.
-        \App\Models\Setting::updateOrCreate(
-            ['key' => \Modules\Notifikasi\Support\NotifikasiSettings::KEY_WA_WEBHOOK],
+        Setting::updateOrCreate(
+            ['key' => NotifikasiSettings::KEY_WA_WEBHOOK],
             ['value' => ['url' => 'http://n8n:5678/webhook/tenant-khusus']]
         );
-        $this->assertSame('http://n8n:5678/webhook/tenant-khusus', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+        $this->assertSame('http://n8n:5678/webhook/tenant-khusus', NotifikasiSettings::webhookUrl());
 
         // Setting kosong → kembali fallback.
-        \App\Models\Setting::updateOrCreate(
-            ['key' => \Modules\Notifikasi\Support\NotifikasiSettings::KEY_WA_WEBHOOK],
+        Setting::updateOrCreate(
+            ['key' => NotifikasiSettings::KEY_WA_WEBHOOK],
             ['value' => ['url' => '  ']]
         );
-        $this->assertSame('http://n8n:5678/webhook/global', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+        $this->assertSame('http://n8n:5678/webhook/global', NotifikasiSettings::webhookUrl());
         tenancy()->end();
     }
 }

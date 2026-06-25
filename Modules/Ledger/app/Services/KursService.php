@@ -17,9 +17,7 @@ use RuntimeException;
  */
 class KursService
 {
-    public function __construct(private readonly JurnalService $jurnalService)
-    {
-    }
+    public function __construct(private readonly JurnalService $jurnalService) {}
 
     /** Set/update kurs untuk satu mata uang pada satu tanggal berlaku. */
     public function setKurs(string $mataUang, float $kurs, ?string $tanggal = null): KursValuta
@@ -97,7 +95,7 @@ class KursService
         return DB::transaction(function () use ($kas, $pendapatan, $idr, $nominalAsing, $kurs, $mataUang, $tanggal, $refType, $refId, $opts): Jurnal {
             $jurnal = $this->jurnalService->postJurnal([
                 'tanggal' => Carbon::parse($tanggal),
-                'deskripsi' => $opts['keterangan'] ?? ('Penerimaan donor ' . strtoupper($mataUang)),
+                'deskripsi' => $opts['keterangan'] ?? ('Penerimaan donor '.strtoupper($mataUang)),
                 'tipe_sumber' => 'donor_valas',
                 'ref_type' => $refType,
                 'ref_id' => $refId,

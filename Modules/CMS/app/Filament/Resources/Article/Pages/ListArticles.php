@@ -2,9 +2,9 @@
 
 namespace Modules\CMS\Filament\Resources\Article\Pages;
 
-use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\CMS\Filament\Resources\Article\ArticleResource;
 
 class ListArticles extends ListRecords
 {
@@ -17,4 +17,3 @@ class ListArticles extends ListRecords
         ];
     }
 }
-

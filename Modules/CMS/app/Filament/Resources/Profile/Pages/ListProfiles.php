@@ -2,9 +2,9 @@
 
 namespace Modules\CMS\Filament\Resources\Profile\Pages;
 
-use Modules\CMS\Filament\Resources\Profile\ProfileResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\CMS\Filament\Resources\Profile\ProfileResource;
 
 class ListProfiles extends ListRecords
 {
@@ -18,4 +18,3 @@ class ListProfiles extends ListRecords
         ];
     }
 }
-

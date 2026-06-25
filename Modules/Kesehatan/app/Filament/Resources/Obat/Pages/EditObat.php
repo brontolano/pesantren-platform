@@ -2,8 +2,8 @@
 
 namespace Modules\Kesehatan\Filament\Resources\Obat\Pages;
 
-use Modules\Kesehatan\Filament\Resources\ObatResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Kesehatan\Filament\Resources\ObatResource;
 
 class EditObat extends EditRecord
 {

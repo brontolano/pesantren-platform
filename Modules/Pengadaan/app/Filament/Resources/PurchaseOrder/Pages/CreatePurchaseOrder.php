@@ -1,13 +1,17 @@
 <?php
+
 namespace Modules\Pengadaan\Filament\Resources\PurchaseOrder\Pages;
-use Modules\Pengadaan\Filament\Resources\PurchaseOrder\PurchaseOrderResource;
+
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Modules\Pengadaan\Filament\Resources\PurchaseOrder\PurchaseOrderResource;
 use Modules\Pengadaan\Services\PurchaseOrderService;
+
 class CreatePurchaseOrder extends CreateRecord
 {
     protected static string $resource = PurchaseOrderResource::class;
+
     protected function handleRecordCreation(array $data): Model
     {
         return app(PurchaseOrderService::class)->buat((int) $data['supplier_id'], $data['items'] ?? [], [

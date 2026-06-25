@@ -3,13 +3,13 @@
 namespace Modules\Akademik\Filament\Resources\Rapor;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\Rapor\Pages\ListRapor;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Akademik\Filament\Resources\Rapor\Pages\ListRapor;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Models\Rapor;
 use Modules\Akademik\Services\RaporService;

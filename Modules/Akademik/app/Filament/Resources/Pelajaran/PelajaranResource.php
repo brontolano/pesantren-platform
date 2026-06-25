@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\Pelajaran;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\Pelajaran\Pages\CreatePelajaran;
-use Modules\Akademik\Filament\Resources\Pelajaran\Pages\EditPelajaran;
-use Modules\Akademik\Filament\Resources\Pelajaran\Pages\ListPelajaran;
 use App\Models\User;
 use App\Support\UiMode;
 use Filament\Actions\Action;
@@ -19,6 +16,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\Pelajaran\Pages\CreatePelajaran;
+use Modules\Akademik\Filament\Resources\Pelajaran\Pages\EditPelajaran;
+use Modules\Akademik\Filament\Resources\Pelajaran\Pages\ListPelajaran;
 use Modules\Akademik\Models\Pelajaran;
 
 class PelajaranResource extends Resource

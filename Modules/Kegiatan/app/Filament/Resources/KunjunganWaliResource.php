@@ -3,9 +3,6 @@
 namespace Modules\Kegiatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Kegiatan\Filament\Resources\KunjunganWali\Pages\CreateKunjunganWali;
-use Modules\Kegiatan\Filament\Resources\KunjunganWali\Pages\EditKunjunganWali;
-use Modules\Kegiatan\Filament\Resources\KunjunganWali\Pages\ListKunjunganWali;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -18,6 +15,9 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Kegiatan\Filament\Resources\KunjunganWali\Pages\CreateKunjunganWali;
+use Modules\Kegiatan\Filament\Resources\KunjunganWali\Pages\EditKunjunganWali;
+use Modules\Kegiatan\Filament\Resources\KunjunganWali\Pages\ListKunjunganWali;
 use Modules\Kegiatan\Models\KunjunganWali;
 use UnitEnum;
 

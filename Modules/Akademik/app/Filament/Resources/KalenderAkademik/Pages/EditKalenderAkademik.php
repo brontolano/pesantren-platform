@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\KalenderAkademik\Pages;
 
-use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
 
 class EditKalenderAkademik extends EditRecord
 {

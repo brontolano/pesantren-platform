@@ -25,9 +25,7 @@ use RuntimeException;
  */
 class DepresiasiService
 {
-    public function __construct(private readonly JurnalService $jurnalService)
-    {
-    }
+    public function __construct(private readonly JurnalService $jurnalService) {}
 
     /**
      * Bangun jadwal penyusutan untuk satu aset (idempoten).
@@ -172,7 +170,7 @@ class DepresiasiService
         return DB::transaction(function () use ($jadwal, $aset, $beban, $bebanAkun, $akumAkun, $dibuatOleh): JadwalPenyusutan {
             $jurnal = $this->jurnalService->postJurnal([
                 'tanggal' => Carbon::createFromFormat('Y-m', $jadwal->periode)->endOfMonth(),
-                'deskripsi' => 'Penyusutan ' . $jadwal->periode . ' — ' . $aset->nama_aset,
+                'deskripsi' => 'Penyusutan '.$jadwal->periode.' — '.$aset->nama_aset,
                 'tipe_sumber' => 'penyusutan',
                 'ref_type' => 'JadwalPenyusutan',
                 'ref_id' => (string) $jadwal->id,

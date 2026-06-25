@@ -2,8 +2,8 @@
 
 namespace Modules\Ledger\Filament\Resources\Pages;
 
-use Modules\Ledger\Filament\Resources\JurnalResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Ledger\Filament\Resources\JurnalResource;
 
 class ListJurnal extends ListRecords
 {

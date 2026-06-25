@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Modules\Kesantrian\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Modules\Kesantrian\Models\JenisPelanggaran;
 use Modules\Kesantrian\Models\PelanggaranSantri;
 use Modules\Kesantrian\Models\Santri;
@@ -103,7 +103,7 @@ class PwaGuruDisiplinController extends Controller
         ]);
 
         // Cek idempotency dengan client_ref jika ada
-        if (!empty($validated['client_ref'])) {
+        if (! empty($validated['client_ref'])) {
             $existing = PelanggaranSantri::query()
                 ->where('tenant_id', auth()->user()->tenant_id)
                 ->where('santri_id', $validated['santri_id'])
@@ -239,7 +239,7 @@ class PwaGuruDisiplinController extends Controller
      */
     private function rentangBulan(string $bulan): array
     {
-        $date = \Carbon\Carbon::createFromFormat('Y-m', $bulan);
+        $date = Carbon::createFromFormat('Y-m', $bulan);
 
         return [
             $date->copy()->startOfMonth(),

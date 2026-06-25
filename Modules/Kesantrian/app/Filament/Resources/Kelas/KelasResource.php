@@ -2,9 +2,6 @@
 
 namespace Modules\Kesantrian\Filament\Resources\Kelas;
 
-use Modules\Kesantrian\Filament\Resources\Kelas\Pages\CreateKelas;
-use Modules\Kesantrian\Filament\Resources\Kelas\Pages\EditKelas;
-use Modules\Kesantrian\Filament\Resources\Kelas\Pages\ListKelas;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -20,6 +17,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\Lembaga;
+use Modules\Kesantrian\Filament\Resources\Kelas\Pages\CreateKelas;
+use Modules\Kesantrian\Filament\Resources\Kelas\Pages\EditKelas;
+use Modules\Kesantrian\Filament\Resources\Kelas\Pages\ListKelas;
 use Modules\Kesantrian\Models\Kelas;
 
 class KelasResource extends Resource

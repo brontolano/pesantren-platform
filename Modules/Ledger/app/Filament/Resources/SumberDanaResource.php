@@ -3,9 +3,6 @@
 namespace Modules\Ledger\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Ledger\Filament\Resources\Pages\CreateSumberDana;
-use Modules\Ledger\Filament\Resources\Pages\EditSumberDana;
-use Modules\Ledger\Filament\Resources\Pages\ListSumberDana;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -20,6 +17,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Ledger\Filament\Resources\Pages\CreateSumberDana;
+use Modules\Ledger\Filament\Resources\Pages\EditSumberDana;
+use Modules\Ledger\Filament\Resources\Pages\ListSumberDana;
 use Modules\Ledger\Models\SumberDana;
 
 class SumberDanaResource extends Resource

@@ -17,4 +17,3 @@ class EditSantri extends EditRecord
         ];
     }
 }
-

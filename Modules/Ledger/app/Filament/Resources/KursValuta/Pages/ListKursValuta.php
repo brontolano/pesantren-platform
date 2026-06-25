@@ -2,9 +2,9 @@
 
 namespace Modules\Ledger\Filament\Resources\KursValuta\Pages;
 
-use Modules\Ledger\Filament\Resources\KursValuta\KursValutaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Ledger\Filament\Resources\KursValuta\KursValutaResource;
 
 class ListKursValuta extends ListRecords
 {

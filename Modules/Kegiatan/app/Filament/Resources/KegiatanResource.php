@@ -3,10 +3,6 @@
 namespace Modules\Kegiatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\CreateKegiatan;
-use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\EditKegiatan;
-use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\ListKegiatan;
-use Modules\Kegiatan\Filament\Resources\Kegiatan\RelationManagers\PresensiRelationManager;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -23,6 +19,10 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\CreateKegiatan;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\EditKegiatan;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\ListKegiatan;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\RelationManagers\PresensiRelationManager;
 use Modules\Kegiatan\Models\Kegiatan;
 use UnitEnum;
 

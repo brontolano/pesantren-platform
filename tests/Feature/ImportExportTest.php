@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Modules\Akademik\Filament\Resources\Pelajaran\Pages\ListPelajaran;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
 use Livewire\Livewire;
+use Modules\Akademik\Filament\Resources\Pelajaran\Pages\ListPelajaran;
 use Modules\Akademik\Models\Pelajaran;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;

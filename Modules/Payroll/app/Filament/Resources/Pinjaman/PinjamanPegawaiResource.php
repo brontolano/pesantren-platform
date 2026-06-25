@@ -3,8 +3,6 @@
 namespace Modules\Payroll\Filament\Resources\Pinjaman;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Payroll\Filament\Resources\Pinjaman\Pages\CreatePinjamanPegawai;
-use Modules\Payroll\Filament\Resources\Pinjaman\Pages\ListPinjamanPegawai;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -21,6 +19,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Payroll\Filament\Resources\Pinjaman\Pages\CreatePinjamanPegawai;
+use Modules\Payroll\Filament\Resources\Pinjaman\Pages\ListPinjamanPegawai;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\PinjamanPegawai;
 use Modules\Payroll\Services\KasbonService;

@@ -3,6 +3,7 @@
 namespace Modules\Ledger\Services;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Modules\Ledger\Models\JurnalBaris;
 
 /**
@@ -80,9 +81,9 @@ class PartyLedgerService
      * G3-23 — Mutasi (buku pembantu) satu pihak: daftar baris jurnal posted
      * dengan info jurnal, terurut tanggal. Saldo berjalan dihitung pemanggil.
      *
-     * @return \Illuminate\Support\Collection<int, array{tanggal:?string, nomor:?string, deskripsi:?string, debit:float, kredit:float, mutasi:float}>
+     * @return Collection<int, array{tanggal:?string, nomor:?string, deskripsi:?string, debit:float, kredit:float, mutasi:float}>
      */
-    public function mutasi(string $partyType, int $partyId, ?string $from = null, ?string $to = null): \Illuminate\Support\Collection
+    public function mutasi(string $partyType, int $partyId, ?string $from = null, ?string $to = null): Collection
     {
         return JurnalBaris::query()
             ->where('party_type', $partyType)
