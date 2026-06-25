@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\DemoAutoLoginController;
 use App\Models\User;
+use App\Services\Jemaah\JemaahAccountService;
 use App\Services\Jemaah\JemaahIdentifierResolver;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Modules\PPDB\Models\UserOtp;
+use Modules\PPDB\Services\PesertaOtpService;
 use Spatie\Permission\Models\Role;
 
 /**
@@ -36,6 +40,7 @@ class AuthApiController extends Controller
 
     public function __construct(
         private readonly JemaahIdentifierResolver $resolver,
+        private readonly JemaahAccountService $accountService,
     ) {}
 
     /** POST /api/v1/auth/login — login jemaah → token. */
@@ -124,6 +129,97 @@ class AuthApiController extends Controller
         }
 
         return $this->tokenResponse($user, 'native-demo');
+    }
+
+    /**
+     * POST /api/v1/auth/daftar — registrasi mandiri jemaah (No.WA + nama → OTP WA).
+     * ANTI-ENUMERASI: respons selalu netral (JemaahAccountService menangani senyap).
+     */
+    public function daftar(Request $request): JsonResponse
+    {
+        if (! $this->hasTenant()) {
+            return response()->json(['ok' => false, 'message' => 'Pesantren tidak dikenali.'], 404);
+        }
+
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'phone' => ['required', 'string', 'max:20'],
+            'email' => ['nullable', 'email', 'max:120'],
+        ], [], [
+            'name' => 'nama',
+            'phone' => 'nomor WhatsApp',
+            'email' => 'email',
+        ]);
+
+        $result = $this->accountService->daftar($data['name'], $data['phone'], $data['email'] ?? null);
+
+        return response()->json(['ok' => true, 'data' => [
+            'identifier' => $result['phone'],
+            'message' => 'Jika data Anda valid, kode aktivasi 6 angka dikirim ke WhatsApp. Masukkan kode itu untuk mengaktifkan akun.',
+        ]]);
+    }
+
+    /**
+     * POST /api/v1/auth/aktivasi — verifikasi OTP + set password → token (langsung
+     * masuk). Anti-enumerasi: akun tak ada / sudah aktif → galat netral pada kode.
+     */
+    public function aktivasi(Request $request): JsonResponse
+    {
+        if (! $this->hasTenant()) {
+            return response()->json(['ok' => false, 'message' => 'Pesantren tidak dikenali.'], 404);
+        }
+
+        $data = $request->validate([
+            'identifier' => ['required', 'string', 'max:120'],
+            'kode' => ['required', 'digits:6'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+        ], [], [
+            'identifier' => 'nomor WhatsApp / email',
+            'kode' => 'kode verifikasi',
+            'password' => 'password',
+        ]);
+
+        $user = $this->resolver->resolve($data['identifier']);
+
+        if ($user === null || ! $user->must_reset_password) {
+            throw ValidationException::withMessages([
+                'kode' => 'Kode tidak valid atau akun tidak dapat diaktivasi. Periksa kembali atau minta kode baru.',
+            ]);
+        }
+
+        app(PesertaOtpService::class)
+            ->verify($user, UserOtp::PURPOSE_JEMAAH_AKTIVASI, $data['kode']);
+
+        $this->accountService->markActivated($user, $data['password']);
+
+        return $this->tokenResponse($user->fresh(), 'native');
+    }
+
+    /**
+     * POST /api/v1/auth/kirim-ulang — kirim ulang OTP aktivasi. Respons selalu
+     * netral (anti-enumerasi), tak peduli akun ada/aktif/tidak.
+     */
+    public function kirimUlang(Request $request): JsonResponse
+    {
+        if (! $this->hasTenant()) {
+            return response()->json(['ok' => false, 'message' => 'Pesantren tidak dikenali.'], 404);
+        }
+
+        $data = $request->validate([
+            'identifier' => ['required', 'string', 'max:120'],
+        ], [], [
+            'identifier' => 'nomor WhatsApp / email',
+        ]);
+
+        try {
+            $this->accountService->requestActivationOtp($data['identifier']);
+        } catch (ValidationException) {
+            // Jangan bocorkan eksistensi/status/rate-limit.
+        }
+
+        return response()->json(['ok' => true, 'data' => [
+            'message' => 'Jika akun yang belum aktif terkait data itu ada, kode aktivasi dikirim ulang ke WhatsApp-nya.',
+        ]]);
     }
 
     private function hasTenant(): bool

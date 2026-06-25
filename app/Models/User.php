@@ -27,6 +27,15 @@ class User extends Authenticatable implements FilamentUser, HasEmailAuthenticati
     use BelongsToTenant, HasApiTokens, HasFactory, HasRoles, Notifiable;
 
     /**
+     * Pin guard Spatie ke 'web'. Semua peran/izin di-seed di guard 'web'; tanpa
+     * pin ini, request via guard 'sanctum' (aplikasi native) membuat Spatie
+     * Guard::getDefaultName ikut driver aktif → 'sanctum' → izin 'web' tak ketemu
+     * → can()/can:izin palsu-false (mis. can:komentar 403 padahal user berhak).
+     * Konsisten dgn Filament & web yang juga guard 'web'. NOL logika uang/nilai.
+     */
+    protected $guard_name = 'web';
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
