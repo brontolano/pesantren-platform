@@ -40,8 +40,9 @@ use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
  * "Akses Cepat" — grid ikon pintasan ke menu/aksi tersering di dasbor tenant.
  *
  * Tiap tile DIGERBANG modul + izin: hanya muncul bila modul aktif untuk tenant
- * DAN pengguna punya izinnya (super_admin lihat semua) — jadi grid otomatis
- * menyesuaikan tiap pesantren & peran, tak ada pintasan yang menabrak 403.
+ * DAN pengguna punya izinnya (pemilik PLATFORM lihat semua; super_admin
+ * PESANTREN ikut gerbang modul tenantnya) — grid menyesuaikan tiap pesantren &
+ * peran, tak ada pintasan yang menabrak 403.
  * Grup yang kosong otomatis hilang; widget tak tampil bila tak ada satu pun tile.
  */
 class QuickAccessWidget extends Widget
@@ -157,11 +158,16 @@ class QuickAccessWidget extends Widget
         return ['label' => $label, 'icon' => $icon, 'color' => $color, 'url' => $url];
     }
 
-    /** Gerbang modul (super_admin lihat semua) — selaras trait ModuleGate. */
+    /**
+     * Gerbang modul — SELARAS trait App\Filament\Concerns\ModuleGate.
+     * Bypass HANYA pemilik PLATFORM (super_admin tanpa tenant). super_admin
+     * PESANTREN ikut gerbang modul tenantnya, agar tile pintasan tak pernah
+     * menabrak 403 ke modul yang nonaktif untuk tenant tsb.
+     */
     private function moduleVisible(string $key): bool
     {
         try {
-            if (auth()->user()?->hasRole('super_admin')) {
+            if (auth()->user()?->isPlatformSuperAdmin()) {
                 return true;
             }
         } catch (\Throwable) {
