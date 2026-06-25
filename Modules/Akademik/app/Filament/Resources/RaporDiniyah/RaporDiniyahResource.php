@@ -3,8 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\RaporDiniyah;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\RaporDiniyah\Pages\IsiRubrik;
-use Modules\Akademik\Filament\Resources\RaporDiniyah\Pages\ListRaporDiniyah;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -12,6 +10,8 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Akademik\Filament\Resources\RaporDiniyah\Pages\IsiRubrik;
+use Modules\Akademik\Filament\Resources\RaporDiniyah\Pages\ListRaporDiniyah;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Models\RaporDiniyah;
 use Modules\Akademik\Services\RaporDiniyahService;

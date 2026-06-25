@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Tagihan\Pages;
 
-use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
 
 class EditTagihan extends EditRecord
 {
@@ -26,4 +26,3 @@ class EditTagihan extends EditRecord
         ];
     }
 }
-

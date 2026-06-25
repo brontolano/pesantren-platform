@@ -6,6 +6,7 @@ use Modules\Keuangan\Models\BankStatement;
 use Modules\Keuangan\Services\BankReconService;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Models\Akun;
+use Modules\Ledger\Models\JurnalBaris;
 use Modules\Ledger\Services\JurnalService;
 use RuntimeException;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -108,7 +109,7 @@ class BankReconTest extends TestCase
         $this->boot('bank3');
         $this->postMasukBank(120000);
         $svc = app(BankReconService::class);
-        $jbId = (int) \Modules\Ledger\Models\JurnalBaris::query()
+        $jbId = (int) JurnalBaris::query()
             ->where('akun_id', $this->akunId('1-1100'))->where('debit', 120000)->value('id');
 
         $stmt = $svc->import($this->akunId('1-1100'), ['nama' => 'Manual'], [

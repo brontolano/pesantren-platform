@@ -27,8 +27,7 @@ class WaBalasanService
     public function __construct(
         private readonly WaGatewayService $gateway,
         private readonly PiiRedactor $redactor,
-    ) {
-    }
+    ) {}
 
     /**
      * Kirim balasan ke percakapan + catat pesan keluar.

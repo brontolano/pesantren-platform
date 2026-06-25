@@ -7,6 +7,7 @@ use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Akademik\Models\Lembaga;
 
 class Kelas extends Model
 {
@@ -33,7 +34,7 @@ class Kelas extends Model
     /** WP-01: NULL = lembaga default tenant (data lama tetap sah). */
     public function lembaga(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Akademik\Models\Lembaga::class, 'lembaga_id');
+        return $this->belongsTo(Lembaga::class, 'lembaga_id');
     }
 
     public function waliKelas(): BelongsTo

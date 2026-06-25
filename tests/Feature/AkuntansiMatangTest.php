@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use InvalidArgumentException;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Models\Akun;
+use Modules\Ledger\Models\AlokasiBiaya;
 use Modules\Ledger\Models\DivisiUnit;
 use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Services\AlokasiBiayaService;
@@ -207,11 +208,11 @@ class AkuntansiMatangTest extends TestCase
     {
         $this->boot('akmA');
         app(AlokasiBiayaService::class)->alokasikan($this->akunBeban(), 100000, [$this->divisi('MA')->id => 1]);
-        $this->assertSame(1, \Modules\Ledger\Models\AlokasiBiaya::query()->count());
+        $this->assertSame(1, AlokasiBiaya::query()->count());
         tenancy()->end();
 
         $this->boot('akmB');
-        $this->assertSame(0, \Modules\Ledger\Models\AlokasiBiaya::query()->count(), 'Alokasi tenant lain tak boleh terlihat.');
+        $this->assertSame(0, AlokasiBiaya::query()->count(), 'Alokasi tenant lain tak boleh terlihat.');
         tenancy()->end();
     }
 }

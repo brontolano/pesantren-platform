@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\AppSantri;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Support\SantriLoginMethod;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Services\TabunganService;
 
 /**
  * App Santri (/app) — login pakai NIS (bukan email; santri hafal NIS-nya)
@@ -25,7 +28,7 @@ class AppSantriController extends Controller
         }
 
         return Inertia::render('AppSantri/Login', [
-            'metodeLogin' => \App\Support\SantriLoginMethod::forLogin(),
+            'metodeLogin' => SantriLoginMethod::forLogin(),
         ]);
     }
 
@@ -45,7 +48,7 @@ class AppSantriController extends Controller
 
         $santri = Santri::query()->where('nis', $data['nis'])->first();
         $user = $santri?->user_id
-            ? \App\Models\User::withoutGlobalScopes()->find($santri->user_id)
+            ? User::withoutGlobalScopes()->find($santri->user_id)
             : null;
 
         if ($user === null || ! Auth::attempt(['email' => $user->email, 'password' => $data['password']])) {
@@ -86,7 +89,7 @@ class AppSantriController extends Controller
         $saldo = 0.0;
         if ($santri !== null) {
             try {
-                $saldo = app(\Modules\Keuangan\Services\TabunganService::class)->getSaldo($santri);
+                $saldo = app(TabunganService::class)->getSaldo($santri);
             } catch (\Throwable) {
                 // Modul Keuangan belum aktif — tampilkan 0.
             }

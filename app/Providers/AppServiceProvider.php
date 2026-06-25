@@ -4,13 +4,14 @@ namespace App\Providers;
 
 use App\Services\AuditLogger;
 use App\Support\PublicApiThrottle;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -34,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
         // SUPER ADMIN = lolos SEMUA permission check (pola resmi spatie).
         // Future-proof: permission baru otomatis dimiliki tanpa re-seed.
         // Return null (bukan false) agar user lain tetap dievaluasi normal.
-        \Illuminate\Support\Facades\Gate::before(function ($user, string $ability) {
+        Gate::before(function ($user, string $ability) {
             try {
                 return method_exists($user, 'hasRole') && $user->hasRole('super_admin') ? true : null;
             } catch (\Throwable) {

@@ -2,9 +2,9 @@
 
 namespace Modules\Kegiatan\Filament\Resources\Recurring\Pages;
 
-use Modules\Kegiatan\Filament\Resources\Recurring\KegiatanRecurringResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Kegiatan\Filament\Resources\Recurring\KegiatanRecurringResource;
 
 class ListKegiatanRecurring extends ListRecords
 {

@@ -7,10 +7,10 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Tagihan;
-use InvalidArgumentException;
 use RuntimeException;
 
 class TagihanService
@@ -235,6 +235,6 @@ class TagihanService
             'Ramadhan', 'Syawal', "Dzulqa'dah", 'Dzulhijjah',
         ];
 
-        return ($namaBulan[$bulanIndex] ?? 'Unknown') . " {$tahun}";
+        return ($namaBulan[$bulanIndex] ?? 'Unknown')." {$tahun}";
     }
 }

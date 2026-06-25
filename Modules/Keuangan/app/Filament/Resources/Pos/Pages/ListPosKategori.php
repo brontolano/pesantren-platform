@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Pos\Pages;
 
-use Modules\Keuangan\Filament\Resources\Pos\PosKategoriResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\Pos\PosKategoriResource;
 
 class ListPosKategori extends ListRecords
 {

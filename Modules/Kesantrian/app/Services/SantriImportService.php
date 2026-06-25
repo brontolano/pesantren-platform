@@ -55,9 +55,8 @@ class SantriImportService
     ];
 
     public function __construct(
-        private readonly SantriService $santriService = new SantriService(),
-    ) {
-    }
+        private readonly SantriService $santriService = new SantriService,
+    ) {}
 
     /**
      * @return array{
@@ -103,6 +102,7 @@ class SantriImportService
 
                     if ($headers === null) {
                         $headers = $this->mapHeaders($values);
+
                         continue;
                     }
 
@@ -111,6 +111,7 @@ class SantriImportService
 
                     if ($this->isEmptyPayload($payload)) {
                         $summary['skipped']++;
+
                         continue;
                     }
 
@@ -132,6 +133,7 @@ class SantriImportService
                             'nama' => $payload['nama'] ?? null,
                             'error' => $validator->errors()->first(),
                         ];
+
                         continue;
                     }
 
@@ -146,6 +148,7 @@ class SantriImportService
                             'nama' => $payload['nama'],
                             'error' => 'NIS sudah ada pada tenant ini.',
                         ];
+
                         continue;
                     }
 
@@ -281,6 +284,7 @@ class SantriImportService
 
         if ($dryRun) {
             $summary['created_kelas']++;
+
             return $knownKelas[$kelasName] = null;
         }
 
@@ -320,7 +324,7 @@ class SantriImportService
         ];
 
         foreach ($romanMap as $roman => $arabic) {
-            if (preg_match('/\b' . preg_quote($roman, '/') . '\b/i', $kelasName) === 1) {
+            if (preg_match('/\b'.preg_quote($roman, '/').'\b/i', $kelasName) === 1) {
                 return $arabic;
             }
         }

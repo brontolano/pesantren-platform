@@ -3,7 +3,6 @@
 namespace Modules\Kesantrian\Filament\Resources\Alumni\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use App\Models\Tenant;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -11,6 +10,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Services\KelulusanService;
+use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use Modules\Kesantrian\Models\Alumni;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Services\AlumniImportService;

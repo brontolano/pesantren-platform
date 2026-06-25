@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use InvalidArgumentException;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SkemaBiaya;
 use Modules\Keuangan\Models\Tagihan;
-use Modules\Kesantrian\Models\Santri;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\CrmAktivitas;
 use Modules\PPDB\Services\CrmService;

@@ -2,9 +2,9 @@
 
 namespace Modules\Notifikasi\Services;
 
-use Throwable;
 use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
+use Throwable;
 
 class WaNotificationService
 {
@@ -12,8 +12,7 @@ class WaNotificationService
         private readonly TemplateRenderer $renderer,
         private readonly WaGatewayService $gatewayService,
         private readonly LogNotifikasiService $logService,
-    ) {
-    }
+    ) {}
 
     public function sendToRecipient(
         BroadcastWa $broadcast,

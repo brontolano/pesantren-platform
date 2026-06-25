@@ -33,6 +33,7 @@ class SantriExporter extends Exporter
     public static function getCompletedNotificationBody(Export $export): string
     {
         $count = number_format($export->successful_rows);
+
         return "Export {$count} data santri telah selesai.";
     }
 }

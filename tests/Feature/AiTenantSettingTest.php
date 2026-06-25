@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -48,7 +49,7 @@ class AiTenantSettingTest extends TestCase
     }
 
     /** Inisialisasi tenant runtime + seed roles/permissions + provisioning setting AI. */
-    private function siapkanTenant(string $prefix): \App\Models\Tenant
+    private function siapkanTenant(string $prefix): Tenant
     {
         $tenant = $this->createRuntimeTenant($prefix, 'Pesantren '.$prefix);
         tenancy()->initialize($tenant);

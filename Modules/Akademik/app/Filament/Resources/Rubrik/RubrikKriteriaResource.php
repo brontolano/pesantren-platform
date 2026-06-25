@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\Rubrik;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\Rubrik\Pages\CreateRubrikKriteria;
-use Modules\Akademik\Filament\Resources\Rubrik\Pages\EditRubrikKriteria;
-use Modules\Akademik\Filament\Resources\Rubrik\Pages\ListRubrikKriteria;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -20,6 +17,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Akademik\Filament\Resources\Rubrik\Pages\CreateRubrikKriteria;
+use Modules\Akademik\Filament\Resources\Rubrik\Pages\EditRubrikKriteria;
+use Modules\Akademik\Filament\Resources\Rubrik\Pages\ListRubrikKriteria;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\RubrikKriteria;
 use Modules\Akademik\Services\RubrikService;

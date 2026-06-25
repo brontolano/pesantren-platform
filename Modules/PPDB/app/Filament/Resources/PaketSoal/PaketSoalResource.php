@@ -3,9 +3,6 @@
 namespace Modules\PPDB\Filament\Resources\PaketSoal;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\PPDB\Filament\Resources\PaketSoal\Pages\CreatePaketSoal;
-use Modules\PPDB\Filament\Resources\PaketSoal\Pages\EditPaketSoal;
-use Modules\PPDB\Filament\Resources\PaketSoal\Pages\ListPaketSoal;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
@@ -22,6 +19,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Modules\PPDB\Filament\Resources\PaketSoal\Pages\CreatePaketSoal;
+use Modules\PPDB\Filament\Resources\PaketSoal\Pages\EditPaketSoal;
+use Modules\PPDB\Filament\Resources\PaketSoal\Pages\ListPaketSoal;
 use Modules\PPDB\Models\PaketSoal;
 
 /**

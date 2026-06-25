@@ -3,10 +3,11 @@
 namespace Modules\Kegiatan\Services;
 
 use chillerlan\QRCode\QRCode;
+use Dompdf\Dompdf;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Modules\Kegiatan\Models\IzinSantri;
+use Mpdf\Mpdf;
+use Mpdf\Output\Destination;
 use RuntimeException;
 
 class SuratIzinSantriService
@@ -39,7 +40,7 @@ class SuratIzinSantriService
             'valid_until' => $izin->tanggal_selesai,
         ]);
 
-        $qrCode = (new QRCode())->render($qrContent);
+        $qrCode = (new QRCode)->render($qrContent);
 
         $html = $this->renderTemplate($izin, $qrCode);
 
@@ -226,7 +227,7 @@ HTML;
     {
         // Cek apakah DOMPDF tersedia
         if (class_exists('Dompdf\Dompdf')) {
-            $dompdf = new \Dompdf\Dompdf();
+            $dompdf = new Dompdf;
             $dompdf->loadHtml($html);
             $dompdf->setPaper('A4');
             $dompdf->render();
@@ -236,9 +237,10 @@ HTML;
 
         // Fallback ke mpdf jika tersedia
         if (class_exists('Mpdf\Mpdf')) {
-            $mpdf = new \Mpdf\Mpdf();
+            $mpdf = new Mpdf;
             $mpdf->WriteHTML($html);
-            return $mpdf->Output('', \Mpdf\Output\Destination::STRING_RETURN);
+
+            return $mpdf->Output('', Destination::STRING_RETURN);
         }
 
         throw new RuntimeException('PDF library tidak ditemukan. Pastikan "dompdf/dompdf" atau "mpdf/mpdf" sudah di-install via composer.');
@@ -246,7 +248,7 @@ HTML;
 
     private function ensureTenantContext(): void
     {
-        if (!tenancy()->initialized || tenancy()->tenant === null) {
+        if (! tenancy()->initialized || tenancy()->tenant === null) {
             throw new RuntimeException('Tenant context belum aktif.');
         }
     }

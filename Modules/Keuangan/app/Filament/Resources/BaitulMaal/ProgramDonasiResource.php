@@ -3,9 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateProgramDonasi;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditProgramDonasi;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListProgramDonasi;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -19,6 +16,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateProgramDonasi;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditProgramDonasi;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListProgramDonasi;
 use Modules\Keuangan\Models\ProgramDonasi;
 use Modules\Ledger\Models\SumberDana;
 

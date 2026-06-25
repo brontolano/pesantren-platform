@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Setting;
 use App\Models\User;
-use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
@@ -20,15 +19,18 @@ class Wp26IzinSantriTest extends TestCase
     use InteractsWithPpdbTestDatabase;
 
     private IzinSantriService $service;
+
     private Santri $santri;
+
     private User $wali;
+
     private User $musyrif;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->configurePpdbTestingDatabase();
-        if (!Schema::connection('pgsql')->hasTable('izin_santri')) {
+        if (! Schema::connection('pgsql')->hasTable('izin_santri')) {
             Artisan::call('migrate:fresh', ['--force' => true]);
         }
         $this->truncatePpdbTables(['domains', 'tenants']);
@@ -47,14 +49,14 @@ class Wp26IzinSantriTest extends TestCase
 
         $this->wali = User::withoutGlobalScopes()->create([
             'name' => 'Wali Santri',
-            'email' => 'wali@' . tenant('id') . '.localhost',
+            'email' => 'wali@'.tenant('id').'.localhost',
             'password' => 'password',
             'tenant_id' => tenant('id'),
         ]);
 
         $this->musyrif = User::withoutGlobalScopes()->create([
             'name' => 'Musyrif',
-            'email' => 'musyrif@' . tenant('id') . '.localhost',
+            'email' => 'musyrif@'.tenant('id').'.localhost',
             'password' => 'password',
             'tenant_id' => tenant('id'),
         ]);

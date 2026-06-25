@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Modules\Kesehatan\Filament\Resources\Obat\Pages\ListObat;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
 use Livewire\Livewire;
+use Modules\Kesehatan\Filament\Resources\Obat\Pages\ListObat;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 

@@ -16,12 +16,12 @@ class BillingService
     public function createPlan(array $data): Plan
     {
         return Plan::create([
-            'name'            => $data['name'],
-            'billing_type'    => $data['billing_type'],
-            'default_price'   => $data['default_price'] ?? 0,
+            'name' => $data['name'],
+            'billing_type' => $data['billing_type'],
+            'default_price' => $data['default_price'] ?? 0,
             'default_modules' => $data['default_modules'] ?? [],
-            'description'     => $data['description'] ?? null,
-            'is_active'       => $data['is_active'] ?? true,
+            'description' => $data['description'] ?? null,
+            'is_active' => $data['is_active'] ?? true,
         ]);
     }
 
@@ -35,13 +35,13 @@ class BillingService
             ->update(['status' => 'cancelled']);
 
         $subscription = TenantSubscription::create([
-            'tenant_id'     => $tenant->id,
-            'plan_id'       => $plan->id,
-            'override'      => $overrides ?: null,
+            'tenant_id' => $tenant->id,
+            'plan_id' => $plan->id,
+            'override' => $overrides ?: null,
             'billing_cycle' => $overrides['billing_cycle'] ?? 'monthly',
-            'starts_at'     => now()->toDateString(),
-            'ends_at'       => null,
-            'status'        => 'active',
+            'starts_at' => now()->toDateString(),
+            'ends_at' => null,
+            'status' => 'active',
         ]);
 
         // Sync modul aktif sesuai plan (+ override)
@@ -53,6 +53,7 @@ class BillingService
     public function suspendSubscription(TenantSubscription $subscription): TenantSubscription
     {
         $subscription->update(['status' => 'suspended']);
+
         return $subscription->fresh();
     }
 
@@ -94,9 +95,9 @@ class BillingService
 
         return PlatformInvoice::create([
             'tenant_id' => $tenant->id,
-            'period'    => $period,
-            'amount'    => $effectiveAmount,
-            'status'    => 'unpaid',
+            'period' => $period,
+            'amount' => $effectiveAmount,
+            'status' => 'unpaid',
         ]);
     }
 
@@ -120,10 +121,10 @@ class BillingService
     public function getStats(): array
     {
         return [
-            'mrr'             => $this->getMRR(),
-            'active_tenants'  => TenantSubscription::where('status', 'active')->count(),
+            'mrr' => $this->getMRR(),
+            'active_tenants' => TenantSubscription::where('status', 'active')->count(),
             'unpaid_invoices' => PlatformInvoice::where('status', 'unpaid')->count(),
-            'total_revenue'   => PlatformInvoice::where('status', 'paid')->sum('amount'),
+            'total_revenue' => PlatformInvoice::where('status', 'paid')->sum('amount'),
         ];
     }
 }

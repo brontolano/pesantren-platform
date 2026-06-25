@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Stancl\Tenancy\Database\Models\Domain;
 use App\Services\DomainVerificationService;
 use Illuminate\Console\Command;
+use Stancl\Tenancy\Database\Models\Domain;
 
 /**
  * Operasional verifikasi domain tenant:

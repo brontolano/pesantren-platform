@@ -33,7 +33,7 @@ class TagihanServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenant);
 
-        (new TagihanService())->setPeriodeKeuangan('masehi');
+        (new TagihanService)->setPeriodeKeuangan('masehi');
 
         $santri = Santri::create([
             'nis' => 'TAG001',
@@ -43,7 +43,7 @@ class TagihanServiceTest extends TestCase
             'status' => 'aktif',
         ]);
 
-        $tagihan = (new TagihanService())->buatTagihanUntukSantri($santri, [
+        $tagihan = (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'keterangan' => 'SPP Juli 2026',
             'nominal' => 350000,
@@ -92,7 +92,7 @@ class TagihanServiceTest extends TestCase
             'kelas_id' => $kelas->id,
         ]);
 
-        $records = (new TagihanService())->buatTagihanPerKelas($kelas, [
+        $records = (new TagihanService)->buatTagihanPerKelas($kelas, [
             'jenis_tagihan' => 'infaq',
             'nominal' => 100000,
             'jatuh_tempo' => '2026-07-15',
@@ -109,7 +109,7 @@ class TagihanServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenant);
 
-        (new TagihanService())->setPeriodeKeuangan('hijriah');
+        (new TagihanService)->setPeriodeKeuangan('hijriah');
 
         $santriA = Santri::create([
             'nis' => 'TAG004',
@@ -127,7 +127,7 @@ class TagihanServiceTest extends TestCase
             'status' => 'aktif',
         ]);
 
-        $records = (new TagihanService())->buatTagihanBulk([$santriA->id, $santriB->id], [
+        $records = (new TagihanService)->buatTagihanBulk([$santriA->id, $santriB->id], [
             'jenis_tagihan' => 'daftar_ulang',
             'nominal' => 200000,
             'jatuh_tempo' => '2026-08-01',
@@ -149,7 +149,7 @@ class TagihanServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenant);
 
-        $service = new TagihanService();
+        $service = new TagihanService;
         $service->setPeriodeKeuangan('keduanya');
 
         $santri = Santri::create([
@@ -178,7 +178,7 @@ class TagihanServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenant);
 
-        $service = new TagihanService();
+        $service = new TagihanService;
         $service->setPeriodeKeuangan('hijriah');
 
         $santri = Santri::create([

@@ -2,8 +2,13 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Models\Pembayaran;
+use Modules\Keuangan\Models\Tagihan;
+use Modules\Pengadaan\Models\Belanja;
 
 /**
  * Kartu statistik ringkas dashboard tenant (mengikuti mockup TU Pesantren):
@@ -29,8 +34,8 @@ class StatsPesantren extends StatsOverviewWidget
     {
         return [
             'default' => 2,
-            'sm'      => 3,
-            'xl'      => 5,
+            'sm' => 3,
+            'xl' => 5,
         ];
     }
 
@@ -58,8 +63,8 @@ class StatsPesantren extends StatsOverviewWidget
         $total = 0;
         $baru = 0;
 
-        if (class_exists(\Modules\Kesantrian\Models\Santri::class)) {
-            $santri = \Modules\Kesantrian\Models\Santri::query();
+        if (class_exists(Santri::class)) {
+            $santri = Santri::query();
             $total = (clone $santri)->where('status', 'aktif')->count();
             $baru = (clone $santri)
                 ->whereYear('created_at', now()->year)
@@ -78,7 +83,7 @@ class StatsPesantren extends StatsOverviewWidget
         $count = 0;
 
         try {
-            $count = \App\Models\User::role(['guru', 'bendahara', 'kepala'])->count();
+            $count = User::role(['guru', 'bendahara', 'kepala'])->count();
         } catch (\Throwable $e) {
             $count = 0;
         }
@@ -93,8 +98,8 @@ class StatsPesantren extends StatsOverviewWidget
     {
         $total = 0.0;
 
-        if (class_exists(\Modules\Keuangan\Models\Pembayaran::class)) {
-            $total = (float) \Modules\Keuangan\Models\Pembayaran::query()
+        if (class_exists(Pembayaran::class)) {
+            $total = (float) Pembayaran::query()
                 ->where('is_verified', true)
                 ->whereYear('tanggal_pembayaran', now()->year)
                 ->whereMonth('tanggal_pembayaran', now()->month)
@@ -111,9 +116,9 @@ class StatsPesantren extends StatsOverviewWidget
     {
         $total = 0.0;
 
-        if (class_exists(\Modules\Pengadaan\Models\Belanja::class)) {
+        if (class_exists(Belanja::class)) {
             // Belanja yang sudah terposting ke buku (punya jurnal) bulan ini.
-            $total = (float) \Modules\Pengadaan\Models\Belanja::query()
+            $total = (float) Belanja::query()
                 ->whereNotNull('jurnal_id')
                 ->whereYear('tanggal', now()->year)
                 ->whereMonth('tanggal', now()->month)
@@ -130,8 +135,8 @@ class StatsPesantren extends StatsOverviewWidget
     {
         $count = 0;
 
-        if (class_exists(\Modules\Keuangan\Models\Tagihan::class)) {
-            $count = \Modules\Keuangan\Models\Tagihan::query()
+        if (class_exists(Tagihan::class)) {
+            $count = Tagihan::query()
                 ->whereIn('status', ['belum_bayar', 'sebagian'])
                 ->count();
         }

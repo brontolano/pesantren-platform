@@ -2,6 +2,7 @@
 
 namespace Modules\Kesantrian\Filament\Pages;
 
+use App\Filament\Resources\Santri\SantriResource;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -202,7 +203,7 @@ class StasiunPendaftaran extends Page
         }
         app(EnrollmentService::class)->catat($santri, 'cetak_kartu', 'done');
 
-        return \App\Filament\Resources\Santri\SantriResource::unduhIdCard(collect([$santri]));
+        return SantriResource::unduhIdCard(collect([$santri]));
     }
 
     private function jalankan(callable $fn, string $sukses): void

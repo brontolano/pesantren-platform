@@ -17,7 +17,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class DevTaskResource extends Resource
 {
@@ -119,7 +121,7 @@ class DevTaskResource extends Resource
                 TextColumn::make('project.name')->label('Proyek')->badge()->color('gray')->sortable(),
                 TextColumn::make('phase')->label('Fase')->toggleable()->wrap()->color('gray'),
                 TextColumn::make('title')->label('Task')->searchable()->wrap()
-                    ->description(fn (DevTask $r): ?string => $r->current_state ? '↳ '.\Illuminate\Support\Str::limit($r->current_state, 80) : null),
+                    ->description(fn (DevTask $r): ?string => $r->current_state ? '↳ '.Str::limit($r->current_state, 80) : null),
                 SelectColumn::make('status')
                     ->label('Status')
                     ->options([
@@ -147,8 +149,8 @@ class DevTaskResource extends Resource
             ])
             ->defaultSort('sort')
             ->groups([
-                \Filament\Tables\Grouping\Group::make('project.name')->label('Proyek'),
-                \Filament\Tables\Grouping\Group::make('phase')->label('Fase'),
+                Group::make('project.name')->label('Proyek'),
+                Group::make('phase')->label('Fase'),
             ])
             ->defaultGroup('project.name')
             ->filters([

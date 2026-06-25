@@ -2,12 +2,12 @@
 
 namespace Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages;
 
-use Modules\Tahfidz\Filament\Resources\Munaqasyah\MunaqasyahResource;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Akademik\Models\PeriodeAkademik;
+use Modules\Tahfidz\Filament\Resources\Munaqasyah\MunaqasyahResource;
 
 class ListMunaqasyah extends ListRecords
 {

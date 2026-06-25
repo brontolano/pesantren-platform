@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SetorKelilingSesi;
 use Modules\Keuangan\Models\TabunganTransaksi;
 use Modules\Keuangan\Services\SetorKelilingService;
 use Modules\Keuangan\Services\TabunganService;
-use Modules\Kesantrian\Models\Santri;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -39,7 +39,7 @@ class SetorKelilingTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => true, 'data' => json_encode([]),
-             'created_at' => now(), 'updated_at' => now()],
+                'created_at' => now(), 'updated_at' => now()],
         );
 
         $petugas = User::withoutGlobalScopes()->create([

@@ -15,8 +15,7 @@ class PortalWaliPwaController extends Controller
 {
     public function __construct(
         private readonly PortalWaliBrandingService $brandingService,
-    ) {
-    }
+    ) {}
 
     public function manifest(): JsonResponse
     {
@@ -207,7 +206,7 @@ SVG;
             '/wali/screenshot.svg?viewport=narrow',
         ];
 
-        $script = <<<JS
+        $script = <<<'JS'
 const CACHE_NAME = %s;
 const SHELL_URLS = %s;
 

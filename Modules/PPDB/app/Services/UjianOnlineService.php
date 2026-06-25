@@ -20,9 +20,7 @@ use RuntimeException;
  */
 class UjianOnlineService
 {
-    public function __construct(private readonly PpdbExamResultService $hasil)
-    {
-    }
+    public function __construct(private readonly PpdbExamResultService $hasil) {}
 
     /** Mulai/lanjutkan attempt. Idempoten: attempt berjalan dikembalikan apa adanya. */
     public function mulai(CalonSantri $calon, PaketSoal $paket): UjianAttempt

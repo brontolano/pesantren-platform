@@ -2,9 +2,9 @@
 
 namespace Modules\Mutu\Filament\Resources\MutuSasaran\Pages;
 
-use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 
 class EditMutuSasaran extends EditRecord
 {

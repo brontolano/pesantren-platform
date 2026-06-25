@@ -3,6 +3,7 @@
 namespace Modules\Asrama\Services;
 
 use Illuminate\Validation\ValidationException;
+use Modules\Asrama\Models\BlokAsrama;
 use Modules\Asrama\Models\KamarAsrama;
 
 class KamarAsramaService
@@ -10,7 +11,7 @@ class KamarAsramaService
     public function simpan(array $data, ?KamarAsrama $kamar = null): KamarAsrama
     {
         $blok = tenancy()->initialized
-            ? \Modules\Asrama\Models\BlokAsrama::query()->findOrFail($data['blok_id'])
+            ? BlokAsrama::query()->findOrFail($data['blok_id'])
             : null;
 
         $totalExisting = $blok?->kamar()->when(
@@ -24,7 +25,7 @@ class KamarAsramaService
             ]);
         }
 
-        $record = $kamar ?? new KamarAsrama();
+        $record = $kamar ?? new KamarAsrama;
         $record->fill($data);
         $record->save();
 

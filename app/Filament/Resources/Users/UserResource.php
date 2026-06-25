@@ -13,6 +13,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rules\Password;
 
 class UserResource extends Resource
@@ -49,7 +50,7 @@ class UserResource extends Resource
         return static::userCanManageUsers();
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return static::userCanManageUsers() && $record->tenant_id === tenant('id');
     }
@@ -140,4 +141,3 @@ class UserResource extends Resource
         return auth()->user()?->can('manage_users') ?? false;
     }
 }
-

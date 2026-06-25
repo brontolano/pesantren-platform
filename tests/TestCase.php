@@ -2,9 +2,9 @@
 
 namespace Tests;
 
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Stancl\Tenancy\Events\TenancyEnded;
 
 abstract class TestCase extends BaseTestCase

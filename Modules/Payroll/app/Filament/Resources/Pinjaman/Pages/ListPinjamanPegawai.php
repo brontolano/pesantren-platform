@@ -2,9 +2,9 @@
 
 namespace Modules\Payroll\Filament\Resources\Pinjaman\Pages;
 
-use Modules\Payroll\Filament\Resources\Pinjaman\PinjamanPegawaiResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Payroll\Filament\Resources\Pinjaman\PinjamanPegawaiResource;
 
 class ListPinjamanPegawai extends ListRecords
 {

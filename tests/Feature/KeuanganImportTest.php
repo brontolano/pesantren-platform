@@ -4,10 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use App\Models\User;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\KeuanganImportService;
-use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Services\TagihanService;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -152,7 +153,7 @@ class KeuanganImportTest extends TestCase
         // Simulasi run sebelumnya gagal di tengah: tagihan sudah ada
         // berstatus belum_bayar, pelunasan historisnya belum masuk.
         $santri = $this->santri('1001');
-        app(\Modules\Keuangan\Services\TagihanService::class)->buatTagihanUntukSantri($santri, [
+        app(TagihanService::class)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'SPP',
             'nominal' => 500000,
             'jatuh_tempo' => '2026-05-10',

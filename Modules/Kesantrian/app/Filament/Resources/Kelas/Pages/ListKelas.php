@@ -2,9 +2,9 @@
 
 namespace Modules\Kesantrian\Filament\Resources\Kelas\Pages;
 
-use Modules\Kesantrian\Filament\Resources\Kelas\KelasResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Kesantrian\Filament\Resources\Kelas\KelasResource;
 
 class ListKelas extends ListRecords
 {
@@ -17,4 +17,3 @@ class ListKelas extends ListRecords
         ];
     }
 }
-

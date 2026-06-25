@@ -2,22 +2,22 @@
 
 namespace App\Filament\Resources\Billing;
 
-use BackedEnum;
-use UnitEnum;
 use App\Filament\Resources\Billing\PlatformInvoice\Pages\CreatePlatformInvoice;
 use App\Filament\Resources\Billing\PlatformInvoice\Pages\EditPlatformInvoice;
 use App\Filament\Resources\Billing\PlatformInvoice\Pages\ListPlatformInvoices;
 use App\Models\PlatformInvoice;
+use BackedEnum;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class PlatformInvoiceResource extends Resource
 {
@@ -85,9 +85,9 @@ class PlatformInvoiceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListPlatformInvoices::route('/'),
+            'index' => ListPlatformInvoices::route('/'),
             'create' => CreatePlatformInvoice::route('/create'),
-            'edit'   => EditPlatformInvoice::route('/{record}/edit'),
+            'edit' => EditPlatformInvoice::route('/{record}/edit'),
         ];
     }
 

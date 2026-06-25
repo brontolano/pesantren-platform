@@ -22,8 +22,7 @@ class PresensiService
 {
     public function __construct(
         private readonly PresensiSantriService $presensiSantriService,
-    ) {
-    }
+    ) {}
 
     /**
      * Catat presensi satu rombel untuk satu sesi jadwal.

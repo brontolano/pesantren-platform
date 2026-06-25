@@ -2,9 +2,9 @@
 
 namespace Modules\Ledger\Filament\Resources\Pages;
 
-use Modules\Ledger\Filament\Resources\DivisiUnitResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Ledger\Filament\Resources\DivisiUnitResource;
 
 class ListDivisiUnit extends ListRecords
 {

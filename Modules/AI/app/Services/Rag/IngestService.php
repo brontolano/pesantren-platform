@@ -264,8 +264,7 @@ class IngestService
         $ekstensi = strtolower(pathinfo($source->path_file, PATHINFO_EXTENSION));
 
         return match (true) {
-            in_array($ekstensi, ['txt', 'md', 'markdown', 'csv'], true)
-                => (string) $disk->get($source->path_file),
+            in_array($ekstensi, ['txt', 'md', 'markdown', 'csv'], true) => (string) $disk->get($source->path_file),
             $ekstensi === 'docx' => $this->ekstrakDocx($disk->path($source->path_file)),
             $ekstensi === 'pdf' => $this->ekstrakPdf($disk->path($source->path_file)),
             default => throw new \RuntimeException(

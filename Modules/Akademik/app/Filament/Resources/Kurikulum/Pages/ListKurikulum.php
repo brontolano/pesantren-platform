@@ -3,10 +3,10 @@
 namespace Modules\Akademik\Filament\Resources\Kurikulum\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use Modules\Akademik\Filament\Resources\Kurikulum\KurikulumResource;
 use App\Models\Tenant;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\Kurikulum\KurikulumResource;
 use Modules\Akademik\Models\Kurikulum;
 use Modules\Akademik\Services\KurikulumImportService;
 

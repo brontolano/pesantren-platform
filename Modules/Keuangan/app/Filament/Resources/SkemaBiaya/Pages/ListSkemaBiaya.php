@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\SkemaBiaya\Pages;
 
-use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
 
 class ListSkemaBiaya extends ListRecords
 {

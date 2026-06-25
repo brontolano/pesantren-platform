@@ -2,12 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\PPDB\Http\Controllers\PesertaAuthController;
-use Modules\PPDB\Http\Controllers\PesertaPwaController;
 use Modules\PPDB\Http\Controllers\PesertaPortalController;
+use Modules\PPDB\Http\Controllers\PesertaPwaController;
+use Modules\PPDB\Http\Controllers\PesertaUjianController;
+use Modules\PPDB\Http\Controllers\PPDBController;
 use Modules\PPDB\Http\Controllers\PpdbFileController;
 use Modules\PPDB\Http\Controllers\PublicPpdbController;
 use Modules\PPDB\Http\Controllers\WilayahController;
-use Modules\PPDB\Http\Controllers\PPDBController;
+use Modules\PPDB\Http\Middleware\FrameAncestorsPpdb;
 use Modules\PPDB\Http\Middleware\ShareSpmbPageData;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
@@ -19,10 +21,10 @@ Route::domain('{tenant}.localhost')->middleware([
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
     Route::get('/ppdb', [PublicPpdbController::class, 'create'])
-        ->middleware(\Modules\PPDB\Http\Middleware\FrameAncestorsPpdb::class)
+        ->middleware(FrameAncestorsPpdb::class)
         ->name('tenant.ppdb.public.create');
     Route::post('/ppdb', [PublicPpdbController::class, 'store'])
-        ->middleware(\Modules\PPDB\Http\Middleware\FrameAncestorsPpdb::class)
+        ->middleware(FrameAncestorsPpdb::class)
         ->name('tenant.ppdb.public.store');
 });
 
@@ -122,15 +124,15 @@ Route::middleware([
             ->name('pengumuman');
         Route::get('/kartu-ujian', [PesertaPortalController::class, 'kartuUjian'])
             ->name('kartu-ujian');
-        Route::get('/ujian', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'index'])
+        Route::get('/ujian', [PesertaUjianController::class, 'index'])
             ->name('ujian.index');
-        Route::post('/ujian/{paket}/mulai', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'mulai'])
+        Route::post('/ujian/{paket}/mulai', [PesertaUjianController::class, 'mulai'])
             ->name('ujian.mulai');
-        Route::get('/ujian/{paket}', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'kerjakan'])
+        Route::get('/ujian/{paket}', [PesertaUjianController::class, 'kerjakan'])
             ->name('ujian.kerjakan');
-        Route::post('/ujian/{paket}/jawab', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'jawab'])
+        Route::post('/ujian/{paket}/jawab', [PesertaUjianController::class, 'jawab'])
             ->name('ujian.jawab');
-        Route::post('/ujian/{paket}/selesai', [\Modules\PPDB\Http\Controllers\PesertaUjianController::class, 'selesai'])
+        Route::post('/ujian/{paket}/selesai', [PesertaUjianController::class, 'selesai'])
             ->name('ujian.selesai');
         Route::get('/daftar-ulang', [PesertaPortalController::class, 'daftarUlang'])
             ->name('daftar-ulang');

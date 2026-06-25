@@ -3,7 +3,9 @@
 namespace Modules\Keuangan\Services;
 
 use App\Models\Setting;
+use App\Support\PhoneNumber;
 use Modules\Keuangan\Models\Pembayaran;
+use Modules\Keuangan\Models\SetorKelilingItem;
 use Modules\Keuangan\Models\TabunganTopup;
 use Modules\Notifikasi\Services\NotifDispatcher;
 use Throwable;
@@ -17,9 +19,7 @@ use Throwable;
  */
 class KeuanganNotifikasiService
 {
-    public function __construct(private readonly NotifDispatcher $dispatcher)
-    {
-    }
+    public function __construct(private readonly NotifDispatcher $dispatcher) {}
 
     /** Wali: pembayaran diverifikasi (tagihan berkurang/lunas). */
     public function pembayaranDiverifikasi(Pembayaran $pembayaran): void
@@ -92,7 +92,7 @@ class KeuanganNotifikasiService
     }
 
     /** Wali: setoran via petugas keliling disetujui (pakai template TOPUP_DIVERIFIKASI). */
-    public function setorKelilingDisetujui(\Modules\Keuangan\Models\SetorKelilingItem $item): void
+    public function setorKelilingDisetujui(SetorKelilingItem $item): void
     {
         $this->safe(function () use ($item): void {
             $santri = $item->santri;
@@ -129,7 +129,7 @@ class KeuanganNotifikasiService
     /** @return array<int,string> Nomor WA wali (kolom santri.no_hp_wali), ternormalisasi 62…. */
     private function waliPhones(?object $santri): array
     {
-        $normalized = \App\Support\PhoneNumber::normalize($santri->no_hp_wali ?? null);
+        $normalized = PhoneNumber::normalize($santri->no_hp_wali ?? null);
 
         return $normalized === '' ? [] : [$normalized];
     }

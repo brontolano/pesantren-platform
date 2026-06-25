@@ -2,9 +2,8 @@
 
 namespace Modules\Asrama\Filament\Resources\PenempatanAsrama;
 
-use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\CreatePenempatanAsrama;
-use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\EditPenempatanAsrama;
-use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\ListPenempatanAsrama;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -16,13 +15,19 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\CreatePenempatanAsrama;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\EditPenempatanAsrama;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\ListPenempatanAsrama;
 use Modules\Asrama\Models\KamarAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;
 use Modules\Kesantrian\Models\Santri;
 
 class PenempatanAsramaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = PenempatanAsrama::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
@@ -35,7 +40,7 @@ class PenempatanAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -48,7 +53,7 @@ class PenempatanAsramaResource extends Resource
         return auth()->user()?->can('manage_santri') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_santri') ?? false;
     }
@@ -66,7 +71,7 @@ class PenempatanAsramaResource extends Resource
                 ->options(fn () => KamarAsrama::query()
                     ->with('blok')
                     ->get()
-                    ->mapWithKeys(fn (KamarAsrama $kamar) => [$kamar->id => $kamar->blok->nama_blok . ' - ' . $kamar->nomor_kamar]))
+                    ->mapWithKeys(fn (KamarAsrama $kamar) => [$kamar->id => $kamar->blok->nama_blok.' - '.$kamar->nomor_kamar]))
                 ->required()
                 ->searchable(),
             DatePicker::make('tanggal_masuk')->required(),
@@ -103,7 +108,7 @@ class PenempatanAsramaResource extends Resource
             ]);
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with(['santri', 'kamar.blok']);
     }
@@ -117,4 +122,3 @@ class PenempatanAsramaResource extends Resource
         ];
     }
 }
-

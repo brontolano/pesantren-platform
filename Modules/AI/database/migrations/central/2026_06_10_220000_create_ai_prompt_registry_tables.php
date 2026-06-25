@@ -48,7 +48,7 @@ return new class extends Migration
 
         // HANYA SATU versi aktif per agen — partial unique index (pgsql).
         DB::statement(
-            "CREATE UNIQUE INDEX ai_prompt_version_satu_aktif_per_agen "
+            'CREATE UNIQUE INDEX ai_prompt_version_satu_aktif_per_agen '
             ."ON ai_prompt_version (agent_key) WHERE status = 'aktif'",
         );
 

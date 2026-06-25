@@ -2,9 +2,9 @@
 
 namespace Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages;
 
-use Modules\Tahfidz\Filament\Resources\TahfidzTarget\TahfidzTargetResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Tahfidz\Filament\Resources\TahfidzTarget\TahfidzTargetResource;
 
 class EditTahfidzTarget extends EditRecord
 {

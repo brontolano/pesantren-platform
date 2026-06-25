@@ -32,9 +32,9 @@ class WilayahTenantImportCommand extends Command
      */
     private array $levels = [
         'provinces' => ['name'],
-        'cities'    => ['province_id', 'name'],
+        'cities' => ['province_id', 'name'],
         'districts' => ['city_id', 'name'],
-        'villages'  => ['district_id', 'name'],
+        'villages' => ['district_id', 'name'],
     ];
 
     public function handle(IndonesiaRegionImporter $importer): int
@@ -44,6 +44,7 @@ class WilayahTenantImportCommand extends Command
         $tenant = Tenant::find($tenantId);
         if (! $tenant) {
             $this->error("Tenant tidak ditemukan: {$tenantId}");
+
             return self::FAILURE;
         }
 
@@ -57,6 +58,7 @@ class WilayahTenantImportCommand extends Command
             foreach ($onlyLevels as $level) {
                 if (! isset($this->levels[$level])) {
                     $this->warn("Level tidak dikenal: {$level} — skip");
+
                     continue;
                 }
 
@@ -88,7 +90,7 @@ class WilayahTenantImportCommand extends Command
         $bar->start();
 
         $payload = [];
-        $total   = 0;
+        $total = 0;
 
         foreach ($importer->rowsFor($level) as $row) {
             if (empty($row['id'])) {
@@ -102,7 +104,7 @@ class WilayahTenantImportCommand extends Command
             // "Kabupaten". Sekaligus mencocokkan data lama "Kabupaten/Kota X".
             if ($level === 'cities' && isset($row['name']) && $row['name'] !== '') {
                 $code = (int) substr((string) $row['id'], 2, 2);
-                $row['name'] = ($code >= 71 ? 'Kota ' : 'Kabupaten ') . $row['name'];
+                $row['name'] = ($code >= 71 ? 'Kota ' : 'Kabupaten ').$row['name'];
             }
 
             $payload[] = $row;

@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
-use Modules\Ledger\Filament\Pages\LaporanKehalalan;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
+use Modules\Ledger\Filament\Pages\LaporanKehalalan;
+use Modules\Ledger\Models\Akun;
+use Modules\Ledger\Services\KehalalanService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -60,14 +62,14 @@ class SertifikatKehalalanPageTest extends TestCase
     {
         // Simulasikan tenant lama yang belum men-seed akun Dana Kebajikan (2-2000).
         $page = $this->bootPage('skh3');
-        $induk = \Modules\Ledger\Models\Akun::query()->where('kode', '2-2000')->first();
+        $induk = Akun::query()->where('kode', '2-2000')->first();
         if ($induk) {
             $induk->children()->delete();
             $induk->delete();
         }
 
         // Pelaporan harus tahan banting (saldo 0), tidak melempar 500.
-        $this->assertSame(0.0, app(\Modules\Ledger\Services\KehalalanService::class)->saldoDanaKebajikan());
+        $this->assertSame(0.0, app(KehalalanService::class)->saldoDanaKebajikan());
 
         $resp = $page->unduhSertifikat();
         ob_start();

@@ -2,13 +2,13 @@
 
 namespace Modules\Kesehatan\Services;
 
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Modules\Akademik\Models\PresensiSantri;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Kesehatan\Models\KunjunganUks;
 use Modules\Kesehatan\Models\RiwayatKesehatan;
 use Modules\Kesehatan\Models\SesiKonseling;
-use Modules\Kesantrian\Models\Santri;
-use Illuminate\Support\Collection;
 
 class KesehatanService
 {
@@ -19,13 +19,13 @@ class KesehatanService
         return RiwayatKesehatan::create([
             'tenant_id' => $santri->tenant_id,
             'santri_id' => $santri->getKey(),
-            'tanggal'   => $data['tanggal'] ?? now()->toDateString(),
-            'keluhan'   => $data['keluhan'] ?? null,
-            'diagnosa'  => $data['diagnosa'] ?? null,
-            'tindakan'  => $data['tindakan'] ?? null,
-            'kondisi'   => $data['kondisi'] ?? 'baik',
-            'petugas'   => $data['petugas'] ?? null,
-            'catatan'   => $data['catatan'] ?? null,
+            'tanggal' => $data['tanggal'] ?? now()->toDateString(),
+            'keluhan' => $data['keluhan'] ?? null,
+            'diagnosa' => $data['diagnosa'] ?? null,
+            'tindakan' => $data['tindakan'] ?? null,
+            'kondisi' => $data['kondisi'] ?? 'baik',
+            'petugas' => $data['petugas'] ?? null,
+            'catatan' => $data['catatan'] ?? null,
         ]);
     }
 
@@ -51,12 +51,12 @@ class KesehatanService
     public function jadwalkanKonseling(Santri $santri, array $data): SesiKonseling
     {
         return SesiKonseling::create([
-            'tenant_id'   => $santri->tenant_id,
-            'santri_id'   => $santri->getKey(),
-            'tanggal'     => $data['tanggal'],
-            'topik'       => $data['topik'] ?? null,
-            'deskripsi'   => $data['deskripsi'] ?? null,
-            'status'      => 'terjadwal',
+            'tenant_id' => $santri->tenant_id,
+            'santri_id' => $santri->getKey(),
+            'tanggal' => $data['tanggal'],
+            'topik' => $data['topik'] ?? null,
+            'deskripsi' => $data['deskripsi'] ?? null,
+            'status' => 'terjadwal',
             'konselor_id' => $data['konselor_id'] ?? null,
         ]);
     }
@@ -64,8 +64,8 @@ class KesehatanService
     public function selesaikanKonseling(SesiKonseling $sesi, array $data): SesiKonseling
     {
         $sesi->update([
-            'status'           => 'selesai',
-            'rekomendasi'      => $data['rekomendasi'] ?? null,
+            'status' => 'selesai',
+            'rekomendasi' => $data['rekomendasi'] ?? null,
             'catatan_lanjutan' => $data['catatan_lanjutan'] ?? null,
         ]);
 
@@ -119,7 +119,7 @@ class KesehatanService
     /**
      * Tandai jam keluar kunjungan UKS.
      */
-    public function tutupKunjungan(KunjunganUks $kunjungan, string $jamKeluar = null): KunjunganUks
+    public function tutupKunjungan(KunjunganUks $kunjungan, ?string $jamKeluar = null): KunjunganUks
     {
         $kunjungan->update([
             'jam_keluar' => $jamKeluar ?? now()->format('H:i:s'),

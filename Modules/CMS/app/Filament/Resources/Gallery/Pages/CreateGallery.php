@@ -2,9 +2,9 @@
 
 namespace Modules\CMS\Filament\Resources\Gallery\Pages;
 
+use Filament\Resources\Pages\CreateRecord;
 use Modules\CMS\Filament\Resources\Gallery\Concerns\SyncsGalleryPhotos;
 use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
-use Filament\Resources\Pages\CreateRecord;
 
 class CreateGallery extends CreateRecord
 {

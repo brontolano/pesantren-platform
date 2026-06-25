@@ -2,8 +2,8 @@
 
 namespace Modules\Ledger\Filament\Resources\Pages;
 
-use Modules\Ledger\Filament\Resources\KebijakanKehalalanResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Ledger\Filament\Resources\KebijakanKehalalanResource;
 
 class ListKebijakanKehalalan extends ListRecords
 {

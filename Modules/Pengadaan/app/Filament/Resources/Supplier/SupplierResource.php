@@ -3,9 +3,6 @@
 namespace Modules\Pengadaan\Filament\Resources\Supplier;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Pengadaan\Filament\Resources\Supplier\Pages\CreateSupplier;
-use Modules\Pengadaan\Filament\Resources\Supplier\Pages\EditSupplier;
-use Modules\Pengadaan\Filament\Resources\Supplier\Pages\ListSupplier;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -19,6 +16,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Pengadaan\Filament\Resources\Supplier\Pages\CreateSupplier;
+use Modules\Pengadaan\Filament\Resources\Supplier\Pages\EditSupplier;
+use Modules\Pengadaan\Filament\Resources\Supplier\Pages\ListSupplier;
 use Modules\Pengadaan\Models\Supplier;
 
 /**

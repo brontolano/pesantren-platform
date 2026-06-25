@@ -18,9 +18,9 @@ class TenantSubscription extends Model
     ];
 
     protected $casts = [
-        'override'   => 'array',
-        'starts_at'  => 'date',
-        'ends_at'    => 'date',
+        'override' => 'array',
+        'starts_at' => 'date',
+        'ends_at' => 'date',
     ];
 
     public function tenant(): BelongsTo

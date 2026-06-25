@@ -2,9 +2,9 @@
 
 namespace Modules\Pembiayaan\Filament\Resources\Pages;
 
-use Modules\Pembiayaan\Filament\Resources\PembiayaanResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Pembiayaan\Filament\Resources\PembiayaanResource;
 
 class ListPembiayaan extends ListRecords
 {

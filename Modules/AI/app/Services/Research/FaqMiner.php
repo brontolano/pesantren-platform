@@ -9,7 +9,7 @@ use InvalidArgumentException;
 use Modules\AI\Models\AiConversation;
 use Modules\AI\Models\AiEscalation;
 use Modules\AI\Models\AiFaqDraf;
-use Modules\AI\Models\AiKnowledgeSource;
+use Modules\AI\Models\AiMessage;
 use Modules\AI\Services\Privacy\PiiRedactor;
 use Modules\AI\Services\Rag\IngestService;
 
@@ -212,8 +212,8 @@ class FaqMiner
 
         // 2. Pesan masuk percakapan chatbot — isi_terredaksi; percakapan
         //    status handoff dilewati (sedang ditangani manusia).
-        \Modules\AI\Models\AiMessage::query()
-            ->where('arah', \Modules\AI\Models\AiMessage::ARAH_MASUK)
+        AiMessage::query()
+            ->where('arah', AiMessage::ARAH_MASUK)
             ->where('created_at', '>=', $batas)
             ->whereHas('conversation', fn ($q) => $q->where('status', '!=', AiConversation::STATUS_HANDOFF))
             ->orderBy('id')

@@ -2,9 +2,9 @@
 
 namespace Modules\Ledger\Filament\Resources\KursValuta\Pages;
 
-use Modules\Ledger\Filament\Resources\KursValuta\KursValutaResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Ledger\Filament\Resources\KursValuta\KursValutaResource;
 
 class EditKursValuta extends EditRecord
 {

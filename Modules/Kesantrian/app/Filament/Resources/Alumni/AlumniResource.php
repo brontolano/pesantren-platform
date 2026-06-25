@@ -2,8 +2,6 @@
 
 namespace Modules\Kesantrian\Filament\Resources\Alumni;
 
-use Modules\Kesantrian\Filament\Resources\Alumni\Pages\EditAlumni;
-use Modules\Kesantrian\Filament\Resources\Alumni\Pages\ListAlumni;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -19,6 +17,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Services\KelulusanService;
+use Modules\Kesantrian\Filament\Resources\Alumni\Pages\EditAlumni;
+use Modules\Kesantrian\Filament\Resources\Alumni\Pages\ListAlumni;
 use Modules\Kesantrian\Models\Alumni;
 use Throwable;
 

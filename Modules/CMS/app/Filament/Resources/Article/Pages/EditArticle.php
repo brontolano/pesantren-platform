@@ -2,9 +2,9 @@
 
 namespace Modules\CMS\Filament\Resources\Article\Pages;
 
-use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\CMS\Filament\Resources\Article\ArticleResource;
 
 class EditArticle extends EditRecord
 {
@@ -24,4 +24,3 @@ class EditArticle extends EditRecord
         return $data;
     }
 }
-

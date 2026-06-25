@@ -3,12 +3,12 @@
 namespace Modules\Ledger\Filament\Resources\AlokasiBiaya;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Ledger\Filament\Resources\AlokasiBiaya\Pages\ListAlokasiBiaya;
 use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Ledger\Filament\Resources\AlokasiBiaya\Pages\ListAlokasiBiaya;
 use Modules\Ledger\Models\AlokasiBiaya;
 
 /**

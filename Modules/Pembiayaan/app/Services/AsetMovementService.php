@@ -29,11 +29,9 @@ class AsetMovementService
     private const COA_LANGKAH = 'Minta admin keuangan menyiapkan Bagan Akun (Pengaturan Keuangan) terlebih dahulu, lalu ulangi pelepasan aset ini.';
 
     /** gap-96c — pesan utama saat bagan akun inti (kas/aset tetap) belum tersedia. */
-    private const COA_BELUM_SIAP = 'Bagan akun keuangan belum siap untuk mencatat pelepasan aset (akun Kas/Aset Tetap belum tersedia). ' . self::COA_LANGKAH;
+    private const COA_BELUM_SIAP = 'Bagan akun keuangan belum siap untuk mencatat pelepasan aset (akun Kas/Aset Tetap belum tersedia). '.self::COA_LANGKAH;
 
-    public function __construct(private readonly JurnalService $jurnalService)
-    {
-    }
+    public function __construct(private readonly JurnalService $jurnalService) {}
 
     /** Pindah lokasi aset (tanpa dampak buku besar). */
     public function mutasiLokasi(Aset $aset, string $keLokasi, array $opsi = []): MutasiAset
@@ -101,13 +99,13 @@ class AsetMovementService
                 throw new RuntimeException(self::COA_BELUM_SIAP);
             }
             if ($akum > 0 && $akumAkun === null) {
-                throw new RuntimeException('Bagan akun belum lengkap: akun Akumulasi Penyusutan (1-2900) belum tersedia. ' . self::COA_LANGKAH);
+                throw new RuntimeException('Bagan akun belum lengkap: akun Akumulasi Penyusutan (1-2900) belum tersedia. '.self::COA_LANGKAH);
             }
             if ($labaRugi < 0 && $rugiAkun === null) {
-                throw new RuntimeException('Bagan akun belum lengkap: akun Rugi Pelepasan Aset (5-8000) belum tersedia. ' . self::COA_LANGKAH);
+                throw new RuntimeException('Bagan akun belum lengkap: akun Rugi Pelepasan Aset (5-8000) belum tersedia. '.self::COA_LANGKAH);
             }
             if ($labaRugi > 0 && $labaAkun === null) {
-                throw new RuntimeException('Bagan akun belum lengkap: akun Laba Pelepasan Aset (4-6000) belum tersedia. ' . self::COA_LANGKAH);
+                throw new RuntimeException('Bagan akun belum lengkap: akun Laba Pelepasan Aset (4-6000) belum tersedia. '.self::COA_LANGKAH);
             }
         }
 
@@ -169,7 +167,7 @@ class AsetMovementService
 
             $jurnal = $this->jurnalService->postJurnal([
                 'tanggal' => $mutasi->tanggal,
-                'deskripsi' => 'Pelepasan aset — ' . $aset->nama_aset,
+                'deskripsi' => 'Pelepasan aset — '.$aset->nama_aset,
                 'tipe_sumber' => 'disposal_aset',
                 'ref_type' => 'MutasiAset',
                 'ref_id' => (string) $mutasi->id,

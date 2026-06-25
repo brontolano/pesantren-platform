@@ -2,9 +2,9 @@
 
 namespace Modules\Asrama\Filament\Resources\BlokAsrama\Pages;
 
-use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
 
 class ListBlokAsrama extends ListRecords
 {
@@ -17,4 +17,3 @@ class ListBlokAsrama extends ListRecords
         ];
     }
 }
-

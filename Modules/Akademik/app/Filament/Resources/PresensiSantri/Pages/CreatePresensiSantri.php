@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\PresensiSantri\Pages;
 
-use Modules\Akademik\Filament\Resources\PresensiSantri\PresensiSantriResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Akademik\Filament\Resources\PresensiSantri\PresensiSantriResource;
 
 class CreatePresensiSantri extends CreateRecord
 {

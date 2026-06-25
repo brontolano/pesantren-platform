@@ -43,7 +43,7 @@ final class TenantBranding
             return $path;
         }
 
-        return url('/_tenant-storage/' . ltrim($path, '/'));
+        return url('/_tenant-storage/'.ltrim($path, '/'));
     }
 
     /**
@@ -67,7 +67,7 @@ final class TenantBranding
             return $path;
         }
 
-        return url('/_tenant-storage/' . ltrim($path, '/'));
+        return url('/_tenant-storage/'.ltrim($path, '/'));
     }
 
     public static function name(string $default = 'Pesantren'): string

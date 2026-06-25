@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tenant;
 use App\Services\StorageQuotaService;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Modules\AI\Models\AiAuditLog;
 use Modules\AI\Models\AiCitation;
 use Modules\AI\Models\AiEscalation;
 use Modules\AI\Models\AiKnowledgeSource;
@@ -49,7 +52,7 @@ class AiRetrievalSitasiTest extends TestCase
         $this->ensurePpdbTestingSchemaReady(['ai_knowledge_source', 'ai_chunk', 'ai_citation']);
         $this->truncatePpdbTables(['domains', 'tenants']);
 
-        \Illuminate\Support\Facades\DB::table('module_registry')->delete();
+        DB::table('module_registry')->delete();
     }
 
     protected function tearDown(): void
@@ -65,7 +68,7 @@ class AiRetrievalSitasiTest extends TestCase
     // Pendukung
     // ------------------------------------------------------------------
 
-    private function siapkanTenant(string $prefix): \App\Models\Tenant
+    private function siapkanTenant(string $prefix): Tenant
     {
         $tenant = $this->createRuntimeTenant($prefix, 'Pesantren '.$prefix);
         tenancy()->initialize($tenant);
@@ -398,7 +401,7 @@ class AiRetrievalSitasiTest extends TestCase
         $this->assertNotNull($citations->first()->audit_log_id);
         $this->assertSame(
             $key,
-            \Modules\AI\Models\AiAuditLog::query()
+            AiAuditLog::query()
                 ->whereKey($citations->first()->audit_log_id)
                 ->value('idempotency_key'),
         );

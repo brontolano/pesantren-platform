@@ -56,11 +56,11 @@ return [
          * file tidak ditemukan → loop "Menunggu ukuran berkas" tak berujung.
          */
         'livewire-tmp' => [
-            'driver'     => 'local',
-            'root'       => storage_path('app/livewire-tmp'),
+            'driver' => 'local',
+            'root' => storage_path('app/livewire-tmp'),
             'visibility' => 'private',
-            'throw'      => false,
-            'report'     => false,
+            'throw' => false,
+            'report' => false,
         ],
 
         's3' => [

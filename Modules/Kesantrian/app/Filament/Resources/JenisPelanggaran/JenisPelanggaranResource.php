@@ -2,9 +2,6 @@
 
 namespace Modules\Kesantrian\Filament\Resources\JenisPelanggaran;
 
-use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\Pages\CreateJenisPelanggaran;
-use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\Pages\EditJenisPelanggaran;
-use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\Pages\ListJenisPelanggaran;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -19,6 +16,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\Pages\CreateJenisPelanggaran;
+use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\Pages\EditJenisPelanggaran;
+use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\Pages\ListJenisPelanggaran;
 use Modules\Kesantrian\Models\JenisPelanggaran;
 use UnitEnum;
 

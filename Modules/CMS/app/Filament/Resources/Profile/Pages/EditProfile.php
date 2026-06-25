@@ -2,8 +2,8 @@
 
 namespace Modules\CMS\Filament\Resources\Profile\Pages;
 
-use Modules\CMS\Filament\Resources\Profile\ProfileResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\CMS\Filament\Resources\Profile\ProfileResource;
 
 class EditProfile extends EditRecord
 {
@@ -14,4 +14,3 @@ class EditProfile extends EditRecord
         return [];
     }
 }
-

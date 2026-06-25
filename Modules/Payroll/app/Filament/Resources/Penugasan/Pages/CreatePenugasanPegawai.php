@@ -2,8 +2,8 @@
 
 namespace Modules\Payroll\Filament\Resources\Penugasan\Pages;
 
-use Modules\Payroll\Filament\Resources\Penugasan\PenugasanPegawaiResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Payroll\Filament\Resources\Penugasan\PenugasanPegawaiResource;
 
 class CreatePenugasanPegawai extends CreateRecord
 {

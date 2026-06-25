@@ -6,6 +6,8 @@ use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Livewire\Livewire;
@@ -53,7 +55,7 @@ class AiResearchTelemetryTest extends TestCase
 
         // Baseline gating modul T-A012: registry kosong = modul tampil.
         DB::table('module_registry')->delete();
-        \Illuminate\Support\Facades\Cache::flush();
+        Cache::flush();
     }
 
     protected function tearDown(): void
@@ -132,7 +134,7 @@ class AiResearchTelemetryTest extends TestCase
         $this->assertTrue($keputusan->eskalasi, 'Blokir level_fatwa harus bereskalasi (prasyarat uji)');
     }
 
-    private function eventTenant(Tenant $tenant): \Illuminate\Database\Eloquent\Builder
+    private function eventTenant(Tenant $tenant): Builder
     {
         return AiResearchEvent::query()->where('tenant_id', (string) $tenant->id);
     }

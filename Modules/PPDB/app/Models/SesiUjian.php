@@ -3,6 +3,7 @@
 namespace Modules\PPDB\Models;
 
 use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -54,7 +55,7 @@ class SesiUjian extends Model
      * Isi hasil skoring (output UjianScoringService::score) ke sesi.
      * Status → 'selesai' (auto-grade tersimpan; essay—bila ada—masih manual).
      *
-     * @param array{auto_score:int,max_auto_score:int,butuh_manual:array} $hasil
+     * @param  array{auto_score:int,max_auto_score:int,butuh_manual:array}  $hasil
      */
     public function isiDariSkor(array $hasil): self
     {
@@ -93,7 +94,7 @@ class SesiUjian extends Model
         return in_array($this->status, [self::STATUS_SELESAI, self::STATUS_DINILAI], true);
     }
 
-    /** @param \Illuminate\Database\Eloquent\Builder $query */
+    /** @param Builder $query */
     public function scopeSelesai($query)
     {
         return $query->whereIn('status', [self::STATUS_SELESAI, self::STATUS_DINILAI]);

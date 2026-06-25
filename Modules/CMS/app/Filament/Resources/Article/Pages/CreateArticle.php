@@ -2,8 +2,8 @@
 
 namespace Modules\CMS\Filament\Resources\Article\Pages;
 
-use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\CMS\Filament\Resources\Article\ArticleResource;
 
 class CreateArticle extends CreateRecord
 {
@@ -17,4 +17,3 @@ class CreateArticle extends CreateRecord
         return $data;
     }
 }
-

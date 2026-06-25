@@ -46,6 +46,7 @@ class AuditPenempatanCommand extends Command
 
             if ($rows === []) {
                 $this->info("[{$tenant->getKey()}] Sinkron — tidak ada drift.");
+
                 continue;
             }
 

@@ -2,9 +2,9 @@
 
 namespace Modules\PPDB\Filament\Resources\JadwalUjian\Pages;
 
-use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 
 class ListJadwalUjian extends ListRecords
 {

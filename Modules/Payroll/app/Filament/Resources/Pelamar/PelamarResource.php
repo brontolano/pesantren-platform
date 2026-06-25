@@ -3,9 +3,6 @@
 namespace Modules\Payroll\Filament\Resources\Pelamar;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Payroll\Filament\Resources\Pelamar\Pages\CreatePelamar;
-use Modules\Payroll\Filament\Resources\Pelamar\Pages\EditPelamar;
-use Modules\Payroll\Filament\Resources\Pelamar\Pages\ListPelamar;
 use App\Services\StorageQuotaService;
 use App\Support\UiMode;
 use Filament\Actions\Action;
@@ -26,6 +23,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Payroll\Filament\Resources\Pelamar\Pages\CreatePelamar;
+use Modules\Payroll\Filament\Resources\Pelamar\Pages\EditPelamar;
+use Modules\Payroll\Filament\Resources\Pelamar\Pages\ListPelamar;
 use Modules\Payroll\Models\Pelamar;
 use Modules\Payroll\Services\RekrutmenService;
 

@@ -2,9 +2,8 @@
 
 namespace Modules\Asrama\Filament\Resources\BlokAsrama;
 
-use Modules\Asrama\Filament\Resources\BlokAsrama\Pages\CreateBlokAsrama;
-use Modules\Asrama\Filament\Resources\BlokAsrama\Pages\EditBlokAsrama;
-use Modules\Asrama\Filament\Resources\BlokAsrama\Pages\ListBlokAsrama;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -15,11 +14,16 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Asrama\Filament\Resources\BlokAsrama\Pages\CreateBlokAsrama;
+use Modules\Asrama\Filament\Resources\BlokAsrama\Pages\EditBlokAsrama;
+use Modules\Asrama\Filament\Resources\BlokAsrama\Pages\ListBlokAsrama;
 use Modules\Asrama\Models\BlokAsrama;
 
 class BlokAsramaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = BlokAsrama::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
@@ -32,7 +36,7 @@ class BlokAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -45,7 +49,7 @@ class BlokAsramaResource extends Resource
         return auth()->user()?->can('manage_santri') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return auth()->user()?->can('manage_santri') ?? false;
     }
@@ -88,4 +92,3 @@ class BlokAsramaResource extends Resource
         ];
     }
 }
-

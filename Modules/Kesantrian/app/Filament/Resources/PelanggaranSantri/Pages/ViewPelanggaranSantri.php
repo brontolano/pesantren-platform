@@ -2,8 +2,8 @@
 
 namespace Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages;
 
-use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
 use Filament\Resources\Pages\ViewRecord;
+use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
 
 class ViewPelanggaranSantri extends ViewRecord
 {

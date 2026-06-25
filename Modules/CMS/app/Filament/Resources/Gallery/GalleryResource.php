@@ -3,9 +3,6 @@
 namespace Modules\CMS\Filament\Resources\Gallery;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\CMS\Filament\Resources\Gallery\Pages\CreateGallery;
-use Modules\CMS\Filament\Resources\Gallery\Pages\EditGallery;
-use Modules\CMS\Filament\Resources\Gallery\Pages\ListGalleries;
 use App\Services\StorageQuotaService;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -30,6 +27,9 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Modules\CMS\Filament\Resources\Gallery\Pages\CreateGallery;
+use Modules\CMS\Filament\Resources\Gallery\Pages\EditGallery;
+use Modules\CMS\Filament\Resources\Gallery\Pages\ListGalleries;
 use Modules\CMS\Models\Gallery;
 
 class GalleryResource extends Resource

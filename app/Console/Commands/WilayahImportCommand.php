@@ -17,10 +17,10 @@ class WilayahImportCommand extends Command
      * Mapping level → tabel + kolom parent.
      */
     private array $levels = [
-        'provinces'  => ['table' => 'provinces',  'parent_col' => null,          'parent_key' => null],
-        'cities'     => ['table' => 'cities',     'parent_col' => 'province_id', 'parent_key' => 'id'],
-        'districts'  => ['table' => 'districts',  'parent_col' => 'city_id',     'parent_key' => 'id'],
-        'villages'   => ['table' => 'villages',   'parent_col' => 'district_id', 'parent_key' => 'id'],
+        'provinces' => ['table' => 'provinces',  'parent_col' => null,          'parent_key' => null],
+        'cities' => ['table' => 'cities',     'parent_col' => 'province_id', 'parent_key' => 'id'],
+        'districts' => ['table' => 'districts',  'parent_col' => 'city_id',     'parent_key' => 'id'],
+        'villages' => ['table' => 'villages',   'parent_col' => 'district_id', 'parent_key' => 'id'],
     ];
 
     public function handle(): int
@@ -40,6 +40,7 @@ class WilayahImportCommand extends Command
             $this->line('3. Jalankan: php artisan wilayah:import');
             $this->line('');
             $this->line('Sumber CSV: https://github.com/cahyadsn/wilayah');
+
             return Command::FAILURE;
         }
 
@@ -51,12 +52,14 @@ class WilayahImportCommand extends Command
             $level = trim($level);
             if (! isset($this->levels[$level])) {
                 $this->warn("Level tidak dikenal: {$level} — skip");
+
                 continue;
             }
 
             $csvFile = "{$basePath}/{$level}.csv";
             if (! file_exists($csvFile)) {
                 $this->warn("File tidak ditemukan: {$csvFile} — skip");
+
                 continue;
             }
 
@@ -67,7 +70,7 @@ class WilayahImportCommand extends Command
         $this->info('Import wilayah selesai.');
         $this->table(
             ['Tabel', 'Jumlah Record'],
-            collect($onlyLevels)->map(fn($l) => [
+            collect($onlyLevels)->map(fn ($l) => [
                 $l,
                 DB::table($this->levels[trim($l)]['table'] ?? $l)->count(),
             ])->toArray()
@@ -84,6 +87,7 @@ class WilayahImportCommand extends Command
         $handle = fopen($csvFile, 'r');
         if (! $handle) {
             $this->error("Gagal membuka: {$csvFile}");
+
             return;
         }
 
@@ -92,11 +96,12 @@ class WilayahImportCommand extends Command
         if (! $header) {
             $this->error("CSV kosong: {$csvFile}");
             fclose($handle);
+
             return;
         }
 
         // Normalize header
-        $header = array_map(fn($h) => strtolower(trim($h)), $header);
+        $header = array_map(fn ($h) => strtolower(trim($h)), $header);
 
         $rows = [];
         $total = 0;
@@ -107,10 +112,14 @@ class WilayahImportCommand extends Command
         $bar->start();
 
         while (($line = fgetcsv($handle)) !== false) {
-            if (count($line) < 2) continue;
+            if (count($line) < 2) {
+                continue;
+            }
 
             $row = array_combine($header, array_pad($line, count($header), null));
-            if (! $row || empty($row['id'])) continue;
+            if (! $row || empty($row['id'])) {
+                continue;
+            }
 
             // Build insert data
             $data = ['id' => trim($row['id']), 'name' => trim($row['name'] ?? '')];

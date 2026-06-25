@@ -25,8 +25,7 @@ class MesinPajakService
 
     public function __construct(
         private readonly KebijakanPajakKehalalan $kebijakanKehalalan = new KebijakanPajakKehalalan,
-    ) {
-    }
+    ) {}
 
     /**
      * Hitung PPN & PPh untuk satu belanja.

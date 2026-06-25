@@ -2,8 +2,8 @@
 
 namespace Modules\Ledger\Filament\Resources\Pages;
 
-use Modules\Ledger\Filament\Resources\AkunResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Ledger\Filament\Resources\AkunResource;
 
 class CreateAkun extends CreateRecord
 {

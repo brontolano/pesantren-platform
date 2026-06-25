@@ -2,9 +2,9 @@
 
 namespace Modules\Kesantrian\Filament\Resources\JenisPelanggaran\Pages;
 
-use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\JenisPelanggaranResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\JenisPelanggaranResource;
 
 class EditJenisPelanggaran extends EditRecord
 {

@@ -198,6 +198,6 @@ final class AppLauncher
             return $value;
         }
 
-        return 'https://' . ltrim($value, '/');
+        return 'https://'.ltrim($value, '/');
     }
 }

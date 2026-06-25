@@ -2,8 +2,6 @@
 
 namespace Modules\Kesantrian\Filament\Resources\PenempatanKelas;
 
-use Modules\Kesantrian\Filament\Resources\PenempatanKelas\Pages\CreatePenempatanKelas;
-use Modules\Kesantrian\Filament\Resources\PenempatanKelas\Pages\ListPenempatanKelas;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -15,6 +13,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Kesantrian\Filament\Resources\PenempatanKelas\Pages\CreatePenempatanKelas;
+use Modules\Kesantrian\Filament\Resources\PenempatanKelas\Pages\ListPenempatanKelas;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\PenempatanKelas;
 use Modules\Kesantrian\Models\Santri;

@@ -61,7 +61,7 @@ class ImportColumnMapper
      * @param  list<string>  $fileHeaders
      * @param  list<string>  $columns  kolom kanonik
      * @param  array<string, list<string>>  $aliases  kanonik => alias tambahan
-     * @return array<string, string>  kanonik => header file (atau '' bila tak ketemu)
+     * @return array<string, string> kanonik => header file (atau '' bila tak ketemu)
      */
     public function autoMatch(array $fileHeaders, array $columns, array $aliases = []): array
     {
@@ -92,7 +92,7 @@ class ImportColumnMapper
      *
      * @param  list<string>  $columns
      * @param  array<string, string>  $mapping
-     * @return string  path CSV sementara (hapus setelah dipakai)
+     * @return string path CSV sementara (hapus setelah dipakai)
      */
     public function normalizeToCsv(string $path, array $columns, array $mapping): string
     {

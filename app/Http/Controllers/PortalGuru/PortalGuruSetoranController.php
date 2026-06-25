@@ -27,8 +27,7 @@ class PortalGuruSetoranController extends Controller
 
     public function __construct(
         private readonly TahfidzService $tahfidzService,
-    ) {
-    }
+    ) {}
 
     public function index(Request $request): Response
     {

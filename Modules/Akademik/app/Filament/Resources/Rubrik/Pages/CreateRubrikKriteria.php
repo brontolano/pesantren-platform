@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\Rubrik\Pages;
 
-use Modules\Akademik\Filament\Resources\Rubrik\RubrikKriteriaResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Akademik\Filament\Resources\Rubrik\RubrikKriteriaResource;
 
 class CreateRubrikKriteria extends CreateRecord
 {

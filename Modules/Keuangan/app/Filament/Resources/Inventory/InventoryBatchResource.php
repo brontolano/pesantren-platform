@@ -3,7 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\Inventory;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryBatch\Pages\ListInventoryBatch;
 use App\Support\UiMode;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
@@ -13,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryBatch\Pages\ListInventoryBatch;
 use Modules\Keuangan\Models\InventoryBatch;
 
 /**

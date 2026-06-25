@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\Program\Pages;
 
-use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
 
 class EditProgramStudi extends EditRecord
 {

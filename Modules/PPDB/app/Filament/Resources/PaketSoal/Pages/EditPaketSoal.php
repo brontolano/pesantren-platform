@@ -2,8 +2,9 @@
 
 namespace Modules\PPDB\Filament\Resources\PaketSoal\Pages;
 
-use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
 
 class EditPaketSoal extends EditRecord
 {
@@ -11,6 +12,6 @@ class EditPaketSoal extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [\Filament\Actions\DeleteAction::make()];
+        return [DeleteAction::make()];
     }
 }

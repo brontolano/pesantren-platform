@@ -3,14 +3,18 @@
 namespace Tests\Feature;
 
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Models\TabunganTopup;
 use Modules\Keuangan\Models\TabunganTransaksi;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\BayarDariSaldoService;
+use Modules\Keuangan\Services\PembayaranService;
+use Modules\Keuangan\Services\TabunganService;
 use Modules\Keuangan\Services\TopupService;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -53,7 +57,7 @@ class TabunganLedgerIntegrityTest extends TestCase
         $this->seedTenantRow($tenant);
 
         // created_by/verified_by ber-FK ke users — butuh user nyata.
-        $this->userId = (int) \App\Models\User::withoutGlobalScopes()->create([
+        $this->userId = (int) User::withoutGlobalScopes()->create([
             'name' => 'Bendahara Uji', 'email' => $prefix.'@uji.localhost',
             'password' => 'password', 'tenant_id' => tenant('id'),
         ])->id;
@@ -184,7 +188,7 @@ class TabunganLedgerIntegrityTest extends TestCase
     public function test_tarik_melebihi_saldo_ditolak_di_dalam_lock(): void
     {
         [$santri, $tabungan] = $this->boot('tli7', 100000);
-        $svc = app(\Modules\Keuangan\Services\TabunganService::class);
+        $svc = app(TabunganService::class);
 
         $svc->tarik($santri, 80000, ['created_by' => $this->userId]);
         $this->assertEqualsWithDelta(20000, (float) $tabungan->fresh()->saldo, 0.01);
@@ -203,13 +207,13 @@ class TabunganLedgerIntegrityTest extends TestCase
 
     public function test_verifikasi_pembayaran_dua_kali_ditolak(): void
     {
-        [$santri, ] = $this->boot('tli8');
+        [$santri] = $this->boot('tli8');
         $tagihan = $this->tagihan($santri, 100000);
-        $bayar = \Modules\Keuangan\Models\Pembayaran::create([
+        $bayar = Pembayaran::create([
             'tagihan_id' => $tagihan->id, 'santri_id' => $santri->id, 'nominal' => 100000,
             'metode' => 'transfer', 'tanggal_pembayaran' => now()->toDateString(), 'is_verified' => false,
         ]);
-        $svc = app(\Modules\Keuangan\Services\PembayaranService::class);
+        $svc = app(PembayaranService::class);
 
         $svc->verifikasiPembayaran($bayar, $this->userId);
         $this->assertSame('lunas', $tagihan->fresh()->status);
@@ -224,18 +228,18 @@ class TabunganLedgerIntegrityTest extends TestCase
 
     public function test_verifikasi_overshoot_lintas_bukti_ditolak(): void
     {
-        [$santri, ] = $this->boot('tli9');
+        [$santri] = $this->boot('tli9');
         $tagihan = $this->tagihan($santri, 100000);
         // Wali tak sengaja unggah DUA bukti bernilai penuh → dua pembayaran pending.
-        $b1 = \Modules\Keuangan\Models\Pembayaran::create([
+        $b1 = Pembayaran::create([
             'tagihan_id' => $tagihan->id, 'santri_id' => $santri->id, 'nominal' => 100000,
             'metode' => 'transfer', 'tanggal_pembayaran' => now()->toDateString(), 'is_verified' => false,
         ]);
-        $b2 = \Modules\Keuangan\Models\Pembayaran::create([
+        $b2 = Pembayaran::create([
             'tagihan_id' => $tagihan->id, 'santri_id' => $santri->id, 'nominal' => 100000,
             'metode' => 'transfer', 'tanggal_pembayaran' => now()->toDateString(), 'is_verified' => false,
         ]);
-        $svc = app(\Modules\Keuangan\Services\PembayaranService::class);
+        $svc = app(PembayaranService::class);
 
         $svc->verifikasiPembayaran($b1, $this->userId); // lunas
         // Verifikasi bukti kedua WAJIB ditolak: total verified akan MELEBIHI tagihan.
@@ -244,7 +248,7 @@ class TabunganLedgerIntegrityTest extends TestCase
             $this->fail('Verifikasi overshoot harus ditolak.');
         } catch (InvalidArgumentException) {
         }
-        $totalVerified = (float) \Modules\Keuangan\Models\Pembayaran::where('tagihan_id', $tagihan->id)
+        $totalVerified = (float) Pembayaran::where('tagihan_id', $tagihan->id)
             ->where('is_verified', true)->sum('nominal');
         $this->assertEqualsWithDelta(100000, $totalVerified, 0.01, 'Total verified tak boleh melebihi tagihan.');
         tenancy()->end();
@@ -253,7 +257,7 @@ class TabunganLedgerIntegrityTest extends TestCase
     public function test_frozen_dan_limit_harian_menolak_tarik(): void
     {
         [$santri, $tabungan] = $this->boot('tli10', 500000);
-        $svc = app(\Modules\Keuangan\Services\TabunganService::class);
+        $svc = app(TabunganService::class);
 
         // Limit harian 100rb: tarik 80rb OK, tarik 30rb lagi DITOLAK (total > limit).
         $tabungan->update(['limit_harian' => 100000]);

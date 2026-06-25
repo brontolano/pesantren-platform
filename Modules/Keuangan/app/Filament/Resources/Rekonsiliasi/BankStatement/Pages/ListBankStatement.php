@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatement\Pages;
 
-use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatementResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatementResource;
 
 class ListBankStatement extends ListRecords
 {

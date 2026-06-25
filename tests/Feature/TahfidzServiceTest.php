@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
-use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
+use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
 use Modules\Tahfidz\Models\HafalanTahfidz;
 use Modules\Tahfidz\Models\PenilaianTahfidz;
 use Modules\Tahfidz\Services\TahfidzService;
@@ -23,9 +23,13 @@ class TahfidzServiceTest extends TestCase
     use InteractsWithPpdbTestDatabase;
 
     private TahfidzService $service;
+
     private Tenant $tenantA;
+
     private Tenant $tenantB;
+
     private Santri $santriA;
+
     private Santri $santriB;
 
     protected function setUp(): void
@@ -39,7 +43,7 @@ class TahfidzServiceTest extends TestCase
             $this->seed(RolesAndPermissionsSeeder::class);
         }
 
-        $this->service = new TahfidzService();
+        $this->service = new TahfidzService;
         $suffix = Str::lower(Str::random(8));
 
         $this->tenantA = $this->createTestTenant("pesantren-a-{$suffix}", 'Pesantren A', "pesantren-a-{$suffix}.localhost");
@@ -48,7 +52,7 @@ class TahfidzServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
         $this->santriA = Santri::create([
             'tenant_id' => $this->tenantA->id,
-            'nis' => 'TA' . strtoupper($suffix) . '01',
+            'nis' => 'TA'.strtoupper($suffix).'01',
             'nama' => 'Ahmad Fulan',
             'tanggal_lahir' => '2012-01-01',
             'jenis_kelamin' => 'L',
@@ -59,7 +63,7 @@ class TahfidzServiceTest extends TestCase
         tenancy()->initialize($this->tenantB);
         $this->santriB = Santri::create([
             'tenant_id' => $this->tenantB->id,
-            'nis' => 'TB' . strtoupper($suffix) . '01',
+            'nis' => 'TB'.strtoupper($suffix).'01',
             'nama' => 'Budi Santoso',
             'tanggal_lahir' => '2012-02-02',
             'jenis_kelamin' => 'L',
@@ -73,11 +77,11 @@ class TahfidzServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
 
         $hafalan = $this->service->createHafalan($this->santriA, [
-            'surah'          => 'Al-Baqarah',
-            'ayat_awal'      => 1,
-            'ayat_akhir'     => 10,
+            'surah' => 'Al-Baqarah',
+            'ayat_awal' => 1,
+            'ayat_akhir' => 10,
             'tanggal_target' => now()->addDays(30)->toDateString(),
-            'status'         => 'berjalan',
+            'status' => 'berjalan',
         ]);
 
         $this->assertInstanceOf(HafalanTahfidz::class, $hafalan);
@@ -93,7 +97,7 @@ class TahfidzServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
 
         $hafalan = $this->service->createHafalan($this->santriA, [
-            'surah'  => 'Al-Fatihah',
+            'surah' => 'Al-Fatihah',
             'status' => 'berjalan',
         ]);
 
@@ -110,14 +114,14 @@ class TahfidzServiceTest extends TestCase
         tenancy()->initialize($this->tenantA);
 
         $hafalan = $this->service->createHafalan($this->santriA, [
-            'surah'  => 'Al-Ikhlas',
+            'surah' => 'Al-Ikhlas',
             'status' => 'berjalan',
         ]);
 
         $penilaian = $this->service->addPenilaian($hafalan, [
-            'jenis'  => 'murajaah',
-            'nilai'  => 90.5,
-            'tanggal'=> now()->toDateString(),
+            'jenis' => 'murajaah',
+            'nilai' => 90.5,
+            'tanggal' => now()->toDateString(),
         ]);
 
         $this->assertInstanceOf(PenilaianTahfidz::class, $penilaian);
@@ -179,7 +183,7 @@ class TahfidzServiceTest extends TestCase
         $admin = User::create([
             'tenant_id' => $this->tenantA->id,
             'name' => 'Admin Tahfidz',
-            'email' => 'admin-tahfidz-' . Str::lower(Str::random(6)) . '@test.local',
+            'email' => 'admin-tahfidz-'.Str::lower(Str::random(6)).'@test.local',
             'password' => 'password',
         ]);
         $admin->assignRole('admin_pesantren');

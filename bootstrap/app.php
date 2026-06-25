@@ -1,10 +1,17 @@
 <?php
 
+use App\Http\Middleware\AuthenticateTenantApiKey;
+use App\Http\Middleware\CheckModuleActive;
+use App\Http\Middleware\EnsureUserIsJemaah;
+use App\Http\Middleware\EnsureUserIsWali;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\InitializeTenancyForWebRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,17 +27,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(
             prepend: [
                 // Tenancy init untuk request grup web (Livewire dll) di domain tenant
-                \App\Http\Middleware\InitializeTenancyForWebRequests::class,
+                InitializeTenancyForWebRequests::class,
             ],
             append: [
-                \App\Http\Middleware\HandleInertiaRequests::class,
+                HandleInertiaRequests::class,
             ],
         );
         $middleware->alias([
-            'module' => \App\Http\Middleware\CheckModuleActive::class,
-            'wali' => \App\Http\Middleware\EnsureUserIsWali::class,
-            'jemaah' => \App\Http\Middleware\EnsureUserIsJemaah::class,
-            'api.key' => \App\Http\Middleware\AuthenticateTenantApiKey::class,
+            'module' => CheckModuleActive::class,
+            'wali' => EnsureUserIsWali::class,
+            'jemaah' => EnsureUserIsJemaah::class,
+            'api.key' => AuthenticateTenantApiKey::class,
         ]);
 
         // API publik (lintas-origin dari website tenant) — stateless, dilindungi CORS.
@@ -48,10 +55,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // ERROR. Jangan laporkan, dan render 404 ringan & netral.
         // (www.* sudah ditangani via redirect 301 di InitializeTenancyForWebRequests.)
         $exceptions->dontReport(
-            \Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException::class,
+            TenantCouldNotBeIdentifiedOnDomainException::class,
         );
         $exceptions->render(function (
-            \Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException $e,
+            TenantCouldNotBeIdentifiedOnDomainException $e,
             Request $request,
         ) {
             if ($request->is('api/*') || $request->expectsJson()) {

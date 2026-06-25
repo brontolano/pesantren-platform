@@ -2,10 +2,10 @@
 
 namespace Modules\Keuangan\Filament\Resources\Pembayaran\Pages;
 
-use Modules\Keuangan\Filament\Resources\Pembayaran\PembayaranResource;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\Pembayaran\PembayaranResource;
 
 class ListPembayaran extends ListRecords
 {
@@ -32,4 +32,3 @@ class ListPembayaran extends ListRecords
         ];
     }
 }
-

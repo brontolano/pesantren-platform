@@ -2,9 +2,10 @@
 
 namespace Modules\Akademik\Filament\Resources\Nilai\Pages;
 
-use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
 use Modules\Akademik\Services\NilaiService;
 
 class EditNilai extends EditRecord
@@ -18,9 +19,8 @@ class EditNilai extends EditRecord
         ];
     }
 
-    protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(NilaiService::class)->simpan($data, auth()->user(), $record);
     }
 }
-

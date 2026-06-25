@@ -8,6 +8,7 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\DB;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Services\SantriAccountService;
+use Modules\Notifikasi\Services\NotifDispatcher;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -90,13 +91,13 @@ class SantriAccountServiceTest extends TestCase
         app(SantriAccountService::class)->provision(Santri::where('nis', 'AKN3-99')->first());
         tenancy()->end();
 
-        $spy = \Mockery::spy(\Modules\Notifikasi\Services\NotifDispatcher::class);
-        $this->app->instance(\Modules\Notifikasi\Services\NotifDispatcher::class, $spy);
+        $spy = \Mockery::spy(NotifDispatcher::class);
+        $this->app->instance(NotifDispatcher::class, $spy);
 
         $this->artisan('santri:provision-akun', ['tenant' => $tenantId, '--kirim-wa' => true])
             ->assertSuccessful();
 
-        tenancy()->initialize(\App\Models\Tenant::find($tenantId));
+        tenancy()->initialize(Tenant::find($tenantId));
         $this->assertNotNull($santri->fresh()->user_id, 'Santri tanpa akun harus dibuatkan.');
         tenancy()->end();
 
@@ -111,7 +112,7 @@ class SantriAccountServiceTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => $tenant->is_active,
-             'data' => json_encode([]), 'created_at' => now(), 'updated_at' => now()],
+                'data' => json_encode([]), 'created_at' => now(), 'updated_at' => now()],
         );
     }
 }

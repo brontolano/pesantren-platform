@@ -76,7 +76,7 @@ class KehalalanGuard
         // Aturan 2: No-income — dana syubhat tak boleh jadi pendapatan.
         if ($akun->tipe === 'PENDAPATAN' && $kredit > 0) {
             throw new PelanggaranKehalalanException(
-                "Baris #{$i}: dana {$sumber->kehalalan} tidak boleh dicatat sebagai pendapatan. " .
+                "Baris #{$i}: dana {$sumber->kehalalan} tidak boleh dicatat sebagai pendapatan. ".
                 'Gunakan akun "Dana Kebajikan / Pembersihan Harta".'
             );
         }
@@ -90,7 +90,7 @@ class KehalalanGuard
         // Aturan 3: Blacklist ibadah/masjid.
         if ($akun->peruntukan === 'ibadah') {
             throw new PelanggaranKehalalanException(
-                "Baris #{$i}: dana {$sumber->kehalalan} DILARANG untuk sarana ibadah/masjid. " .
+                "Baris #{$i}: dana {$sumber->kehalalan} DILARANG untuk sarana ibadah/masjid. ".
                 'Pembangunan masjid wajib dari dana 100% halal.'
             );
         }
@@ -109,7 +109,7 @@ class KehalalanGuard
 
         if (! $diizinkan) {
             throw new PelanggaranKehalalanException(
-                "Baris #{$i}: penyaluran dana {$sumber->kehalalan} ke peruntukan " .
+                "Baris #{$i}: penyaluran dana {$sumber->kehalalan} ke peruntukan ".
                 "\"{$akun->peruntukan}\" tidak diizinkan kebijakan kehalalan tenant."
             );
         }

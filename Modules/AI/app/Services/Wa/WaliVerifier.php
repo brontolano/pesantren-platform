@@ -6,6 +6,7 @@ use App\Models\AccessWali;
 use App\Models\User;
 use App\Services\PortalWali\PortalWaliIdentifierResolver;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Modules\AI\Models\AiConversation;
 use Modules\Kesantrian\Models\Santri;
@@ -61,7 +62,7 @@ class WaliVerifier
      * Daftar anak tertaut wali via AccessWali — urut anak utama dulu
      * (is_primary desc, santri_id asc). Anak pertama = default sesi.
      *
-     * @return \Illuminate\Support\Collection<int, Santri>
+     * @return Collection<int, Santri>
      */
     public function anakTertaut(User $wali)
     {

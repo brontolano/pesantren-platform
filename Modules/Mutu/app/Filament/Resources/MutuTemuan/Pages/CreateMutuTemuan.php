@@ -2,8 +2,8 @@
 
 namespace Modules\Mutu\Filament\Resources\MutuTemuan\Pages;
 
-use Modules\Mutu\Filament\Resources\MutuTemuanResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Mutu\Filament\Resources\MutuTemuanResource;
 
 class CreateMutuTemuan extends CreateRecord
 {

@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\Rubrik\Pages;
 
-use Modules\Akademik\Filament\Resources\Rubrik\RubrikKriteriaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\Rubrik\RubrikKriteriaResource;
 
 class ListRubrikKriteria extends ListRecords
 {

@@ -13,6 +13,7 @@ use Tests\TestCase;
 class PpdbFormFieldConfigurationServiceTest extends TestCase
 {
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void

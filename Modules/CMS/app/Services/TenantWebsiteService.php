@@ -37,12 +37,12 @@ class TenantWebsiteService
             $brandingTagline
         );
 
-        $logoUrl  = $this->resolveAssetUrl(Setting::getTenantStringValue('branding_logo', null));
+        $logoUrl = $this->resolveAssetUrl(Setting::getTenantStringValue('branding_logo', null));
         // Favicon kini bisa berupa path file (kunci 'favicon_path') ATAU URL lama
         // (kunci 'text'). resolveAssetUrl meneruskan URL absolut apa adanya dan
         // mengubah path relatif → /_tenant-storage/{path} (kompat-mundur).
-        $favicon  = $this->resolveAssetUrl(Setting::getTenantStringValue('branding_favicon', null));
-        $font     = Setting::getTenantStringValue('branding_font', $isAlbaKids ? 'modern' : 'default');
+        $favicon = $this->resolveAssetUrl(Setting::getTenantStringValue('branding_favicon', null));
+        $font = Setting::getTenantStringValue('branding_font', $isAlbaKids ? 'modern' : 'default');
         $fontFamily = $this->resolveFontFamily($font);
 
         return [
@@ -586,7 +586,7 @@ class TenantWebsiteService
             return $value;
         }
 
-        return url('/_tenant-storage/' . ltrim($value, '/'));
+        return url('/_tenant-storage/'.ltrim($value, '/'));
     }
 
     protected function resolveFontFamily(?string $font): string

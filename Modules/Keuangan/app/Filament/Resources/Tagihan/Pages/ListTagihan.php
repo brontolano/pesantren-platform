@@ -3,7 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\Tagihan\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
 use App\Models\Tenant;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -14,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Kesantrian\Models\Kelas;
+use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
 use Modules\Keuangan\Services\KeuanganImportService;
 use Modules\Keuangan\Services\TagihanService;
 
@@ -176,4 +176,3 @@ class ListTagihan extends ListRecords
         ];
     }
 }
-

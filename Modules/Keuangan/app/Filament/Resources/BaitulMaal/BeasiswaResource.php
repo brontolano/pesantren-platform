@@ -3,9 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateBeasiswa;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditBeasiswa;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListBeasiswa;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -20,6 +17,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateBeasiswa;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditBeasiswa;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListBeasiswa;
 use Modules\Keuangan\Models\Beasiswa;
 use Modules\Ledger\Models\SumberDana;
 

@@ -3,9 +3,6 @@
 namespace Modules\Kegiatan\Filament\Resources\Template;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Kegiatan\Filament\Resources\Template\Pages\CreateKegiatanTemplate;
-use Modules\Kegiatan\Filament\Resources\Template\Pages\EditKegiatanTemplate;
-use Modules\Kegiatan\Filament\Resources\Template\Pages\ListKegiatanTemplate;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -22,6 +19,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Kegiatan\Filament\Resources\Template\Pages\CreateKegiatanTemplate;
+use Modules\Kegiatan\Filament\Resources\Template\Pages\EditKegiatanTemplate;
+use Modules\Kegiatan\Filament\Resources\Template\Pages\ListKegiatanTemplate;
 use Modules\Kegiatan\Models\KegiatanTemplate;
 use Modules\Kegiatan\Services\KegiatanLanjutService;
 

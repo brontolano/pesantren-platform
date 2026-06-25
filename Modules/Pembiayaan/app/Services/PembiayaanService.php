@@ -13,9 +13,7 @@ use RuntimeException;
  */
 class PembiayaanService
 {
-    public function __construct(private readonly DscrService $dscrService)
-    {
-    }
+    public function __construct(private readonly DscrService $dscrService) {}
 
     /** Buat pengajuan + hitung DSCR. Status draft. */
     public function ajukan(array $data): PengajuanPembiayaan

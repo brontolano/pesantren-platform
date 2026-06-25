@@ -6,6 +6,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\Ledger\Models\Akun;
+use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Models\SumberDana;
 use Modules\Ledger\Services\AnggaranGuardService;
 use Modules\Ledger\Services\JurnalService;
@@ -38,8 +39,7 @@ class BelanjaService
     public function __construct(
         private readonly MesinPajakService $mesinPajak,
         private readonly JurnalService $jurnalService,
-    ) {
-    }
+    ) {}
 
     /** Buat belanja (status diajukan) dengan pajak terhitung otomatis. */
     public function buat(array $data): Belanja
@@ -139,7 +139,7 @@ class BelanjaService
     }
 
     /** Posting jurnal belanja (idempoten via ref Belanja). */
-    public function posting(Belanja $belanja, ?int $dibuatOleh = null): \Modules\Ledger\Models\Jurnal
+    public function posting(Belanja $belanja, ?int $dibuatOleh = null): Jurnal
     {
         $akunBeban = $belanja->akun_beban_id
             ? Akun::find($belanja->akun_beban_id)
@@ -151,7 +151,7 @@ class BelanjaService
             // tipe ini tidak pecah). Sebut bagian COA yang belum siap.
             $kurang = [];
             if ($akunBeban === null) {
-                $kurang[] = 'akun beban (' . ($belanja->akun_beban_id ? 'akun beban terpilih tidak ditemukan' : 'beban default 5-4000 belum ada') . ')';
+                $kurang[] = 'akun beban ('.($belanja->akun_beban_id ? 'akun beban terpilih tidak ditemukan' : 'beban default 5-4000 belum ada').')';
             }
             if ($akunKas === null) {
                 $kurang[] = 'akun kas/bank yang bisa diposting';
@@ -159,8 +159,8 @@ class BelanjaService
 
             throw new RuntimeException(
                 'Bagan Akun (COA) belum lengkap untuk memposting belanja ini: '
-                . implode(' dan ', $kurang)
-                . '. Mohon lengkapi/seed Bagan Akun pesantren (menu Keuangan → Bagan Akun) sebelum mencairkan belanja.'
+                .implode(' dan ', $kurang)
+                .'. Mohon lengkapi/seed Bagan Akun pesantren (menu Keuangan → Bagan Akun) sebelum mencairkan belanja.'
             );
         }
 
@@ -187,7 +187,7 @@ class BelanjaService
 
         return $this->jurnalService->postJurnal([
             'tanggal' => $belanja->tanggal,
-            'deskripsi' => 'Belanja: ' . $belanja->uraian,
+            'deskripsi' => 'Belanja: '.$belanja->uraian,
             'tipe_sumber' => 'belanja',
             'ref_type' => 'Belanja',
             'ref_id' => (string) $belanja->id,
@@ -221,8 +221,8 @@ class BelanjaService
             $kurang[] = 'akun kas/bank';
         }
 
-        return 'Bagan Akun (COA) belum lengkap: ' . implode(' dan ', $kurang)
-            . ' belum tersedia. Lengkapi Bagan Akun (menu Keuangan → Bagan Akun) sebelum mencairkan belanja.';
+        return 'Bagan Akun (COA) belum lengkap: '.implode(' dan ', $kurang)
+            .' belum tersedia. Lengkapi Bagan Akun (menu Keuangan → Bagan Akun) sebelum mencairkan belanja.';
     }
 
     private function baris(?int $akunId, Belanja $belanja, float $debit, float $kredit, string $memo): array

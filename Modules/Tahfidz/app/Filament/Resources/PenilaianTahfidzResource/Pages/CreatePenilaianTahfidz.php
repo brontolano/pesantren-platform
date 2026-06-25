@@ -2,8 +2,8 @@
 
 namespace Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages;
 
-use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
 
 class CreatePenilaianTahfidz extends CreateRecord
 {

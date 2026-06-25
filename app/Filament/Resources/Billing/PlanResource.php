@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\Billing;
 
-use BackedEnum;
-use UnitEnum;
 use App\Filament\Resources\Billing\Plan\Pages\CreatePlan;
 use App\Filament\Resources\Billing\Plan\Pages\EditPlan;
 use App\Filament\Resources\Billing\Plan\Pages\ListPlans;
 use App\Models\Plan;
+use BackedEnum;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -15,10 +15,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class PlanResource extends Resource
 {
@@ -43,9 +43,9 @@ class PlanResource extends Resource
                 ->label('Tipe Billing')
                 ->options([
                     'per_santri' => 'Per Santri',
-                    'flat'       => 'Flat',
-                    'custom'     => 'Custom',
-                    'gratis'     => 'Gratis',
+                    'flat' => 'Flat',
+                    'custom' => 'Custom',
+                    'gratis' => 'Gratis',
                 ])
                 ->required(),
             TextInput::make('default_price')
@@ -57,14 +57,14 @@ class PlanResource extends Resource
                 ->label('Modul Default')
                 ->options([
                     'Kesantrian' => 'Kesantrian',
-                    'Keuangan'   => 'Keuangan',
-                    'PPDB'       => 'PPDB',
-                    'CMS'        => 'CMS/Website',
-                    'Akademik'   => 'Akademik',
-                    'Asrama'     => 'Asrama',
-                    'Tahfidz'    => 'Tahfidz',
-                    'Kesehatan'  => 'Kesehatan',
-                    'Kegiatan'   => 'Kegiatan',
+                    'Keuangan' => 'Keuangan',
+                    'PPDB' => 'PPDB',
+                    'CMS' => 'CMS/Website',
+                    'Akademik' => 'Akademik',
+                    'Asrama' => 'Asrama',
+                    'Tahfidz' => 'Tahfidz',
+                    'Kesehatan' => 'Kesehatan',
+                    'Kegiatan' => 'Kegiatan',
                     'Notifikasi' => 'Notifikasi',
                 ])
                 ->columns(2),
@@ -99,9 +99,9 @@ class PlanResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListPlans::route('/'),
+            'index' => ListPlans::route('/'),
             'create' => CreatePlan::route('/create'),
-            'edit'   => EditPlan::route('/{record}/edit'),
+            'edit' => EditPlan::route('/{record}/edit'),
         ];
     }
 

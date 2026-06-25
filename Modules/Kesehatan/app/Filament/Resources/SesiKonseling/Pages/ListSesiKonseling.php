@@ -2,9 +2,9 @@
 
 namespace Modules\Kesehatan\Filament\Resources\SesiKonseling\Pages;
 
-use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
 
 class ListSesiKonseling extends ListRecords
 {

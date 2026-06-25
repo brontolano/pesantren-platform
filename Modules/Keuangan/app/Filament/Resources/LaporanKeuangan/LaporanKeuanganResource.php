@@ -2,16 +2,16 @@
 
 namespace Modules\Keuangan\Filament\Resources\LaporanKeuangan;
 
-use Modules\Keuangan\Filament\Resources\LaporanKeuangan\Pages\ListLaporanKeuangan;
+use App\Filament\Concerns\ModuleGate;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Keuangan\Filament\Resources\LaporanKeuangan\Pages\ListLaporanKeuangan;
 use Modules\Keuangan\Models\Tagihan;
 
 class LaporanKeuanganResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Tagihan::class;
 
@@ -86,4 +86,3 @@ class LaporanKeuanganResource extends Resource
         ];
     }
 }
-

@@ -2,8 +2,8 @@
 
 namespace Modules\Kesehatan\Filament\Resources\SesiKonseling\Pages;
 
-use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
 
 class EditSesiKonseling extends EditRecord
 {

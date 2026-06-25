@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Kesantrian\Tests\Feature;
 
+use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Kesantrian\Models\EskalasiDisiplin;
 use Modules\Kesantrian\Models\JenisPelanggaran;
 use Modules\Kesantrian\Models\PelanggaranSantri;
 use Modules\Kesantrian\Models\Santri;
@@ -30,10 +31,15 @@ class PwaGuruDisiplinTest extends TestCase
     use InteractsWithPpdbTestDatabase;
 
     protected Tenant $tenant;
+
     protected Santri $santri;
+
     protected JenisPelanggaran $jenis;
+
     protected User $pencatat;
+
     protected User $verifikator;
+
     protected DisiplinService $disiplinService;
 
     protected function setUp(): void
@@ -85,7 +91,7 @@ class PwaGuruDisiplinTest extends TestCase
     public function test_auto_verify_saat_verifikasi_off(): void
     {
         // Set wajib_verifikasi = false
-        \App\Models\Setting::setTenantValue('disiplin.wajib_verifikasi', false);
+        Setting::setTenantValue('disiplin.wajib_verifikasi', false);
 
         $response = $this->actingAs($this->pencatat)
             ->postJson('/api/pwa/guru/disiplin/catatPelanggaran', [
@@ -108,7 +114,7 @@ class PwaGuruDisiplinTest extends TestCase
     public function test_verifikasi_2_lapis_saat_verifikasi_on(): void
     {
         // Set wajib_verifikasi = true (default)
-        \App\Models\Setting::setTenantValue('disiplin.wajib_verifikasi', true);
+        Setting::setTenantValue('disiplin.wajib_verifikasi', true);
 
         // Catat pelanggaran
         $response = $this->actingAs($this->pencatat)
@@ -141,7 +147,7 @@ class PwaGuruDisiplinTest extends TestCase
     /** Test 3: Client_ref idempotency */
     public function test_client_ref_idempotency(): void
     {
-        $clientRef = 'test-ref-' . microtime(true);
+        $clientRef = 'test-ref-'.microtime(true);
 
         // POST pertama
         $response1 = $this->actingAs($this->pencatat)
@@ -206,7 +212,7 @@ class PwaGuruDisiplinTest extends TestCase
     public function test_poin_terbaru_masa_berlaku_semester(): void
     {
         // Set masa_berlaku = semester (default)
-        \App\Models\Setting::setTenantValue('disiplin.masa_berlaku_poin', 'semester');
+        Setting::setTenantValue('disiplin.masa_berlaku_poin', 'semester');
 
         // Buat 2 pelanggaran di bulan berbeda (S1 vs S2)
         $pelanggaran1 = PelanggaranSantri::create([
@@ -339,7 +345,7 @@ class PwaGuruDisiplinTest extends TestCase
     public function test_eskalasi_trigger_on_verify(): void
     {
         // Set ambang = 10 poin untuk SP1
-        \App\Models\Setting::setTenantValue('disiplin.ambang', json_encode([
+        Setting::setTenantValue('disiplin.ambang', json_encode([
             ['poin' => 10, 'label' => 'SP1'],
         ]));
 
@@ -360,7 +366,7 @@ class PwaGuruDisiplinTest extends TestCase
 
         // Cek eskalasi dibuat
         $this->assertTrue(
-            \Modules\Kesantrian\Models\EskalasiDisiplin::query()
+            EskalasiDisiplin::query()
                 ->where('santri_id', $this->santri->id)
                 ->where('label', 'SP1')
                 ->exists()

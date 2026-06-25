@@ -4,6 +4,7 @@ namespace Modules\Payroll\Services;
 
 use App\Models\Tenant;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Modules\Payroll\Models\Employee;
 use OpenSpout\Common\Entity\Row;
@@ -237,7 +238,7 @@ class PegawaiImportService
         foreach ($headers as $index => $key) {
             $value = $values[$index] ?? null;
             if ($value instanceof \DateTimeInterface) {
-                $payload[$key] = \Carbon\Carbon::instance($value)->toDateString();
+                $payload[$key] = Carbon::instance($value)->toDateString();
 
                 continue;
             }

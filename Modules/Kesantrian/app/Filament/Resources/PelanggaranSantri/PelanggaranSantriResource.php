@@ -2,9 +2,6 @@
 
 namespace Modules\Kesantrian\Filament\Resources\PelanggaranSantri;
 
-use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages\CreatePelanggaranSantri;
-use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages\ListPelanggaranSantri;
-use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages\ViewPelanggaranSantri;
 use App\Services\StorageQuotaService;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -26,6 +23,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages\CreatePelanggaranSantri;
+use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages\ListPelanggaranSantri;
+use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages\ViewPelanggaranSantri;
 use Modules\Kesantrian\Models\JenisPelanggaran;
 use Modules\Kesantrian\Models\PelanggaranSantri;
 use Modules\Kesantrian\Models\Santri;

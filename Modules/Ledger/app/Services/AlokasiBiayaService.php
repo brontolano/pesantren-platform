@@ -18,13 +18,11 @@ use RuntimeException;
  */
 class AlokasiBiayaService
 {
-    public function __construct(private readonly JurnalService $jurnalService)
-    {
-    }
+    public function __construct(private readonly JurnalService $jurnalService) {}
 
     /**
      * @param  array<int,float>|array<int,array{divisi_id:int,bobot:float}>  $driver
-     *         Bentuk [divisi_id => bobot] ATAU [['divisi_id'=>..,'bobot'=>..], ...].
+     *                                                                                Bentuk [divisi_id => bobot] ATAU [['divisi_id'=>..,'bobot'=>..], ...].
      * @param  array{periode?:string, keterangan?:string, tanggal?:string, dibuat_oleh?:int}  $opts
      */
     public function alokasikan(Akun|int $akun, float $nominal, array $driver, array $opts = []): AlokasiBiaya
@@ -67,7 +65,7 @@ class AlokasiBiayaService
 
             $jurnal = $this->jurnalService->postJurnal([
                 'tanggal' => isset($opts['tanggal']) ? Carbon::parse($opts['tanggal']) : Carbon::now(),
-                'deskripsi' => 'Alokasi biaya — ' . $akun->nama . (! empty($opts['periode']) ? ' (' . $opts['periode'] . ')' : ''),
+                'deskripsi' => 'Alokasi biaya — '.$akun->nama.(! empty($opts['periode']) ? ' ('.$opts['periode'].')' : ''),
                 'tipe_sumber' => 'alokasi_biaya',
                 'ref_type' => 'AlokasiBiaya',
                 'ref_id' => (string) $alokasi->id,
