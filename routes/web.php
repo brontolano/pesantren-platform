@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CmsPublicApiController;
+use App\Http\Controllers\Api\IbadahApiController;
 use App\Http\Controllers\Api\PpdbPublicApiController;
 use App\Http\Controllers\Api\PublicDirectoryApiController;
 use App\Http\Controllers\Api\TenantApiController;
@@ -176,6 +177,8 @@ Route::get('/api/public/content/gallery', [CmsPublicApiController::class, 'galle
 Route::get('/api/public/content/gallery/{slug}', [CmsPublicApiController::class, 'galleryItem']);
 Route::get('/api/public/content/profile', [CmsPublicApiController::class, 'profile']);
 Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'settings']);
+// Ibadah publik (1-aplikasi / native Android): jadwal sholat + arah kiblat + donasi.
+Route::get('/api/v1/jadwal-sholat', IbadahApiController::class);
 
 // PPDB publik — terima pendaftaran dari form website (Fase minimal: simpan + e-tiket).
 // Anti-spam: rate-limit ketat per tenant+IP (honeypot ditangani di controller).
