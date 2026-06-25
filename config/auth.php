@@ -42,6 +42,13 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Token Sanctum untuk aplikasi NATIVE (Android). Stateless, dipakai
+        // middleware `auth:sanctum`. Tidak mengubah perilaku guard web.
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
     ],
 
     /*
