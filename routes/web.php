@@ -197,7 +197,14 @@ Route::post('/api/v1/auth/kirim-ulang', [AuthApiController::class, 'kirimUlang']
 Route::middleware(['auth:sanctum', 'throttle:public-api'])->group(function () {
     Route::get('/api/v1/auth/me', [AuthApiController::class, 'me']);
     Route::post('/api/v1/auth/logout', [AuthApiController::class, 'logout']);
+    // SSO: tukar token → URL auto-login panel (untuk WebView app native).
+    Route::post('/api/v1/auth/panel-link', [AuthApiController::class, 'panelLink']);
 });
+
+// Auto-login panel web dari tautan signed (dibuka WebView native). Sekali-pakai, TTL pendek.
+Route::get('/auth/panel-masuk', \App\Http\Controllers\PanelMasukController::class)
+    ->middleware('signed')
+    ->name('auth.panel-masuk');
 
 // Komentar artikel (native): baca publik (approved) + kirim (token + izin komentar).
 // Gerbang sama dgn web CommentController: auth + can:komentar + throttle:komentar.

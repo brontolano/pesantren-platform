@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -103,6 +104,38 @@ class AuthApiController extends Controller
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * POST /api/v1/auth/panel-link — tukar token Sanctum → URL auto-login panel web (SSO).
+     *
+     * Panel Filament autentik via COOKIE sesi web; aplikasi native pegang TOKEN. Endpoint ini
+     * mengembalikan URL bertanda-tangan SEKALI-PAKAI (TTL pendek) yang, saat dibuka WebView,
+     * men-set sesi web (lihat PanelMasukController) → panel terbuka tanpa login ulang.
+     * NOL logika uang. Path di-whitelist (cegah open-redirect).
+     */
+    public function panelLink(Request $request): JsonResponse
+    {
+        $data = $request->validate(['path' => ['required', 'string', 'max:200']]);
+        $path = '/'.ltrim($data['path'], '/');
+
+        $allowed = ['/admin', '/app', '/pimpinan'];
+        $ok = collect($allowed)->contains(
+            fn (string $p) => $path === $p || str_starts_with($path, $p.'/')
+        );
+        abort_unless($ok, 422, 'Path tidak diizinkan.');
+
+        $ttl = 60; // detik
+        $url = URL::temporarySignedRoute('auth.panel-masuk', now()->addSeconds($ttl), [
+            'user' => $request->user()->getKey(),
+            'path' => $path,
+            'nonce' => (string) Str::uuid(),
+        ]);
+
+        return response()->json(['ok' => true, 'data' => [
+            'url' => $url,
+            'expires_in' => $ttl,
+        ]]);
     }
 
     /** POST /api/v1/auth/demo/{peran} — autologin demo TOKEN (gerbang demo). */
