@@ -93,7 +93,7 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
             />
         </Head>
 
-        <div class="min-h-screen bg-[#fafbfc] text-slate-800 antialiased" :style="brandStyle">
+        <div class="min-h-screen bg-[#fffaf3] text-slate-800 antialiased" :style="brandStyle">
             <!-- NAV -->
             <nav class="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-md">
                 <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">

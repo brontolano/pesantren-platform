@@ -10,7 +10,7 @@
         ];
     @endphp
 
-    <section class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5
+    <section class="tema-quick rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5
                     dark:bg-[#1C1C24] dark:ring-white/8">
         <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             Akses Cepat

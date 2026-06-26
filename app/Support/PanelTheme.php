@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Setting;
+use App\Support\AlbaKidsTenant;
 
 /**
  * Tema panel admin per PESANTREN (Setting per tenant, tanpa migrasi DB).
@@ -34,6 +35,20 @@ class PanelTheme
             'desc' => 'Menu samping seperti WhatsApp — tampilan standar saat ini.',
             'topNav' => false,
             'bodyClass' => null,
+        ],
+        'pixio' => [
+            'label' => 'Pixio (Emerald–Krim)',
+            'desc' => 'Bahasa visual utama pesantren.online — latar krim hangat, satu aksen emerald, ornamen emas. Sesuai Design System.',
+            'topNav' => false,
+            'bodyClass' => 'tema-pixio',
+            'primary' => '#059669',
+            'vars' => [
+                '--tema-sidebar-header' => '#047857',
+                '--tema-sidebar-header-border' => 'rgba(201, 162, 74, 0.30)',
+                '--tema-active-bg' => '#ecfdf5',
+                '--tema-active-fg' => '#047857',
+                '--tema-active-dark' => 'linear-gradient(90deg, #10b981 0%, #047857 100%)',
+            ],
         ],
         'baitul-maal' => [
             'label' => 'Baitul Maal (Hijau–Emas)',
@@ -164,10 +179,29 @@ class PanelTheme
         ],
     ];
 
-    /** Key tema aktif tenant — fallback 'bawaan' (Setting kosong/tak dikenal/error). */
+    /**
+     * Key tema aktif tenant.
+     * - AlbaKids (tenant custom) → perilaku lama, default 'bawaan' (WhatsApp).
+     * - Tenant lain → DEFAULT 'pixio' bila belum memilih; pilihan eksplisit
+     *   (termasuk 'bawaan' WA bila sengaja dipilih) tetap dihormati.
+     */
     public static function theme(): string
     {
-        return self::resolve(self::SETTING_THEME, self::THEMES);
+        if (AlbaKidsTenant::isActive()) {
+            return self::resolve(self::SETTING_THEME, self::THEMES);
+        }
+
+        try {
+            if (! tenancy()->initialized || tenancy()->tenant === null) {
+                return 'pixio';
+            }
+
+            $value = Setting::getTenantStringValue(self::SETTING_THEME);
+        } catch (\Throwable) {
+            return 'pixio';
+        }
+
+        return is_string($value) && array_key_exists($value, self::THEMES) ? $value : 'pixio';
     }
 
     /** Key preset warna aktif tenant — fallback 'bawaan'. */

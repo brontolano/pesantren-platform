@@ -1,6 +1,6 @@
 <x-filament-widgets::widget>
     {{-- ===== Banner sambutan — gradient WA-green (light) / TikTok-dark (dark) ===== --}}
-    <div class="relative isolate overflow-hidden rounded-2xl px-6 py-5 text-white shadow-sm sm:px-8 sm:py-6
+    <div class="tema-greeting relative isolate overflow-hidden rounded-2xl px-6 py-5 text-white shadow-sm sm:px-8 sm:py-6
                 bg-gradient-to-r from-[#004a38] via-[#008069] to-[#00a884]
                 dark:from-[#0f1c14] dark:via-[#161823] dark:to-[#1a243a]">
 

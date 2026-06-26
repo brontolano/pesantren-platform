@@ -1,7 +1,8 @@
 /* Tipografi Portal Wali — Plus Jakarta Sans (default global, dipakai SPMB/landing)
-   + Jost (Google Fonts, geometric sans) khusus Portal Wali (gaya "Pixio").
+   + Jost (geometric sans, gaya "Pixio" untuk display & UI chrome)
+   + Marcellus (serif display, tema Keuangan "Baitul Maal").
    Harus mendahului semua aturan lain (selain @charset/@layer) agar tidak di-drop. */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Jost:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Jost:wght@400;500;600;700&family=Marcellus&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -13,50 +14,231 @@
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-/*
- * Token brand Portal Wali (brandable per tenant).
- * Override --wali-primary di scope tenant nanti tanpa menyentuh komponen.
- * Dipakai oleh komponen di resources/js/Components/Ui/*.
- *
- * Estetika "Pixio": cream hangat + monokrom near-black + SATU aksen emerald,
- * tombol/chip pill (rounded-full) outline untuk sekunder, minimalis.
- */
+/* ============================================================================
+   DESIGN TOKENS — pesantren.online (sumber tunggal, "Pixio")
+   Disamakan dengan Pesantren.online Design System (tokens/colors·typography·spacing).
+   Estetika: cream hangat + monokrom near-black + SATU aksen emerald + emas ornamen.
+   Tenant white-label menimpa --brand-* saja; komponen membaca alias semantik.
+   ========================================================================== */
 :root {
-    --wali-primary: #059669;       /* emerald-600 — CTA utama */
-    --wali-primary-strong: #047857; /* emerald-700 — hover/active & teks aksen */
-    --wali-primary-tint: #ecfdf5;   /* emerald-50 — background tint */
+    /* ---- Ramp emerald (satu-satunya aksen yang menembus semua produk) ---- */
+    --pst-emerald-50:  #ecfdf5;   /* tint background */
+    --pst-emerald-100: #d1fae5;
+    --pst-emerald-200: #a7f3d0;
+    --pst-emerald-400: #34d399;
+    --pst-emerald-500: #10b981;   /* light / puncak gradient hero */
+    --pst-emerald-600: #059669;   /* PRIMARY — CTA, aktif, tautan */
+    --pst-emerald-700: #047857;   /* strong — hover/active & teks aksen */
+    --pst-emerald-800: #065f46;
+    --pst-emerald-900: #064e3b;
 
-    --wali-success: #059669;        /* lunas / terverifikasi */
-    --wali-warning: #f59e0b;        /* menunggu (amber-500) */
-    --wali-danger: #f43f5e;         /* ditolak (rose-500) */
-    --wali-info: #3b82f6;           /* info (blue-500) */
+    /* ---- Hijau hutan dalam (header formal / keuangan / PPDB) ---- */
+    --pst-forest:      #0a5c36;   /* Baitul Maal primary */
+    --pst-forest-deep: #14532d;   /* SPMB default primary */
 
-    --wali-surface: #ffffff;        /* kartu */
-    --wali-bg: #fffaf3;             /* page bg — cream hangat (Pixio) */
-    --wali-ink: #111111;            /* teks utama (near-black) */
-    --wali-muted: #64748b;          /* teks muted (slate-500) */
-    --wali-border: #efe7da;         /* border tipis hangat untuk kartu */
+    /* ---- Emas islami (ornamen saja — hairline, bulan sabit, divider) ---- */
+    --pst-gold:        #c9a24a;   /* muted gold — ornamen Pixio */
+    --pst-gold-soft:   #e7d3a1;   /* gold lembut — halo / hairline di gelap */
+    --pst-gold-bright: #d4af37;   /* gold Baitul Maal — warning/highlight */
+    --pst-gold-ink:    #7a5e1e;   /* teks emas di cream agar terbaca */
+    --pst-gold-ink-2:  #a07c2c;   /* teks emas sekunder */
 
-    /* === TOKENS PIXIO === */
-    /* Aksen emerald solid lembut untuk CTA & angka penting. */
-    --brand-grad: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    /* Hero: emerald solid-elegan (TETAP gelap/kontras agar teks putih terbaca). */
-    --brand-grad-hero: linear-gradient(160deg, #0b8f63 0%, #059669 45%, #047857 100%);
-    /* Aksen sekunder teal/cyan lembut */
-    --wali-accent: #14b8a6;         /* teal-500 */
-    --wali-accent-soft: #99f6e4;    /* teal-200 */
+    /* ---- Teal (aksen sekunder, jarang) ---- */
+    --pst-teal-500:    #14b8a6;
+    --pst-teal-200:    #99f6e4;
 
-    /* === AKSEN EMAS ISLAMI (muted gold) ===
-       Dipakai untuk ornamen halus (hairline, bintang-bulan sabit, divider).
-       Tenang & elegan — bukan emas mengkilap. */
-    --wali-gold: #c9a24a;           /* muted gold — aksen ornamental */
-    --wali-gold-soft: #e7d3a1;      /* gold lembut — highlight/halo */
+    /* ---- Cream & permukaan hangat (ground yang tenang & premium) ---- */
+    --pst-cream:       #fffaf3;   /* page background — cream hangat */
+    --pst-cream-2:     #fdfbf7;   /* cream Baitul Maal */
+    --pst-cream-muted: #f6f0e6;   /* kartu muted / kartu-dalam-kartu */
+    --pst-parchment:   #f7efdc;   /* panel pengumuman / tint emas */
+    --pst-white:       #ffffff;   /* permukaan kartu utama */
+
+    /* ---- Ink / netral (near-black + ramp slate) ---- */
+    --pst-ink:         #111111;   /* teks utama — near-black, bukan murni */
+    --pst-slate-900:   #0f172a;   /* section gelap marketing / navy */
+    --pst-slate-800:   #1e293b;   /* teks body kuat */
+    --pst-slate-700:   #334155;
+    --pst-slate-600:   #475569;
+    --pst-slate-500:   #64748b;   /* teks muted */
+    --pst-slate-400:   #94a3b8;   /* teks samar / placeholder */
+    --pst-slate-300:   #cbd5e1;
+    --pst-slate-200:   #e2e8f0;   /* border dingin */
+    --pst-slate-100:   #f1f5f9;
+    --pst-slate-50:    #f8fafc;
+
+    /* ---- Border hangat (lebih disukai daripada dingin di permukaan cream) ---- */
+    --pst-border-warm: #efe7da;   /* hairline pada kartu */
+    --pst-border-gold: #e7d3a1;   /* hairline emas */
+
+    /* ---- Ramp status semantik (selalu "soft": -50 bg / -700 ink / -100 ring) ---- */
+    --pst-success:        #059669;
+    --pst-success-bg:     #ecfdf5;
+    --pst-success-ink:    #047857;
+    --pst-success-ring:   #d1fae5;
+
+    --pst-warning:        #f59e0b;
+    --pst-warning-bg:     #fffbeb;
+    --pst-warning-ink:    #b45309;
+    --pst-warning-ring:   #fde68a;
+
+    --pst-danger:         #f43f5e;   /* rose Pixio */
+    --pst-danger-strong:  #b3261e;   /* danger Baitul Maal */
+    --pst-danger-bg:      #fff1f2;
+    --pst-danger-ink:     #be123c;
+    --pst-danger-ring:    #fecdd3;
+
+    --pst-info:           #3b82f6;
+    --pst-info-bg:        #eff6ff;
+    --pst-info-ink:       #1d4ed8;
+    --pst-info-ring:      #dbeafe;
+
+    /* ========================================================================
+       HOOK WHITE-LABEL — tenant menimpa HANYA ini; komponen membaca alias.
+       ====================================================================== */
+    --brand-primary:        var(--pst-emerald-600);
+    --brand-primary-strong: var(--pst-emerald-700);
+    --brand-primary-tint:   var(--pst-emerald-50);
+    --brand-gold:           var(--pst-gold);
+
+    /* ---- Alias permukaan + teks semantik (PAKAI ini di komponen baru) ---- */
+    --surface-page:    var(--pst-cream);
+    --surface-card:    var(--pst-white);
+    --surface-muted:   var(--pst-cream-muted);
+    --surface-gold:    var(--pst-parchment);
+    --surface-dark:    var(--pst-slate-900);
+
+    --text-strong:     var(--pst-ink);
+    --text-body:       var(--pst-slate-800);
+    --text-muted:      var(--pst-slate-500);
+    --text-faint:      var(--pst-slate-400);
+    --text-onbrand:    #ffffff;
+    --text-accent:     var(--pst-emerald-700);
+
+    --border-card:     var(--pst-border-warm);
+    --border-gold:     var(--pst-border-gold);
+    --border-cool:     var(--pst-slate-200);
+
+    /* ========================================================================
+       TOKEN LAMA --wali-* (kompatibilitas) — kini di-alias ke token kanonik
+       di atas agar satu sumber. Nilai identik → tanpa perubahan visual.
+       ====================================================================== */
+    --wali-primary:        var(--brand-primary);        /* emerald-600 — CTA utama */
+    --wali-primary-strong: var(--brand-primary-strong); /* emerald-700 — hover/active & teks aksen */
+    --wali-primary-tint:   var(--brand-primary-tint);   /* emerald-50 — background tint */
+
+    --wali-success: var(--pst-success);   /* lunas / terverifikasi */
+    --wali-warning: var(--pst-warning);   /* menunggu (amber-500) */
+    --wali-danger:  var(--pst-danger);    /* ditolak (rose-500) */
+    --wali-info:    var(--pst-info);       /* info (blue-500) */
+
+    --wali-surface: var(--surface-card);  /* kartu */
+    --wali-bg:      var(--surface-page);  /* page bg — cream hangat (Pixio) */
+    --wali-ink:     var(--text-strong);   /* teks utama (near-black) */
+    --wali-muted:   var(--text-muted);    /* teks muted (slate-500) */
+    --wali-border:  var(--border-card);   /* border tipis hangat untuk kartu */
+
+    --wali-accent:      var(--pst-teal-500);   /* teal-500 — aksen sekunder lembut */
+    --wali-accent-soft: var(--pst-teal-200);   /* teal-200 */
+
+    --wali-gold:      var(--pst-gold);       /* muted gold — aksen ornamental */
+    --wali-gold-soft: var(--pst-gold-soft);  /* gold lembut — highlight/halo */
+
+    /* ========================================================================
+       TIPOGRAFI — dua keluarga bekerja: Jost (display/chrome) + Plus Jakarta Sans
+       (body). Marcellus (serif) khusus tema keuangan. Uang selalu tabular-nums.
+       ====================================================================== */
+    --font-display: 'Jost', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-body:    'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-serif:   'Marcellus', Georgia, 'Times New Roman', serif;
+    --font-native:  system-ui, 'Roboto', -apple-system, 'Segoe UI', sans-serif; /* shell SPMB Android-native */
+
+    --fw-regular:   400;
+    --fw-medium:    500;
+    --fw-semibold:  600;
+    --fw-bold:      700;
+    --fw-extrabold: 800;
+
+    --fs-eyebrow:  11px;   /* label/kicker uppercase ber-tracking */
+    --fs-2xs:      11px;
+    --fs-xs:       12px;
+    --fs-sm:       13px;
+    --fs-base:     15px;   /* ukuran baca default di aplikasi */
+    --fs-md:       16px;
+    --fs-lg:       18px;   /* judul section */
+    --fs-xl:       21px;   /* angka hero kartu */
+    --fs-2xl:      24px;
+    --fs-3xl:      28px;   /* judul layar (auth, page hero) */
+    --fs-display:  32px;
+    --fs-money-lg: 32px;   /* saldo menonjol */
+    --fs-money-xl: 44px;   /* angka hero laporan */
+
+    --lh-tight:   1.15;
+    --lh-snug:    1.3;
+    --lh-normal:  1.5;
+    --lh-relaxed: 1.7;
+
+    --ls-tight:  -0.01em;
+    --ls-normal:  0;
+    --ls-wide:    0.08em;
+    --ls-wider:   0.14em;
+
+    /* ========================================================================
+       SPASI · RADIUS · SHADOW · MOTION — grid 4px, radius besar & ramah,
+       shadow sangat lembut (mengangkat, bukan glow), pill untuk tombol/chip.
+       ====================================================================== */
+    --sp-0:  0;
+    --sp-1:  4px;
+    --sp-2:  8px;
+    --sp-3:  12px;
+    --sp-4:  16px;
+    --sp-5:  20px;
+    --sp-6:  24px;   /* padding samping page default */
+    --sp-8:  32px;
+    --sp-10: 40px;
+    --sp-12: 48px;
+    --sp-16: 64px;
+    --sp-20: 80px;
+
+    --container-mobile: 448px;  /* max-w-md — tiap aplikasi peran = kolom ponsel terpusat */
+    --container-page:   1120px; /* lebar maks marketing / dokumentasi */
+    --page-pad:         24px;
+    --tap-min:          44px;   /* target sentuh minimum */
+
+    --radius-xs:   8px;
+    --radius-sm:   12px;
+    --radius-md:   14px;    /* kolom isian */
+    --radius-lg:   16px;    /* input / kartu kecil (rounded-2xl) */
+    --radius-xl:   20px;
+    --radius-2xl:  24px;    /* kartu default (rounded-3xl) */
+    --radius-3xl:  28px;    /* kartu hero / lembar header */
+    --radius-pill: 9999px;  /* tombol, chip, badge, dot nav */
 
     /* Shadow SANGAT lembut (minimalis, bukan glow berat). */
-    --shadow-soft: 0 6px 24px -16px rgba(17, 17, 17, 0.18);
+    --shadow-soft:    0 6px 24px -16px rgba(17, 17, 17, 0.18);
     --shadow-soft-lg: 0 16px 44px -24px rgba(17, 17, 17, 0.22);
-    /* Shadow tombol emerald (halus, bukan glow). */
-    --shadow-brand: 0 8px 20px -12px rgba(5, 150, 105, 0.45);
+    --shadow-brand:   0 8px 20px -12px rgba(5, 150, 105, 0.45);  /* angkat CTA emerald */
+    --shadow-pop:     0 16px 44px -24px rgba(17, 17, 17, 0.40);  /* nav melayang / sheet */
+
+    /* Hairline ring (dipakai SEBAGAI ganti border pada kartu). */
+    --ring-card: inset 0 0 0 1px var(--border-card);
+    --ring-gold: inset 0 0 0 1px var(--border-gold);
+    /* Kartu = shadow lembut + warm hairline ring dalam satu box-shadow. */
+    --elevation-card: inset 0 0 0 1px #efe7da, 0 6px 24px -16px rgba(17, 17, 17, 0.18);
+    --elevation-nav:  inset 0 0 0 1px #efe7da, 0 16px 44px -24px rgba(17, 17, 17, 0.40);
+
+    /* Motion — tenang & cepat; press = mengecil, bukan memantul. */
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --dur-fast:   150ms;
+    --dur-base:   200ms;
+    --dur-slow:   300ms;
+    --press-scale: 0.97;
+
+    /* Gradient tanda-tangan (cukup gelap agar teks putih terbaca). */
+    --brand-grad:      linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --brand-grad-hero: linear-gradient(160deg, #0b8f63 0%, #059669 45%, #047857 100%);
+    --gold-hairline:   linear-gradient(90deg, transparent 0%, rgba(201, 162, 74, 0) 8%,
+                          var(--pst-gold) 50%, rgba(201, 162, 74, 0) 92%, transparent 100%);
 }
 
 /* Anti-aliasing & rendering teks lebih halus untuk feel premium. */
@@ -70,9 +252,13 @@ html {
  * Utilitas reusable (scoped via class — aman, tidak menyentuh Filament/SPMB).
  * Dipakai komponen Ui Portal Wali.
  */
-/* Font Jost khusus Portal Wali (dipasang di root layout, tidak mengubah font global app). */
-.font-jost {
-    font-family: 'Jost', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+/* Keluarga font sebagai utilitas opt-in (tidak mengubah font global app). */
+.font-jost,
+.font-display {
+    font-family: var(--font-display);
+}
+.font-serif {
+    font-family: var(--font-serif);
 }
 .bg-brand-grad {
     background-image: var(--brand-grad);
@@ -89,14 +275,23 @@ html {
 .shadow-brand {
     box-shadow: var(--shadow-brand);
 }
+.shadow-pop {
+    box-shadow: var(--shadow-pop);
+}
+/* Kartu Pixio: warm hairline ring + shadow lembut dalam satu deklarasi. */
+.elevation-card {
+    box-shadow: var(--elevation-card);
+}
+.elevation-nav {
+    box-shadow: var(--elevation-nav);
+}
+.ring-card {
+    box-shadow: var(--ring-card);
+}
+.ring-gold {
+    box-shadow: var(--ring-gold);
+}
 /* Hairline emas islami — garis tipis gradient emas (fade di tepi), aksen ornamen. */
 .bg-gold-hairline {
-    background-image: linear-gradient(
-        90deg,
-        transparent 0%,
-        rgba(201, 162, 74, 0) 8%,
-        var(--wali-gold) 50%,
-        rgba(201, 162, 74, 0) 92%,
-        transparent 100%
-    );
+    background-image: var(--gold-hairline);
 }

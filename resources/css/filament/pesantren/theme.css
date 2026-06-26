@@ -382,6 +382,114 @@ body.tema-navigasi-atas.dark .fi-topbar {
     border-bottom: 1px solid #2A2A35 !important;
 }
 
+/* ===================================================================
+   Tema "Pixio" (Emerald–Krim) — bahasa visual UTAMA pesantren.online,
+   sesuai Design System: latar krim hangat #fffaf3, sidebar putih +
+   hairline hangat #efe7da, header emerald (var --tema-sidebar-header
+   = #047857), item aktif tint emerald #ecfdf5 + garis emerald inset,
+   ornamen emas tipis. Mode gelap = emerald-ink pekat (bukan TikTok hitam).
+   =================================================================== */
+body.tema-pixio .fi-body {
+    background-color: #fffaf3;
+}
+body.tema-pixio .fi-sidebar {
+    background: #ffffff !important;
+    border-inline-end: 1px solid #efe7da !important;
+}
+/* Label grup: emas-ink islami (ornamen) */
+body.tema-pixio .fi-sidebar-group-label {
+    color: #a07c2c !important;
+}
+/* Item normal: slate */
+body.tema-pixio .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-pixio .fi-sidebar-item-label {
+    color: #475569 !important;
+}
+body.tema-pixio .fi-sidebar-item-btn > .fi-icon,
+body.tema-pixio .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-pixio .fi-sidebar-item-btn .fi-icon {
+    color: #64748b !important;
+}
+/* Hover: wash krim hangat */
+body.tema-pixio .fi-sidebar-item-btn:hover {
+    background-color: #f6f0e6 !important;
+}
+body.tema-pixio .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
+body.tema-pixio .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
+    color: #111111 !important;
+}
+body.tema-pixio .fi-sidebar-item-btn:hover > .fi-icon,
+body.tema-pixio .fi-sidebar-item-btn:hover .fi-icon {
+    color: #047857 !important;
+}
+/* Aktif: tint emerald + garis emerald inset kiri (signature Pixio) */
+body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: #ecfdf5 !important;
+    box-shadow: inset 3px 0 0 #059669 !important;
+}
+body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-pixio .fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: #047857 !important;
+}
+body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+body.tema-pixio .fi-sidebar-item.fi-active .fi-icon {
+    color: #059669 !important;
+}
+/* Topbar: putih + hairline hangat + bayang emas tipis (ornamen) */
+body.tema-pixio .fi-topbar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #efe7da !important;
+    box-shadow: 0 1px 0 rgba(201, 162, 74, 0.30) !important;
+}
+/* Kartu/section: radius besar + hairline hangat + bayang lembut (bukan glow) */
+body.tema-pixio .fi-section,
+body.tema-pixio .fi-wi-stats-overview-stat,
+body.tema-pixio .fi-ta-ctn {
+    border-radius: 1.25rem !important;
+    border: 1px solid #efe7da !important;
+    box-shadow: 0 6px 24px -16px rgba(17, 17, 17, 0.18) !important;
+    background-color: #ffffff;
+}
+/* ---- Pixio MODE GELAP: emerald-ink pekat (bukan TikTok hitam) ---- */
+.dark body.tema-pixio .fi-body,
+body.tema-pixio.dark .fi-body {
+    background-color: #0b1a14 !important;
+}
+.dark body.tema-pixio .fi-sidebar,
+body.tema-pixio.dark .fi-sidebar {
+    background: #0e201a !important;
+    border-inline-end: 1px solid #1e3329 !important;
+}
+.dark body.tema-pixio .fi-topbar,
+.dark body.tema-pixio .fi-header,
+body.tema-pixio.dark .fi-topbar,
+body.tema-pixio.dark .fi-header {
+    background: #0e201a !important;
+    border-bottom: 1px solid #1e3329 !important;
+}
+.dark body.tema-pixio .fi-section,
+.dark body.tema-pixio .fi-wi-stats-overview-stat,
+.dark body.tema-pixio .fi-ta-ctn,
+body.tema-pixio.dark .fi-section,
+body.tema-pixio.dark .fi-wi-stats-overview-stat,
+body.tema-pixio.dark .fi-ta-ctn {
+    border: 1px solid #1e3329 !important;
+    background-color: #11201a !important;
+}
+/* Widget dasbor ikut Pixio saat tema-pixio aktif (tema WA default & AlbaKids TIDAK kena). */
+body.tema-pixio .tema-greeting {
+    background-image: linear-gradient(to right, #0b8f63, #059669, #047857) !important;
+}
+.dark body.tema-pixio .tema-greeting,
+body.tema-pixio.dark .tema-greeting {
+    background-image: linear-gradient(to right, #04281a, #0e201a, #11302a) !important;
+}
+.dark body.tema-pixio .tema-quick,
+body.tema-pixio.dark .tema-quick {
+    background-color: #11201a !important;
+}
+
 /* Tema "Baitul Maal" (desain pesantren-online-admin / PRD Keuangan Digital):
    sidebar gradien hijau hutan #06351F→#04281A, aksen emas #D4AF37, item
    aktif bergaris emas kiri, latar konten krim #FDFBF7. */

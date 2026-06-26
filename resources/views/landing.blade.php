@@ -16,29 +16,47 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="id_ID">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|jost:400,500,600,700|marcellus:400" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        /* Token "Pixio" — disamakan dengan Design System (tokens/colors·typography·spacing). */
         :root {
-            --primary: #059669;
-            --primary-light: #10b981;
-            --primary-dark: #047857;
-            --bg: #fafbfc;
-            --bg-white: #ffffff;
-            --bg-dark: #0f172a;
-            --text: #1e293b;
+            --primary: #059669;        /* emerald-600 — CTA, aktif, tautan */
+            --primary-light: #10b981;  /* emerald-500 */
+            --primary-dark: #047857;   /* emerald-700 — hover/strong */
+            --primary-tint: #ecfdf5;   /* emerald-50 — tint background */
+            --gold: #c9a24a;           /* emas islami — ornamen saja */
+            --gold-soft: #e7d3a1;
+            --bg: #fffaf3;             /* page bg — cream hangat */
+            --bg-white: #ffffff;       /* permukaan kartu */
+            --bg-muted: #f6f0e6;       /* kartu muted */
+            --bg-dark: #0f172a;        /* section gelap (navy/slate-900) */
+            --text: #111111;           /* near-black */
+            --text-body: #1e293b;
             --text-muted: #64748b;
             --text-light: #94a3b8;
-            --border: #e2e8f0;
+            --border: #efe7da;         /* hairline hangat pada kartu */
+            --border-cool: #e2e8f0;
+            --font-display: 'Jost', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+            --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            /* shadow lembut (mengangkat, bukan glow) */
+            --shadow-soft: 0 6px 24px -16px rgba(17,17,17,0.18);
+            --shadow-soft-lg: 0 16px 44px -24px rgba(17,17,17,0.22);
+            --shadow-brand: 0 8px 20px -12px rgba(5,150,105,0.45);
+            --elevation-card: inset 0 0 0 1px var(--border), 0 6px 24px -16px rgba(17,17,17,0.18);
+            --gold-hairline: linear-gradient(90deg, transparent 0%, rgba(201,162,74,0) 8%, var(--gold) 50%, rgba(201,162,74,0) 92%, transparent 100%);
+            --ease: cubic-bezier(.4,0,.2,1);
         }
         body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            font-family: var(--font-body);
             background: var(--bg);
-            color: var(--text);
+            color: var(--text-body);
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
         a { color: inherit; text-decoration: none; }
+        h1, h2, h3, .nav-logo { font-family: var(--font-display); letter-spacing: -0.01em; }
 
         /* NAV */
         nav {
@@ -60,27 +78,34 @@
         .nav-links a:hover { color: var(--primary); }
         .btn {
             display: inline-flex; align-items: center; gap: 0.5rem;
-            padding: 0.6rem 1.5rem; border-radius: 8px;
+            padding: 0.6rem 1.5rem; border-radius: 9999px;
+            font-family: var(--font-display);
             font-size: 0.9rem; font-weight: 600;
-            transition: all 0.2s; border: none; cursor: pointer;
+            transition: transform .2s var(--ease), background .2s var(--ease), box-shadow .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease);
+            border: none; cursor: pointer;
         }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-outline { border: 1.5px solid var(--border); background: transparent; color: var(--text); }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: #fff; box-shadow: var(--shadow-brand); }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline { border: 1.5px solid var(--border-cool); background: #fff; color: var(--text); }
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
 
         /* HERO */
         .hero {
             padding: 10rem 2rem 5rem;
             text-align: center;
-            background: linear-gradient(180deg, #fff 0%, var(--bg) 100%);
+            background:
+                radial-gradient(70% 55% at 50% -8%, var(--primary-tint) 0%, transparent 60%),
+                linear-gradient(180deg, #fffdf9 0%, var(--bg) 100%);
         }
         .hero-inner { max-width: 720px; margin: 0 auto; }
         .hero-badge {
-            display: inline-block;
-            background: #ecfdf5; color: var(--primary);
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: #fff; color: var(--primary-dark);
+            font-family: var(--font-display);
             font-size: 0.8rem; font-weight: 600;
-            padding: 0.35rem 1rem; border-radius: 9999px;
+            padding: 0.4rem 1rem; border-radius: 9999px;
+            box-shadow: var(--elevation-card);
             margin-bottom: 1.5rem;
         }
         .hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.15; margin-bottom: 1.25rem; color: var(--bg-dark); }
@@ -95,7 +120,7 @@
             max-width: 800px; margin: 0 auto;
         }
         .stat { text-align: center; }
-        .stat-num { font-size: 2.25rem; font-weight: 800; color: var(--primary); }
+        .stat-num { font-family: var(--font-display); font-size: 2.25rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
         .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
 
         /* MODULES */
@@ -111,12 +136,17 @@
         }
         .module-card {
             background: var(--bg-white);
-            border: 1px solid var(--border);
-            border-radius: 12px; padding: 1.75rem;
-            transition: all 0.2s;
+            border-radius: 24px; padding: 1.75rem;
+            box-shadow: var(--elevation-card);
+            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
         }
-        .module-card:hover { border-color: var(--primary-light); box-shadow: 0 4px 24px rgba(5,150,105,0.08); transform: translateY(-2px); }
-        .module-icon { font-size: 1.75rem; margin-bottom: 0.75rem; }
+        .module-card:hover { box-shadow: 0 22px 44px -26px rgba(5,150,105,0.28), inset 0 0 0 1px var(--primary-light); transform: translateY(-3px); }
+        .module-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            height: 46px; width: 46px; border-radius: 13px;
+            background: var(--primary-tint); font-size: 1.5rem;
+            margin-bottom: 0.85rem;
+        }
         .module-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; }
         .module-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
 
@@ -129,8 +159,13 @@
 
         /* CTA */
         .cta {
+            position: relative;
             background: var(--bg-dark); color: #fff;
             text-align: center; padding: 5rem 2rem; margin: 3rem 0 0;
+        }
+        .cta::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; background-image: var(--gold-hairline);
         }
         .cta h2 { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
         .cta p { font-size: 1.05rem; color: var(--text-light); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }

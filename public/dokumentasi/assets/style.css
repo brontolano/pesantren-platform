@@ -1,15 +1,15 @@
 /* Panduan pesantren.online — gaya terinspirasi docs.frappe.io, dibesarkan untuk pengguna awam */
-/* Palet brand Pesantren.online — selaras landing: tinta slate, aksen emerald */
+/* Palet brand Pesantren.online "Pixio" — krim hangat, aksen emerald, dot wordmark emas */
 :root {
   --ink: #0f172a;
   --ink-2: #1e293b;
   --ink-soft: #334155;
   --muted: #64748b;
-  --line: #e2e8f0;
-  --bg: #ffffff;
-  --bg-soft: #f8fafc;
+  --line: #efe7da;        /* hairline hangat (Pixio), bukan slate dingin */
+  --bg: #fffaf3;          /* ground krim hangat (Pixio), bukan putih murni */
+  --bg-soft: #f6f0e6;     /* krim-muted hangat utk kode/tabel/hover */
   --accent: #059669;
-  --dot: #10b981;
+  --dot: #c9a24a;         /* dot wordmark = emas islami (signature DS), bukan emerald */
   --accent-soft: #ecfdf5;
   --accent-line: #a7f3d0;
   --warn-bg: #fffbeb;

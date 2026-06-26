@@ -69,7 +69,7 @@ const submitReset = () => {
                 <button
                     type="submit"
                     :disabled="requestForm.processing"
-                    class="block w-full rounded-2xl bg-[var(--jemaah-primary)] px-4 py-3.5 text-center text-base font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
+                    class="block w-full rounded-full bg-[var(--jemaah-primary)] px-4 py-3.5 text-center text-base font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
                 >
                     {{ requestForm.processing ? 'Mengirim…' : 'Kirim Kode ke WhatsApp' }}
                 </button>
@@ -174,7 +174,7 @@ const submitReset = () => {
                 <button
                     type="submit"
                     :disabled="resetForm.processing"
-                    class="block w-full rounded-2xl bg-[var(--jemaah-primary)] px-4 py-3.5 text-center text-base font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
+                    class="block w-full rounded-full bg-[var(--jemaah-primary)] px-4 py-3.5 text-center text-base font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
                 >
                     {{ resetForm.processing ? 'Memproses…' : 'Ganti Password & Masuk' }}
                 </button>
