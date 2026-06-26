@@ -383,49 +383,58 @@ body.tema-navigasi-atas.dark .fi-topbar {
 }
 
 /* ===================================================================
-   Tema "Pixio" (Emerald–Krim) — bahasa visual UTAMA pesantren.online,
-   sesuai Design System: latar krim hangat #fffaf3, sidebar putih +
-   hairline hangat #efe7da, header emerald (var --tema-sidebar-header
-   = #047857), item aktif tint emerald #ecfdf5 + garis emerald inset,
-   ornamen emas tipis. Mode gelap = emerald-ink pekat (bukan TikTok hitam).
+   Tema "Pixio" (Emerald SaaS) — selaras TEMPLATE Design System (templates/
+   tenant-admin + platform-admin): kanvas slate dingin #f1f5f9, sidebar PUTIH
+   penuh (header putih, teks gelap), hairline dingin #e7ecf3, item aktif tint
+   emerald #ecfdf5 + teks emerald (tanpa garis inset), kartu putih radius 14px
+   + bayang halus. Mode gelap = navy DS #0a1018. Konsol desktop bersih.
    =================================================================== */
 body.tema-pixio .fi-body {
-    background-color: #fffaf3;
+    background-color: #f1f5f9;
 }
 body.tema-pixio .fi-sidebar {
     background: #ffffff !important;
-    border-inline-end: 1px solid #efe7da !important;
+    border-inline-end: 1px solid #e7ecf3 !important;
 }
-/* Label grup: emas-ink islami (ornamen) */
+/* Sidebar header PUTIH (DS): batalkan teks-putih bawaan tema WA → teks gelap. */
+body.tema-pixio .fi-sidebar-header,
+body.tema-pixio .fi-sidebar-header * {
+    color: #0f172a !important;
+}
+body.tema-pixio .fi-sidebar-header .fi-logo [class*="bg-primary"],
+body.tema-pixio .fi-sidebar-header .fi-logo span:first-child {
+    background-color: #ecfdf5 !important;
+    box-shadow: inset 0 0 0 1px #d1fae5 !important;
+}
+/* Label grup: faint dingin */
 body.tema-pixio .fi-sidebar-group-label {
-    color: #a07c2c !important;
+    color: #94a3b8 !important;
 }
-/* Item normal: slate */
+/* Item normal: slate-700 */
 body.tema-pixio .fi-sidebar-item-btn > .fi-sidebar-item-label,
 body.tema-pixio .fi-sidebar-item-label {
-    color: #475569 !important;
+    color: #334155 !important;
 }
 body.tema-pixio .fi-sidebar-item-btn > .fi-icon,
 body.tema-pixio .fi-sidebar-item-btn .fi-sidebar-item-icon,
 body.tema-pixio .fi-sidebar-item-btn .fi-icon {
     color: #64748b !important;
 }
-/* Hover: wash krim hangat */
+/* Hover: wash slate dingin */
 body.tema-pixio .fi-sidebar-item-btn:hover {
-    background-color: #f6f0e6 !important;
+    background-color: #f8fafc !important;
 }
 body.tema-pixio .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
 body.tema-pixio .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
-    color: #111111 !important;
+    color: #0f172a !important;
 }
 body.tema-pixio .fi-sidebar-item-btn:hover > .fi-icon,
 body.tema-pixio .fi-sidebar-item-btn:hover .fi-icon {
     color: #047857 !important;
 }
-/* Aktif: tint emerald + garis emerald inset kiri (signature Pixio) */
+/* Aktif: tint emerald + teks emerald (DS — tanpa garis inset) */
 body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background: #ecfdf5 !important;
-    box-shadow: inset 3px 0 0 #059669 !important;
 }
 body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
 body.tema-pixio .fi-sidebar-item.fi-active .fi-sidebar-item-label {
@@ -435,38 +444,49 @@ body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
 body.tema-pixio .fi-sidebar-item.fi-active .fi-icon {
     color: #059669 !important;
 }
-/* Topbar: putih + hairline hangat + bayang emas tipis (ornamen) */
+/* Topbar: putih + hairline dingin (tanpa ornamen emas) */
 body.tema-pixio .fi-topbar {
     background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(6px);
-    border-bottom: 1px solid #efe7da !important;
-    box-shadow: 0 1px 0 rgba(201, 162, 74, 0.30) !important;
+    border-bottom: 1px solid #e7ecf3 !important;
 }
-/* Kartu/section: radius besar + hairline hangat + bayang lembut (bukan glow) */
+/* Kartu/section: putih + border dingin + radius 14px + bayang halus (DS) */
 body.tema-pixio .fi-section,
 body.tema-pixio .fi-wi-stats-overview-stat,
 body.tema-pixio .fi-ta-ctn {
-    border-radius: 1.25rem !important;
-    border: 1px solid #efe7da !important;
-    box-shadow: 0 6px 24px -16px rgba(17, 17, 17, 0.18) !important;
+    border-radius: 14px !important;
+    border: 1px solid #e7ecf3 !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
     background-color: #ffffff;
 }
-/* ---- Pixio MODE GELAP: emerald-ink pekat (bukan TikTok hitam) ---- */
+/* ---- Pixio SaaS MODE GELAP: navy DS #0a1018 (bukan emerald-ink) ---- */
 .dark body.tema-pixio .fi-body,
 body.tema-pixio.dark .fi-body {
-    background-color: #0b1a14 !important;
+    background-color: #0a1018 !important;
 }
 .dark body.tema-pixio .fi-sidebar,
 body.tema-pixio.dark .fi-sidebar {
-    background: #0e201a !important;
-    border-inline-end: 1px solid #1e3329 !important;
+    background: #111a26 !important;
+    border-inline-end: 1px solid #1e2a3a !important;
+}
+/* Header gelap: navy + teks terang (var --tema-sidebar-header putih hanya utk terang). */
+.dark body.tema-pixio .fi-sidebar-header,
+body.tema-pixio.dark .fi-sidebar-header {
+    background: #111a26 !important;
+    border-bottom: 1px solid #1e2a3a !important;
+}
+.dark body.tema-pixio .fi-sidebar-header,
+.dark body.tema-pixio .fi-sidebar-header *,
+body.tema-pixio.dark .fi-sidebar-header,
+body.tema-pixio.dark .fi-sidebar-header * {
+    color: #f1f5f9 !important;
 }
 .dark body.tema-pixio .fi-topbar,
 .dark body.tema-pixio .fi-header,
 body.tema-pixio.dark .fi-topbar,
 body.tema-pixio.dark .fi-header {
-    background: #0e201a !important;
-    border-bottom: 1px solid #1e3329 !important;
+    background: #111a26 !important;
+    border-bottom: 1px solid #1e2a3a !important;
 }
 .dark body.tema-pixio .fi-section,
 .dark body.tema-pixio .fi-wi-stats-overview-stat,
@@ -474,8 +494,8 @@ body.tema-pixio.dark .fi-header {
 body.tema-pixio.dark .fi-section,
 body.tema-pixio.dark .fi-wi-stats-overview-stat,
 body.tema-pixio.dark .fi-ta-ctn {
-    border: 1px solid #1e3329 !important;
-    background-color: #11201a !important;
+    border: 1px solid #1e2a3a !important;
+    background-color: #111a26 !important;
 }
 /* Widget dasbor ikut Pixio saat tema-pixio aktif (tema WA default & AlbaKids TIDAK kena). */
 body.tema-pixio .tema-greeting {
@@ -483,11 +503,11 @@ body.tema-pixio .tema-greeting {
 }
 .dark body.tema-pixio .tema-greeting,
 body.tema-pixio.dark .tema-greeting {
-    background-image: linear-gradient(to right, #04281a, #0e201a, #11302a) !important;
+    background-image: linear-gradient(to right, #064e3b, #065f46, #047857) !important;
 }
 .dark body.tema-pixio .tema-quick,
 body.tema-pixio.dark .tema-quick {
-    background-color: #11201a !important;
+    background-color: #111a26 !important;
 }
 
 /* Tema "Baitul Maal" (desain pesantren-online-admin / PRD Keuangan Digital):

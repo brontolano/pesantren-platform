@@ -37,14 +37,14 @@ class PanelTheme
             'bodyClass' => null,
         ],
         'pixio' => [
-            'label' => 'Pixio (Emerald–Krim)',
-            'desc' => 'Bahasa visual utama pesantren.online — latar krim hangat, satu aksen emerald, ornamen emas. Sesuai Design System.',
+            'label' => 'Pixio (Emerald SaaS)',
+            'desc' => 'Konsol bersih ala Filament — kanvas slate dingin, sidebar putih, aksen emerald. Sesuai template Design System.',
             'topNav' => false,
             'bodyClass' => 'tema-pixio',
             'primary' => '#059669',
             'vars' => [
-                '--tema-sidebar-header' => '#047857',
-                '--tema-sidebar-header-border' => 'rgba(201, 162, 74, 0.30)',
+                '--tema-sidebar-header' => '#ffffff',
+                '--tema-sidebar-header-border' => '#e7ecf3',
                 '--tema-active-bg' => '#ecfdf5',
                 '--tema-active-fg' => '#047857',
                 '--tema-active-dark' => 'linear-gradient(90deg, #10b981 0%, #047857 100%)',
