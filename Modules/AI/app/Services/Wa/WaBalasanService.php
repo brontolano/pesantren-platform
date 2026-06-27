@@ -53,7 +53,12 @@ class WaBalasanService
             'meta' => $meta + ['gateway_status' => $hasil['status'] ?? null],
         ]);
 
-        return ($hasil['status'] ?? null) !== 'disabled';
+        // Sukses HANYA bila gateway benar-benar mengirim. 'disabled' (WA mati),
+        // 'simulated' (endpoint belum dikonfigurasi), dan 'failed' (n8n balas 200
+        // tapi WAHA gagal — body sent:false, ditandai WaGatewayService::interpret)
+        // semuanya BUKAN terkirim → jangan laporkan sukses (selaras
+        // WaNotificationService; menutup titik buta "selalu hijau" di jalur AI).
+        return ! in_array($hasil['status'] ?? null, ['disabled', 'simulated', 'failed'], true);
     }
 
     private function resolveTemplate(): TemplateNotifikasi
