@@ -187,6 +187,45 @@ class TenantRecoveryService
     }
 
     /**
+     * HAPUS PERMANEN satu tenant: backup pengaman dulu, lalu hapus baris central
+     * (domains + ai_credit_ledger + tenant) dan DROP database fisiknya.
+     *
+     * ai_credit_ledger append-only menolak DELETE biasa; di sini kita SET GUC
+     * `app.ledger_purge='on'` di dalam transaksi agar cascade penghapusan tenant
+     * boleh memurnikan ledger (lihat migrasi ..._allow_authorized_purge). UPDATE
+     * tetap mutlak dilarang.
+     *
+     * @return array{db_backup: string, files_backup: ?string}
+     */
+    public function purge(Tenant $tenant): array
+    {
+        // Pastikan tidak dalam konteks tenant (default = central) sebelum hapus.
+        if (function_exists('tenancy') && tenancy()->initialized) {
+            tenancy()->end();
+        }
+
+        $dbBackup = $this->backup($tenant);
+        $filesBackup = $this->backupFiles($tenant);
+
+        // Hapus tenant: cascade central (domains + ai_credit_ledger) + stancl DROP
+        // DATABASE fisik. ai_credit_ledger append-only → butuh GUC app.ledger_purge.
+        // Pakai SET sesi (BUKAN SET LOCAL/transaksi) karena stancl menjalankan
+        // DROP DATABASE yang TAK BOLEH di dalam transaksi. RESET di finally agar
+        // izin purge tak bocor ke operasi lain pada koneksi yang sama.
+        try {
+            DB::statement("SET app.ledger_purge = 'on'");
+            $tenant->delete();
+        } finally {
+            DB::statement("SET app.ledger_purge = 'off'");
+        }
+
+        // Hapus file unggahan fisik (aman tersimpan di $filesBackup).
+        $this->clearFiles($tenant);
+
+        return ['db_backup' => $dbBackup, 'files_backup' => $filesBackup];
+    }
+
+    /**
      * Ukuran database tenant (human readable), mis. "8.5 MB".
      */
     public function size(Tenant $tenant): ?string
