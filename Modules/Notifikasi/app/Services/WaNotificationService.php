@@ -29,11 +29,13 @@ class WaNotificationService
                 'variables' => $variables,
             ]);
 
-            // Gateway tak benar-benar mengirim — 'simulated' (WA belum dikonfigurasi)
-            // atau 'disabled' (WA dimatikan). JANGAN catat 'sent': log jujur + hitung
-            // sebagai TIDAK terkirim agar staf tak salah kira pesan sampai.
+            // Gateway tak benar-benar mengirim — 'simulated' (WA belum dikonfigurasi),
+            // 'disabled' (WA dimatikan), atau 'failed' (pipa n8n balas 200 tapi WAHA
+            // gagal kirim: body `sent:false` — ditandai WaGatewayService::interpret).
+            // JANGAN catat 'sent': log jujur + hitung sebagai TIDAK terkirim agar staf
+            // tak salah kira pesan sampai (menutup titik buta "selalu hijau" WAHA).
             $status = is_array($response) ? ($response['status'] ?? null) : null;
-            if (in_array($status, ['simulated', 'disabled'], true)) {
+            if (in_array($status, ['simulated', 'disabled', 'failed'], true)) {
                 $this->logService->forUndelivered($broadcast, $target, $status, is_array($response) ? $response : []);
 
                 return false;
