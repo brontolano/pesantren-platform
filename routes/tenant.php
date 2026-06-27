@@ -94,6 +94,11 @@ Route::middleware([
     'web',
     PreventAccessFromCentralDomains::class,
     InitializeTenancyByDomain::class,
+    // Proteksi clickjacking utk SELURUH portal tenant (Wali, Jemaah, santri-app,
+    // demo peran). Aman dipasang di sini: permukaan yang SENGAJA di-embed
+    // (form PPDB, widget CMS, landing tenant) ada di routes/web.php — bukan di
+    // grup ini. FrameGuard pakai guard !has(CSP) → tak menimpa kebijakan lain.
+    \App\Http\Middleware\FrameGuard::class,
 ])->group(function () {
 
     /*
