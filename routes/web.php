@@ -126,7 +126,9 @@ Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('te
 // halaman login. (Domain 'sistem' tetap juga menampilkan login di '/'.) Form
 // mem-POST ke /masuk (store); sukses → tujuan per peran (staf → /admin) via
 // AppLauncher, jadi tak nyangkut di website publik.
-Route::get('/masuk', [StaffLoginController::class, 'show'])->name('tenant.masuk.show');
+Route::get('/masuk', [StaffLoginController::class, 'show'])
+    ->middleware(\App\Http\Middleware\FrameGuard::class)
+    ->name('tenant.masuk.show');
 Route::post('/masuk', [StaffLoginController::class, 'store'])
     ->middleware('throttle:20,1')
     ->name('tenant.masuk.store');

@@ -374,6 +374,7 @@ class TenantPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\FrameGuard::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

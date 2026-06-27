@@ -74,6 +74,20 @@ class SecurityHardeningTest extends TestCase
         );
     }
 
+    public function test_rute_login_punya_proteksi_clickjacking(): void
+    {
+        // CLICKJACK-1: rute sensitif (/masuk) WAJIB menolak di-iframe lintas-origin.
+        // Sebelumnya hanya form PPDB (yang memang frameable) punya kebijakan frame;
+        // halaman login tidak — bisa di-clickjack. FrameGuard menutup celah ini.
+        [, $host] = $this->bootTenant();
+
+        $resp = $this->get("http://{$host}/masuk", $this->headers($host));
+
+        $resp->assertOk();
+        $resp->assertHeader('Content-Security-Policy', "frame-ancestors 'self'");
+        $resp->assertHeader('X-Frame-Options', 'SAMEORIGIN');
+    }
+
     public function test_anggaran_otp_harian_membatasi_kirim(): void
     {
         [$tenant, $host] = $this->bootTenant();
