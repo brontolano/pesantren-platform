@@ -2,115 +2,45 @@
 
 namespace Tests\Feature;
 
-use App\Models\Tenant;
 use App\Models\TenantModule;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
+/**
+ * Status modul AKTIF per-tenant (tabel central tenant_modules).
+ *
+ * CATATAN: isolasi data lintas-tenant yang SEBENARNYA (database fisik terpisah)
+ * diuji di TenantPhysicalIsolationTest. Versi lama test ini memakai
+ * RefreshDatabase + Tenant::create yang memicu auto-provisioning
+ * (CREATE DATABASE di dalam transaksi → gagal) sehingga MERAH & memberi
+ * rasa-aman palsu. Ditulis ulang memakai harness DB test kanonik
+ * (InteractsWithPpdbTestDatabase) dan dipersempit ke cakupan yang masih valid.
+ */
 class TenantIsolationTest extends TestCase
 {
-    use RefreshDatabase;
-
-    private Tenant $tenantA;
-
-    private Tenant $tenantB;
-
-    private User $userA;
-
-    private User $userB;
+    use InteractsWithPpdbTestDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->tenantA = Tenant::create(['id' => 'tenant-a', 'name' => 'Tenant A', 'is_active' => true]);
-        $this->tenantA->domains()->create(['domain' => 'tenant-a.localhost']);
-
-        $this->tenantB = Tenant::create(['id' => 'tenant-b', 'name' => 'Tenant B', 'is_active' => true]);
-        $this->tenantB->domains()->create(['domain' => 'tenant-b.localhost']);
-
-        $this->userA = User::withoutGlobalScopes()->create([
-            'name' => 'User A',
-            'email' => 'user@tenant-a.localhost',
-            'password' => bcrypt('password'),
-            'tenant_id' => 'tenant-a',
-        ]);
-
-        $this->userB = User::withoutGlobalScopes()->create([
-            'name' => 'User B',
-            'email' => 'user@tenant-b.localhost',
-            'password' => bcrypt('password'),
-            'tenant_id' => 'tenant-b',
-        ]);
-
-        TenantModule::create(['tenant_id' => 'tenant-a', 'module_name' => 'Hello', 'is_active' => true]);
-        TenantModule::create(['tenant_id' => 'tenant-b', 'module_name' => 'Hello', 'is_active' => false]);
+        $this->ensurePpdbTestingSchemaReady(['tenants', 'domains', 'tenant_modules']);
+        $this->truncatePpdbTables(['tenant_modules', 'domains', 'tenants']);
     }
 
-    public function test_user_query_only_returns_own_tenant_data(): void
+    public function test_status_modul_aktif_terpisah_per_tenant(): void
     {
-        tenancy()->initialize($this->tenantA);
+        $idA = 'mod-a-'.Str::lower(Str::random(6));
+        $idB = 'mod-b-'.Str::lower(Str::random(6));
+        $this->createTestTenant($idA, 'Pesantren A', $idA.'.localhost');
+        $this->createTestTenant($idB, 'Pesantren B', $idB.'.localhost');
 
-        $users = User::all();
+        TenantModule::create(['tenant_id' => $idA, 'module_name' => 'Hello', 'is_active' => true]);
+        TenantModule::create(['tenant_id' => $idB, 'module_name' => 'Hello', 'is_active' => false]);
 
-        $this->assertCount(1, $users);
-        $this->assertEquals('tenant-a', $users->first()->tenant_id);
-        $this->assertEquals('User A', $users->first()->name);
-
-        tenancy()->end();
-    }
-
-    public function test_tenant_b_cannot_see_tenant_a_users(): void
-    {
-        tenancy()->initialize($this->tenantB);
-
-        $users = User::all();
-
-        $this->assertCount(1, $users);
-        $this->assertEquals('tenant-b', $users->first()->tenant_id);
-
-        $userIds = $users->pluck('id')->toArray();
-        $this->assertNotContains($this->userA->id, $userIds);
-
-        tenancy()->end();
-    }
-
-    public function test_creating_user_in_tenant_context_auto_sets_tenant_id(): void
-    {
-        tenancy()->initialize($this->tenantA);
-
-        $newUser = User::create([
-            'name' => 'New User A',
-            'email' => 'new@tenant-a.localhost',
-            'password' => bcrypt('password'),
-        ]);
-
-        $this->assertEquals('tenant-a', $newUser->tenant_id);
-
-        tenancy()->end();
-    }
-
-    public function test_module_active_check_works_per_tenant(): void
-    {
-        $this->assertTrue(TenantModule::isModuleActive('tenant-a', 'Hello'));
-        $this->assertFalse(TenantModule::isModuleActive('tenant-b', 'Hello'));
-    }
-
-    public function test_no_cross_tenant_data_leakage(): void
-    {
-        tenancy()->initialize($this->tenantA);
-        $countA = User::count();
-        tenancy()->end();
-
-        tenancy()->initialize($this->tenantB);
-        $countB = User::count();
-        tenancy()->end();
-
-        $totalWithoutScope = User::withoutGlobalScopes()->count();
-
-        $this->assertEquals(1, $countA);
-        $this->assertEquals(1, $countB);
-        $this->assertEquals(2, $totalWithoutScope);
+        $this->assertTrue(TenantModule::isModuleActive($idA, 'Hello'), 'modul aktif di tenant A');
+        $this->assertFalse(TenantModule::isModuleActive($idB, 'Hello'), 'modul nonaktif di tenant B');
+        // Modul yang tak terdaftar = tidak aktif (default tertutup).
+        $this->assertFalse(TenantModule::isModuleActive($idA, 'TidakAda'), 'modul tak terdaftar default nonaktif');
     }
 }
