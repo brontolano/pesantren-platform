@@ -120,7 +120,7 @@ class SantriImportService
      *   created_kelas:int
      * }
      */
-    public function import(Tenant $tenant, string $path, bool $dryRun = false): array
+    public function import(Tenant $tenant, string $path, bool $dryRun = false, ?string $defaultBirthDate = null): array
     {
         if (! is_file($path)) {
             throw new RuntimeException("File import tidak ditemukan: {$path}");
@@ -164,6 +164,12 @@ class SantriImportService
                         $summary['skipped']++;
 
                         continue;
+                    }
+
+                    // Tanggal lahir kosong + ada default → pakai placeholder agar
+                    // santri TETAP masuk (NOT NULL), untuk dilengkapi staf di panel.
+                    if ($defaultBirthDate !== null && trim($payload['tanggal_lahir'] ?? '') === '') {
+                        $payload['tanggal_lahir'] = $defaultBirthDate;
                     }
 
                     $validator = Validator::make($payload, [
