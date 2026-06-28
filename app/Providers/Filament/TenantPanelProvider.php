@@ -195,22 +195,35 @@ class TenantPanelProvider extends PanelProvider
                 AccountWidget::class,
             ]
             : [
-                GreetingBanner::class,
-                OnboardingChecklist::class,
-                StatsPesantren::class,
-                KeuanganAreaChart::class,
-                KategoriPengeluaranChart::class,
-                TransaksiTerbaru::class,
-                // Ringkasan per-domain (gerbang canView per-permission: santri/keuangan)
-                KesantrianOverviewWidget::class,
-                KeuanganOverviewWidget::class,
-                // Penekanan keuangan tema Baitul Maal (canView = tema aktif saja)
-                KasOverviewWidget::class,
-                PengajuanTerbaru::class,
-                AgendaPengumuman::class,
-                QuickAccessWidget::class,
-                // WP-16 — pengingat kontrak/SK akan habis (canView: payroll + ada data)
-                KontrakAkanHabisWidget::class,
+                // === LAYER 1: Welcome & Onboarding ===
+                GreetingBanner::class,           // sort=-10: welcome
+                OnboardingChecklist::class,      // sort=-9: setup checklist (conditional)
+
+                // === LAYER 2: Key Metrics ===
+                StatsPesantren::class,           // sort=-8: 5 KPI cards (santri, pengurus, kas, tagihan)
+
+                // === LAYER 3: Quick Access (CRUCIAL UX) ===
+                QuickAccessWidget::class,        // sort=-7: shortcut ke aksi harian per role
+
+                // === LAYER 4: Financial Dashboard (for bendahara/tata usaha) ===
+                KeuanganAreaChart::class,        // sort=-6: chart pendapatan/pengeluaran
+                TransaksiTerbaru::class,         // sort=-4: tabel transaksi terbaru (4 cols)
+                KasOverviewWidget::class,        // sort=-5: ringkas kas harian (2 cols, samping chart)
+
+                // === LAYER 5: Ringkasan Sekunder ===
+                KategoriPengeluaranChart::class, // sort=-5: pie chart pengeluaran (conditional data)
+                AgendaPengumuman::class,         // sort=-3: agenda & pengumuman
+                PengajuanTerbaru::class,         // sort=-3: pengajuan terbaru (4 cols)
+
+                // === LAYER 6: Domain Ringkasan (Santri/Keuangan) ===
+                KesantrianOverviewWidget::class, // sort=1: santri stats (adaptive per role)
+                KeuanganOverviewWidget::class,   // sort=2: keuangan stats (adaptive per role)
+
+                // === LAYER 7: Departemen Spesifik ===
+                KontrakAkanHabisWidget::class,   // sort=12: pengingat kontrak (payroll only)
+
+                // === LAYER 8: Admin/Dev (rarely needed) ===
+                // BillingOverviewWidget (sort=10) + DevProgressWidget (sort=20) dihidden via canView() ===
             ];
 
         // PENTING: ->id() & ->path() HARUS dipanggil SEBELUM ->resources()/

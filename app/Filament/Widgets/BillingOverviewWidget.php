@@ -12,6 +12,12 @@ class BillingOverviewWidget extends BaseWidget
 
     protected static bool $isLazy = true;
 
+    public static function canView(): bool
+    {
+        // Hanya untuk platform super_admin — bukan untuk staff pesantren
+        return auth()->user()?->isPlatformSuperAdmin() ?? false;
+    }
+
     protected function getStats(): array
     {
         $billing = app(BillingService::class);
