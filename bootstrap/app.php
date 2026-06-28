@@ -84,4 +84,35 @@ return Application::configure(basePath: dirname(__DIR__))
                 404
             );
         });
+
+        // 403 ANGGUN di panel tenant: bila staf login menjangkau halaman di luar
+        // kewenangannya (mis. ketik URL /admin/.../edit langsung, bookmark/riwayat
+        // basi, atau tautan dalam dari peran lain), JANGAN tampilkan "403 Forbidden"
+        // telanjang yang membingungkan. Alihkan kembali ke Dasbor + notifikasi ramah.
+        // Backend tetap MENOLAK (keamanan utuh) — hanya UX-nya yang dibuat lembut.
+        // 403 di luar panel / tamu / JSON / halaman home (cegah loop) → render
+        // halaman branded resources/views/errors/403.blade.php (fallback).
+        $exceptions->render(function (
+            \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e,
+            Request $request,
+        ) {
+            if ($e->getStatusCode() !== 403) {
+                return null;
+            }
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return null;
+            }
+            if (auth()->check() && $request->is('admin/*') && ! $request->is('admin')) {
+                \Filament\Notifications\Notification::make()
+                    ->title('Akses ditolak')
+                    ->body('Halaman tersebut di luar kewenangan akun Anda. Anda dialihkan kembali ke Dasbor.')
+                    ->danger()
+                    ->persistent()
+                    ->send();
+
+                return redirect('/admin');
+            }
+
+            return null;
+        });
     })->create();
