@@ -3,11 +3,9 @@
 namespace App\Filament\Resources\Santri\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use App\Filament\Exports\SantriExporter;
 use App\Filament\Resources\Santri\SantriResource;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Actions\ExportAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -74,10 +72,41 @@ class ListSantri extends ListRecords
                 'extraSummary' => fn (array $s): string => ($s['created_kelas'] ?? 0) > 0 ? 'Kelas baru dibuat: '.$s['created_kelas'] : '',
                 'petunjuk' => 'Impor data santri dari file Excel/CSV. Kolom WAJIB: nis, nama, jenis_kelamin (isi L atau P), tanggal_lahir. Kolom "kelas" akan dibuat otomatis bila belum ada. Baris dengan NIS yang sudah terdaftar akan DILEWATI (aman diulang). Centang "Validasi dulu (dry-run)" untuk mengecek tanpa menyimpan.',
             ]),
-            ExportAction::make()
-                ->exporter(SantriExporter::class)
+            // Export SINKRON (streamDownload) — langsung unduh CSV, TANPA antrian/
+            // worker/notifikasi (Filament ExportAction queued sempat 500: tabel
+            // 'exports' + notifikasi 'layouts' di worker). 47 kolom = round-trip
+            // dgn template impor. Tergerbang sama dgn akses halaman (view_santri).
+            Action::make('exportSantri')
                 ->label('Export Santri')
-                ->icon('heroicon-o-arrow-down-tray'),
+                ->icon('heroicon-o-arrow-down-tray')
+                ->action(function () {
+                    $kolom = [
+                        'nis', 'nama', 'tanggal_lahir', 'tempat_lahir', 'jenis_kelamin', 'agama', 'nik', 'nisn', 'asal_sekolah',
+                        'alamat', 'rt_rw', 'kode_pos', 'provinsi', 'kabupaten_kota', 'kecamatan', 'desa_kelurahan',
+                        'nama_ayah', 'pekerjaan_ayah', 'no_hp_ayah', 'alamat_ayah', 'rt_rw_ayah', 'kode_pos_ayah', 'provinsi_ayah', 'kabupaten_kota_ayah', 'kecamatan_ayah', 'desa_kelurahan_ayah',
+                        'nama_ibu', 'pekerjaan_ibu', 'no_hp_ibu', 'alamat_ibu', 'rt_rw_ibu', 'kode_pos_ibu', 'provinsi_ibu', 'kabupaten_kota_ibu', 'kecamatan_ibu', 'desa_kelurahan_ibu',
+                        'no_hp_wali', 'email_wali', 'alamat_wali', 'rt_rw_wali', 'kode_pos_wali', 'provinsi_wali', 'kabupaten_kota_wali', 'kecamatan_wali', 'desa_kelurahan_wali',
+                        'kelas', 'tahun_angkatan', 'status',
+                    ];
+
+                    return response()->streamDownload(function () use ($kolom): void {
+                        $out = fopen('php://output', 'w');
+                        fputcsv($out, $kolom);
+                        \Modules\Kesantrian\Models\Santri::query()->with('kelas')->orderBy('nama')->lazy()
+                            ->each(function ($s) use ($out, $kolom): void {
+                                $baris = [];
+                                foreach ($kolom as $k) {
+                                    $baris[] = match ($k) {
+                                        'kelas' => (string) ($s->kelas?->nama_kelas ?? ''),
+                                        'tanggal_lahir' => $s->tanggal_lahir?->format('Y-m-d') ?? '',
+                                        default => (string) ($s->{$k} ?? ''),
+                                    };
+                                }
+                                fputcsv($out, $baris);
+                            });
+                        fclose($out);
+                    }, 'santri-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+                }),
             Action::make('exportCsvPerKelas')
                 ->label('Export Excel per Kelas')
                 ->icon('heroicon-o-table-cells')
