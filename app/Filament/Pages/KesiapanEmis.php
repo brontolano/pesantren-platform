@@ -37,7 +37,7 @@ class KesiapanEmis extends Page
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('akademik') && (auth()->user()?->can('manage_santri') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

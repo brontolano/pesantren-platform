@@ -55,22 +55,22 @@ class SoalUjianResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function form(Schema $schema): Schema

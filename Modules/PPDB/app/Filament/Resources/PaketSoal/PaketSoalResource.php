@@ -49,7 +49,7 @@ class PaketSoalResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->can('manage_santri') ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->can('manage_ppdb') ?? false);
     }
 
     /**

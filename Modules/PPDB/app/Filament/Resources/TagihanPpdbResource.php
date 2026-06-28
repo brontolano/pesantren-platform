@@ -41,7 +41,7 @@ class TagihanPpdbResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function canCreate(): bool
@@ -102,7 +102,7 @@ class TagihanPpdbResource extends Resource
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (TagihanPpdb $record): bool => $record->status !== 'lunas' && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (TagihanPpdb $record): bool => $record->status !== 'lunas' && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (TagihanPpdb $record): void {
                         $record->update(['status' => 'lunas']);
                         $calon = $record->calonSantri;
@@ -119,7 +119,7 @@ class TagihanPpdbResource extends Resource
                     ->label('Tolak Bukti')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (TagihanPpdb $record): bool => $record->bukti_transfer !== null && $record->status !== 'lunas' && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (TagihanPpdb $record): bool => $record->bukti_transfer !== null && $record->status !== 'lunas' && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->schema([
                         Textarea::make('keterangan')
                             ->label('Alasan / catatan (opsional)')
