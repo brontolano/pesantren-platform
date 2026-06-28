@@ -39,17 +39,27 @@ class StatsPesantren extends StatsOverviewWidget
         ];
     }
 
+    public static function canView(): bool
+    {
+        // Adaptif per-peran: sembunyikan kartu bila pemakai tak punya satu pun
+        // dimensi yg relevan (mis. petugas sarpras/payroll murni).
+        return auth()->user()?->canAny(['view_santri', 'view_laporan_keuangan']) ?? false;
+    }
+
     protected function getStats(): array
     {
-        // Statistik umum (santri, pengurus) tampil utk semua staf. Statistik
-        // KEUANGAN (kas masuk/keluar, tagihan) HANYA utk yg punya view_keuangan
-        // — cegah bocornya angka kas/tagihan ke guru & tu (tak punya izin uang).
-        $stats = [
-            $this->statSantri(),
-            $this->statPengurus(),
-        ];
+        // ADAPTIF: statistik SANTRI hanya utk pemegang view_santri; statistik
+        // KEUANGAN (kas masuk/keluar, tagihan) hanya utk view_laporan_keuangan
+        // — tiap peran melihat angka yg relevan fungsinya saja.
+        $user = auth()->user();
+        $stats = [];
 
-        if (auth()->user()?->can('view_keuangan')) {
+        if ($user?->can('view_santri')) {
+            $stats[] = $this->statSantri();
+            $stats[] = $this->statPengurus();
+        }
+
+        if ($user?->can('view_laporan_keuangan')) {
             $stats[] = $this->statKasMasuk();
             $stats[] = $this->statKasKeluar();
             $stats[] = $this->statTagihan();

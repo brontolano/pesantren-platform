@@ -11,14 +11,14 @@ class KeuanganOverviewWidget extends StatsOverviewWidget
 {
     public static function canView(): bool
     {
-        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false;
+        return auth()->user()?->can('view_laporan_keuangan') ?? false;
     }
 
     protected static ?int $sort = 2;
 
     protected function getStats(): array
     {
-        if (! auth()->user()?->canAny(['view_keuangan', 'manage_keuangan'])) {
+        if (! auth()->user()?->can('view_laporan_keuangan')) {
             return [];
         }
 

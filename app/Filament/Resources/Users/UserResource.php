@@ -28,37 +28,8 @@ class UserResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Users';
 
-    /**
-     * Label RAMAH untuk dropdown Role (form User): slug teknis → bahasa staf
-     * pesantren. Hanya untuk TAMPILAN — nilai opsi tetap role_id (lihat field
-     * 'roles' yang pakai relationship()). Peran eksternal (santri/wali/jemaah/
-     * peserta) & alias 'keuangan' sengaja tak masuk daftar (disembunyikan).
-     *
-     * @var array<string, string>
-     */
-    private const ROLE_LABELS = [
-        'super_admin' => 'Super Admin (akses penuh / pemilik)',
-        'admin_pesantren' => 'Admin Pesantren (administrator)',
-        'kepala' => 'Kepala / Kyai (pimpinan)',
-        'tu' => 'Tata Usaha (administrasi)',
-        'guru' => 'Guru (mata pelajaran)',
-        'guru_tahfidz' => 'Guru Tahfidz / Musyrif',
-        'asatidz' => 'Ustadz / Asatidz (pengajar kitab)',
-        'bendahara' => 'Bendahara Unit (tagihan/tabungan/kas)',
-        'bendahara_pusat' => 'Bendahara Pusat / Yayasan',
-        'kepala_keuangan' => 'Kepala Keuangan',
-        'akuntan' => 'Akuntan / Tata Buku (pembukuan)',
-        'petugas_payroll' => 'Petugas Payroll / Bisyaroh',
-        'kasir' => 'Kasir (kantin / POS / setor)',
-        'operator_divisi' => 'Operator Divisi / Unit',
-        'dewan_pembina' => 'Dewan Pembina (pengawas)',
-        'konselor' => 'Konselor / Guru BK',
-        'pengelola_uks' => 'Petugas UKS / Kesehatan',
-        'pengelola_asrama' => 'Pengasuh Asrama / Musyrif',
-        'panitia_ppdb' => 'Panitia PPDB / Pendaftaran',
-        'pengelola_sarpras' => 'Petugas Sarpras / Aset',
-        'IT' => 'IT / Admin Teknis',
-    ];
+    // Label RAMAH peran (slug → bahasa staf) kini terpusat di App\Support\RoleLabel
+    // (dipakai bersama dgn GreetingBanner). Lihat getOptionLabelFromRecordUsing.
 
     protected static ?int $navigationSort = 2;
 
@@ -127,7 +98,7 @@ class UserResource extends Resource
                         ->whereNotIn('name', ['santri', 'wali', 'jemaah', 'peserta', 'keuangan'])
                         ->orderBy('name'),
                 )
-                ->getOptionLabelFromRecordUsing(fn (Model $record): string => self::ROLE_LABELS[$record->name] ?? $record->name)
+                ->getOptionLabelFromRecordUsing(fn (Model $record): string => \App\Support\RoleLabel::for($record->name))
                 ->multiple()
                 ->preload()
                 ->searchable()
@@ -152,7 +123,7 @@ class UserResource extends Resource
                     ->badge()
                     ->separator(',')
                     // Tampilkan label ramah yang sama dgn dropdown (slug → bahasa staf).
-                    ->formatStateUsing(fn (string $state): string => self::ROLE_LABELS[$state] ?? $state),
+                    ->formatStateUsing(fn (string $state): string => \App\Support\RoleLabel::for($state)),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')

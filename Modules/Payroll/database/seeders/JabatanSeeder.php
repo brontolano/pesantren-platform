@@ -35,7 +35,17 @@ class JabatanSeeder extends Seeder
         'Qism Bahasa' => ['kategori' => 'pengurus_santri', 'role' => null],
         'Tata Usaha' => ['kategori' => 'staf', 'role' => 'tu'],
         'Bendahara Unit' => ['kategori' => 'staf', 'role' => 'bendahara'],
+        'Kepala Keuangan' => ['kategori' => 'struktural', 'role' => 'kepala_keuangan'],
+        'Bendahara Pusat' => ['kategori' => 'struktural', 'role' => 'bendahara_pusat'],
+        'Akuntan / Tata Buku' => ['kategori' => 'staf', 'role' => 'akuntan'],
+        'Kasir' => ['kategori' => 'staf', 'role' => 'kasir'],
+        'Operator Divisi / Unit' => ['kategori' => 'staf', 'role' => 'operator_divisi'],
+        'Staf Penggajian' => ['kategori' => 'staf', 'role' => 'petugas_payroll'],
         'Petugas Kesehatan' => ['kategori' => 'staf', 'role' => 'pengelola_uks'],
+        'Konselor / Guru BK' => ['kategori' => 'kepengasuhan', 'role' => 'konselor'],
+        'Panitia PPDB' => ['kategori' => 'staf', 'role' => 'panitia_ppdb'],
+        'Petugas Sarpras' => ['kategori' => 'staf', 'role' => 'pengelola_sarpras'],
+        'Staf IT' => ['kategori' => 'staf', 'role' => 'IT'],
     ];
 
     public function run(): void

@@ -40,6 +40,6 @@ class KesantrianOverviewWidget extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri', 'view_dashboard']) ?? false;
+        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
     }
 }
