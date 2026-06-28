@@ -59,27 +59,27 @@ class JenisPelanggaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_kedisiplinan') ?? false;
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_kedisiplinan', 'manage_kedisiplinan']) ?? false;
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_kedisiplinan') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_kedisiplinan') ?? false;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_kedisiplinan') ?? false;
     }
 
     public static function form(Schema $schema): Schema

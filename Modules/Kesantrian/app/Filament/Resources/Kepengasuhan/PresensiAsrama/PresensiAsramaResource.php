@@ -26,12 +26,12 @@ class PresensiAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_asrama', 'manage_asrama']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_asrama', 'manage_asrama']) ?? false);
     }
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-check';

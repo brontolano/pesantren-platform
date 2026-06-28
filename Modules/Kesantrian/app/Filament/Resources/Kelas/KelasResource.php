@@ -40,22 +40,22 @@ class KelasResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_akademik', 'manage_akademik', 'manage_santri']) ?? false;
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_akademik', 'manage_akademik', 'manage_santri']) ?? false;
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->canAny(['manage_akademik', 'manage_santri']) ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->canAny(['manage_akademik', 'manage_santri']) ?? false;
     }
 
     public static function form(Schema $schema): Schema

@@ -45,12 +45,12 @@ class AlumniResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return UiMode::advanced() && auth()->user()?->canAny(['view_alumni', 'manage_alumni']) ?? false;
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_alumni', 'manage_alumni']) ?? false;
     }
 
     public static function canCreate(): bool
@@ -60,7 +60,7 @@ class AlumniResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_alumni') ?? false;
     }
 
     public static function canDelete(Model $record): bool
@@ -133,7 +133,7 @@ class AlumniResource extends Resource
                     ->icon('heroicon-o-document-check')
                     ->requiresConfirmation()
                     ->visible(fn (Alumni $record): bool => $record->nomor_syahadah === null
-                        && (auth()->user()?->can('manage_santri') ?? false))
+                        && (auth()->user()?->can('manage_alumni') ?? false))
                     ->action(function (Alumni $record): void {
                         try {
                             $alumni = app(KelulusanService::class)->generateNomorSyahadah($record);

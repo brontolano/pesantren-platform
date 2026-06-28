@@ -74,17 +74,17 @@ class PelanggaranSantriResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_kedisiplinan', 'manage_kedisiplinan']) ?? false;
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_kedisiplinan', 'manage_kedisiplinan']) ?? false;
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_kedisiplinan') ?? false;
     }
 
     public static function canEdit(Model $record): bool
@@ -203,7 +203,7 @@ class PelanggaranSantriResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->visible(fn (PelanggaranSantri $record): bool => $record->status === 'dicatat'
-                        && (auth()->user()?->can('manage_santri') ?? false)
+                        && (auth()->user()?->can('manage_kedisiplinan') ?? false)
                         && (int) $record->pencatat_id !== (int) auth()->id())
                     ->action(function (PelanggaranSantri $record): void {
                         try {
@@ -218,7 +218,7 @@ class PelanggaranSantriResource extends Resource
                     ->icon('heroicon-o-clipboard-document-check')
                     ->color('primary')
                     ->visible(fn (PelanggaranSantri $record): bool => in_array($record->status, ['diverifikasi', 'sanksi_dijalankan'], true)
-                        && (auth()->user()?->can('manage_santri') ?? false))
+                        && (auth()->user()?->can('manage_kedisiplinan') ?? false))
                     ->schema([
                         TextInput::make('jenis_sanksi')
                             ->label('Jenis Sanksi')
@@ -247,7 +247,7 @@ class PelanggaranSantriResource extends Resource
                     ->requiresConfirmation()
                     ->modalDescription('Tandai kasus disiplin ini selesai (sanksi tuntas / ditutup).')
                     ->visible(fn (PelanggaranSantri $record): bool => in_array($record->status, ['diverifikasi', 'sanksi_dijalankan'], true)
-                        && (auth()->user()?->can('manage_santri') ?? false))
+                        && (auth()->user()?->can('manage_kedisiplinan') ?? false))
                     ->action(function (PelanggaranSantri $record): void {
                         try {
                             app(DisiplinService::class)->selesaikan($record);
@@ -262,7 +262,7 @@ class PelanggaranSantriResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->visible(fn (PelanggaranSantri $record): bool => ! in_array($record->status, ['selesai', 'dibatalkan'], true)
-                        && (auth()->user()?->can('manage_santri') ?? false))
+                        && (auth()->user()?->can('manage_kedisiplinan') ?? false))
                     ->schema([
                         Textarea::make('alasan')->label('Alasan Pembatalan')->required()->rows(3),
                     ])

@@ -56,6 +56,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage_kegiatan',
             'view_tahfidz',
             'manage_tahfidz',
+            // Kedisiplinan & Alumni — dipisah dari view_santri agar peran keuangan
+            // (yang punya view_santri utk referensi roster) TIDAK ikut melihat menu
+            // pelanggaran/alumni di luar fungsinya.
+            'view_kedisiplinan',
+            'manage_kedisiplinan',
+            'view_alumni',
+            'manage_alumni',
             'view_own_children',
             // F1-PWA — gerbang masuk PWA Guru (/guru): guru mapel, guru
             // tahfidz/musyrif, asatidz, dan kepala (pemantauan).
@@ -160,6 +167,10 @@ class RolesAndPermissionsSeeder extends Seeder
                 'manage_kegiatan',
                 'view_tahfidz',
                 'manage_tahfidz',
+                'view_kedisiplinan',
+                'manage_kedisiplinan',
+                'view_alumni',
+                'manage_alumni',
                 'manage_mutu',
                 'kelola_approval',
                 'lihat_audit',
@@ -188,6 +199,10 @@ class RolesAndPermissionsSeeder extends Seeder
                 'manage_asrama',
                 'view_kegiatan',
                 'manage_kegiatan',
+                'view_kedisiplinan',
+                'manage_kedisiplinan',
+                'view_alumni',
+                'manage_alumni',
                 // T-A052 — TU ikut melayani Kotak Masuk WA chatbot.
                 'ai.chat.kelola',
                 // 1-aplikasi (Fase 2c) — moderasi komentar publik.
@@ -246,6 +261,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_akademik',
                 'manage_akademik',
                 'akses_pwa_guru',
+                // Wali kelas/Waka Kesiswaan merujuk catatan kedisiplinan (read).
+                'view_kedisiplinan',
                 // F3-PWA — Slip Saya: guru melihat/cetak slip MILIKNYA sendiri.
                 'view_slip_sendiri',
             ],
@@ -258,6 +275,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_tahfidz',
                 'manage_tahfidz',
                 'akses_pwa_guru',
+                // Musyrif tahfidz merujuk catatan kedisiplinan (read).
+                'view_kedisiplinan',
                 // F3-PWA — Slip Saya: guru melihat/cetak slip MILIKNYA sendiri.
                 'view_slip_sendiri',
             ],
@@ -267,6 +286,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 // Modul Konseling (sesi konseling) — terpisah dari UKS medis.
                 'view_konseling',
                 'manage_konseling',
+                // Konteks kedisiplinan untuk pendampingan (read).
+                'view_kedisiplinan',
             ],
             'pengelola_uks' => [
                 'view_dashboard',
@@ -281,6 +302,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 // Modul Asrama — blok/kamar/penempatan + biaya asrama.
                 'view_asrama',
                 'manage_asrama',
+                // Musyrif menegakkan & mencatat kedisiplinan santri asrama.
+                'view_kedisiplinan',
+                'manage_kedisiplinan',
             ],
             'kepala' => [
                 'view_dashboard',
@@ -294,6 +318,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_asrama',
                 'view_kegiatan',
                 'view_tahfidz',
+                'view_kedisiplinan',
+                'view_alumni',
                 'manage_tenant_settings',
                 // SPMI — kepala melihat & MENYETUJUI mutu (segregasi: admin_pesantren
                 // hanya menyusun/manage, tak punya approve_mutu).
