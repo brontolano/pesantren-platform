@@ -34,7 +34,7 @@ class ListTagihan extends ListRecords
                 ->modalHeading('Buat Tagihan untuk Satu Kelas')
                 ->modalDescription('Membuat satu tagihan dengan nominal sama untuk semua santri aktif di kelas terpilih.')
                 ->modalSubmitActionLabel('Buat Tagihan')
-                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_keuangan') ?? false))
+                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_tagihan') ?? false))
                 ->schema([
                     Select::make('kelas_id')
                         ->label('Kelas')
@@ -133,7 +133,7 @@ class ListTagihan extends ListRecords
                 'label' => 'Import Tagihan/SPP',
                 'service' => KeuanganImportService::class,
                 'directory' => 'imports/keuangan/uploads',
-                'ability' => 'manage_keuangan',
+                'ability' => 'manage_tagihan',
                 'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nis, jenis_tagihan, nominal, jatuh_tempo, diskon, bulan (YYYY-MM), status_bayar (lunas/belum), tanggal_pembayaran, metode, nomor_bukti. Baris "lunas" WAJIB memilih verifikator di bawah. Idempoten — aman diulang (dry-run dulu).',
                 'schema' => [
                     Select::make('verifikator_id')

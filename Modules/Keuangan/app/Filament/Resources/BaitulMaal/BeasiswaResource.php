@@ -47,7 +47,7 @@ class BeasiswaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_donasi', 'manage_donasi']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -57,12 +57,12 @@ class BeasiswaResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_donasi') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_donasi') ?? false;
     }
 
     public static function form(Schema $schema): Schema

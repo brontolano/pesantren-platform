@@ -36,12 +36,12 @@ class TabunganResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tabungan', 'manage_tabungan']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tabungan', 'manage_tabungan']) ?? false);
     }
 
     public static function canCreate(): bool
@@ -91,7 +91,7 @@ class TabunganResource extends Resource
                     ->label('Setor')
                     ->icon('heroicon-o-plus-circle')
                     ->color('success')
-                    ->visible(fn () => auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn () => auth()->user()?->can('manage_tabungan'))
                     ->form([
                         TextInput::make('nominal')
                             ->label('Nominal Setor')
@@ -117,7 +117,7 @@ class TabunganResource extends Resource
                     ->label('Tarik')
                     ->icon('heroicon-o-minus-circle')
                     ->color('danger')
-                    ->visible(fn () => auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn () => auth()->user()?->can('manage_tabungan'))
                     ->form([
                         TextInput::make('nominal')
                             ->label('Nominal Tarik')
@@ -143,7 +143,7 @@ class TabunganResource extends Resource
                     ->label('Limit / Bekukan')
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->color('gray')
-                    ->visible(fn () => auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn () => auth()->user()?->can('manage_tabungan'))
                     ->form([
                         TextInput::make('limit_harian')
                             ->label('Limit penarikan per hari')

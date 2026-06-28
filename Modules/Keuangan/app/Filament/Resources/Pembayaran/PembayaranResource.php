@@ -71,17 +71,17 @@ class PembayaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tagihan', 'manage_tagihan']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tagihan', 'manage_tagihan']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_tagihan') ?? false;
     }
 
     /**
@@ -209,7 +209,7 @@ class PembayaranResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_tagihan'))
                     ->action(function (Pembayaran $record): void {
                         (new PembayaranService)->verifikasiPembayaran($record, auth()->id());
                     }),
@@ -217,7 +217,7 @@ class PembayaranResource extends Resource
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_tagihan'))
                     ->form([
                         Textarea::make('alasan_penolakan')
                             ->label('Alasan Penolakan')

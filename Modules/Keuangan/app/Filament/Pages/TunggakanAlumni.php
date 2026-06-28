@@ -43,7 +43,7 @@ class TunggakanAlumni extends Page implements HasTable
     public static function canAccess(): bool
     {
         return static::moduleVisible('keuangan')
-            && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+            && (auth()->user()?->canAny(['view_tagihan', 'manage_tagihan']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

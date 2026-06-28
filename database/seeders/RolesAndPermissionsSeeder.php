@@ -23,6 +23,16 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage_santri',
             'view_keuangan',
             'manage_keuangan',
+            // Keuangan granular per-posisi (2026-06-28) — pecah view/manage_keuangan
+            // yg kasar agar tiap posisi keuangan lihat fungsinya saja (kasir≠akuntan
+            // ≠bendahara). Lihat breakdown posisi keuangan.
+            'view_tagihan',
+            'manage_tagihan',
+            'view_tabungan',
+            'manage_tabungan',
+            'view_donasi',
+            'manage_donasi',
+            'view_laporan_keuangan',
             // Keuangan/Baitul Maal — granular (modul Ledger & turunannya)
             'view_ledger',
             'manage_ledger',
@@ -132,19 +142,25 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Grant kas/keuangan operasional — dipakai bersama oleh 'keuangan' &
         // aliasnya 'bendahara' (satu sumber, mencegah dua daftar drift).
+        // BENDAHARA (unit) = operasional kas: tagihan + tabungan + donasi + laporan
+        // + lihat pembukuan. Pembukuan PENUH (manage_ledger) = akuntan/kepala_keuangan.
         $kasKeuanganGrants = [
             'view_dashboard',
-            'view_keuangan',
-            'manage_keuangan',
+            'view_santri',
+            'view_tagihan',
+            'manage_tagihan',
+            'view_tabungan',
+            'manage_tabungan',
+            'setor_tabungan',
+            'operate_pos',
+            'view_donasi',
+            'manage_donasi',
+            'view_laporan_keuangan',
             'view_ledger',
-            'manage_ledger',
             'manage_dana_kebajikan',
             'input_belanja',
             'manage_pajak',
-            'setor_tabungan',
-            'operate_pos',
             'view_notifikasi',
-            'view_santri',
         ];
 
         $rolePermissions = [
@@ -159,6 +175,15 @@ class RolesAndPermissionsSeeder extends Seeder
                 'manage_santri',
                 'view_keuangan',
                 'manage_keuangan',
+                'view_tagihan',
+                'manage_tagihan',
+                'view_tabungan',
+                'manage_tabungan',
+                'view_donasi',
+                'manage_donasi',
+                'view_laporan_keuangan',
+                'view_ledger',
+                'manage_ledger',
                 'view_notifikasi',
                 'manage_notifikasi',
                 'view_akademik',
@@ -224,30 +249,49 @@ class RolesAndPermissionsSeeder extends Seeder
             // Alias bendahara — sama persis dengan 'keuangan' (demo seeder memakai role ini).
             'bendahara' => $kasKeuanganGrants,
             // --- Peran Baitul Maal (modul Keuangan Digital) ---
+            // Bendahara PUSAT/Yayasan = pimpinan keuangan menyeluruh (semua + approval
+            // pencairan, tutup buku, payroll, pembiayaan).
             'bendahara_pusat' => [
-                'view_dashboard', 'view_keuangan', 'manage_keuangan',
-                'view_ledger', 'manage_ledger', 'close_period', 'manage_dana_kebajikan',
-                'input_belanja', 'approve_pencairan', 'manage_pajak', 'run_payroll',
-                'setor_tabungan', 'operate_pos', 'view_laporan_pimpinan', 'manage_pembiayaan',
-                'view_notifikasi', 'view_santri',
+                'view_dashboard', 'view_santri',
+                'view_tagihan', 'manage_tagihan', 'view_tabungan', 'manage_tabungan',
+                'setor_tabungan', 'operate_pos', 'view_donasi', 'manage_donasi',
+                'view_laporan_keuangan', 'view_ledger', 'manage_ledger', 'close_period',
+                'manage_dana_kebajikan', 'input_belanja', 'approve_pencairan', 'manage_pajak',
+                'run_payroll', 'view_laporan_pimpinan', 'manage_pembiayaan', 'view_notifikasi',
             ],
+            // Kepala Keuangan = pimpinan departemen keuangan (semua kecuali operasional
+            // kasir harian; fokus approval, pembukuan, laporan, mutu).
             'kepala_keuangan' => [
-                'view_dashboard', 'view_keuangan', 'manage_keuangan',
+                'view_dashboard', 'view_santri',
+                'view_tagihan', 'manage_tagihan', 'view_tabungan', 'manage_tabungan',
+                'view_donasi', 'manage_donasi', 'view_laporan_keuangan',
                 'view_ledger', 'manage_ledger', 'close_period', 'manage_dana_kebajikan',
-                'approve_pencairan', 'manage_pajak', 'run_payroll',
-                'view_laporan_pimpinan', 'manage_pembiayaan', 'manage_mutu', 'approve_mutu',
-                'view_notifikasi', 'view_santri',
+                'approve_pencairan', 'manage_pajak', 'run_payroll', 'view_laporan_pimpinan',
+                'manage_pembiayaan', 'manage_mutu', 'approve_mutu', 'view_notifikasi',
             ],
+            // Akuntan / Tata Buku = pembukuan double-entry (jurnal, buku besar, neraca,
+            // COA, laporan keuangan). TANPA operasional kas/tagihan/payroll.
+            'akuntan' => [
+                'view_dashboard', 'view_santri',
+                'view_ledger', 'manage_ledger', 'view_laporan_keuangan',
+            ],
+            // Petugas Payroll / Bisyaroh = penggajian & kepegawaian (run_payroll
+            // menggerbang semua menu Penggajian + Kepegawaian).
+            'petugas_payroll' => [
+                'view_dashboard', 'view_santri', 'run_payroll',
+            ],
+            // Operator Divisi/Unit = input belanja unitnya + lihat pembukuan.
             'operator_divisi' => [
-                'view_dashboard', 'view_keuangan', 'view_ledger',
-                'input_belanja', 'view_santri',
+                'view_dashboard', 'view_santri', 'input_belanja', 'view_ledger',
             ],
+            // Kasir = kasir kantin/loket + setor tabungan. TANPA tagihan/laporan/pembukuan.
             'kasir' => [
-                'view_dashboard', 'view_keuangan', 'setor_tabungan', 'operate_pos', 'view_santri',
+                'view_dashboard', 'view_santri', 'operate_pos', 'setor_tabungan', 'view_tabungan',
             ],
+            // Dewan Pembina = pengawas: lihat laporan keuangan & pimpinan (read-only).
             'dewan_pembina' => [
-                'view_dashboard', 'view_keuangan', 'view_ledger',
-                'view_laporan_pimpinan', 'view_santri',
+                'view_dashboard', 'view_santri',
+                'view_laporan_keuangan', 'view_ledger', 'view_laporan_pimpinan',
             ],
             'asatidz' => [
                 'view_dashboard', 'view_slip_sendiri',

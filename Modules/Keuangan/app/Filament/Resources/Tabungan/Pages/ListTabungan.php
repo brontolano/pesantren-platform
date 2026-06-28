@@ -28,7 +28,7 @@ class ListTabungan extends ListRecords
                 'label' => 'Import Saldo Awal',
                 'service' => TabunganSaldoImportService::class,
                 'directory' => 'imports/keuangan/tabungan/uploads',
-                'ability' => 'manage_keuangan',
+                'ability' => 'manage_tabungan',
                 'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nis (wajib), saldo_awal (wajib, angka), keterangan. Membuat transaksi pembuka tabungan. Idempoten: santri yang sudah punya saldo awal dilewati. Dry-run dulu.',
             ]),
         ];
