@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Services;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Tagihan;
@@ -93,7 +94,7 @@ class TagihanRutinService
     /**
      * Query santri AKTIF sesuai target aturan (semua/lembaga/kelas/tingkat).
      *
-     * @return \Illuminate\Database\Eloquent\Builder<Santri>
+     * @return Builder<Santri>
      */
     private function resolveSantri(TagihanRutin $aturan)
     {
