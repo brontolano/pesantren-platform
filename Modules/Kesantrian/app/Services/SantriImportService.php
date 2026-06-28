@@ -565,7 +565,15 @@ class SantriImportService
      */
     private function normalizeIdNumber(string $value): string
     {
-        return preg_replace('/\D+/', '', trim($value)) ?? '';
+        $value = trim($value);
+
+        // Buang bagian desimal artefak float ('3204...003.0' → '3204...003')
+        // SEBELUM strip non-digit, agar '.0' tak ikut jadi digit '0' ekstra.
+        if (str_contains($value, '.')) {
+            $value = explode('.', $value)[0];
+        }
+
+        return preg_replace('/\D+/', '', $value) ?? '';
     }
 
     /**
