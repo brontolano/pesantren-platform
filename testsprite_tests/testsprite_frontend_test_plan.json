@@ -1,0 +1,482 @@
+[
+  {
+    "id": "TC001",
+    "title": "Open the landing page and access staff sign-in",
+    "description": "This verifies that a visitor can view the public landing page and continue to the staff login page from the main call to action.",
+    "category": "Marketing Landing",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the platform overview content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link or button to continue to staff sign-in"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the staff sign-in page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Read the privacy policy and return to the landing page",
+    "description": "This verifies that a public visitor can open the privacy policy page, read the static content, and return to the landing page.",
+    "category": "Legal and Info Pages",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /kebijakan-privasi"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the privacy policy content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link or control that returns to the landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the landing page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Open the public PPDB page on a tenant context and complete registration",
+    "description": "This verifies that a prospective student can access the tenant-scoped admission form, submit the required information, and see a successful completion state.",
+    "category": "Public PPDB Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /ppdb"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the admission registration form is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the applicant information fields with valid values"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a successful submission confirmation is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Read the terms of service and return to the landing page",
+    "description": "This verifies that a public visitor can open the terms page, read the static content, and return to the landing page.",
+    "category": "Legal and Info Pages",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /syarat-layanan"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the terms of service content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link or control that returns to the landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the landing page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Open the landing page and reach documentation",
+    "description": "This verifies that a visitor can view the landing page and open the documentation portal from the public navigation.",
+    "category": "Marketing Landing",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the landing page overview content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open documentation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the documentation portal is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Read the disclaimer and return to the landing page",
+    "description": "This verifies that a public visitor can open the disclaimer page, read the static content, and return to the landing page.",
+    "category": "Legal and Info Pages",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /disclaimer"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the disclaimer content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link or control that returns to the landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the landing page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Legacy login path opens staff sign-in",
+    "description": "This verifies that the legacy login route takes a visitor to the branded staff sign-in experience.",
+    "category": "Staff/Portal Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the staff sign-in page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Read the cookie policy and return to the landing page",
+    "description": "This verifies that a public visitor can open the cookie policy page, read the static content, and return to the landing page.",
+    "category": "Legal and Info Pages",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /cookie-policy"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the cookie policy content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link or control that returns to the landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the landing page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Open a legal page from the landing page",
+    "description": "This verifies that a visitor can open a static legal or informational page from the public landing page and see its content.",
+    "category": "Marketing Landing",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to open a legal or informational page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the legal or informational page content is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Browse the documentation home and open a guide section",
+    "description": "This verifies that a public visitor can open the documentation portal, browse between guide sections, and read a selected guide topic.",
+    "category": "Documentation Portal",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /dokumentasi"
+      },
+      {
+        "type": "action",
+        "description": "Open a guide section from the documentation home"
+      },
+      {
+        "type": "action",
+        "description": "Open another guide section from the documentation navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected guide content is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Read the contact page and return to the landing page",
+    "description": "This verifies that a public visitor can open the contact page, read the contact information, and return to the landing page.",
+    "category": "Legal and Info Pages",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /kontak"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the contact information is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link or control that returns to the landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the landing page is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Read documentation and move between guide sections",
+    "description": "This verifies that a visitor can open the documentation portal and browse between supporting guidance sections.",
+    "category": "Marketing Landing",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /dokumentasi"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the documentation content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click a documentation section link"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selected guidance content is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Return to the landing page from a legal page",
+    "description": "This verifies that a visitor can open a legal page and then navigate back to the landing page.",
+    "category": "Marketing Landing",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /kebijakan-privasi"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the privacy policy content is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to return to the landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the landing page is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Show required-field validation on empty sign-in form",
+    "description": "This verifies that submitting the staff sign-in form without required values shows validation feedback.",
+    "category": "Staff/Portal Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /masuk"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form without entering credentials"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation errors are displayed for the required sign-in fields"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC015",
+    "title": "Read the account deletion information and return to the landing page",
+    "description": "This verifies that a public visitor can open the account deletion page, read the compliance information, and return to the landing page.",
+    "category": "Legal and Info Pages",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /hapus-akun"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the account deletion information is displayed"
+      },
+      {
+        "type": "action",
+        "description": "Click the link or control that returns to the landing page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the landing page is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC016",
+    "title": "Show authentication error for incorrect password",
+    "description": "This verifies that a visitor who enters valid-looking credentials with an incorrect password sees an authentication error message.",
+    "category": "Staff/Portal Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /masuk"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with an incorrect password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an authentication error message is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC017",
+    "title": "Open the account deletion page and read the compliance content",
+    "description": "This verifies that a public visitor can open the account deletion page and see the required deletion-request information.",
+    "category": "Marketing Landing",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /hapus-akun"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the account deletion request content is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC018",
+    "title": "Show sign-in validation for an invalid email format",
+    "description": "This verifies that the staff sign-in form rejects an invalid email format before submission is accepted.",
+    "category": "Staff/Portal Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /masuk"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with an invalid email format"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with a password value"
+      },
+      {
+        "type": "action",
+        "description": "Submit the sign-in form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an email validation error is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC019",
+    "title": "Open the public PPDB page on the central host",
+    "description": "This verifies that opening the tenant-scoped admission page without a resolved tenant shows an unavailable or redirect state instead of the registration form.",
+    "category": "Public PPDB Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /ppdb"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the admission registration form is not displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an unavailable or redirect state is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC020",
+    "title": "Open the public donation page on the central host",
+    "description": "This verifies that opening the tenant-scoped donation page without a resolved tenant shows an unavailable or redirect state instead of the donation experience.",
+    "category": "Public PPDB Registration",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /donasi"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the donation page is not displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an unavailable or redirect state is displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]
