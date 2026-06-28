@@ -35,7 +35,7 @@ class DasborPimpinan extends Page
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
             && static::moduleVisible('ledger')
-            && (Auth::user()?->canAny(['view_laporan_pimpinan', 'view_ledger', 'manage_ledger']) ?? false);
+            && (Auth::user()?->canAny(['view_laporan_pimpinan', 'akses_pimpinan']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

@@ -35,7 +35,7 @@ class DosirAsesmen extends Page
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
             && static::moduleVisible('ledger')
-            && (Auth::user()?->canAny(['view_laporan_pimpinan', 'view_ledger', 'manage_mutu']) ?? false);
+            && (Auth::user()?->canAny(['view_laporan_pimpinan', 'manage_mutu', 'approve_mutu']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

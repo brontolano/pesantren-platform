@@ -34,7 +34,7 @@ class CrmDashboard extends Page
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
             && static::moduleVisible('crm')
-            && (Auth::user()?->canAny(['view_laporan_pimpinan', 'manage_keuangan']) ?? false);
+            && (Auth::user()?->canAny(['view_laporan_pimpinan', 'view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
