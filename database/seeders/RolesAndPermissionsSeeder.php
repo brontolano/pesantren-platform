@@ -43,6 +43,19 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage_notifikasi',
             'view_akademik',
             'manage_akademik',
+            // Granular per-modul spesialis (2026-06-28) — agar visibilitas modul
+            // selaras FUNGSI peran, bukan menumpang view_santri/view_akademik yang
+            // membuat petugas UKS/konselor/asrama melihat modul di luar fungsinya.
+            'view_kesehatan',
+            'manage_kesehatan',
+            'view_konseling',
+            'manage_konseling',
+            'view_asrama',
+            'manage_asrama',
+            'view_kegiatan',
+            'manage_kegiatan',
+            'view_tahfidz',
+            'manage_tahfidz',
             'view_own_children',
             // F1-PWA — gerbang masuk PWA Guru (/guru): guru mapel, guru
             // tahfidz/musyrif, asatidz, dan kepala (pemantauan).
@@ -104,6 +117,23 @@ class RolesAndPermissionsSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
+        // Grant kas/keuangan operasional — dipakai bersama oleh 'keuangan' &
+        // aliasnya 'bendahara' (satu sumber, mencegah dua daftar drift).
+        $kasKeuanganGrants = [
+            'view_dashboard',
+            'view_keuangan',
+            'manage_keuangan',
+            'view_ledger',
+            'manage_ledger',
+            'manage_dana_kebajikan',
+            'input_belanja',
+            'manage_pajak',
+            'setor_tabungan',
+            'operate_pos',
+            'view_notifikasi',
+            'view_santri',
+        ];
+
         $rolePermissions = [
             'super_admin' => Permission::query()->pluck('name')->all(),
             'admin_pesantren' => [
@@ -120,6 +150,16 @@ class RolesAndPermissionsSeeder extends Seeder
                 'manage_notifikasi',
                 'view_akademik',
                 'manage_akademik',
+                'view_kesehatan',
+                'manage_kesehatan',
+                'view_konseling',
+                'manage_konseling',
+                'view_asrama',
+                'manage_asrama',
+                'view_kegiatan',
+                'manage_kegiatan',
+                'view_tahfidz',
+                'manage_tahfidz',
                 'manage_mutu',
                 'kelola_approval',
                 'lihat_audit',
@@ -144,40 +184,18 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_santri',
                 'manage_santri',
                 'view_akademik',
+                'view_asrama',
+                'manage_asrama',
+                'view_kegiatan',
+                'manage_kegiatan',
                 // T-A052 — TU ikut melayani Kotak Masuk WA chatbot.
                 'ai.chat.kelola',
                 // 1-aplikasi (Fase 2c) — moderasi komentar publik.
                 'moderasi_komentar',
             ],
-            'keuangan' => [
-                'view_dashboard',
-                'view_keuangan',
-                'manage_keuangan',
-                'view_ledger',
-                'manage_ledger',
-                'manage_dana_kebajikan',
-                'input_belanja',
-                'manage_pajak',
-                'setor_tabungan',
-                'operate_pos',
-                'view_notifikasi',
-                'view_santri',
-            ],
+            'keuangan' => $kasKeuanganGrants,
             // Alias bendahara — sama persis dengan 'keuangan' (demo seeder memakai role ini).
-            'bendahara' => [
-                'view_dashboard',
-                'view_keuangan',
-                'manage_keuangan',
-                'view_ledger',
-                'manage_ledger',
-                'manage_dana_kebajikan',
-                'input_belanja',
-                'manage_pajak',
-                'setor_tabungan',
-                'operate_pos',
-                'view_notifikasi',
-                'view_santri',
-            ],
+            'bendahara' => $kasKeuanganGrants,
             // --- Peran Baitul Maal (modul Keuangan Digital) ---
             'bendahara_pusat' => [
                 'view_dashboard', 'view_keuangan', 'manage_keuangan',
@@ -218,6 +236,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 'ai.generator.ikhtisar',
                 // F1-PWA — asatidz juga pengajar lapangan.
                 'akses_pwa_guru',
+                // Pengajar tahfidz/kitab — modul Tahfidz.
+                'view_tahfidz',
+                'manage_tahfidz',
             ],
             'guru' => [
                 'view_dashboard',
@@ -233,6 +254,9 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_santri',
                 'view_akademik',
                 'manage_akademik',
+                // Modul Tahfidz — musyrif/guru tahfidz.
+                'view_tahfidz',
+                'manage_tahfidz',
                 'akses_pwa_guru',
                 // F3-PWA — Slip Saya: guru melihat/cetak slip MILIKNYA sendiri.
                 'view_slip_sendiri',
@@ -240,15 +264,23 @@ class RolesAndPermissionsSeeder extends Seeder
             'konselor' => [
                 'view_dashboard',
                 'view_santri',
+                // Modul Konseling (sesi konseling) — terpisah dari UKS medis.
+                'view_konseling',
+                'manage_konseling',
             ],
             'pengelola_uks' => [
                 'view_dashboard',
                 'view_santri',
+                // Modul Kesehatan/UKS — kunjungan, obat, riwayat kesehatan.
+                'view_kesehatan',
+                'manage_kesehatan',
             ],
             'pengelola_asrama' => [
                 'view_dashboard',
                 'view_santri',
-                'manage_santri',
+                // Modul Asrama — blok/kamar/penempatan + biaya asrama.
+                'view_asrama',
+                'manage_asrama',
             ],
             'kepala' => [
                 'view_dashboard',
@@ -256,6 +288,12 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_keuangan',
                 'view_notifikasi',
                 'view_akademik',
+                // Pengawasan pimpinan (view-only) atas modul operasional.
+                'view_kesehatan',
+                'view_konseling',
+                'view_asrama',
+                'view_kegiatan',
+                'view_tahfidz',
                 'manage_tenant_settings',
                 // SPMI — kepala melihat & MENYETUJUI mutu (segregasi: admin_pesantren
                 // hanya menyusun/manage, tak punya approve_mutu).
@@ -270,6 +308,20 @@ class RolesAndPermissionsSeeder extends Seeder
                 'akses_pimpinan',
                 // 1-aplikasi (Fase 2c) — moderasi komentar publik.
                 'moderasi_komentar',
+            ],
+            // IT — admin teknis/sistem (sebelumnya ada di DB tanpa definisi seeder).
+            // Fokus infrastruktur: modul, user/role, pengaturan, audit, dokumen.
+            // TANPA akses data santri/keuangan secara default (bukan fungsinya).
+            'IT' => [
+                'view_dashboard',
+                'manage_modules',
+                'manage_users',
+                'manage_roles',
+                'manage_tenant_settings',
+                'lihat_audit',
+                'kelola_dokumen',
+                'view_notifikasi',
+                'manage_notifikasi',
             ],
             'wali' => [
                 'view_own_children',

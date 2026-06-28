@@ -26,7 +26,7 @@ class SesiKonselingResource extends Resource
     /** Mode simple: menu lanjutan disembunyikan (fungsi & route tetap aktif). */
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::navAdvanced('kesehatan_lanjut');
+        return UiMode::navAdvanced('kesehatan_lanjut') && static::canAccess();
     }
 
     use ModuleGate;
@@ -118,6 +118,6 @@ class SesiKonselingResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_santri') ?? false);
+        return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_konseling') ?? false);
     }
 }

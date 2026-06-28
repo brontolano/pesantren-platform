@@ -36,22 +36,22 @@ class KamarAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_asrama', 'manage_asrama']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_asrama', 'manage_asrama']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_asrama') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_asrama') ?? false;
     }
 
     public static function form(Schema $schema): Schema

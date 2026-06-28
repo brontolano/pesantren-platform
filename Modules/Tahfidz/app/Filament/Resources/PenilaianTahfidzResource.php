@@ -28,12 +28,12 @@ class PenilaianTahfidzResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('tahfidz');
+        return UiMode::advanced() && static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('tahfidz');
+        return static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     protected static ?string $model = PenilaianTahfidz::class;

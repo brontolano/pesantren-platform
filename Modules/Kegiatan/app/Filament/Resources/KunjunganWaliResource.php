@@ -26,7 +26,7 @@ class KunjunganWaliResource extends Resource
     /** Mode simple: menu lanjutan disembunyikan (fungsi & route tetap aktif). */
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced();
+        return UiMode::advanced() && static::canAccess();
     }
 
     use ModuleGate;
@@ -86,6 +86,6 @@ class KunjunganWaliResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
+        return static::moduleVisible('kegiatan') && (auth()->user()?->can('view_kegiatan') ?? false);
     }
 }

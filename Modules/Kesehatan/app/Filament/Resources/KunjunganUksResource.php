@@ -145,6 +145,6 @@ class KunjunganUksResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_santri') ?? false);
+        return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_kesehatan') ?? false);
     }
 }

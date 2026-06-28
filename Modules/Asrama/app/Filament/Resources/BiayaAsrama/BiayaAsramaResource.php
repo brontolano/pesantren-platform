@@ -38,22 +38,22 @@ class BiayaAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_asrama']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_asrama']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_asrama']) ?? false);
     }
 
     public static function canEdit(Model $record): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_asrama']) ?? false);
     }
 
     public static function form(Schema $schema): Schema

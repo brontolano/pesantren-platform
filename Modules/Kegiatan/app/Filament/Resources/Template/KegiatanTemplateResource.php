@@ -45,7 +45,7 @@ class KegiatanTemplateResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
+        return UiMode::advanced() && static::moduleVisible('kegiatan') && (auth()->user()?->can('view_kegiatan') ?? false);
     }
 
     public static function canAccess(): bool
