@@ -28,6 +28,34 @@ class UserResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Users';
 
+    /**
+     * Label RAMAH untuk dropdown Role (form User): slug teknis → bahasa staf
+     * pesantren. Hanya untuk TAMPILAN — nilai opsi tetap role_id (lihat field
+     * 'roles' yang pakai relationship()). Peran eksternal (santri/wali/jemaah/
+     * peserta) & alias 'keuangan' sengaja tak masuk daftar (disembunyikan).
+     *
+     * @var array<string, string>
+     */
+    private const ROLE_LABELS = [
+        'super_admin' => 'Super Admin (akses penuh / pemilik)',
+        'admin_pesantren' => 'Admin Pesantren (administrator)',
+        'kepala' => 'Kepala / Kyai (pimpinan)',
+        'tu' => 'Tata Usaha (administrasi)',
+        'guru' => 'Guru (mata pelajaran)',
+        'guru_tahfidz' => 'Guru Tahfidz / Musyrif',
+        'asatidz' => 'Ustadz / Asatidz (pengajar kitab)',
+        'bendahara' => 'Bendahara / Kasir Unit (keuangan)',
+        'bendahara_pusat' => 'Bendahara Pusat / Yayasan',
+        'kepala_keuangan' => 'Kepala Keuangan',
+        'kasir' => 'Kasir (kantin / POS)',
+        'operator_divisi' => 'Operator Divisi / Unit',
+        'dewan_pembina' => 'Dewan Pembina (pengawas)',
+        'konselor' => 'Konselor / Guru BK',
+        'pengelola_uks' => 'Petugas UKS / Kesehatan',
+        'pengelola_asrama' => 'Pengasuh Asrama / Musyrif',
+        'IT' => 'IT / Admin Teknis',
+    ];
+
     protected static ?int $navigationSort = 2;
 
     public static function shouldRegisterNavigation(): bool
@@ -77,24 +105,28 @@ class UserResource extends Resource
                 ->dehydrated(fn (?string $state): bool => filled($state))
                 ->maxLength(255),
             Select::make('roles')
-                ->label('Role')
+                ->label('Role / Peran')
+                ->helperText('Peran menentukan menu & akses yang terlihat staf. Untuk PEGAWAI, peran biasanya TER-ISI OTOMATIS dari Jabatan/Penugasan — pilih manual di sini hanya bila perlu.')
                 // relationship() menyetir opsi: value = ID role (cocok pivot
                 // model_has_roles.role_id). JANGAN override ->options() dgn nama —
                 // value jadi nama → relationship resolve "where roles.id='<nama>'"
                 // → 500 (bigint vs string). Urutan abjad lewat query relationship.
-                // Sembunyikan peran EKSTERNAL/komunitas (santri/wali/jemaah/peserta):
-                // itu diberikan OTOMATIS oleh sistem (SantriAccountService, dll) saat
-                // akun santri/wali/jemaah/calon-santri dibuat — bukan di-assign manual
-                // ke akun staf di sini. Mengurangi kekisruhan & cegah salah-assign.
+                // Sembunyikan peran EKSTERNAL/komunitas (santri/wali/jemaah/peserta)
+                // — diberikan OTOMATIS oleh sistem (SantriAccountService, dll) saat
+                // akun santri/wali/jemaah/calon-santri dibuat — dan alias 'keuangan'
+                // (kembar 'bendahara') agar tak membingungkan. Label DITAMPILKAN ramah
+                // via getOptionLabelFromRecordUsing (nilai tetap role_id).
                 ->relationship(
                     'roles',
                     'name',
                     fn (Builder $query): Builder => $query
-                        ->whereNotIn('name', ['santri', 'wali', 'jemaah', 'peserta'])
+                        ->whereNotIn('name', ['santri', 'wali', 'jemaah', 'peserta', 'keuangan'])
                         ->orderBy('name'),
                 )
+                ->getOptionLabelFromRecordUsing(fn (Model $record): string => self::ROLE_LABELS[$record->name] ?? $record->name)
                 ->multiple()
                 ->preload()
+                ->searchable()
                 ->required(),
         ]);
     }
@@ -112,9 +144,11 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('roles.name')
-                    ->label('Role')
+                    ->label('Role / Peran')
                     ->badge()
-                    ->separator(','),
+                    ->separator(',')
+                    // Tampilkan label ramah yang sama dgn dropdown (slug → bahasa staf).
+                    ->formatStateUsing(fn (string $state): string => self::ROLE_LABELS[$state] ?? $state),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')
