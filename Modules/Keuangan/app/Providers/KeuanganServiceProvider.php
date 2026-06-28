@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\Keuangan\Console\TerbitkanTagihanRutinCommand;
 
 class KeuanganServiceProvider extends ServiceProvider
 {
@@ -14,6 +15,11 @@ class KeuanganServiceProvider extends ServiceProvider
     {
         $this->registerConfig();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+
+        // Penerbitan Tagihan Rutin otomatis (terjadwal harian di routes/console.php).
+        $this->commands([
+            TerbitkanTagihanRutinCommand::class,
+        ]);
     }
 
     public function register(): void

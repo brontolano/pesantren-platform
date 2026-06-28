@@ -117,6 +117,7 @@ use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatementResource;
 use Modules\Keuangan\Filament\Resources\SetorKeliling\SetorKelilingResource;
 use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
+use Modules\Keuangan\Filament\Resources\TagihanRutin\TagihanRutinResource;
 use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
 use Modules\Keuangan\Filament\Resources\TabunganTopup\TabunganTopupResource;
 use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
@@ -600,6 +601,8 @@ class TenantPanelProvider extends PanelProvider
             BankStatementResource::class,
             // Skema Biaya / Pricing (G2-16)
             SkemaBiayaResource::class,
+            // Tagihan Rutin (langganan SPP/makan/asrama — auto-generate terjadwal)
+            TagihanRutinResource::class,
             // Procurement (G2-09)
             SupplierResource::class,
             PurchaseOrderResource::class,
