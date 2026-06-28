@@ -73,6 +73,12 @@ class PengaturanBranding extends Page implements HasForms
      */
     public ?string $currentFaviconPath = null;
 
+    /**
+     * Path foto tokoh/hero login (mis. foto pengasuh/sesepuh) yang tampil di
+     * panel kiri halaman /masuk, di samping kalimat Bismillah. Pola sama logo.
+     */
+    public ?string $currentHeroPath = null;
+
     /** Pilihan font branding (key => label). */
     public const FONTS = [
         'default' => 'Default Sans',
@@ -113,6 +119,9 @@ class PengaturanBranding extends Page implements HasForms
         $this->currentFaviconPath = data_get($settings->get('branding_favicon')?->value, 'favicon_path')
             ?? data_get($settings->get('branding_favicon')?->value, 'text');
 
+        // Foto tokoh/hero login — path tersimpan dipegang property terpisah.
+        $this->currentHeroPath = data_get($settings->get('branding_hero_image')?->value, 'path');
+
         // gap-131: default Tahun Ajaran mengikuti PeriodeAkademik aktif bila ada,
         // fallback ke nilai tersimpan, lalu '2026/2027'.
         $defaultAcademicYear = data_get($settings->get('admission_academic_year')?->value, 'text', '2026/2027');
@@ -130,6 +139,7 @@ class PengaturanBranding extends Page implements HasForms
             'branding_secondary_color' => data_get($settings->get('branding_secondary_color')?->value, 'color', self::DEFAULT_SECONDARY),
             'branding_logo' => null,   // SENGAJA null — lihat komentar di atas
             'branding_favicon' => null,   // SENGAJA null — pola sama dengan logo
+            'branding_hero_image' => null,   // SENGAJA null — pola sama dengan logo
             'branding_font' => data_get($settings->get('branding_font')?->value, 'text', 'default'),
             'branding_latitude' => data_get($settings->get('branding_latitude')?->value, 'text'),
             'branding_longitude' => data_get($settings->get('branding_longitude')?->value, 'text'),
@@ -203,6 +213,19 @@ class PengaturanBranding extends Page implements HasForms
                             ->helperText('ICO/PNG, maks 512 KB. Favicon lama tetap aktif sampai ada yang baru.'),
                     ])
                     ->columns(2),
+
+                Section::make('Foto Tokoh (Hero Login)')
+                    ->description('Foto pengasuh/sesepuh pesantren yang tampil di sisi kiri halaman masuk, di samping kalimat Bismillah. Sebaiknya foto dengan latar transparan (PNG/WebP) agar menyatu rapi.')
+                    ->schema([
+                        FileUpload::make('branding_hero_image')
+                            ->label('Upload Foto Tokoh Baru')
+                            ->disk(StorageQuotaService::diskName())
+                            ->directory('branding')
+                            ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->maxSize(4096)
+                            ->helperText('JPG/PNG/WebP (PNG transparan disarankan), maks 4 MB. Foto lama tetap aktif sampai ada yang baru.'),
+                    ]),
 
                 Section::make('Lokasi & Jadwal Sholat')
                     ->description('Koordinat pesantren untuk perhitungan jadwal sholat di dashboard (metode Kemenag, zona WIB). Kosongkan untuk memakai default Bandung.')
@@ -291,6 +314,16 @@ class PengaturanBranding extends Page implements HasForms
             $this->currentFaviconPath = $newFaviconPath;
         }
 
+        // Foto tokoh/hero: pola sama logo. Disimpan sebagai 'path' agar terbaca
+        // oleh TenantBranding::heroImageUrl (getTenantStringValue kandidat 'path').
+        $newHeroPath = $data['branding_hero_image'] ?? null;
+        $heroPath = $newHeroPath ?: $this->currentHeroPath;
+
+        if ($newHeroPath) {
+            $this->registerLogoAsMediaFile($newHeroPath);
+            $this->currentHeroPath = $newHeroPath;
+        }
+
         $payloads = [
             'branding_name' => ['text' => $data['branding_name'] ?? null],
             'branding_tagline' => ['text' => $data['branding_tagline'] ?? null],
@@ -298,6 +331,7 @@ class PengaturanBranding extends Page implements HasForms
             'branding_secondary_color' => ['color' => $data['branding_secondary_color'] ?? null],
             'branding_logo' => ['logo_path' => $logoPath],
             'branding_favicon' => ['favicon_path' => $faviconPath],
+            'branding_hero_image' => ['path' => $heroPath],
             'branding_font' => ['text' => $data['branding_font'] ?? 'default'],
             'branding_latitude' => ['text' => $data['branding_latitude'] ?? null],
             'branding_longitude' => ['text' => $data['branding_longitude'] ?? null],
@@ -326,6 +360,7 @@ class PengaturanBranding extends Page implements HasForms
             'branding_secondary_color' => $data['branding_secondary_color'] ?? null,
             'branding_logo' => null,   // Selalu kosong pasca-save
             'branding_favicon' => null,   // Selalu kosong pasca-save (pola logo)
+            'branding_hero_image' => null,   // Selalu kosong pasca-save (pola logo)
             'branding_font' => $data['branding_font'] ?? 'default',
             'branding_latitude' => $data['branding_latitude'] ?? null,
             'branding_longitude' => $data['branding_longitude'] ?? null,
