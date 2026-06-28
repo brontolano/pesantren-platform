@@ -82,7 +82,17 @@ class UserResource extends Resource
                 // model_has_roles.role_id). JANGAN override ->options() dgn nama —
                 // value jadi nama → relationship resolve "where roles.id='<nama>'"
                 // → 500 (bigint vs string). Urutan abjad lewat query relationship.
-                ->relationship('roles', 'name', fn (Builder $query): Builder => $query->orderBy('name'))
+                // Sembunyikan peran EKSTERNAL/komunitas (santri/wali/jemaah/peserta):
+                // itu diberikan OTOMATIS oleh sistem (SantriAccountService, dll) saat
+                // akun santri/wali/jemaah/calon-santri dibuat — bukan di-assign manual
+                // ke akun staf di sini. Mengurangi kekisruhan & cegah salah-assign.
+                ->relationship(
+                    'roles',
+                    'name',
+                    fn (Builder $query): Builder => $query
+                        ->whereNotIn('name', ['santri', 'wali', 'jemaah', 'peserta'])
+                        ->orderBy('name'),
+                )
                 ->multiple()
                 ->preload()
                 ->required(),
