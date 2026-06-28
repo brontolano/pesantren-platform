@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
     {{-- ===== Banner sambutan — gradient WA-green (light) / TikTok-dark (dark) ===== --}}
     <div class="tema-greeting relative isolate overflow-hidden rounded-2xl px-6 py-5 text-white shadow-sm sm:px-8 sm:py-6
-                bg-gradient-to-r from-[#004a38] via-[#008069] to-[#00a884]
+                bg-gradient-to-r from-[#0b8f63] via-[#059669] to-[#047857]
                 dark:from-[#0f1c14] dark:via-[#161823] dark:to-[#1a243a]">
 
         {{-- Ornamen bulat samar kanan atas --}}
@@ -191,11 +191,11 @@
                         <div
                             class="flex min-w-[3.25rem] flex-col items-center rounded-xl px-2.5 py-2 text-center transition"
                             :class="p.key === nextKey
-                                ? 'bg-white text-[#008069] shadow-sm dark:bg-[#00a884] dark:text-white'
+                                ? 'bg-white text-[#059669] shadow-sm dark:bg-[#10b981] dark:text-white'
                                 : 'text-white/85'"
                         >
                             <span class="text-[10px] font-semibold uppercase tracking-wide"
-                                  :class="p.key === nextKey ? 'text-[#008069]/80 dark:text-white/90' : 'text-white/60'"
+                                  :class="p.key === nextKey ? 'text-[#059669]/80 dark:text-white/90' : 'text-white/60'"
                                   x-text="p.label"></span>
                             <span class="mt-0.5 text-sm font-bold tabular-nums" x-text="p.time"></span>
                         </div>
