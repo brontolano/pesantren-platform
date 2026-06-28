@@ -115,6 +115,39 @@
             </div>
         @endif
 
+        {{-- Live Preview iFrame --}}
+        <div class="space-y-4 border-t border-gray-200 pt-8 dark:border-gray-700">
+            <div>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">👁️ Pratinjau Langsung</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Preview diperbarui real-time saat Anda memilih tema & warna.
+                </p>
+            </div>
+
+            <div class="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+                <iframe
+                    id="theme-preview-frame"
+                    class="h-96 w-full"
+                    title="Preview Tema"
+                    srcdoc="{{ htmlspecialchars($this->generatePreviewHtml()) }}"
+                ></iframe>
+            </div>
+
+            <script>
+                // Real-time CSS var injection ke iFrame saat Livewire update
+                document.addEventListener('livewire:updated', function(event) {
+                    const frame = document.getElementById('theme-preview-frame');
+                    if (frame && frame.contentDocument) {
+                        const style = frame.contentDocument.querySelector('style[data-theme-css]');
+                        if (style) {
+                            const cssVars = '{{ $this->previewCssVars() }}';
+                            style.textContent = ':root { ' + cssVars + ' }';
+                        }
+                    }
+                });
+            </script>
+        </div>
+
         {{-- Action Buttons --}}
         <div class="flex gap-3 border-t border-gray-200 pt-6 dark:border-gray-700">
             @if ($this->previewTheme !== $this->selectedTheme || $this->previewColor !== $this->selectedColor)

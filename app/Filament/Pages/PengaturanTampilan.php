@@ -185,4 +185,152 @@ class PengaturanTampilan extends Page
         ));
     }
 
+    /**
+     * Generate preview HTML yang embedded di iFrame.
+     * CSS vars akan di-inject secara real-time via JS.
+     */
+    public function generatePreviewHtml(): string
+    {
+        $cssVars = htmlspecialchars($this->previewCssVars());
+        $themeName = htmlspecialchars(PanelTheme::THEMES[$this->previewTheme]['label'] ?? '');
+
+        return <<<HTML
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Preview Tema</title>
+    <style data-theme-css>
+        :root { {$cssVars} }
+    </style>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 200px;
+            background: var(--tema-sidebar-header, #ffffff);
+            border-right: 1px solid var(--tema-sidebar-header-border, #e5e7eb);
+            padding: 16px;
+            box-shadow: inset -1px 0 0 rgba(0,0,0,0.05);
+        }
+        .sidebar-logo {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+        .sidebar-item {
+            padding: 10px 12px;
+            margin: 4px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #6b7280;
+            transition: all 200ms;
+        }
+        .sidebar-item.active {
+            background: var(--tema-active-bg, #ecfdf5);
+            color: var(--tema-active-fg, #047857);
+            font-weight: 600;
+        }
+        .sidebar-item:hover:not(.active) {
+            background: rgba(0,0,0,0.04);
+        }
+        .content {
+            flex: 1;
+            padding: 32px;
+            background: #fafafa;
+        }
+        .header {
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+        .header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 12px 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+        .card p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background: var(--tema-sidebar-header, #059669);
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 200ms;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .theme-name {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-logo">Pesantren</div>
+            <div class="sidebar-item active">📊 Dashboard</div>
+            <div class="sidebar-item">👥 Santri</div>
+            <div class="sidebar-item">💰 Keuangan</div>
+            <div class="sidebar-item">📚 Akademik</div>
+            <div class="sidebar-item">⚙️ Pengaturan</div>
+        </div>
+        <div class="content">
+            <div class="header">
+                <h1>Pratinjau Tema</h1>
+                <p>Perubahan diterapkan real-time saat Anda memilih tema & warna.</p>
+            </div>
+            <div class="card">
+                <h3>Contoh Kartu Panel</h3>
+                <p>Kartu ini menunjukkan styling dengan palet warna pilihan. Perhatikan warna sidebar & elemen interaktif.</p>
+                <button class="btn">Aksi Contoh</button>
+                <div class="theme-name">Tema: {$themeName}</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
+    }
+
 }
