@@ -131,7 +131,7 @@ Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('te
 // Dipakai app Android (WebView memuat /app): tampilan ber-bottom-nav (Beranda ·
 // Ibadah · Kabar · Akun · Info) dari konten CMS/branding yang sama dgn landing,
 // agar pengunjung app tak "lari" ke halaman marketing. Aditif — tak mengubah '/'.
-Route::get('/app', AppShellController::class)->name('tenant.app-shell');
+Route::get('/beranda', AppShellController::class)->name('tenant.app-shell');
 
 Route::get('/masuk', [StaffLoginController::class, 'show'])->name('tenant.masuk.show');
 Route::post('/masuk', [StaffLoginController::class, 'store'])
