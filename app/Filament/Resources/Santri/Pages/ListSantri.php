@@ -39,8 +39,38 @@ class ListSantri extends ListRecords
                 'service' => SantriImportService::class,
                 'directory' => 'imports/kesantrian/santri/uploads',
                 'ability' => 'manage_santri',
-                'template' => ['nis', 'nama', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'nik', 'nisn', 'kelas', 'tahun_angkatan', 'status', 'nama_ayah', 'nama_ibu', 'no_hp_wali', 'email_wali', 'alamat'],
-                'template_contoh' => ['2024001', 'Ahmad Fauzi', 'L', 'Bandung', '2010-05-17', '3273010101100001', '0098765432', '7 A', '2024', 'aktif', 'Bapak Fulan', 'Ibu Fulanah', '081234567890', 'wali@contoh.com', 'Jl. Merdeka No. 1'],
+                // Template PERSIS field form "Buat Santri" panel admin, urut per-section:
+                // Data Pribadi → Alamat Santri → Data Ayah (+alamat) → Data Ibu (+alamat) →
+                // Akun Wali (+alamat) → Akademik. Foto dilewati (upload, bukan teks Excel).
+                // Hanya nis, nama, jenis_kelamin, tanggal_lahir yang WAJIB.
+                'template' => [
+                    // Data Pribadi
+                    'nis', 'nama', 'tanggal_lahir', 'tempat_lahir', 'jenis_kelamin', 'agama', 'nik', 'nisn', 'asal_sekolah',
+                    // Alamat Santri
+                    'alamat', 'rt_rw', 'kode_pos', 'provinsi', 'kabupaten_kota', 'kecamatan', 'desa_kelurahan',
+                    // Data Ayah (+ Alamat Ayah)
+                    'nama_ayah', 'pekerjaan_ayah', 'no_hp_ayah', 'alamat_ayah', 'rt_rw_ayah', 'kode_pos_ayah', 'provinsi_ayah', 'kabupaten_kota_ayah', 'kecamatan_ayah', 'desa_kelurahan_ayah',
+                    // Data Ibu (+ Alamat Ibu)
+                    'nama_ibu', 'pekerjaan_ibu', 'no_hp_ibu', 'alamat_ibu', 'rt_rw_ibu', 'kode_pos_ibu', 'provinsi_ibu', 'kabupaten_kota_ibu', 'kecamatan_ibu', 'desa_kelurahan_ibu',
+                    // Akun Wali (+ Alamat Wali / Domisili Keluarga)
+                    'no_hp_wali', 'email_wali', 'alamat_wali', 'rt_rw_wali', 'kode_pos_wali', 'provinsi_wali', 'kabupaten_kota_wali', 'kecamatan_wali', 'desa_kelurahan_wali',
+                    // Akademik
+                    'kelas', 'tahun_angkatan', 'status',
+                ],
+                'template_contoh' => [
+                    // Data Pribadi
+                    '2024001', 'Ahmad Fauzi', '2010-05-17', 'Bandung', 'L', 'Islam', '3273010101100001', '0098765432', 'SDN Merdeka 1',
+                    // Alamat Santri
+                    'Jl. Merdeka No. 1', '003/008', '40132', 'Jawa Barat', 'Kota Bandung', 'Coblong', 'Sukamaju',
+                    // Data Ayah (+ Alamat Ayah)
+                    'Bapak Fulan', 'Wiraswasta', '081234567891', 'Jl. Merdeka No. 1', '003/008', '40132', 'Jawa Barat', 'Kota Bandung', 'Coblong', 'Sukamaju',
+                    // Data Ibu (+ Alamat Ibu)
+                    'Ibu Fulanah', 'Ibu Rumah Tangga', '081234567892', 'Jl. Merdeka No. 1', '003/008', '40132', 'Jawa Barat', 'Kota Bandung', 'Coblong', 'Sukamaju',
+                    // Akun Wali (+ Alamat Wali)
+                    '081234567890', 'wali@contoh.com', 'Jl. Merdeka No. 1', '003/008', '40132', 'Jawa Barat', 'Kota Bandung', 'Coblong', 'Sukamaju',
+                    // Akademik
+                    '7 A', '2024', 'aktif',
+                ],
                 'extraSummary' => fn (array $s): string => ($s['created_kelas'] ?? 0) > 0 ? 'Kelas baru dibuat: '.$s['created_kelas'] : '',
                 'petunjuk' => 'Impor data santri dari file Excel/CSV. Kolom WAJIB: nis, nama, jenis_kelamin (isi L atau P), tanggal_lahir. Kolom "kelas" akan dibuat otomatis bila belum ada. Baris dengan NIS yang sudah terdaftar akan DILEWATI (aman diulang). Centang "Validasi dulu (dry-run)" untuk mengecek tanpa menyimpan.',
             ]),

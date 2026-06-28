@@ -19,15 +19,25 @@ class SantriImportService
      * @var array<string, list<string>>
      */
     private const HEADER_ALIASES = [
+        // — Data pribadi —
         'nis' => ['nis', 'nomor_induk_santri', 'nomor induk santri'],
         'nama' => ['nama', 'nama_santri', 'nama santri', 'nama_lengkap', 'nama lengkap'],
+        'nama_panggilan' => ['nama_panggilan', 'nama panggilan', 'panggilan', 'nama_alias'],
         'tanggal_lahir' => ['tanggal_lahir', 'tanggal lahir', 'tgl_lahir', 'tgl lahir', 'birth_date'],
         'tempat_lahir' => ['tempat_lahir', 'tempat lahir'],
         'jenis_kelamin' => ['jenis_kelamin', 'jenis kelamin', 'jk', 'gender', 'kelamin'],
         'agama' => ['agama'],
         'nik' => ['nik', 'nomer_induk_kependudukan_(nik)', 'nomer_induk_kependudukan', 'nomor_induk_kependudukan'],
         'nisn' => ['nisn', 'nomer_induk_siswa_nasional', 'nomor_induk_siswa_nasional'],
+        'cita_cita' => ['cita_cita', 'cita cita', 'cita2'],
+        'anak_ke' => ['anak_ke', 'anak ke', 'anak_keberapa'],
+        'jumlah_saudara' => ['jumlah_saudara', 'jumlah saudara', 'jml_saudara', 'jumlah_saudara_kandung'],
+        // — Asal sekolah —
         'asal_sekolah' => ['asal_sekolah', 'asal sekolah', 'sekolah_asal', 'sekolah asal'],
+        'jenjang_asal' => ['jenjang_asal', 'jenjang asal', 'jenjang_sekolah_asal'],
+        'npsn' => ['npsn', 'npsn_asal', 'npsn_sekolah_asal'],
+        'tahun_lulus' => ['tahun_lulus', 'tahun lulus', 'tahun_lulus_asal'],
+        // — Alamat santri —
         'alamat' => ['alamat', 'alamat_lengkap', 'alamat lengkap', 'alamat_santri'],
         'rt_rw' => ['rt_rw', 'rt_rw_santri'],
         'desa_kelurahan' => ['desa_kelurahan', 'desa_kelurahan_santri'],
@@ -35,19 +45,57 @@ class SantriImportService
         'kabupaten_kota' => ['kabupaten_kota', 'kabupaten_kota_santri'],
         'provinsi' => ['provinsi', 'provinsi_santri'],
         'kode_pos' => ['kode_pos', 'kode_pos_santri'],
-        'no_hp_wali' => ['no_hp_wali', 'no hp wali', 'nomor_wali', 'nomor wali', 'hp_wali', 'wa_wali', 'nomor_telepon_wali', 'nomer_telepon_ayah', 'nomor_telepon_ayah', 'nomor_telepon_ibu'],
+        // — Data ayah —
+        'nama_ayah' => ['nama_ayah', 'nama ayah', 'ayah', 'nama_ayah_kandung'],
+        'nik_ayah' => ['nik_ayah', 'nik ayah'],
+        'pendidikan_ayah' => ['pendidikan_ayah', 'pendidikan ayah'],
+        'pekerjaan_ayah' => ['pekerjaan_ayah', 'pekerjaan ayah'],
+        'penghasilan_ayah' => ['penghasilan_ayah', 'penghasilan ayah'],
+        'no_hp_ayah' => ['no_hp_ayah', 'no hp ayah', 'hp_ayah', 'wa_ayah', 'nomor_telepon_ayah', 'nomer_telepon_ayah', 'telepon_ayah'],
+        'alamat_ayah' => ['alamat_ayah', 'alamat ayah'],
+        'rt_rw_ayah' => ['rt_rw_ayah'],
+        'desa_kelurahan_ayah' => ['desa_kelurahan_ayah'],
+        'kecamatan_ayah' => ['kecamatan_ayah'],
+        'kabupaten_kota_ayah' => ['kabupaten_kota_ayah'],
+        'provinsi_ayah' => ['provinsi_ayah'],
+        'kode_pos_ayah' => ['kode_pos_ayah'],
+        // — Data ibu —
+        'nama_ibu' => ['nama_ibu', 'nama ibu', 'ibu', 'nama_ibu_kandung'],
+        'nik_ibu' => ['nik_ibu', 'nik ibu'],
+        'pendidikan_ibu' => ['pendidikan_ibu', 'pendidikan ibu'],
+        'pekerjaan_ibu' => ['pekerjaan_ibu', 'pekerjaan ibu'],
+        'penghasilan_ibu' => ['penghasilan_ibu', 'penghasilan ibu'],
+        'no_hp_ibu' => ['no_hp_ibu', 'no hp ibu', 'hp_ibu', 'wa_ibu', 'nomor_telepon_ibu', 'nomer_telepon_ibu', 'telepon_ibu'],
+        'alamat_ibu' => ['alamat_ibu', 'alamat ibu'],
+        'rt_rw_ibu' => ['rt_rw_ibu'],
+        'desa_kelurahan_ibu' => ['desa_kelurahan_ibu'],
+        'kecamatan_ibu' => ['kecamatan_ibu'],
+        'kabupaten_kota_ibu' => ['kabupaten_kota_ibu'],
+        'provinsi_ibu' => ['provinsi_ibu'],
+        'kode_pos_ibu' => ['kode_pos_ibu'],
+        // — Data wali (penanggung jawab + akun portal) —
+        'nama_wali' => ['nama_wali', 'nama wali'],
+        'hubungan_wali' => ['hubungan_wali', 'hubungan wali', 'status_wali'],
+        'pekerjaan_wali' => ['pekerjaan_wali', 'pekerjaan wali'],
+        'penghasilan_wali' => ['penghasilan_wali', 'penghasilan wali'],
+        'pembiaya' => ['pembiaya', 'penanggung_biaya', 'penanggung biaya'],
+        'no_hp_wali' => ['no_hp_wali', 'no hp wali', 'nomor_wali', 'nomor wali', 'hp_wali', 'wa_wali', 'nomor_telepon_wali'],
+        'email_wali' => ['email_wali', 'email wali'],
+        'alamat_wali' => ['alamat_wali', 'alamat wali'],
         'rt_rw_wali' => ['rt_rw_wali'],
         'desa_kelurahan_wali' => ['desa_kelurahan_wali'],
         'kecamatan_wali' => ['kecamatan_wali'],
         'kabupaten_kota_wali' => ['kabupaten_kota_wali'],
         'provinsi_wali' => ['provinsi_wali'],
         'kode_pos_wali' => ['kode_pos_wali'],
-        'email_wali' => ['email_wali', 'email wali'],
-        'nama_ayah' => ['nama_ayah', 'nama ayah', 'ayah', 'nama_ayah_kandung', 'nama_ayah_kandung'],
-        'nama_ibu' => ['nama_ibu', 'nama ibu', 'ibu', 'nama_ibu_kandung'],
-        'pekerjaan_ayah' => ['pekerjaan_ayah', 'pekerjaan ayah'],
-        'pekerjaan_ibu' => ['pekerjaan_ibu', 'pekerjaan ibu'],
+        // — Kesehatan —
+        'golongan_darah' => ['golongan_darah', 'golongan darah', 'gol_darah', 'gol darah'],
+        'tinggi_badan' => ['tinggi_badan', 'tinggi badan', 'tinggi'],
+        'berat_badan' => ['berat_badan', 'berat badan', 'berat'],
+        'riwayat_penyakit' => ['riwayat_penyakit', 'riwayat penyakit', 'penyakit'],
+        // — Akademik & status —
         'status' => ['status', 'status_santri', 'status santri'],
+        'is_mukim' => ['is_mukim', 'mukim', 'is mukim', 'tinggal_di_asrama', 'mondok'],
         'tahun_angkatan' => ['tahun_angkatan', 'tahun angkatan', 'angkatan', 'tahun_masuk', 'tahun masuk'],
         'kelas' => ['kelas', 'nama_kelas', 'nama kelas', 'kelas_awal', 'kelas awal', 'kelas_detail', 'kelas detail'],
         'tingkat' => ['tingkat', 'level'],
@@ -238,6 +286,12 @@ class SantriImportService
             $payload['tahun_angkatan'] = $this->normalizeAcademicYear($payload['tahun_angkatan']);
         }
 
+        if (isset($payload['is_mukim']) && $payload['is_mukim'] !== '') {
+            $payload['is_mukim'] = $this->normalizeBoolean($payload['is_mukim']);
+        } else {
+            unset($payload['is_mukim']);
+        }
+
         return $payload;
     }
 
@@ -386,6 +440,13 @@ class SantriImportService
             'keluar', 'dikeluarkan', 'waqof', 'tendik' => 'keluar',
             default => $normalized,
         };
+    }
+
+    private function normalizeBoolean(string $value): string
+    {
+        $normalized = Str::lower(trim($value));
+
+        return in_array($normalized, ['1', 'ya', 'y', 'true', 'mukim', 'mondok', 'asrama', 'iya'], true) ? '1' : '0';
     }
 
     private function normalizeAcademicYear(string $value): string
