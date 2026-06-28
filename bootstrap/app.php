@@ -103,20 +103,27 @@ return Application::configure(basePath: dirname(__DIR__))
                 return null;
             }
             if (auth()->check() && $request->is('admin/*') && ! $request->is('admin')) {
-                \Filament\Notifications\Notification::make()
-                    ->title('Akses ditolak')
-                    ->body('Halaman tersebut di luar kewenangan akun Anda. Anda dialihkan kembali ke Dasbor.')
-                    ->danger()
-                    ->persistent()
-                    ->send();
+                // Handler exception TAK BOLEH ikut melempar. Bila apa pun di jalur
+                // redirect gagal → fallback ke halaman 403 branded (return null →
+                // Laravel render resources/views/errors/403.blade.php).
+                try {
+                    \Filament\Notifications\Notification::make()
+                        ->title('Akses ditolak')
+                        ->body('Halaman tersebut di luar kewenangan akun Anda. Anda dialihkan kembali ke Dasbor.')
+                        ->danger()
+                        ->persistent()
+                        ->send();
 
-                // PENTING: pakai RedirectResponse Laravel EKSPLISIT — JANGAN helper
-                // redirect(). Mount halaman Filament berjalan dalam konteks Livewire
-                // yang me-rebind 'redirect' ke Livewire\...\Redirector (tanpa ->headers);
-                // saat response melewati middleware CSRF (PreventRequestForgery) →
-                // "Undefined property ...Redirector::$headers" → 500. RedirectResponse
-                // murni Symfony punya ->headers, jadi aman di Livewire & non-Livewire.
-                return new \Illuminate\Http\RedirectResponse(url('admin'), 302);
+                    // PENTING: pakai RedirectResponse Laravel EKSPLISIT — JANGAN helper
+                    // redirect(). Mount halaman Filament berjalan dalam konteks Livewire
+                    // yang me-rebind 'redirect' ke Livewire\...\Redirector (tanpa ->headers);
+                    // saat response melewati middleware CSRF (PreventRequestForgery) →
+                    // "Undefined property ...Redirector::$headers" → 500. RedirectResponse
+                    // murni Symfony punya ->headers, jadi aman di Livewire & non-Livewire.
+                    return new \Illuminate\Http\RedirectResponse(url('admin'), 302);
+                } catch (\Throwable) {
+                    return null;
+                }
             }
 
             return null;
