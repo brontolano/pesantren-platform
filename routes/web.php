@@ -16,6 +16,7 @@ use App\Support\KebijakanPrivasiSistem;
 use App\Support\TenantBranding;
 use Illuminate\Support\Facades\Route;
 use Modules\CMS\Http\Controllers\EmbedWidgetController;
+use Modules\CMS\Http\Controllers\AppShellController;
 use Modules\CMS\Http\Controllers\TenantLandingPageController;
 use Modules\PPDB\Http\Controllers\LandingRegistrationController;
 use Modules\PPDB\Http\Controllers\PpdbFileController;
@@ -126,6 +127,12 @@ Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('te
 // halaman login. (Domain 'sistem' tetap juga menampilkan login di '/'.) Form
 // mem-POST ke /masuk (store); sukses → tujuan per peran (staf → /admin) via
 // AppLauncher, jadi tak nyangkut di website publik.
+// ── Home publik "mode aplikasi" (1-app per pesantren) ──
+// Dipakai app Android (WebView memuat /app): tampilan ber-bottom-nav (Beranda ·
+// Ibadah · Kabar · Akun · Info) dari konten CMS/branding yang sama dgn landing,
+// agar pengunjung app tak "lari" ke halaman marketing. Aditif — tak mengubah '/'.
+Route::get('/app', AppShellController::class)->name('tenant.app-shell');
+
 Route::get('/masuk', [StaffLoginController::class, 'show'])->name('tenant.masuk.show');
 Route::post('/masuk', [StaffLoginController::class, 'store'])
     ->middleware('throttle:20,1')
