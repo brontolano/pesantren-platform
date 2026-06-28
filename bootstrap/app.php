@@ -110,7 +110,13 @@ return Application::configure(basePath: dirname(__DIR__))
                     ->persistent()
                     ->send();
 
-                return redirect('/admin');
+                // PENTING: pakai RedirectResponse Laravel EKSPLISIT — JANGAN helper
+                // redirect(). Mount halaman Filament berjalan dalam konteks Livewire
+                // yang me-rebind 'redirect' ke Livewire\...\Redirector (tanpa ->headers);
+                // saat response melewati middleware CSRF (PreventRequestForgery) →
+                // "Undefined property ...Redirector::$headers" → 500. RedirectResponse
+                // murni Symfony punya ->headers, jadi aman di Livewire & non-Livewire.
+                return new \Illuminate\Http\RedirectResponse(url('admin'), 302);
             }
 
             return null;
