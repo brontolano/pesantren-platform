@@ -6,10 +6,10 @@
 
 /*
  |--------------------------------------------------------------------------
- | Tema Pesantren — Pixio Light (cream+emerald) · TikTok Dark
+ | Tema Pesantren v2 — WhatsApp Light · TikTok Dark
  |--------------------------------------------------------------------------
- | Mode terang  : inspirasi WhatsApp — sidebar putih + header hijau #059669,
- |                background #fffaf3, active item tint #ecfdf5.
+ | Mode terang  : inspirasi WhatsApp — sidebar putih + header hijau #008069,
+ |                background #F0F2F5, active item tint #E7F7EE.
  | Mode gelap   : inspirasi TikTok — sidebar #161823, surface #1C1C24,
  |                border #2A2A35, high-contrast text.
  | Compact      : padding lebih rapat di sidebar, kartu, tabel, tombol.
@@ -31,7 +31,7 @@
 
 /* Light: WA signature background */
 .fi-body {
-    background-color: #fffaf3;
+    background-color: #F0F2F5;
 }
 
 /* Dark: TikTok deep black */
@@ -49,10 +49,10 @@
     border-inline-end: 1px solid #E9EDEF !important;
 }
 
-/* Header brand: warna header WA (#059669) — bisa di-override preset warna
+/* Header brand: warna header WA (#008069) — bisa di-override preset warna
    tema via --tema-* (lihat App\Support\PanelTheme; fallback = nilai lama). */
 .fi-sidebar-header {
-    background: var(--tema-sidebar-header, #059669) !important;
+    background: var(--tema-sidebar-header, #008069) !important;
     border-bottom: 1px solid var(--tema-sidebar-header-border, #007259) !important;
     padding-top: 0.875rem !important;
     padding-bottom: 0.875rem !important;
@@ -132,18 +132,18 @@
 
 /* ACTIVE: tint hijau lembut + teks WA dark green (override-able preset warna) */
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background: var(--tema-active-bg, #ecfdf5) !important;
+    background: var(--tema-active-bg, #E7F7EE) !important;
     box-shadow: none !important;
 }
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
 .fi-sidebar-item.fi-active .fi-sidebar-item-label {
-    color: var(--tema-active-fg, #059669) !important;
+    color: var(--tema-active-fg, #008069) !important;
     font-weight: 600 !important;
 }
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-active .fi-icon {
-    color: var(--tema-active-fg, #059669) !important;
+    color: var(--tema-active-fg, #008069) !important;
 }
 
 /* Tombol sidebar misc (collapse grup, notifikasi) */
@@ -361,7 +361,7 @@
 /* Tema "Navigasi Atas": topbar mengambil warna header sidebar agar
    identitas tema tetap terasa walau sidebar tidak tampil. */
 body.tema-navigasi-atas .fi-topbar {
-    background: var(--tema-sidebar-header, #059669) !important;
+    background: var(--tema-sidebar-header, #008069) !important;
     border-bottom: 1px solid var(--tema-sidebar-header-border, #007259) !important;
 }
 body.tema-navigasi-atas .fi-topbar .fi-topbar-item-label,
@@ -1212,8 +1212,8 @@ body.tema-hijau-malam .fi-topbar-start {
 }
 .tema-nav-dd-item.aktif {
     font-weight: 600;
-    color: var(--tema-active-fg, #059669);
-    background: var(--tema-active-bg, #ecfdf5);
+    color: var(--tema-active-fg, #008069);
+    background: var(--tema-active-bg, #E7F7EE);
 }
 .dark .tema-nav-dd-item { color: rgba(255, 255, 255, 0.75); }
 .dark .tema-nav-dd-item:hover { background: rgba(255, 255, 255, 0.07); color: #ffffff; }
