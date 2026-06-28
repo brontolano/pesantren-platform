@@ -103,7 +103,7 @@
 
     /* ---- Alias permukaan + teks semantik (PAKAI ini di komponen baru) ---- */
     --surface-page:    var(--pst-cream);
-    --surface-card:    var(--pst-white);
+    --surface-card:    var(--pst-cream);
     --surface-muted:   var(--pst-cream-muted);
     --surface-gold:    var(--pst-parchment);
     --surface-dark:    var(--pst-slate-900);
