@@ -292,6 +292,20 @@ class SantriImportService
             unset($payload['is_mukim']);
         }
 
+        // Nomor HP/telepon → muat varchar(20) (ambil nomor pertama, digit-only).
+        foreach (['no_hp_ayah', 'no_hp_ibu', 'no_hp_wali'] as $phoneField) {
+            if (isset($payload[$phoneField]) && $payload[$phoneField] !== '') {
+                $payload[$phoneField] = $this->normalizePhone($payload[$phoneField]);
+            }
+        }
+
+        // Nomor identitas → bersihkan artefak float ('....0') & non-digit.
+        foreach (['nik', 'nisn', 'nik_ayah', 'nik_ibu'] as $idField) {
+            if (isset($payload[$idField]) && $payload[$idField] !== '') {
+                $payload[$idField] = $this->normalizeIdNumber($payload[$idField]);
+            }
+        }
+
         return $payload;
     }
 
@@ -483,9 +497,75 @@ class SantriImportService
     private function rowValues(Row $row): array
     {
         return array_map(
-            static fn ($cell): string => trim((string) $cell->getValue()),
+            static fn ($cell): string => self::cellToString($cell->getValue()),
             $row->getCells(),
         );
+    }
+
+    /**
+     * Konversi nilai cell Spout ke string yang AMAN, menangani tipe non-string:
+     * - DateTimeInterface (cell tanggal Excel) → 'Y-m-d' (cegah fatal cast).
+     * - float yang sebenarnya bilangan bulat (NIK/NISN dibaca numerik) → string
+     *   integer tanpa suffix '.0' atau notasi ilmiah (mis. 3204360206120003,
+     *   bukan 3204360206120003.0 atau 3.2E+15).
+     * - selainnya → cast string biasa.
+     */
+    private static function cellToString(mixed $value): string
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+
+        if (is_int($value)) {
+            return (string) $value;
+        }
+
+        if (is_float($value)) {
+            // Bilangan bulat besar (NIK 16 digit) → tampilkan utuh tanpa '.0'/E-notasi.
+            if (floor($value) === $value && abs($value) < 1.0e+18) {
+                return number_format($value, 0, '', '');
+            }
+
+            return trim((string) $value);
+        }
+
+        return trim((string) $value);
+    }
+
+    /**
+     * Normalisasi nomor telepon/HP agar muat di kolom varchar(20):
+     * - Bila berisi banyak nomor (dipisah '/', ',', ';', spasi, 'atau') → ambil
+     *   nomor PERTAMA saja (sisanya tak muat & jarang dipakai untuk WA blast).
+     * - Buang semua karakter selain digit dan '+' awalan.
+     * - Potong maksimal 20 karakter (lebar kolom).
+     */
+    private function normalizePhone(string $value): string
+    {
+        $value = trim($value);
+
+        if ($value === '') {
+            return '';
+        }
+
+        // Ambil token pertama sebelum pemisah nomor ganda.
+        $first = preg_split('/\s*(?:\/|,|;|\bdan\b|\batau\b|\|)\s*/i', $value)[0] ?? $value;
+        $first = trim($first);
+
+        // Pertahankan '+' awalan (kode negara), buang sisanya selain digit.
+        $plus = str_starts_with($first, '+') ? '+' : '';
+        $digits = preg_replace('/\D+/', '', $first) ?? '';
+
+        return mb_substr($plus.$digits, 0, 20);
+    }
+
+    /**
+     * Normalisasi nomor identitas (NIK/NISN): buang non-digit & sisa '.0'.
+     * Tidak memotong panjang (kolom nik/nisn cukup lebar) tapi membersihkan
+     * artefak float ('3204360206120003.0' → '3204360206120003').
+     */
+    private function normalizeIdNumber(string $value): string
+    {
+        return preg_replace('/\D+/', '', trim($value)) ?? '';
     }
 
     /**

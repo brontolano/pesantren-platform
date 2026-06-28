@@ -28,7 +28,6 @@ use App\Filament\Widgets\KeuanganOverviewWidget;
 use App\Filament\Widgets\KontrakAkanHabisWidget;
 use App\Filament\Widgets\OnboardingChecklist;
 use App\Filament\Widgets\PengajuanTerbaru;
-use App\Filament\Widgets\QuickAccessWidget;
 use App\Filament\Widgets\StatsPesantren;
 use App\Filament\Widgets\TransaksiTerbaru;
 use App\Http\Middleware\ApplyPanelTheme;
@@ -201,9 +200,6 @@ class TenantPanelProvider extends PanelProvider
 
                 // === LAYER 2: Key Metrics ===
                 StatsPesantren::class,           // sort=-8: 5 KPI cards (santri, pengurus, kas, tagihan)
-
-                // === LAYER 3: Quick Access (CRUCIAL UX) ===
-                QuickAccessWidget::class,        // sort=-7: shortcut ke aksi harian per role
 
                 // === LAYER 4: Financial Dashboard (for bendahara/tata usaha) ===
                 KeuanganAreaChart::class,        // sort=-6: chart pendapatan/pengeluaran
