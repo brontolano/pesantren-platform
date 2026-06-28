@@ -174,6 +174,18 @@ class SantriImportService
                         'status' => ['nullable', 'in:aktif,cuti,lulus,keluar,dikeluarkan'],
                         'tahun_angkatan' => ['nullable', 'string', 'max:9'],
                         'email_wali' => ['nullable', 'email', 'max:255'],
+                    ], [
+                        // Pesan RAMAH (sebut kolom + saran) — translasi locale tak
+                        // selalu ke-load di konteks import; default 'validation.required'
+                        // membingungkan staf. Tiap pesan menyebut KOLOM yang harus diisi.
+                        'nis.required' => 'Kolom "nis" wajib diisi.',
+                        'nama.required' => 'Kolom "nama" wajib diisi.',
+                        'tanggal_lahir.required' => 'Kolom "tanggal_lahir" wajib diisi (format: YYYY-MM-DD).',
+                        'tanggal_lahir.date' => 'Kolom "tanggal_lahir" bukan tanggal yang valid (format: YYYY-MM-DD).',
+                        'jenis_kelamin.required' => 'Kolom "jenis_kelamin" wajib diisi (L atau P).',
+                        'jenis_kelamin.in' => 'Kolom "jenis_kelamin" harus L atau P.',
+                        'status.in' => 'Kolom "status" tidak dikenal (aktif/cuti/lulus/keluar/dikeluarkan).',
+                        'email_wali.email' => 'Kolom "email_wali" bukan email yang valid.',
                     ]);
 
                     if ($validator->fails()) {
