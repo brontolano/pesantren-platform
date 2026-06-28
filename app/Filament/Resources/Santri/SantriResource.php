@@ -146,7 +146,11 @@ class SantriResource extends Resource
                     ->label('Foto')
                     ->image()
                     ->directory('santri-photos')
-                    ->maxSize(2048),
+                    ->maxSize(2048)
+                    // Privasi foto putri: sembunyikan field foto saat mengedit santri
+                    // perempuan bila pengguna bukan pimpinan pondok/super admin
+                    // (saat tambah baru / santri putra tetap tampil).
+                    ->visible(fn (?Santri $record): bool => $record === null || $record->fotoDapatDilihat()),
             ])->columns(2),
 
             Section::make('Alamat Santri')->schema([
@@ -420,7 +424,10 @@ class SantriResource extends Resource
                 ImageColumn::make('photo_url')
                     ->label('Foto')
                     ->circular()
-                    ->defaultImageUrl(fn () => 'https://ui-avatars.com/api/?background=random&name=S'),
+                    // Privasi foto putri: santri perempuan hanya tampil ke pimpinan
+                    // pondok/super admin; selain itu → avatar inisial nama.
+                    ->getStateUsing(fn (Santri $record): ?string => $record->fotoDapatDilihat() ? $record->photo_url : null)
+                    ->defaultImageUrl(fn (Santri $record): string => $record->avatarInisialUrl()),
                 TextColumn::make('nis')
                     ->label('NIS')
                     ->searchable()

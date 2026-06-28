@@ -28,6 +28,7 @@ use App\Filament\Widgets\KeuanganOverviewWidget;
 use App\Filament\Widgets\KontrakAkanHabisWidget;
 use App\Filament\Widgets\OnboardingChecklist;
 use App\Filament\Widgets\PengajuanTerbaru;
+use App\Filament\Widgets\PondokOverviewWidget;
 use App\Filament\Widgets\StatsPesantren;
 use App\Filament\Widgets\TransaksiTerbaru;
 use App\Http\Middleware\ApplyPanelTheme;
@@ -200,6 +201,7 @@ class TenantPanelProvider extends PanelProvider
 
                 // === LAYER 2: Key Metrics ===
                 StatsPesantren::class,           // sort=-8: 5 KPI cards (santri, pengurus, kas, tagihan)
+                PondokOverviewWidget::class,     // sort=0: indikator per pondok (Banin/Banat) — bila multi-pondok
 
                 // === LAYER 4: Financial Dashboard (for bendahara/tata usaha) ===
                 KeuanganAreaChart::class,        // sort=-6: chart pendapatan/pengeluaran
