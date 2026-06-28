@@ -132,6 +132,26 @@ class ListTagihan extends ListRecords
                 'template_contoh' => ['2024001', 'SPP', '300000', '2026-07-10', '0', '2026-07', 'belum', '', '', ''],
                 'label' => 'Import Tagihan/SPP',
                 'service' => KeuanganImportService::class,
+                // Export round-trip (sinkron, sama format dgn template impor) — bendahara
+                // bisa unduh tagihan → sunting di Excel → impor ulang (idempoten). Kolom
+                // pembayaran (tanggal_pembayaran/metode/nomor_bukti) sengaja KOSONG: itu
+                // jalur "tandai lunas" saat impor, bukan atribut tagihan itu sendiri.
+                'export' => fn (Tenant $t) => \Modules\Keuangan\Models\Tagihan::query()
+                    ->with('santri:id,nis')
+                    ->orderByDesc('id')
+                    ->lazy()
+                    ->map(fn (\Modules\Keuangan\Models\Tagihan $tg): array => [
+                        'nis' => (string) ($tg->santri?->nis ?? ''),
+                        'jenis_tagihan' => (string) ($tg->jenis_tagihan ?? ''),
+                        'nominal' => $tg->nominal !== null ? (string) (int) $tg->nominal : '',
+                        'jatuh_tempo' => $tg->jatuh_tempo?->format('Y-m-d') ?? '',
+                        'diskon' => $tg->diskon !== null ? (string) (int) $tg->diskon : '',
+                        'bulan' => (string) ($tg->bulan_masehi ?? ''),
+                        'status_bayar' => $tg->status === 'lunas' ? 'lunas' : 'belum',
+                        'tanggal_pembayaran' => '',
+                        'metode' => '',
+                        'nomor_bukti' => '',
+                    ]),
                 'directory' => 'imports/keuangan/uploads',
                 'ability' => 'manage_tagihan',
                 'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nis, jenis_tagihan, nominal, jatuh_tempo, diskon, bulan (YYYY-MM), status_bayar (lunas/belum), tanggal_pembayaran, metode, nomor_bukti. Baris "lunas" WAJIB memilih verifikator di bawah. Idempoten — aman diulang (dry-run dulu).',
