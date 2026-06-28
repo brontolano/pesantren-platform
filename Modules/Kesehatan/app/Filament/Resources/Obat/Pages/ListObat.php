@@ -30,16 +30,16 @@ class ListObat extends ListRecords
                 ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_santri') ?? false)),
             ...$this->importActions([
                 'entitas' => 'obat',
-                'template' => ['nama', 'satuan', 'stok', 'ambang_menipis'],
-                'template_contoh' => ['Paracetamol', 'tablet', '100', '20'],
+                'template' => ['nama', 'satuan', 'stok', 'ambang_menipis', 'aktif'],
+                'template_contoh' => ['Paracetamol', 'tablet', '100', '20', 'Ya'],
                 'export' => fn (Tenant $t) => Obat::withoutGlobalScopes()
                     ->where('tenant_id', $t->id)->orderBy('nama')->lazy()
-                    ->map(fn ($o): array => ['nama' => $o->nama, 'satuan' => $o->satuan, 'stok' => $o->stok, 'ambang_menipis' => $o->ambang_menipis]),
+                    ->map(fn ($o): array => ['nama' => $o->nama, 'satuan' => $o->satuan, 'stok' => $o->stok, 'ambang_menipis' => $o->ambang_menipis, 'aktif' => $o->aktif ? 'Ya' : 'Tidak']),
                 'label' => 'Import Obat',
                 'service' => ObatImportService::class,
                 'directory' => 'imports/kesehatan/obat/uploads',
                 'ability' => 'manage_santri',
-                'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nama (wajib, unik), satuan, stok (stok awal), ambang_menipis. Nama yang sudah ada dilewati. Dry-run dulu.',
+                'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nama (wajib, unik), satuan, stok (stok awal), ambang_menipis, aktif (Ya/Tidak, default Ya). Nama yang sudah ada dilewati. Dry-run dulu.',
             ]),
         ];
     }

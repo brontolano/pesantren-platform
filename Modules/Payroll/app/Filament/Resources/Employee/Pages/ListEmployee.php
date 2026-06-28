@@ -30,16 +30,38 @@ class ListEmployee extends ListRecords
                 ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_payroll') ?? false)),
             ...$this->importActions([
                 'entitas' => 'pegawai',
-                'template' => ['nip', 'nama', 'jabatan', 'status_kepegawaian', 'nik', 'nuptk', 'tanggal_masuk', 'email'],
-                'template_contoh' => ['P001', 'Ustadz Ali', 'Guru', 'tetap', '', '', '2020-07-01', 'ali@contoh.test'],
+                // Template selaras field skalar form panel admin (Data Pegawai +
+                // Identitas EMIS). Struktur gaji & arsip sertifikasi = repeater,
+                // dikelola via UI terpisah (tak bisa template datar). Hanya nip & nama WAJIB.
+                'template' => [
+                    'nip', 'nama', 'jabatan', 'status_kepegawaian', 'email',
+                    'npwp', 'ptkp_status', 'tanggal_masuk', 'tanggal_selesai', 'aktif',
+                    'nik', 'nuptk', 'nrg', 'pendidikan_terakhir', 'is_mukim', 'asal_alumni',
+                ],
+                'template_contoh' => [
+                    'P001', 'Ustadz Ali', 'Guru', 'tetap', 'ali@contoh.test',
+                    '12.345.678.9-012.000', 'TK0', '2020-07-01', '', 'Ya',
+                    '3273010101800001', '1234567890123456', '987654321', 'S1', 'Ya', 'Tidak',
+                ],
                 'export' => fn (Tenant $t) => Employee::withoutGlobalScopes()
                     ->where('tenant_id', $t->id)->with('user')->orderBy('nama')->lazy()
-                    ->map(fn ($e): array => ['nip' => $e->nip, 'nama' => $e->nama, 'jabatan' => $e->jabatan, 'status_kepegawaian' => $e->status_kepegawaian, 'nik' => $e->nik, 'nuptk' => $e->nuptk, 'tanggal_masuk' => $e->tanggal_masuk?->format('Y-m-d'), 'email' => $e->user?->email]),
+                    ->map(fn ($e): array => [
+                        'nip' => $e->nip, 'nama' => $e->nama, 'jabatan' => $e->jabatan,
+                        'status_kepegawaian' => $e->status_kepegawaian, 'email' => $e->user?->email,
+                        'npwp' => $e->npwp, 'ptkp_status' => $e->ptkp_status,
+                        'tanggal_masuk' => $e->tanggal_masuk?->format('Y-m-d'),
+                        'tanggal_selesai' => $e->tanggal_selesai?->format('Y-m-d'),
+                        'aktif' => $e->aktif ? 'Ya' : 'Tidak',
+                        'nik' => $e->nik, 'nuptk' => $e->nuptk, 'nrg' => $e->nrg,
+                        'pendidikan_terakhir' => $e->pendidikan_terakhir,
+                        'is_mukim' => $e->is_mukim ? 'Ya' : 'Tidak',
+                        'asal_alumni' => $e->asal_alumni ? 'Ya' : 'Tidak',
+                    ]),
                 'label' => 'Import Pegawai',
                 'service' => PegawaiImportService::class,
                 'directory' => 'imports/payroll/pegawai/uploads',
                 'ability' => 'manage_payroll',
-                'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nip (wajib, unik), nama (wajib), jabatan, status_kepegawaian (tetap/honorer/kontrak), nik, nuptk, tanggal_masuk, email (untuk tautkan akun login). NIP yang sudah ada dilewati. Aman diulang (dry-run dulu).',
+                'petunjuk' => 'Unggah .xlsx/.csv/.ods. WAJIB: nip (unik), nama. Opsional: jabatan, status_kepegawaian (tetap/honorer/kontrak), email (tautkan akun login), npwp, ptkp_status (mis. TK0/K1), tanggal_masuk, tanggal_selesai, nik, nuptk, nrg, pendidikan_terakhir, dan kolom Ya/Tidak: aktif, is_mukim, asal_alumni. NIP yang sudah ada dilewati. Aman diulang (dry-run dulu). Struktur gaji & sertifikasi diisi lewat form pegawai, bukan import.',
             ]),
         ];
     }

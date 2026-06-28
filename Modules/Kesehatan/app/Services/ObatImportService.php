@@ -24,6 +24,7 @@ class ObatImportService
         'satuan' => ['satuan', 'unit'],
         'stok' => ['stok', 'jumlah', 'stok_awal'],
         'ambang_menipis' => ['ambang_menipis', 'ambang', 'stok_minimum', 'minimum'],
+        'aktif' => ['aktif', 'status_aktif', 'is_active'],
     ];
 
     /**
@@ -99,6 +100,9 @@ class ObatImportService
                         }
                         if (isset($payload['ambang_menipis'])) {
                             $atribut['ambang_menipis'] = (int) $payload['ambang_menipis'];
+                        }
+                        if (isset($payload['aktif']) && trim((string) $payload['aktif']) !== '') {
+                            $atribut['aktif'] = in_array(mb_strtolower(trim((string) $payload['aktif'])), ['1', 'ya', 'y', 'true', 'aktif', 'iya'], true) ? 1 : 0;
                         }
                         Obat::create($atribut);
                     }
