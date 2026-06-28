@@ -70,8 +70,37 @@ class QuickAccessWidget extends Widget
     /** @return array<int, array{label:string, items:array<int,array<string,string>>}> */
     protected function buildGroups(): array
     {
-        return array_values(array_filter([
-            $this->group('Kesantrian', [
+        // Untuk role tertentu, kelompokkan ulang agar prioritas jelas & tidak overwhelming
+        $user = auth()->user();
+        $isKeuangan = $user?->can('view_laporan_keuangan') ?? false;
+        $isOperasional = $user?->can('manage_santri') ?? false;
+        $isAkademik = $user?->can('view_akademik') ?? false;
+
+        // Role-specific layout: bendahara & kasir lihat keuangan DULUAN, kemudian lainnya
+        if ($isKeuangan && !$isOperasional && !$isAkademik) {
+            // BENDAHARA / KASIR: fokus keuangan
+            return array_values(array_filter([
+                $this->group('🔴 Prioritas', [
+                    $this->link('Tagihan', 'heroicon-o-document-text', 'warning', TagihanResource::class, 'index', 'keuangan', ['view_tagihan', 'manage_tagihan']),
+                    $this->link('Pembayaran', 'heroicon-o-banknotes', 'warning', PembayaranResource::class, 'index', 'keuangan', ['view_tagihan', 'manage_tagihan']),
+                    $this->link('Tabungan', 'heroicon-o-wallet', 'warning', TabunganResource::class, 'index', 'keuangan', ['view_tabungan', 'manage_tabungan']),
+                    $this->link('Laporan', 'heroicon-o-chart-bar', 'warning', LaporanKeuanganResource::class, 'index', 'keuangan', ['view_laporan_keuangan']),
+                ]),
+                $this->group('Pembukuan', [
+                    $this->link('Jurnal', 'heroicon-o-book-open', 'warning', JurnalResource::class, 'index', 'ledger', ['view_ledger', 'manage_ledger']),
+                    $this->link('Slip Gaji', 'heroicon-o-currency-dollar', 'warning', SlipGajiResource::class, 'index', 'payroll', ['run_payroll']),
+                    $this->link('Belanja', 'heroicon-o-shopping-cart', 'warning', BelanjaResource::class, 'index', 'pengadaan', ['input_belanja', 'manage_ledger']),
+                ]),
+                $this->group('Referensi', [
+                    $this->link('Data Santri', 'heroicon-o-users', 'success', SantriResource::class, 'index', null, ['view_santri']),
+                    $this->link('Kelas', 'heroicon-o-academic-cap', 'success', KelasResource::class, 'index', null, ['view_akademik', 'manage_santri']),
+                ]),
+            ], fn (array $g): bool => $g['items'] !== []));
+        }
+
+        // DEFAULT: semua grup, tapi urutan diprioritaskan per peran
+        $groups = [
+            $this->group('📚 Kesantrian', [
                 $this->link('Data Santri', 'heroicon-o-users', 'success', SantriResource::class, 'index', null, ['view_santri', 'manage_santri']),
                 $this->link('Tambah Santri', 'heroicon-o-user-plus', 'success', SantriResource::class, 'create', null, ['manage_santri']),
                 $this->link('Kelas', 'heroicon-o-academic-cap', 'success', KelasResource::class, 'index', null, ['view_akademik', 'manage_akademik', 'manage_santri']),
@@ -79,7 +108,7 @@ class QuickAccessWidget extends Widget
                 $this->link('Izin Santri', 'heroicon-o-clipboard-document-check', 'success', IzinSantriResource::class, 'index', 'kegiatan', ['manage_kegiatan']),
                 $this->link('Kunjungan Wali', 'heroicon-o-home', 'success', KunjunganWaliResource::class, 'index', 'kegiatan', ['view_kegiatan']),
             ]),
-            $this->group('Keuangan', [
+            $this->group('💰 Keuangan', [
                 $this->link('Tagihan', 'heroicon-o-document-text', 'warning', TagihanResource::class, 'index', 'keuangan', ['view_tagihan', 'manage_tagihan']),
                 $this->link('Pembayaran', 'heroicon-o-banknotes', 'warning', PembayaranResource::class, 'index', 'keuangan', ['view_tagihan', 'manage_tagihan']),
                 $this->link('Tabungan', 'heroicon-o-wallet', 'warning', TabunganResource::class, 'index', 'keuangan', ['view_tabungan', 'manage_tabungan']),
@@ -88,36 +117,38 @@ class QuickAccessWidget extends Widget
                 $this->link('Slip Gaji', 'heroicon-o-currency-dollar', 'warning', SlipGajiResource::class, 'index', 'payroll', ['run_payroll']),
                 $this->link('Belanja', 'heroicon-o-shopping-cart', 'warning', BelanjaResource::class, 'index', 'pengadaan', ['input_belanja', 'manage_ledger']),
             ]),
-            $this->group('Akademik', [
+            $this->group('🎓 Akademik', [
                 $this->link('Pelajaran', 'heroicon-o-book-open', 'info', PelajaranResource::class, 'index', 'akademik', ['view_akademik', 'manage_akademik']),
                 $this->link('Jadwal', 'heroicon-o-clock', 'info', JadwalPelajaranResource::class, 'index', 'akademik', ['view_akademik', 'manage_akademik']),
                 $this->link('Nilai', 'heroicon-o-clipboard-document-list', 'info', NilaiResource::class, 'index', 'akademik', ['view_akademik', 'manage_akademik']),
                 $this->link('Rapor', 'heroicon-o-document-chart-bar', 'info', RaporResource::class, 'index', 'akademik', ['view_akademik', 'manage_akademik']),
             ]),
-            $this->group('Asrama & Tahfidz', [
+            $this->group('🏠 Asrama & Tahfidz', [
                 $this->link('Blok Asrama', 'heroicon-o-building-office', 'primary', BlokAsramaResource::class, 'index', 'asrama', ['view_asrama', 'manage_asrama']),
                 $this->link('Kamar', 'heroicon-o-home-modern', 'primary', KamarAsramaResource::class, 'index', 'asrama', ['view_asrama', 'manage_asrama']),
                 $this->link('Hafalan', 'heroicon-o-book-open', 'primary', HafalanTahfidzResource::class, 'index', 'tahfidz', ['view_tahfidz', 'manage_tahfidz']),
                 $this->link('Penilaian Tahfidz', 'heroicon-o-star', 'primary', PenilaianTahfidzResource::class, 'index', 'tahfidz', ['view_tahfidz', 'manage_tahfidz']),
             ]),
-            $this->group('PPDB & Kegiatan', [
+            $this->group('🎯 PPDB & Kegiatan', [
                 $this->link('Calon Santri', 'heroicon-o-user-plus', 'info', CalonSantriResource::class, 'index', 'ppdb', ['view_ppdb', 'manage_ppdb']),
                 $this->link('Hasil Ujian', 'heroicon-o-check-badge', 'info', HasilUjianResource::class, 'index', 'ppdb', ['view_ppdb', 'manage_ppdb']),
                 $this->link('Kegiatan', 'heroicon-o-calendar-days', 'info', KegiatanResource::class, 'index', 'kegiatan', ['view_kegiatan']),
             ]),
-            $this->group('Kesehatan & Media', [
+            $this->group('❤️ Kesehatan & Media', [
                 $this->link('Riwayat Kesehatan', 'heroicon-o-heart', 'danger', RiwayatKesehatanResource::class, 'index', 'kesehatan', ['view_kesehatan']),
                 $this->link('Konseling', 'heroicon-o-chat-bubble-left-right', 'danger', SesiKonselingResource::class, 'index', 'kesehatan', ['view_konseling']),
                 $this->link('File Media', 'heroicon-o-photo', 'primary', MediaFileResource::class, 'index', 'file_storage', ['manage_tenant_settings']),
             ]),
-            $this->group('Website & Pengaturan', [
+            $this->group('⚙️ Website & Pengaturan', [
                 $this->link('Artikel', 'heroicon-o-newspaper', 'gray', ArticleResource::class, 'index', 'cms', ['manage_santri', 'manage_tenant_settings']),
                 $this->link('Galeri', 'heroicon-o-camera', 'gray', GalleryResource::class, 'index', 'cms', ['manage_santri', 'manage_tenant_settings']),
                 $this->link('Broadcast WA', 'heroicon-o-megaphone', 'gray', BroadcastWaResource::class, 'index', 'notifikasi', ['manage_notifikasi']),
                 $this->link('Pusat Setup', 'heroicon-o-clipboard-document-check', 'gray', null, 'index', null, ['manage_tenant_settings'], SetupUnit::class),
                 $this->link('Pengguna', 'heroicon-o-cog-6-tooth', 'gray', UserResource::class, 'index', null, ['manage_users']),
             ]),
-        ], fn (array $g): bool => $g['items'] !== []));
+        ];
+
+        return array_values(array_filter($groups, fn (array $g): bool => $g['items'] !== []));
     }
 
     /**
