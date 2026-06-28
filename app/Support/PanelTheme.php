@@ -24,10 +24,16 @@ class PanelTheme
     public const SETTING_COLOR = 'panel_color_preset';
 
     /**
-     * Registry TEMA (layout/gaya). 'topNav' memindah menu utama ke bilah atas;
-     * 'bodyClass' mengaktifkan blok CSS `.tema-…` di theme.css; 'primary' +
-     * 'vars' (opsional) = palet bawaan tema yang MENGIKAT — tema berpalet
-     * penuh selalu memakai paletnya sendiri, preset warna diabaikan.
+     * Registry TEMA (layout/gaya). Metadata diperkaya untuk UI card-based theme selector:
+     * - topNav: apakah gunakan navigasi atas
+     * - bodyClass: blok CSS tema di theme.css
+     * - primary/vars: palet bawaan (mengikat bila ada)
+     * - category: 'sidebar' | 'topnav' | 'utility'
+     * - icon: heroicon untuk visual
+     * - thumbnail: path image mockup
+     * - recommended_roles: siapa sebaiknya pakai (admin, bendahara, pimpinan, dst)
+     * - features: daftar keunggulan tema
+     * - efficiency: 'compact' | 'normal' | 'spacious'
      */
     public const THEMES = [
         'bawaan' => [
@@ -35,6 +41,12 @@ class PanelTheme
             'desc' => 'Menu samping seperti WhatsApp — tampilan standar saat ini.',
             'topNav' => false,
             'bodyClass' => null,
+            'category' => 'sidebar',
+            'icon' => 'heroicon-o-rectangle-group',
+            'thumbnail' => '/images/theme-thumbnails/bawaan.webp',
+            'recommended_roles' => ['admin_pesantren', 'tu'],
+            'features' => ['Familiar seperti WhatsApp', 'Cocok untuk entry-level', 'Tidak perlu adaptasi'],
+            'efficiency' => 'normal',
         ],
         'pixio' => [
             'label' => 'Pixio (Emerald SaaS)',
@@ -49,6 +61,12 @@ class PanelTheme
                 '--tema-active-fg' => '#047857',
                 '--tema-active-dark' => 'linear-gradient(90deg, #10b981 0%, #047857 100%)',
             ],
+            'category' => 'sidebar',
+            'icon' => 'heroicon-o-sparkles',
+            'thumbnail' => '/images/theme-thumbnails/pixio.webp',
+            'recommended_roles' => ['admin_pesantren', 'bendahara_pusat', 'akuntan'],
+            'features' => ['Premium SaaS look', 'Brand identity emerald', 'Cream hangat, sidebar putih', 'Aksen profesional'],
+            'efficiency' => 'normal',
         ],
         'baitul-maal' => [
             'label' => 'Baitul Maal (Hijau–Emas)',
@@ -63,6 +81,12 @@ class PanelTheme
                 '--tema-active-fg' => '#ffffff',
                 '--tema-active-dark' => 'linear-gradient(90deg, #157A4C 0%, #0A5C36 100%)',
             ],
+            'category' => 'sidebar',
+            'icon' => 'heroicon-o-currency-dollar',
+            'thumbnail' => '/images/theme-thumbnails/baitul-maal.webp',
+            'recommended_roles' => ['bendahara_pusat', 'akuntan', 'kepala_keuangan'],
+            'features' => ['Hijau hutan profesional', 'Aksen emas islami', 'Latar hangat krim', 'Fokus keuangan'],
+            'efficiency' => 'normal',
         ],
         'pimpinan-biru' => [
             'label' => 'Pimpinan Biru (Navigasi Atas)',
@@ -77,6 +101,12 @@ class PanelTheme
                 '--tema-active-fg' => '#1d4ed8',
                 '--tema-active-dark' => 'linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%)',
             ],
+            'category' => 'topnav',
+            'icon' => 'heroicon-o-chart-bar',
+            'thumbnail' => '/images/theme-thumbnails/pimpinan-biru.webp',
+            'recommended_roles' => ['kepala', 'dewan_pembina', 'pimpinan'],
+            'features' => ['Navy profesional', 'Menu di atas (top-nav)', 'Dashboard pimpinan', 'Lebih luas kerja'],
+            'efficiency' => 'spacious',
         ],
         'merah-putih' => [
             'label' => 'Merah Putih',
@@ -91,6 +121,12 @@ class PanelTheme
                 '--tema-active-fg' => '#ffffff',
                 '--tema-active-dark' => 'linear-gradient(90deg, #dc2626 0%, #b91c1c 100%)',
             ],
+            'category' => 'sidebar',
+            'icon' => 'heroicon-o-flag',
+            'thumbnail' => '/images/theme-thumbnails/merah-putih.webp',
+            'recommended_roles' => ['admin_pesantren', 'kepala', 'tu'],
+            'features' => ['Merah marun elegan', 'Nuansa kebangsaan', 'Kontras putih bersih', 'Identitas NKRI'],
+            'efficiency' => 'normal',
         ],
         'hijau-malam' => [
             'label' => 'Hijau Malam (Emas)',
@@ -105,18 +141,36 @@ class PanelTheme
                 '--tema-active-fg' => '#0f5132',
                 '--tema-active-dark' => 'linear-gradient(90deg, #10b981 0%, #047857 100%)',
             ],
+            'category' => 'topnav',
+            'icon' => 'heroicon-o-moon',
+            'thumbnail' => '/images/theme-thumbnails/hijau-malam.webp',
+            'recommended_roles' => ['kepala', 'dewan_pembina'],
+            'features' => ['Hijau mewah gelap', 'Emas islami', 'Menu top-nav', 'Elegan & formal'],
+            'efficiency' => 'spacious',
         ],
         'navigasi-atas' => [
             'label' => 'Navigasi Atas',
             'desc' => 'Menu utama pindah ke bilah atas, area kerja lebih lega — cocok layar lebar.',
             'topNav' => true,
             'bodyClass' => 'tema-navigasi-atas',
+            'category' => 'topnav',
+            'icon' => 'heroicon-o-bars-3',
+            'thumbnail' => '/images/theme-thumbnails/navigasi-atas.webp',
+            'recommended_roles' => ['admin_pesantren', 'tu', 'bendahara_pusat'],
+            'features' => ['Menu di atas', 'Area kerja maksimal', 'Cocok layar lebar', 'Tidak ada sidebar'],
+            'efficiency' => 'spacious',
         ],
         'kompak' => [
             'label' => 'Kompak',
             'desc' => 'Sidebar tetap, jarak antar elemen lebih rapat — muat lebih banyak data per layar.',
             'topNav' => false,
             'bodyClass' => 'tema-kompak',
+            'category' => 'utility',
+            'icon' => 'heroicon-o-rectangle-stack',
+            'thumbnail' => '/images/theme-thumbnails/kompak.webp',
+            'recommended_roles' => ['operator_divisi', 'kasir', 'petugas_payroll'],
+            'features' => ['Data-dense', 'Spasi minimal', 'Banyak baris/layar', 'Efisien untuk entry'],
+            'efficiency' => 'compact',
         ],
     ];
 
@@ -268,5 +322,105 @@ class PanelTheme
         }
 
         return is_string($value) && array_key_exists($value, $registry) ? $value : 'bawaan';
+    }
+
+    /** ========================================================================
+       HELPER METHODS UNTUK UI THEME SELECTOR (CARD-BASED)
+       ======================================================================== */
+
+    /** Ambil metadata satu tema beserta key-nya. */
+    public static function themeWithMetadata(string $themeKey): ?array
+    {
+        if (! array_key_exists($themeKey, self::THEMES)) {
+            return null;
+        }
+
+        return array_merge(['key' => $themeKey], self::THEMES[$themeKey]);
+    }
+
+    /** Daftar semua tema dengan metadata (untuk render card grid). */
+    public static function allThemesWithMetadata(): array
+    {
+        return collect(self::THEMES)->map(
+            fn (array $theme, string $key) => array_merge(['key' => $key], $theme)
+        )->values()->all();
+    }
+
+    /** Filter tema per kategori (sidebar / topnav / utility). */
+    public static function themesByCategory(string $category): array
+    {
+        return collect(self::THEMES)
+            ->filter(fn (array $t) => ($t['category'] ?? null) === $category)
+            ->map(fn (array $theme, string $key) => array_merge(['key' => $key], $theme))
+            ->values()
+            ->all();
+    }
+
+    /** Tema yang recommended untuk role tertentu. */
+    public static function recommendedThemeForRole(string $role): ?string
+    {
+        foreach (self::THEMES as $key => $theme) {
+            if (in_array($role, $theme['recommended_roles'] ?? [])) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    /** Daftar kategori tema yang tersedia. */
+    public static function categories(): array
+    {
+        return collect(self::THEMES)
+            ->pluck('category')
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+    }
+
+    /** Label kategori untuk UI. */
+    public static function categoryLabel(string $category): string
+    {
+        return match ($category) {
+            'sidebar' => 'Sidebar Klasik',
+            'topnav' => 'Navigasi Atas (Top-Nav)',
+            'utility' => 'Utilitas',
+            default => ucfirst($category),
+        };
+    }
+
+    /** Ambil metadata satu preset warna beserta key-nya. */
+    public static function colorWithMetadata(string $colorKey): ?array
+    {
+        if (! array_key_exists($colorKey, self::COLORS)) {
+            return null;
+        }
+
+        return array_merge(['key' => $colorKey], self::COLORS[$colorKey]);
+    }
+
+    /** Daftar warna yang applicable untuk tema aktif. */
+    public static function applicableColors(): array
+    {
+        $currentTheme = self::theme();
+        $themeMeta = self::THEMES[$currentTheme];
+
+        // Tema berpalet penuh (primary exists) → hanya gunakan palet tema itu.
+        if (isset($themeMeta['primary'])) {
+            return [
+                'locked' => true,
+                'reason' => "Tema '{$themeMeta['label']}' memiliki palet sendiri.",
+                'colors' => [$currentTheme => $themeMeta],
+            ];
+        }
+
+        // Tema tanpa palet → semua preset warna applicable.
+        return [
+            'locked' => false,
+            'colors' => collect(self::COLORS)
+                ->map(fn (array $c, string $k) => array_merge(['key' => $k], $c))
+                ->all(),
+        ];
     }
 }
