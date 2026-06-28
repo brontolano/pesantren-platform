@@ -51,6 +51,12 @@ opcache.max_accelerated_files=20000\n\
 opcache.validate_timestamps=0\n\
 opcache.interned_strings_buffer=16" > /usr/local/etc/php/conf.d/opcache-prod.ini
 
+# Batas upload (default PHP 2M terlalu kecil untuk foto branding/hero & dokumen).
+RUN echo "upload_max_filesize=16M\n\
+post_max_size=20M\n\
+memory_limit=256M\n\
+max_file_uploads=30" > /usr/local/etc/php/conf.d/uploads-prod.ini
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
