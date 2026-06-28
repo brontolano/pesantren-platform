@@ -61,7 +61,12 @@ COPY --from=frontend /app/public/build public/build
 # Override FrankenPHP default Caddyfile dengan konfigurasi on-demand TLS kita
 COPY Caddyfile /etc/caddy/Caddyfile
 
-RUN composer install --no-dev --optimize-autoloader
+# Pakai vendor/ dari stage cache (composer.lock sama) lalu cukup bangun autoloader
+# optimal + package:discover (post-autoload-dump). MENGHINDARI composer install
+# ulang dari nol setiap perubahan kode app — yang sebelumnya mengunduh seluruh
+# paket lagi (rapuh terhadap blip download GitHub/codeload, mis. HTTP 400).
+COPY --from=vendor /app/vendor vendor
+RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
 
 # Buat direktori temp Livewire (disk 'livewire-tmp', lihat config/filesystems.php).
 # Direktori ini tidak ada di git (file-nya di-gitignore). Tanpa ini,
