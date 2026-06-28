@@ -98,7 +98,7 @@ class CalonSantriResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function canCreate(): bool
@@ -107,17 +107,17 @@ class CalonSantriResource extends Resource
             return false;
         }
 
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -309,7 +309,7 @@ class CalonSantriResource extends Resource
                     ->label('Kirim Ulang OTP / Koreksi No. WA')
                     ->icon('heroicon-o-key')
                     ->color('warning')
-                    ->visible(fn (): bool => ! AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (): bool => ! AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->modalHeading('Kirim Ulang Kode OTP Portal SPMB')
                     ->modalDescription('Untuk peserta yang tidak menerima kode atau salah menulis nomor WA. Perbaiki nomor bila perlu — kode OTP baru dikirim ke nomor di bawah dan blokir percobaan sebelumnya dibuka. Password TIDAK ikut terkirim; peserta membuat password sendiri saat memakai kode.')
                     ->modalSubmitActionLabel('Simpan Nomor & Kirim OTP')
@@ -343,7 +343,7 @@ class CalonSantriResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalDescription('Kirim ulang ucapan terima kasih ke nomor Ayah & Ibu (nomor sama/satu dikirim sekali).')
-                    ->visible(fn (): bool => AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (): bool => AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
                         try {
                             $sent = app(AlbaKidsRegistrationNotificationService::class)->notifyGuardians($record);
@@ -361,7 +361,7 @@ class CalonSantriResource extends Resource
                     ->color('info')
                     ->requiresConfirmation()
                     ->modalDescription('Kirim ulang ringkasan pendaftar + lampiran dokumen (Bukti/KK/Akta) ke WhatsApp admin panitia.')
-                    ->visible(fn (): bool => AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (): bool => AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
                         try {
                             $broadcast = app(AlbaKidsRegistrationNotificationService::class)->notifyAdmin($record);
@@ -380,7 +380,7 @@ class CalonSantriResource extends Resource
                     ->icon('heroicon-o-bell-alert')
                     ->color('info')
                     ->requiresConfirmation()
-                    ->visible(fn (CalonSantri $record): bool => (string) $record->status_pendaftaran === 'lulus' && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (CalonSantri $record): bool => (string) $record->status_pendaftaran === 'lulus' && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
                         if ($record->no_hp_wali) {
                             app(PpdbWhatsappNotifier::class)->sendPengingatDaftarUlang(
@@ -405,7 +405,7 @@ class CalonSantriResource extends Resource
                     ->modalDescription('Tetapkan peserta LULUS (butuh minimal satu hasil ujian). Pengumuman dikirim via WhatsApp.')
                     ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
                         && in_array((string) $record->status_pendaftaran, ['pending', 'menunggu_verifikasi', 'verifikasi_berkas', 'cadangan'], true)
-                        && (Auth::user()?->can('manage_santri') ?? false))
+                        && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
                         try {
                             app(PpdbAdmissionDecisionService::class)->decide($record, ['status_pendaftaran' => 'lulus']);
@@ -422,7 +422,7 @@ class CalonSantriResource extends Resource
                     ->modalDescription('Tetapkan peserta sebagai CADANGAN (butuh minimal satu hasil ujian).')
                     ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
                         && in_array((string) $record->status_pendaftaran, ['pending', 'menunggu_verifikasi', 'verifikasi_berkas'], true)
-                        && (Auth::user()?->can('manage_santri') ?? false))
+                        && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
                         try {
                             app(PpdbAdmissionDecisionService::class)->decide($record, ['status_pendaftaran' => 'cadangan']);
@@ -445,7 +445,7 @@ class CalonSantriResource extends Resource
                     ])
                     ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
                         && ! in_array((string) $record->status_pendaftaran, ['ditolak', 'lulus'], true)
-                        && (Auth::user()?->can('manage_santri') ?? false))
+                        && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (array $data, CalonSantri $record): void {
                         try {
                             app(PpdbAdmissionDecisionService::class)->decide($record, [

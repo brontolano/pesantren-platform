@@ -53,6 +53,8 @@ class UserResource extends Resource
         'konselor' => 'Konselor / Guru BK',
         'pengelola_uks' => 'Petugas UKS / Kesehatan',
         'pengelola_asrama' => 'Pengasuh Asrama / Musyrif',
+        'panitia_ppdb' => 'Panitia PPDB / Pendaftaran',
+        'pengelola_sarpras' => 'Petugas Sarpras / Aset',
         'IT' => 'IT / Admin Teknis',
     ];
 

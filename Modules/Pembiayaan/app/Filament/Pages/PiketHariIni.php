@@ -39,7 +39,7 @@ class PiketHariIni extends Page
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('pembiayaan') && auth()->check();
+        return static::moduleVisible('pembiayaan') && (auth()->user()?->canAny(['view_sarpras', 'manage_sarpras']) ?? false);
     }
 
     /** @return array<int, array{area: AreaPiket, ceklis: Collection}> */

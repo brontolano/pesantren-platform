@@ -85,7 +85,7 @@ class SetupPesantren extends Page implements HasForms
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
-            && (auth()->user()?->canAny(['manage_santri', 'manage_akademik', 'manage_keuangan']) ?? false);
+            && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

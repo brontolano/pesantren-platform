@@ -52,22 +52,22 @@ class CalonSantriDokumenResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -127,7 +127,7 @@ class CalonSantriDokumenResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isVerified() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isVerified() && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantriDokumen $record): void {
                         $record->update([
                             'status' => CalonSantriDokumen::STATUS_VERIFIED,
@@ -149,7 +149,7 @@ class CalonSantriDokumenResource extends Resource
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isRejected() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isRejected() && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->schema([
                         Textarea::make('catatan_verifikasi')
                             ->label('Alasan penolakan')

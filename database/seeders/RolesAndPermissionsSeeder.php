@@ -63,6 +63,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage_kedisiplinan',
             'view_alumni',
             'manage_alumni',
+            // PPDB/Pendaftaran (panitia) & Sarpras/Aset (petugas) — dipisah dari
+            // view_santri agar tak bocor ke peran lain (mis. bendahara/guru).
+            'view_ppdb',
+            'manage_ppdb',
+            'view_sarpras',
+            'manage_sarpras',
             'view_own_children',
             // F1-PWA — gerbang masuk PWA Guru (/guru): guru mapel, guru
             // tahfidz/musyrif, asatidz, dan kepala (pemantauan).
@@ -171,6 +177,10 @@ class RolesAndPermissionsSeeder extends Seeder
                 'manage_kedisiplinan',
                 'view_alumni',
                 'manage_alumni',
+                'view_ppdb',
+                'manage_ppdb',
+                'view_sarpras',
+                'manage_sarpras',
                 'manage_mutu',
                 'kelola_approval',
                 'lihat_audit',
@@ -203,6 +213,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'manage_kedisiplinan',
                 'view_alumni',
                 'manage_alumni',
+                'view_ppdb',
+                'manage_ppdb',
                 // T-A052 — TU ikut melayani Kotak Masuk WA chatbot.
                 'ai.chat.kelola',
                 // 1-aplikasi (Fase 2c) — moderasi komentar publik.
@@ -320,6 +332,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view_tahfidz',
                 'view_kedisiplinan',
                 'view_alumni',
+                'view_ppdb',
+                'view_sarpras',
                 'manage_tenant_settings',
                 // SPMI — kepala melihat & MENYETUJUI mutu (segregasi: admin_pesantren
                 // hanya menyusun/manage, tak punya approve_mutu).
@@ -348,6 +362,20 @@ class RolesAndPermissionsSeeder extends Seeder
                 'kelola_dokumen',
                 'view_notifikasi',
                 'manage_notifikasi',
+            ],
+            // Panitia PPDB — kelola pendaftaran (calon santri, gelombang, dokumen,
+            // laporan). Lihat roster santri utk rujukan. TANPA akses keuangan/akademik.
+            'panitia_ppdb' => [
+                'view_dashboard',
+                'view_santri',
+                'view_ppdb',
+                'manage_ppdb',
+            ],
+            // Petugas Sarpras — kelola sarana/prasarana, area piket, laporan kerusakan.
+            'pengelola_sarpras' => [
+                'view_dashboard',
+                'view_sarpras',
+                'manage_sarpras',
             ],
             'wali' => [
                 'view_own_children',

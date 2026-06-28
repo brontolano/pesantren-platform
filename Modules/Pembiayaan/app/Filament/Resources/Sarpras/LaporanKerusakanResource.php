@@ -161,6 +161,6 @@ class LaporanKerusakanResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('pembiayaan') && auth()->check();
+        return static::moduleVisible('pembiayaan') && (auth()->user()?->canAny(['view_sarpras', 'manage_sarpras']) ?? false);
     }
 }

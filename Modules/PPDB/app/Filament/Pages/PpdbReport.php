@@ -29,7 +29,7 @@ class PpdbReport extends Page
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (auth()->user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public function getViewData(): array

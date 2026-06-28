@@ -37,12 +37,12 @@ class BroadcastWaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('notifikasi') && (auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false);
+        return static::moduleVisible('notifikasi') && (auth()->user()?->can('manage_notifikasi') ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('notifikasi') && (auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false);
+        return static::moduleVisible('notifikasi') && (auth()->user()?->can('manage_notifikasi') ?? false);
     }
 
     public static function canCreate(): bool

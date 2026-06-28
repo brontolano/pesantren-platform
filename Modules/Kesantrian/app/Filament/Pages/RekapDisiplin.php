@@ -43,7 +43,7 @@ class RekapDisiplin extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_kedisiplinan', 'manage_kedisiplinan']) ?? false;
     }
 
     public static function shouldRegisterNavigation(): bool
