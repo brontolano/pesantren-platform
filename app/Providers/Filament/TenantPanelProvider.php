@@ -353,8 +353,12 @@ class TenantPanelProvider extends PanelProvider
                 'logoUrl' => TenantBranding::logoUrl(),
             ]))
             ->brandLogoHeight('2.25rem')
+            // Pixio Design System: emerald #059669 sbg satu-satunya aksen (CTA,
+            // active, link). gray = Slate (ramp ink). Tenant boleh override via
+            // ApplyPanelTheme/preset warna.
+            ->font('Plus Jakarta Sans')
             ->colors([
-                'primary' => Color::Green,
+                'primary' => Color::Emerald,
                 'gray' => Color::Slate,
             ])
             ->middleware([
