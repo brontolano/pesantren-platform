@@ -87,6 +87,27 @@ class PengaturanBranding extends Page implements HasForms
         'mono' => 'Mono Editorial',
     ];
 
+    /**
+     * Default tautan konten Aplikasi (Beranda & Ibadah) — sinkron dengan
+     * AppShellController::DEFAULTS. Admin bisa menimpa via form ini.
+     *
+     * @var array<string,string>
+     */
+    public const APP_LINKS = [
+        'app_profil_pondok_url' => 'https://asy-syifaa.com/profil-pondok-pesantren',
+        'app_profil_abuya_url' => 'https://asy-syifaa.com/profil-abuya',
+        'app_profil_guru_url' => 'https://asy-syifaa.com/profil-guru',
+        'app_struktur_url' => 'https://asy-syifaa.com/struktur-organisasi',
+        'app_instagram_url' => 'https://www.instagram.com/ponpes.asysyifaa',
+        'app_instagram2_url' => 'https://www.instagram.com/asysyifaapusat/',
+        'app_instagram3_url' => 'https://www.instagram.com/syifaalawiyyahofficial/',
+        'app_youtube_url' => 'https://www.youtube.com/@AsySyifaaTVOfficial/videos',
+        'app_facebook_url' => 'https://www.facebook.com/AsySyifaaTV/live_videos',
+        'app_jadwal_kajian_url' => '',
+        'app_donasi_url' => '/donasi',
+        'app_zakat_wakaf_url' => '',
+    ];
+
     /** Warna default mengikuti fallback di TenantWebsiteService. */
     private const DEFAULT_PRIMARY = '#14532d';
 
@@ -153,6 +174,10 @@ class PengaturanBranding extends Page implements HasForms
             'admission_transfer_amount' => data_get($settings->get('admission_transfer_amount')?->value, 'text'),
             'admission_transfer_instructions' => data_get($settings->get('admission_transfer_instructions')?->value, 'text'),
             'admission_success_message' => data_get($settings->get('admission_success_message')?->value, 'text'),
+            // Konten Aplikasi (Beranda & Ibadah) — saved value atau default.
+            ...collect(self::APP_LINKS)->mapWithKeys(fn ($default, $key) => [
+                $key => data_get($settings->get($key)?->value, 'text', $default),
+            ])->all(),
         ]);
     }
 
@@ -255,6 +280,33 @@ class PengaturanBranding extends Page implements HasForms
                             ->addActionLabel('Tambah field'),
                     ]),
 
+                Section::make('Konten Aplikasi — Beranda')
+                    ->description('Tautan yang tampil di menu Beranda aplikasi (membuka situs/akun resmi). Kosongkan untuk memakai default.')
+                    ->schema([
+                        TextInput::make('app_profil_pondok_url')->label('Profil Pondok (URL)')->url(),
+                        TextInput::make('app_profil_abuya_url')->label('Profil Abuya (URL)')->url(),
+                        TextInput::make('app_profil_guru_url')->label('Profil Para Guru (URL)')->url(),
+                        TextInput::make('app_struktur_url')->label('Struktur Organisasi (URL)')->url(),
+                        TextInput::make('app_instagram_url')->label('Instagram — Ponpes (URL)')->url(),
+                        TextInput::make('app_instagram2_url')->label('Instagram — Pusat (URL)')->url(),
+                        TextInput::make('app_instagram3_url')->label('Instagram — Putri (URL)')->url(),
+                        TextInput::make('app_youtube_url')->label('Asy-Syifaa TV — YouTube (URL)')->url(),
+                        TextInput::make('app_facebook_url')->label('Asy-Syifaa TV — Facebook (URL)')->url(),
+                    ])
+                    ->columns(2),
+
+                Section::make('Konten Aplikasi — Ibadah')
+                    ->description('Layanan ibadah di aplikasi. Kosongkan salah satu untuk menyembunyikannya dari menu Ibadah.')
+                    ->schema([
+                        TextInput::make('app_jadwal_kajian_url')->label('Jadwal Kajian (URL)')->url()
+                            ->helperText('Tautan halaman jadwal kajian/majelis. Kosong = disembunyikan.'),
+                        TextInput::make('app_donasi_url')->label('Donasi / Infaq (URL atau /donasi)')
+                            ->helperText('Default /donasi (halaman donasi pesantren).'),
+                        TextInput::make('app_zakat_wakaf_url')->label('Zakat & Wakaf (URL)')->url()
+                            ->helperText('Tautan halaman zakat/wakaf. Kosong = disembunyikan.'),
+                    ])
+                    ->columns(2),
+
                 Section::make('Landing Registration')
                     ->description('Pengaturan form inline di landing page, termasuk admin WhatsApp dan informasi transfer.')
                     ->schema([
@@ -347,6 +399,12 @@ class PengaturanBranding extends Page implements HasForms
             'admission_success_message' => ['text' => $data['admission_success_message'] ?? null],
         ];
 
+        // Konten Aplikasi (Beranda & Ibadah) — simpan sebagai ['text'=>...]
+        // (terbaca AppShellController via getTenantStringValue kandidat 'text').
+        foreach (array_keys(self::APP_LINKS) as $appKey) {
+            $payloads[$appKey] = ['text' => $data[$appKey] ?? null];
+        }
+
         foreach ($payloads as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
@@ -374,6 +432,8 @@ class PengaturanBranding extends Page implements HasForms
             'admission_transfer_amount' => $data['admission_transfer_amount'] ?? null,
             'admission_transfer_instructions' => $data['admission_transfer_instructions'] ?? null,
             'admission_success_message' => $data['admission_success_message'] ?? null,
+            // Pertahankan nilai konten aplikasi pasca-save.
+            ...collect(self::APP_LINKS)->mapWithKeys(fn ($d, $key) => [$key => $data[$key] ?? null])->all(),
         ]);
 
         Notification::make()

@@ -6,21 +6,39 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Services\PrayerTimesService;
 use App\Services\QiblaService;
-use App\Support\AppLauncher;
 use App\Support\TenantBranding;
 use Illuminate\Contracts\View\View;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Services\TenantWebsiteService;
 
 /**
- * Home publik "mode aplikasi" (1-app per pesantren). Dipakai oleh app Android
- * (WebView memuat /app) — tampilan ringkas ber-bottom-nav agar pengunjung tak
- * "lari" ke halaman marketing. Konten diambil dari CMS/branding yang sama
- * dengan landing, tapi tata letak app-native (Beranda · Ibadah · Kabar · Akun ·
- * Info). Defensif: kegagalan sumber apa pun → bagian itu kosong, bukan 500.
+ * Home publik "mode aplikasi" (1-app per pesantren). Dipakai app Android
+ * (WebView memuat /beranda) — tampilan ringkas ber-bottom-nav agar pengunjung
+ * tak "lari" ke halaman marketing.
+ *
+ * Konten (menu profil, galeri IG, Asy-Syifaa TV, jadwal kajian, donasi, zakat/
+ * wakaf) DAPAT DIATUR di admin (PengaturanBranding) lewat Setting; default di
+ * sini memakai tautan resmi asy-syifaa.com. Defensif: gagal apa pun → bagian
+ * kosong, bukan 500.
  */
 class AppShellController extends Controller
 {
+    /** Default tautan konten (dipakai bila admin belum mengisi Setting). */
+    private const DEFAULTS = [
+        'app_profil_pondok_url' => 'https://asy-syifaa.com/profil-pondok-pesantren',
+        'app_profil_abuya_url' => 'https://asy-syifaa.com/profil-abuya',
+        'app_profil_guru_url' => 'https://asy-syifaa.com/profil-guru',
+        'app_struktur_url' => 'https://asy-syifaa.com/struktur-organisasi',
+        'app_instagram_url' => 'https://www.instagram.com/ponpes.asysyifaa',
+        'app_instagram2_url' => 'https://www.instagram.com/asysyifaapusat/',
+        'app_instagram3_url' => 'https://www.instagram.com/syifaalawiyyahofficial/',
+        'app_youtube_url' => 'https://www.youtube.com/@AsySyifaaTVOfficial/videos',
+        'app_facebook_url' => 'https://www.facebook.com/AsySyifaaTV/live_videos',
+        'app_jadwal_kajian_url' => '',
+        'app_donasi_url' => '/donasi',
+        'app_zakat_wakaf_url' => '',
+    ];
+
     public function __invoke(TenantWebsiteService $websiteService): View
     {
         $web = [];
@@ -33,16 +51,6 @@ class AppShellController extends Controller
         $branding = $web['branding'] ?? [];
         $contact = $web['contact'] ?? [];
 
-        $user = auth()->user();
-        $authedTarget = null;
-        if ($user) {
-            try {
-                $authedTarget = AppLauncher::primaryDestination($user)['url'] ?? '/admin';
-            } catch (\Throwable) {
-                $authedTarget = '/admin';
-            }
-        }
-
         return view('app-shell', [
             'namaPesantren' => $branding['name'] ?? TenantBranding::name(),
             'tagline' => $branding['tagline'] ?? 'Pendidikan adab, ilmu, dan layanan santri',
@@ -53,11 +61,26 @@ class AppShellController extends Controller
                 'email' => $contact['email'] ?? '',
             ],
             'ibadah' => $this->ibadahPayload(),
+            'cfg' => $this->appConfig(),
             'artikel' => $this->artikelTerbaru(),
-            'user' => $user,
-            'authedTarget' => $authedTarget,
-            'ppdbAktif' => $this->routeAda('tenant.ppdb.form'),
+            'masukUrl' => '/masuk',
         ]);
+    }
+
+    /** Konfigurasi konten app (Setting → fallback default asy-syifaa). */
+    private function appConfig(): array
+    {
+        $cfg = [];
+        foreach (self::DEFAULTS as $key => $default) {
+            try {
+                $val = Setting::getTenantStringValue($key, null);
+            } catch (\Throwable) {
+                $val = null;
+            }
+            $cfg[$key] = ($val !== null && trim($val) !== '') ? trim($val) : $default;
+        }
+
+        return $cfg;
     }
 
     /** Jadwal sholat + arah kiblat (selaras TenantLandingPageController). */
@@ -69,7 +92,6 @@ class AppShellController extends Controller
 
         $jadwal = [];
         $kiblat = null;
-        $donasiUrl = null;
 
         if ($adaLokasi) {
             try {
@@ -86,11 +108,7 @@ class AppShellController extends Controller
             }
         }
 
-        if ((bool) Setting::getTenantValue('beranda.tampil_donasi', true)) {
-            $donasiUrl = '/donasi';
-        }
-
-        return ['jadwal' => $jadwal, 'kiblat' => $kiblat, 'donasiUrl' => $donasiUrl];
+        return ['jadwal' => $jadwal, 'kiblat' => $kiblat];
     }
 
     /** 6 kabar/artikel terbaru yang sudah terbit. */
@@ -106,10 +124,5 @@ class AppShellController extends Controller
         } catch (\Throwable) {
             return collect();
         }
-    }
-
-    private function routeAda(string $name): bool
-    {
-        return app('router')->has($name);
     }
 }
