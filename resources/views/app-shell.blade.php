@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0F5132">
 <title>{{ $namaPesantren }}</title>
+{{-- PWA / "Tambahkan ke Layar Utama" (iPhone & Android) --}}
+<link rel="manifest" href="/beranda/manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="{{ $namaPesantren }}">
+@if($logoUrl)
+<link rel="apple-touch-icon" href="{{ $logoUrl }}">
+<link rel="icon" href="{{ $logoUrl }}">
+@endif
 <style>
   *,*::before,*::after{ box-sizing:border-box; }
   :root{
@@ -23,7 +33,7 @@
   .eyebrow{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.14em; color:var(--emr); }
   a{ text-decoration:none; color:inherit; }
 
-  .appbar{ display:flex; align-items:center; gap:11px; padding:14px 16px 6px; }
+  .appbar{ display:flex; align-items:center; gap:11px; padding:calc(14px + env(safe-area-inset-top)) 16px 6px; }
   .appbar .lg{ width:38px; height:38px; border-radius:11px; overflow:hidden; background:#E6F4EE; display:flex; align-items:center; justify-content:center; }
   .appbar .lg img{ width:100%; height:100%; object-fit:cover; }
   .appbar .nm{ font-weight:800; font-size:15px; line-height:1.15; }

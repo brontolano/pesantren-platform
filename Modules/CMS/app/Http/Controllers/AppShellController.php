@@ -68,6 +68,36 @@ class AppShellController extends Controller
         ]);
     }
 
+    /**
+     * Manifest PWA — agar "Tambahkan ke Layar Utama" (iPhone/Android) memasang
+     * ikon logo pesantren, nama, dan jalan layar-penuh (standalone).
+     */
+    public function manifest(TenantWebsiteService $websiteService): \Illuminate\Http\JsonResponse
+    {
+        $nama = TenantBranding::name();
+        try {
+            $nama = ($websiteService->buildLandingPagePayload()['branding']['name'] ?? null) ?: $nama;
+        } catch (\Throwable) {
+        }
+        $logo = TenantBranding::logoUrl();
+        $icons = $logo ? [
+            ['src' => $logo, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => $logo, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+        ] : [];
+
+        return response()->json([
+            'name' => $nama,
+            'short_name' => mb_substr($nama, 0, 12),
+            'start_url' => '/beranda',
+            'scope' => '/',
+            'display' => 'standalone',
+            'orientation' => 'portrait',
+            'background_color' => '#fffaf3',
+            'theme_color' => '#0F5132',
+            'icons' => $icons,
+        ])->header('Content-Type', 'application/manifest+json');
+    }
+
     /** Konfigurasi konten app (Setting → fallback default asy-syifaa). */
     private function appConfig(): array
     {
