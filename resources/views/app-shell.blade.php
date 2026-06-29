@@ -44,6 +44,29 @@
   .banner .s.on .n{ color:var(--emr-deep); }
   .banner .s .t{ font-size:13px; font-weight:800; margin-top:2px; color:#fff; font-variant-numeric:tabular-nums; }
   .banner .s.on .t{ color:var(--emr-deep); }
+  .banner .head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; position:relative; }
+  .banner .head .ttl{ font-size:12px; font-weight:700; letter-spacing:.12em; color:#cdeede; }
+  .banner .head .loc{ font-size:10px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2); border-radius:9999px; padding:4px 9px; color:#eaf5ee; }
+  .banner .boxes{ display:flex; gap:9px; position:relative; }
+  .banner .bx{ flex:1; background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.14); border-radius:14px; padding:10px 12px; }
+  .banner .bx .lab{ font-size:9.5px; color:#cdeede; font-weight:700; letter-spacing:.08em; }
+  .banner .bx .num{ font-size:23px; font-weight:800; margin-top:2px; font-variant-numeric:tabular-nums; }
+  .banner .bx.cd .num{ color:#ffd874; }
+  .banner .note{ font-size:10px; color:#bcd4c6; margin-top:11px; position:relative; line-height:1.4; }
+
+  /* ── Kompas kiblat ── */
+  .kompas-wrap{ text-align:center; padding:18px 16px 4px; }
+  .kompas{ position:relative; width:230px; height:230px; margin:6px auto 0; }
+  .kompas .ring{ position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle at 50% 42%,#0e5c3a,#0F5132); box-shadow:inset 0 0 0 2px rgba(216,180,97,.4), 0 14px 34px -18px rgba(0,0,0,.4); }
+  .kompas .rose{ position:absolute; inset:0; transition:transform .12s linear; }
+  .kompas .card-pt{ position:absolute; left:50%; transform:translateX(-50%); color:#fff; font-weight:800; font-size:13px; }
+  .kompas .card-pt.n{ top:9px; color:#ffd874; } .kompas .card-pt.s{ bottom:9px; }
+  .kompas .card-e{ position:absolute; top:50%; right:11px; transform:translateY(-50%); color:#fff; font-weight:800; font-size:13px; }
+  .kompas .card-w{ position:absolute; top:50%; left:11px; transform:translateY(-50%); color:#fff; font-weight:800; font-size:13px; }
+  .kompas .kaaba{ position:absolute; left:50%; top:50%; width:0; height:0; }
+  .kompas .kaaba .ic{ position:absolute; left:-17px; top:-105px; width:34px; height:34px; font-size:30px; line-height:34px; text-align:center; filter:drop-shadow(0 3px 6px rgba(0,0,0,.4)); }
+  .kompas .center{ position:absolute; left:50%; top:50%; width:12px; height:12px; border-radius:50%; background:#ffd874; transform:translate(-50%,-50%); box-shadow:0 0 0 4px rgba(255,216,116,.25); }
+  .kompas .fixed-top{ position:absolute; left:50%; top:-3px; transform:translateX(-50%); width:0; height:0; border-left:9px solid transparent; border-right:9px solid transparent; border-top:14px solid #ef4444; z-index:3; }
 
   .sectitle{ font-weight:800; font-size:15px; margin:20px 0 11px; padding:0 16px; }
 
@@ -127,26 +150,26 @@
 
     {{-- ===== BERANDA ===== --}}
     <div class="tabpane on" data-pane="beranda">
-      {{-- Banner jadwal sholat --}}
+      {{-- Banner jadwal sholat (gaya dashboard: jam hidup + hitung mundur) --}}
       @if(!empty($ibadah['jadwal']))
         <div class="banner">
-          <div class="row1">
-            <div>
-              <div class="nx">Sholat berikutnya</div>
-              <div class="nxt">{{ $nextName ?: 'Jadwal Sholat' }}@if($nextTime) · {{ $nextTime }}@endif</div>
-            </div>
-            @if($ibadah['kiblat'] !== null)
-              <div class="kib"><div class="v">{{ $ibadah['kiblat'] }}°</div><div class="l">KIBLAT</div></div>
-            @endif
+          <div class="head">
+            <div class="ttl">🌙 JADWAL SHOLAT</div>
+            <div class="loc">📍 lokasi default</div>
+          </div>
+          <div class="boxes">
+            <div class="bx"><div class="lab">SEKARANG</div><div class="num" id="clk">--:--:--</div></div>
+            <div class="bx cd"><div class="lab" id="menuju">MENUJU</div><div class="num" id="cd">--:--:--</div></div>
           </div>
           <div class="strip">
             @foreach($ibadah['jadwal'] as $i => $s)
-              <div class="s {{ $i===$nextIdx?'on':'' }}">
+              <div class="s {{ $i===$nextIdx?'on':'' }}" data-nm="{{ $s['name'] ?? $s['nama'] ?? '' }}">
                 <div class="n">{{ $s['name'] ?? $s['nama'] ?? '' }}</div>
                 <div class="t">{{ $s['time'] ?? $s['waktu'] ?? '' }}</div>
               </div>
             @endforeach
           </div>
+          <div class="note">Perkiraan waktu (metode Kemenag) · izinkan GPS untuk akurasi lokasi</div>
         </div>
       @endif
 
@@ -201,10 +224,22 @@
           @endforeach
         </div>
         @if($ibadah['kiblat'] !== null)
-          <div class="card" style="margin-top:12px;text-align:center;padding:16px">
-            <div class="muted small">Arah kiblat</div>
-            <div class="disp" style="font-size:32px;color:var(--emr-deep);margin-top:2px">{{ $ibadah['kiblat'] }}°</div>
-            <div class="muted small">dari arah utara</div>
+          <div class="card" style="margin-top:12px;padding:6px 0 16px" id="kiblatCard" data-qibla="{{ $ibadah['kiblat'] }}">
+            <div class="kompas-wrap">
+              <div class="muted small">Arah Kiblat · <b style="color:var(--emr-deep)">{{ $ibadah['kiblat'] }}°</b> dari utara</div>
+              <div class="kompas">
+                <div class="ring"></div>
+                <div class="fixed-top"></div>
+                <div class="rose" id="rose">
+                  <span class="card-pt n">U</span><span class="card-pt s">S</span>
+                  <span class="card-e">T</span><span class="card-w">B</span>
+                  <div class="kaaba" id="kaaba"><div class="ic">🕋</div></div>
+                </div>
+                <div class="center"></div>
+              </div>
+              <div class="muted small" id="kompasHint" style="margin-top:12px">Putar HP perlahan hingga 🕋 berada di atas (garis merah) — itulah arah kiblat.</div>
+              <button class="btn btn-gho" id="btnKompas" style="display:none;margin:12px 0 0">Aktifkan Kompas</button>
+            </div>
           </div>
         @endif
       @else
@@ -258,12 +293,65 @@
   </div>
 </div>
 
+@php
+  $pr = collect($ibadah['jadwal'] ?? [])->map(fn ($s) => [
+    'n' => $s['name'] ?? $s['nama'] ?? '',
+    't' => $s['time'] ?? $s['waktu'] ?? '',
+  ])->values();
+@endphp
 <script>
   function tab(name){
     document.querySelectorAll('.tabpane').forEach(p=>p.classList.toggle('on', p.dataset.pane===name));
     document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on', b.dataset.tab===name));
     document.querySelector('.screen').scrollTo(0,0);
   }
+
+  // ── Jam hidup + hitung mundur sholat berikutnya (gaya dashboard) ──
+  const PRAYERS = @json($pr);
+  (function(){
+    const clk=document.getElementById('clk'); if(!clk||!PRAYERS.length) return;
+    const cd=document.getElementById('cd'), menuju=document.getElementById('menuju');
+    const pad=n=>String(n).padStart(2,'0');
+    function tick(){
+      const now=new Date();
+      clk.textContent=pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+      let target=null,name='';
+      for(const p of PRAYERS){ const a=p.t.match(/(\d{1,2}):(\d{2})/); if(!a) continue;
+        const t=new Date(now); t.setHours(+a[1],+a[2],0,0); if(t>now){ target=t; name=p.n; break; } }
+      if(!target){ const a=PRAYERS[0].t.match(/(\d{1,2}):(\d{2})/); target=new Date(now); target.setDate(target.getDate()+1); if(a) target.setHours(+a[1],+a[2],0,0); name=PRAYERS[0].n; }
+      const d=Math.max(0,target-now), hh=Math.floor(d/3.6e6), mm=Math.floor(d%3.6e6/6e4), ss=Math.floor(d%6e4/1e3);
+      if(menuju) menuju.textContent='MENUJU '+(name||'').toUpperCase();
+      if(cd) cd.textContent=pad(hh)+':'+pad(mm)+':'+pad(ss);
+      document.querySelectorAll('.banner .s').forEach(s=>s.classList.toggle('on', s.dataset.nm===name));
+    }
+    tick(); setInterval(tick,1000);
+  })();
+
+  // ── Kompas kiblat (DeviceOrientation) + 🕋 ──
+  (function(){
+    const card=document.getElementById('kiblatCard'); if(!card) return;
+    const qibla=parseFloat(card.dataset.qibla)||0;
+    const rose=document.getElementById('rose'), kaaba=document.getElementById('kaaba'),
+          hint=document.getElementById('kompasHint'), btn=document.getElementById('btnKompas');
+    kaaba.style.transform='rotate('+qibla+'deg)';
+    let got=false;
+    function handle(e){
+      let h=null;
+      if(e.webkitCompassHeading!=null) h=e.webkitCompassHeading;
+      else if(e.alpha!=null) h=360-e.alpha;
+      if(h==null) return; got=true;
+      rose.style.transform='rotate('+(-h)+'deg)';
+    }
+    function start(){
+      window.addEventListener('deviceorientationabsolute', handle, true);
+      window.addEventListener('deviceorientation', handle, true);
+      setTimeout(()=>{ if(!got) hint.textContent='Kompas tak tersedia di perangkat ini. Arah kiblat '+Math.round(qibla)+'° dari utara.'; }, 1800);
+    }
+    if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+      btn.style.display='';
+      btn.onclick=()=>DeviceOrientationEvent.requestPermission().then(s=>{ if(s==='granted'){ btn.style.display='none'; start(); } }).catch(()=>{});
+    } else { start(); }
+  })();
 </script>
 </body>
 </html>
