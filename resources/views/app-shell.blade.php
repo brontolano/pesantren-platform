@@ -67,6 +67,13 @@
   .kompas .kaaba .ic{ position:absolute; left:-17px; top:-105px; width:34px; height:34px; font-size:30px; line-height:34px; text-align:center; filter:drop-shadow(0 3px 6px rgba(0,0,0,.4)); }
   .kompas .center{ position:absolute; left:50%; top:50%; width:12px; height:12px; border-radius:50%; background:#ffd874; transform:translate(-50%,-50%); box-shadow:0 0 0 4px rgba(255,216,116,.25); }
   .kompas .fixed-top{ position:absolute; left:50%; top:-3px; transform:translateX(-50%); width:0; height:0; border-left:9px solid transparent; border-right:9px solid transparent; border-top:14px solid #ef4444; z-index:3; }
+  .kompas .deg{ position:absolute; left:50%; bottom:40px; transform:translateX(-50%); color:#ffd874; font-weight:800; font-size:15px; font-variant-numeric:tabular-nums; }
+
+  .datehdr{ margin:0 16px 11px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .datehdr .dtxt{ font-weight:700; font-size:13.5px; color:var(--emr-deep); }
+  .datehdr .seg{ display:flex; background:#eef2ee; border-radius:9999px; padding:3px; flex:0 0 auto; }
+  .datehdr .seg button{ border:none; background:none; font-family:inherit; font-size:11.5px; font-weight:700; color:var(--muted); padding:5px 11px; border-radius:9999px; cursor:pointer; }
+  .datehdr .seg button.on{ background:var(--emr); color:#fff; }
 
   .sectitle{ font-weight:800; font-size:15px; margin:20px 0 11px; padding:0 16px; }
 
@@ -134,11 +141,9 @@
   $nowMin = (int)date('H')*60 + (int)date('i');
   $nextIdx = -1;
   foreach (($ibadah['jadwal'] ?? []) as $i => $s) {
-    $t = $s['time'] ?? $s['waktu'] ?? '';
+    $t = $s['time'] ?? '';
     if (preg_match('/(\d{1,2}):(\d{2})/', $t, $m) && ((int)$m[1]*60+(int)$m[2]) >= $nowMin) { $nextIdx = $i; break; }
   }
-  $nextName = $nextIdx >= 0 ? ($ibadah['jadwal'][$nextIdx]['name'] ?? $ibadah['jadwal'][$nextIdx]['nama'] ?? '') : '';
-  $nextTime = $nextIdx >= 0 ? ($ibadah['jadwal'][$nextIdx]['time'] ?? $ibadah['jadwal'][$nextIdx]['waktu'] ?? '') : '';
 @endphp
 
 <div class="wrap">
@@ -163,9 +168,9 @@
           </div>
           <div class="strip">
             @foreach($ibadah['jadwal'] as $i => $s)
-              <div class="s {{ $i===$nextIdx?'on':'' }}" data-nm="{{ $s['name'] ?? $s['nama'] ?? '' }}">
-                <div class="n">{{ $s['name'] ?? $s['nama'] ?? '' }}</div>
-                <div class="t">{{ $s['time'] ?? $s['waktu'] ?? '' }}</div>
+              <div class="s {{ $i===$nextIdx?'on':'' }}" data-nm="{{ $s['label'] ?? '' }}">
+                <div class="n">{{ $s['label'] ?? '' }}</div>
+                <div class="t">{{ $s['time'] ?? '' }}</div>
               </div>
             @endforeach
           </div>
@@ -217,10 +222,22 @@
     {{-- ===== IBADAH ===== --}}
     <div class="tabpane" data-pane="ibadah">
       <div class="sectitle" style="margin-top:14px">Arah Kiblat &amp; Jadwal Sholat</div>
+      <div class="datehdr">
+        <div>
+          <div class="dtxt" id="dateMasehi">{{ $tanggal['masehi'] }}</div>
+          @if($tanggal['hijriah'])<div class="dtxt" id="dateHijriah" style="display:none;color:var(--gold)">{{ $tanggal['hijriah'] }}</div>@endif
+        </div>
+        @if($tanggal['hijriah'])
+          <div class="seg">
+            <button class="on" id="segM" onclick="setKal('m')">Masehi</button>
+            <button id="segH" onclick="setKal('h')">Hijriah</button>
+          </div>
+        @endif
+      </div>
       @if(!empty($ibadah['jadwal']))
         <div class="card">
           @foreach($ibadah['jadwal'] as $s)
-            <div class="li"><span class="ic">{!! $svg('mosque',18) !!}</span><span class="nm">{{ $s['name'] ?? $s['nama'] ?? '' }}</span><span class="val">{{ $s['time'] ?? $s['waktu'] ?? '' }}</span></div>
+            <div class="li"><span class="ic">{!! $svg('mosque',18) !!}</span><span class="nm">{{ $s['label'] ?? '' }}</span><span class="val">{{ $s['time'] ?? '' }}</span></div>
           @endforeach
         </div>
         @if($ibadah['kiblat'] !== null)
@@ -233,9 +250,10 @@
                 <div class="rose" id="rose">
                   <span class="card-pt n">U</span><span class="card-pt s">S</span>
                   <span class="card-e">T</span><span class="card-w">B</span>
-                  <div class="kaaba" id="kaaba"><div class="ic">🕋</div></div>
+                  <div class="kaaba" id="kaaba"><div class="ic"><svg viewBox="0 0 32 32" width="34" height="34"><rect x="5" y="7" width="22" height="22" rx="2" fill="#1a1a1a"/><rect x="5" y="7" width="22" height="2.4" fill="#c9a24a"/><rect x="5" y="11.2" width="22" height="3.4" fill="#d8b461"/><rect x="13.2" y="20" width="5.6" height="9" rx="1" fill="#0e5c3a"/></svg></div></div>
                 </div>
                 <div class="center"></div>
+                <div class="deg" id="degTxt"></div>
               </div>
               <div class="muted small" id="kompasHint" style="margin-top:12px">Putar HP perlahan hingga 🕋 berada di atas (garis merah) — itulah arah kiblat.</div>
               <button class="btn btn-gho" id="btnKompas" style="display:none;margin:12px 0 0">Aktifkan Kompas</button>
@@ -295,8 +313,8 @@
 
 @php
   $pr = collect($ibadah['jadwal'] ?? [])->map(fn ($s) => [
-    'n' => $s['name'] ?? $s['nama'] ?? '',
-    't' => $s['time'] ?? $s['waktu'] ?? '',
+    'n' => $s['label'] ?? '',
+    't' => $s['time'] ?? '',
   ])->values();
 @endphp
 <script>
@@ -327,28 +345,54 @@
     tick(); setInterval(tick,1000);
   })();
 
-  // ── Kompas kiblat (DeviceOrientation) + 🕋 ──
+  // ── Pilih kalender Masehi/Hijriah ──
+  function setKal(k){
+    const m=document.getElementById('dateMasehi'), h=document.getElementById('dateHijriah');
+    const sm=document.getElementById('segM'), sh=document.getElementById('segH');
+    if(!m||!h) return;
+    const hij=(k==='h');
+    m.style.display=hij?'none':''; h.style.display=hij?'':'none';
+    sm&&sm.classList.toggle('on',!hij); sh&&sh.classList.toggle('on',hij);
+    try{ localStorage.setItem('kal', k); }catch(e){}
+  }
+  try{ if(localStorage.getItem('kal')==='h') setKal('h'); }catch(e){}
+
+  // ── Kompas kiblat (DeviceOrientation) — smoothing + kompensasi orientasi layar ──
   (function(){
     const card=document.getElementById('kiblatCard'); if(!card) return;
     const qibla=parseFloat(card.dataset.qibla)||0;
     const rose=document.getElementById('rose'), kaaba=document.getElementById('kaaba'),
-          hint=document.getElementById('kompasHint'), btn=document.getElementById('btnKompas');
+          hint=document.getElementById('kompasHint'), btn=document.getElementById('btnKompas'),
+          degTxt=document.getElementById('degTxt');
     kaaba.style.transform='rotate('+qibla+'deg)';
-    let got=false;
+    const norm=a=>((a%360)+360)%360;
+    let smooth=null, got=false, absSeen=false;
+    function screenAngle(){ return (screen.orientation&&screen.orientation.angle)||window.orientation||0; }
+    function apply(h){
+      h=norm(h+screenAngle());
+      if(smooth==null) smooth=h;
+      else { let d=((h-smooth+540)%360)-180; smooth=norm(smooth+d*0.18); } // low-pass + wrap
+      rose.style.transform='rotate('+(-smooth)+'deg)';
+      const selisih=Math.abs(((qibla-smooth+540)%360)-180);
+      if(degTxt) degTxt.textContent=Math.round(norm(smooth))+'°';
+      hint.textContent = selisih<=6
+        ? '✓ Tepat menghadap kiblat — 🕋 di garis merah.'
+        : 'Putar HP perlahan hingga 🕋 di atas (garis merah).';
+      hint.style.color = selisih<=6 ? 'var(--emr)' : '';
+    }
     function handle(e){
       let h=null;
-      if(e.webkitCompassHeading!=null) h=e.webkitCompassHeading;
-      else if(e.alpha!=null) h=360-e.alpha;
-      if(h==null) return; got=true;
-      rose.style.transform='rotate('+(-h)+'deg)';
+      if(e.webkitCompassHeading!=null) h=e.webkitCompassHeading;      // iOS (dari utara, CW)
+      else if(e.alpha!=null){ if(e.absolute){ absSeen=true; } else if(absSeen){ return; } h=360-e.alpha; }
+      if(h==null) return; got=true; apply(h);
     }
     function start(){
-      window.addEventListener('deviceorientationabsolute', handle, true);
+      window.addEventListener('deviceorientationabsolute', e=>{absSeen=true;handle(e);}, true);
       window.addEventListener('deviceorientation', handle, true);
-      setTimeout(()=>{ if(!got) hint.textContent='Kompas tak tersedia di perangkat ini. Arah kiblat '+Math.round(qibla)+'° dari utara.'; }, 1800);
+      setTimeout(()=>{ if(!got){ hint.textContent='Kompas tak tersedia di perangkat ini. Arah kiblat '+Math.round(qibla)+'° dari utara — gunakan kompas terpisah.'; if(degTxt) degTxt.textContent=Math.round(qibla)+'°'; } }, 2000);
     }
     if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
-      btn.style.display='';
+      btn.style.display=''; btn.textContent='Aktifkan Kompas';
       btn.onclick=()=>DeviceOrientationEvent.requestPermission().then(s=>{ if(s==='granted'){ btn.style.display='none'; start(); } }).catch(()=>{});
     } else { start(); }
   })();

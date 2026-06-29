@@ -61,6 +61,7 @@ class AppShellController extends Controller
                 'email' => $contact['email'] ?? '',
             ],
             'ibadah' => $this->ibadahPayload(),
+            'tanggal' => $this->tanggalIbadah(),
             'cfg' => $this->appConfig(),
             'artikel' => $this->artikelTerbaru(),
             'masukUrl' => '/masuk',
@@ -81,6 +82,30 @@ class AppShellController extends Controller
         }
 
         return $cfg;
+    }
+
+    /** Tanggal hari ini dalam Masehi & Hijriah (untuk header jadwal sholat). */
+    private function tanggalIbadah(): array
+    {
+        $masehi = now()->locale('id')->translatedFormat('l, d F Y');
+
+        $hijriah = '';
+        try {
+            if (extension_loaded('intl')) {
+                $cal = \IntlCalendar::createInstance(null, 'en@calendar=islamic-civil');
+                $cal->setTime(now()->timestamp * 1000);
+                $d = $cal->get(\IntlCalendar::FIELD_DAY_OF_MONTH);
+                $mo = $cal->get(\IntlCalendar::FIELD_MONTH); // 0-based
+                $y = $cal->get(\IntlCalendar::FIELD_YEAR);
+                $bulan = ['Muharram', 'Safar', 'Rabiul Awal', 'Rabiul Akhir', 'Jumadil Awal',
+                    'Jumadil Akhir', 'Rajab', "Sya'ban", 'Ramadhan', 'Syawal', "Dzulqa'dah", 'Dzulhijjah'];
+                $hijriah = $d.' '.($bulan[$mo] ?? '').' '.$y.' H';
+            }
+        } catch (\Throwable) {
+            $hijriah = '';
+        }
+
+        return ['masehi' => $masehi, 'hijriah' => $hijriah];
     }
 
     /** Jadwal sholat + arah kiblat (selaras TenantLandingPageController). */
