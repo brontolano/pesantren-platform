@@ -149,6 +149,19 @@ class AlumniResource extends Resource
                     ->visible(fn (Alumni $record): bool => $record->nomor_syahadah !== null)
                     ->url(fn (Alumni $record): string => route('tenant.akademik.export.syahadah.print', ['alumni' => $record]))
                     ->openUrlInNewTab(),
+                // #328 — cetak ijazah (Muadalah/PKPPS) per jenjang lembaga.
+                Action::make('cetak_ijazah_muadalah')
+                    ->label('Cetak Ijazah Muadalah')
+                    ->icon('heroicon-o-academic-cap')
+                    ->visible(fn (Alumni $record): bool => filled($record->nomor_ijazah) || filled($record->nomor_syahadah))
+                    ->url(fn (Alumni $record): string => route('tenant.akademik.export.ijazah.print', ['alumni' => $record, 'jenis' => 'muadalah']))
+                    ->openUrlInNewTab(),
+                Action::make('cetak_ijazah_pkpps')
+                    ->label('Cetak Ijazah PKPPS')
+                    ->icon('heroicon-o-academic-cap')
+                    ->visible(fn (Alumni $record): bool => filled($record->nomor_ijazah) || filled($record->nomor_syahadah))
+                    ->url(fn (Alumni $record): string => route('tenant.akademik.export.ijazah.print', ['alumni' => $record, 'jenis' => 'pkpps']))
+                    ->openUrlInNewTab(),
             ]);
     }
 
