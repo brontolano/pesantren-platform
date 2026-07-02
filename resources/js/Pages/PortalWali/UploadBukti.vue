@@ -106,6 +106,23 @@ function submit() {
                     class="mt-1 block text-white"
                 />
             </div>
+            <!-- #332: rincian komponen syahriah (transparansi) -->
+            <div v-if="bill.komponen && bill.komponen.length" class="mt-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+                <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">Rincian tagihan</p>
+                <ul class="mt-2 space-y-1">
+                    <li
+                        v-for="(k, ki) in bill.komponen"
+                        :key="ki"
+                        class="flex items-center justify-between gap-2 text-[12.5px] text-white/85"
+                    >
+                        <span class="truncate">
+                            {{ k.nama }}
+                            <span v-if="k.masukTabungan" class="ml-1 rounded-full bg-white/15 px-1.5 py-px text-[9.5px] font-semibold text-emerald-200">→ Tabungan</span>
+                        </span>
+                        <MoneyText :amount="k.nominal" size="sm" tone="inherit" class="shrink-0" />
+                    </li>
+                </ul>
+            </div>
         </UiCard>
 
         <!-- RINGKASAN -->

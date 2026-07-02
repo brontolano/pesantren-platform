@@ -164,6 +164,21 @@ class Santri extends Model
             .urlencode($this->nama ?? 'Santri');
     }
 
+    /**
+     * URL foto yang AMAN ditampilkan ke pengguna saat ini:
+     * foto asli (via /_tenant-storage) bila boleh dilihat & ada,
+     * selain itu avatar inisial. Dipakai permukaan non-Filament
+     * (portal guru gerbang, loket pendaftaran, dsb).
+     */
+    public function urlFotoAman(): string
+    {
+        if ($this->photo_url && $this->fotoDapatDilihat()) {
+            return url('/_tenant-storage/'.ltrim($this->photo_url, '/'));
+        }
+
+        return $this->avatarInisialUrl();
+    }
+
     public function enrollments(): HasMany
     {
         return $this->hasMany(SantriEnrollment::class, 'santri_id');
@@ -216,6 +231,24 @@ class Santri extends Model
     public function biayaAsrama(): HasMany
     {
         return $this->hasMany(BiayaAsrama::class, 'santri_id');
+    }
+
+    /** #338: jenjang formal kesetaraan (ula/wustha/ulya) diturunkan dari kelas aktif. */
+    public function getJenjangKesetaraanAttribute(): ?string
+    {
+        return $this->kelas?->jenjang_kesetaraan;
+    }
+
+    /** #338: tingkat kesetaraan (Ula 1-6, Wustha 1-3, Ulya 1-3) dari kelas aktif. */
+    public function getTingkatKesetaraanAttribute(): ?int
+    {
+        return $this->kelas?->tingkat_kesetaraan;
+    }
+
+    /** #338: label ringkas jenjang formal, mis. "Ula 3"; null bila belum terpetakan. */
+    public function getLabelKesetaraanAttribute(): ?string
+    {
+        return $this->kelas?->label_kesetaraan;
     }
 
     public function penempatanAktif(): HasOne

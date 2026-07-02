@@ -120,7 +120,10 @@ class CalonSantriDokumenResource extends Resource
                 Action::make('lihatFile')
                     ->label('Lihat')
                     ->icon('heroicon-o-eye')
-                    ->visible(fn (CalonSantriDokumen $record): bool => $record->file_url !== null)
+                    // Privasi foto putri (#340): pas foto calon PEREMPUAN hanya
+                    // bisa dibuka peran berhak (pimpinan/super admin).
+                    ->visible(fn (CalonSantriDokumen $record): bool => $record->file_url !== null
+                        && static::fotoCalonBolehDilihat($record))
                     ->url(fn (CalonSantriDokumen $record): string => route('ppdb.file.dokumen', $record), shouldOpenInNewTab: true),
                 Action::make('verifikasi')
                     ->label('Verifikasi')
@@ -177,6 +180,20 @@ class CalonSantriDokumenResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
             ]);
+    }
+
+    /**
+     * Privasi foto putri (#340): dokumen jenis 'foto' milik calon santri
+     * PEREMPUAN hanya boleh dibuka peran berhak (Santri::PERAN_LIHAT_FOTO_PUTRI).
+     * Dokumen lain (ijazah, KK, akta) tidak digerbang.
+     */
+    public static function fotoCalonBolehDilihat(CalonSantriDokumen $record): bool
+    {
+        if ($record->jenis_dokumen !== 'foto') {
+            return true;
+        }
+
+        return $record->calonSantri?->fotoDapatDilihat() ?? true;
     }
 
     public static function getEloquentQuery(): Builder

@@ -27,7 +27,7 @@ class TagihanRutin extends Model
     public const FREKUENSI = ['bulanan', 'semester', 'tahunan'];
 
     protected $fillable = [
-        'tenant_id', 'nama', 'jenis_tagihan', 'frekuensi', 'nominal',
+        'tenant_id', 'nama', 'jenis_tagihan', 'frekuensi', 'nominal', 'komponen',
         'target_tipe', 'target_lembaga_id', 'target_kelas_id', 'target_tingkat',
         'tanggal_terbit', 'tempo_hari', 'sumber_dana_id', 'divisi_unit_id',
         'keterangan', 'notif_wa', 'aktif', 'terakhir_terbit_periode',
@@ -35,6 +35,7 @@ class TagihanRutin extends Model
 
     protected $casts = [
         'nominal' => 'decimal:2',
+        'komponen' => 'array',
         'tanggal_terbit' => 'integer',
         'tempo_hari' => 'integer',
         'notif_wa' => 'boolean',

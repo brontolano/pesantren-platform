@@ -55,7 +55,10 @@ class TagihanRutinService
         $jatuhTempo = $this->hitungJatuhTempo($aturan, $periode);
         $bulanHijriah = $this->tagihanService->hitungBulanHijriah($jatuhTempo);
 
-        DB::transaction(function () use ($aturan, $santriList, $periode, $jatuhTempo, $bulanHijriah, &$summary): void {
+        /** @var list<Tagihan> $tagihanBaru */
+        $tagihanBaru = [];
+
+        DB::transaction(function () use ($aturan, $santriList, $periode, $jatuhTempo, $bulanHijriah, &$summary, &$tagihanBaru): void {
             foreach ($santriList as $santri) {
                 // Lapis 2: idempotensi per-santri (jenis + periode masehi).
                 $sudahAda = Tagihan::query()
@@ -70,10 +73,12 @@ class TagihanRutinService
                     continue;
                 }
 
-                $this->tagihanService->buatTagihanUntukSantri($santri, [
+                $tagihanBaru[] = $this->tagihanService->buatTagihanUntukSantri($santri, [
                     'jenis_tagihan' => $aturan->jenis_tagihan,
                     'keterangan' => $aturan->keterangan ?? $aturan->nama,
                     'nominal' => (float) $aturan->nominal,
+                    // #332: salin rincian komponen ke tagihan (transparansi wali).
+                    'komponen' => \Modules\Keuangan\Support\SyahriahKomponen::normalize($aturan->komponen) ?: null,
                     'jatuh_tempo' => $jatuhTempo,
                     'status' => 'belum_bayar',
                     'sumber_dana_id' => $aturan->sumber_dana_id,
@@ -87,6 +92,17 @@ class TagihanRutinService
 
             $aturan->forceFill(['terakhir_terbit_periode' => $periode])->save();
         });
+
+        // #339 — notif WA ke wali SETELAH commit (gagal WA ≠ gagal terbit).
+        // Hanya tagihan yang BARU dibuat run ini (idempoten ganda: run ulang
+        // melewati tagihan existing → tak ada kirim ulang; plus penanda
+        // notif_wa_sent_at di KeuanganNotifikasiService::tagihanTerbit).
+        if ($aturan->notif_wa && $tagihanBaru !== []) {
+            $notifikasi = app(KeuanganNotifikasiService::class);
+            foreach ($tagihanBaru as $tagihan) {
+                $notifikasi->tagihanTerbit($tagihan);
+            }
+        }
 
         return $summary;
     }

@@ -29,6 +29,7 @@ class EmisExportService
         'NIK', 'TEMPAT_LAHIR', 'TANGGAL_LAHIR', 'ALAMAT', 'MUKIM',
         // Refs #327 — pelengkapan kolom form EMIS 4.0 (di-APPEND, urutan lama utuh).
         'NO_KK', 'NO_AKTA_LAHIR', 'NAMA_AYAH', 'NAMA_IBU', 'ROMBEL', 'LEMBAGA', 'JENJANG',
+        'JENJANG_KESETARAAN', 'TINGKAT_KESETARAAN',
     ];
 
     public const HEADER_PEGAWAI = [
@@ -92,6 +93,9 @@ class EmisExportService
                 $s->kelas?->nama_kelas ?? '',
                 $s->kelas?->lembaga?->nama ?? '',
                 $s->kelas?->lembaga?->jenjang ?? '',
+                // #338: jenjang formal kesetaraan diturunkan dari kelas aktif santri
+                strtoupper((string) ($s->jenjang_kesetaraan ?? '')),
+                $s->tingkat_kesetaraan !== null ? (string) $s->tingkat_kesetaraan : '',
             ];
         })->all();
     }

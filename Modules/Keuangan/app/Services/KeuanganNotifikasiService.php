@@ -5,6 +5,7 @@ namespace Modules\Keuangan\Services;
 use App\Models\Setting;
 use App\Support\PhoneNumber;
 use Modules\Keuangan\Models\Pembayaran;
+use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Models\SetorKelilingItem;
 use Modules\Keuangan\Models\TabunganTopup;
 use Modules\Notifikasi\Services\NotifDispatcher;
@@ -20,6 +21,44 @@ use Throwable;
 class KeuanganNotifikasiService
 {
     public function __construct(private readonly NotifDispatcher $dispatcher) {}
+
+    /**
+     * Wali: tagihan baru terbit dari Tagihan Rutin (#339, template TAGIHAN_BARU).
+     *
+     * IDEMPOTEN: penanda `tagihan.notif_wa_sent_at` diisi HANYA bila dispatcher
+     * melaporkan minimal 1 pesan benar-benar terkirim (bukan status hijau palsu
+     * WAHA — lihat cek sent/gateway_status di WaNotificationService). Tagihan
+     * yang sudah bertanda TIDAK dikirimi ulang.
+     */
+    public function tagihanTerbit(Tagihan $tagihan): void
+    {
+        $this->safe(function () use ($tagihan): void {
+            if ($tagihan->notif_wa_sent_at !== null) {
+                return; // sudah pernah terkirim — jangan dobel
+            }
+
+            $santri = $tagihan->santri;
+            $phones = $this->waliPhones($santri);
+            if ($phones === []) {
+                return;
+            }
+
+            $hasil = $this->dispatcher->kirim('tagihan_terbit', [
+                'wa' => $phones,
+                'data' => [
+                    'nama_santri' => $santri?->nama ?? '-',
+                    'jenis_tagihan' => $tagihan->jenis_tagihan ?? '-',
+                    'nominal' => number_format((float) ($tagihan->nominal_akhir ?? $tagihan->nominal), 0, ',', '.'),
+                    'jatuh_tempo' => $tagihan->jatuh_tempo?->translatedFormat('d F Y') ?? '-',
+                    'nama_pesantren' => $this->namaPesantren(),
+                ],
+            ]);
+
+            if (is_array($hasil) && ($hasil['terkirim'] ?? 0) > 0) {
+                $tagihan->forceFill(['notif_wa_sent_at' => now()])->save();
+            }
+        });
+    }
 
     /** Wali: pembayaran diverifikasi (tagihan berkurang/lunas). */
     public function pembayaranDiverifikasi(Pembayaran $pembayaran): void

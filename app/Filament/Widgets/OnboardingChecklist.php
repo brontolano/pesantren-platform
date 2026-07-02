@@ -7,19 +7,23 @@ use App\Filament\Pages\SetupPesantren;
 use App\Filament\Pages\SetupUnit;
 use App\Filament\Resources\Santri\SantriResource;
 use App\Models\Setting;
-use App\Models\User;
+use App\Support\UnitSetupRegistry;
 use Filament\Widgets\Widget;
 use Illuminate\Support\Facades\DB;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
-use Modules\CMS\Models\Article;
-use Modules\CMS\Models\Gallery;
-use Modules\Kesantrian\Models\Santri;
 
 /**
  * Checklist Onboarding — memandu pengurus baru menyelesaikan langkah pertama
  * MENGIKUTI JALUR ADOPSI NYATA (profil → santri → wali → website). Keuangan
  * SENGAJA tidak di sini (bukan jalur adopsi awal). Otomatis hilang saat semua
- * langkah selesai atau ditutup pengguna. Baca state nyata DB; aman (try/catch).
+ * langkah selesai atau ditutup pengguna.
+ *
+ * KONSOLIDASI (anti-drift): definisi "selesai" TIDAK dicek ulang di sini —
+ * diderivasi dari dua sumber kebenaran bersama:
+ *  - SetupPesantren::progress() → status fondasi (setup.selesai)
+ *  - UnitSetupRegistry::stepDone() → status data per langkah unit
+ * Satu-satunya cek lokal = adaFiturDipasang() (tabel CENTRAL tenant_modules,
+ * di luar cakupan registry per-unit).
  */
 class OnboardingChecklist extends Widget
 {
@@ -72,15 +76,19 @@ class OnboardingChecklist extends Widget
         ];
     }
 
-    /** @return array<int, array{label:string,desc:string,icon:string,done:bool,url:?string}> */
-    protected static function buildSteps(): array
+    /**
+     * PUBLIC agar bisa diuji anti-drift terhadap sumber kebenarannya.
+     *
+     * @return array<int, array{label:string,desc:string,icon:string,done:bool,url:?string}>
+     */
+    public static function buildSteps(): array
     {
         return [
             [
                 'label' => 'Selesaikan Setup Pesantren',
                 'desc' => 'Atur fondasi pondok: identitas, lembaga, periode, & kebijakan (wizard terpandu).',
                 'icon' => 'heroicon-o-sparkles',
-                'done' => self::setupSelesai(),
+                'done' => SetupPesantren::progress()['selesai'],
                 'url' => self::pageUrl(SetupPesantren::class),
             ],
             [
@@ -94,33 +102,24 @@ class OnboardingChecklist extends Widget
                 'label' => 'Masukkan data santri',
                 'desc' => 'Impor dari Excel atau tambah satu per satu.',
                 'icon' => 'heroicon-o-user-group',
-                'done' => self::adaData(Santri::class),
+                'done' => UnitSetupRegistry::stepDone('kesantrian', 'santri'),
                 'url' => self::urlOf(SantriResource::class, 'create'),
             ],
             [
                 'label' => 'Tautkan akun wali',
                 'desc' => 'Agar wali bisa pantau tagihan & tabungan lewat HP.',
                 'icon' => 'heroicon-o-users',
-                'done' => self::adaWali(),
+                'done' => UnitSetupRegistry::stepDone('kesantrian', 'wali'),
                 'url' => self::urlOf(SantriResource::class),
             ],
             [
                 'label' => 'Tampilkan website pondok',
                 'desc' => 'Tulis artikel atau unggah foto galeri.',
                 'icon' => 'heroicon-o-globe-alt',
-                'done' => self::adaKontenWebsite(),
+                'done' => UnitSetupRegistry::stepDone('kelembagaan', 'website'),
                 'url' => self::urlOf(ArticleResource::class, 'create'),
             ],
         ];
-    }
-
-    private static function setupSelesai(): bool
-    {
-        try {
-            return Setting::getTenantValue('setup.selesai') !== null;
-        } catch (\Throwable) {
-            return false;
-        }
     }
 
     private static function pageUrl(string $page): ?string
@@ -129,15 +128,6 @@ class OnboardingChecklist extends Widget
             return class_exists($page) ? $page::getUrl() : null;
         } catch (\Throwable) {
             return null;
-        }
-    }
-
-    private static function adaData(string $model): bool
-    {
-        try {
-            return class_exists($model) && $model::query()->exists();
-        } catch (\Throwable) {
-            return false;
         }
     }
 
@@ -153,31 +143,6 @@ class OnboardingChecklist extends Widget
                 ->where('tenant_id', tenant('id'))
                 ->where('is_active', true)
                 ->exists();
-        } catch (\Throwable) {
-            return false;
-        }
-    }
-
-    private static function adaWali(): bool
-    {
-        try {
-            return User::query()
-                ->whereHas('roles', fn ($q) => $q->where('name', 'wali'))
-                ->exists();
-        } catch (\Throwable) {
-            return false;
-        }
-    }
-
-    private static function adaKontenWebsite(): bool
-    {
-        try {
-            $artikel = class_exists(Article::class)
-                && Article::query()->where('is_published', true)->exists();
-            $galeri = class_exists(Gallery::class)
-                && Gallery::query()->exists();
-
-            return $artikel || $galeri;
         } catch (\Throwable) {
             return false;
         }

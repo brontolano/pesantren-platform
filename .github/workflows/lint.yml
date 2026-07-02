@@ -1,0 +1,39 @@
+# Gate lint TERPISAH dari test.yml (issue #335).
+#
+# test.yml merah permanen di CI karena arsitektur DB-per-tenant (butuh banyak
+# database fisik) — BUKAN gate dan jangan dijadikan gate. Workflow ini yang
+# jadi gate HIJAU: cepat, tanpa DB/Redis, hanya style check Pint.
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-lint-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-lint-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Pint (style check, tanpa perubahan)
+        run: vendor/bin/pint --test

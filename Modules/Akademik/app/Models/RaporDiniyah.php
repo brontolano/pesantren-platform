@@ -23,6 +23,7 @@ class RaporDiniyah extends Model
     public const BLOK = [
         'nilai_imtihan' => 'Nilai Imtihan',
         'capaian_kitab' => 'Capaian Kitab',
+        'sorogan' => 'Sorogan & Ngaji Kitab',
         'tahfidz' => 'Tahfidz',
         'ubudiyah_akhlak' => 'Ubudiyah & Akhlak',
         'kehadiran_kegiatan' => 'Kehadiran Kegiatan',

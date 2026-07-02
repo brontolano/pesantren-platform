@@ -178,6 +178,17 @@ Route::get('/disclaimer', fn () => view('legal.disclaimer'))->name('legal.discla
 Route::get('/cookie-policy', fn () => view('legal.cookie-policy'))->name('legal.cookies');
 Route::get('/kontak', fn () => view('legal.contact'))->name('legal.contact');
 
+// Halaman pemasaran "bahasa kiai" (issue #334) — manfaat platform dijelaskan
+// tanpa jargon teknis untuk pengasuh/pengurus pesantren. Hanya relevan di
+// central domain; di domain tenant diarahkan ke situs pusat.
+Route::get('/untuk-pesantren', function () {
+    if (! in_array(request()->getHost(), config('tenancy.central_domains', []), true)) {
+        return redirect('https://pesantren.online/untuk-pesantren');
+    }
+
+    return view('untuk-pesantren');
+})->name('landing.untuk-pesantren');
+
 // ── API publik konten CMS untuk website tenant (mis. api.asy-syifaa.com) ──
 // Tenant di-resolve dari domain oleh middleware tenancy web. CORS: config/cors.php.
 // Kontrak: docs/SPEC-API-WEBSITE-ASY-SYIFAA.md

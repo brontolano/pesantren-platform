@@ -565,6 +565,8 @@ Route::middleware([
         Route::get('/rapor-diniyah/{raporDiniyah}/print', [AkademikExportController::class, 'raporDiniyahPrint'])->name('rapor-diniyah.print');
         // WP-08 — cetak syahadah (sertifikat internal) per alumni.
         Route::get('/syahadah/{alumni}/print', [AkademikExportController::class, 'syahadahPrint'])->name('syahadah.print');
+        // #328 — cetak ijazah Muadalah/PKPPS parameterik per jenjang ula/wustha/ulya.
+        Route::get('/ijazah/{alumni}/print', [AkademikExportController::class, 'ijazahPrint'])->name('ijazah.print');
     });
 
     // WP-11 — cetak daftar peserta wisuda tahfidz per periode (lulus + ditandai).

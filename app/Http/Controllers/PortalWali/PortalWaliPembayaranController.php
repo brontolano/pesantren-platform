@@ -56,6 +56,8 @@ class PortalWaliPembayaranController extends Controller
                 'sisaTagihan' => (float) $tagihan->sisa_tagihan,
                 'status' => $tagihan->status,
                 'jatuhTempo' => optional($tagihan->jatuh_tempo)?->format('Y-m-d'),
+                // #332: rincian komponen syahriah (transparansi untuk wali).
+                'komponen' => PortalWaliService::komponenPayload($tagihan),
             ],
             'metodePembayaran' => MetodePembayaran::query()
                 ->where('is_active', true)
