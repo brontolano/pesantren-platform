@@ -101,6 +101,10 @@ class PortalWaliService
                 'id' => $santri->id,
                 'nis' => $santri->nis,
                 'nama' => $santri->nama,
+                // Kebijakan privasi foto putri (#340): wali HANYA bisa membuka
+                // santri miliknya sendiri (getAccessibleSantriQuery membatasi ke
+                // wali_user_id / accessWali), jadi wali melihat foto ANAK SENDIRI
+                // — ini wajar & diizinkan; tidak digerbang avatar inisial.
                 'photoUrl' => $santri->photo_url,
                 'status' => $santri->status,
                 'tanggalLahir' => optional($santri->tanggal_lahir)?->format('Y-m-d'),
