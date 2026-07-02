@@ -11,7 +11,9 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Facades\Storage;
 use Modules\Kesantrian\Models\Kelas;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Services\SantriImportService;
 use Modules\Kesantrian\Services\WaliImportService;
 
@@ -25,6 +27,7 @@ class ListSantri extends ListRecords
     {
         return [
             $this->buatAkunWaliAction(),
+            $this->unduhKredensialWaliAction(),
             // Import data santri dari Excel/CSV — memenuhi janji empty-state
             // ("Mulai dengan mengimpor data dari Excel"). Mesin tetap di
             // SantriImportService (idempoten: NIS yang sudah ada dilewati,
@@ -92,7 +95,7 @@ class ListSantri extends ListRecords
                     return response()->streamDownload(function () use ($kolom): void {
                         $out = fopen('php://output', 'w');
                         fputcsv($out, $kolom);
-                        \Modules\Kesantrian\Models\Santri::query()->with('kelas')->orderBy('nama')->lazy()
+                        Santri::query()->with('kelas')->orderBy('nama')->lazy()
                             ->each(function ($s) use ($out, $kolom): void {
                                 $baris = [];
                                 foreach ($kolom as $k) {
@@ -172,7 +175,7 @@ class ListSantri extends ListRecords
             ->schema([
                 Placeholder::make('petunjuk')
                     ->label('Petunjuk')
-                    ->content('Membuat akun Portal Wali untuk santri AKTIF yang punya NOMOR HP wali (login wali pakai no. HP). Santri yang walinya sudah berakun cukup ditautkan (tidak dobel). Setelah dibuat, kredensial sementara tersimpan sebagai CSV di server untuk dibagikan.'),
+                    ->content('Membuat akun Portal Wali untuk santri AKTIF yang punya NOMOR HP wali (login wali pakai no. HP). Santri yang walinya sudah berakun cukup ditautkan (tidak dobel). Setelah dibuat, unduh kredensial sementara lewat tombol "Unduh Kredensial Wali" di halaman ini.'),
                 Checkbox::make('dry_run')
                     ->label('Validasi dulu (dry-run) — tidak membuat akun')
                     ->default(true),
@@ -198,7 +201,7 @@ class ListSantri extends ListRecords
                 );
 
                 if (! $dryRun && $result['csv_path'] !== null) {
-                    $body .= "\n\nKredensial sementara tersimpan di server: ".basename((string) $result['csv_path']);
+                    $body .= "\n\nKredensial sementara siap: klik tombol \"Unduh Kredensial Wali\" (file ".basename((string) $result['csv_path']).').';
                 }
 
                 $notification = Notification::make()
@@ -208,6 +211,34 @@ class ListSantri extends ListRecords
 
                 $result['failed'] > 0 ? $notification->warning() : $notification->success();
                 $notification->send();
+            });
+    }
+
+    /**
+     * Unduh CSV kredensial wali TERAKHIR lewat panel (menutup alur CLI/akses
+     * storage/ manual). Terproteksi: hanya pemegang manage_santri; file berisi
+     * password sementara, jadi tak pernah diekspos lewat URL publik.
+     */
+    protected function unduhKredensialWaliAction(): Action
+    {
+        return Action::make('unduhKredensialWali')
+            ->label('Unduh Kredensial Wali')
+            ->icon('heroicon-o-key')
+            ->color('gray')
+            ->visible(fn (): bool => tenancy()->initialized
+                && (auth()->user()?->can('manage_santri') ?? false)
+                && WaliImportService::lastCsvFile() !== null)
+            ->action(function () {
+                $file = WaliImportService::lastCsvFile();
+                if ($file === null) {
+                    Notification::make()->title('Belum ada file kredensial wali.')->warning()->send();
+
+                    return null;
+                }
+
+                return response()->streamDownload(function () use ($file): void {
+                    echo Storage::disk('local')->get($file);
+                }, basename($file), ['Content-Type' => 'text/csv; charset=UTF-8']);
             });
     }
 }
