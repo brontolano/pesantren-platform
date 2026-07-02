@@ -28,6 +28,11 @@ class TenantReprovisionCommandTest extends TestCase
 
     public function test_reprovision_membackfill_modul_yang_hilang(): void
     {
+        // Default tenant baru kini RAMPING (hanya modul inti). Untuk menguji
+        // mekanisme BACKFILL modul released, aktifkan flag rollback agar provision
+        // & reprovision mengaktifkan modul released (lihat TenantProvisioner::seedModules).
+        config(['tenant_modules.default_active_released' => true]);
+
         $id = 'repro-'.str()->lower(str()->random(5));
         $tenant = $this->createProvisionedTenant($id, 'Pesantren Reprovision', $id.'.localhost');
 

@@ -74,6 +74,11 @@ class RbacSegregationTest extends TestCase
         ]);
         $user->assignRole($role);
 
+        // Isolasi lapis PERMISSION: beberapa resource (mis. SlipGaji/Payroll)
+        // juga digerbang UiMode::advanced() (default user = 'simple'). Set mode
+        // lanjutan agar UiMode netral & yang diuji murni RBAC, bukan mode tampilan.
+        $user->forceFill(['ui_mode' => 'advanced'])->save();
+
         return $user->fresh();
     }
 
