@@ -10,6 +10,19 @@ services:
     image: pesantren-platform-app:latest
     container_name: pesantren-app
     restart: unless-stopped
+    # Healthcheck ANTI insiden 2026-06-30 (HTTP 200 body 0-byte): Caddy hidup tapi
+    # runtime PHP FrankenPHP mati → status 200 saja TIDAK cukup. Cek body NON-KOSONG
+    # dari /up (endpoint health Laravel, dieksekusi PHP, tanpa sentuh DB tenant).
+    # wget dipakai (terpasang pasti di image, lihat Dockerfile); grep -q . gagal
+    # bila body kosong → container ditandai unhealthy → di-restart oleh autoheal.
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/up | grep -q . || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    labels:
+      - autoheal=true
     ports:
       - "80:80"
       - "443:443"
@@ -31,6 +44,25 @@ services:
         condition: service_healthy
     networks:
       - internal
+
+  # ── Autoheal: restart otomatis container unhealthy ──
+  # Docker/Compose TIDAK me-restart container yang unhealthy dengan sendirinya
+  # (restart policy hanya bereaksi pada exit, bukan health). autoheal memantau
+  # container berlabel autoheal=true (saat ini: pesantren-app) dan me-restart-nya
+  # saat unhealthy — menggantikan `docker restart pesantren-app` manual insiden
+  # 2026-06-30. Butuh akses docker.sock (read/write, hanya operasi restart).
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: pesantren-autoheal
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
+      - AUTOHEAL_INTERVAL=10
+      - AUTOHEAL_START_PERIOD=60
+      - AUTOHEAL_DEFAULT_STOP_TIMEOUT=15
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: none
 
   # ── Queue worker: OTP peserta (queue 'notifikasi') + job umum (queue 'default') ──
   # Pakai image hasil build service `app` (kode sama). Tanpa worker, semua job antrian menumpuk.
