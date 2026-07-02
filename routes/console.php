@@ -33,6 +33,13 @@ Schedule::command('keuangan:rekonsiliasi-harian')
     ->dailyAt('01:30')
     ->withoutOverlapping();
 
+// Blueprint §16: rekonsiliasi Ledger — deteksi transaksi terverifikasi tanpa
+// jurnal pasangan (drift akibat listener posting fail-silent) & alarmkan via log.
+// DETEKSI saja (tanpa --repost) agar penyembuhan tetap keputusan sadar operator.
+Schedule::command('ledger:rekonsiliasi')
+    ->dailyAt('01:45')
+    ->withoutOverlapping();
+
 // T-A002: alarm anomali biaya kredit AI per tenant (hari ini vs rata-rata
 // 7 hari) — sore hari agar pemakaian harian sudah cukup terkumpul.
 Schedule::command('ai:anomali')
