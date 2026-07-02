@@ -27,6 +27,8 @@ class EmisExportService
     public const HEADER = [
         'NISN', 'NIS', 'NAMA', 'JENIS_KELAMIN', 'TAHUN_ANGKATAN', 'STATUS_SANTRI', 'STATUS_SPP', 'TUNGGAKAN',
         'NIK', 'TEMPAT_LAHIR', 'TANGGAL_LAHIR', 'ALAMAT', 'MUKIM',
+        // Refs #327 — pelengkapan kolom form EMIS 4.0 (di-APPEND, urutan lama utuh).
+        'NO_KK', 'NO_AKTA_LAHIR', 'NAMA_AYAH', 'NAMA_IBU', 'ROMBEL', 'LEMBAGA', 'JENJANG',
     ];
 
     public const HEADER_PEGAWAI = [
@@ -63,7 +65,7 @@ class EmisExportService
      */
     public function barisSantri(): array
     {
-        return Santri::query()->orderBy('nama')->get()->map(function (Santri $s) {
+        return Santri::query()->with('kelas.lembaga')->orderBy('nama')->get()->map(function (Santri $s) {
             $tunggakan = Tagihan::where('santri_id', $s->id)->belumLunas()->get()
                 ->sum(fn (Tagihan $t) => $t->sisa_tagihan);
 
@@ -81,6 +83,15 @@ class EmisExportService
                 $s->tanggal_lahir?->format('Y-m-d') ?? '',
                 $s->alamat ?? '',
                 $s->is_mukim === null ? '' : ($s->is_mukim ? 'MUKIM' : 'NON-MUKIM'),
+                // Refs #327 — kolom EMIS 4.0 tambahan; rombel/lembaga/jenjang
+                // diturunkan dari relasi kelas → lembaga yang SUDAH ada.
+                $s->no_kk ?? '',
+                $s->no_akta_lahir ?? '',
+                $s->nama_ayah ?? '',
+                $s->nama_ibu ?? '',
+                $s->kelas?->nama_kelas ?? '',
+                $s->kelas?->lembaga?->nama ?? '',
+                $s->kelas?->lembaga?->jenjang ?? '',
             ];
         })->all();
     }
@@ -138,6 +149,13 @@ class EmisExportService
                 }
                 if ($kosong($s->nisn)) {
                     $kurang[] = 'NISN kosong';
+                }
+                // Refs #327 — field kependudukan wajib form EMIS 4.0.
+                if ($kosong($s->no_kk)) {
+                    $kurang[] = 'No. KK kosong';
+                }
+                if ($kosong($s->no_akta_lahir)) {
+                    $kurang[] = 'No. akta lahir kosong';
                 }
                 if ($kurang !== []) {
                     $hasil[] = sprintf('Santri %s (NIS %s): %s', $s->nama, $s->nis ?? '-', implode(', ', $kurang));
