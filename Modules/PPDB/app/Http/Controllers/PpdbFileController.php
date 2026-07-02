@@ -36,6 +36,15 @@ class PpdbFileController extends Controller
 
         abort_unless(is_string($doc->file_url) && Storage::disk($disk)->exists($doc->file_url), 404);
 
+        // Preview in-panel (pdf-viewer / gambar): sajikan inline agar bisa
+        // di-embed dalam <iframe>/<img> pada modal Filament, alih-alih memaksa
+        // unduhan. Otorisasi & gerbang privasi tetap berlaku di atas.
+        if ($request->boolean('inline')) {
+            return Storage::disk($disk)->response($doc->file_url, null, [
+                'Content-Disposition' => 'inline',
+            ]);
+        }
+
         return Storage::disk($disk)->download($doc->file_url);
     }
 
