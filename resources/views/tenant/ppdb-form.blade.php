@@ -13,7 +13,9 @@
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --primary: #15803d; --primary-dark: #14532d; --gold: #ca8a04; --bg: #f8faf9; --text: #1e293b; --text-muted: #64748b; --border: #d1d9d4; --error: #dc2626; }
+        /* Default Pixio (emerald + krim + emas). AlbaKids dipulihkan ke forest asli di bawah. */
+        :root { --primary: #059669; --primary-dark: #047857; --gold: #c9a24a; --bg: #fffaf3; --text: #1e293b; --text-muted: #64748b; --border: #efe7da; --error: #dc2626; }
+        body.tenant-albakids { --primary: #15803d; --primary-dark: #14532d; --gold: #ca8a04; --bg: #f8faf9; --border: #d1d9d4; }
         body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
         a { color: var(--primary); text-decoration: none; }
         nav { background: #fff; border-bottom: 1px solid var(--border); padding: 0 1.5rem; position: sticky; top: 0; z-index: 50; }
@@ -56,7 +58,7 @@
         @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } .card { padding: 1.5rem; } }
     </style>
 </head>
-<body>
+<body class="@if(\App\Support\AlbaKidsTenant::isActive())tenant-albakids @endif">
 
 <nav>
     <div class="nav-inner">

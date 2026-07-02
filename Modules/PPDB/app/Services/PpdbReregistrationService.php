@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Modules\Asrama\Models\KamarAsrama;
 use Modules\Asrama\Services\AsramaService;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Kesantrian\Services\SantriAccountService;
 use Modules\Kesantrian\Services\SantriService;
 use Modules\PPDB\Models\CalonSantri;
 use RuntimeException;
@@ -22,8 +23,7 @@ class PpdbReregistrationService
 
     public function __construct(
         private readonly SantriService $santriService,
-    ) {
-    }
+    ) {}
 
     public function register(CalonSantri|int $calonSantri, array $payload): CalonSantri
     {
@@ -63,7 +63,7 @@ class PpdbReregistrationService
             // App Santri: konversi LULUS -> akun login santri + tautan akun wali.
             // Best-effort (tak menggagalkan daftar ulang bila pembuatan akun gagal).
             try {
-                $akun = app(\Modules\Kesantrian\Services\SantriAccountService::class);
+                $akun = app(SantriAccountService::class);
                 $akun->provision($santri->fresh());
                 $akun->tautkanWali($santri->fresh());
             } catch (\Throwable $e) {

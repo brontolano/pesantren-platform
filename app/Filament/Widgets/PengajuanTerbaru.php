@@ -24,6 +24,7 @@ class PengajuanTerbaru extends TableWidget
     public static function canView(): bool
     {
         return PanelTheme::theme() === 'baitul-maal'
+            && (auth()->user()?->can('view_laporan_keuangan') ?? false)
             && class_exists(ApprovalRequest::class);
     }
 

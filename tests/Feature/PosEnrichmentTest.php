@@ -3,13 +3,13 @@
 namespace Tests\Feature;
 
 use InvalidArgumentException;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\PosKategori;
 use Modules\Keuangan\Models\PosProfil;
 use Modules\Keuangan\Services\PosEnrichmentService;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\Jurnal;
-use Modules\Kesantrian\Models\Santri;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 

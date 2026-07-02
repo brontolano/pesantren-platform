@@ -3,6 +3,8 @@
 namespace Modules\Ledger\Services;
 
 use Modules\Ledger\Models\Akun;
+use Modules\Ledger\Models\Jurnal;
+use Modules\Ledger\Models\JurnalBaris;
 use Modules\Ledger\Models\SumberDana;
 use RuntimeException;
 
@@ -19,9 +21,7 @@ class DanaKebajikanService
 {
     public const AKUN_DANA_KEBAJIKAN = '2-2000';
 
-    public function __construct(private readonly JurnalService $jurnalService)
-    {
-    }
+    public function __construct(private readonly JurnalService $jurnalService) {}
 
     /**
      * Terima dana syubhat: Debit Kas, Kredit Dana Kebajikan (bukan pendapatan).
@@ -31,14 +31,14 @@ class DanaKebajikanService
      *                          secara EKSPLISIT — pemanggil UI WAJIB mengisi ini agar submit
      *                          ulang tak menggandakan uang.
      */
-    public function terima(float $nominal, string $kodeSumberSyubhat, ?int $dibuatOleh = null, ?string $keterangan = null, ?string $refId = null): \Modules\Ledger\Models\Jurnal
+    public function terima(float $nominal, string $kodeSumberSyubhat, ?int $dibuatOleh = null, ?string $keterangan = null, ?string $refId = null): Jurnal
     {
         $sumber = $this->sumberSyubhat($kodeSumberSyubhat);
         $kas = $this->akunKas();
         $danaKebajikan = $this->akunDanaKebajikan();
 
         return $this->jurnalService->postJurnal($this->dedupKey($refId, 'DanaKebajikan:terima', [
-            'deskripsi' => 'Penerimaan dana kebajikan/pembersihan (pelepasan) — ' . ($keterangan ?? $sumber->nama_sumber),
+            'deskripsi' => 'Penerimaan dana kebajikan/pembersihan (pelepasan) — '.($keterangan ?? $sumber->nama_sumber),
             'tipe_sumber' => 'kebajikan',
             'dibuat_oleh' => $dibuatOleh,
             'baris' => [
@@ -54,7 +54,7 @@ class DanaKebajikanService
      * TIDAK menyentuh surplus/defisit. Guard menolak bila tujuan = ibadah/masjid atau
      * peruntukan tidak diizinkan kebijakan tenant.
      */
-    public function salurkan(float $nominal, string $kodeAkunPenyaluran, string $kodeSumberSyubhat, ?int $dibuatOleh = null, ?string $keterangan = null, ?string $refId = null): \Modules\Ledger\Models\Jurnal
+    public function salurkan(float $nominal, string $kodeAkunPenyaluran, string $kodeSumberSyubhat, ?int $dibuatOleh = null, ?string $keterangan = null, ?string $refId = null): Jurnal
     {
         $sumber = $this->sumberSyubhat($kodeSumberSyubhat);
         $kas = $this->akunKas();
@@ -62,7 +62,7 @@ class DanaKebajikanService
             ->firstOr(fn () => throw new RuntimeException("Akun penyaluran {$kodeAkunPenyaluran} tidak ditemukan."));
 
         return $this->jurnalService->postJurnal($this->dedupKey($refId, 'DanaKebajikan:salurkan', [
-            'deskripsi' => 'Penyaluran dana kebajikan — ' . ($keterangan ?? $tujuan->nama),
+            'deskripsi' => 'Penyaluran dana kebajikan — '.($keterangan ?? $tujuan->nama),
             'tipe_sumber' => 'kebajikan',
             'dibuat_oleh' => $dibuatOleh,
             'baris' => [
@@ -101,8 +101,8 @@ class DanaKebajikanService
         $induk = $this->akunDanaKebajikan();
         $ids = array_merge([$induk->id], $induk->children()->pluck('id')->all());
 
-        $kredit = (float) \Modules\Ledger\Models\JurnalBaris::whereIn('akun_id', $ids)->sum('kredit');
-        $debit = (float) \Modules\Ledger\Models\JurnalBaris::whereIn('akun_id', $ids)->sum('debit');
+        $kredit = (float) JurnalBaris::whereIn('akun_id', $ids)->sum('kredit');
+        $debit = (float) JurnalBaris::whereIn('akun_id', $ids)->sum('debit');
 
         return round($kredit - $debit, 2);
     }

@@ -48,7 +48,7 @@ class TenantModulIsolationTest extends TestCase
             'is_active' => true,
         ]);
 
-        $svc = new ModuleService();
+        $svc = new ModuleService;
 
         // Lapis enable (query central murni).
         $this->assertTrue($svc->isEnabledForTenant('akademik', $a->getKey()));
@@ -64,7 +64,7 @@ class TenantModulIsolationTest extends TestCase
         $a = $this->createTestTenant('iso-c', 'Tenant C');
         $b = $this->createTestTenant('iso-d', 'Tenant D');
 
-        $svc = new ModuleService();
+        $svc = new ModuleService;
 
         // Core (kesantrian) selalu tampil untuk SEMUA tenant tanpa aktivasi.
         $this->assertTrue($svc->isVisibleForTenant('kesantrian', $a));

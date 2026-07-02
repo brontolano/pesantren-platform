@@ -52,9 +52,9 @@ class PortalGuruGerbangController extends Controller
                     'nis' => (string) $santri->nis,
                     'nama' => $santri->nama,
                     'kelas' => $santri->kelas?->nama ?? '-',
-                    'foto' => $santri->photo_url
-                        ? url('/_tenant-storage/'.ltrim($santri->photo_url, '/'))
-                        : null,
+                    // Privasi foto putri: guru pos gerbang bukan peran berhak →
+                    // santri putri tampil avatar inisial, bukan foto asli.
+                    'foto' => $santri->urlFotoAman(),
                     'status' => $kondisi['status'], // hijau | kuning | merah
                     'izin' => $izin === null ? null : [
                         'id' => $izin->id,

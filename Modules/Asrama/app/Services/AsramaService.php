@@ -2,13 +2,12 @@
 
 namespace Modules\Asrama\Services;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Collection;
 use Modules\Asrama\Models\BiayaAsrama;
 use Modules\Asrama\Models\KamarAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;
 use Modules\Kesantrian\Models\Santri;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 class AsramaService
 {

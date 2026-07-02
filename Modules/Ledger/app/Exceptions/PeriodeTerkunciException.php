@@ -7,6 +7,4 @@ use RuntimeException;
 /**
  * Dilempar saat ada upaya posting bertanggal periode berstatus `closed` (Pagar #4).
  */
-class PeriodeTerkunciException extends RuntimeException
-{
-}
+class PeriodeTerkunciException extends RuntimeException {}

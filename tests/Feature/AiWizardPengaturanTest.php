@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\ModuleRegistrySeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 use Modules\AI\Filament\Pages\PengaturanAi;
@@ -45,7 +47,7 @@ class AiWizardPengaturanTest extends TestCase
         // DB test persisten lintas-run: registry modul bisa sudah terisi dari
         // suite lain. Kosongkan agar baseline = "modul tak terdaftar → tampil"
         // (pola ModuleService); test gating menyemai ulang registry sendiri.
-        \Illuminate\Support\Facades\DB::table('module_registry')->delete();
+        DB::table('module_registry')->delete();
 
         // Halaman hanya terdaftar pada panel tenant.
         Filament::setCurrentPanel(Filament::getPanel('tenant'));
@@ -60,7 +62,7 @@ class AiWizardPengaturanTest extends TestCase
         parent::tearDown();
     }
 
-    private function siapkanTenant(string $prefix): \App\Models\Tenant
+    private function siapkanTenant(string $prefix): Tenant
     {
         $tenant = $this->createRuntimeTenant($prefix, 'Pesantren '.$prefix);
         tenancy()->initialize($tenant);

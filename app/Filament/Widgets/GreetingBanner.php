@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Services\PrayerTimesService;
+use App\Support\RoleLabel;
 use App\Support\TenantBranding;
 use Filament\Widgets\Widget;
 
@@ -22,8 +23,18 @@ class GreetingBanner extends Widget
 
     protected function getViewData(): array
     {
-        $name = trim((string) (auth()->user()?->name ?? 'Admin'));
+        $user = auth()->user();
+        $name = trim((string) ($user?->name ?? 'Admin'));
         $first = $name !== '' ? explode(' ', $name)[0] : 'Admin';
+
+        // Label peran utama (sapaan sadar-peran) — peran pertama yg dipegang.
+        $peran = '';
+        try {
+            $roleName = $user?->getRoleNames()->first();
+            $peran = RoleLabel::for($roleName);
+        } catch (\Throwable) {
+            $peran = '';
+        }
 
         $service = app(PrayerTimesService::class);
 
@@ -34,13 +45,14 @@ class GreetingBanner extends Widget
         );
 
         return [
-            'nama'        => $first,
-            'prayers'     => $prayers,
-            'nextPrayer'  => $service->nextPrayerKey($prayers),
+            'nama' => $first,
+            'peran' => $peran,
+            'prayers' => $prayers,
+            'nextPrayer' => $service->nextPrayerKey($prayers),
             // Koordinat fallback + zona waktu untuk JS (dipakai bila GPS ditolak).
-            'lat'         => TenantBranding::latitude(),
-            'lng'         => TenantBranding::longitude(),
-            'tz'          => TenantBranding::timezoneOffset(),
+            'lat' => TenantBranding::latitude(),
+            'lng' => TenantBranding::longitude(),
+            'tz' => TenantBranding::timezoneOffset(),
         ];
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use Modules\Kegiatan\Models\IzinSantri;
 use Modules\Kegiatan\Services\IzinSantriService;
 use Modules\Kegiatan\Services\SuratIzinSantriService;
+use Modules\Notifikasi\Services\NotifDispatcher;
 use Throwable;
 
 class PwaGuruIzinController extends Controller
@@ -67,7 +68,7 @@ class PwaGuruIzinController extends Controller
 
         // Kirim notifikasi ke wali
         try {
-            app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('izin_disetujui', [
+            app(NotifDispatcher::class)->kirim('izin_disetujui', [
                 'data' => [
                     'santri_nama' => $izin->santri?->nama,
                     'disetujui_oleh' => $user->name,
@@ -117,7 +118,7 @@ class PwaGuruIzinController extends Controller
 
         // Kirim notifikasi ke wali
         try {
-            app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('izin_ditolak', [
+            app(NotifDispatcher::class)->kirim('izin_ditolak', [
                 'data' => [
                     'santri_nama' => $izin->santri?->nama,
                     'alasan' => $data['catatan'],

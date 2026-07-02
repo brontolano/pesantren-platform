@@ -32,7 +32,7 @@ class DemoAktivitasHarianSeeder extends Seeder
 
     private function akun(string $nama): ?object
     {
-        return DB::table('akun')->where('nama', 'ilike', '%' . $nama . '%')->where('is_postable', true)->first();
+        return DB::table('akun')->where('nama', 'ilike', '%'.$nama.'%')->where('is_postable', true)->first();
     }
 
     private function buatJurnal(string $deskripsi, int $debitAkun, int $kreditAkun, float $nominal, string $key): void
@@ -45,7 +45,7 @@ class DemoAktivitasHarianSeeder extends Seeder
 
         $jurnalId = DB::table('jurnal')->insertGetId([
             'tenant_id' => $this->tid,
-            'nomor' => 'JU-' . strtoupper(substr(md5($key), 0, 8)),
+            'nomor' => 'JU-'.strtoupper(substr(md5($key), 0, 8)),
             'tanggal' => now()->toDateString(),
             'deskripsi' => $deskripsi,
             'status' => 'posted',
@@ -103,7 +103,7 @@ class DemoAktivitasHarianSeeder extends Seeder
                 'nominal' => $t->nominal_akhir,
                 'metode' => $i % 2 === 0 ? 'transfer' : 'tunai',
                 'tanggal_pembayaran' => now()->toDateString(),
-                'nomor_bukti' => 'TRF-' . now()->format('Ymd') . '-' . str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
+                'nomor_bukti' => 'TRF-'.now()->format('Ymd').'-'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
                 'catatan' => $i % 2 === 0 ? 'Transfer dari wali via m-banking' : 'Bayar tunai di loket',
                 'is_verified' => $verified,
                 'verified_by' => $verified ? $adminId : null,
@@ -140,7 +140,7 @@ class DemoAktivitasHarianSeeder extends Seeder
         foreach ($pengajuan as $i => $p) {
             $belanjaId = DB::table('belanja')->insertGetId([
                 'tenant_id' => $this->tid,
-                'client_ref' => 'demo-belanja-' . now()->format('Ymd') . '-' . $i,
+                'client_ref' => 'demo-belanja-'.now()->format('Ymd').'-'.$i,
                 'tanggal' => now()->toDateString(),
                 'uraian' => $p['uraian'],
                 'jenis' => 'barang',
@@ -237,11 +237,11 @@ class DemoAktivitasHarianSeeder extends Seeder
         }
 
         $hari = now()->format('Ymd');
-        $this->buatJurnal('Belanja sayur & bumbu dapur harian', $beban->id, $kas->id, 850000, 'demo-harian-dapur-' . $hari);
-        $this->buatJurnal('Transport undangan pengajian', $beban->id, $kas->id, 150000, 'demo-harian-transport-' . $hari);
+        $this->buatJurnal('Belanja sayur & bumbu dapur harian', $beban->id, $kas->id, 850000, 'demo-harian-dapur-'.$hari);
+        $this->buatJurnal('Transport undangan pengajian', $beban->id, $kas->id, 150000, 'demo-harian-transport-'.$hari);
 
         if ($pendapatan) {
-            $this->buatJurnal('Infaq kotak masjid hari ini', $kas->id, $pendapatan->id, 670000, 'demo-harian-infaq-' . $hari);
+            $this->buatJurnal('Infaq kotak masjid hari ini', $kas->id, $pendapatan->id, 670000, 'demo-harian-infaq-'.$hari);
         }
     }
 }

@@ -7,7 +7,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Services\PpdbRegistrationNumberService;
 use Modules\PPDB\Services\PpdbWhatsappNotifier;
 use Modules\PPDB\Support\PpdbPhone;

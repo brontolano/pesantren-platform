@@ -27,6 +27,7 @@ class NotifDispatcher
         'approval_chasing' => 'approval_chasing',     // F1: minta keputusan persetujuan
         'kegiatan_h1' => 'kegiatan_h1',               // Kegiatan: reminder H-1
         'tagihan_jatuh_tempo' => 'tagihan_jatuh_tempo', // Keuangan: tagihan jatuh tempo
+        'tagihan_terbit' => 'TAGIHAN_BARU',           // Keuangan #339: Tagihan Rutin terbit → WA wali
         'stok_expiry' => 'stok_expiry',               // Inventory: batch mendekati kedaluwarsa
         'keputusan_ppdb' => 'keputusan_ppdb',         // PPDB: hasil seleksi
         // Event uang PWA Wali/Peserta (NOTIF-1, TGH-5, TAB-4) — additive.
@@ -134,7 +135,9 @@ class NotifDispatcher
                 $ok ? $hasil['terkirim']++ : $hasil['gagal']++;
             }
 
-            $broadcast->update(['status' => $hasil['gagal'] === 0 ? 'selesai' : 'sebagian']);
+            // Kosakata status KANONIK = sent/partial_failed (samakan dgn BroadcastWaService
+            // & BroadcastWaResource). Sebelumnya 'selesai'/'sebagian' → tak dikenali UI/badge.
+            $broadcast->update(['status' => $hasil['gagal'] === 0 ? 'sent' : 'partial_failed']);
 
             return $hasil;
         } catch (Throwable $e) {

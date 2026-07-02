@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use InvalidArgumentException;
 use Modules\Keuangan\Models\InventoryItem;
-use Modules\Keuangan\Models\InventoryMutasi;
 use Modules\Keuangan\Services\InventoryService;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;

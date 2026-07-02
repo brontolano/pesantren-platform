@@ -71,8 +71,8 @@ class LaporanPsak109Service
         // Mengambil jurnal di akun aset tetap (1-2xxx) dengan sumber dana ZIS
         $sumberZis = SumberDana::where(function ($q) {
             $q->where('nama_sumber', 'like', '%zakat%')
-              ->orWhere('nama_sumber', 'like', '%infak%')
-              ->orWhere('nama_sumber', 'like', '%sedekah%');
+                ->orWhere('nama_sumber', 'like', '%infak%')
+                ->orWhere('nama_sumber', 'like', '%sedekah%');
         })->pluck('id');
 
         if ($sumberZis->isEmpty()) {
@@ -178,7 +178,7 @@ class LaporanPsak109Service
             match ($jenis) {
                 'zakat' => $q->where('nama_sumber', 'like', '%zakat%'),
                 'infak' => $q->where('nama_sumber', 'like', '%infak%')
-                             ->orWhere('nama_sumber', 'like', '%sedekah%'),
+                    ->orWhere('nama_sumber', 'like', '%sedekah%'),
                 'amil' => $q->where('nama_sumber', 'like', '%amil%'),
                 default => $q->whereRaw('1=0'),
             };
@@ -233,6 +233,7 @@ class LaporanPsak109Service
         if ($ids->isEmpty()) {
             return 0.0;
         }
+
         return $this->saldoSumber($ids, null, $to ? date('Y-m-d', strtotime($to.' +1 day')) : null);
     }
 

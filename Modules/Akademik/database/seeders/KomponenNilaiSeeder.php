@@ -13,6 +13,10 @@ use Modules\Akademik\Models\KomponenNilai;
  * (pola LedgerSeeder); tenant_id terisi otomatis via BelongsToTenant.
  *
  * Bobot yang SUDAH diubah tenant tidak ditimpa (hanya create bila belum ada).
+ *
+ * Bobot ini SATU sumber dengan fallback netral
+ * NilaiService::DEFAULT_GRADE_WEIGHTS (Harian 40 / UTS 30 / UAS 30) dan default
+ * registry 'akademik_grade_weights' di Pusat Kebijakan — jangan dibuat berbeda.
  */
 class KomponenNilaiSeeder extends Seeder
 {

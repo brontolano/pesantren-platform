@@ -2,15 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\PpdbReport;
-use App\Filament\Resources\PPDB\CalonSantriDokumenResource;
-use App\Filament\Resources\PPDB\CalonSantriResource;
-use App\Filament\Resources\PPDB\HasilUjianResource;
 use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Modules\PPDB\Filament\Pages\PpdbReport;
+use Modules\PPDB\Filament\Resources\CalonSantriDokumenResource;
+use Modules\PPDB\Filament\Resources\CalonSantriResource;
+use Modules\PPDB\Filament\Resources\HasilUjianResource;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\CalonSantriDokumen;
 use Modules\PPDB\Models\HasilUjian;
@@ -22,6 +21,7 @@ class PpdbResourceTest extends TestCase
     use InteractsWithPpdbTestDatabase;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void
@@ -203,7 +203,7 @@ class PpdbResourceTest extends TestCase
             'status_pendaftaran' => 'ditolak',
         ]);
 
-        $report = new PpdbReport();
+        $report = new PpdbReport;
         $counts = $report->getViewData()['counts'];
 
         $this->assertSame(2, $counts['total']);

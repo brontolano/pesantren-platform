@@ -38,8 +38,9 @@ Edit di Excel, lalu import kembali bila perlu.
 
 ## 3. Akun Wali
 Di halaman **Santri** → tombol **Buat Akun Wali**. Sistem membuat akun untuk santri
-yang punya **nomor HP wali** (login Portal Wali pakai no. HP). Kredensial sementara
-tersimpan sebagai file untuk dibagikan.
+yang punya **nomor HP wali** (login Portal Wali pakai no. HP). Setelah selesai,
+klik tombol **Unduh Kredensial Wali** (di halaman yang sama) untuk mengunduh CSV
+kredensial sementara yang dibagikan ke wali — **tanpa CLI atau akses server**.
 
 ## 4. Mencetak dokumen
 Tombol **Cetak** tersedia di:

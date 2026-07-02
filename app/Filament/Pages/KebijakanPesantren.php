@@ -37,7 +37,7 @@ class KebijakanPesantren extends Page implements HasForms
 
     protected static ?string $title = 'Kebijakan Pesantren';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
     protected static ?int $navigationSort = 5;
 
@@ -78,9 +78,26 @@ class KebijakanPesantren extends Page implements HasForms
 
         foreach (KebijakanRegistry::entries() as $key => $entry) {
             $nilai = $svc->nilai($key);
-            $state[self::fieldName($key)] = $entry['tipe'] === 'json'
-                ? ($nilai === null ? '' : json_encode($nilai, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES))
-                : $nilai;
+
+            if ($entry['tipe'] === 'json') {
+                $state[self::fieldName($key)] = $nilai === null
+                    ? ''
+                    : json_encode($nilai, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+                continue;
+            }
+
+            // Defensif: field skalar (select/text/number/bool/textarea) butuh
+            // nilai SKALAR. Bila nilai tersimpan ter-bungkus array — mis.
+            // ['text'=>..] / ['value'=>..] / ['enabled'=>..] dari editor lain
+            // (PengaturanKeuangan menulis keuangan.jenis_lembaga sbg ['text'=>..])
+            // — ambil skalarnya agar OptionStateCast (Select) tidak melempar
+            // "Array to string conversion" saat form di-fill (gap-126).
+            if (is_array($nilai)) {
+                $nilai = $nilai['text'] ?? $nilai['value'] ?? $nilai['enabled'] ?? null;
+            }
+
+            $state[self::fieldName($key)] = $nilai;
         }
 
         return $state;
@@ -139,6 +156,7 @@ class KebijakanPesantren extends Page implements HasForms
             'select' => Select::make($name)->label($label)->options($entry['options'] ?? [])->native(false),
             'json' => Textarea::make($name)->label($label)->rows(5)
                 ->helperText($entry['deskripsi'].' (Format JSON — biarkan kosong untuk ikut bawaan.)'),
+            'textarea' => Textarea::make($name)->label($label)->rows(4),
             default => TextInput::make($name)->label($label),
         };
 

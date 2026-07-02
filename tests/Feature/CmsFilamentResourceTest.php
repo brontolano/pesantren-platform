@@ -2,10 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\CMS\Article\ArticleResource;
-use App\Filament\Resources\CMS\Gallery\GalleryResource;
-use App\Filament\Resources\CMS\Profile\ProfileResource;
-use App\Filament\Resources\CMS\WebsiteSetting\WebsiteSettingResource;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
@@ -13,6 +9,10 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Modules\CMS\Filament\Resources\Article\ArticleResource;
+use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
+use Modules\CMS\Filament\Resources\Profile\ProfileResource;
+use Modules\CMS\Filament\Resources\WebsiteSetting\WebsiteSettingResource;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Models\Gallery;
 use Modules\CMS\Models\WebsiteSection;

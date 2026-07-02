@@ -25,7 +25,7 @@ class SetupUnit extends Page
 
     protected static ?string $navigationLabel = 'Pusat Setup';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
     protected static ?int $navigationSort = -11;
 
@@ -43,6 +43,13 @@ class SetupUnit extends Page
 
         $user = auth()->user();
         if ($user === null) {
+            return false;
+        }
+
+        // "Pusat Setup" = konfigurasi awal pesantren (ranah admin). Tanpa ini,
+        // hub muncul untuk petugas unit mana pun yg punya 1 izin unit (mis. UKS
+        // via manage_kesehatan) → tampil di grup "Pengaturan Sistem" yg membingungkan.
+        if (! $user->can('manage_tenant_settings')) {
             return false;
         }
 
@@ -118,7 +125,9 @@ class SetupUnit extends Page
     private function dataUnit(string $kode): array
     {
         $def = UnitSetupRegistry::units()[$kode];
-        $steps = $def['steps'];
+        // Pisahkan langkah wajib vs opsional (importer historis migrasi tengah tahun).
+        $steps = array_values(array_filter($def['steps'], fn (array $s): bool => ! $s['opsional']));
+        $stepsOpsional = array_values(array_filter($def['steps'], fn (array $s): bool => $s['opsional']));
 
         $nextKey = null;
         foreach ($steps as $s) {
@@ -138,7 +147,9 @@ class SetupUnit extends Page
             'label' => $def['label'],
             'icon' => $def['icon'],
             'steps' => $steps,
+            'stepsOpsional' => $stepsOpsional,
             'progress' => UnitSetupRegistry::progress($kode),
+            'verifikasi' => UnitSetupRegistry::verifikasi($kode),
             'nextKey' => $nextKey,
             'hubUrl' => static::getUrl(),
             'tokoUrl' => $tokoUrl,

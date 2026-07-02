@@ -3,6 +3,8 @@
 namespace Modules\Kesantrian\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Modules\Kesantrian\Console\AuditPenempatanCommand;
+use Modules\Kesantrian\Console\ProvisionAkunSantriCommand;
 
 class KesantrianServiceProvider extends ServiceProvider
 {
@@ -17,8 +19,8 @@ class KesantrianServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Modules\Kesantrian\Console\ProvisionAkunSantriCommand::class,
-                \Modules\Kesantrian\Console\AuditPenempatanCommand::class,
+                ProvisionAkunSantriCommand::class,
+                AuditPenempatanCommand::class,
             ]);
         }
     }
@@ -32,7 +34,7 @@ class KesantrianServiceProvider extends ServiceProvider
     protected function registerConfig(): void
     {
         $this->publishes([
-            module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower . '.php'),
+            module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower.'.php'),
         ], 'config');
         $this->mergeConfigFrom(
             module_path($this->moduleName, 'config/config.php'),

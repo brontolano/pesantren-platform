@@ -19,8 +19,7 @@ class KepalaKeuanganPwaBrandingController extends Controller
 {
     public function __construct(
         private readonly KepalaKeuanganBrandingService $brandingService,
-    ) {
-    }
+    ) {}
 
     public function manifest(): JsonResponse
     {
@@ -120,7 +119,7 @@ SVG;
             '/keuangan/icon.svg?size=512',
         ];
 
-        $script = <<<JS
+        $script = <<<'JS'
 const CACHE_NAME = %s;
 const SHELL_URLS = %s;
 

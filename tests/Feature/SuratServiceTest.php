@@ -72,7 +72,7 @@ class SuratServiceTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => $tenant->is_active,
-             'data' => json_encode([]), 'created_at' => now(), 'updated_at' => now()],
+                'data' => json_encode([]), 'created_at' => now(), 'updated_at' => now()],
         );
     }
 }

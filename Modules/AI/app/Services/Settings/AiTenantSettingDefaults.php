@@ -28,13 +28,15 @@ class AiTenantSettingDefaults
 
             // ============================ PENTING ============================
             // whitelist_kitab & blacklist_topik default SENGAJA KOSONG.
-            // Isi keagamaan (daftar kitab rujukan per manhaj, daftar topik
-            // terlarang: nikah/talak/waris, takfir, politik praktis, aqidah
-            // sensitif, dst.) HANYA boleh masuk dari berkas seed yang sudah
-            // DITINJAU USTADZ (GATE-3 PRD §12.2). DILARANG KERAS dikarang
-            // oleh pengembang/AI — struktur field disediakan, isinya tidak.
-            // Konsekuensi aman: whitelist kosong → retrieval keagamaan tidak
-            // menemukan rujukan → jawaban "silakan tanya ustadz" (PRD §6.3).
+            // Isi keagamaan (daftar kitab rujukan, daftar topik terlarang:
+            // nikah/talak/waris, takfir, politik praktis, aqidah sensitif, dst.)
+            // DIISI MANDIRI oleh PESANTUREN lewat Wizard Pengaturan AI (gap-83 —
+            // tanggung jawab Dewan Asatidz pesantren, bukan seed pusat), lalu
+            // menunggu persetujuan Kyai/Mudir (sensitive_fields). TETAP DILARANG
+            // KERAS dikarang oleh pengembang/AI — struktur field disediakan,
+            // isinya datang dari pesantren. Konsekuensi aman bila kosong:
+            // retrieval keagamaan tidak menemukan rujukan → jawaban "silakan
+            // tanya ustadz" (PRD §6.3).
             // =================================================================
             'whitelist_kitab' => [],
             'blacklist_topik' => [],
@@ -79,6 +81,12 @@ class AiTenantSettingDefaults
 
             'bahasa' => 'id',
             'gaya' => 'formal_santun',
+
+            // gap-135 — mode uji chatbot WA: true = balas template statis
+            // (tanpa LLM), false = pipeline intent/RAG aktif. Default true
+            // = perilaku teraman & sama dengan env AI_WA_MODE_UJI bawaan.
+            // Field NON-sensitif: perubahan langsung aktif tanpa approval kyai.
+            'mode_uji_wa' => true,
 
             // 24 jam: di luar jam tidak pernah terjadi; pesan tetap tersedia.
             'jam_layanan' => ['mulai' => '00:00', 'selesai' => '23:59'],

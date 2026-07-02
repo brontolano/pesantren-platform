@@ -1,8 +1,4 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Asrama\Http\Controllers\AsramaController;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('asramas', AsramaController::class)->names('asrama');
-});
+// UI modul Asrama disajikan via panel Filament — tak ada rute web kustom.
+// (Scaffold nwidart Route::resource dihapus: cegah 500/404 di /asramas utk user login.)

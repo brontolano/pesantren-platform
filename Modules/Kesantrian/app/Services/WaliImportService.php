@@ -2,6 +2,7 @@
 
 namespace Modules\Kesantrian\Services;
 
+use App\Models\Setting;
 use App\Models\User;
 use App\Support\PhoneNumber;
 use Illuminate\Support\Facades\Hash;
@@ -23,19 +24,22 @@ use Modules\Kesantrian\Models\Santri;
  */
 class WaliImportService
 {
+    /** Setting tenant: nama file CSV kredensial terakhir (untuk unduh via panel). */
+    public const SETTING_LAST_CSV = 'wali_import.last_csv';
+
     /**
      * @return array{
      *   total:int, created:int, existing:int, no_hp:int,
      *   imported:int, skipped:int, failed:int,
      *   errors:array<int, array{row:int, ref:string, error:string}>,
-     *   csv_path:?string
+     *   csv_path:?string, csv_file:?string
      * }
      */
     public function generate(string $tenantId, bool $dryRun = false): array
     {
         $stats = [
             'total' => 0, 'created' => 0, 'existing' => 0, 'no_hp' => 0,
-            'imported' => 0, 'skipped' => 0, 'failed' => 0, 'errors' => [], 'csv_path' => null,
+            'imported' => 0, 'skipped' => 0, 'failed' => 0, 'errors' => [], 'csv_path' => null, 'csv_file' => null,
         ];
         $credentials = [];
 
@@ -105,16 +109,32 @@ class WaliImportService
         $stats['skipped'] = $stats['existing'] + $stats['no_hp'];
 
         if (! $dryRun && $credentials !== []) {
-            $stats['csv_path'] = $this->saveCsv($credentials, $tenantId);
+            [$stats['csv_path'], $stats['csv_file']] = $this->saveCsv($credentials, $tenantId);
         }
 
         return $stats;
     }
 
     /**
-     * @param  array<int, array<int, string>>  $credentials
+     * Nama file CSV kredensial TERAKHIR (relatif disk 'local' tenant), atau null.
+     * Dipakai aksi panel "Unduh Kredensial Wali" — tanpa akses storage/ manual.
      */
-    private function saveCsv(array $credentials, string $tenantId): string
+    public static function lastCsvFile(): ?string
+    {
+        try {
+            $file = (string) Setting::getTenantStringValue(self::SETTING_LAST_CSV);
+
+            return $file !== '' && Storage::disk('local')->exists($file) ? $file : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @param  array<int, array<int, string>>  $credentials
+     * @return array{0:string, 1:string} [path absolut, nama file relatif disk 'local']
+     */
+    private function saveCsv(array $credentials, string $tenantId): array
     {
         $filename = "wali-import-{$tenantId}-".now()->format('Ymd-His').'.csv';
 
@@ -130,6 +150,17 @@ class WaliImportService
         // Storage 'local' = tenancy-aware (root storage/tenant{id}/app); auto-buat folder.
         Storage::disk('local')->put($filename, $csv);
 
-        return Storage::disk('local')->path($filename);
+        // Catat file terakhir agar bisa DIUNDUH lewat panel (aksi "Unduh Kredensial
+        // Wali" di halaman Santri) — tanpa perlu akses storage/ server manual.
+        try {
+            Setting::updateOrCreate(
+                ['tenant_id' => $tenantId, 'key' => self::SETTING_LAST_CSV],
+                ['value' => ['text' => $filename]],
+            );
+        } catch (\Throwable) {
+            // Gagal mencatat setting tak boleh menggagalkan pembuatan akun.
+        }
+
+        return [Storage::disk('local')->path($filename), $filename];
     }
 }

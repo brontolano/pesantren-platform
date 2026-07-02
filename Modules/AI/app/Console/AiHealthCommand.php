@@ -10,6 +10,7 @@ use Modules\AI\Models\AiTenantBudget;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
 use Modules\AI\Services\Metering\BudgetGuard;
+use Modules\AI\Services\Prompts\PromptRegistry;
 use Throwable;
 
 /**
@@ -72,7 +73,7 @@ class AiHealthCommand extends Command
         if ($healthy && ! $this->option('skip-generate')) {
             // T-A004: pakai agen 'uji-internal' bila terdaftar — uji generate
             // ikut melewati prompt registry dan mencatat prompt_version_id.
-            $agentUji = app(\Modules\AI\Services\Prompts\PromptRegistry::class)
+            $agentUji = app(PromptRegistry::class)
                 ->agentTerdaftar('uji-internal') ? 'uji-internal' : 'health-check';
 
             $result = $gateway->generate(new AiGenerateRequest(

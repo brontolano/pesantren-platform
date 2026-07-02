@@ -2,13 +2,13 @@
 
 namespace Modules\Kegiatan\Services;
 
+use App\Models\Setting;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\Kegiatan\Models\IzinSantri;
 use Modules\Kesantrian\Models\Santri;
-use App\Models\Setting;
-use App\Models\User;
 use RuntimeException;
 
 class IzinSantriService
@@ -29,7 +29,7 @@ class IzinSantriService
 
         return DB::transaction(function () use ($payload, $tglMulai, $tglSelesai, $santri) {
             // Check idempoten dulu sebelum validasi (agar client_ref yang sama bisa di-resend tanpa error)
-            if (!empty($payload['client_ref'])) {
+            if (! empty($payload['client_ref'])) {
                 $existing = IzinSantri::where('tenant_id', tenant('id'))
                     ->where('santri_id', $payload['santri_id'])
                     ->where('client_ref', $payload['client_ref'])
@@ -123,7 +123,7 @@ class IzinSantriService
             throw new InvalidArgumentException('jenis_izin wajib diisi.');
         }
 
-        if (!in_array($payload['jenis_izin'], ['pulang', 'sakit', 'keluar_kota', 'kunjungan'], true)) {
+        if (! in_array($payload['jenis_izin'], ['pulang', 'sakit', 'keluar_kota', 'kunjungan'], true)) {
             throw new InvalidArgumentException('jenis_izin tidak valid.');
         }
 
@@ -133,7 +133,7 @@ class IzinSantriService
             throw new InvalidArgumentException('tanggal_selesai tidak boleh sebelum tanggal_mulai.');
         }
 
-        // Cek overlap dengan izin pending/disetujui lain pada santri yang sama
+        // Cek overlap dengan izin diajukan/disetujui lain pada santri yang sama
         $ada = IzinSantri::where('tenant_id', tenant('id'))
             ->where('santri_id', $santri->id)
             ->whereIn('status', ['diajukan', 'disetujui'])
@@ -148,7 +148,7 @@ class IzinSantriService
             ->exists();
 
         if ($ada) {
-            throw new InvalidArgumentException('Tanggal izin ini tumpang-tindih dengan izin lain yang masih pending/disetujui.');
+            throw new InvalidArgumentException('Tanggal izin ini tumpang-tindih dengan izin lain yang masih diajukan/disetujui.');
         }
 
         // Cek H-minimum sebelum izin mulai
@@ -176,7 +176,7 @@ class IzinSantriService
 
     private function ensureTenantContext(): void
     {
-        if (!tenancy()->initialized || tenancy()->tenant === null) {
+        if (! tenancy()->initialized || tenancy()->tenant === null) {
             throw new RuntimeException('Tenant context belum aktif.');
         }
     }

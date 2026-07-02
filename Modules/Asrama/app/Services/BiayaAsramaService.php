@@ -18,7 +18,7 @@ class BiayaAsramaService
             $santri,
             [
                 'jenis_tagihan' => 'asrama',
-                'keterangan' => $data['keterangan'] ?? 'Biaya asrama ' . $data['periode'],
+                'keterangan' => $data['keterangan'] ?? 'Biaya asrama '.$data['periode'],
                 'nominal' => $data['nominal'],
                 'jatuh_tempo' => $data['jatuh_tempo'] ?? now()->toDateString(),
                 'status' => $data['status_pembayaran'] ?? 'belum_bayar',
@@ -27,7 +27,7 @@ class BiayaAsramaService
             $biaya?->tagihanKeuangan,
         );
 
-        $record = $biaya ?? new BiayaAsrama();
+        $record = $biaya ?? new BiayaAsrama;
         $record->fill([
             'santri_id' => $santri->id,
             'kamar_id' => $kamar?->id,

@@ -72,8 +72,8 @@ class ResearchTelemetry
      *
      * @param  array<string, mixed>  $payloadBaru
      * @param  array<string, mixed>|null  $payloadLama  payload versi aktif
-     *         sebelumnya (null bila tidak ada — dianggap pernah opt-in agar
-     *         pembersihan tetap berjalan).
+     *                                                  sebelumnya (null bila tidak ada — dianggap pernah opt-in agar
+     *                                                  pembersihan tetap berjalan).
      */
     public function onSettingAktif(string $tenantId, array $payloadBaru, ?array $payloadLama): void
     {

@@ -8,8 +8,9 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
-use Modules\Keuangan\Models\Tagihan;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Models\Tagihan;
+use Modules\Keuangan\Services\PembayaranService;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Models\SumberDana;
@@ -18,7 +19,6 @@ use Modules\Ledger\Services\LaporanService;
 use Modules\Pajak\Database\Seeders\PajakSeeder;
 use Modules\Pengadaan\Models\Belanja;
 use Modules\Pengadaan\Services\BelanjaService;
-use Modules\Keuangan\Services\PembayaranService;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -50,7 +50,7 @@ class PwaApiTest extends TestCase
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->user = User::withoutGlobalScopes()->create([
-            'name' => 'Bendahara', 'email' => 'b@' . tenant('id') . '.localhost',
+            'name' => 'Bendahara', 'email' => 'b@'.tenant('id').'.localhost',
             'password' => 'password', 'tenant_id' => tenant('id'),
         ]);
         $this->user->assignRole('bendahara');
@@ -90,7 +90,7 @@ class PwaApiTest extends TestCase
     public function test_api_pemasukan_membuat_jurnal_otomatis(): void
     {
         $this->boot();
-        $santri = Santri::create(['nis' => 'S-' . str()->random(4), 'nama' => 'A', 'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'L']);
+        $santri = Santri::create(['nis' => 'S-'.str()->random(4), 'nama' => 'A', 'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'L']);
         $tagihan = Tagihan::create([
             'santri_id' => $santri->id, 'jenis_tagihan' => 'spp', 'nominal' => 200000,
             'nominal_akhir' => 200000, 'jatuh_tempo' => '2026-06-30', 'status' => 'belum_bayar',
@@ -108,7 +108,7 @@ class PwaApiTest extends TestCase
     {
         $this->boot();
         // posting pemasukan dulu
-        $santri = Santri::create(['nis' => 'S-' . str()->random(4), 'nama' => 'B', 'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'L']);
+        $santri = Santri::create(['nis' => 'S-'.str()->random(4), 'nama' => 'B', 'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'L']);
         $tagihan = Tagihan::create([
             'santri_id' => $santri->id, 'jenis_tagihan' => 'spp', 'nominal' => 500000,
             'nominal_akhir' => 500000, 'jatuh_tempo' => '2026-06-30', 'status' => 'belum_bayar',

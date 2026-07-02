@@ -8,8 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Province extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
+
     protected $keyType = 'string';
+
     protected $fillable = ['id', 'name'];
 
     public function cities(): HasMany

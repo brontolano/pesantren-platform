@@ -1,0 +1,9 @@
+# Override khusus uji TestSprite lokal — JANGAN commit.
+# Tujuan: hindari bentrok host-port redis 6379 dengan container lain (mp-redis).
+# App tetap akses redis & postgres lewat jaringan internal compose, jadi
+# publikasi host-port tidak diperlukan untuk uji.
+services:
+  redis:
+    ports: !reset []
+  postgres:
+    ports: !reset []

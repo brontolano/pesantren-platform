@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PPDB untuk Panitia · Panduan Pesantren.online</title>
+<meta name="description" content="Mengatur PPDB, verifikasi berkas pendaftar, jadwal & nilai ujian, keputusan lulus/cadangan/tolak, dan tagihan daftar ulang.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a><a class="nav-item" href="../cara-setup/">🚀 Cara Setup Pesantren</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item active" href="../ppdb-panitia/">📝 PPDB untuk Panitia</a><div class="nav-sub"><a href="#1-mengatur-pengaturan-ppdb">1. Mengatur Pengaturan PPDB</a><a href="#2-mengatur-gelombang-ppdb">2. Mengatur Gelombang PPDB</a><a href="#3-melihat-calon-santri">3. Melihat Calon Santri</a><a href="#4-verifikasi-berkas-dokumen">4. Verifikasi Berkas (Dokumen)</a><a href="#5-jadwal-amp-nilai-ujian">5. Jadwal &amp; Nilai Ujian</a><a href="#6-keputusan-seleksi">6. Keputusan: Lulus / Cadangan / Tolak</a><a href="#7-tagihan-amp-daftar-ulang">7. Tagihan &amp; Daftar Ulang</a><a href="#8-pengingat-penting">8. Pengingat Penting</a><a href="#contekan-cepat-panitia">Contekan Cepat Panitia</a></div><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama & Kehidupan Santri</a><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">📝</div>
+        <div>
+
+          <h1>PPDB untuk Panitia</h1>
+          <p class="lead">Mengatur PPDB, verifikasi berkas pendaftar, jadwal &amp; nilai ujian, keputusan lulus/cadangan/tolak, dan tagihan daftar ulang.</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>, dan akun Bapak/Ibu punya hak <strong>kelola santri</strong> (panitia PPDB). Semua menu di panduan ini ada di grup menu <strong>PPDB</strong> pada menu kiri.
+Aplikasi ini menggantikan: buku pendaftaran, map berkas calon santri, dan daftar nilai ujian masuk. Setiap keputusan (berkas diverifikasi, lulus/cadangan/tolak, tagihan lunas) otomatis dikabari ke wali lewat WhatsApp — tidak perlu menelepon satu per satu.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Mengatur Pengaturan PPDB (sekali di awal)</li>
+<li>Mengatur gelombang PPDB</li>
+<li>Melihat daftar calon santri</li>
+<li>Verifikasi berkas (dokumen)</li>
+<li>Jadwal &amp; nilai ujian</li>
+<li>Keputusan: lulus / cadangan / tolak</li>
+<li>Tagihan &amp; daftar ulang</li>
+<li>Pengingat penting</li>
+</ol>
+<hr>
+<h2 id="1-mengatur-pengaturan-ppdb">1. Mengatur Pengaturan PPDB<a class="anchor" href="#1-mengatur-pengaturan-ppdb" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> <strong>sekali di awal</strong> sebelum membuka pendaftaran, atau setiap pergantian tahun ajaran. Di sinilah Bapak/Ibu menentukan tahun ajaran, nomor rekening, nomor WhatsApp admin, dan kolom apa saja yang wajib diisi pendaftar.</p>
+<p><strong>Siapkan dulu:</strong> tahun ajaran yang dibuka, nama bank + nomor rekening + atas nama rekening pesantren, nominal biaya pendaftaran, dan nomor WhatsApp admin yang akan menerima pemberitahuan pendaftar baru.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>PPDB</strong> → <strong>Pengaturan PPDB</strong>.</li>
+<li>Bagian <strong>Pendaftaran &amp; Informasi Transfer</strong> — isi:<ul>
+<li><strong>Tahun Ajaran</strong> — contoh: <code>2026/2027</code>.</li>
+<li><strong>WhatsApp Admin</strong> — nomor tujuan pemberitahuan pendaftar baru.</li>
+<li><strong>Nama Bank, Nomor Rekening, Atas Nama Rekening</strong> — rekening tujuan transfer.</li>
+<li><strong>Nominal Transfer</strong> — boleh ditulis angka atau teks, misalnya <code>Rp350.000</code>. Ini hanya informasi tampilan, bukan transaksi keuangan.</li>
+<li><strong>Instruksi Transfer</strong> dan <strong>Pesan sukses setelah submit</strong> — teks yang dibaca pendaftar di website.</li>
+<li><strong>Aktifkan form pendaftaran inline di landing page</strong> — nyalakan bila ingin formulir pendaftaran tampil langsung di halaman depan website.</li>
+</ul>
+</li>
+<li>Bagian <strong>Konfigurasi Field Formulir PPDB</strong> — atur setiap kolom formulir. Pada kolom <strong>Mode</strong>, isi salah satu kata: <code>required</code> (wajib), <code>optional</code> (boleh kosong), <code>hidden</code> (disembunyikan), atau <code>staf</code> (tidak tampil ke pendaftar — diisi panitia). Ketuk <strong>Tambah field</strong> bila perlu menambah baris.</li>
+<li>Ketuk <strong>Simpan</strong> (tombol di bawah halaman).</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> halaman Pengaturan PPDB dengan bagian Informasi Transfer terisi <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pesan <em>“Pengaturan PPDB disimpan”</em>. Informasi rekening &amp; tahun ajaran kini dipakai di seluruh alur pendaftaran.</p>
+<blockquote>
+<p>💡 <strong>Tahun Ajaran</strong> otomatis mengikuti periode akademik yang sedang aktif bila sudah diatur — Bapak/Ibu tinggal memeriksa, tidak perlu mengetik ulang.</p>
+</blockquote>
+<p>⚠️ <em>Menu Pengaturan PPDB tidak muncul?</em> → halaman ini hanya untuk pengguna dengan hak <strong>kelola pengaturan pesantren</strong>. Minta admin pesantren memberi hak itu, atau minta beliau yang mengisinya.</p>
+<hr>
+<h2 id="2-mengatur-gelombang-ppdb">2. Mengatur Gelombang PPDB<a class="anchor" href="#2-mengatur-gelombang-ppdb" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> mendaftarkan gelombang pendaftaran (Gelombang 1, Gelombang 2, dst.) sebagai catatan referensi: kapan buka, kapan tutup, kuota, dan biaya pendaftaran.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>PPDB</strong> → <strong>Gelombang PPDB</strong>. (Bisa juga lewat tautan <em>“Buka menu Gelombang PPDB →”</em> di halaman Pengaturan PPDB.)</li>
+<li>Ketuk <strong>+ Tambah</strong> (atau <strong>New</strong>).</li>
+<li>Isi formulir:<ul>
+<li><strong>Nama Gelombang</strong> — contoh: <code>Gelombang 1</code>.</li>
+<li><strong>Tahun Ajaran</strong> — terisi otomatis mengikuti periode aktif; periksa kembali.</li>
+<li><strong>Tanggal Buka</strong> dan <strong>Tanggal Tutup</strong>.</li>
+<li><strong>Kuota</strong> — kosongkan bila tanpa batas.</li>
+<li><strong>Biaya Pendaftaran</strong> — nominal referensi tampilan saja, tidak memengaruhi pembukuan/tagihan.</li>
+<li><strong>Aktif</strong> — nyalakan untuk gelombang yang sedang berjalan.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> gelombang muncul di tabel dengan tanda centang pada kolom <strong>Aktif</strong>.</p>
+<blockquote>
+<p>💡 Master Gelombang ini bersifat <strong>referensi/catatan</strong> dan belum tersambung otomatis ke formulir pendaftaran di website — gunanya merapikan data tahun ajaran dan gelombang Bapak/Ibu.</p>
+</blockquote>
+<hr>
+<h2 id="3-melihat-calon-santri">3. Melihat Calon Santri<a class="anchor" href="#3-melihat-calon-santri" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setiap hari saat pendaftaran berjalan, untuk memantau siapa saja yang sudah mendaftar.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>PPDB</strong> → <strong>Calon Santri</strong>.</li>
+<li>Muncul daftar pendaftar: <strong>No. Pendaftaran</strong>, <strong>Nama</strong>, <strong>Status</strong>, jenis kelamin, program, dan No. HP wali.</li>
+<li>Cari pendaftar lewat kotak Cari 🔍 (ketik nama atau nomor pendaftaran).</li>
+<li>Pakai penyaring (filter) <strong>Status Pendaftaran</strong> atau <strong>Program Diminati</strong> untuk mempersempit daftar.</li>
+<li>Ketuk barisnya untuk membaca detail, atau ketuk <strong>Edit</strong> (pensil) untuk membetulkan data.</li>
+</ol>
+<p><strong>Arti warna status:</strong></p>
+<ul>
+<li><strong>Pending / Menunggu Verifikasi / Cadangan</strong> (kuning) — masih dalam proses.</li>
+<li><strong>Verifikasi Berkas / Registrasi Ulang</strong> (biru) — sedang/sudah lanjut tahap berikutnya.</li>
+<li><strong>Lulus</strong> (hijau) — diterima.</li>
+<li><strong>Ditolak</strong> (merah).</li>
+</ul>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> tabel Calon Santri dengan kolom Status berwarna <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> angka kecil (badge) di samping menu <strong>Calon Santri</strong> menunjukkan berapa pendaftar yang <em>masih dalam proses</em> dan perlu ditinjau panitia.</p>
+<blockquote>
+<p>💡 Kolom <strong>NISN</strong> dan beberapa data EMIS bertanda <em>“diisi panitia”</em> — tidak tampil ke pendaftar, dan Bapak/Ibu yang melengkapinya lewat tombol <strong>Edit</strong>.</p>
+</blockquote>
+<hr>
+<h2 id="4-verifikasi-berkas-dokumen">4. Verifikasi Berkas (Dokumen)<a class="anchor" href="#4-verifikasi-berkas-dokumen" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setelah pendaftar mengunggah berkas (KK, akta, ijazah, bukti transfer, dsb.). Tugas panitia: memeriksa apakah berkasnya benar dan jelas.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>PPDB</strong> → <strong>Dokumen PPDB</strong>.</li>
+<li>Muncul daftar dokumen per calon santri, dengan kolom <strong>Verifikasi</strong> (Menunggu Verifikasi / Terverifikasi / Ditolak).</li>
+<li>Ketuk <strong>Lihat</strong> (ikon mata) untuk membuka file dan memeriksanya.</li>
+<li>Putuskan:<ul>
+<li>Berkas benar &amp; jelas → ketuk <strong>Verifikasi</strong> (centang hijau), lalu konfirmasi.</li>
+<li>Berkas buram/salah → ketuk <strong>Tolak</strong> (silang merah), <strong>tulis alasan penolakan</strong>, lalu simpan.</li>
+</ul>
+</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> kolom Verifikasi berubah menjadi <strong>Terverifikasi</strong> (hijau) atau <strong>Ditolak</strong> (merah). Wali otomatis menerima kabar lewat WhatsApp — bila ditolak, alasan yang Bapak/Ibu tulis ikut terkirim supaya wali bisa mengunggah ulang.</p>
+<p>⚠️ <em>Tombol Lihat tidak ada?</em> → berkasnya memang belum diunggah pendaftar. Hubungi wali agar mengunggah dulu.</p>
+<hr>
+<h2 id="5-jadwal-amp-nilai-ujian">5. Jadwal &amp; Nilai Ujian<a class="anchor" href="#5-jadwal-amp-nilai-ujian" aria-hidden="true">#</a></h2>
+<p><strong>Penting:</strong> untuk bisa <strong>meluluskan</strong> atau menjadikan <strong>cadangan</strong>, setiap pendaftar <strong>wajib punya minimal satu nilai/hasil ujian</strong>. Maka selesaikan bagian ini sebelum mengambil keputusan di Bagian 6.</p>
+<h3>a. Membuat jadwal ujian</h3>
+<ol>
+<li>Menu kiri → grup <strong>PPDB</strong> → <strong>Jadwal Ujian</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>, lalu isi <strong>Kategori Ujian</strong> (contoh: <code>Tes Baca Quran</code>), <strong>Tanggal</strong>, <strong>Waktu Mulai/Selesai</strong>, dan <strong>Ruang</strong>.</li>
+<li>Ketuk <strong>Simpan</strong>. Jadwal ini tampil di kartu peserta digital.</li>
+</ol>
+<h3>b. Memasukkan nilai ujian (input manual)</h3>
+<ol>
+<li>Menu kiri → grup <strong>PPDB</strong> → <strong>Hasil Ujian (Input Manual)</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>, lalu isi:<ul>
+<li><strong>Calon Santri</strong> — ketik sebagian nama, pilih dari daftar.</li>
+<li><strong>Kategori Ujian</strong> — contoh: <code>Tes Baca Quran</code>.</li>
+<li><strong>Nilai</strong> — angka.</li>
+<li><strong>Catatan</strong> — bila perlu.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<h3>c. Ujian online (bila dipakai)</h3>
+<p>Bila pesantren memakai ujian online, hasilnya terkumpul otomatis di menu <strong>Hasil Ujian Online</strong>. Untuk soal <strong>esai</strong>, panitia menilai manual: ketuk <strong>Nilai Essay</strong> pada baris yang berstatus <em>Menunggu Nilai</em>, beri skor tiap jawaban, lalu simpan — nilai final otomatis tercatat ke Hasil Ujian.</p>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Hasil Ujian (Input Manual) dengan kotak Nilai <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> nilai muncul di tabel. Kini pendaftar itu sudah boleh diluluskan/dijadikan cadangan.</p>
+<blockquote>
+<p>💡 Menu <strong>Jadwal Ujian</strong> dan <strong>Hasil Ujian (Input Manual)</strong> hanya tampil pada <strong>Mode Lanjutan</strong>. Bila menunya belum kelihatan, minta admin mengaktifkan Mode Lanjutan.</p>
+</blockquote>
+<hr>
+<h2 id="6-keputusan-seleksi">6. Keputusan: Lulus / Cadangan / Tolak<a class="anchor" href="#6-keputusan-seleksi" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setelah berkas diverifikasi dan nilai ujian masuk — saatnya memutuskan nasib pendaftar.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>PPDB</strong> → <strong>Calon Santri</strong>.</li>
+<li>Pada baris pendaftar, pilih salah satu tombol aksi:<ul>
+<li><strong>Luluskan</strong> (topi wisuda, hijau) — menetapkan <strong>LULUS</strong>.</li>
+<li><strong>Cadangan</strong> (jam, kuning) — menetapkan sebagai <strong>cadangan</strong>.</li>
+<li><strong>Tolak</strong> (silang, merah) — menolak; Bapak/Ibu <strong>wajib menulis alasan penolakan</strong>.</li>
+</ul>
+</li>
+<li>Konfirmasi pada kotak yang muncul.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> status pendaftar berubah dan <strong>pengumuman otomatis dikirim ke wali lewat WhatsApp</strong>. Tidak perlu mengumumkan manual satu per satu.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Muncul pesan “membutuhkan minimal satu hasil ujian”</em> → pendaftar itu belum punya nilai ujian. Kembali ke Bagian 5, masukkan nilainya, lalu ulangi.</li>
+<li><em>Tombol Luluskan/Cadangan tidak muncul</em> → biasanya karena status pendaftar sudah final (sudah lulus/ditolak) atau sudah daftar ulang. Keputusan yang sudah daftar ulang <strong>terkunci</strong> demi mencegah data janggal.</li>
+<li><em>Perlu mengingatkan yang sudah lulus?</em> → tombol <strong>Ingatkan Daftar Ulang</strong> mengirim pengingat via WhatsApp (muncul untuk pendaftar berstatus Lulus).</li>
+</ul>
+<blockquote>
+<p>💡 Bila pendaftar tidak menerima kode OTP atau salah menulis nomor WA, gunakan tombol <strong>Kirim Ulang OTP / Koreksi No. WA</strong> untuk membetulkan nomor dan mengirim ulang kode. Password tidak pernah dikirim — pendaftar membuat sendiri lewat kode.</p>
+</blockquote>
+<hr>
+<h2 id="7-tagihan-amp-daftar-ulang">7. Tagihan &amp; Daftar Ulang<a class="anchor" href="#7-tagihan-amp-daftar-ulang" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Tagihan (biaya pendaftaran / daftar ulang) <strong>dibuat otomatis oleh sistem</strong>. Tugas panitia di sini hanya <strong>memverifikasi bukti transfer</strong> yang diunggah wali — bukan membuat tagihan baru.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>PPDB</strong> → <strong>Tagihan PPDB</strong>.</li>
+<li>Muncul daftar tagihan: nama, jenis, nominal, status, dan apakah bukti sudah <strong>Ada</strong>.</li>
+<li>Pada tagihan berstatus <strong>Menunggu Verifikasi</strong>, ketuk <strong>Lihat Bukti</strong> (mata) untuk memeriksa bukti transfer.</li>
+<li>Putuskan:<ul>
+<li>Bukti benar → ketuk <strong>Konfirmasi Lunas</strong> (centang hijau), lalu konfirmasi.</li>
+<li>Bukti salah/tidak jelas → ketuk <strong>Tolak Bukti</strong> (silang merah), boleh tulis catatan, lalu simpan. Status kembali ke <em>Belum Bayar</em> agar wali mengunggah ulang.</li>
+</ul>
+</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> status tagihan berubah menjadi <strong>Lunas</strong> (hijau). Wali otomatis menerima konfirmasi pembayaran lewat WhatsApp.</p>
+<blockquote>
+<p>💡 Halaman Tagihan PPDB <strong>tidak punya tombol Tambah</strong> — itu memang disengaja. Nominal &amp; informasi rekening diatur di <strong>Pengaturan PPDB</strong> (Bagian 1); tagihan tersusun otomatis dari sana.</p>
+</blockquote>
+<hr>
+<h2 id="8-pengingat-penting">8. Pengingat Penting<a class="anchor" href="#8-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>🧭 <strong>Urutannya: Atur dulu, baru terima.</strong> Lengkapi <strong>Pengaturan PPDB</strong> (tahun ajaran + rekening) sebelum pendaftaran dibuka.</li>
+<li>📄 <strong>Verifikasi berkas dengan teliti.</strong> Bila menolak, tulis alasan yang jelas — wali membacanya dan akan mengunggah ulang.</li>
+<li>📝 <strong>Nilai ujian dulu, baru putuskan.</strong> Lulus/cadangan butuh minimal satu hasil ujian.</li>
+<li>🤝 <strong>Pengumuman terkirim otomatis.</strong> Setiap keputusan dikabari ke wali via WhatsApp — tidak perlu kabari manual.</li>
+<li>🔒 <strong>Keputusan yang sudah daftar ulang terkunci.</strong> Koreksi lewat alur kesantrian, bukan dengan memaksa ubah status.</li>
+<li>🚪 <strong>Keluar (logout)</strong> kalau memakai komputer kantor bersama.</li>
+</ol>
+<hr>
+<h2 id="contekan-cepat-panitia">Contekan Cepat Panitia<a class="anchor" href="#contekan-cepat-panitia" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Atur tahun ajaran, rekening, WA admin, kolom formulir</td>
+<td>PPDB → Pengaturan PPDB</td>
+</tr>
+<tr>
+<td>Tambah/ubah gelombang</td>
+<td>PPDB → Gelombang PPDB → + Tambah</td>
+</tr>
+<tr>
+<td>Lihat daftar pendaftar</td>
+<td>PPDB → Calon Santri</td>
+</tr>
+<tr>
+<td>Verifikasi / tolak berkas</td>
+<td>PPDB → Dokumen PPDB → Verifikasi / Tolak</td>
+</tr>
+<tr>
+<td>Buat jadwal ujian</td>
+<td>PPDB → Jadwal Ujian → + Tambah</td>
+</tr>
+<tr>
+<td>Masukkan nilai ujian</td>
+<td>PPDB → Hasil Ujian (Input Manual) → + Tambah</td>
+</tr>
+<tr>
+<td>Nilai esai ujian online</td>
+<td>PPDB → Hasil Ujian Online → Nilai Essay</td>
+</tr>
+<tr>
+<td>Luluskan / Cadangan / Tolak</td>
+<td>PPDB → Calon Santri → tombol aksi di baris</td>
+</tr>
+<tr>
+<td>Verifikasi bukti transfer</td>
+<td>PPDB → Tagihan PPDB → Konfirmasi Lunas / Tolak Bukti</td>
+</tr>
+<tr>
+<td>Ingatkan daftar ulang</td>
+<td>PPDB → Calon Santri → Ingatkan Daftar Ulang</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../guru/"><span>‹ Sebelumnya</span><b>Guru / Ustadz</b></a>
+      <a class="pager-link next" href="../website/"><span>Berikutnya ›</span><b>Pengurus Website</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-mengatur-pengaturan-ppdb">1. Mengatur Pengaturan PPDB</a><a href="#2-mengatur-gelombang-ppdb">2. Mengatur Gelombang PPDB</a><a href="#3-melihat-calon-santri">3. Melihat Calon Santri</a><a href="#4-verifikasi-berkas-dokumen">4. Verifikasi Berkas (Dokumen)</a><a href="#5-jadwal-amp-nilai-ujian">5. Jadwal &amp; Nilai Ujian</a><a href="#6-keputusan-seleksi">6. Keputusan: Lulus / Cadangan / Tolak</a><a href="#7-tagihan-amp-daftar-ulang">7. Tagihan &amp; Daftar Ulang</a><a href="#8-pengingat-penting">8. Pengingat Penting</a><a href="#contekan-cepat-panitia">Contekan Cepat Panitia</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

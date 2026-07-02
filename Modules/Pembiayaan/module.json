@@ -1,7 +1,7 @@
 {
     "name": "Pembiayaan",
     "alias": "pembiayaan",
-    "description": "Modul Pembiayaan (Baitul Maal) — analisis DSCR syariah, agunan non-wakaf, persetujuan Pembina",
+    "description": "Modul Sarana & Pembiayaan — Aset & Inventaris (termasuk sarpras piket/laporan kerusakan), Pembiayaan/DSCR syariah (agunan non-wakaf, persetujuan Pembina), dan Baitul Maal",
     "keywords": ["pembiayaan", "dscr", "kredit", "agunan"],
     "priority": 0,
     "providers": [

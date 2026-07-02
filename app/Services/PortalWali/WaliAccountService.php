@@ -19,8 +19,7 @@ class WaliAccountService
     public function __construct(
         private readonly PesertaOtpService $otpService,
         private readonly PortalWaliIdentifierResolver $resolver,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{user: User, phone: string, children_count: int}
@@ -222,7 +221,7 @@ class WaliAccountService
 
     private function createWaliUser(Collection $santriList, string $phone, string $identifier): User
     {
-        $user = new User();
+        $user = new User;
         $user->name = $this->resolveWaliName($santriList);
         $user->phone = $this->claimablePhone($phone);
         $user->email = $this->claimableEmail($this->resolveEmail($identifier, $santriList));

@@ -19,7 +19,11 @@ use Modules\Akademik\Database\Seeders\KalenderLiburNasionalSeeder;
 use Modules\Akademik\Database\Seeders\KomponenNilaiSeeder;
 use Modules\Akademik\Database\Seeders\LembagaSeeder;
 use Modules\Kesantrian\Database\Seeders\JenisPelanggaranSeeder;
+use Modules\Keuangan\Database\Seeders\PosKategoriSeeder;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
+use Modules\Notifikasi\Database\Seeders\TemplateNotifikasiSeeder;
+use Modules\Pajak\Database\Seeders\PajakSeeder;
+use Modules\Pajak\Database\Seeders\TerPph21Seeder;
 use Modules\Payroll\Database\Seeders\JabatanSeeder;
 use Spatie\Permission\PermissionRegistrar;
 
@@ -133,6 +137,34 @@ class TenantProvisioner
             // (firstOrCreate by nama) — editan tenant TIDAK ditimpa.
             Artisan::call('db:seed', [
                 '--class' => JenisPelanggaranSeeder::class,
+                '--force' => true,
+            ]);
+
+            // (b3g) Notifikasi: 23 template WA bawaan (pengumuman, tagihan, izin,
+            // mutu, dll, channel 'wa'). Idempoten (updateOrCreate tenant+kode) —
+            // agar tenant baru langsung punya template di dropdown Broadcast.
+            Artisan::call('db:seed', [
+                '--class' => TemplateNotifikasiSeeder::class,
+                '--force' => true,
+            ]);
+
+            // (b3h) Keuangan: kategori POS Kas/Kantin bawaan. Idempoten
+            // (updateOrCreate by kode) — agar Loket Kas/Kasir Kantin tak buntu
+            // hari pertama (dropdown kategori tak kosong).
+            Artisan::call('db:seed', [
+                '--class' => PosKategoriSeeder::class,
+                '--force' => true,
+            ]);
+
+            // (b3i) Pajak: tarif pajak (PMK 59/2022) + lapisan TER PPh21. Idempoten
+            // (updateOrCreate) — agar kalkulator pajak tak selalu 0 & tabel Tarif
+            // Pajak tak kosong-buntu (canCreate=false).
+            Artisan::call('db:seed', [
+                '--class' => PajakSeeder::class,
+                '--force' => true,
+            ]);
+            Artisan::call('db:seed', [
+                '--class' => TerPph21Seeder::class,
                 '--force' => true,
             ]);
 

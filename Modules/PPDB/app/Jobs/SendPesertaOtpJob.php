@@ -63,7 +63,7 @@ class SendPesertaOtpJob implements ShouldQueue
             $variables = array_merge($this->variables, [
                 'kode_otp' => $this->plainCode,
                 'berlaku_menit' => (string) UserOtp::TTL_MINUTES,
-                'tujuan' => $this->purpose === UserOtp::PURPOSE_RESET
+                'tujuan' => in_array($this->purpose, [UserOtp::PURPOSE_RESET, UserOtp::PURPOSE_JEMAAH_RESET], true)
                     ? 'mengatur ulang password'
                     : 'mengaktifkan akun',
                 'nama_pesantren' => tenant()?->getAttribute('name') ?? 'Pesantren',

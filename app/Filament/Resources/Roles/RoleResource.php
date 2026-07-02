@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -48,7 +49,7 @@ class RoleResource extends Resource
         return static::userCanManageRoles();
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return static::userCanManageRoles();
     }
@@ -107,4 +108,3 @@ class RoleResource extends Resource
         return auth()->user()?->can('manage_roles') ?? false;
     }
 }
-

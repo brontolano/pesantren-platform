@@ -7,6 +7,10 @@ use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
+use Modules\Ledger\Filament\Pages\LaporanDanaBosBop;
+use Modules\Ledger\Filament\Pages\LaporanDanaKebajikan;
+use Modules\Ledger\Filament\Pages\LaporanKeuanganPokok;
+use Modules\Ledger\Filament\Pages\LaporanRkam;
 use Modules\Ledger\Support\FiturKeuangan;
 
 /** Pusat Laporan — indeks tautan ke seluruh laporan keuangan (L1–L7). */
@@ -20,7 +24,7 @@ class PusatLaporan extends Page
 
     protected static ?string $title = 'Pusat Laporan';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Laporan Pimpinan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Laporan';
 
     protected static ?int $navigationSort = 1;
 

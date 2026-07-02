@@ -2,13 +2,14 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Ledger\PeriodeAkuntansiResource;
-use App\Filament\Resources\Payroll\SlipGajiResource;
-use App\Filament\Resources\Pengadaan\BelanjaResource;
+use App\Models\TenantModule;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Modules\Ledger\Filament\Resources\PeriodeAkuntansiResource;
+use Modules\Payroll\Filament\Resources\SlipGajiResource;
+use Modules\Pengadaan\Filament\Resources\BelanjaResource;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -50,7 +51,7 @@ class RbacSegregationTest extends TestCase
         // DILAKUKAN DI KONTEKS CENTRAL (sebelum init tenancy) karena tenant_modules
         // adalah tabel central.
         foreach (['ledger', 'payroll', 'pengadaan'] as $modul) {
-            \App\Models\TenantModule::firstOrCreate(
+            TenantModule::firstOrCreate(
                 ['tenant_id' => $tenant->getKey(), 'module_name' => $modul],
                 ['is_active' => true],
             );

@@ -14,7 +14,5 @@ class BelanjaDisetujui
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public readonly Belanja $belanja)
-    {
-    }
+    public function __construct(public readonly Belanja $belanja) {}
 }

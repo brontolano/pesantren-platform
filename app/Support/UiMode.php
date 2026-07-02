@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -14,6 +15,15 @@ use Illuminate\Support\Facades\Auth;
  */
 class UiMode
 {
+    /**
+     * Kunci allowlist "tampilkan walau Mode Sederhana" yang dikenal.
+     * Tiap kunci dipetakan ke Setting tenant boolean
+     * `ui.sederhana_tampilkan_{key}` (default tak-ada → FALSE → nol regresi).
+     *
+     * @var array<int, string>
+     */
+    public const NAV_KEYS = ['ledger', 'akademik_inti', 'kesehatan_lanjut', 'pajak'];
+
     public static function current(): string
     {
         $user = Auth::user();
@@ -47,5 +57,50 @@ class UiMode
     public static function advanced(): bool
     {
         return ! self::simple();
+    }
+
+    /**
+     * Apakah kunci nav termasuk allowlist yang dikenal?
+     */
+    public static function isNavKey(string $key): bool
+    {
+        return in_array($key, self::NAV_KEYS, true);
+    }
+
+    /**
+     * Visibilitas navigasi untuk menu INTI yang boleh "dipromosikan" agar
+     * tetap muncul di Mode Sederhana lewat setelan per-pesantren.
+     *
+     * Default (Setting tak-ada / tenant belum siap) → FALSE pada cabang
+     * promosi → hasil PERSIS sama dengan UiMode::advanced() (NOL REGRESI).
+     */
+    public static function navAdvanced(string $key): bool
+    {
+        return self::advanced() || self::tampilDiSederhana($key);
+    }
+
+    /**
+     * Baca Setting tenant boolean `ui.sederhana_tampilkan_{key}`.
+     * Dibungkus try/catch: bila tabel/tenant belum siap → default FALSE.
+     * Kunci di luar allowlist → selalu FALSE (tak bisa promosi sembarang menu).
+     */
+    protected static function tampilDiSederhana(string $key): bool
+    {
+        if (! self::isNavKey($key)) {
+            return false;
+        }
+
+        try {
+            $value = Setting::getTenantValue('ui.sederhana_tampilkan_'.$key, false);
+
+            if (is_array($value)) {
+                $value = $value['enabled'] ?? $value['value'] ?? false;
+            }
+
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        } catch (\Throwable) {
+            // Tabel settings / tenant belum siap → perlakukan sebagai OFF.
+            return false;
+        }
     }
 }

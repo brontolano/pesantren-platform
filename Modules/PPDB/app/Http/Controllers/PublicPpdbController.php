@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
-use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Services\PesertaAccountService;
 use Modules\PPDB\Services\PpdbRegistrationNumberService;
 use Modules\PPDB\Services\PpdbStatusTrackingService;
@@ -74,8 +73,7 @@ class PublicPpdbController extends Controller
         Request $request,
         PpdbRegistrationNumberService $registrationNumberService,
         PesertaAccountService $pesertaAccountService
-    )
-    {
+    ) {
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'jenisKelamin' => ['required', 'in:L,P'],

@@ -1,0 +1,26 @@
+{
+  "_keterangan": "CONTOH STRUKTUR (tidak pernah dimuat — ekstensi .example diabaikan). Berkas SEBENARNYA bernama gate3-preset-syariah.json TANPA .example, dan HANYA disalin ke folder ini SETELAH Dewan Ustadz mengisi & menyetujui template di _PLAN/05-AI/seed-gate3/. AiGate3PresetSeeder menanam isi HANYA bila _peninjau terisi DAN _status_berkas == 'disetujui'. Aturan Emas #8: konten keagamaan TIDAK BOLEH dikarang pengembang/AI.",
+  "_status_berkas": "menunggu_tinjauan_ustadz",
+  "_peninjau": null,
+  "_tanggal_tinjauan": null,
+  "preset": "aswaja_nu",
+  "blacklist_topik": [
+    {
+      "kategori": "(contoh format — diisi dari blacklist-topik-default.json yang disetujui ustadz)",
+      "deskripsi": "Topik yang AI dilarang menjawab; AI mengalihkan ke ustadz dengan kalimat santun.",
+      "sumber": "tinjauan_ustadz",
+      "_status": "menunggu_tinjauan_ustadz",
+      "kata_kunci": ["(daftar kata kunci sehari-hari yang memicu pengalihan)"]
+    }
+  ],
+  "whitelist_kitab": [
+    {
+      "judul": "(contoh format — diisi dari preset-manhaj-aswaja-nu.json yang disetujui ustadz)",
+      "pengarang": "",
+      "bidang": "fikih",
+      "madzhab": "syafii",
+      "batasan": "(opsional)",
+      "_status": "menunggu_tinjauan_ustadz"
+    }
+  ]
+}

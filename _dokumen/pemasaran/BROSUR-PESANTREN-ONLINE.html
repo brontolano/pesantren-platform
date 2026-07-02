@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Brosur — pesantren.online</title>
+<!-- Cetak: buka di browser → Ctrl+P → Simpan sebagai PDF (A4, margin bawaan, aktifkan "Background graphics"). -->
+<style>
+  :root{
+    --hijau:#059669; --hijau-tua:#047857; --hijau-gelap:#064e3b;
+    --emas:#c9a24a; --krem:#fffaf3; --gelap:#0f172a; --abu:#64748b;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  @page { size: A4; margin: 0; }
+  body { font-family: 'Plus Jakarta Sans','Segoe UI',system-ui,sans-serif; color: #334155; background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 210mm; min-height: 297mm; margin: 10px auto; background: #fff; padding: 14mm 16mm; position: relative; display: flex; flex-direction: column; }
+  @media print { body { background: #fff; } .page { margin: 0; page-break-after: always; } }
+  h1,h2,h3 { color: var(--gelap); letter-spacing: -0.01em; }
+
+  /* Halaman 1 */
+  .hero { background: linear-gradient(135deg, var(--hijau-gelap) 0%, var(--hijau-tua) 60%, var(--hijau) 100%); color: #fff; border-radius: 14px; padding: 12mm 12mm 10mm; position: relative; overflow: hidden; }
+  .hero::after { content:""; position:absolute; right:-30mm; top:-30mm; width:80mm; height:80mm; border-radius:50%; background: rgba(201,162,74,0.18); }
+  .brand { font-size: 13pt; font-weight: 800; letter-spacing: 0.02em; }
+  .brand .dot { color: var(--emas); }
+  .hero h1 { color: #fff; font-size: 25pt; line-height: 1.2; margin: 8mm 0 4mm; max-width: 150mm; }
+  .hero h1 em { font-style: normal; color: #ffe9b8; }
+  .hero p { font-size: 11.5pt; line-height: 1.6; color: #d1fae5; max-width: 155mm; }
+  .goldline { height: 2px; margin: 7mm 0; background: linear-gradient(90deg, transparent, var(--emas) 50%, transparent); }
+
+  .benefits { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; margin-top: 2mm; }
+  .b { border: 1px solid #e7e0d2; border-radius: 10px; padding: 5mm; background: var(--krem); }
+  .b.full { grid-column: 1 / -1; }
+  .b .ic { font-size: 15pt; }
+  .b h3 { font-size: 11.5pt; margin: 2mm 0 1.5mm; color: var(--hijau-gelap); }
+  .b p { font-size: 9.5pt; line-height: 1.55; color: #475569; }
+  .b b { color: var(--hijau-tua); }
+
+  .foot1 { margin-top: auto; padding-top: 5mm; text-align: center; font-size: 9pt; color: var(--abu); }
+
+  /* Halaman 2 */
+  .sec-title { text-align: center; margin: 2mm 0 6mm; }
+  .sec-title .eyebrow { font-size: 9pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--hijau); }
+  .sec-title h2 { font-size: 17pt; margin-top: 2mm; }
+  .steps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5mm; }
+  .step { text-align: center; padding: 5mm; border-radius: 10px; border: 1px solid #e2e8f0; }
+  .step .n { display: inline-flex; width: 10mm; height: 10mm; border-radius: 3mm; background: var(--hijau); color: #fff; align-items: center; justify-content: center; font-weight: 800; font-size: 12pt; }
+  .step h3 { font-size: 10.5pt; margin: 3mm 0 1.5mm; }
+  .step p { font-size: 9pt; color: var(--abu); line-height: 1.5; }
+
+  .quote { margin: 8mm 0; padding: 6mm 8mm; border-left: 3px solid var(--emas); background: var(--krem); border-radius: 0 10px 10px 0; }
+  .quote p { font-size: 10.5pt; font-style: italic; color: #334155; line-height: 1.6; }
+  .quote .who { margin-top: 2mm; font-size: 9pt; font-weight: 700; color: var(--hijau-tua); font-style: normal; }
+
+  .tanya { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 4mm; }
+  .qa { border: 1px solid #e2e8f0; border-radius: 8px; padding: 4mm; }
+  .qa h3 { font-size: 9.5pt; color: var(--hijau-gelap); }
+  .qa p { font-size: 8.8pt; color: var(--abu); margin-top: 1mm; line-height: 1.5; }
+
+  .cta { margin-top: auto; background: var(--gelap); color: #fff; border-radius: 12px; padding: 8mm 10mm; text-align: center; }
+  .cta h2 { color: #fff; font-size: 15pt; }
+  .cta p { color: #cbd5e1; font-size: 10pt; margin: 2mm 0 4mm; }
+  .cta .kontak { display: flex; justify-content: center; gap: 8mm; font-size: 10.5pt; font-weight: 700; flex-wrap: wrap; }
+  .cta .kontak span { color: #6ee7b7; }
+</style>
+</head>
+<body>
+
+<!-- ===================== HALAMAN 1 ===================== -->
+<div class="page">
+  <div class="hero">
+    <div class="brand">Pesantren<span class="dot">.</span>online</div>
+    <h1>Urus pesantren dengan tenang, <em>layani umat sepenuh hati.</em></h1>
+    <p>Sistem pengelolaan pesantren yang dibuat khusus untuk pondok di Indonesia — tanpa perlu ahli komputer, tanpa perlu server. Pondok tetap berjalan seperti biasa; hanya lebih tertib, amanah, dan terbuka.</p>
+  </div>
+
+  <div class="goldline"></div>
+
+  <div class="benefits">
+    <div class="b full">
+      <span class="ic">🕌</span>
+      <h3>Uang pesantren terjaga kehalalannya</h3>
+      <p>Setiap rupiah dicatat sumbernya — <b>yang halal dan yang syubhat tercatat terpisah</b>, tidak tercampur. Bila ditanya "uang ini dari mana?", jawabannya selalu ada, hitam di atas putih. Amanah umat terjaga, hati pengasuh tenang.</p>
+    </div>
+    <div class="b">
+      <span class="ic">🌙</span>
+      <h3>Khadim digital menjawab wali 24 jam</h3>
+      <p>Pertanyaan wali — tagihan, jadwal penjengukan, kabar pondok — <b>dijawab kapan saja, siang malam</b>, dengan jawaban yang sudah disetujui pengurus. Staf tidak kewalahan, wali tidak menunggu.</p>
+    </div>
+    <div class="b">
+      <span class="ic">📋</span>
+      <h3>Laporan Kemenag (EMIS) sekali klik</h3>
+      <p>Data santri sudah tersimpan rapi, sehingga laporan EMIS <b>cukup diminta sekali, langsung jadi</b> — bukan berhari-hari menyalin berkas.</p>
+    </div>
+    <div class="b">
+      <span class="ic">🤝</span>
+      <h3>Syahriah &amp; tabungan terang bagi wali</h3>
+      <p>Tagihan dan bukti bayar <b>terkirim lewat WhatsApp</b>, dan wali bisa membuka portal untuk melihat syahriah serta tabungan anaknya kapan saja. Kepercayaan wali kepada pondok bertambah.</p>
+    </div>
+    <div class="b">
+      <span class="ic">🔒</span>
+      <h3>Data pondok terpisah total</h3>
+      <p>Ibarat rumah, tiap pesantren punya <b>rumah datanya sendiri dengan kunci sendiri</b> — bukan satu aula dihuni bersama. Data pondok panjenengan tidak mungkin tercampur dengan pesantren lain.</p>
+    </div>
+  </div>
+
+  <div class="foot1">pesantren.online — dibuat dengan amanah di Indonesia · PT Rojo Bronto Lano</div>
+</div>
+
+<!-- ===================== HALAMAN 2 ===================== -->
+<div class="page">
+  <div class="sec-title">
+    <div class="eyebrow">Mudah dimulai</div>
+    <h2>Jalan dalam tiga langkah — tanpa repot</h2>
+  </div>
+
+  <div class="steps">
+    <div class="step"><span class="n">1</span><h3>Silaturahmi &amp; daftar</h3><p>Hubungi kami lewat WhatsApp. Tim kami menyiapkan sistem untuk pondok panjenengan — biasanya siap dalam satu hari.</p></div>
+    <div class="step"><span class="n">2</span><h3>Data pondok dipindahkan</h3><p>Data santri dan keuangan dari buku atau Excel kami bantu pindahkan. Staf pondok didampingi sampai lancar.</p></div>
+    <div class="step"><span class="n">3</span><h3>Wali mulai menerima kabar</h3><p>Aplikasi wali dan santri langsung aktif. Tagihan, tabungan, dan kabar pondok sampai ke WhatsApp wali.</p></div>
+  </div>
+
+  <div class="quote">
+    <p>"Sejak pakai pesantren.online, rekap tagihan yang dulu berhari-hari kini selesai dalam hitungan menit. Wali pun tenang karena selalu dapat kabar."</p>
+    <div class="who">— KH. Abdul Karim, Pimpinan Ponpes Darul Falah</div>
+  </div>
+
+  <div class="sec-title" style="margin-top:2mm">
+    <div class="eyebrow">Yang sering ditanyakan</div>
+    <h2>Menjawab keraguan panjenengan</h2>
+  </div>
+  <div class="tanya">
+    <div class="qa"><h3>Apakah pondok harus punya komputer khusus?</h3><p>Tidak. Cukup HP atau komputer biasa yang sudah ada. Semua dibuka lewat internet, kami yang mengurus mesinnya.</p></div>
+    <div class="qa"><h3>Staf kami tidak paham teknologi. Bagaimana?</h3><p>Tim kami mendampingi sampai lancar, dan tersedia panduan berbahasa sederhana. Umumnya staf terbiasa dalam hitungan hari.</p></div>
+    <div class="qa"><h3>Apakah data pondok aman?</h3><p>Setiap pesantren punya ruang data terpisah dengan cadangan rutin. Data tidak pernah tercampur dengan pesantren lain.</p></div>
+    <div class="qa"><h3>Berapa biayanya?</h3><p>Mulai gratis untuk pondok kecil. Selebihnya dihitung per santri per bulan — bayar hanya modul yang dipakai, tanpa biaya tersembunyi.</p></div>
+  </div>
+
+  <div class="cta">
+    <h2>Silakan lihat sendiri, gratis dan tanpa kewajiban</h2>
+    <p>Kami siap bersilaturahmi dan menunjukkan langsung bagaimana sistem ini berjalan.</p>
+    <div class="kontak">
+      <div><span>WhatsApp</span> 0855-7271-1197</div>
+      <div><span>Demo</span> demo.pesantren.online</div>
+      <div><span>Web</span> pesantren.online/untuk-pesantren</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

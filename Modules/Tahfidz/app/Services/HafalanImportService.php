@@ -3,10 +3,11 @@
 namespace Modules\Tahfidz\Services;
 
 use App\Models\Tenant;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Tahfidz\Models\HafalanTahfidz;
 use Modules\Tahfidz\Models\Halaqah;
-use Modules\Kesantrian\Models\Santri;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Reader\Common\Creator\ReaderFactory;
 use RuntimeException;
@@ -35,7 +36,7 @@ class HafalanImportService
         'catatan' => ['catatan', 'keterangan'],
     ];
 
-    private const STATUS_VALID = ['direncanakan', 'proses', 'selesai'];
+    private const STATUS_VALID = ['direncanakan', 'berjalan', 'selesai'];
 
     /**
      * @return array{tenant_id:string, source:string, dry_run:bool, imported:int, skipped:int, failed:int, errors:list<array{row:int, ref:?string, error:string}>}
@@ -217,7 +218,7 @@ class HafalanImportService
         foreach ($headers as $index => $key) {
             $value = $values[$index] ?? null;
             if ($value instanceof \DateTimeInterface) {
-                $payload[$key] = \Carbon\Carbon::instance($value)->toDateString();
+                $payload[$key] = Carbon::instance($value)->toDateString();
 
                 continue;
             }

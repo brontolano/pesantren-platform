@@ -20,7 +20,7 @@ class EksporEmis extends Page
 
     protected static ?string $title = 'Ekspor Terformat EMIS';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Santri';
 
     protected static ?int $navigationSort = 10;
 
@@ -32,7 +32,7 @@ class EksporEmis extends Page
     {
         return static::moduleVisible('akademik')
             && Filament::getCurrentPanel()?->getId() === 'tenant'
-            && (Auth::user()?->canAny(['view_keuangan', 'manage_keuangan', 'view_santri']) ?? false);
+            && (Auth::user()?->can('manage_santri') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

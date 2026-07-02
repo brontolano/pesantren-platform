@@ -11,7 +11,5 @@ class SlipGajiFinal
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public readonly SlipGaji $slip)
-    {
-    }
+    public function __construct(public readonly SlipGaji $slip) {}
 }

@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Models\Plan;
 use App\Models\Tenant;
-use App\Models\TenantSubscription;
 use App\Services\BillingService;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\CheckboxList;
@@ -223,8 +222,10 @@ class KalkulatorLangganan extends Page implements HasForms
         $tenant = Tenant::find($this->data['tenant_id'] ?? null);
         if (! $tenant) {
             Notification::make()->title('Pilih pesantren dulu')->warning()->send();
+
             return null;
         }
+
         return $tenant;
     }
 
@@ -278,7 +279,7 @@ class KalkulatorLangganan extends Page implements HasForms
 
         Notification::make()
             ->title('Invoice dibuat')
-            ->body('Periode ' . $period . ' — Rp ' . number_format($preview['total'], 0, ',', '.'))
+            ->body('Periode '.$period.' — Rp '.number_format($preview['total'], 0, ',', '.'))
             ->success()
             ->send();
     }

@@ -2,15 +2,16 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Akademik\Nilai\NilaiResource;
-use App\Filament\Resources\Akademik\PeriodeAkademik\PeriodeAkademikResource;
-use App\Filament\Resources\Akademik\Rapor\RaporResource;
 use App\Models\Setting;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
+use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
+use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\Pelajaran;
@@ -69,7 +70,7 @@ class AkademikServiceTest extends TestCase
         $guru = $this->createGuru('guru-range@test.local');
         [$kelas, $santri, $periode, $pelajaran] = $this->createAkademikFixture($guru);
 
-        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->expectException(ValidationException::class);
 
         app(NilaiService::class)->simpan([
             'santri_id' => $santri->id,

@@ -55,7 +55,7 @@ function kumpulkan() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-stone-50 pb-24">
+    <div class="min-h-screen bg-[#fffaf3] pb-24">
         <header class="sticky top-0 z-10 bg-emerald-700 px-5 py-3 text-white shadow">
             <div class="mx-auto flex max-w-md items-center justify-between">
                 <p class="truncate text-sm font-bold">{{ sesi.nama }}</p>

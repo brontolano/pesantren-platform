@@ -76,12 +76,12 @@ class KepalaKeuanganDemoSeeder extends Seeder
         $counter = Jurnal::max('id') + 1;
         foreach ($entries as $entry) {
             $jurnal = Jurnal::create([
-                'nomor' => 'JU-DEMO-' . str_pad((string) $counter, 4, '0', STR_PAD_LEFT),
+                'nomor' => 'JU-DEMO-'.str_pad((string) $counter, 4, '0', STR_PAD_LEFT),
                 'tanggal' => $entry['tanggal'],
                 'deskripsi' => $entry['deskripsi'],
                 'status' => 'posted',
                 'kehalalan' => $counter % 5 === 0 ? 'syubhat' : 'halal',
-                'idempotency_key' => 'demo-seed-' . $counter,
+                'idempotency_key' => 'demo-seed-'.$counter,
                 'posted_at' => $entry['tanggal'],
                 'created_by' => 1,
             ]);

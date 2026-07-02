@@ -12,6 +12,7 @@ use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Services\PembayaranService;
 use Modules\Keuangan\Services\TagihanService;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class KeuanganExportControllerTest extends TestCase
@@ -41,7 +42,7 @@ class KeuanganExportControllerTest extends TestCase
         $user = $this->createFinanceUser('keuangan@tenant-export.test');
         $santri = $this->createSantri('EXP001', 'Ahmad Export');
 
-        (new TagihanService())->buatTagihanUntukSantri($santri, [
+        (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'keterangan' => 'SPP Juli',
             'nominal' => 450000,
@@ -76,21 +77,21 @@ class KeuanganExportControllerTest extends TestCase
         $verifier = $this->createFinanceUser('verifier@tenant-export.test');
         $santri = $this->createSantri('EXP002', 'Fatimah Export');
 
-        $tagihan = (new TagihanService())->buatTagihanUntukSantri($santri, [
+        $tagihan = (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'nominal' => 300000,
             'jatuh_tempo' => '2026-07-15',
             'bulan_masehi' => '2026-07',
         ]);
 
-        $pembayaran = (new PembayaranService())->inputPembayaran($tagihan, [
+        $pembayaran = (new PembayaranService)->inputPembayaran($tagihan, [
             'nominal' => 125000,
             'metode' => 'transfer',
             'nomor_bukti' => 'TRX-001',
             'tanggal_pembayaran' => now()->toDateString(),
         ]);
 
-        (new PembayaranService())->verifikasiPembayaran($pembayaran, $verifier->id);
+        (new PembayaranService)->verifikasiPembayaran($pembayaran, $verifier->id);
 
         $this->actingAs($user);
 
@@ -121,9 +122,9 @@ class KeuanganExportControllerTest extends TestCase
 
         $this->actingAs($user);
 
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+        $this->expectException(HttpException::class);
 
-        app(KeuanganExportController::class)->tagihanCsv(new Request());
+        app(KeuanganExportController::class)->tagihanCsv(new Request);
 
         tenancy()->end();
     }

@@ -15,17 +15,17 @@ class PortalWaliHafalanController extends Controller
 
     public function __invoke(Request $request, PortalWaliService $portalWaliService): Response
     {
-        $wali     = $this->currentWali($request);
-        $child    = $this->accessibleSantri($request, $portalWaliService, (string) $request->route('santri'));
+        $wali = $this->currentWali($request);
+        $child = $this->accessibleSantri($request, $portalWaliService, (string) $request->route('santri'));
         $dashboard = $portalWaliService->getDashboardPayload($wali);
 
         return Inertia::render('PortalWali/Hafalan', [
             'wali' => ['id' => $wali->id, 'name' => $wali->name],
             'children' => $dashboard['children'],
             'santri' => [
-                'id'   => $child->id,
+                'id' => $child->id,
                 'nama' => $child->nama,
-                'nis'  => $child->nis,
+                'nis' => $child->nis,
             ],
             'navigation' => $this->navigationItems($dashboard['children'], $child->id),
             ...$portalWaliService->getHafalanPayload($child),

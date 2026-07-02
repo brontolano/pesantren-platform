@@ -4,16 +4,15 @@ namespace Tests\Feature;
 
 use App\Models\Setting;
 use App\Models\User;
-use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 use Modules\Kegiatan\Http\Controllers\PwaGuruIzinController;
-use Modules\Kegiatan\Http\Controllers\PwaWaliIzinController;
 use Modules\Kegiatan\Models\IzinSantri;
 use Modules\Kegiatan\Services\IzinSantriService;
 use Modules\Kesantrian\Models\Santri;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -23,15 +22,18 @@ class Wp26PwaApiTest extends TestCase
     use InteractsWithPpdbTestDatabase;
 
     private Santri $santri;
+
     private User $wali;
+
     private User $musyrif;
+
     private IzinSantriService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->configurePpdbTestingDatabase();
-        if (!Schema::connection('pgsql')->hasTable('izin_santri')) {
+        if (! Schema::connection('pgsql')->hasTable('izin_santri')) {
             Artisan::call('migrate:fresh', ['--force' => true]);
         }
         $this->truncatePpdbTables(['domains', 'tenants']);
@@ -50,23 +52,23 @@ class Wp26PwaApiTest extends TestCase
 
         $this->wali = User::withoutGlobalScopes()->create([
             'name' => 'Wali Santri',
-            'email' => 'wali@' . tenant('id') . '.localhost',
+            'email' => 'wali@'.tenant('id').'.localhost',
             'password' => 'password',
             'tenant_id' => tenant('id'),
         ]);
 
         $this->musyrif = User::withoutGlobalScopes()->create([
             'name' => 'Musyrif',
-            'email' => 'musyrif@' . tenant('id') . '.localhost',
+            'email' => 'musyrif@'.tenant('id').'.localhost',
             'password' => 'password',
             'tenant_id' => tenant('id'),
         ]);
 
         // Grant permission ke musyrif
-        if (\Spatie\Permission\Models\Permission::where('name', 'akses_pwa_guru')->exists()) {
+        if (Permission::where('name', 'akses_pwa_guru')->exists()) {
             $this->musyrif->givePermissionTo('akses_pwa_guru');
         } else {
-            $perm = \Spatie\Permission\Models\Permission::create(['name' => 'akses_pwa_guru', 'guard_name' => 'web']);
+            $perm = Permission::create(['name' => 'akses_pwa_guru', 'guard_name' => 'web']);
             $this->musyrif->givePermissionTo($perm);
         }
 
@@ -193,7 +195,7 @@ class Wp26PwaApiTest extends TestCase
             'alasan' => 'Izin 1',
         ]);
 
-        $controller = new PwaGuruIzinController();
+        $controller = new PwaGuruIzinController;
         $response = $controller->antrean(
             $this->req('GET', [], $this->musyrif)
         );
@@ -223,7 +225,7 @@ class Wp26PwaApiTest extends TestCase
             'alasan' => 'Pulang ke rumah',
         ]);
 
-        $controller = new PwaGuruIzinController();
+        $controller = new PwaGuruIzinController;
         $response = $controller->setujui(
             $this->req('POST', [], $this->musyrif),
             $izin->id,
@@ -254,7 +256,7 @@ class Wp26PwaApiTest extends TestCase
             'alasan' => 'Pulang ke rumah',
         ]);
 
-        $controller = new PwaGuruIzinController();
+        $controller = new PwaGuruIzinController;
         $response = $controller->tolak(
             $this->req('POST', ['catatan' => 'Ada kegiatan penting'], $this->musyrif),
             $izin->id,

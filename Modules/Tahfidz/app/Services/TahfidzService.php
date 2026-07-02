@@ -3,11 +3,11 @@
 namespace Modules\Tahfidz\Services;
 
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Tahfidz\Models\HafalanTahfidz;
 use Modules\Tahfidz\Models\PenilaianTahfidz;
-use Modules\Kesantrian\Models\Santri;
-use Illuminate\Support\Collection;
 
 class TahfidzService
 {
@@ -16,27 +16,27 @@ class TahfidzService
     public function createHafalan(Santri $santri, array $data): HafalanTahfidz
     {
         return HafalanTahfidz::create([
-            'tenant_id'      => $santri->tenant_id,
-            'santri_id'      => $santri->getKey(),
-            'surah'          => $data['surah'] ?? null,
-            'ayat_awal'      => $data['ayat_awal'] ?? null,
-            'ayat_akhir'     => $data['ayat_akhir'] ?? null,
+            'tenant_id' => $santri->tenant_id,
+            'santri_id' => $santri->getKey(),
+            'surah' => $data['surah'] ?? null,
+            'ayat_awal' => $data['ayat_awal'] ?? null,
+            'ayat_akhir' => $data['ayat_akhir'] ?? null,
             'tanggal_target' => $data['tanggal_target'] ?? null,
-            'status'         => $data['status'] ?? 'direncanakan',
-            'catatan'        => $data['catatan'] ?? null,
+            'status' => $data['status'] ?? 'direncanakan',
+            'catatan' => $data['catatan'] ?? null,
         ]);
     }
 
     public function updateHafalan(HafalanTahfidz $hafalan, array $data): HafalanTahfidz
     {
         $hafalan->update(array_filter([
-            'surah'           => $data['surah'] ?? $hafalan->surah,
-            'ayat_awal'       => $data['ayat_awal'] ?? $hafalan->ayat_awal,
-            'ayat_akhir'      => $data['ayat_akhir'] ?? $hafalan->ayat_akhir,
-            'tanggal_target'  => $data['tanggal_target'] ?? $hafalan->tanggal_target,
+            'surah' => $data['surah'] ?? $hafalan->surah,
+            'ayat_awal' => $data['ayat_awal'] ?? $hafalan->ayat_awal,
+            'ayat_akhir' => $data['ayat_akhir'] ?? $hafalan->ayat_akhir,
+            'tanggal_target' => $data['tanggal_target'] ?? $hafalan->tanggal_target,
             'tanggal_selesai' => $data['tanggal_selesai'] ?? $hafalan->tanggal_selesai,
-            'status'          => $data['status'] ?? $hafalan->status,
-            'catatan'         => $data['catatan'] ?? $hafalan->catatan,
+            'status' => $data['status'] ?? $hafalan->status,
+            'catatan' => $data['catatan'] ?? $hafalan->catatan,
         ], fn ($v) => $v !== null));
 
         return $hafalan->fresh();
@@ -45,7 +45,7 @@ class TahfidzService
     public function selesaikanHafalan(HafalanTahfidz $hafalan): HafalanTahfidz
     {
         $hafalan->update([
-            'status'          => 'selesai',
+            'status' => 'selesai',
             'tanggal_selesai' => now()->toDateString(),
         ]);
 
@@ -68,10 +68,10 @@ class TahfidzService
             ->get();
 
         return [
-            'total'       => $hafalan->count(),
-            'selesai'     => $hafalan->where('status', 'selesai')->count(),
-            'direncanakan'=> $hafalan->where('status', 'direncanakan')->count(),
-            'berjalan'    => $hafalan->where('status', 'berjalan')->count(),
+            'total' => $hafalan->count(),
+            'selesai' => $hafalan->where('status', 'selesai')->count(),
+            'direncanakan' => $hafalan->where('status', 'direncanakan')->count(),
+            'berjalan' => $hafalan->where('status', 'berjalan')->count(),
         ];
     }
 
@@ -102,23 +102,23 @@ class TahfidzService
         try {
             return DB::transaction(function () use ($santri, $data, $inputBy, $clientRef): HafalanTahfidz {
                 $hafalan = HafalanTahfidz::create([
-                    'tenant_id'       => $santri->tenant_id,
-                    'santri_id'       => $santri->getKey(),
-                    'halaqah_id'      => $data['halaqah_id'] ?? null,
-                    'surah'           => $data['surah'],
-                    'ayat_awal'       => $data['ayat_awal'] ?? null,
-                    'ayat_akhir'      => $data['ayat_akhir'] ?? null,
-                    'status'          => 'selesai',
+                    'tenant_id' => $santri->tenant_id,
+                    'santri_id' => $santri->getKey(),
+                    'halaqah_id' => $data['halaqah_id'] ?? null,
+                    'surah' => $data['surah'],
+                    'ayat_awal' => $data['ayat_awal'] ?? null,
+                    'ayat_akhir' => $data['ayat_akhir'] ?? null,
+                    'status' => 'selesai',
                     'tanggal_selesai' => $data['tanggal'] ?? now()->toDateString(),
-                    'catatan'         => $data['catatan'] ?? null,
-                    'client_ref'      => $clientRef,
+                    'catatan' => $data['catatan'] ?? null,
+                    'client_ref' => $clientRef,
                 ]);
 
                 $this->addPenilaian($hafalan, [
-                    'jenis'    => $data['jenis'] ?? 'murajaah',
-                    'nilai'    => $data['nilai'] ?? null,
-                    'catatan'  => $data['catatan'] ?? null,
-                    'tanggal'  => $data['tanggal'] ?? now()->toDateString(),
+                    'jenis' => $data['jenis'] ?? 'murajaah',
+                    'nilai' => $data['nilai'] ?? null,
+                    'catatan' => $data['catatan'] ?? null,
+                    'tanggal' => $data['tanggal'] ?? now()->toDateString(),
                     'input_by' => $inputBy,
                 ]);
 
@@ -143,14 +143,14 @@ class TahfidzService
     public function addPenilaian(HafalanTahfidz $hafalan, array $data): PenilaianTahfidz
     {
         return PenilaianTahfidz::create([
-            'tenant_id'  => $hafalan->tenant_id,
-            'santri_id'  => $hafalan->santri_id,
+            'tenant_id' => $hafalan->tenant_id,
+            'santri_id' => $hafalan->santri_id,
             'hafalan_id' => $hafalan->getKey(),
-            'jenis'      => $data['jenis'] ?? 'murajaah',
-            'nilai'      => $data['nilai'] ?? null,
-            'catatan'    => $data['catatan'] ?? null,
-            'tanggal'    => $data['tanggal'] ?? now()->toDateString(),
-            'input_by'   => $data['input_by'] ?? null,
+            'jenis' => $data['jenis'] ?? 'murajaah',
+            'nilai' => $data['nilai'] ?? null,
+            'catatan' => $data['catatan'] ?? null,
+            'tanggal' => $data['tanggal'] ?? now()->toDateString(),
+            'input_by' => $data['input_by'] ?? null,
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Tenants\Pages;
 
 use App\Filament\Resources\Tenants\TenantResource;
+use App\Models\Tenant;
 use App\Services\TenantProvisioner;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -25,7 +26,7 @@ class CreateTenant extends CreateRecord
         $sistemDomain = $data['sistem_domain'] ?? null;
         unset($data['primary_domain'], $data['website_domain'], $data['sistem_domain']);
 
-        /** @var \App\Models\Tenant $tenant */
+        /** @var Tenant $tenant */
         // create() memicu TenantCreated -> CreateDatabase + MigrateDatabase (sync).
         $tenant = static::getModel()::create($data);
 

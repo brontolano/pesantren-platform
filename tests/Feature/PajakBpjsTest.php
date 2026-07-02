@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
 use App\Models\User;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
+use Modules\Ledger\Models\Jurnal;
 use Modules\Pajak\Services\PajakPenghasilanService;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Services\BpjsService;
@@ -120,7 +122,7 @@ class PajakBpjsTest extends TestCase
         $slip = $svc->finalisasi($slip->fresh());
         $this->assertSame('final', $slip->status);
         $this->assertNotNull($slip->jurnal_id);
-        $jurnal = \Modules\Ledger\Models\Jurnal::with('baris')->find($slip->jurnal_id);
+        $jurnal = Jurnal::with('baris')->find($slip->jurnal_id);
         $this->assertEqualsWithDelta($jurnal->baris->sum('debit'), $jurnal->baris->sum('kredit'), 0.01);
         $this->assertEqualsWithDelta(10000000, (float) $jurnal->baris->sum('debit'), 0.01);
         tenancy()->end();
@@ -130,7 +132,7 @@ class PajakBpjsTest extends TestCase
     {
         $this->boot('ptg3');
         // Paksa rate BPJS sangat besar agar potongan > bruto.
-        \App\Models\Setting::create(['key' => 'keuangan.bpjs.kesehatan_pekerja', 'value' => ['value' => 200]]);
+        Setting::create(['key' => 'keuangan.bpjs.kesehatan_pekerja', 'value' => ['value' => 200]]);
         $u = User::withoutGlobalScopes()->create([
             'name' => 'X', 'email' => 'x'.str()->random(5).'@'.tenant('id').'.localhost',
             'password' => 'password', 'tenant_id' => tenant('id'),

@@ -14,9 +14,7 @@ use Modules\Ledger\Models\SumberDana;
  */
 class KehalalanService
 {
-    public function __construct(private readonly DanaKebajikanService $danaKebajikan)
-    {
-    }
+    public function __construct(private readonly DanaKebajikanService $danaKebajikan) {}
 
     /** Klasifikasi kehalalan dari sumber dana (default halal bila tak ada sumber). */
     public function klasifikasi(?int $sumberDanaId): string

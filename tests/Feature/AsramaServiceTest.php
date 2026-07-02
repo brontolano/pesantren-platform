@@ -2,14 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Asrama\BiayaAsrama\BiayaAsramaResource;
-use App\Filament\Resources\Asrama\BlokAsrama\BlokAsramaResource;
-use App\Filament\Resources\Asrama\KamarAsrama\KamarAsramaResource;
-use App\Filament\Resources\Asrama\PenempatanAsrama\PenempatanAsramaResource;
+use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
+use Modules\Asrama\Filament\Resources\BiayaAsrama\BiayaAsramaResource;
+use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
+use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\PenempatanAsramaResource;
 use Modules\Asrama\Models\BiayaAsrama;
 use Modules\Asrama\Models\BlokAsrama;
 use Modules\Asrama\Models\KamarAsrama;
@@ -182,11 +183,11 @@ class AsramaServiceTest extends TestCase
     }
 
     /**
-     * @return array{0: \App\Models\Tenant, 1?: Santri, 2?: Santri}
+     * @return array{0: Tenant, 1?: Santri, 2?: Santri}
      */
     private function createAsramaFixture(string $tenantId): array
     {
-        $tenant = $this->createTestTenant($tenantId, 'Pesantren ' . $tenantId, $tenantId);
+        $tenant = $this->createTestTenant($tenantId, 'Pesantren '.$tenantId, $tenantId);
         tenancy()->initialize($tenant);
 
         $kelas = Kelas::create([
@@ -199,8 +200,8 @@ class AsramaServiceTest extends TestCase
 
         $santriA = Santri::create([
             'tenant_id' => $tenant->id,
-            'nis' => strtoupper(substr($tenantId, 0, 6)) . '01',
-            'nama' => 'Santri ' . $tenantId . ' A',
+            'nis' => strtoupper(substr($tenantId, 0, 6)).'01',
+            'nama' => 'Santri '.$tenantId.' A',
             'tanggal_lahir' => '2012-01-01',
             'jenis_kelamin' => 'L',
             'status' => 'aktif',
@@ -209,8 +210,8 @@ class AsramaServiceTest extends TestCase
 
         $santriB = Santri::create([
             'tenant_id' => $tenant->id,
-            'nis' => strtoupper(substr($tenantId, 0, 6)) . '02',
-            'nama' => 'Santri ' . $tenantId . ' B',
+            'nis' => strtoupper(substr($tenantId, 0, 6)).'02',
+            'nama' => 'Santri '.$tenantId.' B',
             'tanggal_lahir' => '2012-02-02',
             'jenis_kelamin' => 'P',
             'status' => 'aktif',

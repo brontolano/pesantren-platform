@@ -142,6 +142,12 @@ class LedgerJurnalTest extends TestCase
         tenancy()->initialize($tenant);
         (new LedgerSeeder)->run();
 
+        // LedgerSeeder kini menyemai 1 periode default 'open' bulan berjalan yang
+        // dapat tumpang-tindih dengan rentang Juni di bawah. Bersihkan dulu agar
+        // fixture deterministik: HANYA periode 'closed' uji ini yang ada saat posting,
+        // sehingga resolvePeriode() menjamin yang ter-resolve adalah yang tertutup.
+        PeriodeAkuntansi::query()->delete();
+
         $periode = PeriodeAkuntansi::create([
             'nama' => 'TA 2025/2026 Ganjil',
             'tgl_mulai' => '2026-06-01',

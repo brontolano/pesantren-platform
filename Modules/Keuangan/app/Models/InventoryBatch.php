@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Models;
 
 use App\Traits\BelongsToTenant;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Core\Concerns\Auditable;
@@ -37,7 +38,7 @@ class InventoryBatch extends Model
     }
 
     /** Apakah batch sudah kedaluwarsa per tanggal acuan. */
-    public function kedaluwarsa(?\Carbon\CarbonInterface $acuan = null): bool
+    public function kedaluwarsa(?CarbonInterface $acuan = null): bool
     {
         if ($this->tanggal_kedaluwarsa === null) {
             return false;

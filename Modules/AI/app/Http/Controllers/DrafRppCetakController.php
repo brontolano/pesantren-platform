@@ -2,6 +2,7 @@
 
 namespace Modules\AI\Http\Controllers;
 
+use App\Models\User;
 use App\Services\ModuleService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -78,7 +79,7 @@ class DrafRppCetakController extends Controller
     private function namaPengesah(AiDrafRpp $paket): ?string
     {
         return $paket->disahkan_oleh !== null
-            ? \App\Models\User::query()->whereKey($paket->disahkan_oleh)->value('name')
+            ? User::query()->whereKey($paket->disahkan_oleh)->value('name')
             : null;
     }
 }

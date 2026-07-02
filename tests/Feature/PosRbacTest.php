@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Pos\PosKategoriResource;
 use App\Models\TenantModule;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Modules\Keuangan\Filament\Resources\Pos\PosKategoriResource;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;

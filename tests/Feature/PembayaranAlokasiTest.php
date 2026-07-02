@@ -51,7 +51,7 @@ class PembayaranAlokasiTest extends TestCase
 
     private function tagihanSpp(Santri $santri, string $bulan, string $jatuhTempo, float $nominal): Tagihan
     {
-        return (new TagihanService())->buatTagihanUntukSantri($santri, [
+        return (new TagihanService)->buatTagihanUntukSantri($santri, [
             'jenis_tagihan' => 'spp',
             'keterangan' => 'SPP '.$bulan,
             'nominal' => $nominal,

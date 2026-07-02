@@ -13,8 +13,7 @@ class PesertaPwaController extends Controller
 {
     public function __construct(
         private readonly PesertaBrandingService $brandingService,
-    ) {
-    }
+    ) {}
 
     public function manifest(): JsonResponse
     {
@@ -118,7 +117,7 @@ SVG;
             '/spmb/icon.svg?size=512',
         ];
 
-        $script = <<<JS
+        $script = <<<'JS'
 const CACHE_NAME = %s;
 const SHELL_URLS = %s;
 
