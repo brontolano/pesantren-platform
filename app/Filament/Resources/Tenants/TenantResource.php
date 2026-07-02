@@ -7,6 +7,7 @@ use App\Filament\Resources\Tenants\Pages\EditTenant;
 use App\Filament\Resources\Tenants\Pages\ListTenants;
 use App\Models\Tenant;
 use App\Models\User;
+use App\Services\DnsOtomasiService;
 use App\Services\TenantRecoveryService;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -66,6 +67,44 @@ class TenantResource extends Resource
         return static::userCanManageTenants();
     }
 
+    /**
+     * Custom domain tenant = domain bertitik (bukan subdomain platform polos).
+     *
+     * @return array<int,string>
+     */
+    public static function customDomains(Tenant $record): array
+    {
+        return $record->domains
+            ->pluck('domain')
+            ->filter(fn ($d): bool => is_string($d) && str_contains($d, '.'))
+            ->values()
+            ->all();
+    }
+
+    /** Jalankan aksi DNS (cek/otomasi) untuk semua custom domain lalu tampilkan notifikasi ramah. */
+    protected static function jalankanAksiDns(Tenant $record, \Closure $aksi): void
+    {
+        $svc = app(DnsOtomasiService::class);
+        $domains = static::customDomains($record);
+
+        if ($domains === []) {
+            Notification::make()->title('Tidak ada custom domain pada tenant ini.')->warning()->send();
+
+            return;
+        }
+
+        foreach ($domains as $domain) {
+            $hasil = $aksi($svc, $domain);
+
+            Notification::make()
+                ->title($hasil['ok'] ? "DNS {$domain}: OK" : "DNS {$domain}: perlu tindakan")
+                ->body($hasil['pesan'])
+                ->{$hasil['ok'] ? 'success' : 'warning'}()
+                ->persistent()
+                ->send();
+        }
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -93,12 +132,15 @@ class TenantResource extends Resource
                     ->maxLength(255),
                 TextInput::make('website_domain')
                     ->label('Domain Website Publik (custom)')
-                    ->helperText('Misal: asy-syifaa.sch.id — kosongkan jika pakai subdomain')
+                    ->helperText(fn (): string => 'Misal: asy-syifaa.sch.id — kosongkan jika pakai subdomain. '
+                        .'Opsi MANUAL: arahkan A record ke '.config('dns.server_ip')
+                        .' lalu pakai tombol "Cek DNS" di daftar tenant. Opsi OTOMATIS tersedia bila domain dikelola di Hostinger.')
                     ->nullable()
                     ->maxLength(255),
                 TextInput::make('sistem_domain')
                     ->label('Domain Sistem (panel admin)')
-                    ->helperText('Otomatis: sistem.{website_domain}. Isi manual jika berbeda.')
+                    ->helperText(fn (): string => 'Otomatis: sistem.{website_domain}. Isi manual jika berbeda. '
+                        .'A record juga harus mengarah ke '.config('dns.server_ip').'.')
                     ->nullable()
                     ->maxLength(255),
             ]),
@@ -131,6 +173,38 @@ class TenantResource extends Resource
                     ->color('success')
                     ->action(fn (Tenant $record) => $record->update(['is_active' => true]))
                     ->visible(fn (Tenant $record): bool => ! $record->is_active),
+
+                // === DNS custom domain: 2 opsi (manual + otomasi) — Refs #350 ===
+                ActionGroup::make([
+                    Action::make('dns_cek')
+                        ->label('Cek DNS (manual)')
+                        ->icon('heroicon-o-magnifying-glass')
+                        ->color('gray')
+                        ->action(function (Tenant $record): void {
+                            static::jalankanAksiDns($record, fn (DnsOtomasiService $svc, string $d) => $svc->cekDns($d));
+                        }),
+                    Action::make('dns_otomatis')
+                        ->label('Otomatis (domain di Hostinger)')
+                        ->icon('heroicon-o-bolt')
+                        ->color('success')
+                        ->disabled(fn (): bool => ! app(DnsOtomasiService::class)->otomasiAktif())
+                        ->tooltip(fn (): ?string => app(DnsOtomasiService::class)->otomasiAktif()
+                            ? null
+                            : 'Nonaktif: isi HOSTINGER_API_TOKEN di ENV untuk mengaktifkan otomasi DNS.')
+                        ->requiresConfirmation()
+                        ->modalHeading('Buat A record otomatis via Hostinger')
+                        ->modalDescription(fn (Tenant $record): string => 'A record untuk '
+                            .(implode(', ', static::customDomains($record)) ?: '(tidak ada custom domain)')
+                            .' akan dibuat otomatis mengarah ke '.app(DnsOtomasiService::class)->serverIp()
+                            .'. Hanya berhasil bila zona domain dikelola di akun Hostinger owner; jika tidak, akan ditampilkan instruksi manual.')
+                        ->action(function (Tenant $record): void {
+                            static::jalankanAksiDns($record, fn (DnsOtomasiService $svc, string $d) => $svc->buatARecord($d));
+                        }),
+                ])
+                    ->label('DNS Domain')
+                    ->icon('heroicon-o-globe-alt')
+                    ->button()
+                    ->visible(fn (Tenant $record): bool => static::customDomains($record) !== []),
 
                 // === Recovery database per tenant ===
                 ActionGroup::make([
