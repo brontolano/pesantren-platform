@@ -32,6 +32,9 @@ class Santri extends Model
         'agama',
         'nik',
         'nisn',
+        // Kependudukan wajib EMIS 4.0 (Refs #327)
+        'no_kk',
+        'no_akta_lahir',
         'nama_panggilan',
         'cita_cita',
         'anak_ke',
