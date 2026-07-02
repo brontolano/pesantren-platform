@@ -130,7 +130,20 @@ const submitComment = () => {
                     >
                         {{ article.excerpt }}
                     </p>
-                    <div class="prose prose-slate max-w-none whitespace-pre-line text-base leading-8">
+                    <!--
+                      contentHtml sudah DISANITASI di server (Symfony HtmlSanitizer:
+                      elemen aman + iframe HANYA dari youtube-nocookie/vimeo). Aman
+                      untuk v-html. Fallback: konten mentah (escaped) bila kosong.
+                    -->
+                    <div
+                        v-if="article.contentHtml"
+                        class="prose prose-slate max-w-none text-base leading-8"
+                        v-html="article.contentHtml"
+                    ></div>
+                    <div
+                        v-else
+                        class="prose prose-slate max-w-none whitespace-pre-line text-base leading-8"
+                    >
                         {{ article.content }}
                     </div>
                 </div>
