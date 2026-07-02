@@ -2,6 +2,7 @@
 
 namespace Modules\Kesantrian\Filament\Resources\Alumni;
 
+use App\Support\PrintContent;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -21,6 +22,7 @@ use Modules\Kesantrian\Filament\Resources\Alumni\Pages\EditAlumni;
 use Modules\Kesantrian\Filament\Resources\Alumni\Pages\ListAlumni;
 use Modules\Kesantrian\Models\Alumni;
 use Throwable;
+use Torgodly\Html2Media\Actions\Html2MediaAction;
 
 /**
  * WP-08 — Buku alumni: arsip nomor ijazah negara (input manual TU),
@@ -162,7 +164,48 @@ class AlumniResource extends Resource
                     ->visible(fn (Alumni $record): bool => filled($record->nomor_ijazah) || filled($record->nomor_syahadah))
                     ->url(fn (Alumni $record): string => route('tenant.akademik.export.ijazah.print', ['alumni' => $record, 'jenis' => 'pkpps']))
                     ->openUrlInNewTab(),
+                // Adopsi html2media: unduh PDF rapi / cetak dari modal, tanpa header
+                // URL & margin liar bawaan window.print browser. Me-render view
+                // ijazah-print + data yang SAMA dengan route cetak (jalur lama tetap
+                // ada di atas sbg fallback). Jenjang wajib ula/wustha/ulya → aksi
+                // hanya tampil bila jenjang lembaga sudah terisi valid.
+                static::aksiIjazahPdf('muadalah', 'PDF Ijazah Muadalah'),
+                static::aksiIjazahPdf('pkpps', 'PDF Ijazah PKPPS'),
+                Html2MediaAction::make('pdf_syahadah')
+                    ->label('PDF Syahadah')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->format('a4')
+                    ->orientation('portrait')
+                    ->preview()
+                    ->savePdf()
+                    ->filename(fn (Alumni $record): string => 'syahadah-'.($record->santri?->nis ?: $record->getKey()))
+                    ->visible(fn (Alumni $record): bool => $record->nomor_syahadah !== null)
+                    ->content(fn (Alumni $record) => PrintContent::syahadah(
+                        $record,
+                        app(KelulusanService::class)->renderSyahadah($record),
+                    )),
             ]);
+    }
+
+    /**
+     * Aksi Html2Media untuk cetak ijazah rapi (A4 potrait). Terpisah agar dua
+     * jenis (muadalah/pkpps) berbagi konfigurasi identik. Jenjang diturunkan dari
+     * lembaga; bila belum ula/wustha/ulya, aksi disembunyikan (render butuh jenjang
+     * valid — konsisten dgn guard 422 di controller cetak lama).
+     */
+    protected static function aksiIjazahPdf(string $jenis, string $label): Html2MediaAction
+    {
+        return Html2MediaAction::make('pdf_ijazah_'.$jenis)
+            ->label($label)
+            ->icon('heroicon-o-arrow-down-tray')
+            ->format('a4')
+            ->orientation('portrait')
+            ->preview()
+            ->savePdf()
+            ->filename(fn (Alumni $record): string => 'ijazah-'.$jenis.'-'.($record->santri?->nis ?: $record->getKey()))
+            ->visible(fn (Alumni $record): bool => (filled($record->nomor_ijazah) || filled($record->nomor_syahadah))
+                && in_array(strtolower((string) $record->lembaga?->jenjang), ['ula', 'wustha', 'ulya'], true))
+            ->content(fn (Alumni $record) => PrintContent::ijazah($record, $jenis));
     }
 
     public static function getEloquentQuery(): Builder

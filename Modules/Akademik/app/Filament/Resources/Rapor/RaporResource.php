@@ -3,6 +3,7 @@
 namespace Modules\Akademik\Filament\Resources\Rapor;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\PrintContent;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
@@ -14,6 +15,7 @@ use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Models\Rapor;
 use Modules\Akademik\Services\RaporService;
 use Modules\Kesantrian\Models\Kelas;
+use Torgodly\Html2Media\Actions\Html2MediaAction;
 
 class RaporResource extends Resource
 {
@@ -86,6 +88,19 @@ class RaporResource extends Resource
                     ->url(fn (Rapor $record): string => route('tenant.akademik.export.rapor.print', $record))
                     ->openUrlInNewTab(false)
                     ->visible(fn () => tenancy()->initialized),
+                // Adopsi html2media: unduh PDF rapi / cetak dari modal (tanpa header
+                // URL & margin liar). Blade + data identik dengan route cetak di atas
+                // (jalur window.print lama dipertahankan sbg fallback).
+                Html2MediaAction::make('pdf_rapor')
+                    ->label('Unduh PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->format('a4')
+                    ->orientation('portrait')
+                    ->preview()
+                    ->savePdf()
+                    ->filename(fn (Rapor $record): string => 'rapor-'.($record->santri?->nis ?: $record->getKey()))
+                    ->visible(fn () => tenancy()->initialized)
+                    ->content(fn (Rapor $record) => PrintContent::rapor($record)),
             ])
             ->defaultSort('generated_at', 'desc');
     }
