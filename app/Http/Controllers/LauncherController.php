@@ -6,9 +6,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Auth\StaffLoginController;
 use App\Models\User;
-use App\Support\AlbaKidsTenant;
 use App\Support\AppLauncher;
 use App\Support\TenantBranding;
+use App\Support\TenantCustomizationRegistry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -30,12 +30,13 @@ class LauncherController extends Controller
     {
         if (! Auth::check()) {
             // Satu pintu: TAMU melihat Beranda publik (landing CMS) dengan tombol
-            // "Masuk" → /masuk; tidak lagi dipaksa login di "/". AlbaKids (custom)
-            // dipertahankan: tamu langsung ke form login bermerek.
+            // "Masuk" → /masuk; tidak lagi dipaksa login di "/". Tenant custom
+            // (registry 'guest_home' = 'login', mis. albakids) dipertahankan:
+            // tamu langsung ke form login bermerek (tahap 3 #343).
             // Fallback defensif: bila landing gagal render (mis. modul CMS belum
             // siap di tenant) → form login (perilaku lama) agar tak pernah 500.
             // Login tetap selalu terjangkau di /masuk (route universal).
-            if (AlbaKidsTenant::isActive()) {
+            if (TenantCustomizationRegistry::stringValue('guest_home') === 'login') {
                 return app(StaffLoginController::class)->show();
             }
 
@@ -52,10 +53,10 @@ class LauncherController extends Controller
         // Jemaah (peran publik) berlabuh di Beranda publik. JANGAN ikuti
         // redirect('/') dari AppLauncher di sini: route ini SENDIRI adalah '/'
         // pada domain 'sistem' → akan loop tak berujung (ERR_TOO_MANY_REDIRECTS).
-        // Render landing langsung (sama seperti jalur tamu). AlbaKids (custom)
-        // tidak punya peran jemaah → fallback login.
+        // Render landing langsung (sama seperti jalur tamu). Tenant custom
+        // ('guest_home' = 'login') tidak punya peran jemaah → fallback login.
         if ($user->hasRole('jemaah')) {
-            if (AlbaKidsTenant::isActive()) {
+            if (TenantCustomizationRegistry::stringValue('guest_home') === 'login') {
                 return app(StaffLoginController::class)->show();
             }
 

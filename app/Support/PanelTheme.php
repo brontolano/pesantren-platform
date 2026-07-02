@@ -3,7 +3,6 @@
 namespace App\Support;
 
 use App\Models\Setting;
-use App\Support\AlbaKidsTenant;
 
 /**
  * Tema panel admin per PESANTREN (Setting per tenant, tanpa migrasi DB).
@@ -234,28 +233,31 @@ class PanelTheme
     ];
 
     /**
-     * Key tema aktif tenant.
-     * - AlbaKids (tenant custom) → perilaku lama, default 'bawaan' (WhatsApp).
-     * - Tenant lain → DEFAULT 'pixio' bila belum memilih; pilihan eksplisit
-     *   (termasuk 'bawaan' WA bila sengaja dipilih) tetap dihormati.
+     * Key tema aktif tenant. Default per-tenant dari registry kustomisasi
+     * ('panel_theme_default'; tahap 3 #343 — dulu cabang AlbaKidsTenant):
+     * - tenant custom (mis. albakids) → 'bawaan' (WhatsApp, perilaku lama),
+     * - tenant lain → 'pixio' bila belum memilih; pilihan eksplisit tenant
+     *   via Setting (termasuk 'bawaan' bila sengaja dipilih) tetap dihormati.
      */
     public static function theme(): string
     {
-        if (AlbaKidsTenant::isActive()) {
-            return self::resolve(self::SETTING_THEME, self::THEMES);
+        $default = TenantCustomizationRegistry::stringValue('panel_theme_default') ?? 'pixio';
+
+        if (! array_key_exists($default, self::THEMES)) {
+            $default = 'pixio';
         }
 
         try {
             if (! tenancy()->initialized || tenancy()->tenant === null) {
-                return 'pixio';
+                return $default;
             }
 
             $value = Setting::getTenantStringValue(self::SETTING_THEME);
         } catch (\Throwable) {
-            return 'pixio';
+            return $default;
         }
 
-        return is_string($value) && array_key_exists($value, self::THEMES) ? $value : 'pixio';
+        return is_string($value) && array_key_exists($value, self::THEMES) ? $value : $default;
     }
 
     /** Key preset warna aktif tenant — fallback 'bawaan'. */
