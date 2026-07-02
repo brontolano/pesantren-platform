@@ -10,6 +10,7 @@ use Inertia\Response;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Models\Comment;
 use Modules\CMS\Services\TenantWebsiteService;
+use Modules\CMS\Support\ArticleContentRenderer;
 
 class ArticleDetailController extends Controller
 {
@@ -32,6 +33,10 @@ class ArticleDetailController extends Controller
                 'slug' => $article->slug,
                 'excerpt' => $article->excerpt,
                 'content' => $article->content,
+                // HTML aman (blok Video Kajian → iframe host-terkunci; sisanya
+                // disanitasi Symfony). Vue merender ini via v-html; 'content'
+                // mentah dipertahankan untuk kompat mundur.
+                'contentHtml' => ArticleContentRenderer::render($article->content),
                 'featuredImageUrl' => $article->featured_image_url,
                 'publishedAt' => optional($article->published_at)?->toDateString(),
                 'metaTitle' => $article->meta_title,

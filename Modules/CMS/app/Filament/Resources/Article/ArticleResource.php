@@ -28,6 +28,7 @@ use Illuminate\Support\Str;
 use Modules\CMS\Filament\Resources\Article\Pages\CreateArticle;
 use Modules\CMS\Filament\Resources\Article\Pages\EditArticle;
 use Modules\CMS\Filament\Resources\Article\Pages\ListArticles;
+use Modules\CMS\Filament\RichContent\VideoKajianBlock;
 use Modules\CMS\Models\Article;
 
 class ArticleResource extends Resource
@@ -122,8 +123,13 @@ class ArticleResource extends Resource
                                         'bulletList', 'orderedList',
                                         'blockquote',
                                         'link',
+                                        'customBlocks',
                                         'redo', 'undo',
-                                    ]),
+                                    ])
+                                    // Blok "Video Kajian" NATIVE (embed
+                                    // YouTube/Vimeo, host terkunci). Tombol
+                                    // 'customBlocks' di atas membuka panelnya.
+                                    ->customBlocks([VideoKajianBlock::class]),
                             ]),
                     ])->columnSpan(['default' => 1, 'lg' => 2]),
 
