@@ -44,6 +44,17 @@ return [
         // PPDB: alur custom (verifikasi pembayaran tanpa ujian/OTP/portal peserta).
         // false = alur PPDB standar penuh.
         'ppdb_custom_flow' => false,
+
+        // PPDB: form pendaftaran inline di landing page (LandingRegistrationController).
+        // false = rute 404 kecuali Setting tenant 'admission_inline_enabled' aktif.
+        // (tahap 5 #343 — dulu cek tenant key 'albakids' hardcoded)
+        'ppdb_inline_admission' => false,
+
+        // Profil default konten website publik (TenantWebsiteService): copy,
+        // warna, font, dan seksi landing bawaan bila tenant belum mengisi
+        // CMS/Setting. 'pesantren' = default platform; 'albakids' = paket
+        // preschool custom. (tahap 5 #343 — dulu isAlbaKidsTenant() hardcoded)
+        'website_defaults' => 'pesantren',
         'ppdb_program_options' => [
             'Reguler' => 'Reguler',
             'Tahfidz' => 'Tahfidz',
@@ -98,6 +109,8 @@ return [
             'body_class' => 'tenant-albakids',
 
             'ppdb_custom_flow' => true,
+            'ppdb_inline_admission' => true,
+            'website_defaults' => 'albakids',
             'ppdb_program_options' => [
                 'Preschool' => 'Preschool',
             ],

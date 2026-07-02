@@ -4,6 +4,7 @@ namespace Modules\PPDB\Services;
 
 use App\Models\Setting;
 use App\Support\PhoneNumber;
+use App\Support\TenantCustomizationRegistry;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -26,6 +27,19 @@ class AlbaKidsRegistrationNotificationService
     ) {}
 
     /**
+     * Prefix kode template dari registry (kunci tahap 2 'notif_template_prefix'
+     * — sama dgn filter BroadcastWa/TemplateNotifikasi resource, sehingga
+     * template yang dibuat di sini otomatis tampil di resource tenant tsb).
+     * Fallback 'albakids_' = nilai legacy kompat data produksi (kode template
+     * lama di DB tenant); migrasi kode = keputusan owner (inventaris #10).
+     * (tahap 5 #343)
+     */
+    private function templatePrefix(): string
+    {
+        return TenantCustomizationRegistry::stringValue('notif_template_prefix') ?? 'albakids_';
+    }
+
+    /**
      * Kirim semua notifikasi pendaftaran: ucapan terima kasih ke orang tua +
      * ringkasan & lampiran dokumen ke admin.
      *
@@ -35,7 +49,7 @@ class AlbaKidsRegistrationNotificationService
     {
         // Pastikan template broadcast umum tersedia (dipakai fitur broadcast manual).
         $this->resolveTemplate(
-            'albakids_broadcast_general',
+            $this->templatePrefix().'broadcast_general',
             'Broadcast Alba Kids',
             'Assalamu alaikum Bapak/Ibu, {{isi_pesan}}'
         );
@@ -122,7 +136,7 @@ class AlbaKidsRegistrationNotificationService
     private function guardianTemplate(): TemplateNotifikasi
     {
         return $this->resolveTemplate(
-            'albakids_registration_received',
+            $this->templatePrefix().'registration_received',
             'Pendaftaran Alba Kids diterima',
             'Assalamu alaikum {{salam}}, terima kasih sudah mendaftarkan {{nama_calon}} di Alba Kids Pre-School. Nomor pendaftaran: {{nomor_pendaftaran}}. Bukti transfer sudah kami terima dan sedang diverifikasi. {{pesan_tambahan}}'.self::FOOTER
         );
@@ -131,7 +145,7 @@ class AlbaKidsRegistrationNotificationService
     private function adminTemplate(): TemplateNotifikasi
     {
         return $this->resolveTemplate(
-            'albakids_admin_new_registration',
+            $this->templatePrefix().'admin_new_registration',
             'Pendaftar baru Alba Kids',
             "Pendaftar baru Alba Kids masuk.\n\n{{ringkasan}}\n\nDokumen (file terlampir menyusul; link cadangan):\n{{dokumen}}\n\nSegera verifikasi di panel admin.".self::FOOTER
         );
