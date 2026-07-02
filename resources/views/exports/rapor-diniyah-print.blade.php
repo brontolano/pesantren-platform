@@ -73,6 +73,34 @@
         @endif
     @endif
 
+    @if(in_array('sorogan', $blokAktif, true))
+        <h3>Sorogan &amp; Ngaji Kitab</h3>
+        @if(!empty($blok['sorogan']['daftar']))
+            <table>
+                <thead><tr><th>Kitab</th><th>Setoran</th><th>Posisi Terakhir</th><th>Status</th><th>Nilai Rata</th></tr></thead>
+                <tbody>
+                @foreach($blok['sorogan']['daftar'] as $item)
+                    <tr>
+                        <td>{{ $item['kitab'] ?? '-' }}</td>
+                        <td>{{ $item['jumlah_setoran'] ?? 0 }}</td>
+                        <td>{{ $item['posisi_terakhir'] ?? '-' }}</td>
+                        <td>{{ !empty($item['khatam']) ? 'khatam' : ($item['status_terakhir'] ?? '-') }}</td>
+                        <td>{{ $item['nilai_rata'] ?? '-' }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+            <p>
+                Total setoran: {{ $blok['sorogan']['jumlah_setoran'] ?? 0 }} —
+                Kitab khatam: {{ $blok['sorogan']['kitab_khatam'] ?? 0 }} —
+                Nilai rata: {{ $blok['sorogan']['nilai_rata'] ?? '-' }} —
+                Sesi bandongan/halaqah: hadir {{ $blok['sorogan']['sesi_bandongan']['hadir'] ?? 0 }} dari {{ $blok['sorogan']['sesi_bandongan']['ikut'] ?? 0 }}
+            </p>
+        @else
+            <p class="empty">Belum ada setoran sorogan pada periode ini.</p>
+        @endif
+    @endif
+
     @if(in_array('tahfidz', $blokAktif, true))
         <h3>Tahfidz</h3>
         <table>
