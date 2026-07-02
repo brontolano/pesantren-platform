@@ -14,4 +14,10 @@ class EditTagihanRutin extends EditRecord
     {
         return [DeleteAction::make()];
     }
+
+    /** #332: nominal = total komponen bila rincian diisi. */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return TagihanRutinResource::sinkronkanKomponen($data);
+    }
 }
