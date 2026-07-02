@@ -22,7 +22,18 @@ VPS PT Rojo Bronto Lano (1 server, IP: [IP_VPS])
 
 ---
 
-## Langkah Setup Domain Custom
+## Dua Opsi Setup DNS (keputusan owner issue #350 poin 4)
+
+| Opsi | Kapan dipakai | Siapa yang bertindak |
+|---|---|---|
+| **1. Manual** | Domain dikelola di registrar mana pun (Niagahoster, Cloudflare, dll) | Pesantren menambah A record sendiri → admin platform klik **Cek DNS** di *Daftar Pesantren → DNS Domain* untuk memverifikasi domain sudah mengarah ke IP platform |
+| **2. Otomatis** | Zona domain dikelola di akun **Hostinger** owner | Admin platform klik **Otomatis (domain di Hostinger)** di *Daftar Pesantren → DNS Domain*; A record dibuat via API Hostinger DNS. Butuh `HOSTINGER_API_TOKEN` di ENV — tanpa token tombol tampil nonaktif. Jika zona tidak ditemukan, sistem menampilkan instruksi manual (fallback) |
+
+IP target A record dibaca dari ENV `PLATFORM_SERVER_IP` (config `dns.server_ip`), tidak di-hardcode di UI. Mekanisme SSL on-demand existing tidak berubah — begitu DNS benar, sertifikat terbit otomatis saat domain diakses.
+
+---
+
+## Langkah Setup Domain Custom (Opsi Manual)
 
 ### 1. Dapatkan IP VPS
 
