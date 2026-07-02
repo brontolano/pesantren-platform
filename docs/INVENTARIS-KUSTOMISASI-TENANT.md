@@ -21,7 +21,17 @@ asy-syifaa. Total **±40 titik kustomisasi** di 8 kategori:
 | Guard Pixio body-class di blade | 6 blade | ✅ **SELESAI tahap 4** — kelas body dari registry (`body_class`), blade tidak cek slug tenant |
 | Perilaku login/launcher | 3 | ✅ **SELESAI tahap 3** — `guest_home` + `login_variant` via registry |
 | Default konten asy-syifaa (AppShell/Branding) | 2 file | ✅ **SELESAI tahap 4** — default satu sumber di registry (`app_content_links`); Setting per-key tetap menang |
-| Data/tipe hardcoded (`pendaftaran_albakids`, template `albakids_%`) | 4 | belum; butuh migrasi data hati-hati |
+| Data/tipe hardcoded (`pendaftaran_albakids`, template `albakids_%`) | 4 | ✅ **SELESAI tahap 5 (sisi KODE)** — kode baca nilai dari registry (`ppdb_gelombang_scope`, `ppdb_tagihan_tipe_scope`, `notif_template_prefix`, `ppdb_inline_admission`); NILAI di DB produksi TIDAK dimigrasi (keputusan owner, lihat §2e) |
+
+**Status akhir tahap 5 (2026-07-02):** seluruh ±40 titik kustomisasi runtime
+kini lewat `TenantCustomizationRegistry` (Setting > config > default) atau
+sudah Setting-overridable. `AlbaKidsTenant` **NOL perujuk runtime** →
+`@deprecated` (dijaga test `test_tidak_ada_perujuk_runtime_alba_kids_tenant`).
+Sisa = keputusan owner / non-hot-path: migrasi NILAI data produksi
+(`tipe='pendaftaran_albakids'`, kode template `albakids_*` di DB tenant),
+penghapusan fisik `AlbaKidsTenant.php` setelah 1 rilis aman, #19 blade legacy,
+#20 konten komponen Vue custom, #23 koordinat default, #27/#28 konten
+asy-syifaa di landing central (konten, bukan cabang logika).
 
 `app/Console/Commands/*` (importer per-tenant) dan komentar/dokumentasi TIDAK
 dihitung — bukan hot path runtime.
@@ -41,8 +51,8 @@ Risiko: L (kosmetik), M (fitur tenant salah tampil), H (perilaku/uang/keamanan).
 | 6 | `app/Support/PanelTheme.php:244` | tema | AlbaKids dipaksa default tema `bawaan` | L | ✅ **SELESAI tahap 3** → kunci registry `panel_theme_default` (`pixio` default, `bawaan` utk albakids); pilihan eksplisit via Setting tetap menang |
 | 7 | `Modules/PPDB/.../CalonSantriResource.php` (±15 titik: 106,125,217,236-284,312,346,364,406-469,487-502) | panel+nav | Label, opsi program, status default, aksi WA khusus, grup nav 'PPDB Custom' | M | ✅ **SELESAI tahap 2** → `feature('ppdb_custom_flow')` + `label('ppdb.calon_santri.*')` + `value('ppdb_program_options')` + `stringValue('ppdb_status_default'/'ppdb_gelombang_scope')`; jangka panjang: konfigurasi PPDB per-tenant di DB |
 | 8 | `Modules/PPDB/.../TagihanPpdbResource.php:60-70,141-142,157-172` | panel+data | Label + filter `tipe = 'pendaftaran_albakids'` | M | ✅ **SELESAI tahap 2** → `feature('ppdb_custom_flow')` + `label('ppdb.tagihan.*')` + `stringValue('ppdb_tagihan_tipe_scope')` (nilai tipe di DATA belum dimigrasi — lihat #9) |
-| 9 | `Modules/PPDB/.../LandingRegistrationController.php:145,184` | data+perilaku | Tulis `tipe='pendaftaran_albakids'`; cek key `albakids` utk notif | M | registry `ppdb_variant` + service notifikasi via binding |
-| 10 | `Modules/PPDB/app/Services/AlbaKidsRegistrationNotificationService.php` | perilaku | Service notif WA khusus, kode template `albakids_*` | M | interface `RegistrationNotifier` + binding per registry |
+| 9 | `Modules/PPDB/.../LandingRegistrationController.php:145,184` | data+perilaku | Tulis `tipe='pendaftaran_albakids'`; cek key `albakids` utk notif | M | ✅ **SELESAI tahap 5** → gelombang & tipe dibaca dari registry (`ppdb_gelombang_scope`/`ppdb_tagihan_tipe_scope`, fallback nilai legacy utk kompat data lama); gerbang rute via `feature('ppdb_inline_admission')`; migrasi NILAI di DB = keputusan owner |
+| 10 | `Modules/PPDB/app/Services/AlbaKidsRegistrationNotificationService.php` | perilaku | Service notif WA khusus, kode template `albakids_*` | M | ✅ **SELESAI tahap 5** → kode template = `stringValue('notif_template_prefix')` + suffix generik (fallback legacy `albakids_`); interface/binding per-tenant TIDAK diperlukan selama implementasi tunggal (nama kelas = kosmetik) |
 | 11 | `Modules/Notifikasi/.../BroadcastWaResource.php:67,146-179` | panel+nav+data | Filter template `albakids_%`, label & grup nav custom | M | ✅ **SELESAI tahap 2** → `stringValue('notif_template_prefix')` + `label('notifikasi.broadcast_wa.*')` |
 | 12 | `Modules/Notifikasi/.../TemplateNotifikasiResource.php:141-165` | panel+nav+data | idem #11 | M | ✅ **SELESAI tahap 2** → `stringValue('notif_template_prefix')` + `label('notifikasi.template.*')` |
 | 13 | `resources/views/tenant/login.blade.php:51-73` | tema | Guard Pixio: `body.tenant-albakids` pulihkan gaya tombol asli | L | ✅ **SELESAI tahap 4** → registry `body_class`; kelas `tenant-albakids` dipertahankan utk kompat CSS |
@@ -56,7 +66,7 @@ Risiko: L (kosmetik), M (fitur tenant salah tampil), H (perilaku/uang/keamanan).
 | 21 | `Modules/CMS/.../AppShellController.php:28-36,101` | landing | Default URL konten asy-syifaa (fallback bila Setting kosong) | L | ✅ **SELESAI tahap 4** → registry `app_content_links` (satu sumber; Setting per-key tetap menang) |
 | 22 | `app/Filament/Pages/PengaturanBranding.php:97-105` | panel | Default URL asy-syifaa yg sama (duplikat #21) | L | ✅ **SELESAI tahap 4** → konstanta `APP_LINKS` dihapus, baca `TenantCustomizationRegistry::appContentLinks()` |
 | 23 | `app/Support/TenantBranding.php:18` | perilaku | Koordinat default = Asy-Syifaa Padalarang | L | default netral + seeder per-tenant |
-| 24 | `app/Support/AlbaKidsTenant.php` | (resolver) | Host + tenant key hardcoded | — | dipertahankan sementara; jangka panjang semua pemanggil pindah ke registry lalu kelas ini dihapus |
+| 24 | `app/Support/AlbaKidsTenant.php` | (resolver) | Host + tenant key hardcoded | — | ✅ **tahap 5: NOL perujuk runtime → `@deprecated`**; file dipertahankan 1 rilis (jaring pengaman blade cache/deploy lama), hapus fisik = keputusan owner rilis berikut; dijaga test anti-regresi |
 | 25 | `Modules/AI/config/config.php:701` | perilaku | Placeholder default tenant AI (komentar; nilai kosong) | L | sudah config-driven, biarkan |
 | 26 | `config/cors.php:19-25` | perilaku | Apex domain asy-syifaa di default env CORS | L | sudah env-driven; biarkan |
 | 27 | `resources/views/tenant/launcher.blade.php:80` | landing | URL website asy-syifaa hardcoded | L | Setting `website_url` |
@@ -147,6 +157,37 @@ memiliki domain itu) dan menambah query per-request.
   `TenantPanelAuthedSmokeTest`.
 - TIDAK disentuh (tahap 5): data DB produksi (`pendaftaran_albakids`, template
   `albakids_%`) + penghapusan `AlbaKidsTenant`.
+
+## 2e. Catatan tahap 5 — FINAL kode (Refs #343)
+
+- **Data hardcoded (#8 kategori terakhir, titik #9/#10)**: kode TIDAK lagi
+  menulis string identitas tenant; nilai dibaca dari registry:
+  - `LandingRegistrationController`: `gelombang` ← `ppdb_gelombang_scope`,
+    `tipe` tagihan ← `ppdb_tagihan_tipe_scope` (kunci SAMA dengan scope filter
+    resource tahap 2 → baris yang ditulis pasti tampil di resource); gerbang
+    rute ← kunci baru `ppdb_inline_admission` (default false, albakids true;
+    Setting `admission_inline_enabled` tetap bisa mengaktifkan).
+  - `AlbaKidsRegistrationNotificationService`: kode template =
+    `notif_template_prefix` + suffix generik (`registration_received`, dst.).
+  - Fallback literal legacy (`'Landing Alba Kids'`, `'pendaftaran_albakids'`,
+    `'albakids_'`) DIPERTAHANKAN sebagai default bila registry kosong —
+    kompat-mundur data produksi & tenant lain yang mengaktifkan inline via
+    Setting. **Migrasi NILAI di DB produksi TIDAK dilakukan** (bukan
+    zero-risk: menyentuh baris tagihan uang + kode template WA live) →
+    keputusan owner, rencana terpisah.
+- **`TenantWebsiteService::isAlbaKidsTenant()` (#4)**: perujuk runtime
+  TERAKHIR `AlbaKidsTenant` → kini baca kunci registry `website_defaults`
+  (`'pesantren'` default | `'albakids'`). Resolusi registry mencakup tenant
+  key + alias host → perilaku identik.
+- **`AlbaKidsTenant` (#24)**: NOL perujuk runtime (app/Modules/blade) →
+  ditandai `@deprecated` mengarah ke registry. File TIDAK dihapus fisik dulu
+  (jaring pengaman 1 rilis); penghapusan = tindak lanjut rilis berikut.
+- Guard: `TenantCustomizationRegistryTest::test_kunci_tahap5_default_dan_override_albakids`
+  + `test_tidak_ada_perujuk_runtime_alba_kids_tenant` (scan FQCN di app/ &
+  Modules/) + suite tahap 1-4 + `TenantPanelAuthedSmokeTest`.
+- Copy kosmetik bertuliskan "Alba Kids" di keterangan/pesan sukses form inline
+  tetap (konten form custom, bukan cabang logika; overridable via Setting
+  `admission_success_message` dsb.).
 
 ## 3. Desain mekanisme: `TenantCustomizationRegistry`
 

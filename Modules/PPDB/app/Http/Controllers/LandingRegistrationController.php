@@ -4,6 +4,7 @@ namespace Modules\PPDB\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Support\TenantCustomizationRegistry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -97,7 +98,10 @@ class LandingRegistrationController extends Controller
                 'asal_sekolah' => null,
                 'program_diminati' => $program,
                 'tahun_ajaran' => $this->academicYear(),
-                'gelombang' => 'Landing Alba Kids',
+                // Gelombang dari registry (kunci sama dgn scope filter resource,
+                // tahap 2) — fallback nilai legacy agar data lama & tenant tanpa
+                // entri registry tetap konsisten (tahap 5 #343).
+                'gelombang' => TenantCustomizationRegistry::stringValue('ppdb_gelombang_scope') ?? 'Landing Alba Kids',
                 'status_pendaftaran' => 'menunggu_verifikasi',
                 'data_ortu' => [
                     'child_order' => $validated['child_order'] ?? null,
@@ -142,7 +146,12 @@ class LandingRegistrationController extends Controller
             TagihanPpdb::create([
                 'tenant_id' => tenant()?->getTenantKey(),
                 'calon_santri_id' => $candidate->getKey(),
-                'tipe' => 'pendaftaran_albakids',
+                // Tipe tagihan dari registry — WAJIB sama dgn scope filter
+                // TagihanPpdbResource ('ppdb_tagihan_tipe_scope') agar baris yang
+                // ditulis di sini tampil di resource. Fallback nilai legacy
+                // 'pendaftaran_albakids' (kompat data produksi; migrasi nilai =
+                // keputusan owner, lihat inventaris #9). (tahap 5 #343)
+                'tipe' => TenantCustomizationRegistry::stringValue('ppdb_tagihan_tipe_scope') ?? 'pendaftaran_albakids',
                 'nominal' => $nominalTransfer,
                 'jatuh_tempo' => now()->toDateString(),
                 'status' => 'menunggu_verifikasi',
@@ -181,7 +190,11 @@ class LandingRegistrationController extends Controller
 
     private function inlineAdmissionEnabled(): bool
     {
-        return tenant()?->getTenantKey() === 'albakids'
+        // Registry, bukan cek tenant key 'albakids' (tahap 5 #343). Kunci
+        // 'ppdb_inline_admission' (default false; entri albakids true — perilaku
+        // identik, termasuk alias host). Setting per-tenant tetap bisa
+        // mengaktifkan tanpa entri registry.
+        return TenantCustomizationRegistry::feature('ppdb_inline_admission')
             || (bool) Setting::getTenantValue('admission_inline_enabled', false);
     }
 

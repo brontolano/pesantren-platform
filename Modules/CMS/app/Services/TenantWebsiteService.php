@@ -634,14 +634,13 @@ class TenantWebsiteService
     }
 
     /**
-     * Konsolidasi resolver (#343 tahap 2): delegasi ke AlbaKidsTenant — satu
-     * sumber kebenaran (host + tenant key), duplikasi logika dihapus. Cabang
-     * query domains() lama dihapus: hanya tenant berkey 'albakids' yang punya
-     * domain tsb, jadi cabang itu tak pernah tercapai (redundan) dan hanya
-     * menambah query per-request.
+     * Profil default konten website dari registry (#343 tahap 5) — perujuk
+     * terakhir AlbaKidsTenant dipensiunkan. Kunci 'website_defaults'
+     * ('pesantren' default | 'albakids' paket preschool); resolusi registry
+     * mencakup tenant key + alias host, perilaku identik resolver lama.
      */
     protected function isAlbaKidsTenant(): bool
     {
-        return \App\Support\AlbaKidsTenant::isActive();
+        return \App\Support\TenantCustomizationRegistry::stringValue('website_defaults') === 'albakids';
     }
 }

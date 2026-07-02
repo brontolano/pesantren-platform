@@ -94,6 +94,52 @@ class TenantCustomizationRegistryTest extends TestCase
         tenancy()->end();
     }
 
+    public function test_kunci_tahap5_default_dan_override_albakids(): void
+    {
+        // Default: inline admission mati, profil konten website 'pesantren'.
+        $tenant = $this->createRuntimeTenant('reg-t5', 'Pesantren Tahap5');
+        tenancy()->initialize($tenant);
+
+        $this->assertFalse(TenantCustomizationRegistry::feature('ppdb_inline_admission'));
+        $this->assertSame('pesantren', TenantCustomizationRegistry::stringValue('website_defaults'));
+
+        // Entri albakids: inline admission aktif + profil konten 'albakids'
+        // (perilaku identik cek tenant-key/isAlbaKidsTenant() lama).
+        $this->applyAlbaKidsEntryFor((string) $tenant->getTenantKey());
+        $this->assertTrue(TenantCustomizationRegistry::feature('ppdb_inline_admission'));
+        $this->assertSame('albakids', TenantCustomizationRegistry::stringValue('website_defaults'));
+
+        tenancy()->end();
+    }
+
+    public function test_tidak_ada_perujuk_runtime_alba_kids_tenant(): void
+    {
+        // Guard tahap 5 #343: kelas AlbaKidsTenant @deprecated — tidak boleh
+        // ada pemakaian FQCN di app/ & Modules/ selain kelas itu sendiri.
+        $offenders = [];
+        $roots = [base_path('app'), base_path('Modules')];
+        $self = str_replace('\\', '/', app_path('Support/AlbaKidsTenant.php'));
+
+        foreach ($roots as $root) {
+            $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS));
+            foreach ($iterator as $file) {
+                if ($file->getExtension() !== 'php') {
+                    continue;
+                }
+                $path = str_replace('\\', '/', $file->getPathname());
+                if ($path === $self) {
+                    continue;
+                }
+                $contents = (string) file_get_contents($file->getPathname());
+                if (str_contains($contents, 'App\\Support\\AlbaKidsTenant')) {
+                    $offenders[] = $path;
+                }
+            }
+        }
+
+        $this->assertSame([], $offenders, 'Masih ada perujuk App\\Support\\AlbaKidsTenant — pindahkan ke TenantCustomizationRegistry.');
+    }
+
     public function test_label_fallback_bila_kunci_tak_dioverride(): void
     {
         $tenant = $this->createRuntimeTenant('reg-fb', 'Pesantren Fallback');
