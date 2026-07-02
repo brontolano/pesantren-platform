@@ -87,6 +87,75 @@ use Modules\Tahfidz\Models\Halaqah;
 class UnitSetupRegistry
 {
     /**
+     * Setting tenant: daftar kode unit yang WAJIB untuk pesantren ini (#350 poin 1).
+     * Tidak ada = default (SEMUA unit wajib, perilaku lama). Ada = hanya kode
+     * di daftar yang wajib; sisanya opsional (tetap bisa diisi, tak menahan go-live).
+     */
+    public const SETTING_UNIT_WAJIB = 'setup.unit_wajib';
+
+    /** Setting tenant: skenario setup — 'baru' (default) atau 'migrasi' tengah tahun (#350 poin 2). */
+    public const SETTING_SKENARIO = 'setup.skenario';
+
+    /** Apakah unit ini WAJIB untuk tenant aktif? Default (setting absen) = wajib. */
+    public static function unitWajib(string $kode): bool
+    {
+        try {
+            $v = Setting::getTenantValue(self::SETTING_UNIT_WAJIB);
+        } catch (\Throwable) {
+            return true;
+        }
+
+        return is_array($v) ? in_array($kode, $v, true) : true;
+    }
+
+    /** Ubah flag wajib satu unit (menulis Setting tenant, idempoten). */
+    public static function setUnitWajib(string $kode, bool $wajib): void
+    {
+        $v = Setting::getTenantValue(self::SETTING_UNIT_WAJIB);
+        // Setting absen = semua wajib → materialisasi dulu agar toggle 1 unit
+        // tidak diam-diam menjadikan unit lain opsional.
+        $daftar = is_array($v) ? $v : array_keys(self::units());
+        $daftar = array_values(array_diff($daftar, [$kode]));
+        if ($wajib) {
+            $daftar[] = $kode;
+        }
+        Setting::updateOrCreate(['key' => self::SETTING_UNIT_WAJIB], ['value' => $daftar]);
+    }
+
+    /** Skenario setup tenant = migrasi tengah tahun? (default: pesantren baru bersih). */
+    public static function skenarioMigrasi(): bool
+    {
+        try {
+            return Setting::getTenantStringValue(self::SETTING_SKENARIO) === 'migrasi';
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Unit berikutnya yang belum tuntas (urutan registry) — penunjuk "Lanjut ke"
+     * (#350 poin 3). Hanya unit yang boleh diakses $user & berflag WAJIB.
+     *
+     * @return array{kode:string, label:string}|null
+     */
+    public static function nextUnit(?User $user = null): ?array
+    {
+        foreach (self::unitsCached() as $kode => $def) {
+            if ($user !== null && ! $user->can($def['permission'])) {
+                continue;
+            }
+            if (! self::unitWajib($kode)) {
+                continue;
+            }
+            if (! self::progress($kode)['tuntas']) {
+                return ['kode' => $kode, 'label' => $def['label']];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return array<string, array{
      *   label:string, icon:string, permission:string,
      *   steps: list<array{key:string, label:string, desc:string, done:bool, url:?string, opsional:bool}>
@@ -342,7 +411,7 @@ class UnitSetupRegistry
     {
         $unit = self::units()[$kode] ?? null;
         if ($unit === null) {
-            return ['selesai' => 0, 'total' => 0, 'persen' => 0, 'tuntas' => false, 'opsional_selesai' => 0, 'opsional_total' => 0];
+            return ['selesai' => 0, 'total' => 0, 'persen' => 0, 'tuntas' => false, 'opsional_selesai' => 0, 'opsional_total' => 0, 'wajib' => true];
         }
 
         $wajib = collect($unit['steps'])->where('opsional', false);
@@ -357,6 +426,7 @@ class UnitSetupRegistry
             'tuntas' => $total > 0 && $selesai === $total,
             'opsional_selesai' => $opsional->where('done', true)->count(),
             'opsional_total' => $opsional->count(),
+            'wajib' => self::unitWajib($kode),
         ];
     }
 

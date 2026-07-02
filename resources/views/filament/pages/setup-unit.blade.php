@@ -21,8 +21,26 @@
             <span class="text-sm font-semibold {{ $setup['selesai'] ? 'text-emerald-600' : 'text-amber-600' }}">{{ $setup['persen'] }}%</span>
         </a>
 
+        {{-- Penunjuk "Lanjut ke" (#350 poin 3): selalu ada 1 jalan jelas, tanpa mengunci navigasi bebas. --}}
+        @if (! empty($lanjut))
+            <a href="{{ $lanjut['url'] }}"
+               class="flex items-center gap-3 rounded-2xl border border-emerald-300 bg-emerald-50/70 px-5 py-4 transition hover:bg-emerald-50 dark:border-emerald-800/60 dark:bg-emerald-950/30">
+                <x-filament::icon icon="heroicon-m-arrow-right-circle" class="h-6 w-6 shrink-0 text-emerald-600" />
+                <span class="min-w-0 flex-1">
+                    <span class="block text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                        Lanjut ke: {{ $lanjut['label'] }}
+                    </span>
+                    <span class="block text-xs text-emerald-700/80 dark:text-emerald-300/70">
+                        Unit berikutnya yang belum selesai. Anda tetap bebas memilih unit lain di bawah.
+                    </span>
+                </span>
+                <span class="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white">Lanjutkan</span>
+            </a>
+        @endif
+
         <p class="text-sm text-stone-500 dark:text-stone-400">
             Selesaikan setup tiap unit secara bertahap. Klik sebuah unit untuk dipandu langkah demi langkah.
+            Tandai unit yang tidak dipakai pondok Anda sebagai <strong>opsional</strong> agar tak menahan kesiapan go-live.
         </p>
 
         <div class="grid gap-4 sm:grid-cols-2">
@@ -40,6 +58,16 @@
                                 {{ $u['progress']['selesai'] }} dari {{ $u['progress']['total'] }} langkah
                             </span>
                         </div>
+                        {{-- Toggle wajib/opsional per pesantren (#350 poin 1) — tulis Setting setup.unit_wajib. --}}
+                        <button type="button"
+                            wire:click.stop.prevent="toggleWajib('{{ $u['kode'] }}')"
+                            title="Klik untuk mengubah: unit wajib ikut menahan kesiapan go-live, unit opsional tidak."
+                            class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold
+                                {{ $u['progress']['wajib']
+                                    ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300'
+                                    : 'bg-stone-100 text-stone-500 hover:bg-stone-200 dark:bg-white/10 dark:text-stone-400' }}">
+                            {{ $u['progress']['wajib'] ? 'Wajib' : 'Opsional' }}
+                        </button>
                         <span class="text-sm font-semibold {{ $u['progress']['tuntas'] ? 'text-emerald-600' : 'text-stone-400' }}">
                             {{ $u['progress']['persen'] }}%
                         </span>
@@ -58,10 +86,34 @@
                 @endif
                 <a href="{{ $hubUrl }}" class="text-sm text-stone-500 hover:text-emerald-700 dark:text-stone-400">Semua unit</a>
             </div>
-            <span class="text-sm font-semibold {{ $progress['tuntas'] ? 'text-emerald-600' : 'text-stone-400' }}">
-                {{ $progress['persen'] }}% selesai
+            <span class="flex items-center gap-2">
+                @unless ($wajib)
+                    <span class="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-semibold text-stone-500 dark:bg-white/10 dark:text-stone-400"
+                        title="Unit ini ditandai opsional untuk pesantren Anda — tidak menahan kesiapan go-live.">
+                        Opsional untuk pesantren Anda
+                    </span>
+                @endunless
+                <span class="text-sm font-semibold {{ $progress['tuntas'] ? 'text-emerald-600' : 'text-stone-400' }}">
+                    {{ $progress['persen'] }}% selesai
+                </span>
             </span>
         </div>
+
+        {{-- Penunjuk "Lanjut ke" (#350 poin 3): langkah wajib pertama yang belum beres. --}}
+        @if (! empty($nextStep))
+            <div class="mt-2 flex items-center gap-3 rounded-xl border border-emerald-300 bg-emerald-50/70 px-4 py-3 dark:border-emerald-800/60 dark:bg-emerald-950/30">
+                <x-filament::icon icon="heroicon-m-arrow-right-circle" class="h-5 w-5 shrink-0 text-emerald-600" />
+                <span class="min-w-0 flex-1 text-sm font-semibold text-emerald-900 dark:text-emerald-100">
+                    Lanjut ke: {{ $nextStep['label'] }}
+                </span>
+                @if ($nextStep['url'])
+                    <a href="{{ $nextStep['url'] }}"
+                       class="shrink-0 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700">
+                        Buka
+                    </a>
+                @endif
+            </div>
+        @endif
 
         <ul class="mt-2 space-y-2">
             @foreach ($steps as $i => $step)
@@ -99,23 +151,39 @@
         </ul>
 
         @if (! empty($stepsOpsional))
-            {{-- Importer historis — HANYA untuk migrasi tengah tahun dari sistem lama. --}}
-            <div class="mt-4">
+            {{-- Importer historis — untuk migrasi tengah tahun dari sistem lama.
+                 Skenario 'migrasi' (#350 poin 2) → seksi ini DITONJOLKAN (gaya normal,
+                 disarankan); skenario 'baru' → tetap redup/terlipat seperti semula. --}}
+            <div class="mt-4 {{ $skenarioMigrasi ? 'rounded-2xl border border-emerald-200 bg-emerald-50/40 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/10' : '' }}">
                 <div class="flex items-center gap-2">
-                    <span class="text-sm font-semibold text-stone-700 dark:text-stone-200">Data historis (opsional)</span>
-                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
-                        Hanya untuk migrasi tengah tahun
+                    <span class="text-sm font-semibold {{ $skenarioMigrasi ? 'text-emerald-900 dark:text-emerald-100' : 'text-stone-700 dark:text-stone-200' }}">
+                        {{ $skenarioMigrasi ? 'Data historis dari sistem lama' : 'Data historis (opsional)' }}
+                    </span>
+                    <span class="rounded-full px-2 py-0.5 text-[11px] font-semibold
+                        {{ $skenarioMigrasi
+                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300'
+                            : 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300' }}">
+                        {{ $skenarioMigrasi ? 'Disarankan untuk skenario migrasi Anda' : 'Hanya untuk migrasi tengah tahun' }}
                     </span>
                 </div>
-                <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                    Pesantren baru yang mulai dari nol boleh <strong>melewati semua langkah ini</strong>.
-                    Isi hanya bila pindahan dari sistem/pembukuan lama di tengah tahun ajaran.
+                <p class="mt-1 text-xs {{ $skenarioMigrasi ? 'text-emerald-800/80 dark:text-emerald-200/70' : 'text-stone-500 dark:text-stone-400' }}">
+                    @if ($skenarioMigrasi)
+                        Anda memilih skenario <strong>migrasi tengah tahun</strong> — impor data historis di bawah
+                        agar laporan menyambung dari sistem lama. Tetap tidak wajib; lewati yang tak relevan.
+                    @else
+                        Pesantren baru yang mulai dari nol boleh <strong>melewati semua langkah ini</strong>.
+                        Isi hanya bila pindahan dari sistem/pembukuan lama di tengah tahun ajaran.
+                    @endif
                 </p>
                 <ul class="mt-2 space-y-2">
                     @foreach ($stepsOpsional as $step)
                         <li>
-                            <div class="flex items-center gap-3 rounded-xl border border-dashed px-4 py-3
-                                {{ $step['done'] ? 'border-emerald-200 bg-white/70 dark:border-emerald-900/40 dark:bg-white/5' : 'border-stone-300 bg-stone-50/60 dark:border-white/10 dark:bg-white/5' }}">
+                            <div class="flex items-center gap-3 rounded-xl border px-4 py-3 {{ $skenarioMigrasi ? '' : 'border-dashed' }}
+                                {{ $step['done']
+                                    ? 'border-emerald-200 bg-white/70 dark:border-emerald-900/40 dark:bg-white/5'
+                                    : ($skenarioMigrasi
+                                        ? 'border-stone-200 bg-white dark:border-white/10 dark:bg-white/5'
+                                        : 'border-stone-300 bg-stone-50/60 dark:border-white/10 dark:bg-white/5') }}">
                                 <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full
                                     {{ $step['done'] ? 'bg-emerald-600 text-white' : 'bg-stone-100 text-stone-400 dark:bg-white/10 dark:text-stone-400' }}">
                                     <x-filament::icon :icon="$step['done'] ? 'heroicon-m-check' : 'heroicon-o-archive-box-arrow-down'" class="h-5 w-5" />
@@ -129,7 +197,10 @@
                                 </span>
                                 @if ($step['url'])
                                     <a href="{{ $step['url'] }}"
-                                       class="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-white/10">
+                                       class="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold
+                                           {{ $skenarioMigrasi && ! $step['done']
+                                               ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                                               : 'text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-white/10' }}">
                                         {{ $step['done'] ? 'Tinjau' : 'Buka' }}
                                     </a>
                                 @endif

@@ -69,6 +69,9 @@ class OnboardingChecklist extends Widget
 
         return [
             'steps' => $steps,
+            // Penunjuk "Lanjut ke" (#350 poin 3) — langkah pertama yang belum
+            // selesai, konsisten dengan penunjuk di Pusat Setup (sumber sama).
+            'lanjut' => collect($steps)->first(fn (array $s): bool => ! $s['done']),
             'selesai' => $selesai,
             'total' => count($steps),
             'persen' => count($steps) > 0 ? (int) round($selesai / count($steps) * 100) : 0,

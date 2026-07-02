@@ -11,11 +11,13 @@ use App\Services\StorageQuotaService;
 use App\Services\TenantHealthCheck;
 use App\Support\KebijakanRegistry;
 use App\Support\UiMode;
+use App\Support\UnitSetupRegistry;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -113,6 +115,7 @@ class SetupPesantren extends Page implements HasForms
         $istilah = is_array($v = Setting::getTenantValue(IstilahRegistry::SETTING_KEY)) ? $v : [];
 
         $this->form->fill([
+            'skenario' => Setting::getTenantStringValue(UnitSetupRegistry::SETTING_SKENARIO) ?? 'baru',
             'nama' => Setting::getTenantStringValue('branding_name'),
             'tagline' => Setting::getTenantStringValue('branding_tagline'),
             'preset' => null, // jangan auto-terapkan ulang
@@ -157,6 +160,18 @@ class SetupPesantren extends Page implements HasForms
                                     ? '<p class="text-sm">Selamat datang! Ikuti langkah-langkah berikut untuk menyiapkan pondok Anda. Tiap langkah singkat, dan yang opsional boleh dilewati dulu — bisa diisi kapan saja.</p>'
                                     : '<p class="text-sm">Setup fondasi tenant. Mode Lanjutan: semua field tampil.</p>'
                             )),
+                        // Pertanyaan skenario (#350 poin 2) — menentukan apakah importer
+                        // historis di Pusat Setup ditonjolkan. Bisa diubah kapan saja
+                        // (buka ulang wizard ini).
+                        Radio::make('skenario')
+                            ->label('Kondisi pesantren Anda saat ini')
+                            ->options([
+                                'baru' => 'Pesantren baru bersih — mulai dari nol, tanpa data lama',
+                                'migrasi' => 'Migrasi tengah tahun — pindahan dari sistem/pembukuan lama, ada data historis',
+                            ])
+                            ->default('baru')
+                            ->required()
+                            ->helperText('Skenario migrasi akan menonjolkan langkah impor data historis di Pusat Setup. Bisa diubah kapan saja.'),
                         Select::make('preset')
                             ->label('Jenis pesantren (arketipe)')
                             ->options($presetOptions)
@@ -333,6 +348,9 @@ class SetupPesantren extends Page implements HasForms
                             )),
                     ]),
             ])
+                // Wizard linear terpandu (#350 poin 3): resume ke langkah pertama
+                // yang belum selesai — navigasi bebas antar langkah tetap terbuka.
+                ->startOnStep(fn (): int => $this->langkahResume())
                 ->submitAction(new HtmlString(
                     '<button type="submit" class="fi-btn fi-btn-size-md fi-color-primary rounded-lg px-4 py-2 bg-primary-600 text-white font-semibold text-sm" wire:loading.attr="disabled">'
                     .'<span wire:loading.remove wire:target="simpan">Selesai &amp; Simpan</span>'
@@ -373,6 +391,15 @@ class SetupPesantren extends Page implements HasForms
     public function persist(array $data): void
     {
         $selesai = [];
+
+        // 0) Skenario setup (#350 poin 2) — dibaca UnitSetupRegistry/SetupUnit
+        //    untuk menonjolkan importer historis saat migrasi tengah tahun.
+        if (in_array($data['skenario'] ?? null, ['baru', 'migrasi'], true)) {
+            Setting::updateOrCreate(
+                ['key' => UnitSetupRegistry::SETTING_SKENARIO],
+                ['value' => ['text' => $data['skenario']]],
+            );
+        }
 
         // 1) Arketipe (opsional). Selain menerapkan preset kebijakan, SIMPAN
         //    pilihannya (setup.preset) → dipakai mesin rekomendasi Pusat Modul
@@ -474,6 +501,48 @@ class SetupPesantren extends Page implements HasForms
         }
         Setting::updateOrCreate(['key' => IstilahRegistry::SETTING_KEY], ['value' => $map]);
         IstilahRegistry::flushCache();
+    }
+
+    /**
+     * Nomor langkah (1-based, di antara langkah yang TAMPIL) tempat wizard
+     * dibuka: langkah pertama yang belum selesai menurut 'setup.langkah_selesai'.
+     * Langkah info (Modul/Kurikulum) menumpang status langkah data terdekat.
+     */
+    public function langkahResume(): int
+    {
+        try {
+            $done = is_array($v = Setting::getTenantValue('setup.langkah_selesai')) ? $v : [];
+            $akademik = $this->akademikAktif();
+            $ada = fn (string $k): bool => in_array($k, $done, true);
+
+            // [tampil, selesai] — urutan HARUS sama dengan urutan Step di form().
+            $urutan = [
+                [true, filled(Setting::getTenantStringValue(UnitSetupRegistry::SETTING_SKENARIO))], // Mulai
+                [true, $ada('identitas')],            // Identitas
+                [true, $ada('identitas')],            // Modul Aktif (info)
+                [$akademik, $ada('lembaga')],         // Lembaga
+                [$akademik, $ada('periode')],         // Periode Akademik
+                [$akademik, $ada('periode')],         // Kurikulum (info)
+                [true, $ada('kebijakan')],            // Kebijakan
+                [true, $ada('keuangan')],             // Keuangan
+                [true, false],                        // Selesai (ringkasan)
+            ];
+
+            $nomor = 0;
+            foreach ($urutan as [$tampil, $selesai]) {
+                if (! $tampil) {
+                    continue;
+                }
+                $nomor++;
+                if (! $selesai) {
+                    return $nomor;
+                }
+            }
+
+            return max($nomor, 1);
+        } catch (\Throwable) {
+            return 1;
+        }
     }
 
     /** Union langkah selesai ke Setting (idempoten). */
