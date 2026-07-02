@@ -70,7 +70,7 @@
         @media(min-width:1280px){.aside{display:block}}
     </style>
 </head>
-<body class="{{ ($isAlbaKids ?? false) ? 'tenant-albakids' : '' }}">
+<body class="{{ \App\Support\TenantCustomizationRegistry::bodyClass() }}">
 <div class="split">
     {{-- Bagian 1: Foto + Teks (satu grup) --}}
     <aside class="aside">

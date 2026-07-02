@@ -65,7 +65,7 @@
         body.tenant-albakids .contact { background: #f1f5f9; }
     </style>
 </head>
-<body class="@if(\App\Support\AlbaKidsTenant::isActive())tenant-albakids @endif">
+<body class="{{ \App\Support\TenantCustomizationRegistry::bodyClass() }}">
     <div class="card">
         <div class="icon">⚠️</div>
         <h1>Layanan Sementara Ditangguhkan</h1>

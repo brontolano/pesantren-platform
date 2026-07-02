@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\MediaFile;
 use App\Models\Setting;
 use App\Services\StorageQuotaService;
+use App\Support\TenantCustomizationRegistry;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
@@ -87,27 +88,12 @@ class PengaturanBranding extends Page implements HasForms
         'mono' => 'Mono Editorial',
     ];
 
-    /**
-     * Default tautan konten Aplikasi (Beranda & Ibadah) — sinkron dengan
-     * AppShellController::DEFAULTS. Admin bisa menimpa via form ini.
-     *
-     * @var array<string,string>
+    /*
+     * Default tautan konten Aplikasi (Beranda & Ibadah) kini satu sumber di
+     * registry: TenantCustomizationRegistry::appContentLinks() — sinkron
+     * otomatis dengan AppShellController (tahap 4 #343, dulu konstanta
+     * APP_LINKS duplikat).
      */
-    public const APP_LINKS = [
-        'app_profil_pondok_url' => 'https://asy-syifaa.com/profil-pondok-pesantren',
-        'app_profil_abuya_url' => 'https://asy-syifaa.com/profil-abuya',
-        'app_profil_guru_url' => 'https://asy-syifaa.com/profil-guru',
-        'app_struktur_url' => 'https://asy-syifaa.com/struktur-organisasi',
-        'app_instagram_url' => 'https://www.instagram.com/ponpes.asysyifaa',
-        'app_instagram2_url' => 'https://www.instagram.com/asysyifaapusat/',
-        'app_instagram3_url' => 'https://www.instagram.com/syifaalawiyyahofficial/',
-        'app_youtube_url' => 'https://www.youtube.com/@AsySyifaaTVOfficial/videos',
-        'app_facebook_url' => 'https://www.facebook.com/AsySyifaaTV/live_videos',
-        'app_jadwal_kajian_url' => '',
-        'app_donasi_url' => '/donasi',
-        'app_zakat_wakaf_url' => '',
-    ];
-
     /** Warna default mengikuti fallback di TenantWebsiteService. */
     private const DEFAULT_PRIMARY = '#14532d';
 
@@ -175,7 +161,7 @@ class PengaturanBranding extends Page implements HasForms
             'admission_transfer_instructions' => data_get($settings->get('admission_transfer_instructions')?->value, 'text'),
             'admission_success_message' => data_get($settings->get('admission_success_message')?->value, 'text'),
             // Konten Aplikasi (Beranda & Ibadah) — saved value atau default.
-            ...collect(self::APP_LINKS)->mapWithKeys(fn ($default, $key) => [
+            ...collect(TenantCustomizationRegistry::appContentLinks())->mapWithKeys(fn ($default, $key) => [
                 $key => data_get($settings->get($key)?->value, 'text', $default),
             ])->all(),
         ]);
@@ -401,7 +387,7 @@ class PengaturanBranding extends Page implements HasForms
 
         // Konten Aplikasi (Beranda & Ibadah) — simpan sebagai ['text'=>...]
         // (terbaca AppShellController via getTenantStringValue kandidat 'text').
-        foreach (array_keys(self::APP_LINKS) as $appKey) {
+        foreach (array_keys(TenantCustomizationRegistry::appContentLinks()) as $appKey) {
             $payloads[$appKey] = ['text' => $data[$appKey] ?? null];
         }
 
@@ -433,7 +419,7 @@ class PengaturanBranding extends Page implements HasForms
             'admission_transfer_instructions' => $data['admission_transfer_instructions'] ?? null,
             'admission_success_message' => $data['admission_success_message'] ?? null,
             // Pertahankan nilai konten aplikasi pasca-save.
-            ...collect(self::APP_LINKS)->mapWithKeys(fn ($d, $key) => [$key => $data[$key] ?? null])->all(),
+            ...collect(TenantCustomizationRegistry::appContentLinks())->mapWithKeys(fn ($d, $key) => [$key => $data[$key] ?? null])->all(),
         ]);
 
         Notification::make()

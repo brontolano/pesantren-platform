@@ -58,7 +58,7 @@
         @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } .card { padding: 1.5rem; } }
     </style>
 </head>
-<body class="@if(\App\Support\AlbaKidsTenant::isActive())tenant-albakids @endif">
+<body class="{{ \App\Support\TenantCustomizationRegistry::bodyClass() }}">
 
 <nav>
     <div class="nav-inner">

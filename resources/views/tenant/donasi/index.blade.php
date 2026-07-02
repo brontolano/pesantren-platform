@@ -20,7 +20,7 @@
         .galat { color: #b91c1c; font-size: .85rem; margin-top: 8px; }
     </style>
 </head>
-<body class="@if(AppSupportAlbaKidsTenant::isActive())tenant-albakids @endif">
+<body class="{{ \App\Support\TenantCustomizationRegistry::bodyClass() }}">
 <main>
     <h1>Donasi &amp; Infaq<br><span style="font-size:1rem;color:#57534e">{{ $nama }}</span></h1>
 

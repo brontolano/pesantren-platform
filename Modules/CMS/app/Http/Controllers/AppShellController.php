@@ -7,7 +7,9 @@ use App\Models\Setting;
 use App\Services\PrayerTimesService;
 use App\Services\QiblaService;
 use App\Support\TenantBranding;
+use App\Support\TenantCustomizationRegistry;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Services\TenantWebsiteService;
 
@@ -23,21 +25,11 @@ use Modules\CMS\Services\TenantWebsiteService;
  */
 class AppShellController extends Controller
 {
-    /** Default tautan konten (dipakai bila admin belum mengisi Setting). */
-    private const DEFAULTS = [
-        'app_profil_pondok_url' => 'https://asy-syifaa.com/profil-pondok-pesantren',
-        'app_profil_abuya_url' => 'https://asy-syifaa.com/profil-abuya',
-        'app_profil_guru_url' => 'https://asy-syifaa.com/profil-guru',
-        'app_struktur_url' => 'https://asy-syifaa.com/struktur-organisasi',
-        'app_instagram_url' => 'https://www.instagram.com/ponpes.asysyifaa',
-        'app_instagram2_url' => 'https://www.instagram.com/asysyifaapusat/',
-        'app_instagram3_url' => 'https://www.instagram.com/syifaalawiyyahofficial/',
-        'app_youtube_url' => 'https://www.youtube.com/@AsySyifaaTVOfficial/videos',
-        'app_facebook_url' => 'https://www.facebook.com/AsySyifaaTV/live_videos',
-        'app_jadwal_kajian_url' => '',
-        'app_donasi_url' => '/donasi',
-        'app_zakat_wakaf_url' => '',
-    ];
+    /*
+     * Default tautan konten (bila admin belum mengisi Setting) kini dari
+     * registry: TenantCustomizationRegistry::appContentLinks() — satu sumber
+     * dengan PengaturanBranding (tahap 4 #343, dulu konstanta DEFAULTS duplikat).
+     */
 
     public function __invoke(TenantWebsiteService $websiteService): View
     {
@@ -72,7 +64,7 @@ class AppShellController extends Controller
      * Manifest PWA — agar "Tambahkan ke Layar Utama" (iPhone/Android) memasang
      * ikon logo pesantren, nama, dan jalan layar-penuh (standalone).
      */
-    public function manifest(TenantWebsiteService $websiteService): \Illuminate\Http\JsonResponse
+    public function manifest(TenantWebsiteService $websiteService): JsonResponse
     {
         $nama = TenantBranding::name();
         try {
@@ -102,7 +94,7 @@ class AppShellController extends Controller
     private function appConfig(): array
     {
         $cfg = [];
-        foreach (self::DEFAULTS as $key => $default) {
+        foreach (TenantCustomizationRegistry::appContentLinks() as $key => $default) {
             try {
                 $val = Setting::getTenantStringValue($key, null);
             } catch (\Throwable) {
