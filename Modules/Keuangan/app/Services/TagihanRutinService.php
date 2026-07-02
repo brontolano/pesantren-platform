@@ -74,6 +74,8 @@ class TagihanRutinService
                     'jenis_tagihan' => $aturan->jenis_tagihan,
                     'keterangan' => $aturan->keterangan ?? $aturan->nama,
                     'nominal' => (float) $aturan->nominal,
+                    // #332: salin rincian komponen ke tagihan (transparansi wali).
+                    'komponen' => \Modules\Keuangan\Support\SyahriahKomponen::normalize($aturan->komponen) ?: null,
                     'jatuh_tempo' => $jatuhTempo,
                     'status' => 'belum_bayar',
                     'sumber_dana_id' => $aturan->sumber_dana_id,

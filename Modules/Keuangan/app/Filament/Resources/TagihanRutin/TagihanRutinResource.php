@@ -7,6 +7,7 @@ use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -27,6 +28,7 @@ use Modules\Keuangan\Filament\Resources\TagihanRutin\Pages\EditTagihanRutin;
 use Modules\Keuangan\Filament\Resources\TagihanRutin\Pages\ListTagihanRutin;
 use Modules\Keuangan\Models\TagihanRutin;
 use Modules\Keuangan\Services\TagihanRutinService;
+use Modules\Keuangan\Support\SyahriahKomponen;
 use Modules\Ledger\Models\DivisiUnit;
 use Modules\Ledger\Models\SumberDana;
 
@@ -93,12 +95,19 @@ class TagihanRutinResource extends Resource
                 Select::make('jenis_tagihan')->label('Jenis Tagihan')->required()->native(false)
                     ->options(self::JENIS)
                     ->helperText('Menentukan idempotensi: 1 santri 1 tagihan jenis ini per bulan.'),
-                TextInput::make('nominal')->label('Nominal (Rp)')->numeric()->required()->prefix('Rp'),
+                TextInput::make('nominal')->label('Nominal (Rp)')->numeric()->required()->prefix('Rp')
+                    ->helperText('Bila rincian komponen diisi, nominal dihitung otomatis dari jumlah komponen saat disimpan.'),
                 Select::make('frekuensi')->label('Frekuensi')->native(false)->default('bulanan')
                     ->options(['bulanan' => 'Bulanan', 'semester' => 'Per Semester', 'tahunan' => 'Tahunan']),
                 Toggle::make('aktif')->label('Aktif')->default(true)->inline(false)
                     ->helperText('Nonaktif = tidak diterbitkan otomatis.'),
             ])->columns(2),
+
+            Section::make('Rincian Komponen (opsional)')
+                ->description('Syahriah berlapis dalam satu tagihan — mis. makan, listrik, madrasah diniyah, kas kamar, tabungan, bisyaroh. Total tagihan = jumlah seluruh komponen. Komponen bertanda "Masuk Tabungan" otomatis disetorkan ke tabungan santri saat tagihan lunas.')
+                ->schema([
+                    static::komponenRepeater(),
+                ])->collapsed(fn (?Model $record): bool => empty($record?->komponen)),
 
             Section::make('Untuk Siapa (Target Santri)')->schema([
                 Select::make('target_tipe')->label('Target')->native(false)->required()->default('semua')
@@ -151,7 +160,10 @@ class TagihanRutinResource extends Resource
                 TextColumn::make('nama')->label('Nama')->searchable()->sortable()->weight('bold'),
                 TextColumn::make('jenis_tagihan')->label('Jenis')->badge()
                     ->formatStateUsing(fn (string $state): string => self::JENIS[$state] ?? $state),
-                TextColumn::make('nominal')->label('Nominal')->money('IDR')->sortable(),
+                TextColumn::make('nominal')->label('Nominal')->money('IDR')->sortable()
+                    ->description(fn (TagihanRutin $r): ?string => empty($r->komponen)
+                        ? null
+                        : count($r->komponen).' komponen'),
                 TextColumn::make('target_tipe')->label('Target')->badge()
                     ->formatStateUsing(fn (TagihanRutin $r): string => match ($r->target_tipe) {
                         'lembaga' => 'Pondok: '.($r->lembaga?->nama ?? '—'),
@@ -189,6 +201,43 @@ class TagihanRutinResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
             ]);
+    }
+
+    /**
+     * Repeater rincian komponen — dipakai form resource & modal template (#332).
+     */
+    public static function komponenRepeater(string $name = 'komponen'): Repeater
+    {
+        return Repeater::make($name)
+            ->label('Komponen')
+            ->schema([
+                TextInput::make('nama')->label('Nama Komponen')->required()
+                    ->placeholder('Mis. Madrasah diniyah / Kas kamar / Bisyaroh'),
+                TextInput::make('nominal')->label('Nominal (Rp)')->numeric()->required()
+                    ->prefix('Rp')->minValue(1),
+                Toggle::make('masuk_tabungan')->label('Masuk Tabungan')->default(false)->inline(false)
+                    ->helperText('Disetor ke tabungan santri saat lunas.'),
+            ])
+            ->columns(3)
+            ->addActionLabel('Tambah Komponen')
+            ->reorderable(false)
+            ->default([]);
+    }
+
+    /**
+     * Sinkronkan data form: normalisasi komponen; bila ada komponen,
+     * nominal aturan = total komponen (jaga invarian jalur uang).
+     */
+    public static function sinkronkanKomponen(array $data): array
+    {
+        $komponen = SyahriahKomponen::normalize($data['komponen'] ?? null);
+        $data['komponen'] = $komponen ?: null;
+
+        if ($komponen !== []) {
+            $data['nominal'] = SyahriahKomponen::total($komponen);
+        }
+
+        return $data;
     }
 
     public static function getPages(): array

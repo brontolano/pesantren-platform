@@ -278,6 +278,12 @@ class PembayaranService
 
         if ($totalDibayar >= $nominalAkhir && $nominalAkhir > 0) {
             $tagihan->update(['status' => 'lunas']);
+
+            // #332: porsi komponen `masuk_tabungan` disetor otomatis ke Tabungan
+            // santri saat lunas. Idempoten (penanda tabungan_disetor_at pada baris
+            // ter-lock) — aman walau recalculation lunas terpicu berulang dari
+            // dua jalur (verifikasi Pembayaran & BayarDariSaldo).
+            app(TagihanKomponenTabunganService::class)->setorPorsiTabungan($tagihan);
         } elseif ($totalDibayar > 0) {
             $tagihan->update(['status' => 'sebagian']);
         } else {
