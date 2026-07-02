@@ -237,10 +237,25 @@ class TagihanResource extends Resource
                         'lainnya' => 'Lainnya',
                     ]),
             ])
-            ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
-            ]);
+            ->actions(static::rowActions())
+            // A5 — menu klik-kanan (leek/filament-right-click): MEMAKAI ULANG
+            // action baris yang SAMA (Edit/Hapus) — nol logika/izin baru;
+            // otorisasi Filament (canEdit/canDelete) tetap berlaku.
+            ->contextMenuActions(static::rowActions());
+    }
+
+    /**
+     * Action baris tabel Tagihan — SATU sumber dipakai ulang oleh ->actions()
+     * DAN ->contextMenuActions() (menu klik-kanan A5). Nol logika baru.
+     *
+     * @return array<int, \Filament\Actions\Action>
+     */
+    protected static function rowActions(): array
+    {
+        return [
+            EditAction::make(),
+            DeleteAction::make(),
+        ];
     }
 
     public static function getEloquentQuery(): Builder

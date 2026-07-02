@@ -195,9 +195,27 @@ class PelanggaranSantriResource extends Resource
                     ->label('Jenis')
                     ->options(fn () => JenisPelanggaran::query()->pluck('nama', 'id')),
             ])
-            ->actions([
-                ViewAction::make(),
-                Action::make('verifikasi')
+            ->actions(static::rowActions())
+            // A5 — menu klik-kanan (leek/filament-right-click): MEMAKAI ULANG
+            // action baris yang SAMA (Lihat/Verifikasi/Catat Sanksi/Selesai/
+            // Batalkan) — nol logika/izin baru; ->visible() (status + permission
+            // manage_kedisiplinan) tetap berlaku di menu klik-kanan.
+            ->contextMenuActions(static::rowActions());
+    }
+
+    /**
+     * Action baris tabel Pelanggaran/Ta'zir — SATU sumber dipakai ulang oleh
+     * ->actions() DAN ->contextMenuActions() (menu klik-kanan A5). Ekstraksi
+     * verbatim dari blok actions lama; nol logika baru; ->visible()/otorisasi
+     * (siklus status + manage_kedisiplinan) tetap berlaku.
+     *
+     * @return array<int, \Filament\Actions\Action>
+     */
+    protected static function rowActions(): array
+    {
+        return [
+            ViewAction::make(),
+            Action::make('verifikasi')
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
@@ -274,7 +292,7 @@ class PelanggaranSantriResource extends Resource
                             Notification::make()->danger()->title('Gagal membatalkan')->body($e->getMessage())->send();
                         }
                     }),
-            ]);
+        ];
     }
 
     public static function statusColor(string $state): string

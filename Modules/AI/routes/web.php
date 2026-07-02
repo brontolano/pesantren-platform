@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\AI\Http\Controllers\DrafIkhtisarCetakController;
 use Modules\AI\Http\Controllers\DrafRppCetakController;
 use Modules\AI\Http\Controllers\DrafSoalCetakController;
+use Modules\AI\Http\Controllers\KhadimChatController;
 use Modules\AI\Http\Controllers\RatingJawabanController;
 use Modules\AI\Http\Controllers\RingkasanKebijakanController;
 use Modules\AI\Http\Controllers\TanyaUstadzController;
@@ -36,6 +37,15 @@ Route::post('/ai/tanya-ustadz', TanyaUstadzController::class)
 Route::post('/ai/rating-jawaban', RatingJawabanController::class)
     ->middleware(['auth', 'throttle:60,1'])
     ->name('ai.rating-jawaban');
+
+// Muara widget chat "Khadim Digital" (plugin alkoumi/filament-n8n-chat).
+// KRUSIAL: chat BERMUARA ke AiGateway (audit+budget+policy) — bukan webhook
+// n8n/LLM eksternal. WAJIB login (auth eksisting) + konteks tenant + gerbang
+// modul 'ai' + flag ai.n8n_chat.enabled (default OFF, dicek controller).
+// Throttle santun anti-spam.
+Route::post('/ai/khadim-chat', KhadimChatController::class)
+    ->middleware(['auth', 'throttle:30,1'])
+    ->name('ai.khadim-chat');
 
 // T-A040 — lembar cetak paket draf soal Generator Soal (print-friendly,
 // dibuka tab baru dari halaman GeneratorSoal). WAJIB login; permission
