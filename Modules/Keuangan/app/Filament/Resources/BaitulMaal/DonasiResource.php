@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\PrintContent;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -13,6 +14,7 @@ use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListDonasi;
 use Modules\Keuangan\Models\Donasi;
 use Modules\Keuangan\Services\DonasiService;
 use Throwable;
+use Torgodly\Html2Media\Actions\Html2MediaAction;
 
 /**
  * 2c — Donasi masuk (niat publik). Bendahara melihat bukti transfer lalu
@@ -118,6 +120,19 @@ class DonasiResource extends Resource
                     ->url(fn (Donasi $record): string => route('tenant.donasi.kuitansi', ['donasi' => $record->id]))
                     ->openUrlInNewTab()
                     ->visible(fn (Donasi $record): bool => $record->status === Donasi::STATUS_DIKONFIRMASI),
+                // Adopsi html2media: unduh kuitansi sbg PDF rapi / cetak dari modal
+                // (jalur window.print lama dipertahankan sbg fallback). Blade + data
+                // identik dgn route tenant.donasi.kuitansi.
+                Html2MediaAction::make('pdf_kuitansi')
+                    ->label('Unduh PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->format('a4')
+                    ->orientation('portrait')
+                    ->preview()
+                    ->savePdf()
+                    ->filename(fn (Donasi $record): string => 'kuitansi-donasi-'.$record->getKey())
+                    ->visible(fn (Donasi $record): bool => $record->status === Donasi::STATUS_DIKONFIRMASI)
+                    ->content(fn (Donasi $record) => PrintContent::kwitansiDonasi($record)),
             ]);
     }
 

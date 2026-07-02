@@ -3,6 +3,7 @@
 namespace Modules\Akademik\Filament\Resources\RaporDiniyah;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\PrintContent;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -17,6 +18,7 @@ use Modules\Akademik\Models\RaporDiniyah;
 use Modules\Akademik\Services\RaporDiniyahService;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
+use Torgodly\Html2Media\Actions\Html2MediaAction;
 
 /**
  * WP-10 — Rapor Diniyah (pola RaporResource): generate per kelas + cetak,
@@ -112,6 +114,19 @@ class RaporDiniyahResource extends Resource
                     ->url(fn (RaporDiniyah $record): string => route('tenant.akademik.export.rapor-diniyah.print', $record))
                     ->openUrlInNewTab(false)
                     ->visible(fn () => tenancy()->initialized),
+                // Adopsi html2media: unduh PDF rapi / cetak dari modal (jalur
+                // window.print lama dipertahankan sbg fallback). Blok mengikuti
+                // Setting akademik.rapor_diniyah_blok (blokAktif) — sama dgn route.
+                Html2MediaAction::make('pdf_rapor_diniyah')
+                    ->label('Unduh PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->format('a4')
+                    ->orientation('portrait')
+                    ->preview()
+                    ->savePdf()
+                    ->filename(fn (RaporDiniyah $record): string => 'rapor-diniyah-'.($record->santri?->nis ?: $record->getKey()))
+                    ->visible(fn () => tenancy()->initialized)
+                    ->content(fn (RaporDiniyah $record) => PrintContent::raporDiniyah($record)),
             ])
             ->defaultSort('generated_at', 'desc');
     }

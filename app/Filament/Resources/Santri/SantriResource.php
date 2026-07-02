@@ -7,6 +7,7 @@ use App\Filament\Resources\Santri\Pages\EditSantri;
 use App\Filament\Resources\Santri\Pages\ListSantri;
 use App\Models\Setting;
 use App\Services\StorageQuotaService;
+use App\Support\PrintContent;
 use Filament\Actions\Action;
 use Filament\Actions\Action as FormAction;
 use Filament\Actions\BulkAction;
@@ -42,6 +43,7 @@ use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Services\IdCardService;
 use Modules\Kesantrian\Services\SantriAccountService;
 use Modules\Notifikasi\Services\NotifDispatcher;
+use Torgodly\Html2Media\Actions\Html2MediaAction;
 
 class SantriResource extends Resource
 {
@@ -535,6 +537,18 @@ class SantriResource extends Resource
                     ->label('ID Card')
                     ->icon('heroicon-o-identification')
                     ->action(fn ($record) => static::unduhIdCard(collect([$record]))),
+                // Adopsi html2media: pratinjau + unduh PDF / cetak kartu rapi dari
+                // modal (jalur unduh lama via ReportExportService dipertahankan sbg
+                // fallback). Render template 'id-card-santri' berikut kop brand.
+                Html2MediaAction::make('pdf_id_card')
+                    ->label('PDF ID Card')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->format('a4')
+                    ->orientation('portrait')
+                    ->preview()
+                    ->savePdf()
+                    ->filename(fn ($record): string => 'id-card-'.($record->nis ?: $record->getKey()))
+                    ->content(fn ($record) => PrintContent::idCard(collect([$record]))),
                 Action::make('kirim_kredensial')
                     ->label('Kirim Kredensial')
                     ->icon('heroicon-o-key')
