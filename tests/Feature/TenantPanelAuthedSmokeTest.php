@@ -32,6 +32,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
             'tenants', 'domains', 'users', 'roles', 'permissions', 'model_has_roles', 'model_has_permissions',
             'santri', 'tagihan', 'pembayaran', 'calon_santri', 'gelombang_ppdb',
             'jenis_pelanggaran', 'pelanggaran_santri', 'sanksi_santri', 'eskalasi_disiplin',
+            'kitab', 'sorogan_setoran', 'ngaji_sesi', 'ngaji_sesi_peserta',
         ]);
         $this->truncatePpdbTables(['domains', 'tenants']);
     }
@@ -150,6 +151,36 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $halaqahReq->headers->set('Host', $host);
         $halaqahStatus = $kernel->handle($halaqahReq)->getStatusCode();
         $this->assertSame(200, $halaqahStatus, "Edit Halaqah (KeanggotaanRelationManager) status {$halaqahStatus}, harusnya 200.");
+
+        // Issue #330 — Sorogan & Ngaji Kitab WAJIB 200 → bukti resource TERDAFTAR
+        // + form penilaian (create) & halaman progres per santri ter-render.
+        foreach ([
+            'admin/setoran-sorogan' => 'ListSetoranSorogan',
+            'admin/setoran-sorogan/create' => 'CreateSetoranSorogan (form penilaian)',
+            'admin/setoran-sorogan/progres' => 'ProgresSorogan (progres per santri)',
+            'admin/ngaji-sesi' => 'ListNgajiSesi',
+            'admin/ngaji-sesi/create' => 'CreateNgajiSesi',
+        ] as $soroganPath => $soroganLabel) {
+            $soroganReq = Request::create("http://{$host}/{$soroganPath}", 'GET');
+            $soroganReq->headers->set('Host', $host);
+            $soroganStatus = $kernel->handle($soroganReq)->getStatusCode();
+            $this->assertSame(200, $soroganStatus, "Sorogan/Ngaji Kitab ({$soroganLabel}) status {$soroganStatus}, harusnya 200.");
+        }
+
+        // Edit Sesi Ngaji WAJIB 200 → bukti PesertaRelationManager ter-mount
+        // (RM hanya tampil di halaman edit).
+        $kitabSmokeId = DB::connection('tenant')->table('kitab')->insertGetId([
+            'tenant_id' => $tenant->id, 'nama' => 'Kitab Smoke',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $ngajiSesiId = DB::connection('tenant')->table('ngaji_sesi')->insertGetId([
+            'tenant_id' => $tenant->id, 'kitab_id' => $kitabSmokeId, 'tanggal' => now()->toDateString(),
+            'metode' => 'bandongan', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $ngajiEditReq = Request::create("http://{$host}/admin/ngaji-sesi/{$ngajiSesiId}/edit", 'GET');
+        $ngajiEditReq->headers->set('Host', $host);
+        $ngajiEditStatus = $kernel->handle($ngajiEditReq)->getStatusCode();
+        $this->assertSame(200, $ngajiEditStatus, "Edit Sesi Ngaji (PesertaRelationManager) status {$ngajiEditStatus}, harusnya 200.");
 
         // Sima'an (SimaAnResource baru, slug eksplisit tahfidz/simaan) WAJIB 200 →
         // bukti resource TERDAFTAR di panel.
