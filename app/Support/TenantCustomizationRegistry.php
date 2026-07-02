@@ -25,6 +25,41 @@ class TenantCustomizationRegistry
         return (string) static::value('landing_component');
     }
 
+    /**
+     * Flag fitur kustomisasi untuk tenant saat ini (mis. 'ppdb_custom_flow').
+     * Resource bertanya "apakah alur X aktif?", BUKAN "apakah ini albakids?".
+     */
+    public static function feature(string $key, bool $default = false): bool
+    {
+        $value = static::value($key);
+
+        return is_bool($value) ? $value : $default;
+    }
+
+    /**
+     * Label override untuk tenant saat ini. $key = kunci di peta 'labels'
+     * (mis. 'ppdb.calon_santri.navigation'); fallback $default bila tenant
+     * tidak meng-override label tersebut.
+     */
+    public static function label(string $key, string $default): string
+    {
+        $labels = static::value('labels');
+
+        if (is_array($labels) && isset($labels[$key]) && is_string($labels[$key])) {
+            return $labels[$key];
+        }
+
+        return $default;
+    }
+
+    /** Nilai string opsional (scope query dsb.); null/'' → null. */
+    public static function stringValue(string $key): ?string
+    {
+        $value = static::value($key);
+
+        return is_string($value) && $value !== '' ? $value : null;
+    }
+
     /** Ambil nilai kustomisasi $key untuk tenant saat ini, fallback ke default. */
     public static function value(string $key): mixed
     {

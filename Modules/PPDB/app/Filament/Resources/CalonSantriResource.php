@@ -3,7 +3,7 @@
 namespace Modules\PPDB\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Support\AlbaKidsTenant;
+use App\Support\TenantCustomizationRegistry;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -103,7 +103,9 @@ class CalonSantriResource extends Resource
 
     public static function canCreate(): bool
     {
-        if (AlbaKidsTenant::isActive()) {
+        // Alur PPDB custom (mis. Alba Kids): pendaftar hanya masuk lewat form
+        // website — panitia tidak membuat data manual.
+        if (TenantCustomizationRegistry::feature('ppdb_custom_flow')) {
             return false;
         }
 
@@ -122,15 +124,8 @@ class CalonSantriResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $programOptions = AlbaKidsTenant::isActive()
-            ? [
-                'Preschool' => 'Preschool',
-            ]
-            : [
-                'Reguler' => 'Reguler',
-                'Tahfidz' => 'Tahfidz',
-                'Muadalah' => 'Muadalah',
-            ];
+        /** @var array<string, string> $programOptions */
+        $programOptions = (array) TenantCustomizationRegistry::value('ppdb_program_options');
 
         $statusOptions = [
             'pending' => 'Pending',
@@ -214,7 +209,7 @@ class CalonSantriResource extends Resource
                 Select::make('status_pendaftaran')
                     ->label('Status Pendaftaran')
                     ->options($statusOptions)
-                    ->default(AlbaKidsTenant::isActive() ? 'menunggu_verifikasi' : 'pending')
+                    ->default(TenantCustomizationRegistry::stringValue('ppdb_status_default') ?? 'pending')
                     ->required(),
                 Textarea::make('catatan_keputusan')
                     ->label('Catatan Keputusan')
@@ -233,14 +228,9 @@ class CalonSantriResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $isAlbaKids = AlbaKidsTenant::isActive();
-        $programFilterOptions = $isAlbaKids
-            ? ['Preschool' => 'Preschool']
-            : [
-                'Reguler' => 'Reguler',
-                'Tahfidz' => 'Tahfidz',
-                'Muadalah' => 'Muadalah',
-            ];
+        $customFlow = TenantCustomizationRegistry::feature('ppdb_custom_flow');
+        /** @var array<string, string> $programFilterOptions */
+        $programFilterOptions = (array) TenantCustomizationRegistry::value('ppdb_program_options');
 
         return $table
             ->emptyStateHeading('Belum ada pendaftar')
@@ -277,11 +267,11 @@ class CalonSantriResource extends Resource
                 TextColumn::make('created_at')
                     ->label('Masuk')
                     ->dateTime('d M Y H:i')
-                    ->visible($isAlbaKids),
+                    ->visible($customFlow),
                 TextColumn::make('hasil_ujian_count')
                     ->label('Hasil Ujian')
                     ->counts('hasilUjian')
-                    ->visible(! $isAlbaKids),
+                    ->visible(! $customFlow),
             ])
             ->defaultSort('nomor_pendaftaran')
             ->filters([
@@ -309,7 +299,7 @@ class CalonSantriResource extends Resource
                     ->label('Kirim Ulang OTP / Koreksi No. WA')
                     ->icon('heroicon-o-key')
                     ->color('warning')
-                    ->visible(fn (): bool => ! AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_ppdb') ?? false))
+                    ->visible(fn (): bool => ! TenantCustomizationRegistry::feature('ppdb_custom_flow') && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->modalHeading('Kirim Ulang Kode OTP Portal SPMB')
                     ->modalDescription('Untuk peserta yang tidak menerima kode atau salah menulis nomor WA. Perbaiki nomor bila perlu — kode OTP baru dikirim ke nomor di bawah dan blokir percobaan sebelumnya dibuka. Password TIDAK ikut terkirim; peserta membuat password sendiri saat memakai kode.')
                     ->modalSubmitActionLabel('Simpan Nomor & Kirim OTP')
@@ -343,7 +333,7 @@ class CalonSantriResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalDescription('Kirim ulang ucapan terima kasih ke nomor Ayah & Ibu (nomor sama/satu dikirim sekali).')
-                    ->visible(fn (): bool => AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_ppdb') ?? false))
+                    ->visible(fn (): bool => TenantCustomizationRegistry::feature('ppdb_custom_flow') && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
                         try {
                             $sent = app(AlbaKidsRegistrationNotificationService::class)->notifyGuardians($record);
@@ -361,7 +351,7 @@ class CalonSantriResource extends Resource
                     ->color('info')
                     ->requiresConfirmation()
                     ->modalDescription('Kirim ulang ringkasan pendaftar + lampiran dokumen (Bukti/KK/Akta) ke WhatsApp admin panitia.')
-                    ->visible(fn (): bool => AlbaKidsTenant::isActive() && (Auth::user()?->can('manage_ppdb') ?? false))
+                    ->visible(fn (): bool => TenantCustomizationRegistry::feature('ppdb_custom_flow') && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
                         try {
                             $broadcast = app(AlbaKidsRegistrationNotificationService::class)->notifyAdmin($record);
@@ -403,7 +393,7 @@ class CalonSantriResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalDescription('Tetapkan peserta LULUS (butuh minimal satu hasil ujian). Pengumuman dikirim via WhatsApp.')
-                    ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
+                    ->visible(fn (CalonSantri $record): bool => ! TenantCustomizationRegistry::feature('ppdb_custom_flow')
                         && in_array((string) $record->status_pendaftaran, ['pending', 'menunggu_verifikasi', 'verifikasi_berkas', 'cadangan'], true)
                         && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
@@ -420,7 +410,7 @@ class CalonSantriResource extends Resource
                     ->color('warning')
                     ->requiresConfirmation()
                     ->modalDescription('Tetapkan peserta sebagai CADANGAN (butuh minimal satu hasil ujian).')
-                    ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
+                    ->visible(fn (CalonSantri $record): bool => ! TenantCustomizationRegistry::feature('ppdb_custom_flow')
                         && in_array((string) $record->status_pendaftaran, ['pending', 'menunggu_verifikasi', 'verifikasi_berkas'], true)
                         && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantri $record): void {
@@ -443,7 +433,7 @@ class CalonSantriResource extends Resource
                             ->rows(3)
                             ->maxLength(1000),
                     ])
-                    ->visible(fn (CalonSantri $record): bool => ! AlbaKidsTenant::isActive()
+                    ->visible(fn (CalonSantri $record): bool => ! TenantCustomizationRegistry::feature('ppdb_custom_flow')
                         && ! in_array((string) $record->status_pendaftaran, ['ditolak', 'lulus'], true)
                         && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (array $data, CalonSantri $record): void {
@@ -466,8 +456,8 @@ class CalonSantriResource extends Resource
         $query = parent::getEloquentQuery()
             ->withCount('hasilUjian');
 
-        if (AlbaKidsTenant::isActive()) {
-            $query->where('gelombang', 'Landing Alba Kids');
+        if (($gelombang = TenantCustomizationRegistry::stringValue('ppdb_gelombang_scope')) !== null) {
+            $query->where('gelombang', $gelombang);
         }
 
         return $query;
@@ -484,21 +474,21 @@ class CalonSantriResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Daftar Pendaftar' : 'Calon Santri';
+        return TenantCustomizationRegistry::label('ppdb.calon_santri.navigation', 'Calon Santri');
     }
 
     public static function getModelLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Pendaftar Alba Kids' : 'Calon Santri';
+        return TenantCustomizationRegistry::label('ppdb.calon_santri.model', 'Calon Santri');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Daftar Pendaftar' : 'Calon Santri';
+        return TenantCustomizationRegistry::label('ppdb.calon_santri.plural', 'Calon Santri');
     }
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return AlbaKidsTenant::isActive() ? 'PPDB Custom' : 'Pendaftaran';
+        return TenantCustomizationRegistry::label('ppdb.calon_santri.nav_group', 'Pendaftaran');
     }
 }

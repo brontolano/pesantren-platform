@@ -3,7 +3,7 @@
 namespace Modules\Notifikasi\Filament\Resources\TemplateNotifikasi;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Support\AlbaKidsTenant;
+use App\Support\TenantCustomizationRegistry;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
@@ -138,8 +138,8 @@ class TemplateNotifikasiResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        if (AlbaKidsTenant::isActive()) {
-            $query->where('kode_template', 'like', 'albakids_%');
+        if (($prefix = TenantCustomizationRegistry::stringValue('notif_template_prefix')) !== null) {
+            $query->where('kode_template', 'like', $prefix.'%');
         }
 
         return $query;
@@ -147,21 +147,21 @@ class TemplateNotifikasiResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Template Pesan' : 'Template Notifikasi';
+        return TenantCustomizationRegistry::label('notifikasi.template.navigation', 'Template Notifikasi');
     }
 
     public static function getModelLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Template Pesan Alba Kids' : 'Template Notifikasi';
+        return TenantCustomizationRegistry::label('notifikasi.template.model', 'Template Notifikasi');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Template Pesan' : 'Template Notifikasi';
+        return TenantCustomizationRegistry::label('notifikasi.template.plural', 'Template Notifikasi');
     }
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Komunikasi';
+        return TenantCustomizationRegistry::label('notifikasi.template.nav_group', 'Komunikasi');
     }
 }

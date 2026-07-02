@@ -3,7 +3,7 @@
 namespace Modules\PPDB\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Support\AlbaKidsTenant;
+use App\Support\TenantCustomizationRegistry;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
@@ -57,17 +57,17 @@ class TagihanPpdbResource extends Resource
 
     public static function table(Table $table): Table
     {
-        $isAlbaKids = AlbaKidsTenant::isActive();
+        $customFlow = TenantCustomizationRegistry::feature('ppdb_custom_flow');
 
         return $table
             ->columns([
                 TextColumn::make('calonSantri.nama')
-                    ->label($isAlbaKids ? 'Nama Pendaftar' : 'Calon Santri')
+                    ->label(TenantCustomizationRegistry::label('ppdb.tagihan.kolom_calon_santri', 'Calon Santri'))
                     ->searchable(),
                 TextColumn::make('tipe')
                     ->label('Jenis')
                     ->badge()
-                    ->visible(! $isAlbaKids),
+                    ->visible(! $customFlow),
                 TextColumn::make('nominal')
                     ->label('Nominal')
                     ->money('IDR'),
@@ -138,8 +138,8 @@ class TagihanPpdbResource extends Resource
     {
         $query = parent::getEloquentQuery()->with('calonSantri');
 
-        if (AlbaKidsTenant::isActive()) {
-            $query->where('tipe', 'pendaftaran_albakids');
+        if (($tipe = TenantCustomizationRegistry::stringValue('ppdb_tagihan_tipe_scope')) !== null) {
+            $query->where('tipe', $tipe);
         }
 
         return $query;
@@ -154,21 +154,21 @@ class TagihanPpdbResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Custom Form' : 'Tagihan PPDB';
+        return TenantCustomizationRegistry::label('ppdb.tagihan.navigation', 'Tagihan PPDB');
     }
 
     public static function getModelLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Form Website Alba Kids' : 'Tagihan PPDB';
+        return TenantCustomizationRegistry::label('ppdb.tagihan.model', 'Tagihan PPDB');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Custom Form' : 'Tagihan PPDB';
+        return TenantCustomizationRegistry::label('ppdb.tagihan.plural', 'Tagihan PPDB');
     }
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return AlbaKidsTenant::isActive() ? 'PPDB Custom' : 'Pendaftaran';
+        return TenantCustomizationRegistry::label('ppdb.tagihan.nav_group', 'Pendaftaran');
     }
 }

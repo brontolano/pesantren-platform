@@ -633,16 +633,15 @@ class TenantWebsiteService
         ];
     }
 
+    /**
+     * Konsolidasi resolver (#343 tahap 2): delegasi ke AlbaKidsTenant — satu
+     * sumber kebenaran (host + tenant key), duplikasi logika dihapus. Cabang
+     * query domains() lama dihapus: hanya tenant berkey 'albakids' yang punya
+     * domain tsb, jadi cabang itu tak pernah tercapai (redundan) dan hanya
+     * menambah query per-request.
+     */
     protected function isAlbaKidsTenant(): bool
     {
-        if (tenant()?->getTenantKey() === 'albakids') {
-            return true;
-        }
-
-        if (request()?->getHost() === 'albakids.pesantren.online') {
-            return true;
-        }
-
-        return tenant()?->domains()->where('domain', 'albakids.pesantren.online')->exists() ?? false;
+        return \App\Support\AlbaKidsTenant::isActive();
     }
 }
