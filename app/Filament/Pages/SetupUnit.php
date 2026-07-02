@@ -93,6 +93,29 @@ class SetupUnit extends Page
         return $this->unit === null ? $this->dataHub() : $this->dataUnit($this->unit);
     }
 
+    /**
+     * Toggle flag WAJIB satu unit (#350 poin 1) — hanya pengelola tenant.
+     * Flag disimpan di Setting 'setup.unit_wajib'; default (belum pernah
+     * diubah) = semua unit wajib, sama dengan perilaku lama.
+     */
+    public function toggleWajib(string $kode): void
+    {
+        if (! (auth()->user()?->can('manage_tenant_settings') ?? false)
+            || ! isset(UnitSetupRegistry::units()[$kode])) {
+            return;
+        }
+
+        $baru = ! UnitSetupRegistry::unitWajib($kode);
+        UnitSetupRegistry::setUnitWajib($kode, $baru);
+
+        Notification::make()
+            ->title($baru
+                ? 'Unit ditandai WAJIB untuk pesantren Anda'
+                : 'Unit ditandai opsional — tidak menahan kesiapan go-live')
+            ->success()
+            ->send();
+    }
+
     /** Data tampilan hub: semua unit + progres + tautan. */
     private function dataHub(): array
     {
@@ -112,9 +135,17 @@ class SetupUnit extends Page
             ];
         }
 
+        // Penunjuk "Lanjut ke" (#350 poin 3): satu jalan jelas — unit wajib
+        // pertama (urutan registry) yang belum tuntas. Navigasi bebas tetap ada.
+        $next = UnitSetupRegistry::nextUnit($user);
+
         return [
             'mode' => 'hub',
             'kartu' => $kartu,
+            'lanjut' => $next === null ? null : [
+                'label' => $next['label'],
+                'url' => static::getUrl(['unit' => $next['kode']]),
+            ],
             // Indikator fondasi (Setup Pesantren) — pintu UTAMA sebelum isi data.
             'setup' => SetupPesantren::progress(),
             'setupUrl' => SetupPesantren::getUrl(),
@@ -130,9 +161,11 @@ class SetupUnit extends Page
         $stepsOpsional = array_values(array_filter($def['steps'], fn (array $s): bool => $s['opsional']));
 
         $nextKey = null;
+        $nextStep = null;
         foreach ($steps as $s) {
             if (! $s['done']) {
                 $nextKey = $s['key'];
+                $nextStep = $s;
                 break;
             }
         }
@@ -151,6 +184,10 @@ class SetupUnit extends Page
             'progress' => UnitSetupRegistry::progress($kode),
             'verifikasi' => UnitSetupRegistry::verifikasi($kode),
             'nextKey' => $nextKey,
+            'nextStep' => $nextStep,
+            'wajib' => UnitSetupRegistry::unitWajib($kode),
+            // Skenario migrasi tengah tahun (#350 poin 2) → importer historis DITONJOLKAN.
+            'skenarioMigrasi' => UnitSetupRegistry::skenarioMigrasi(),
             'hubUrl' => static::getUrl(),
             'tokoUrl' => $tokoUrl,
         ];
