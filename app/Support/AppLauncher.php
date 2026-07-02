@@ -93,7 +93,7 @@ final class AppLauncher
         // Santri MURNI (tanpa kapasitas staf) → aplikasi santri. Dicek sebelum
         // "hub" karena canAccessPanel tidak mengecualikan role santri.
         if ($user->hasRole('santri') && ! self::hasStaffCapability($user)) {
-            return ['kind' => 'redirect', 'url' => self::routeOr('tenant.santri-app.beranda', '/santri-app')];
+            return ['kind' => 'redirect', 'url' => self::routeOr('tenant.app-santri.home', '/app')];
         }
 
         $adminUrl = self::adminPanelUrl($user);

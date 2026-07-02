@@ -2,6 +2,7 @@
 
 namespace Modules\Keuangan\Filament\Resources\SetorKeliling;
 
+use App\Filament\Concerns\ModuleGate;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -29,6 +30,8 @@ use Modules\Keuangan\Services\SetorKelilingService;
  */
 class SetorKelilingResource extends Resource
 {
+    use ModuleGate;
+
     protected static ?string $model = SetorKelilingSesi::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
@@ -39,11 +42,21 @@ class SetorKelilingResource extends Resource
 
     protected static ?string $modelLabel = 'Sesi Setor Keliling';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::moduleVisible('keuangan') && static::canAccess();
+    }
+
     public static function canAccess(): bool
     {
         $user = Auth::user();
 
-        return ($user?->can('operate_pos') || $user?->can('manage_tabungan')) ?? false;
+        // Domain tabungan = modul keuangan (seragam dgn TabunganResource/
+        // TabunganTopupResource). Eksplisit; keuangan core → tetap tampil bila
+        // pemakai berwenang. Sebelumnya tanpa gerbang modul sama sekali (audit #5).
+        // Izin mengikuti main terkini: operate_pos ATAU manage_tabungan.
+        return static::moduleVisible('keuangan')
+            && (($user?->can('operate_pos') || $user?->can('manage_tabungan')) ?? false);
     }
 
     public static function form(Schema $schema): Schema

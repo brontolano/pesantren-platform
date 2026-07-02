@@ -19,6 +19,10 @@ class PembayaranDiverifikasi
 
     public function __construct(
         public readonly Pembayaran $pembayaran,
-        public readonly int $verifiedBy,
-    ) {}
+        // Nullable: jalur otomatis (mis. bayar dari saldo tabungan) bisa tanpa
+        // verifikator manusia. Listener Ledger memetakannya ke jurnal.dibuat_oleh
+        // yang memang nullable. Pemanggil manual (bendahara) tetap mengisi int.
+        public readonly ?int $verifiedBy,
+    ) {
+    }
 }

@@ -4,6 +4,7 @@ namespace Modules\PPDB\Services;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Modules\Notifikasi\Support\NotifikasiSettings;
 
 /**
  * Pengirim notifikasi WhatsApp PPDB via pipa n8n → WAHA.
@@ -17,6 +18,15 @@ class PpdbWhatsappNotifier
     private function dispatch(string $phone, string $message, string $nomor, string $name): bool
     {
         if ($phone === '') {
+            return false;
+        }
+
+        // Hormati toggle master WA tenant (Pengaturan Notifikasi), konsisten dgn
+        // WaGatewayService — bila WA dimatikan, PPDB pun tak mengirim (audit #6).
+        // Webhook & kontrak n8n PPDB (payload to/eticket_no + cek flag `sent`)
+        // sengaja TETAP dipakai; konsolidasi penuh ke hub (template/log terpusat)
+        // = keputusan owner agar tak mematahkan workflow n8n PPDB yang live.
+        if (! NotifikasiSettings::waEnabled()) {
             return false;
         }
 
