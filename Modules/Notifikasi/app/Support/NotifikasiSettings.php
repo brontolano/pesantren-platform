@@ -3,6 +3,8 @@
 namespace Modules\Notifikasi\Support;
 
 use App\Models\Setting;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Crypt;
 
 /**
  * Resolver pengaturan notifikasi per-tenant (disimpan di tabel `settings`)
@@ -23,6 +25,8 @@ class NotifikasiSettings
 
     public const KEY_WA_WEBHOOK = 'notif_wa_webhook_url';
 
+    public const KEY_WA_API_KEY = 'notif_wa_api_key';
+
     /** Notifikasi WhatsApp aktif? Default: aktif. */
     public static function waEnabled(): bool
     {
@@ -41,7 +45,7 @@ class NotifikasiSettings
      */
     public static function webhookUrl(): ?string
     {
-        $value = data_get(Setting::getTenantValue(self::KEY_WA_WEBHOOK), 'url');
+        $value = self::reveal(data_get(Setting::getTenantValue(self::KEY_WA_WEBHOOK), 'url'));
 
         if (is_string($value) && trim($value) !== '') {
             return trim($value);
@@ -50,6 +54,58 @@ class NotifikasiSettings
         $fallback = config('notifikasi.n8n_webhook_url');
 
         return is_string($fallback) && $fallback !== '' ? $fallback : null;
+    }
+
+    /**
+     * API key WAHA (opsional) — override per-tenant di Setting, fallback ke config/env.
+     * Nilai di Setting disimpan terenkripsi (lihat conceal()); dibaca dgn reveal()
+     * yang kompat-mundur terhadap nilai plaintext lama.
+     */
+    public static function wahaApiKey(): ?string
+    {
+        $value = self::reveal(data_get(Setting::getTenantValue(self::KEY_WA_API_KEY), 'key'));
+
+        if (is_string($value) && trim($value) !== '') {
+            return trim($value);
+        }
+
+        $fallback = config('notifikasi.waha_api_key');
+
+        return is_string($fallback) && $fallback !== '' ? $fallback : null;
+    }
+
+    /**
+     * Enkripsi nilai sensitif sebelum SIMPAN ke Setting. Mengembalikan null bila
+     * kosong. Dipakai oleh PengaturanNotifikasi::save().
+     */
+    public static function conceal(?string $plain): ?string
+    {
+        $plain = is_string($plain) ? trim($plain) : '';
+
+        if ($plain === '') {
+            return null;
+        }
+
+        return Crypt::encryptString($plain);
+    }
+
+    /**
+     * Dekripsi nilai dari Setting. KOMPAT-MUNDUR: nilai lama yang belum terenkripsi
+     * (plaintext) akan gagal decrypt → dianggap plaintext & dikembalikan apa adanya,
+     * agar notifikasi produksi tak putus saat migrasi enkripsi bertahap.
+     */
+    public static function reveal(mixed $stored): ?string
+    {
+        if (! is_string($stored) || $stored === '') {
+            return is_string($stored) ? $stored : null;
+        }
+
+        try {
+            return Crypt::decryptString($stored);
+        } catch (DecryptException) {
+            // Nilai lama pra-enkripsi (plaintext) — pakai apa adanya.
+            return $stored;
+        }
     }
 
     /** Tanda tangan/footer yang ditambahkan ke akhir setiap pesan WA (opsional). */

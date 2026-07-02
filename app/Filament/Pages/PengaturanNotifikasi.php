@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -14,6 +15,8 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\HtmlString;
+use Modules\Notifikasi\Services\WahaHealthService;
 use Modules\Notifikasi\Support\NotifikasiSettings;
 
 /**
@@ -61,7 +64,8 @@ class PengaturanNotifikasi extends Page implements HasForms
             'notif_email_enabled' => NotifikasiSettings::emailEnabled(),
             'notif_wa_signature' => NotifikasiSettings::signature(),
             'notif_broadcast_interval' => NotifikasiSettings::broadcastInterval(),
-            'notif_wa_webhook_url' => data_get(Setting::getTenantValue(NotifikasiSettings::KEY_WA_WEBHOOK), 'url'),
+            'notif_wa_webhook_url' => NotifikasiSettings::reveal(data_get(Setting::getTenantValue(NotifikasiSettings::KEY_WA_WEBHOOK), 'url')),
+            'notif_wa_api_key' => NotifikasiSettings::reveal(data_get(Setting::getTenantValue(NotifikasiSettings::KEY_WA_API_KEY), 'key')),
         ]);
     }
 
@@ -78,12 +82,21 @@ class PengaturanNotifikasi extends Page implements HasForms
                             ->label('Aktifkan notifikasi WhatsApp')
                             ->default(true)
                             ->helperText('Jika mati: OTP, pemberitahuan, dan broadcast WA tidak dikirim.'),
+                        Placeholder::make('waha_health_status')
+                            ->label('Status sesi WhatsApp (WAHA)')
+                            ->content(fn (): HtmlString => new HtmlString($this->wahaHealthBadge())),
                         TextInput::make('notif_wa_webhook_url')
                             ->label('URL webhook n8n khusus tenant (opsional)')
                             ->url()
                             ->maxLength(255)
                             ->placeholder('http://n8n:5678/webhook/ppdb-wa')
-                            ->helperText('Kosongkan untuk memakai pipa WA bawaan platform. Isi bila tenant ini punya alur n8n/nomor pengirim sendiri.'),
+                            ->helperText('Kosongkan untuk memakai pipa WA bawaan platform. Isi bila tenant ini punya alur n8n/nomor pengirim sendiri. Disimpan terenkripsi.'),
+                        TextInput::make('notif_wa_api_key')
+                            ->label('API key WAHA (opsional)')
+                            ->password()
+                            ->revealable()
+                            ->maxLength(255)
+                            ->helperText('Isi bila instance WAHA dijalankan dengan WAHA_API_KEY (dikirim sebagai header X-Api-Key). Disimpan terenkripsi.'),
                         Textarea::make('notif_wa_signature')
                             ->label('Tanda tangan / footer pesan')
                             ->rows(2)
@@ -142,6 +155,30 @@ class PengaturanNotifikasi extends Page implements HasForms
         return 'Server email AKTIF (mailer: '.$mailer.($host ? ', '.$host : '').'). Email notifikasi akan dikirim.';
     }
 
+    /**
+     * Badge status sesi WAHA (WORKING / mati) untuk halaman ini. Fail-soft:
+     * probe timeout pendek & error ditelan di WahaHealthService — badge tak
+     * pernah menggagalkan render halaman (regresi 500).
+     */
+    private function wahaHealthBadge(): string
+    {
+        $r = app(WahaHealthService::class)->check(3);
+
+        if (! ($r['configured'] ?? false)) {
+            return '<span style="color:#6b7280">◯ WAHA langsung tidak dikonfigurasi — notifikasi lewat pipa n8n. Status sesi tak dapat diperiksa dari sini.</span>';
+        }
+
+        if ($r['healthy'] ?? false) {
+            return '<span style="color:#16a34a;font-weight:600">● WORKING</span> — sesi WhatsApp aktif dan siap mengirim.';
+        }
+
+        $status = e((string) ($r['status'] ?? 'TIDAK TERJANGKAU'));
+        $error = e((string) ($r['error'] ?? 'Sesi tidak sehat.'));
+
+        return '<span style="color:#dc2626;font-weight:600">● '.$status.'</span> — '.$error
+            .' WhatsApp mungkin tidak terkirim (nomor logout / QR perlu di-scan ulang).';
+    }
+
     public function save(): void
     {
         $data = $this->form->getState();
@@ -151,7 +188,10 @@ class PengaturanNotifikasi extends Page implements HasForms
             NotifikasiSettings::KEY_EMAIL_ENABLED => ['enabled' => (bool) ($data['notif_email_enabled'] ?? true)],
             NotifikasiSettings::KEY_WA_SIGNATURE => ['text' => $data['notif_wa_signature'] ?? null],
             NotifikasiSettings::KEY_BROADCAST_INTERVAL => ['seconds' => max(0, min(300, (int) ($data['notif_broadcast_interval'] ?? 10)))],
-            NotifikasiSettings::KEY_WA_WEBHOOK => ['url' => filled($data['notif_wa_webhook_url'] ?? null) ? trim($data['notif_wa_webhook_url']) : null],
+            // Kredensial sensitif disimpan TERENKRIPSI (Crypt). Nilai lama plaintext
+            // tetap terbaca via NotifikasiSettings::reveal() (kompat-mundur).
+            NotifikasiSettings::KEY_WA_WEBHOOK => ['url' => NotifikasiSettings::conceal($data['notif_wa_webhook_url'] ?? null)],
+            NotifikasiSettings::KEY_WA_API_KEY => ['key' => NotifikasiSettings::conceal($data['notif_wa_api_key'] ?? null)],
         ];
 
         foreach ($payloads as $key => $value) {

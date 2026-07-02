@@ -77,3 +77,12 @@ Schedule::command('keuangan:terbitkan-tagihan-rutin')
 Schedule::command('ai:faq-mining')
     ->weeklyOn(1, '05:30')
     ->withoutOverlapping();
+
+// Pengerasan WA: health-check sesi WAHA per tenant tiap pagi (jendela ~06:30,
+// setelah tagihan rutin). Alarm via Log::warning bila sesi ≠ WORKING (nomor
+// logout / QR perlu di-scan ulang) agar WA tak "diam-diam mati". Fail-soft:
+// probe timeout pendek, error ditelan, selalu exit 0 → tak ganggu penjadwal
+// maupun jalur kirim notifikasi.
+Schedule::command('wa:health-check')
+    ->dailyAt('06:40')
+    ->withoutOverlapping();
