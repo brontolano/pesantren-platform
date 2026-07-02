@@ -6,7 +6,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
+use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\Jurnal;
+use Modules\Ledger\Models\SumberDana;
 use Modules\Ledger\Services\JurnalService;
 use Modules\Ledger\Services\LaporanService;
 use Modules\Payroll\Models\SlipGaji;
@@ -39,7 +41,7 @@ class PayrollDanaTest extends TestCase
     private function ptk(): User
     {
         return User::withoutGlobalScopes()->create([
-            'name' => 'Ustadz', 'email' => 'u' . str()->random(4) . '@' . tenant('id') . '.localhost',
+            'name' => 'Ustadz', 'email' => 'u'.str()->random(4).'@'.tenant('id').'.localhost',
             'password' => 'password', 'tenant_id' => tenant('id'),
         ]);
     }
@@ -93,16 +95,16 @@ class PayrollDanaTest extends TestCase
         $svc->postJurnal([
             'tanggal' => '2026-06-02', 'ref_type' => 'T', 'ref_id' => 'wkf',
             'baris' => [
-                ['akun_id' => \Modules\Ledger\Models\Akun::where('kode', '1-1000')->value('id'), 'sumber_dana_id' => \Modules\Ledger\Models\SumberDana::where('kode_dana', '04')->value('id'), 'debit' => 5000000],
-                ['akun_id' => \Modules\Ledger\Models\Akun::where('kode', '4-3000')->value('id'), 'sumber_dana_id' => \Modules\Ledger\Models\SumberDana::where('kode_dana', '04')->value('id'), 'kredit' => 5000000],
+                ['akun_id' => Akun::where('kode', '1-1000')->value('id'), 'sumber_dana_id' => SumberDana::where('kode_dana', '04')->value('id'), 'debit' => 5000000],
+                ['akun_id' => Akun::where('kode', '4-3000')->value('id'), 'sumber_dana_id' => SumberDana::where('kode_dana', '04')->value('id'), 'kredit' => 5000000],
             ],
         ]);
         // Penerimaan Zakat (05) 1jt → akun 4-4000
         $svc->postJurnal([
             'tanggal' => '2026-06-03', 'ref_type' => 'T', 'ref_id' => 'zkt',
             'baris' => [
-                ['akun_id' => \Modules\Ledger\Models\Akun::where('kode', '1-1000')->value('id'), 'sumber_dana_id' => \Modules\Ledger\Models\SumberDana::where('kode_dana', '05')->value('id'), 'debit' => 1000000],
-                ['akun_id' => \Modules\Ledger\Models\Akun::where('kode', '4-4000')->value('id'), 'sumber_dana_id' => \Modules\Ledger\Models\SumberDana::where('kode_dana', '05')->value('id'), 'kredit' => 1000000],
+                ['akun_id' => Akun::where('kode', '1-1000')->value('id'), 'sumber_dana_id' => SumberDana::where('kode_dana', '05')->value('id'), 'debit' => 1000000],
+                ['akun_id' => Akun::where('kode', '4-4000')->value('id'), 'sumber_dana_id' => SumberDana::where('kode_dana', '05')->value('id'), 'kredit' => 1000000],
             ],
         ]);
 

@@ -3,6 +3,7 @@
 namespace Modules\PPDB\Models;
 
 use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -73,13 +74,13 @@ class CalonSantriDokumen extends Model
         return self::STATUS_LABELS[$this->effectiveStatus()] ?? self::STATUS_LABELS[self::STATUS_PENDING];
     }
 
-    /** @param \Illuminate\Database\Eloquent\Builder $query */
+    /** @param Builder $query */
     public function scopePending($query)
     {
         return $query->where('status', self::STATUS_PENDING);
     }
 
-    /** @param \Illuminate\Database\Eloquent\Builder $query */
+    /** @param Builder $query */
     public function scopeVerified($query)
     {
         return $query->where('status', self::STATUS_VERIFIED);

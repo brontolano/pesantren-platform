@@ -3,6 +3,7 @@
 namespace Modules\PPDB\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -20,9 +21,7 @@ use Modules\PPDB\Services\UjianOnlineService;
  */
 class PesertaUjianController extends Controller
 {
-    public function __construct(private readonly UjianOnlineService $ujian)
-    {
-    }
+    public function __construct(private readonly UjianOnlineService $ujian) {}
 
     public function index(Request $request): Response
     {
@@ -92,7 +91,7 @@ class PesertaUjianController extends Controller
         ]);
     }
 
-    public function jawab(Request $request, int $paket): \Illuminate\Http\JsonResponse
+    public function jawab(Request $request, int $paket): JsonResponse
     {
         $calon = $this->calon($request);
         $data = $request->validate([

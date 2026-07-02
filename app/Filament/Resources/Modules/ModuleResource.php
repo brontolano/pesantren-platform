@@ -125,7 +125,7 @@ class ModuleResource extends Resource
                             );
                         }
                         Notification::make()
-                            ->title('Modul "' . $r->label . '" disebar ke ' . $tenants->count() . ' tenant')
+                            ->title('Modul "'.$r->label.'" disebar ke '.$tenants->count().' tenant')
                             ->success()->send();
                     }),
                 EditAction::make(),

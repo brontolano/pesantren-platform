@@ -96,7 +96,7 @@ class SantriImportCommand extends Command
             File::makeDirectory($directory, 0777, true);
         }
 
-        $path = $directory . DIRECTORY_SEPARATOR . now()->format('Ymd-His-u') . "-{$tenantId}-" . Str::lower(Str::random(6)) . '.json';
+        $path = $directory.DIRECTORY_SEPARATOR.now()->format('Ymd-His-u')."-{$tenantId}-".Str::lower(Str::random(6)).'.json';
 
         File::put($path, json_encode($summary, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 

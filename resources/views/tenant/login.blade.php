@@ -45,8 +45,16 @@
         .err{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:11px;padding:10px 13px;font-size:.82rem;margin-top:16px}
         .btn{appearance:none;border:none;cursor:pointer;width:100%;border-radius:9999px;padding:14px;font-size:.97rem;
             font-weight:700;font-family:inherit;color:#fff;min-height:50px;box-shadow:var(--shadow-brand);
-            background:linear-gradient(135deg,var(--brand),var(--brand-strong));transition:transform .15s}
-        .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(0)}
+            background:linear-gradient(135deg,var(--brand),var(--brand-strong));
+            transition:transform .2s cubic-bezier(.4,0,.2,1),filter .2s}
+        /* Tanda tekan khas Pixio: hover mempekat warna, tekan = mengecil (scale .97), bukan memantul.
+           DIPAGARI: tidak berlaku untuk AlbaKids (tenant custom). */
+        body:not(.tenant-albakids) .btn:hover{filter:brightness(.95)}
+        body:not(.tenant-albakids) .btn:active{transform:scale(.97)}
+        /* AlbaKids (tenant custom): pertahankan perilaku tombol ASLI pra-Pixio, tanpa perubahan. */
+        body.tenant-albakids .btn{transition:transform .15s}
+        body.tenant-albakids .btn:hover{transform:translateY(-1px)}
+        body.tenant-albakids .btn:active{transform:translateY(0)}
         .alt{margin-top:24px}
         .alt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
         .alt-card{display:flex;flex-direction:column;gap:3px;border:1px solid var(--border);border-radius:14px;
@@ -62,7 +70,7 @@
         @media(min-width:1280px){.aside{display:block}}
     </style>
 </head>
-<body>
+<body class="{{ ($isAlbaKids ?? false) ? 'tenant-albakids' : '' }}">
 <div class="split">
     {{-- Bagian 1: Foto + Teks (satu grup) --}}
     <aside class="aside">
@@ -114,26 +122,6 @@
                 <label class="remember"><input type="checkbox" name="remember" value="1"> Ingat saya di perangkat ini</label>
                 <button class="btn" type="submit">Masuk</button>
             </form>
-
-            <div class="alt">
-                @include('tenant.partials.ornament', ['color' => 'var(--gold-soft)'])
-                <div class="alt-grid">
-                    <a class="alt-card" href="{{ $waliLoginUrl }}">
-                        <span class="ttl">
-                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.13a9.4 9.4 0 0 0 2.63.37 9.34 9.34 0 0 0 4.12-.95 4.13 4.13 0 0 0-7.53-2.5M15 19.13v.1A12.3 12.3 0 0 1 8.62 21c-2.33 0-4.51-.65-6.37-1.77v-.1a6.38 6.38 0 0 1 11.96-3.07M12 6.38a3.38 3.38 0 1 1-6.75 0 3.38 3.38 0 0 1 6.75 0Zm8.25 2.25a2.63 2.63 0 1 1-5.25 0 2.63 2.63 0 0 1 5.25 0Z"/></svg>
-                            Wali Santri
-                        </span>
-                        <span class="ds">Orang tua / wali santri aktif</span>
-                    </a>
-                    <a class="alt-card" href="{{ $ppdbUrl }}">
-                        <span class="ttl">
-                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.15a60 60 0 0 0-.49 6.35A48.6 48.6 0 0 1 12 20.9a48.6 48.6 0 0 1 8.23-4.4 60 60 0 0 0-.49-6.35M12 13.49a50.7 50.7 0 0 1 7.74-3.34L12 3.49 4.26 10.15A50.7 50.7 0 0 1 12 13.49Z"/></svg>
-                            Calon Santri
-                        </span>
-                        <span class="ds">Pendaftaran santri baru (PPDB)</span>
-                    </a>
-                </div>
-            </div>
 
             <footer>&copy; {{ date('Y') }} {{ $pesantren }} &middot; <a href="/kebijakan-privasi">Kebijakan Privasi</a></footer>
         </div>

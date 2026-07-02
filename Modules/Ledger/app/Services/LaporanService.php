@@ -12,9 +12,7 @@ use Modules\Ledger\Models\SumberDana;
  */
 class LaporanService
 {
-    public function __construct(private readonly BukuBesarService $bukuBesar)
-    {
-    }
+    public function __construct(private readonly BukuBesarService $bukuBesar) {}
 
     /**
      * L6 — Neraca (posisi keuangan). Aset = Kewajiban + Ekuitas (+ surplus berjalan).

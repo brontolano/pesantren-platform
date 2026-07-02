@@ -2,6 +2,7 @@
 
 namespace Modules\AI\Http\Controllers;
 
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -35,9 +36,7 @@ use Modules\AI\Services\Privacy\PiiRedactor;
  */
 class WaWebhookController extends Controller
 {
-    public function __construct(private readonly PiiRedactor $redactor)
-    {
-    }
+    public function __construct(private readonly PiiRedactor $redactor) {}
 
     public function __invoke(Request $request): JsonResponse
     {
@@ -113,7 +112,7 @@ class WaWebhookController extends Controller
                     'meta' => ['session' => (string) request()->input('session', '')],
                 ]);
             });
-        } catch (\Illuminate\Database\UniqueConstraintViolationException) {
+        } catch (UniqueConstraintViolationException) {
             // Balapan dua webhook identik — yang kalah dianggap duplikat.
             return response()->json(['status' => 'duplikat']);
         }

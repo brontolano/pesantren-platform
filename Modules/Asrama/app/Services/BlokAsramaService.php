@@ -18,7 +18,7 @@ class BlokAsramaService
             ]);
         }
 
-        $record = $blok ?? new BlokAsrama();
+        $record = $blok ?? new BlokAsrama;
         $record->fill($data);
         $record->save();
 

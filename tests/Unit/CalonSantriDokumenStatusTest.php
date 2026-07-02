@@ -13,7 +13,7 @@ class CalonSantriDokumenStatusTest extends TestCase
 {
     public function test_dokumen_baru_dianggap_pending(): void
     {
-        $doc = new CalonSantriDokumen();
+        $doc = new CalonSantriDokumen;
 
         $this->assertSame(CalonSantriDokumen::STATUS_PENDING, $doc->effectiveStatus());
         $this->assertTrue($doc->isPending());

@@ -26,7 +26,7 @@ class TemplateNotifikasiSeeder extends Seeder
             [
                 'kode_template' => 'TAGIHAN_BARU',
                 'judul' => 'Pemberitahuan Tagihan Baru',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'jenis_tagihan', 'nominal', 'jatuh_tempo', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 Assalamu'alaikum Bapak/Ibu Wali Santri {{nama_santri}},
@@ -48,7 +48,7 @@ MSG,
             [
                 'kode_template' => 'TAGIHAN_JATUH_TEMPO',
                 'judul' => 'Pengingat Tagihan Akan Jatuh Tempo',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'jenis_tagihan', 'nominal', 'jatuh_tempo', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ⚠️ *PENGINGAT TAGIHAN*
@@ -67,7 +67,7 @@ MSG,
             [
                 'kode_template' => 'PEMBAYARAN_DITERIMA',
                 'judul' => 'Konfirmasi Pembayaran Diterima',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'jenis_tagihan', 'nominal', 'tanggal_bayar', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ✅ *PEMBAYARAN DITERIMA*
@@ -89,7 +89,7 @@ MSG,
             [
                 'kode_template' => 'TAGIHAN_TERLAMBAT',
                 'judul' => 'Pemberitahuan Tagihan Melewati Jatuh Tempo',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'jenis_tagihan', 'nominal', 'jatuh_tempo', 'hari_terlambat', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 🔴 *TAGIHAN MELEWATI JATUH TEMPO*
@@ -108,7 +108,7 @@ MSG,
             [
                 'kode_template' => 'PPDB_PENDAFTARAN_DITERIMA',
                 'judul' => 'Konfirmasi Pendaftaran PPDB Diterima',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_calon', 'nomor_pendaftaran', 'nama_pesantren', 'tahun_ajaran'],
                 'isi' => <<<'MSG'
 ✅ *PENDAFTARAN DITERIMA*
@@ -129,7 +129,7 @@ MSG,
             [
                 'kode_template' => 'PPDB_DITERIMA',
                 'judul' => 'Selamat — Calon Santri Diterima',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_calon', 'nomor_pendaftaran', 'nama_pesantren', 'batas_registrasi_ulang'],
                 'isi' => <<<'MSG'
 🎉 *SELAMAT! CALON SANTRI DITERIMA*
@@ -155,7 +155,7 @@ MSG,
             [
                 'kode_template' => 'PPDB_TIDAK_DITERIMA',
                 'judul' => 'Hasil Seleksi PPDB',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_calon', 'nomor_pendaftaran', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 Assalamu'alaikum Bapak/Ibu,
@@ -176,7 +176,7 @@ MSG,
             [
                 'kode_template' => 'IZIN_DISETUJUI',
                 'judul' => 'Izin Santri Disetujui',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'jenis_izin', 'tanggal_mulai', 'tanggal_selesai', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ✅ *IZIN DISETUJUI*
@@ -199,7 +199,7 @@ MSG,
             [
                 'kode_template' => 'GERBANG_TANPA_IZIN',
                 'judul' => 'Santri Keluar Tanpa Izin',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'nis', 'waktu', 'petugas'],
                 'isi' => <<<'MSG'
 🚨 *SANTRI KELUAR TANPA IZIN*
@@ -217,7 +217,7 @@ MSG,
             [
                 'kode_template' => 'PENGUMUMAN_UMUM',
                 'judul' => 'Pengumuman dari Pesantren',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_pesantren', 'judul_pengumuman', 'isi_pengumuman'],
                 'isi' => <<<'MSG'
 📢 *PENGUMUMAN*
@@ -235,7 +235,7 @@ MSG,
             [
                 'kode_template' => 'PESAN_WALI_BARU',
                 'judul' => 'Pesan Baru dari Guru',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'nama_guru', 'jenis', 'isi_pesan', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ✉️ *PESAN DARI GURU*
@@ -255,7 +255,7 @@ MSG,
             [
                 'kode_template' => 'KONTRAK_AKAN_HABIS',
                 'judul' => 'Kontrak/SK Pegawai Akan Habis',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_pegawai', 'jenis', 'nomor', 'tanggal_selesai', 'sisa_hari', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ⏰ *KONTRAK/SK AKAN HABIS*
@@ -277,7 +277,7 @@ MSG,
             [
                 'kode_template' => 'PEMBAYARAN_DIVERIFIKASI',
                 'judul' => 'Pembayaran Diterima',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'jenis_tagihan', 'nominal', 'status_tagihan', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ✅ *PEMBAYARAN DITERIMA*
@@ -294,7 +294,7 @@ MSG,
             [
                 'kode_template' => 'PEMBAYARAN_DITOLAK',
                 'judul' => 'Bukti Pembayaran Ditolak',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'jenis_tagihan', 'nominal', 'alasan', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ⚠️ *BUKTI PEMBAYARAN DITOLAK*
@@ -311,7 +311,7 @@ MSG,
             [
                 'kode_template' => 'TOPUP_DIVERIFIKASI',
                 'judul' => 'Setoran Saldo Berhasil',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'nominal', 'saldo', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 💰 *SETORAN SALDO BERHASIL*
@@ -328,7 +328,7 @@ MSG,
             [
                 'kode_template' => 'TOPUP_DITOLAK',
                 'judul' => 'Setoran Saldo Ditolak',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'nominal', 'alasan', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ⚠️ *SETORAN SALDO DITOLAK*
@@ -345,7 +345,7 @@ MSG,
             [
                 'kode_template' => 'BUKTI_BAYAR_MASUK',
                 'judul' => 'Antrean Verifikasi Baru',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['jenis', 'nama_santri', 'nominal', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 🔔 *ANTRIAN VERIFIKASI BARU* — {{nama_pesantren}}
@@ -361,7 +361,7 @@ MSG,
             [
                 'kode_template' => 'BERKAS_PPDB_MASUK',
                 'judul' => 'Berkas/Bukti PPDB Baru',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['jenis', 'nama_calon', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 🔔 *BERKAS PPDB BARU* — {{nama_pesantren}}
@@ -375,7 +375,7 @@ MSG,
             [
                 'kode_template' => 'PENGINGAT_DAFTAR_ULANG',
                 'judul' => 'Pengingat Daftar Ulang',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_calon', 'nomor_pendaftaran', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 🎉 *PENGINGAT DAFTAR ULANG*
@@ -393,7 +393,7 @@ MSG,
             [
                 'kode_template' => 'KREDENSIAL_SANTRI',
                 'judul' => 'Akun Aplikasi Santri',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'nis', 'username', 'password', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 🔐 *AKUN APLIKASI SANTRI* — {{nama_pesantren}}
@@ -413,7 +413,7 @@ MSG,
             [
                 'kode_template' => 'DISIPLIN_PELANGGARAN',
                 'judul' => 'Pemberitahuan Catatan Disiplin Santri',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'jenis_pelanggaran', 'kategori', 'poin', 'waktu', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 Assalamu'alaikum Bapak/Ibu Wali Santri {{nama_santri}},
@@ -433,7 +433,7 @@ MSG,
             [
                 'kode_template' => 'DISIPLIN_ESKALASI',
                 'judul' => 'Pemberitahuan Surat Peringatan Disiplin',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'label', 'total_poin', 'periode', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 ⚠️ *PEMBERITAHUAN {{label}}*
@@ -452,7 +452,7 @@ MSG,
             [
                 'kode_template' => 'MUTU_LAMPU_KUNING',
                 'judul' => 'Lampu Kuning Mutu Santri',
-                'channel' => 'whatsapp',
+                'channel' => 'wa',
                 'variable_dinamis' => ['nama_santri', 'nis', 'jenis', 'keterangan', 'nama_pesantren'],
                 'isi' => <<<'MSG'
 🟡 *LAMPU KUNING MUTU SANTRI*

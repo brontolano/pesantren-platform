@@ -40,6 +40,7 @@ class RaporDiniyahService
         private readonly NilaiService $nilaiService,
         private readonly KalenderService $kalenderService,
         private readonly DisiplinService $disiplinService,
+        private readonly SoroganService $soroganService,
     ) {}
 
     public function generate(Santri $santri, PeriodeAkademik $periode): RaporDiniyah
@@ -47,6 +48,12 @@ class RaporDiniyahService
         $blok = [
             'nilai_imtihan' => $this->blokNilaiImtihan($santri, $periode),
             'capaian_kitab' => $this->blokCapaianKitab($santri, $periode),
+            // Issue #330 — Sorogan & Ngaji Kitab (setoran individual + sesi massal).
+            'sorogan' => $this->soroganService->ringkasan(
+                $santri,
+                Carbon::parse($periode->tanggal_mulai)->toDateString(),
+                Carbon::parse($periode->tanggal_akhir)->toDateString(),
+            ),
             'tahfidz' => $this->blokTahfidz($santri, $periode),
             'ubudiyah_akhlak' => $this->blokUbudiyahAkhlak($santri, $periode),
             'kehadiran_kegiatan' => $this->blokKehadiranKegiatan($santri, $periode),

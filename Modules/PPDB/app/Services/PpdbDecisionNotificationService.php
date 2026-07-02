@@ -32,8 +32,7 @@ class PpdbDecisionNotificationService
     public function __construct(
         private readonly BroadcastWaService $broadcastWaService,
         private readonly PpdbStatusTrackingService $trackingService,
-    ) {
-    }
+    ) {}
 
     public function notifyDecision(CalonSantri|int $calonSantri): BroadcastWa
     {

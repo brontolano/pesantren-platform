@@ -8,7 +8,6 @@
  * License:     GPL-2.0-or-later
  * Text Domain: pesantren-online-widget
  */
-
 if (! defined('ABSPATH')) {
     exit;
 }

@@ -144,6 +144,7 @@ class LaporanIsak35Service
 
         if (! $terikat && $sumberIds->isEmpty()) {
             $lr = $this->laporan->labaRugi($from, $to);
+
             return [
                 'pendapatan' => $lr['pendapatan'],
                 'beban' => $lr['beban'],

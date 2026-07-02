@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\BayarDariSaldoService;
 use Modules\Keuangan\Services\TabunganService;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\Jurnal;
@@ -36,7 +36,7 @@ class TabunganJurnalTest extends TestCase
         $this->seedTenantRow($tenant);
         (new LedgerSeeder)->run();
 
-        return Santri::create(['nis' => 'S-' . str()->random(4), 'nama' => 'Santri', 'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'L']);
+        return Santri::create(['nis' => 'S-'.str()->random(4), 'nama' => 'Santri', 'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'L']);
     }
 
     public function test_setor_tabungan_auto_jurnal_seimbang(): void

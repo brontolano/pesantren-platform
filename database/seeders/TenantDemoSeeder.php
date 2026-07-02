@@ -2,10 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 /**
  * Seeder data contoh untuk tenant "demo".
@@ -26,8 +29,8 @@ class TenantDemoSeeder extends Seeder
         );
 
         // 1. Roles & permissions (pakai seeder yang sudah ada)
-        (new RolesAndPermissionsSeeder())->run();
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        (new RolesAndPermissionsSeeder)->run();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // 2. Users
         $users = [
@@ -37,11 +40,11 @@ class TenantDemoSeeder extends Seeder
             ['name' => 'Hj. Nurjanah', 'email' => 'bendahara@demo.pesantren.online', 'role' => 'bendahara'],
         ];
         foreach ($users as $u) {
-            $user = \App\Models\User::withoutGlobalScopes()->updateOrCreate(
+            $user = User::withoutGlobalScopes()->updateOrCreate(
                 ['email' => $u['email']],
                 ['name' => $u['name'], 'password' => Hash::make('demo1234'), 'tenant_id' => $t]
             );
-            if (\Spatie\Permission\Models\Role::where('name', $u['role'])->exists()) {
+            if (Role::where('name', $u['role'])->exists()) {
                 $user->syncRoles([$u['role']]);
             }
         }
@@ -105,11 +108,11 @@ class TenantDemoSeeder extends Seeder
                 ['tenant_id' => $t, 'nis' => $s['nis']],
                 [
                     'nama' => $s['nama'], 'jenis_kelamin' => $s['jk'], 'status' => 'aktif',
-                    'tahun_angkatan' => (int) ('20' . substr($s['nis'], 2, 2)),
-                    'tanggal_lahir' => '2011-0' . (($i % 8) + 1) . '-1' . (($i % 8) + 1),
+                    'tahun_angkatan' => (int) ('20'.substr($s['nis'], 2, 2)),
+                    'tanggal_lahir' => '2011-0'.(($i % 8) + 1).'-1'.(($i % 8) + 1),
                     'tempat_lahir' => $kota[$i % 5],
-                    'nama_ayah' => 'Bapak ' . explode(' ', $s['nama'])[0],
-                    'nama_ibu' => 'Ibu ' . explode(' ', $s['nama'])[0],
+                    'nama_ayah' => 'Bapak '.explode(' ', $s['nama'])[0],
+                    'nama_ibu' => 'Ibu '.explode(' ', $s['nama'])[0],
                     'kelas_id' => $kelasIds[$i % count($kelasIds)],
                     'created_at' => $now, 'updated_at' => $now,
                 ]
@@ -118,11 +121,11 @@ class TenantDemoSeeder extends Seeder
         $santriIds = DB::table('santri')->where('tenant_id', $t)->where('status', 'aktif')->pluck('id');
 
         // 6b. Demo PWA Wali (W2/W3) — user wali + akses anak + metode bayar + saldo tabungan.
-        $waliUser = \App\Models\User::withoutGlobalScopes()->updateOrCreate(
+        $waliUser = User::withoutGlobalScopes()->updateOrCreate(
             ['email' => 'wali@demo.pesantren.online'],
             ['name' => 'Bapak Ahmad (Wali)', 'password' => Hash::make('demo1234'), 'tenant_id' => $t]
         );
-        if (\Spatie\Permission\Models\Role::where('name', 'wali')->exists()) {
+        if (Role::where('name', 'wali')->exists()) {
             $waliUser->syncRoles(['wali']);
         }
 
@@ -169,7 +172,7 @@ class TenantDemoSeeder extends Seeder
         foreach (DB::table('tagihan')->where('tenant_id', $t)->where('bulan_masehi', '2026-05')->where('status', 'lunas')->get() as $i => $tag) {
             DB::table('pembayaran')->updateOrInsert(
                 ['tenant_id' => $t, 'tagihan_id' => $tag->id],
-                ['santri_id' => $tag->santri_id, 'nominal' => 500000, 'metode' => $metode[$i % 3], 'tanggal_pembayaran' => '2026-05-' . str_pad((string) (($i % 14) + 5), 2, '0', STR_PAD_LEFT), 'is_verified' => true, 'verified_at' => $now, 'created_at' => $now, 'updated_at' => $now]
+                ['santri_id' => $tag->santri_id, 'nominal' => 500000, 'metode' => $metode[$i % 3], 'tanggal_pembayaran' => '2026-05-'.str_pad((string) (($i % 14) + 5), 2, '0', STR_PAD_LEFT), 'is_verified' => true, 'verified_at' => $now, 'created_at' => $now, 'updated_at' => $now]
             );
         }
 
@@ -211,11 +214,11 @@ class TenantDemoSeeder extends Seeder
                 ['tenant_id' => $t, 'nomor_pendaftaran' => sprintf('PPDB-2026-%04d', $i + 1)],
                 [
                     'tracking_token' => Str::random(40), 'tracking_token_generated_at' => $now,
-                    'nama' => $p['nama'], 'tanggal_lahir' => '2012-0' . ($i + 2) . '-1' . ($i + 1),
+                    'nama' => $p['nama'], 'tanggal_lahir' => '2012-0'.($i + 2).'-1'.($i + 1),
                     'tempat_lahir' => $kota[$i % 5], 'jenis_kelamin' => $p['jk'],
-                    'nama_ayah' => 'Bapak ' . explode(' ', $p['nama'])[0], 'nama_ibu' => 'Ibu ' . explode(' ', $p['nama'])[0],
-                    'no_hp_wali' => '0812' . rand(10000000, 99999999), 'email_wali' => strtolower(explode(' ', $p['nama'])[0]) . '@gmail.com',
-                    'alamat' => 'Jl. Contoh No. ' . ($i + 1) . ', Sumedang', 'asal_sekolah' => 'SD/MI Contoh',
+                    'nama_ayah' => 'Bapak '.explode(' ', $p['nama'])[0], 'nama_ibu' => 'Ibu '.explode(' ', $p['nama'])[0],
+                    'no_hp_wali' => '0812'.rand(10000000, 99999999), 'email_wali' => strtolower(explode(' ', $p['nama'])[0]).'@gmail.com',
+                    'alamat' => 'Jl. Contoh No. '.($i + 1).', Sumedang', 'asal_sekolah' => 'SD/MI Contoh',
                     'program_diminati' => $p['prog'], 'status_pendaftaran' => $p['status'],
                     'created_at' => $now, 'updated_at' => $now,
                 ]

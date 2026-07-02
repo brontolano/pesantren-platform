@@ -36,7 +36,7 @@ class SumberPengetahuan extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim Digital';
+    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim';
 
     protected static ?string $navigationLabel = 'Sumber Pengetahuan';
 
@@ -79,7 +79,7 @@ class SumberPengetahuan extends Page implements HasForms
             ->statePath('data')
             ->components([
                 Section::make('Tambah Sumber Pengetahuan')
-                    ->description('Unggah dokumen (.txt, .md, .docx) ATAU tempel teks langsung. Dokumen diproses di latar belakang lalu siap dirujuk Khadim Digital.')
+                    ->description('Unggah dokumen (.txt, .md, .docx, .pdf) ATAU tempel teks langsung. Dokumen diproses di latar belakang lalu siap dirujuk Khadim Digital.')
                     ->columns(2)
                     ->components([
                         TextInput::make('judul')
@@ -98,11 +98,12 @@ class SumberPengetahuan extends Page implements HasForms
                             ->required(),
                         FileUpload::make('berkas')
                             ->label('Berkas dokumen')
-                            ->helperText('Format: .txt, .md, .docx. Kosongkan bila menempel teks di bawah.')
+                            ->helperText('Format: .txt, .md, .docx, .pdf. PDF harus punya lapisan teks (bukan hasil pindai/foto). Kosongkan bila menempel teks di bawah.')
                             ->acceptedFileTypes([
                                 'text/plain',
                                 'text/markdown',
                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/pdf',
                             ])
                             ->maxSize(StorageQuotaService::maxFileKb())
                             ->storeFiles(false)

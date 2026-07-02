@@ -3,7 +3,6 @@
 namespace Modules\Kesantrian\Services;
 
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\Kesantrian\Models\Alumni;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Models\StatusSantri;
@@ -35,6 +34,7 @@ class SantriService
     public function update(Santri $santri, array $data): Santri
     {
         $santri->update($data);
+
         return $santri->fresh();
     }
 

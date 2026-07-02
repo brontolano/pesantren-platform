@@ -25,7 +25,7 @@ return new class extends Migration
 
         if (! Schema::hasColumn('ai_chunk', 'konten_fts')) {
             DB::statement(
-                "ALTER TABLE ai_chunk ADD COLUMN konten_fts tsvector "
+                'ALTER TABLE ai_chunk ADD COLUMN konten_fts tsvector '
                 ."GENERATED ALWAYS AS (to_tsvector('simple', coalesce(konten, ''))) STORED"
             );
         }

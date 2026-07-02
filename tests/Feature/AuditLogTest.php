@@ -16,8 +16,11 @@ class AuditLogTest extends TestCase
     use DatabaseTransactions;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
+
     private User $userA;
+
     private User $userB;
 
     protected function setUp(): void

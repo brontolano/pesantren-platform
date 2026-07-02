@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Tenant;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Services\TabunganSaldoImportService;
 use Modules\Keuangan\Services\TabunganService;
-use Modules\Kesantrian\Models\Santri;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 

@@ -27,38 +27,39 @@ class SetupTenantUsersCommand extends Command
     /** Default roles yang akan dibuat */
     private array $defaultRoles = [
         [
-            'label'       => 'Admin Pesantren',
-            'role'        => 'admin_pesantren',
-            'name'        => 'Admin',
-            'email_prefix'=> 'admin',
+            'label' => 'Admin Pesantren',
+            'role' => 'admin_pesantren',
+            'name' => 'Admin',
+            'email_prefix' => 'admin',
         ],
         [
-            'label'       => 'Tata Usaha (TU)',
-            'role'        => 'tu',
-            'name'        => 'Tata Usaha',
-            'email_prefix'=> 'tu',
+            'label' => 'Tata Usaha (TU)',
+            'role' => 'tu',
+            'name' => 'Tata Usaha',
+            'email_prefix' => 'tu',
         ],
         [
-            'label'       => 'Bendahara',
-            'role'        => 'keuangan',
-            'name'        => 'Bendahara',
-            'email_prefix'=> 'bendahara',
+            'label' => 'Bendahara',
+            'role' => 'keuangan',
+            'name' => 'Bendahara',
+            'email_prefix' => 'bendahara',
         ],
         [
-            'label'       => 'Kepala Pesantren',
-            'role'        => 'kepala',
-            'name'        => 'Kepala',
-            'email_prefix'=> 'kepala',
+            'label' => 'Kepala Pesantren',
+            'role' => 'kepala',
+            'name' => 'Kepala',
+            'email_prefix' => 'kepala',
         ],
     ];
 
     public function handle(): int
     {
         $tenantId = (string) $this->argument('tenant');
-        $tenant   = Tenant::find($tenantId);
+        $tenant = Tenant::find($tenantId);
 
         if (! $tenant) {
             $this->error("Tenant '{$tenantId}' tidak ditemukan.");
+
             return self::FAILURE;
         }
 
@@ -68,16 +69,16 @@ class SetupTenantUsersCommand extends Command
         tenancy()->initialize($tenant);
 
         try {
-            $created  = [];
-            $skipped  = [];
-            $domain   = "{$tenantId}.localhost"; // ganti dengan domain production saat live
+            $created = [];
+            $skipped = [];
+            $domain = "{$tenantId}.localhost"; // ganti dengan domain production saat live
 
             foreach ($this->defaultRoles as $roleConfig) {
                 $email = "{$roleConfig['email_prefix']}@{$domain}";
-                $name  = $roleConfig['name'];
+                $name = $roleConfig['name'];
 
                 if ($this->option('interactive')) {
-                    $name  = $this->ask("  Nama {$roleConfig['label']}", $name);
+                    $name = $this->ask("  Nama {$roleConfig['label']}", $name);
                     $email = $this->ask("  Email {$roleConfig['label']}", $email);
                 }
 
@@ -86,6 +87,7 @@ class SetupTenantUsersCommand extends Command
                 if ($existing && ! $this->option('force')) {
                     $this->line("  <fg=yellow>⚠ Skip:</> {$roleConfig['label']} ({$email}) — sudah ada");
                     $skipped[] = $email;
+
                     continue;
                 }
 
@@ -94,17 +96,17 @@ class SetupTenantUsersCommand extends Command
                     ['email' => $email],
                     [
                         'tenant_id' => $tenantId,
-                        'name'      => $name,
-                        'password'  => Hash::make($password),
+                        'name' => $name,
+                        'password' => Hash::make($password),
                     ]
                 );
 
                 $user->syncRoles([$roleConfig['role']]);
 
                 $created[] = [
-                    'role'     => $roleConfig['label'],
-                    'name'     => $name,
-                    'email'    => $email,
+                    'role' => $roleConfig['label'],
+                    'name' => $name,
+                    'email' => $email,
                     'password' => $password,
                 ];
 
@@ -128,7 +130,7 @@ class SetupTenantUsersCommand extends Command
         }
 
         if (! empty($skipped)) {
-            $this->info('User yang dilewati (sudah ada): ' . implode(', ', $skipped));
+            $this->info('User yang dilewati (sudah ada): '.implode(', ', $skipped));
         }
 
         $this->newLine();

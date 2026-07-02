@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Modules\PPDB\Models\CalonSantri;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -31,7 +33,7 @@ class KebijakanPrivasiTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => true, 'data' => json_encode([]),
-             'created_at' => now(), 'updated_at' => now()],
+                'created_at' => now(), 'updated_at' => now()],
         );
         tenancy()->end();
 
@@ -49,7 +51,7 @@ class KebijakanPrivasiTest extends TestCase
 
         // Override redaksi per tenant.
         tenancy()->initialize($tenant);
-        \App\Models\Setting::updateOrCreate(['key' => 'kebijakan_privasi_sistem'], ['value' => ['text' => 'REDAKSI KHUSUS PONDOK KAMI']]);
+        Setting::updateOrCreate(['key' => 'kebijakan_privasi_sistem'], ['value' => ['text' => 'REDAKSI KHUSUS PONDOK KAMI']]);
         tenancy()->end();
 
         $this->call('GET', "http://{$host}/kebijakan-privasi", [], [], [], $server)
@@ -80,7 +82,7 @@ class KebijakanPrivasiTest extends TestCase
             ->assertSessionDoesntHaveErrors();
 
         tenancy()->initialize($tenant);
-        $calon = \Modules\PPDB\Models\CalonSantri::query()->where('nama', 'Calon Uji')->first();
+        $calon = CalonSantri::query()->where('nama', 'Calon Uji')->first();
         $this->assertNotNull($calon);
         $this->assertNotNull($calon->consent_kebijakan_at, 'Waktu persetujuan kebijakan tercatat.');
         tenancy()->end();

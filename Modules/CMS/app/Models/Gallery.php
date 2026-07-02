@@ -2,6 +2,7 @@
 
 namespace Modules\CMS\Models;
 
+use App\Services\MediaRegistrar;
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -42,7 +43,7 @@ class Gallery extends Model
         // Cover yang diupload (path disk) otomatis ter-index ke Media File.
         static::saved(function (Gallery $g): void {
             if ($g->cover_image_url) {
-                app(\App\Services\MediaRegistrar::class)
+                app(MediaRegistrar::class)
                     ->register($g->cover_image_url, 'Galeri/'.$g->title);
             }
         });
@@ -89,6 +90,6 @@ class Gallery extends Model
             return $value;
         }
 
-        return url('/_tenant-storage/' . ltrim($value, '/'));
+        return url('/_tenant-storage/'.ltrim($value, '/'));
     }
 }

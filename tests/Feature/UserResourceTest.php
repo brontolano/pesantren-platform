@@ -15,6 +15,7 @@ class UserResourceTest extends TestCase
     use DatabaseTransactions;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void

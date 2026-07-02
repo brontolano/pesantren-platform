@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -85,7 +86,7 @@ class TenantApiKey extends Model
             && hash_equals($this->key_hash, self::hashKey($plain));
     }
 
-    /** @param \Illuminate\Database\Eloquent\Builder $query */
+    /** @param Builder $query */
     public function scopeActive($query)
     {
         return $query->whereNull('revoked_at');

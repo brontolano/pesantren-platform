@@ -33,7 +33,6 @@
                     {{-- Label + type --}}
                     <div class="flex-1 min-w-0">
                         <p class="font-medium text-sm text-gray-900 dark:text-gray-100">{{ $section['label'] }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 font-mono">{{ $section['section_type'] }}</p>
                     </div>
 
                     {{-- Status badge --}}
@@ -64,7 +63,7 @@
                     @if ($section['section_type'] === 'hero')
                         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
-                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Eyebrow</label>
+                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Teks Kecil di Atas Judul</label>
                                 <input type="text" wire:model="sections.{{ $i }}.config.eyebrow"
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                             </div>
@@ -79,17 +78,17 @@
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"></textarea>
                             </div>
                             <div>
-                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Primary CTA Label</label>
+                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Teks Tombol Utama</label>
                                 <input type="text" wire:model="sections.{{ $i }}.config.primaryCtaLabel"
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                             </div>
                             <div>
-                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Primary CTA Link</label>
+                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Tautan Tombol Utama</label>
                                 <input type="text" wire:model="sections.{{ $i }}.config.primaryCtaHref"
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Stats</label>
+                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Statistik (Angka Sorotan)</label>
                                 <textarea wire:model="sections.{{ $i }}.config.stats_text" rows="3"
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-mono dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                     placeholder="Program|Muadalah&#10;Asrama|Putra & Putri"></textarea>
@@ -120,7 +119,7 @@
                                     placeholder="Satu misi per baris"></textarea>
                             </div>
                             <div>
-                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Highlights</label>
+                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Sorotan</label>
                                 <textarea wire:model="sections.{{ $i }}.config.highlights_text" rows="3"
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                     placeholder="Satu highlight per baris"></textarea>
@@ -205,7 +204,7 @@
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"></textarea>
                             </div>
                             <div class="md:col-span-2">
-                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Highlights</label>
+                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Sorotan</label>
                                 <textarea wire:model="sections.{{ $i }}.config.highlights_text" rows="3"
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                                     placeholder="Satu highlight per baris"></textarea>
@@ -224,7 +223,7 @@
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Body</label>
+                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Isi Teks</label>
                                 <textarea wire:model="sections.{{ $i }}.config.body" rows="3"
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"></textarea>
                             </div>
@@ -234,7 +233,7 @@
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                             </div>
                             <div>
-                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Helper Text</label>
+                                <label class="fi-fo-field-wrp-label mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200">Teks Bantuan</label>
                                 <input type="text" wire:model="sections.{{ $i }}.config.helperText"
                                     class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
                             </div>

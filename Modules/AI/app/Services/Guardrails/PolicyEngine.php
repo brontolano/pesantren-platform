@@ -3,6 +3,8 @@
 namespace Modules\AI\Services\Guardrails;
 
 use App\Models\User;
+use App\Services\ModuleService;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use Modules\AI\Models\AiEscalation;
 use Modules\AI\Models\AiPolicy;
@@ -10,6 +12,7 @@ use Modules\AI\Models\AiPolicyRule;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
 use Modules\AI\Services\Gateway\AiGenerateResult;
 use Modules\AI\Services\Privacy\PiiRedactor;
+use Modules\AI\Services\Research\ResearchTelemetry;
 use Modules\AI\Services\Settings\TenantSettingService;
 use Throwable;
 
@@ -57,7 +60,7 @@ class PolicyEngine
         // untuk tenant ini (development non-demo / released tanpa aktivasi
         // tenant_modules) ditolak santun SEBELUM cek apa pun — menonaktifkan
         // modul per tenant mematikan jalur gateway, bukan hanya halaman panel.
-        $modulAktif = app(\App\Services\ModuleService::class)
+        $modulAktif = app(ModuleService::class)
             ->isVisibleForTenant('ai', tenancy()->initialized ? tenant() : null);
 
         if (! $modulAktif) {
@@ -383,7 +386,7 @@ class PolicyEngine
         return $context === '' ? $request->prompt : $request->prompt."\n".$context;
     }
 
-    /** @return \Illuminate\Database\Eloquent\Collection<int, AiPolicyRule> */
+    /** @return Collection<int, AiPolicyRule> */
     private function ruleBlacklistAktif()
     {
         return AiPolicyRule::query()
@@ -527,7 +530,7 @@ class PolicyEngine
             // T-A013: hanya baris BARU (retry idempoten tidak menggandakan
             // statistik); ResearchTelemetry sendiri best-effort + opt-in.
             if ($eskalasi->wasRecentlyCreated && tenancy()->initialized) {
-                app(\Modules\AI\Services\Research\ResearchTelemetry::class)
+                app(ResearchTelemetry::class)
                     ->rekamEskalasiKategori((string) tenant()->getKey(), $kategori);
             }
         } catch (Throwable $e) {

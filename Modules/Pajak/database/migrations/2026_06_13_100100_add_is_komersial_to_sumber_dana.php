@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -17,7 +18,7 @@ return new class extends Migration
         });
 
         // Set default: unit_usaha dan sewa = komersial
-        \Illuminate\Support\Facades\DB::table('sumber_dana')
+        DB::table('sumber_dana')
             ->whereIn('kategori', ['komersial'])
             ->where('kode_dana', 'like', '04%') // Unit Usaha
             ->update(['is_komersial' => true]);

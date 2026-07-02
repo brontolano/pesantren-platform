@@ -2,11 +2,11 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\CMS\WebsiteBuilder;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
 use Livewire\Livewire;
+use Modules\CMS\Filament\Pages\WebsiteBuilder;
 use Modules\CMS\Models\WebsiteSection;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;

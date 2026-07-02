@@ -6,27 +6,30 @@ use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
-use App\Http\Controllers\DemoAutoLoginController;
-use App\Http\Controllers\DemoApps\UksDemoController;
-use App\Http\Controllers\DemoApps\TuDemoController;
+use App\Http\Controllers\CetakController;
 use App\Http\Controllers\DemoApps\HumasDemoController;
-use App\Http\Controllers\DemoApps\KepegawaianDemoController;
-use App\Http\Controllers\DemoApps\PpdbPanitiaDemoController;
-use App\Http\Controllers\DemoApps\PosKantinDemoController;
 use App\Http\Controllers\DemoApps\KeamananDemoController;
-use App\Http\Controllers\DemoApps\PengasuhanDemoController;
+use App\Http\Controllers\DemoApps\KepegawaianDemoController;
 use App\Http\Controllers\DemoApps\PengabdianDemoController;
+use App\Http\Controllers\DemoApps\PengasuhanDemoController;
+use App\Http\Controllers\DemoApps\PosKantinDemoController;
+use App\Http\Controllers\DemoApps\PpdbPanitiaDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
+use App\Http\Controllers\DemoApps\TuDemoController;
+use App\Http\Controllers\DemoApps\UksDemoController;
+use App\Http\Controllers\DemoAutoLoginController;
+use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\EmisExportController;
+use App\Http\Controllers\Jemaah\JemaahAuthController;
+use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
+use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
+use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\KeuanganPwaController;
 use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
 use App\Http\Controllers\PengadaanExportController;
-use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
-use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
-use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
 use App\Http\Controllers\PimpinanPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
@@ -61,19 +64,23 @@ use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
 use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
-use App\Http\Controllers\CetakController;
+use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\SantriExportController;
 use App\Http\Controllers\TahfidzExportController;
 use App\Support\TenantBranding;
 use App\Support\UiMode;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
+use Modules\CMS\Http\Controllers\CommentController;
 use Modules\CMS\Http\Controllers\SitemapController;
 use Modules\Keuangan\Models\Donasi;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\KontrakKerja;
 use Modules\Payroll\Services\RaporUstadzService;
+use Modules\Pembiayaan\Models\AreaPiket;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -141,6 +148,11 @@ Route::middleware([
      */
     Route::get('/demo-masuk/{peran}', DemoAutoLoginController::class)
         ->name('tenant.demo.autologin');
+
+    // Etalase demo — pemilih peran (satu klik login per peran). Gerbang sama:
+    // hanya tenant demo + DEMO_AUTOLOGIN (selain itu 404).
+    Route::get('/coba', [DemoPickerController::class, 'show'])->name('tenant.demo.picker');
+    Route::get('/demo', [DemoPickerController::class, 'show'])->name('tenant.demo.picker.alias');
 
     /*
      * ── App PWA demo peran (controller-dummy, gate auth saja) ──
@@ -280,8 +292,51 @@ Route::middleware([
         ]);
     })->middleware('auth')->name('tenant.payroll.rapor-ustadz');
 
+    // gap-121 — Cetak stiker QR Area Piket (print blade; QR di-scan via
+    // keyboard-wedge di PWA Guru). ?area={id} = satu area; tanpa query = semua aktif.
+    Route::get('/sarpras/area-piket/cetak-qr', function () {
+        $query = AreaPiket::query()->where('aktif', true)->orderBy('nama');
+        if (($id = request()->integer('area')) > 0) {
+            $query->whereKey($id);
+        }
+        $areas = $query->get();
+        abort_if($areas->isEmpty(), 404);
+
+        $qr = new QRCode(new QROptions([
+            'outputBase64' => true, // data-URI → langsung dipakai <img src>
+            'scale' => 6,
+        ]));
+
+        return view('exports.area-piket-qr-print', [
+            'namaPesantren' => TenantBranding::name(tenant('name') ?? 'Pesantren'),
+            'areas' => $areas->map(fn (AreaPiket $a): array => [
+                'nama' => (string) $a->nama,
+                'kode' => (string) $a->kode_qr,
+                'qr' => $qr->render((string) $a->kode_qr),
+            ])->all(),
+        ]);
+    })->middleware('auth')->name('tenant.sarpras.area-piket.cetak-qr');
+
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
+
+    // 1-aplikasi (Fase 4 fondasi) — PWA scope ROOT "/": manifest + ikon untuk
+    // SELURUH aplikasi (Beranda publik/Jemaah) agar installable & jadi dasar TWA
+    // root per tenant. Publik, pasif (JSON/SVG). Service worker root menyusul
+    // (Fase 3, butuh uji-perangkat sebelum deploy).
+    Route::get('/manifest.webmanifest', [RootPwaController::class, 'manifest'])->name('tenant.pwa.manifest');
+    Route::get('/icon.svg', [RootPwaController::class, 'icon'])->name('tenant.pwa.icon');
+    // Service worker scope "/" (Fase 3) — shell-only allow-list. Endpoint selalu
+    // tersedia, TAPI registrasi di app.blade.php digerbang flag pwa.root_sw_enabled
+    // (default OFF) → aktif hanya setelah owner uji-perangkat.
+    Route::get('/sw.js', [RootPwaController::class, 'serviceWorker'])->name('tenant.pwa.sw');
+
+    // 1-aplikasi (Fase 2c) — kirim komentar artikel. Gerbang izin 'komentar'
+    // (jemaah + semua peran internal/komunitas; calon santri 'peserta' eksternal
+    // TIDAK punya izin ini); tamu read-only. Limiter ber-prefix tenant (anti-spam).
+    Route::post('/artikel/{slug}/komentar', [CommentController::class, 'store'])
+        ->middleware(['auth', 'can:komentar', 'throttle:komentar'])
+        ->name('tenant.cms.comments.store');
 
     // Switch mode tampilan panel (simple <-> advanced) — preferensi per user.
     Route::post('/ui-mode/toggle', function () {
@@ -424,6 +479,27 @@ Route::middleware([
         Route::post('/lupa-password/reset', [PortalWaliAuthController::class, 'resetPassword'])->middleware('throttle:10,15')->name('password.reset');
     });
 
+    // 1-aplikasi (Fase 2b) — auth peran publik "jemaah" (registrasi mandiri
+    // No. WA + password via OTP). Publik (tanpa middleware role); berlabuh ke
+    // Beranda '/' setelah masuk. Throttle a la /wali & /spmb.
+    Route::prefix('jemaah')->name('tenant.jemaah.auth.')->group(function () {
+        Route::get('/login', [JemaahAuthController::class, 'showLogin'])->name('login');
+        Route::get('/daftar', [JemaahAuthController::class, 'showDaftar'])->name('register');
+        Route::get('/aktivasi', [JemaahAuthController::class, 'showAktivasi'])->name('activation');
+        Route::get('/lupa-password', [JemaahAuthController::class, 'showLupaPassword'])->name('password.forgot');
+        Route::post('/daftar', [JemaahAuthController::class, 'daftar'])->middleware('throttle:5,15')->name('register.submit');
+        Route::post('/login', [JemaahAuthController::class, 'login'])->middleware('throttle:10,1')->name('login.attempt');
+        Route::post('/aktivasi', [JemaahAuthController::class, 'aktivasi'])->middleware('throttle:10,15')->name('activation.verify');
+        Route::post('/aktivasi/kirim-ulang', [JemaahAuthController::class, 'kirimUlang'])->middleware('throttle:3,15')->name('activation.resend');
+        Route::post('/lupa-password', [JemaahAuthController::class, 'lupaPassword'])->middleware('throttle:5,15')->name('password.request');
+        Route::post('/lupa-password/reset', [JemaahAuthController::class, 'resetPassword'])->middleware('throttle:10,15')->name('password.reset');
+    });
+
+    Route::middleware('jemaah')->prefix('jemaah')->name('tenant.jemaah.')->group(function () {
+        Route::post('/logout', [JemaahAuthController::class, 'logout'])->name('logout');
+        // Endpoint area-jemaah (mis. komentar) menyusul di Fase 2c.
+    });
+
     Route::middleware('wali')->prefix('wali')->name('tenant.portal-wali.')->group(function () {
         Route::get('/', PortalWaliDashboardController::class)->name('dashboard');
         Route::post('/logout', [PortalWaliAuthController::class, 'logout'])->name('logout');
@@ -489,6 +565,8 @@ Route::middleware([
         Route::get('/rapor-diniyah/{raporDiniyah}/print', [AkademikExportController::class, 'raporDiniyahPrint'])->name('rapor-diniyah.print');
         // WP-08 — cetak syahadah (sertifikat internal) per alumni.
         Route::get('/syahadah/{alumni}/print', [AkademikExportController::class, 'syahadahPrint'])->name('syahadah.print');
+        // #328 — cetak ijazah Muadalah/PKPPS parameterik per jenjang ula/wustha/ulya.
+        Route::get('/ijazah/{alumni}/print', [AkademikExportController::class, 'ijazahPrint'])->name('ijazah.print');
     });
 
     // WP-11 — cetak daftar peserta wisuda tahfidz per periode (lulus + ditandai).

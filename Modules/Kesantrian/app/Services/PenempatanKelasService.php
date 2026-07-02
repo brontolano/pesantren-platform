@@ -3,6 +3,7 @@
 namespace Modules\Kesantrian\Services;
 
 use App\Models\Setting;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\PenempatanKelas;
@@ -61,6 +62,7 @@ class PenempatanKelasService
                 $count++;
             }
         }
+
         return $count;
     }
 
@@ -71,9 +73,9 @@ class PenempatanKelasService
      * - 'linear': semua santri naik ke kelas berikutnya (promosi normal)
      * - 'muadahah': santri bisa loncat/turun kelas berdasarkan nilai (configurable)
      *
-     * @param string $tahunAkademikBaru e.g. "2027/2028"
-     * @param array $pemetaan Mapping kelas lama → kelas baru. Format: [old_kelas_id => new_kelas_id]
-     * @param array|null $overrides Khusus mode muadahah: [santri_id => target_kelas_id] untuk loncat/turun
+     * @param  string  $tahunAkademikBaru  e.g. "2027/2028"
+     * @param  array  $pemetaan  Mapping kelas lama → kelas baru. Format: [old_kelas_id => new_kelas_id]
+     * @param  array|null  $overrides  Khusus mode muadahah: [santri_id => target_kelas_id] untuk loncat/turun
      */
     public function prosesKenaikanKelas(string $tahunAkademikBaru, array $pemetaan, ?array $overrides = null): array
     {
@@ -100,13 +102,14 @@ class PenempatanKelasService
                     if (! $targetKelas) {
                         $hasil['gagal']++;
                         $hasil['detail'][] = "Santri {$santri->nis}: kelas target override tidak ditemukan";
+
                         continue;
                     }
                 }
 
                 $alasan = $mode === 'muadahah' && $overrides && isset($overrides[$santri->id])
                     ? "Kenaikan kelas mode Mu'adalah (override)"
-                    : "Kenaikan kelas mode " . ucfirst($mode);
+                    : 'Kenaikan kelas mode '.ucfirst($mode);
 
                 $kelasAsal = optional($santri->kelas)->nama_kelas ?? '?';
 
@@ -126,13 +129,14 @@ class PenempatanKelasService
     public function getMode(): string
     {
         $setting = Setting::where('key', 'kelas_mode')->first();
+
         return $setting?->value ?? 'linear';
     }
 
     /**
      * Riwayat penempatan santri.
      */
-    public function riwayat(Santri $santri): \Illuminate\Database\Eloquent\Collection
+    public function riwayat(Santri $santri): Collection
     {
         return PenempatanKelas::where('santri_id', $santri->id)
             ->with('kelas')

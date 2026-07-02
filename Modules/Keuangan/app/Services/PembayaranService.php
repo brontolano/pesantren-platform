@@ -2,13 +2,14 @@
 
 namespace Modules\Keuangan\Services;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Events\PembayaranDiverifikasi;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use RuntimeException;
-use InvalidArgumentException;
 
 class PembayaranService
 {
@@ -277,6 +278,12 @@ class PembayaranService
 
         if ($totalDibayar >= $nominalAkhir && $nominalAkhir > 0) {
             $tagihan->update(['status' => 'lunas']);
+
+            // #332: porsi komponen `masuk_tabungan` disetor otomatis ke Tabungan
+            // santri saat lunas. Idempoten (penanda tabungan_disetor_at pada baris
+            // ter-lock) — aman walau recalculation lunas terpicu berulang dari
+            // dua jalur (verifikasi Pembayaran & BayarDariSaldo).
+            app(TagihanKomponenTabunganService::class)->setorPorsiTabungan($tagihan);
         } elseif ($totalDibayar > 0) {
             $tagihan->update(['status' => 'sebagian']);
         } else {
@@ -287,7 +294,7 @@ class PembayaranService
     /**
      * List pembayaran untuk satu tagihan.
      */
-    public function listPembayaranTagihan(Tagihan|int $tagihan): \Illuminate\Database\Eloquent\Collection
+    public function listPembayaranTagihan(Tagihan|int $tagihan): Collection
     {
         $this->ensureTenantContext();
 

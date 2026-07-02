@@ -40,10 +40,10 @@ class BayarDariSaldoService
     /**
      * Bayar tagihan memakai saldo tabungan. Atomik + lock baris tagihan/tabungan.
      *
-     * @param  Santri|int  $santri    Santri pemilik tabungan & tagihan.
-     * @param  Tagihan|int $tagihan   Tagihan yang akan dibayar.
-     * @param  float       $nominal   Nominal yang dibayar (> 0, <= sisa tagihan, <= saldo).
-     * @param  int|null    $createdBy ID user pemicu (wali) untuk audit trail.
+     * @param  Santri|int  $santri  Santri pemilik tabungan & tagihan.
+     * @param  Tagihan|int  $tagihan  Tagihan yang akan dibayar.
+     * @param  float  $nominal  Nominal yang dibayar (> 0, <= sisa tagihan, <= saldo).
+     * @param  int|null  $createdBy  ID user pemicu (wali) untuk audit trail.
      */
     public function bayar(Santri|int $santri, Tagihan|int $tagihan, float $nominal, ?int $createdBy = null): Pembayaran
     {

@@ -2,6 +2,8 @@
 
 namespace Modules\Core\Services;
 
+use App\Models\Setting;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -15,12 +17,25 @@ use RuntimeException;
  * (tenant, jenis, tahun, nomor_urut) jadi backstop bila dua pencatatan
  * bersamaan — yang kalah di-retry sekali.
  *
- * Format nomor surat KELUAR: {urut}/{kode}/{bulan-romawi}/{tahun}
+ * Format nomor surat KELUAR konfigurabel via Setting (lihat KebijakanRegistry),
+ * pola default {urut}/{kode}/{bulan}/{tahun} = perilaku lama persis. Placeholder:
+ * {urut} (3 digit), {kode} (kode lembaga), {bulan} (romawi), {tahun}.
+ * Kode lembaga eksplisit di payload['kode'] tetap menang atas Setting (kompat-mundur).
  * Surat MASUK menyimpan nomor surat pengirim apa adanya; agenda tetap berurut.
  */
 class SuratService
 {
     private const ROMAWI = [1 => 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+
+    /** Kode lembaga default pada nomor surat keluar (perilaku lama). */
+    public const SETTING_KODE_LEMBAGA = 'surat.kode_lembaga';
+
+    public const DEFAULT_KODE_LEMBAGA = 'PES';
+
+    /** Pola nomor surat keluar; placeholder {urut}/{kode}/{bulan}/{tahun}. */
+    public const SETTING_FORMAT_NOMOR = 'surat.format_nomor';
+
+    public const DEFAULT_FORMAT_NOMOR = '{urut}/{kode}/{bulan}/{tahun}';
 
     /**
      * @param array{jenis:string, tanggal_surat:string, pihak:string, perihal:string,
@@ -54,13 +69,7 @@ class SuratService
                     ->value('nomor_urut');
 
                 $nomor = $jenis === 'keluar'
-                    ? sprintf(
-                        '%03d/%s/%s/%d',
-                        $urut,
-                        strtoupper($payload['kode'] ?? 'PES'),
-                        self::ROMAWI[$tanggal->month],
-                        $tanggal->year,
-                    )
+                    ? $this->formatNomorKeluar($urut, $tanggal, $payload['kode'] ?? null)
                     : (string) $payload['nomor_surat'];
 
                 return Surat::create([
@@ -80,13 +89,35 @@ class SuratService
 
         try {
             return $simpan();
-        } catch (\Illuminate\Database\QueryException $e) {
+        } catch (QueryException $e) {
             // Unique (tenant, jenis, tahun, nomor_urut) kena saat balapan → retry sekali.
             if (in_array($e->getCode(), ['23505', '23000'], true)) {
                 return $simpan();
             }
             throw $e;
         }
+    }
+
+    /**
+     * Render nomor surat keluar dari pola Setting (fallback pola bawaan).
+     * Kode lembaga eksplisit (argumen) menang atas Setting → bawaan 'PES'.
+     * Pola default menghasilkan output identik dengan format lama.
+     */
+    private function formatNomorKeluar(int $urut, Carbon $tanggal, ?string $kodeEksplisit): string
+    {
+        // Kode eksplisit (termasuk string kosong) menang persis seperti perilaku
+        // lama (strtoupper($payload['kode'] ?? 'PES')); bila tak ada → Setting → bawaan.
+        $kode = $kodeEksplisit
+            ?? (Setting::getTenantStringValue(self::SETTING_KODE_LEMBAGA) ?: self::DEFAULT_KODE_LEMBAGA);
+
+        $format = Setting::getTenantStringValue(self::SETTING_FORMAT_NOMOR) ?: self::DEFAULT_FORMAT_NOMOR;
+
+        return strtr($format, [
+            '{urut}' => sprintf('%03d', $urut),
+            '{kode}' => strtoupper($kode),
+            '{bulan}' => self::ROMAWI[$tanggal->month],
+            '{tahun}' => (string) $tanggal->year,
+        ]);
     }
 
     private function ensureTenantContext(): void

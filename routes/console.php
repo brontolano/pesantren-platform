@@ -57,6 +57,13 @@ Schedule::command('ai:bersihkan-percakapan')
     ->dailyAt('02:30')
     ->withoutOverlapping();
 
+// Tagihan Rutin: terbitkan SPP/makan/asrama dll otomatis per tenant tiap pagi.
+// Hanya aturan yang `tanggal_terbit`-nya == hari ini yang diproses; idempoten
+// berlapis (guard periode aturan + cek per-santri) → aman jalan tiap hari.
+Schedule::command('keuangan:terbitkan-tagihan-rutin')
+    ->dailyAt('06:30')
+    ->withoutOverlapping();
+
 // FAQ-Mining: tambang pertanyaan berulang → usulan FAQ per tenant, MINGGUAN
 // (Senin pagi). Human-in-the-loop: hanya mengusulkan + notifikasi pengelola;
 // masuk RAG hanya setelah disahkan manusia di halaman Usulan FAQ.

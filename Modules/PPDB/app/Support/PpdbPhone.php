@@ -2,6 +2,8 @@
 
 namespace Modules\PPDB\Support;
 
+use App\Support\PhoneNumber;
+
 /**
  * Normalisasi No. HP Indonesia ke format `62…` (E.164 tanpa '+').
  *
@@ -15,6 +17,6 @@ class PpdbPhone
     {
         // Delegasi ke sumber kebenaran tunggal: App\Support\PhoneNumber
         // (idempoten, menangani +62/62/0 ganda — anti country-code dobel).
-        return \App\Support\PhoneNumber::normalize($raw);
+        return PhoneNumber::normalize($raw);
     }
 }

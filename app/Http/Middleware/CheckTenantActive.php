@@ -17,7 +17,7 @@ class CheckTenantActive
     {
         $tenant = tenant();
 
-        if ($tenant && !$tenant->is_active) {
+        if ($tenant && ! $tenant->is_active) {
             return response()->view('tenant.suspended', [
                 'tenantName' => $tenant->name ?? 'Pesantren',
             ], 503);

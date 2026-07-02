@@ -13,6 +13,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rules\Password;
 
 class UserResource extends Resource
@@ -26,6 +27,9 @@ class UserResource extends Resource
     protected static ?string $modelLabel = 'User';
 
     protected static ?string $pluralModelLabel = 'Users';
+
+    // Label RAMAH peran (slug → bahasa staf) kini terpusat di App\Support\RoleLabel
+    // (dipakai bersama dgn GreetingBanner). Lihat getOptionLabelFromRecordUsing.
 
     protected static ?int $navigationSort = 2;
 
@@ -49,7 +53,7 @@ class UserResource extends Resource
         return static::userCanManageUsers();
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return static::userCanManageUsers() && $record->tenant_id === tenant('id');
     }
@@ -76,14 +80,28 @@ class UserResource extends Resource
                 ->dehydrated(fn (?string $state): bool => filled($state))
                 ->maxLength(255),
             Select::make('roles')
-                ->label('Role')
+                ->label('Role / Peran')
+                ->helperText('Peran menentukan menu & akses yang terlihat staf. Untuk PEGAWAI, peran biasanya TER-ISI OTOMATIS dari Jabatan/Penugasan — pilih manual di sini hanya bila perlu.')
                 // relationship() menyetir opsi: value = ID role (cocok pivot
                 // model_has_roles.role_id). JANGAN override ->options() dgn nama —
                 // value jadi nama → relationship resolve "where roles.id='<nama>'"
                 // → 500 (bigint vs string). Urutan abjad lewat query relationship.
-                ->relationship('roles', 'name', fn (Builder $query): Builder => $query->orderBy('name'))
+                // Sembunyikan peran EKSTERNAL/komunitas (santri/wali/jemaah/peserta)
+                // — diberikan OTOMATIS oleh sistem (SantriAccountService, dll) saat
+                // akun santri/wali/jemaah/calon-santri dibuat — dan alias 'keuangan'
+                // (kembar 'bendahara') agar tak membingungkan. Label DITAMPILKAN ramah
+                // via getOptionLabelFromRecordUsing (nilai tetap role_id).
+                ->relationship(
+                    'roles',
+                    'name',
+                    fn (Builder $query): Builder => $query
+                        ->whereNotIn('name', ['santri', 'wali', 'jemaah', 'peserta', 'keuangan'])
+                        ->orderBy('name'),
+                )
+                ->getOptionLabelFromRecordUsing(fn (Model $record): string => \App\Support\RoleLabel::for($record->name))
                 ->multiple()
                 ->preload()
+                ->searchable()
                 ->required(),
         ]);
     }
@@ -101,9 +119,11 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('roles.name')
-                    ->label('Role')
+                    ->label('Role / Peran')
                     ->badge()
-                    ->separator(','),
+                    ->separator(',')
+                    // Tampilkan label ramah yang sama dgn dropdown (slug → bahasa staf).
+                    ->formatStateUsing(fn (string $state): string => \App\Support\RoleLabel::for($state)),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y H:i')
@@ -140,4 +160,3 @@ class UserResource extends Resource
         return auth()->user()?->can('manage_users') ?? false;
     }
 }
-

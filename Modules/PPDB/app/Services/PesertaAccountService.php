@@ -31,8 +31,7 @@ class PesertaAccountService
 {
     public function __construct(
         private readonly PesertaOtpService $otpService,
-    ) {
-    }
+    ) {}
 
     /**
      * Provision akun peserta untuk sebuah pendaftaran + kirim OTP aktivasi.
@@ -70,7 +69,7 @@ class PesertaAccountService
             return $user;
         }
 
-        $user = new User();
+        $user = new User;
         $user->name = (string) $calon->nama;
         // phone & email unik per DB tenant — klaim hanya bila belum dipakai akun
         // lain (kasus: 1 wali mendaftarkan 2 anak → anak ke-2 login pakai nomor

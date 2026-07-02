@@ -83,11 +83,15 @@ final class AppLauncher
         if ($user->hasRole('peserta')) {
             return ['kind' => 'redirect', 'url' => self::routeOr('spmb.dashboard', '/spmb')];
         }
-        // Santri MURNI (tanpa kapasitas staf) → App Santri NYATA (/app,
-        // AppSantriController), BUKAN aplikasi demo /santri-app (SantriDemoController,
-        // data statis). Keduanya pakai guard `auth` web yang sama, jadi sesi login
-        // pusat langsung diterima. Dicek sebelum "hub" karena canAccessPanel tidak
-        // mengecualikan role santri.
+        // Jemaah (peran publik, 1-aplikasi) → Beranda publik '/'. Berbasis ROLE
+        // (bukan can()) demi alasan yang sama: super_admin di-bypass Gate::before.
+        // Diletakkan setelah wali/peserta agar akun dual-peran tetap diutamakan
+        // ke portal keluarganya, lalu jemaah, sebelum logika staf/hub.
+        if ($user->hasRole('jemaah')) {
+            return ['kind' => 'redirect', 'url' => url('/')];
+        }
+        // Santri MURNI (tanpa kapasitas staf) → aplikasi santri. Dicek sebelum
+        // "hub" karena canAccessPanel tidak mengecualikan role santri.
         if ($user->hasRole('santri') && ! self::hasStaffCapability($user)) {
             return ['kind' => 'redirect', 'url' => self::routeOr('tenant.app-santri.home', '/app')];
         }
@@ -194,6 +198,6 @@ final class AppLauncher
             return $value;
         }
 
-        return 'https://' . ltrim($value, '/');
+        return 'https://'.ltrim($value, '/');
     }
 }

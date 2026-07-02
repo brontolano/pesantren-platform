@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kesehatan &amp; UKS · Panduan Pesantren.online</title>
+<meta name="description" content="Mencatat kunjungan UKS, mengelola stok obat, riwayat kesehatan santri, dan sesi konseling.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a><a class="nav-item" href="../cara-setup/">🚀 Cara Setup Pesantren</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama & Kehidupan Santri</a><a class="nav-item active" href="../kesehatan-uks/">🩺 Kesehatan & UKS</a><div class="nav-sub"><a href="#1-mencatat-kunjungan-uks">1. Mencatat Kunjungan UKS</a><a href="#2-kelola-stok-obat">2. Kelola Stok Obat</a><a href="#3-stok-masuk-amp-keluar">3. Stok Masuk &amp; Keluar</a><a href="#4-import-obat-dari-excel">4. Import Obat dari Excel</a><a href="#5-riwayat-kesehatan-santri">5. Riwayat Kesehatan Santri</a><a href="#6-sesi-konseling">6. Sesi Konseling</a><a href="#7-pengingat-penting">7. Pengingat Penting</a><a href="#contekan-cepat-uks">Contekan Cepat UKS</a></div><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">🩺</div>
+        <div>
+
+          <h1>Kesehatan &amp; UKS</h1>
+          <p class="lead">Mencatat kunjungan santri ke UKS, mengelola stok obat, riwayat kesehatan, dan sesi konseling.</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>.
+Panduan ini untuk <strong>petugas UKS / poskestren</strong>. Aplikasi ini menggantikan: buku kunjungan UKS, kartu stok obat manual, dan buku catatan kesehatan santri.
+Semua menu ada di grup <strong>UKS</strong> pada menu kiri.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Mencatat kunjungan UKS</li>
+<li>Kelola stok obat</li>
+<li>Stok masuk &amp; keluar</li>
+<li>Import obat dari Excel</li>
+<li>Riwayat kesehatan santri</li>
+<li>Sesi konseling</li>
+<li>Pengingat penting</li>
+</ol>
+<hr>
+<h2 id="1-mencatat-kunjungan-uks">1. Mencatat Kunjungan UKS<a class="anchor" href="#1-mencatat-kunjungan-uks" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> setiap kali ada santri datang ke UKS — sakit kepala, demam, luka, atau sekadar minta obat.</p>
+<p><strong>Siapkan dulu:</strong> nama santri yang berkunjung dan keluhannya.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>UKS</strong> → <strong>Kunjungan UKS</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong> (New).</li>
+<li>Isi formulir:<ul>
+<li><strong>Santri</strong> — ketik sebagian nama, pilih dari daftar.</li>
+<li><strong>Tanggal</strong> — biasanya sudah terisi hari ini.</li>
+<li><strong>Jam Masuk</strong> — biasanya sudah terisi jam sekarang.</li>
+<li><strong>Jam Keluar</strong> — boleh dikosongkan dulu kalau santri masih di UKS, isi nanti saat ia pulang.</li>
+<li><strong>Keluhan</strong> — apa yang dirasakan santri. Contoh: <code>Pusing dan demam sejak subuh</code>.</li>
+<li><strong>Tindakan</strong> — apa yang Bapak/Ibu lakukan. Contoh: <code>Istirahat, kompres, minum obat penurun panas</code>.</li>
+<li><strong>Obat Diberikan</strong> — tulis nama &amp; jumlah obat bila ada. Contoh: <code>Paracetamol 1 tablet</code>.</li>
+<li><strong>Status</strong> — pilih salah satu:<ul>
+<li><strong>Pulang</strong> — santri langsung kembali ke aktivitas.</li>
+<li><strong>Istirahat</strong> — dirawat di UKS. <em>Pilihan ini otomatis menandai presensi santri menjadi "sakit" hari itu</em> — jadi guru tidak perlu mencatat alpa.</li>
+<li><strong>Rujuk</strong> — dibawa ke RS/klinik luar.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Kalau memilih <strong>Rujuk</strong>, muncul kotak tambahan:<ul>
+<li><strong>Rujuk ke (RS/Klinik)</strong> — nama tujuan rujukan.</li>
+<li><strong>Biaya Rujukan</strong> — angka rupiah bila ada.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong> (Create).</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Kunjungan UKS dengan pilihan Status (Pulang / Istirahat / Rujuk) <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> catatan muncul di tabel Kunjungan UKS. Status tampil berwarna — hijau (Pulang), kuning (Istirahat), merah (Rujuk).</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Sudah ada catatan santri yang sama di tanggal yang sama</em> → satu santri hanya boleh satu catatan kunjungan per tanggal. Buka catatan yang sudah ada, ketuk <strong>Edit</strong>, lalu tambahkan keterangan di sana.</li>
+<li><em>Santri sebenarnya tidak sakit, salah pilih "Istirahat"</em> → buka catatan, ketuk <strong>Edit</strong>, ganti Status ke <strong>Pulang</strong>, <strong>Simpan</strong>.</li>
+</ul>
+<hr>
+<h2 id="2-kelola-stok-obat">2. Kelola Stok Obat<a class="anchor" href="#2-kelola-stok-obat" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> mendaftarkan obat baru ke daftar stok UKS, atau mengecek obat mana yang menipis.</p>
+<p><strong>Langkahnya (menambah obat baru):</strong></p>
+<ol>
+<li>Menu kiri → <strong>UKS</strong> → <strong>Stok Obat</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong> (New).</li>
+<li>Isi:<ul>
+<li><strong>Nama Obat</strong> — contoh: <code>Paracetamol</code>.</li>
+<li><strong>Satuan</strong> — contoh: <code>tablet</code>, <code>botol</code>, <code>pcs</code>.</li>
+<li><strong>Stok Awal</strong> — jumlah yang ada saat ini. <em>Hanya bisa diisi saat membuat obat baru.</em> Setelahnya, perubahan stok dilakukan lewat aksi <strong>Stok Masuk / Stok Keluar</strong> (lihat Bagian 3) supaya tercatat rapi.</li>
+<li><strong>Ambang Menipis</strong> — batas jumlah agar sistem mengingatkan. Contoh: isi <code>10</code>, maka saat stok turun ke 10 atau kurang, obat ditandai merah.</li>
+<li><strong>Aktif</strong> — biarkan menyala untuk obat yang dipakai.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong> (Create).</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> tabel Stok Obat dengan kolom Stok berwarna merah untuk obat yang menipis <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> obat muncul di tabel. Kolom <strong>Stok</strong> berwarna hijau bila aman, merah bila sudah mencapai ambang menipis. Pada menu kiri, di samping <strong>Stok Obat</strong> muncul <strong>angka merah</strong> = berapa jenis obat yang sedang menipis — itu pengingat untuk segera dibeli ulang.</p>
+<blockquote>
+<p>💡 <strong>Cari obat menipis dengan cepat:</strong> di tabel Stok Obat, gunakan saringan (filter) <strong>Stok Menipis</strong> untuk menampilkan hanya obat yang perlu dibeli.</p>
+</blockquote>
+<blockquote>
+<p>🖨️ <strong>Cetak daftar stok:</strong> di halaman Stok Obat ada tombol <strong>Cetak Stok</strong> untuk mencetak daftar obat (berguna saat belanja ke apotek).</p>
+</blockquote>
+<hr>
+<h2 id="3-stok-masuk-amp-keluar">3. Stok Masuk &amp; Keluar<a class="anchor" href="#3-stok-masuk-amp-keluar" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Setiap kali obat <strong>bertambah</strong> (beli baru, dapat bantuan) atau <strong>berkurang</strong> (dipakai, kedaluwarsa), jangan mengubah angka stok langsung. Gunakan tombol <strong>Stok Masuk</strong> atau <strong>Stok Keluar</strong>. Dengan begitu setiap perubahan tercatat dan bisa ditelusuri kapan saja.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>UKS</strong> → <strong>Stok Obat</strong>.</li>
+<li>Pada baris obat yang dimaksud, ketuk tombol aksi:<ul>
+<li><strong>Stok Masuk</strong> (hijau) — saat obat datang/bertambah.</li>
+<li><strong>Stok Keluar</strong> (kuning) — saat obat berkurang.</li>
+</ul>
+</li>
+<li>Isi:<ul>
+<li><strong>Jumlah</strong> — banyaknya yang masuk/keluar (minimal 1).</li>
+<li><strong>Keterangan</strong> — alasan singkat. Contoh: <code>Beli dari apotek</code> atau <code>Dipakai untuk piket</code>.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>. Stok obat akan otomatis bertambah/berkurang.</li>
+</ol>
+<p><strong>Melihat riwayat keluar-masuk satu obat:</strong></p>
+<ol>
+<li>Buka obat (ketuk <strong>Edit</strong> pada barisnya).</li>
+<li>Lihat bagian <strong>Riwayat Mutasi Stok</strong> di bawah formulir — daftar semua masuk/keluar lengkap dengan waktu, jumlah, keterangan, dan siapa yang mencatat.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pesan "Stok masuk tercatat" / "Stok keluar tercatat", dan angka stok berubah.</p>
+<p>⚠️ <em>Catatan:</em> Riwayat Mutasi Stok bersifat <strong>hanya-baca</strong> — tidak bisa diubah atau dihapus, demi menjaga keaslian catatan. Kalau salah jumlah, catat koreksi dengan aksi sebaliknya (mis. salah Stok Masuk → catat Stok Keluar dengan keterangan "koreksi").</p>
+<hr>
+<h2 id="4-import-obat-dari-excel">4. Import Obat dari Excel<a class="anchor" href="#4-import-obat-dari-excel" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> saat pertama kali memasukkan banyak obat sekaligus dari daftar yang sudah ada di Excel — tidak perlu mengetik satu per satu.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>UKS</strong> → <strong>Stok Obat</strong>.</li>
+<li>Ketuk tombol <strong>Import Obat</strong> di kanan atas.</li>
+<li>Unduh dulu <strong>template/contoh</strong> yang disediakan, lalu isi data Anda. Kolomnya:<ul>
+<li><strong>nama</strong> — wajib, dan harus unik (tidak boleh ada dua obat dengan nama sama).</li>
+<li><strong>satuan</strong> — contoh: <code>tablet</code>.</li>
+<li><strong>stok</strong> — jumlah stok awal.</li>
+<li><strong>ambang_menipis</strong> — batas pengingat menipis.</li>
+</ul>
+</li>
+<li>Simpan file sebagai <code>.xlsx</code>, <code>.csv</code>, atau <code>.ods</code>.</li>
+<li>Unggah file. Lakukan <strong>uji coba (dry-run)</strong> dulu untuk memastikan tidak ada baris yang keliru sebelum benar-benar memasukkan data.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> obat-obat dari Excel muncul di tabel Stok Obat.</p>
+<p>⚠️ <em>Nama obat yang sudah ada akan dilewati</em> (tidak ditimpa), supaya tidak ada data ganda. Jadi import aman diulang.</p>
+<hr>
+<h2 id="5-riwayat-kesehatan-santri">5. Riwayat Kesehatan Santri<a class="anchor" href="#5-riwayat-kesehatan-santri" aria-hidden="true">#</a></h2>
+<blockquote>
+<p>🔎 Menu <strong>Riwayat Kesehatan</strong> dan <strong>Sesi Konseling</strong> termasuk fitur lanjutan. Bila tidak terlihat di menu kiri, pesantren sedang memakai <strong>Mode Sederhana</strong>. Minta admin mengaktifkan <strong>Mode Lanjutan</strong> (untuk modul Kesehatan) agar menu ini muncul. Fungsinya tetap aktif; hanya tampilannya yang disembunyikan agar menu tidak ramai.</p>
+</blockquote>
+<p><strong>Apa ini?</strong> Catatan kesehatan yang lebih lengkap per santri — berguna untuk kasus yang perlu diagnosa &amp; tindak lanjut, bukan sekadar kunjungan harian.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>UKS</strong> → <strong>Riwayat Kesehatan</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Santri</strong> — pilih nama.</li>
+<li><strong>Tanggal</strong> — kapan diperiksa.</li>
+<li><strong>Keluhan</strong> — apa yang dirasakan.</li>
+<li><strong>Diagnosa</strong> — dugaan/penilaian (bila ada).</li>
+<li><strong>Tindakan</strong> — penanganan yang diberikan.</li>
+<li><strong>Kondisi</strong> — Baik / Sakit / Rujuk ke RS.</li>
+<li><strong>Petugas UKS</strong> — nama petugas yang menangani.</li>
+<li><strong>Catatan</strong> — keterangan tambahan bila perlu.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> catatan muncul di tabel, kolom Kondisi berwarna sesuai status.</p>
+<hr>
+<h2 id="6-sesi-konseling">6. Sesi Konseling<a class="anchor" href="#6-sesi-konseling" aria-hidden="true">#</a></h2>
+<blockquote>
+<p>🔎 Sama seperti Riwayat Kesehatan, menu ini muncul saat pesantren memakai <strong>Mode Lanjutan</strong> untuk modul Kesehatan.</p>
+</blockquote>
+<p><strong>Kapan dipakai:</strong> mencatat sesi konseling/bimbingan santri (masalah belajar, adaptasi, atau pribadi) beserta tindak lanjutnya.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → <strong>UKS</strong> → <strong>Sesi Konseling</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Santri</strong> — pilih nama.</li>
+<li><strong>Tanggal Konseling</strong> — kapan sesi berlangsung/dijadwalkan.</li>
+<li><strong>Topik</strong> — pokok pembicaraan. Contoh: <code>Sulit beradaptasi di asrama</code>.</li>
+<li><strong>Deskripsi Masalah</strong> — uraian singkat.</li>
+<li><strong>Status</strong> — Terjadwal / Selesai / Dibatalkan.</li>
+<li><strong>Konselor</strong> — pilih petugas/guru pembimbing (boleh dikosongkan).</li>
+<li><strong>Rekomendasi</strong> — saran/arahan hasil sesi.</li>
+<li><strong>Catatan Lanjutan</strong> — hal yang perlu dipantau ke depan.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> sesi muncul di tabel dengan Status berwarna (kuning Terjadwal, hijau Selesai, merah Dibatalkan).</p>
+<blockquote>
+<p>🤲 Catatan konseling bersifat <strong>sensitif</strong>. Tulis seperlunya, jaga kerahasiaan santri, dan hanya buka di perangkat yang aman.</p>
+</blockquote>
+<hr>
+<h2 id="7-pengingat-penting">7. Pengingat Penting<a class="anchor" href="#7-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>🛏️ <strong>Pilih "Istirahat" untuk santri yang dirawat di UKS</strong> — presensinya otomatis jadi "sakit", guru tidak perlu mencatat ulang.</li>
+<li>📦 <strong>Jangan ubah angka stok langsung.</strong> Selalu lewat <strong>Stok Masuk / Stok Keluar</strong> supaya jejaknya tercatat.</li>
+<li>🔴 <strong>Perhatikan angka merah</strong> di samping menu Stok Obat — itu jumlah obat yang menipis dan perlu dibeli.</li>
+<li>🧪 <strong>Import obat: uji coba (dry-run) dulu</strong> sebelum benar-benar memasukkan, supaya kesalahan ketahuan lebih awal.</li>
+<li>🤲 <strong>Catatan kesehatan &amp; konseling itu rahasia.</strong> Tulis dengan hormat, jangan mempermalukan.</li>
+<li>🚪 <strong>Keluar (logout)</strong> kalau memakai komputer kantor bersama.</li>
+</ol>
+<hr>
+<h2 id="contekan-cepat-uks">Contekan Cepat UKS<a class="anchor" href="#contekan-cepat-uks" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Catat santri datang ke UKS</td>
+<td>UKS → Kunjungan UKS → + Tambah</td>
+</tr>
+<tr>
+<td>Tambah obat baru</td>
+<td>UKS → Stok Obat → + Tambah</td>
+</tr>
+<tr>
+<td>Obat datang / berkurang</td>
+<td>UKS → Stok Obat → Stok Masuk / Stok Keluar</td>
+</tr>
+<tr>
+<td>Lihat riwayat keluar-masuk obat</td>
+<td>UKS → Stok Obat → Edit → Riwayat Mutasi Stok</td>
+</tr>
+<tr>
+<td>Masukkan banyak obat dari Excel</td>
+<td>UKS → Stok Obat → Import Obat</td>
+</tr>
+<tr>
+<td>Cetak daftar stok</td>
+<td>UKS → Stok Obat → Cetak Stok</td>
+</tr>
+<tr>
+<td>Catat riwayat kesehatan (lanjutan)</td>
+<td>UKS → Riwayat Kesehatan → + Tambah</td>
+</tr>
+<tr>
+<td>Catat sesi konseling (lanjutan)</td>
+<td>UKS → Sesi Konseling → + Tambah</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../asrama/"><span>‹ Sebelumnya</span><b>Asrama & Kehidupan Santri</b></a>
+      <a class="pager-link next" href="../akademik/"><span>Berikutnya ›</span><b>Akademik Lanjutan</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-mencatat-kunjungan-uks">1. Mencatat Kunjungan UKS</a><a href="#2-kelola-stok-obat">2. Kelola Stok Obat</a><a href="#3-stok-masuk-amp-keluar">3. Stok Masuk &amp; Keluar</a><a href="#4-import-obat-dari-excel">4. Import Obat dari Excel</a><a href="#5-riwayat-kesehatan-santri">5. Riwayat Kesehatan Santri</a><a href="#6-sesi-konseling">6. Sesi Konseling</a><a href="#7-pengingat-penting">7. Pengingat Penting</a><a href="#contekan-cepat-uks">Contekan Cepat UKS</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

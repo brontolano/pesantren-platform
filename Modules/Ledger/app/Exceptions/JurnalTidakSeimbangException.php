@@ -7,6 +7,4 @@ use RuntimeException;
 /**
  * Dilempar saat total debit != total kredit (Pagar #1: Σdebit = Σkredit).
  */
-class JurnalTidakSeimbangException extends RuntimeException
-{
-}
+class JurnalTidakSeimbangException extends RuntimeException {}

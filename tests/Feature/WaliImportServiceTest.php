@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use App\Models\User;
+use App\Support\PhoneNumber;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Services\WaliImportService;
@@ -84,7 +85,7 @@ class WaliImportServiceTest extends TestCase
         $this->assertSame(1, $hasil['created']);
         $this->assertSame(1, $hasil['total'], 'santri tanpa no HP tidak masuk query');
 
-        $phone = \App\Support\PhoneNumber::normalize('081234567002');
+        $phone = PhoneNumber::normalize('081234567002');
         $user = User::query()->where('phone', $phone)->first();
         $this->assertNotNull($user);
         $this->assertTrue($user->hasRole('wali'));

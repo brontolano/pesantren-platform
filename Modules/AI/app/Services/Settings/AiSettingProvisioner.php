@@ -4,6 +4,7 @@ namespace Modules\AI\Services\Settings;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Modules\AI\Database\Seeders\AiTemplateRppSeeder;
 use Modules\AI\Models\AiTenantSetting;
 use Throwable;
 
@@ -66,7 +67,7 @@ class AiSettingProvisioner
     private function seedTemplateRpp(string $tenantId): void
     {
         try {
-            \Modules\AI\Database\Seeders\AiTemplateRppSeeder::seedDefault();
+            AiTemplateRppSeeder::seedDefault();
         } catch (Throwable $e) {
             Log::warning('AiSettingProvisioner: gagal seed template RPP default — provisioning tenant tetap lanjut.', [
                 'tenant_id' => $tenantId,

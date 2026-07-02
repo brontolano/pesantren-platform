@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Ledger\AkunResource;
-use App\Filament\Resources\Ledger\JurnalResource;
-use App\Filament\Resources\Ledger\SumberDanaResource;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Modules\Ledger\Filament\Resources\AkunResource;
+use Modules\Ledger\Filament\Resources\JurnalResource;
+use Modules\Ledger\Filament\Resources\SumberDanaResource;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -34,7 +34,7 @@ class LedgerAksesTest extends TestCase
     {
         $user = User::withoutGlobalScopes()->create([
             'name' => ucfirst($role),
-            'email' => $role . '@' . tenant('id') . '.localhost',
+            'email' => $role.'@'.tenant('id').'.localhost',
             'password' => 'password',
             'tenant_id' => tenant('id'),
         ]);

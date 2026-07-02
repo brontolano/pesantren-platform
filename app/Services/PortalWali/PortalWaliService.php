@@ -101,6 +101,10 @@ class PortalWaliService
                 'id' => $santri->id,
                 'nis' => $santri->nis,
                 'nama' => $santri->nama,
+                // Kebijakan privasi foto putri (#340): wali HANYA bisa membuka
+                // santri miliknya sendiri (getAccessibleSantriQuery membatasi ke
+                // wali_user_id / accessWali), jadi wali melihat foto ANAK SENDIRI
+                // — ini wajar & diizinkan; tidak digerbang avatar inisial.
                 'photoUrl' => $santri->photo_url,
                 'status' => $santri->status,
                 'tanggalLahir' => optional($santri->tanggal_lahir)?->format('Y-m-d'),
@@ -226,6 +230,24 @@ class PortalWaliService
         ];
     }
 
+    /**
+     * #332: normalkan rincian komponen tagihan untuk frontend portal wali.
+     *
+     * @return array<int, array{nama:string, nominal:float, masukTabungan:bool}>
+     */
+    public static function komponenPayload(Tagihan $tagihan): array
+    {
+        return collect($tagihan->komponen ?? [])
+            ->filter(fn ($k): bool => is_array($k))
+            ->map(fn (array $k): array => [
+                'nama' => (string) ($k['nama'] ?? ''),
+                'nominal' => (float) ($k['nominal'] ?? 0),
+                'masukTabungan' => (bool) ($k['masuk_tabungan'] ?? false),
+            ])
+            ->values()
+            ->all();
+    }
+
     public function getFinancialPayload(Santri $santri): array
     {
         $tagihan = Tagihan::query()
@@ -243,6 +265,8 @@ class PortalWaliService
                 'status' => $item->status,
                 'jatuhTempo' => optional($item->jatuh_tempo)?->format('Y-m-d'),
                 'periodeAkademik' => $item->periode_akademik,
+                // #332: rincian komponen syahriah (transparansi untuk wali).
+                'komponen' => self::komponenPayload($item),
             ])
             ->values();
 

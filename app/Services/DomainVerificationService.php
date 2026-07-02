@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use Stancl\Tenancy\Database\Models\Domain;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Stancl\Tenancy\Database\Models\Domain;
 
 /**
  * Verifikasi kepemilikan domain/subdomain tenant (task Integrasi).

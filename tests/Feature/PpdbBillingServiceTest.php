@@ -18,6 +18,7 @@ class PpdbBillingServiceTest extends TestCase
     use InteractsWithPpdbTestDatabase;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void

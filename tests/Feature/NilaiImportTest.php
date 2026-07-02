@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use Modules\Akademik\Models\Nilai;
-use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Models\Pelajaran;
+use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Services\NilaiImportService;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;

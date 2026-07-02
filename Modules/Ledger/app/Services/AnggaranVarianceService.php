@@ -14,8 +14,7 @@ class AnggaranVarianceService
 {
     public function __construct(
         private readonly AnggaranGuardService $guard = new AnggaranGuardService,
-    ) {
-    }
+    ) {}
 
     /**
      * Varians per pos anggaran + total + proyeksi akhir tahun (linear burn).

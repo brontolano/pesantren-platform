@@ -4,13 +4,14 @@ namespace App\Providers;
 
 use App\Services\AuditLogger;
 use App\Support\PublicApiThrottle;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
@@ -34,7 +35,7 @@ class AppServiceProvider extends ServiceProvider
         // SUPER ADMIN = lolos SEMUA permission check (pola resmi spatie).
         // Future-proof: permission baru otomatis dimiliki tanpa re-seed.
         // Return null (bukan false) agar user lain tetap dievaluasi normal.
-        \Illuminate\Support\Facades\Gate::before(function ($user, string $ability) {
+        Gate::before(function ($user, string $ability) {
             try {
                 return method_exists($user, 'hasRole') && $user->hasRole('super_admin') ? true : null;
             } catch (\Throwable) {
@@ -74,6 +75,16 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute(max(1, $perMinute))
                 ->by('ppdb-submit:'.$tenantId.':'.$request->ip());
+        });
+
+        // 1-aplikasi (Fase 2c) — kirim komentar artikel. Kunci di-prefix tenant +
+        // user agar id numerik yang sama lintas tenant (DB-per-tenant) TIDAK saling
+        // menggerus jatah. Pola sama dgn throttleKey JemaahAuthController.
+        RateLimiter::for('komentar', function (Request $request) {
+            $tenantId = tenant()?->getTenantKey() ?? 'central';
+            $by = $request->user()?->getAuthIdentifier() ?? $request->ip();
+
+            return Limit::perMinute(10)->by('komentar:'.$tenantId.':'.$by);
         });
 
         Event::listen(Login::class, function (Login $event): void {

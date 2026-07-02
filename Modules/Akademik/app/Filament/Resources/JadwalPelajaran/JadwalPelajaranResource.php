@@ -1,0 +1,231 @@
+<?php
+
+namespace Modules\Akademik\Filament\Resources\JadwalPelajaran;
+
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\CreateJadwalPelajaran;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\EditJadwalPelajaran;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages\ListJadwalPelajaran;
+use Modules\Akademik\Models\JadwalPelajaran;
+use Modules\Akademik\Models\Pelajaran;
+use Modules\Akademik\Models\PeriodeAkademik;
+use Modules\Akademik\Services\JadwalPelajaranService;
+use Modules\Akademik\Services\KurikulumService;
+use Modules\Kesantrian\Models\Kelas;
+
+class JadwalPelajaranResource extends Resource
+{
+    use ModuleGate;
+
+    protected static ?string $model = JadwalPelajaran::class;
+
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
+
+    protected static ?string $navigationLabel = 'Jadwal Pelajaran';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Pembelajaran';
+
+    protected static ?int $navigationSort = 3;
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return UiMode::navAdvanced('akademik_inti') && static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('manage_akademik') ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->can('manage_akademik') ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->can('manage_akademik') ?? false;
+    }
+
+    /**
+     * WP-06: pesan peringatan LUNAK bila mapel di luar kurikulum aktif
+     * tingkat kelas itu; null bila aman / kelas tanpa kurikulum (perilaku
+     * lama utuh). TIDAK pernah memblokir simpan.
+     */
+    public static function kurikulumWarning(mixed $kelasId, mixed $pelajaranId): ?string
+    {
+        if (! $kelasId || ! $pelajaranId) {
+            return null;
+        }
+
+        $diLuar = app(KurikulumService::class)
+            ->isMapelDiLuarKurikulum((int) $kelasId, (int) $pelajaranId);
+
+        return $diLuar
+            ? 'Mapel ini tidak terdaftar di kurikulum aktif untuk tingkat kelas tersebut.'
+            : null;
+    }
+
+    /**
+     * gap-98: pesan peringatan LUNAK bila jadwal bentrok dengan jadwal lain
+     * (kelas/guru/ruangan sama, hari sama, jam tumpang-tindih); null bila aman
+     * atau data belum lengkap. TIDAK pernah memblokir simpan. Record yang
+     * sedang diedit diabaikan via $ignoreId.
+     */
+    public static function bentrokWarning(Get $get, mixed $ignoreId = null): ?string
+    {
+        return JadwalPelajaranService::cekBentrok(
+            $get('hari'),
+            $get('jam_mulai'),
+            $get('jam_selesai'),
+            $get('kelas_id'),
+            $get('pelajaran_id'),
+            $get('ruangan'),
+            $ignoreId !== null ? (int) $ignoreId : null,
+        );
+    }
+
+    /**
+     * gap-98: closure afterStateUpdated yang menampilkan Notification warning
+     * bila terdeteksi bentrok jadwal. NON-BLOKIR — simpan tetap berjalan.
+     */
+    protected static function peringatanBentrok(): \Closure
+    {
+        return function (Get $get, ?Model $record): void {
+            $warning = self::bentrokWarning($get, $record?->getKey());
+            if ($warning !== null) {
+                Notification::make()
+                    ->title('Bentrok jadwal terdeteksi')
+                    ->body($warning.' Jadwal tetap bisa disimpan.')
+                    ->warning()
+                    ->send();
+            }
+        };
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Jadwal')->schema([
+                Select::make('periode_akademik_id')
+                    ->label('Periode Akademik')
+                    ->options(fn () => PeriodeAkademik::query()->orderByDesc('tanggal_mulai')->pluck('nama', 'id'))
+                    ->searchable()
+                    ->nullable(),
+                Select::make('kelas_id')
+                    ->options(fn () => Kelas::query()->orderBy('nama_kelas')->pluck('nama_kelas', 'id'))
+                    ->searchable()
+                    ->live()
+                    ->required(),
+                Select::make('pelajaran_id')
+                    ->options(fn () => Pelajaran::query()->orderBy('nama')->pluck('nama', 'id'))
+                    ->searchable()
+                    ->live()
+                    // WP-06: validasi LUNAK kurikulum — hanya peringatan,
+                    // simpan TIDAK pernah diblokir (tenant tanpa kurikulum
+                    // tidak melihat apa-apa).
+                    ->hint(fn (Get $get): ?string => self::kurikulumWarning($get('kelas_id'), $get('pelajaran_id')))
+                    ->hintColor('warning')
+                    ->afterStateUpdated(function (Get $get, $state): void {
+                        $warning = self::kurikulumWarning($get('kelas_id'), $state);
+                        if ($warning !== null) {
+                            Notification::make()
+                                ->title('Mapel di luar kurikulum')
+                                ->body($warning.' Jadwal tetap bisa disimpan.')
+                                ->warning()
+                                ->send();
+                        }
+                    })
+                    ->required(),
+                Select::make('hari')
+                    ->options([
+                        'senin' => 'Senin',
+                        'selasa' => 'Selasa',
+                        'rabu' => 'Rabu',
+                        'kamis' => 'Kamis',
+                        'jumat' => 'Jumat',
+                        'sabtu' => 'Sabtu',
+                        'ahad' => 'Ahad',
+                    ])
+                    ->live()
+                    ->afterStateUpdated(self::peringatanBentrok())
+                    ->required(),
+                TextInput::make('jam_mulai')
+                    ->type('time')
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(self::peringatanBentrok())
+                    ->required(),
+                TextInput::make('jam_selesai')
+                    ->type('time')
+                    ->live(onBlur: true)
+                    // gap-98: peringatan LUNAK bentrok jadwal — hanya hint,
+                    // simpan TIDAK pernah diblokir.
+                    ->hint(fn (Get $get, ?Model $record): ?string => self::bentrokWarning($get, $record?->getKey()))
+                    ->hintColor('warning')
+                    ->afterStateUpdated(self::peringatanBentrok())
+                    ->required(),
+                TextInput::make('ruangan')
+                    ->maxLength(255)
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(self::peringatanBentrok()),
+            ])->columns(2),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->emptyStateHeading('Belum ada jadwal pelajaran')
+            ->emptyStateDescription('Pastikan Kelas dan Pelajaran sudah dibuat, lalu susun jadwal mingguan di sini.')
+            ->emptyStateIcon('heroicon-o-clock')
+            ->emptyStateActions([
+                Action::make('tambah')
+                    ->label('Tambah Jadwal')
+                    ->icon('heroicon-o-plus')
+                    ->visible(fn (): bool => static::canCreate())
+                    ->url(fn (): string => static::getUrl('create')),
+            ])
+            ->columns([
+                TextColumn::make('kelas.nama_kelas')->label('Kelas')->sortable(),
+                TextColumn::make('pelajaran.nama')->label('Pelajaran')->searchable(),
+                TextColumn::make('pelajaran.guruPengampu.name')->label('Guru'),
+                TextColumn::make('hari')->badge(),
+                TextColumn::make('jam_mulai'),
+                TextColumn::make('jam_selesai'),
+                TextColumn::make('ruangan'),
+            ])
+            ->defaultSort('hari')
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListJadwalPelajaran::route('/'),
+            'create' => CreateJadwalPelajaran::route('/create'),
+            'edit' => EditJadwalPelajaran::route('/{record}/edit'),
+        ];
+    }
+}

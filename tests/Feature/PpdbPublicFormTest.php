@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Tenant;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Modules\PPDB\Services\PpdbStatusTrackingService;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -149,7 +149,7 @@ class PpdbPublicFormTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $token = app(\Modules\PPDB\Services\PpdbStatusTrackingService::class)
+        $token = app(PpdbStatusTrackingService::class)
             ->issueTrackingLink((int) $candidate)['tracking_token'];
         $storedToken = DB::table('calon_santri')->where('id', $candidate)->value('tracking_token');
         $this->assertSame($token, $storedToken);

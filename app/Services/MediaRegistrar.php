@@ -17,7 +17,7 @@ class MediaRegistrar
     /**
      * Daftarkan satu path disk ke media_files (idempotent).
      *
-     * @param  string|null  $path    Path relatif di disk tenant (bukan URL).
+     * @param  string|null  $path  Path relatif di disk tenant (bukan URL).
      * @param  string|null  $folder  Label folder logis utk pengelompokan (mis. "Galeri/Wisuda VI").
      */
     public function register(?string $path, ?string $folder = null): ?MediaFile

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Setting;
 use App\Models\TenantModule;
 use App\Models\User;
+use App\Services\TenantProvisioner;
 use Database\Seeders\ModuleRegistrySeeder;
 use Spatie\Permission\Models\Role;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -104,7 +105,7 @@ class ProvisioningRegressionTest extends TestCase
             );
 
             $admin = User::withoutGlobalScopes()
-                ->where('email', 'admin@' . $tenant->id . '.localhost')
+                ->where('email', 'admin@'.$tenant->id.'.localhost')
                 ->first();
 
             $this->assertNotNull($admin, 'User admin wajib dibuat saat provisioning');
@@ -123,7 +124,7 @@ class ProvisioningRegressionTest extends TestCase
         });
 
         // Reprovision (idempotent) TIDAK boleh mengembalikan ke default.
-        app(\App\Services\TenantProvisioner::class)->provision($tenant);
+        app(TenantProvisioner::class)->provision($tenant);
 
         $tenant->run(function (): void {
             $this->assertSame('#ff0000', Setting::getTenantStringValue('branding_primary_color'));

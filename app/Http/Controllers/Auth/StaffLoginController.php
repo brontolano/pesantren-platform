@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Support\AlbaKidsTenant;
 use App\Support\AppLauncher;
 use App\Support\TenantBranding;
 use Illuminate\Http\RedirectResponse;
@@ -45,6 +46,8 @@ class StaffLoginController extends Controller
             'primaryColor' => TenantBranding::primaryColor('#0f5132'),
             'waliLoginUrl' => $this->routeOr('tenant.portal-wali.auth.login', '/wali/login'),
             'ppdbUrl' => $this->routeOr('spmb.login', '/spmb/login'),
+            // Tenant custom (AlbaKids) DIPAGARI dari perubahan desain platform.
+            'isAlbaKids' => AlbaKidsTenant::isActive(),
         ]);
     }
 
@@ -55,12 +58,12 @@ class StaffLoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $key = Str::transliterate(Str::lower($data['email']) . '|' . $request->ip());
+        $key = Str::transliterate(Str::lower($data['email']).'|'.$request->ip());
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             throw ValidationException::withMessages([
                 'email' => 'Terlalu banyak percobaan masuk. Coba lagi dalam '
-                    . RateLimiter::availableIn($key) . ' detik.',
+                    .RateLimiter::availableIn($key).' detik.',
             ]);
         }
 

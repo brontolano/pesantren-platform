@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\AccessWali;
+use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Modules\Kesantrian\Models\Santri;
@@ -22,7 +24,7 @@ class PortalWaliPinTest extends TestCase
         $this->withoutVite();
         $this->configurePpdbTestingDatabase();
         if (! Schema::connection('pgsql')->hasTable('access_wali')) {
-            \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
+            Artisan::call('migrate:fresh', ['--force' => true]);
         }
         $this->truncatePpdbTables(['access_wali', 'santri', 'model_has_roles', 'roles', 'permissions', 'role_has_permissions', 'users', 'domains', 'tenants']);
     }
@@ -61,7 +63,7 @@ class PortalWaliPinTest extends TestCase
             ->post("http://{$host}/wali/santri/{$anak->id}/atur-pin", ['pin' => '135790'], $server)
             ->assertRedirect();
 
-        tenancy()->initialize(\App\Models\Tenant::query()->where('id', 'like', 'pin1%')->first());
+        tenancy()->initialize(Tenant::query()->where('id', 'like', 'pin1%')->first());
         $userId = $anak->fresh()->user_id;
         $this->assertNotNull($userId, 'Akun santri dibuat saat set PIN.');
         $this->assertTrue(Hash::check('135790', User::withoutGlobalScopes()->find($userId)->password));
@@ -77,7 +79,7 @@ class PortalWaliPinTest extends TestCase
             ->post("http://{$host}/wali/santri/{$anakLain->id}/atur-pin", ['pin' => '111111'], $server);
         $this->assertContains($res->status(), [403, 404], 'Set PIN anak orang lain harus ditolak.');
 
-        tenancy()->initialize(\App\Models\Tenant::query()->where('id', 'like', 'pin2%')->first());
+        tenancy()->initialize(Tenant::query()->where('id', 'like', 'pin2%')->first());
         $this->assertNull($anakLain->fresh()->user_id, 'Akun anak orang lain TIDAK terbuat.');
         tenancy()->end();
     }

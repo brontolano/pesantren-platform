@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Setting;
 use App\Models\Tenant;
-use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\Kesantrian\Models\Alumni;
 use Modules\Kesantrian\Models\Kelas;
@@ -20,6 +20,7 @@ class KesantrianTest extends TestCase
     use RefreshDatabase;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void
@@ -59,7 +60,7 @@ class KesantrianTest extends TestCase
         ]);
 
         // NIS yang sama di tenant yang sama harus gagal (unique constraint)
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectException(QueryException::class);
 
         Santri::create([
             'tenant_id' => 'tenant-a',
@@ -127,7 +128,7 @@ class KesantrianTest extends TestCase
             'kelas_id' => $kelas7->id,
         ]);
 
-        $service = new PenempatanKelasService();
+        $service = new PenempatanKelasService;
         $hasil = $service->prosesKenaikanKelas('2027/2028', [$kelas7->id => $kelas8->id]);
 
         $this->assertEquals(1, $hasil['berhasil']);
@@ -159,7 +160,7 @@ class KesantrianTest extends TestCase
             'status' => 'aktif', 'kelas_id' => $kelas7->id,
         ]);
 
-        $service = new PenempatanKelasService();
+        $service = new PenempatanKelasService;
         $hasil = $service->prosesKenaikanKelas(
             '2027/2028',
             [$kelas7->id => $kelas8->id],
@@ -190,7 +191,7 @@ class KesantrianTest extends TestCase
             'status' => 'aktif', 'kelas_id' => $kelasA->id,
         ]);
 
-        $service = new PenempatanKelasService();
+        $service = new PenempatanKelasService;
 
         // Penempatan awal
         $service->tempatkan($santri, $kelasA, '2026/2027');
@@ -236,7 +237,7 @@ class KesantrianTest extends TestCase
             ]);
         }
 
-        $service = new SantriService();
+        $service = new SantriService;
         $listAktif = $service->listPerKelas($kelas->id);
 
         $this->assertCount(4, $listAktif); // 4 aktif, 1 cuti
@@ -309,7 +310,7 @@ class KesantrianTest extends TestCase
             'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'L', 'status' => 'aktif',
         ]);
 
-        $service = new SantriService();
+        $service = new SantriService;
 
         // Cuti
         $service->ubahStatus($santri, 'cuti', 'Sakit', 30);
@@ -332,7 +333,7 @@ class KesantrianTest extends TestCase
             'tanggal_lahir' => '2012-01-01', 'jenis_kelamin' => 'P', 'status' => 'aktif',
         ]);
 
-        $service = new SantriService();
+        $service = new SantriService;
         $service->luluskan($santri, '2026', 'Kuliah', 'UIN Bandung');
 
         $this->assertEquals('lulus', $santri->fresh()->status);

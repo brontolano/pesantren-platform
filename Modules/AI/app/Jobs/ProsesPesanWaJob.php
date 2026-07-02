@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Modules\AI\Models\AiConversation;
 use Modules\AI\Models\AiMessage;
+use Modules\AI\Services\Settings\TenantSettingService;
 use Modules\AI\Services\Wa\WaBalasanService;
 use Modules\AI\Services\Wa\WaChatService;
 use Modules\AI\Services\Wa\WaHandoffService;
@@ -24,7 +25,8 @@ use Modules\AI\Services\Wa\WaHandoffService;
  *  3. opt_out aktif           → DIAM total (penghormatan seketika);
  *  3b. status handoff (T-A052)→ bot DIAM (pesan tersimpan + notifikasi admin
  *      Kotak Masuk WA); 'ditutup' dibuka kembali oleh pesan baru;
- *  4. mode_uji=true (T-A050)  → balasan template statis TANPA LLM;
+ *  4. mode_uji=true (T-A050)  → balasan template statis TANPA LLM (gap-135:
+ *     flag dari SETTING tenant `mode_uji_wa`, fallback env `ai.wa.mode_uji`);
  *  5. mode_uji=false (T-A051) → pipeline WaChatService:
  *     verifikasi wali → intent rule-based → tool/template → free-form RAG.
  *
@@ -106,7 +108,7 @@ class ProsesPesanWaJob implements ShouldQueue
         }
 
         // 4. T-A050 mode uji: balasan statis tanpa LLM.
-        if ((bool) config('ai.wa.mode_uji', true)) {
+        if ($this->modeUjiAktif()) {
             $balasan->balas($conversation, (string) config('ai.wa.balasan_mode_uji'), ['jenis' => 'mode_uji']);
 
             return;
@@ -121,6 +123,34 @@ class ProsesPesanWaJob implements ShouldQueue
         }
 
         app(WaChatService::class)->proses($conversation, $masuk, $isi);
+    }
+
+    /**
+     * gap-135 — sumber flag mode_uji WA:
+     *   1) SETTING tenant (ai_tenant_setting.payload['mode_uji_wa']) bila terisi;
+     *   2) FALLBACK env lama config('ai.wa.mode_uji') bila setting belum punya
+     *      kunci itu (tenant lama yang dibuat sebelum toggle ada — kompat-mundur,
+     *      jalur env TIDAK dihapus).
+     */
+    private function modeUjiAktif(): bool
+    {
+        // Best-effort baca setting tenant; kegagalan apa pun (tabel belum
+        // termigrasi, dll.) jatuh aman ke env lama — pemrosesan pesan WA tidak
+        // boleh gagal hanya karena sumber flag.
+        try {
+            $payload = (array) (app(TenantSettingService::class)->aktif()?->payload ?? []);
+
+            if (array_key_exists('mode_uji_wa', $payload) && $payload['mode_uji_wa'] !== null) {
+                return (bool) $payload['mode_uji_wa'];
+            }
+        } catch (\Throwable $e) {
+            Log::warning('ProsesPesanWaJob: gagal baca mode_uji_wa dari setting tenant — fallback env.', [
+                'tenant' => $this->tenantId,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return (bool) config('ai.wa.mode_uji', true);
     }
 
     public function failed(?\Throwable $e): void

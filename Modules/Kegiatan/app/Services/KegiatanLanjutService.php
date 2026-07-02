@@ -154,7 +154,7 @@ class KegiatanLanjutService
         // Mentok MAX_OCCURRENCE sementara masih dalam batas → surface (jangan
         // generate tak lengkap secara diam-diam). Persempit window atau set akhir.
         throw new RuntimeException(
-            'Rentang recurring melebihi batas ' . self::MAX_OCCURRENCE . ' kemunculan — persempit tanggal akhir/sampai.'
+            'Rentang recurring melebihi batas '.self::MAX_OCCURRENCE.' kemunculan — persempit tanggal akhir/sampai.'
         );
     }
 

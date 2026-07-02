@@ -14,7 +14,5 @@ class TabunganTransaksiDicatat
 {
     use Dispatchable, SerializesModels;
 
-    public function __construct(public readonly TabunganTransaksi $transaksi)
-    {
-    }
+    public function __construct(public readonly TabunganTransaksi $transaksi) {}
 }

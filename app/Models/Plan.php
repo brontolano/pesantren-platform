@@ -17,9 +17,9 @@ class Plan extends Model
     ];
 
     protected $casts = [
-        'default_price'   => 'decimal:2',
+        'default_price' => 'decimal:2',
         'default_modules' => 'array',
-        'is_active'       => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     public function subscriptions(): HasMany

@@ -2,11 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Mutu\DokumenMutuResource;
+use App\Models\TenantModule;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Modules\Mutu\Filament\Resources\DokumenMutuResource;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -36,7 +37,7 @@ class MutuRbacTest extends TestCase
 
         // Pastikan modul 'mutu' TAMPAK (deterministik terlepas dari ModuleRegistry
         // yang mungkin di-seed test lain) — aktivasi di konteks CENTRAL sebelum init.
-        \App\Models\TenantModule::firstOrCreate(
+        TenantModule::firstOrCreate(
             ['tenant_id' => $tenant->getKey(), 'module_name' => 'mutu'],
             ['is_active' => true],
         );

@@ -1,0 +1,22 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:8000",
+  "executionArgs": {
+    "projectName": "pesantren-platform",
+    "projectPath": "C:\\Users\\maula\\Downloads\\ABDM\\_Agent Manager\\_PESANTREN\\pesantren-platform",
+    "testIds": [
+      "TC001",
+      "TC002",
+      "TC014",
+      "TC016"
+    ],
+    "additionalInstruction": "Test only the central domain public surface at http://localhost:8000. Do NOT attempt tenant subdomains. Do NOT submit any real data, payments, or transactions. For login, only verify form validation and invalid-credential error handling — do not expect a successful login.",
+    "serverMode": "production",
+    "envs": {
+      "API_KEY": "sk-user-DyFfIrUeMOpbPb5N_CmtVf6hJgBtBusySzeAw_ieUw60bdhkL4xzCF4RUCvx5wJT3GWkQPEGCoXAu91tSkfsWOq2EhAU7VIjyccmqBbB_FOMPMHlrGqsHSZvtVOsVXk2Uco"
+    }
+  },
+  "serverPort": 65123
+}

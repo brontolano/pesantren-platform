@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kebijakan Privasi Sistem — {{ $nama }}</title>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background: #f8faf9; color: #1c1917; margin: 0; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #fffaf3; color: #1c1917; margin: 0; }
+        body.tenant-albakids { background: #f8faf9; } /* AlbaKids: pertahankan netral asli */
         main { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
         h1 { font-size: 1.5rem; color: #064e3b; }
         .kartu { background: #fff; border: 1px solid #e7e5e4; border-radius: 16px; padding: 28px; margin-top: 20px; }
@@ -15,7 +16,7 @@
         footer { margin-top: 28px; font-size: .8rem; color: #78716c; }
     </style>
 </head>
-<body>
+<body class="@if(AppSupportAlbaKidsTenant::isActive())tenant-albakids @endif">
     <main>
         <h1>Kebijakan Privasi Sistem<br><span style="font-size:1rem;color:#57534e">{{ $nama }}</span></h1>
         <div class="kartu"><pre>{{ $isi }}</pre></div>

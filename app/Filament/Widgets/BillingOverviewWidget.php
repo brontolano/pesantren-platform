@@ -12,13 +12,19 @@ class BillingOverviewWidget extends BaseWidget
 
     protected static bool $isLazy = true;
 
+    public static function canView(): bool
+    {
+        // Hanya untuk platform super_admin — bukan untuk staff pesantren
+        return auth()->user()?->isPlatformSuperAdmin() ?? false;
+    }
+
     protected function getStats(): array
     {
         $billing = app(BillingService::class);
-        $stats   = $billing->getStats();
+        $stats = $billing->getStats();
 
         return [
-            Stat::make('MRR', 'Rp ' . number_format($stats['mrr'], 0, ',', '.'))
+            Stat::make('MRR', 'Rp '.number_format($stats['mrr'], 0, ',', '.'))
                 ->description('Monthly Recurring Revenue')
                 ->color('success')
                 ->icon('heroicon-o-banknotes'),
@@ -33,7 +39,7 @@ class BillingOverviewWidget extends BaseWidget
                 ->color($stats['unpaid_invoices'] > 0 ? 'danger' : 'success')
                 ->icon('heroicon-o-document-currency-dollar'),
 
-            Stat::make('Total Pendapatan', 'Rp ' . number_format($stats['total_revenue'], 0, ',', '.'))
+            Stat::make('Total Pendapatan', 'Rp '.number_format($stats['total_revenue'], 0, ',', '.'))
                 ->description('Kumulatif invoice lunas')
                 ->color('warning')
                 ->icon('heroicon-o-chart-bar'),

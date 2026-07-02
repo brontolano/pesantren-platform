@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Modules\CMS\Models\Article;
+use Modules\Kesantrian\Models\Santri;
 
 /**
  * Widget <script> embed untuk situs eksternal (mis. WordPress lama pesantren):
@@ -27,7 +28,7 @@ class EmbedWidgetController extends Controller
         $payload = Cache::remember('embed-widget-data-'.tenant('id'), 300, function (): array {
             $santriAktif = 0;
             try {
-                $santriAktif = \Modules\Kesantrian\Models\Santri::query()->where('status', 'aktif')->count();
+                $santriAktif = Santri::query()->where('status', 'aktif')->count();
             } catch (\Throwable) {
                 // Modul Kesantrian belum dipakai tenant ini — statistik 0 saja.
             }

@@ -2,6 +2,7 @@
 
 namespace Modules\Pembiayaan\Services;
 
+use Modules\Ledger\Services\LaporanService;
 use Modules\Ledger\Support\FiturKeuangan;
 
 /**
@@ -27,6 +28,31 @@ class DscrService
             'dscr' => $dscr,
             'zona' => $this->zona($dscr, $ambang),
             'ambang' => $ambang,
+        ];
+    }
+
+    /**
+     * gap-101 — Panduan/estimasi EBITDA tahunan dari buku besar (READ-ONLY, advisory).
+     *
+     * Proksi EBITDA ≈ surplus/defisit operasional (Pendapatan − Beban) dari
+     * LaporanService::labaRugi() yang SUDAH ADA. Angka ini hanya bantuan input
+     * agar staf tak menebak — TIDAK memposting jurnal & TIDAK mengubah rumus DSCR.
+     * Karena beban penyusutan & beban bunga masih termasuk dalam surplus L-R,
+     * hasilnya konservatif (≤ EBITDA sebenarnya); staf boleh menyesuaikan manual.
+     *
+     * @param  string|null  $from  awal periode (Y-m-d); null = sejak awal
+     * @param  string|null  $to  akhir periode (Y-m-d); null = s.d. kini
+     * @return array{estimasi: float, dasar: string, catatan: string}
+     */
+    public function estimasiEbitdaDariLedger(?string $from = null, ?string $to = null): array
+    {
+        $surplus = (float) app(LaporanService::class)->labaRugi($from, $to)['surplus_defisit'];
+
+        return [
+            'estimasi' => round(max($surplus, 0.0), 2),
+            'dasar' => 'surplus_operasional_laba_rugi',
+            'catatan' => 'Estimasi advisory dari surplus operasional buku besar (konservatif; belum '
+                .'menambahkan kembali penyusutan/bunga). Silakan sesuaikan manual bila perlu.',
         ];
     }
 

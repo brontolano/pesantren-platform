@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\Setting;
+use App\Models\Tenant;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\PPDB\Models\CalonSantri;
@@ -199,7 +199,7 @@ class AlbaKidsLandingRegistrationTest extends TestCase
         ]);
     }
 
-    private function makeAlbaTenant(string $suffix): \App\Models\Tenant
+    private function makeAlbaTenant(string $suffix): Tenant
     {
         $tenant = $this->createProvisionedTenant(
             'albakids-'.$suffix.'-'.str()->lower(str()->random(5)),

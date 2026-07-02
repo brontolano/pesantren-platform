@@ -135,6 +135,13 @@ class RingkasanKebijakan
             $tidakAkan[] = 'tidak akan mengirimkan data penggunaan untuk riset produk';
         }
 
+        // --- Chatbot WhatsApp (gap-135 mode uji) ------------------------
+        if (($payload['mode_uji_wa'] ?? true) === true) {
+            $tidakAkan[] = 'tidak akan menjawab pesan WhatsApp dengan AI selama mode uji coba aktif — penanya hanya menerima balasan template singkat';
+        } else {
+            $akan[] = 'menjawab pesan WhatsApp wali secara penuh (verifikasi wali, lalu tanya-jawab) karena mode uji coba dimatikan';
+        }
+
         // --- Jam layanan & anggaran -------------------------------------
         $jam = (array) ($payload['jam_layanan'] ?? []);
         $mulai = (string) ($jam['mulai'] ?? '00:00');

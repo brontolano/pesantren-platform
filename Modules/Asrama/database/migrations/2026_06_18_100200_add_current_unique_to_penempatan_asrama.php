@@ -23,7 +23,7 @@ return new class extends Migration
                 'CREATE UNIQUE INDEX IF NOT EXISTS penempatan_asrama_current_unik '
                 .'ON penempatan_asrama (tenant_id, santri_id) WHERE is_current = true'
             );
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Non-fatal: bila ada data ganda historis, index dilewati (invarian
             // tetap dijaga PenempatanAsramaService di jalur aplikasi).
         }
@@ -33,7 +33,7 @@ return new class extends Migration
     {
         try {
             DB::statement('DROP INDEX IF EXISTS penempatan_asrama_current_unik');
-        } catch (\Throwable) {
+        } catch (Throwable) {
         }
     }
 };

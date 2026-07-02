@@ -4,9 +4,9 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\EmisExportService;
-use Modules\Kesantrian\Models\Santri;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 

@@ -9,6 +9,7 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Inertia\Response;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -45,8 +46,8 @@ class AppLauncherTest extends TestCase
     private function user(array $roles): User
     {
         $u = User::withoutGlobalScopes()->create([
-            'name' => 'U ' . implode('-', $roles),
-            'email' => str()->lower(str()->random(8)) . '@' . tenant('id') . '.localhost',
+            'name' => 'U '.implode('-', $roles),
+            'email' => str()->lower(str()->random(8)).'@'.tenant('id').'.localhost',
             'password' => 'password',
             'tenant_id' => tenant('id'),
         ]);
@@ -163,14 +164,15 @@ class AppLauncherTest extends TestCase
         $this->assertNull(AppLauncher::websiteUrl());
     }
 
-    public function test_controller_guest_render_login_di_root(): void
+    public function test_controller_guest_render_beranda_publik_di_root(): void
     {
         $this->boot();
         Auth::logout();
         $resp = app(LauncherController::class)();
-        // Satu pintu: login bermerek dirender langsung di '/', bukan redirect ke /masuk.
-        $this->assertInstanceOf(View::class, $resp);
-        $this->assertSame('tenant.login', $resp->name());
+        // Satu pintu (Fase 2): TAMU (non-albakids) melihat Beranda publik (Inertia
+        // landing) di '/', tidak lagi dipaksa form login. Login tetap terjangkau
+        // di /masuk (route universal). AlbaKids (custom) tetap form login.
+        $this->assertInstanceOf(Response::class, $resp);
     }
 
     public function test_controller_wali_auto_redirect(): void

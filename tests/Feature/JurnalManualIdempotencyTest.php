@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\JurnalManual;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
@@ -11,8 +10,10 @@ use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use Livewire\Livewire;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
+use Modules\Ledger\Filament\Pages\JurnalManual;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\Jurnal;
+use Modules\Ledger\Services\DanaKebajikanService;
 use Modules\Ledger\Services\JurnalService;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -112,7 +113,7 @@ class JurnalManualIdempotencyTest extends TestCase
     public function test_dana_kebajikan_refid_dedup_saldo_tetap_benar(): void
     {
         $this->boot('jmg6');
-        $svc = app(\Modules\Ledger\Services\DanaKebajikanService::class);
+        $svc = app(DanaKebajikanService::class);
         // Pola AMAN untuk caller (UI ke depan WAJIB ikut): kirim refId stabil dari
         // dokumen sumber → submit kembar dedup, saldo tak menggandakan.
         $svc->terima(500000, '90', refId: 'KB-001');

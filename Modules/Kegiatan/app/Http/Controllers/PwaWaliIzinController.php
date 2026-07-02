@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Modules\Kegiatan\Models\IzinSantri;
 use Modules\Kegiatan\Services\IzinSantriService;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Notifikasi\Services\NotifDispatcher;
 use Throwable;
 
 class PwaWaliIzinController extends Controller
@@ -49,7 +50,7 @@ class PwaWaliIzinController extends Controller
 
         // Kirim notifikasi ke musyrif
         try {
-            app(\Modules\Notifikasi\Services\NotifDispatcher::class)->kirim('izin_diajukan', [
+            app(NotifDispatcher::class)->kirim('izin_diajukan', [
                 'data' => [
                     'santri_nama' => $santri->nama,
                     'jenis_izin' => $data['jenis_izin'],

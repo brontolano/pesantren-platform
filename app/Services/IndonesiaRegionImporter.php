@@ -6,6 +6,7 @@ use App\Models\City;
 use App\Models\District;
 use App\Models\Province;
 use App\Models\Village;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\LazyCollection;
@@ -49,7 +50,7 @@ class IndonesiaRegionImporter
     }
 
     /**
-     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     * @param  class-string<Model>  $modelClass
      * @param  list<string>  $uniqueBy
      */
     private function importLevel(string $level, string $modelClass, array $uniqueBy): int
@@ -93,6 +94,7 @@ class IndonesiaRegionImporter
 
                 if ($headers === null) {
                     $headers = $this->normalizeHeaders($row);
+
                     continue;
                 }
 
@@ -201,7 +203,7 @@ class IndonesiaRegionImporter
 
     private function resolveSource(string $level): string
     {
-        $env = env('WILAYAH_SOURCE_' . strtoupper($level));
+        $env = env('WILAYAH_SOURCE_'.strtoupper($level));
 
         return is_string($env) && $env !== ''
             ? $env

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
 use InvalidArgumentException;
 use Modules\Akademik\Models\RubrikKriteria;
 use Modules\Akademik\Services\PresensiSantriService;
@@ -183,7 +184,7 @@ class AkademikKpiTest extends TestCase
         $this->boot('akp7c');
         $svc = app(PresensiSantriService::class);
         // Setting disimpan sebagai array (pola umum) → harus dihormati, bukan default 80.
-        \App\Models\Setting::create(['key' => 'akademik_kehadiran_minimal', 'value' => ['value' => 90]]);
+        Setting::create(['key' => 'akademik_kehadiran_minimal', 'value' => ['value' => 90]]);
         $this->assertSame(90, $svc->ambang());
 
         $s = $this->santri();

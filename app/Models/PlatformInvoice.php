@@ -17,7 +17,7 @@ class PlatformInvoice extends Model
     ];
 
     protected $casts = [
-        'amount'  => 'decimal:2',
+        'amount' => 'decimal:2',
         'paid_at' => 'datetime',
     ];
 
@@ -29,9 +29,9 @@ class PlatformInvoice extends Model
     public function markPaid(string $proofPath): self
     {
         $this->update([
-            'status'        => 'paid',
+            'status' => 'paid',
             'payment_proof' => $proofPath,
-            'paid_at'       => now(),
+            'paid_at' => now(),
         ]);
 
         return $this->fresh();

@@ -32,11 +32,11 @@ class RecipientResolver
         }
 
         return collect($targets)
-                ->filter(fn ($target): bool => filled($target))
-                ->map(fn ($target) => [
-                    'target' => $target,
-                    'variables' => array_merge($variables, ['target' => $target]),
-                ]);
+            ->filter(fn ($target): bool => filled($target))
+            ->map(fn ($target) => [
+                'target' => $target,
+                'variables' => array_merge($variables, ['target' => $target]),
+            ]);
     }
 
     private function resolveSantri(array $filters): Collection

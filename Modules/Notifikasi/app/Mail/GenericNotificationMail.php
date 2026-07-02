@@ -13,8 +13,7 @@ class GenericNotificationMail extends Mailable
     public function __construct(
         public readonly string $subjectLine,
         public readonly string $bodyText,
-    ) {
-    }
+    ) {}
 
     public function build(): self
     {
