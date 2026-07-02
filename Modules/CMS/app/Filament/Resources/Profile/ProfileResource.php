@@ -4,9 +4,6 @@ namespace Modules\CMS\Filament\Resources\Profile;
 
 use App\Filament\Concerns\BuiltInWebsiteGate;
 use App\Filament\Concerns\ModuleGate;
-use Modules\CMS\Filament\Resources\Profile\Pages\CreateProfile;
-use Modules\CMS\Filament\Resources\Profile\Pages\EditProfile;
-use Modules\CMS\Filament\Resources\Profile\Pages\ListProfiles;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -20,6 +17,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\CMS\Filament\Resources\Profile\Pages\CreateProfile;
+use Modules\CMS\Filament\Resources\Profile\Pages\EditProfile;
+use Modules\CMS\Filament\Resources\Profile\Pages\ListProfiles;
 use Modules\CMS\Models\WebsiteSection;
 
 class ProfileResource extends Resource

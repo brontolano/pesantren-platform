@@ -2,8 +2,8 @@
 
 namespace Modules\Payroll\Filament\Resources\Jabatan\Pages;
 
-use Modules\Payroll\Filament\Resources\Jabatan\JabatanResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Payroll\Filament\Resources\Jabatan\JabatanResource;
 
 class EditJabatan extends EditRecord
 {

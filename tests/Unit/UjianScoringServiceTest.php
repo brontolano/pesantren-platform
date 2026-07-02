@@ -27,7 +27,7 @@ class UjianScoringServiceTest extends TestCase
             $this->soal(3, SoalUjian::TIPE_ESSAY, null, 10), // manual
         ];
 
-        $hasil = (new UjianScoringService())->score($soal, [
+        $hasil = (new UjianScoringService)->score($soal, [
             1 => 'B',
             2 => 'C',
             3 => 'jawaban essay peserta',
@@ -50,7 +50,7 @@ class UjianScoringServiceTest extends TestCase
             $this->soal(2, SoalUjian::TIPE_PG, 'D', 2),
         ];
 
-        $hasil = (new UjianScoringService())->score($soal, [1 => 'A', 2 => 'd']);
+        $hasil = (new UjianScoringService)->score($soal, [1 => 'A', 2 => 'd']);
 
         $this->assertSame(4, $hasil['auto_score']);
         $this->assertSame(100.0, $hasil['persen_auto']);
@@ -61,7 +61,7 @@ class UjianScoringServiceTest extends TestCase
     {
         $soal = [$this->soal(1, SoalUjian::TIPE_PG, 'A', 5)];
 
-        $hasil = (new UjianScoringService())->score($soal, []); // tak ada jawaban
+        $hasil = (new UjianScoringService)->score($soal, []); // tak ada jawaban
 
         $this->assertSame(0, $hasil['auto_score']);
         $this->assertSame(0, $hasil['terjawab']);

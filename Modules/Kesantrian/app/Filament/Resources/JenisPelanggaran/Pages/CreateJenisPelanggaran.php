@@ -2,8 +2,8 @@
 
 namespace Modules\Kesantrian\Filament\Resources\JenisPelanggaran\Pages;
 
-use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\JenisPelanggaranResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\JenisPelanggaranResource;
 
 class CreateJenisPelanggaran extends CreateRecord
 {

@@ -2,9 +2,9 @@
 
 namespace Modules\Payroll\Filament\Resources\Pelamar\Pages;
 
-use Modules\Payroll\Filament\Resources\Pelamar\PelamarResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Payroll\Filament\Resources\Pelamar\PelamarResource;
 
 class ListPelamar extends ListRecords
 {

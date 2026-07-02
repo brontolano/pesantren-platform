@@ -2,8 +2,8 @@
 
 namespace Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages;
 
-use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
 
 class EditPenilaianTahfidz extends EditRecord
 {

@@ -3,9 +3,6 @@
 namespace Modules\Pembiayaan\Filament\Resources\Sarpras;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\CreateAreaPiket;
-use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\EditAreaPiket;
-use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\ListAreaPiket;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -17,6 +14,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\CreateAreaPiket;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\EditAreaPiket;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\ListAreaPiket;
 use Modules\Pembiayaan\Models\AreaPiket;
 use UnitEnum;
 
@@ -95,6 +95,6 @@ class AreaPiketResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('pembiayaan') && auth()->check();
+        return static::moduleVisible('pembiayaan') && (auth()->user()?->canAny(['view_sarpras', 'manage_sarpras']) ?? false);
     }
 }

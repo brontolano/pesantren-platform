@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages;
 
-use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 
 class CreatePosProfil extends CreateRecord
 {

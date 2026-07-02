@@ -3,7 +3,6 @@
 namespace Modules\Ledger\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Ledger\Filament\Resources\Pages\ListKebijakanKehalalan;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -16,6 +15,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Ledger\Filament\Resources\Pages\ListKebijakanKehalalan;
 use Modules\Ledger\Models\KebijakanKehalalan;
 use Modules\Ledger\Support\FiturKeuangan;
 

@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
     {{-- ===== Banner sambutan — gradient WA-green (light) / TikTok-dark (dark) ===== --}}
-    <div class="relative isolate overflow-hidden rounded-2xl px-6 py-5 text-white shadow-sm sm:px-8 sm:py-6
-                bg-gradient-to-r from-[#004a38] via-[#008069] to-[#00a884]
+    <div class="tema-greeting relative isolate overflow-hidden rounded-2xl px-6 py-5 text-white shadow-sm sm:px-8 sm:py-6
+                bg-gradient-to-r from-[#0b8f63] via-[#059669] to-[#047857]
                 dark:from-[#0f1c14] dark:via-[#161823] dark:to-[#1a243a]">
 
         {{-- Ornamen bulat samar kanan atas --}}
@@ -16,11 +16,18 @@
                 </p>
                 <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
                     Assalamu&rsquo;alaikum, <span class="text-white/90">{{ $nama }}</span>
-                    <span class="inline-block">&#128075;</span>
                 </h2>
                 <p class="mt-1 text-sm text-white/75">
                     Semoga semua aktivitas hari ini bernilai ibadah.
                 </p>
+                @if (! empty($peran))
+                    <span class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/90 ring-1 ring-white/15">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5">
+                            <path d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" /><path d="M5 21a7 7 0 0 1 14 0" />
+                        </svg>
+                        {{ $peran }}
+                    </span>
+                @endif
             </div>
 
             {{-- ════════════════════════════════════════════════════════════
@@ -184,11 +191,11 @@
                         <div
                             class="flex min-w-[3.25rem] flex-col items-center rounded-xl px-2.5 py-2 text-center transition"
                             :class="p.key === nextKey
-                                ? 'bg-white text-[#008069] shadow-sm dark:bg-[#00a884] dark:text-white'
+                                ? 'bg-white text-[#059669] shadow-sm dark:bg-[#10b981] dark:text-white'
                                 : 'text-white/85'"
                         >
                             <span class="text-[10px] font-semibold uppercase tracking-wide"
-                                  :class="p.key === nextKey ? 'text-[#008069]/80 dark:text-white/90' : 'text-white/60'"
+                                  :class="p.key === nextKey ? 'text-[#059669]/80 dark:text-white/90' : 'text-white/60'"
                                   x-text="p.label"></span>
                             <span class="mt-0.5 text-sm font-bold tabular-nums" x-text="p.time"></span>
                         </div>

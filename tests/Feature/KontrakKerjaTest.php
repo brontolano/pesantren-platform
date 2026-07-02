@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
-use Modules\Payroll\Filament\Resources\Kontrak\Pages\CreateKontrakKerja;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
 use Filament\Forms\Components\BaseFileUpload;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Artisan;
+use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
+use Modules\Payroll\Filament\Resources\Kontrak\Pages\CreateKontrakKerja;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\KontrakKerja;
 use Modules\Payroll\Services\KontrakService;

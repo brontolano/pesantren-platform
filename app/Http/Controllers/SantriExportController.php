@@ -15,7 +15,7 @@ class SantriExportController extends Controller
 
         $kelas = $this->getKelas($request);
         $santri = $this->getSantriQuery($kelas->id, $request->string('status')->toString())->get();
-        $filename = 'santri-' . str($kelas->nama_kelas)->slug() . '.csv';
+        $filename = 'santri-'.str($kelas->nama_kelas)->slug().'.csv';
 
         return response()->streamDownload(function () use ($santri): void {
             $handle = fopen('php://output', 'w');

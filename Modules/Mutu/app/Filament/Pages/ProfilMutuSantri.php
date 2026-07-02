@@ -33,7 +33,7 @@ class ProfilMutuSantri extends Page
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('mutu') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('mutu') && (auth()->user()?->canAny(['manage_mutu', 'approve_mutu']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

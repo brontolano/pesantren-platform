@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\KalenderAkademik\Pages;
 
-use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
 
 class CreateKalenderAkademik extends CreateRecord
 {

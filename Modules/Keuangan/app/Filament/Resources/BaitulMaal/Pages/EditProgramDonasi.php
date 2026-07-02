@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal\Pages;
 
-use Modules\Keuangan\Filament\Resources\BaitulMaal\ProgramDonasiResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\ProgramDonasiResource;
 
 class EditProgramDonasi extends EditRecord
 {

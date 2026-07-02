@@ -2,8 +2,8 @@
 
 namespace Modules\PPDB\Filament\Resources\PaketSoal\Pages;
 
-use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
 
 class CreatePaketSoal extends CreateRecord
 {

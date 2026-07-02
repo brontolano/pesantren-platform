@@ -3,10 +3,6 @@
 namespace Modules\Tahfidz\Filament\Resources\Halaqah;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\CreateHalaqah;
-use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\EditHalaqah;
-use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\ListHalaqah;
-use Modules\Tahfidz\Filament\Resources\Halaqah\RelationManagers\KeanggotaanRelationManager;
 use App\Models\User;
 use BackedEnum;
 use Filament\Forms\Components\Select;
@@ -18,6 +14,10 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\CreateHalaqah;
+use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\EditHalaqah;
+use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\ListHalaqah;
+use Modules\Tahfidz\Filament\Resources\Halaqah\RelationManagers\KeanggotaanRelationManager;
 use Modules\Tahfidz\Models\Halaqah;
 use UnitEnum;
 
@@ -48,12 +48,12 @@ class HalaqahResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('tahfidz');
+        return static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('tahfidz');
+        return static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     public static function form(Schema $schema): Schema

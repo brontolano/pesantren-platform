@@ -1,10 +1,18 @@
 <?php
 
+use App\Http\Middleware\AuthenticateTenantApiKey;
+use App\Http\Middleware\CheckModuleActive;
+use App\Http\Middleware\EnsureUserIsJemaah;
+use App\Http\Middleware\EnsureUserIsWali;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\InitializeTenancyForWebRequests;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -20,17 +28,22 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(
             prepend: [
                 // Tenancy init untuk request grup web (Livewire dll) di domain tenant
-                \App\Http\Middleware\InitializeTenancyForWebRequests::class,
+                InitializeTenancyForWebRequests::class,
             ],
             append: [
-                \App\Http\Middleware\HandleInertiaRequests::class,
+                HandleInertiaRequests::class,
+                // Header keamanan global aman (nosniff/HSTS/Referrer-Policy).
+                SecurityHeaders::class,
             ],
         );
+        $middleware->api(append: [
+            SecurityHeaders::class,
+        ]);
         $middleware->alias([
-            'module' => \App\Http\Middleware\CheckModuleActive::class,
-            'wali' => \App\Http\Middleware\EnsureUserIsWali::class,
-            'jemaah' => \App\Http\Middleware\EnsureUserIsJemaah::class,
-            'api.key' => \App\Http\Middleware\AuthenticateTenantApiKey::class,
+            'module' => CheckModuleActive::class,
+            'wali' => EnsureUserIsWali::class,
+            'jemaah' => EnsureUserIsJemaah::class,
+            'api.key' => AuthenticateTenantApiKey::class,
         ]);
 
         // API publik (lintas-origin dari website tenant) — stateless, dilindungi CORS.
@@ -48,10 +61,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // ERROR. Jangan laporkan, dan render 404 ringan & netral.
         // (www.* sudah ditangani via redirect 301 di InitializeTenancyForWebRequests.)
         $exceptions->dontReport(
-            \Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException::class,
+            TenantCouldNotBeIdentifiedOnDomainException::class,
         );
         $exceptions->render(function (
-            \Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException $e,
+            TenantCouldNotBeIdentifiedOnDomainException $e,
             Request $request,
         ) {
             if ($request->is('api/*') || $request->expectsJson()) {
@@ -70,5 +83,49 @@ return Application::configure(basePath: dirname(__DIR__))
                 .'Kembali ke pesantren.online &rarr;</a></p></div>',
                 404
             );
+        });
+
+        // 403 ANGGUN di panel tenant: bila staf login menjangkau halaman di luar
+        // kewenangannya (mis. ketik URL /admin/.../edit langsung, bookmark/riwayat
+        // basi, atau tautan dalam dari peran lain), JANGAN tampilkan "403 Forbidden"
+        // telanjang yang membingungkan. Alihkan kembali ke Dasbor + notifikasi ramah.
+        // Backend tetap MENOLAK (keamanan utuh) — hanya UX-nya yang dibuat lembut.
+        // 403 di luar panel / tamu / JSON / halaman home (cegah loop) → render
+        // halaman branded resources/views/errors/403.blade.php (fallback).
+        $exceptions->render(function (
+            \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e,
+            Request $request,
+        ) {
+            if ($e->getStatusCode() !== 403) {
+                return null;
+            }
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return null;
+            }
+            if (auth()->check() && $request->is('admin/*') && ! $request->is('admin')) {
+                // Handler exception TAK BOLEH ikut melempar. Bila apa pun di jalur
+                // redirect gagal → fallback ke halaman 403 branded (return null →
+                // Laravel render resources/views/errors/403.blade.php).
+                try {
+                    \Filament\Notifications\Notification::make()
+                        ->title('Akses ditolak')
+                        ->body('Halaman tersebut di luar kewenangan akun Anda. Anda dialihkan kembali ke Dasbor.')
+                        ->danger()
+                        ->persistent()
+                        ->send();
+
+                    // PENTING: pakai RedirectResponse Laravel EKSPLISIT — JANGAN helper
+                    // redirect(). Mount halaman Filament berjalan dalam konteks Livewire
+                    // yang me-rebind 'redirect' ke Livewire\...\Redirector (tanpa ->headers);
+                    // saat response melewati middleware CSRF (PreventRequestForgery) →
+                    // "Undefined property ...Redirector::$headers" → 500. RedirectResponse
+                    // murni Symfony punya ->headers, jadi aman di Livewire & non-Livewire.
+                    return new \Illuminate\Http\RedirectResponse(url('admin'), 302);
+                } catch (\Throwable) {
+                    return null;
+                }
+            }
+
+            return null;
         });
     })->create();

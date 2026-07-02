@@ -3,6 +3,7 @@
 namespace Modules\Core\Services;
 
 use App\Models\Setting;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Support\Facades\View;
 use InvalidArgumentException;
 use Modules\Core\Exceptions\ReportPdfUnavailableException;
@@ -54,7 +55,7 @@ class ReportExportService
     public function pdfTersedia(): bool
     {
         return class_exists(\Barryvdh\DomPDF\Facade\Pdf::class)
-            || class_exists(\Barryvdh\DomPDF\PDF::class);
+            || class_exists(PDF::class);
     }
 
     /** Resolusi key template → nama view blade. */

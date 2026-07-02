@@ -123,6 +123,29 @@ class CalonSantri extends Model
         'tanggal_registrasi_ulang' => 'datetime',
     ];
 
+    /**
+     * Privasi foto putri (#340) — mengikuti kebijakan Santri::fotoDapatDilihat():
+     * foto calon santri PEREMPUAN hanya boleh dilihat pimpinan pondok / super
+     * admin; peran lain melihat avatar inisial.
+     */
+    public function fotoDapatDilihat(): bool
+    {
+        if ($this->jenis_kelamin !== 'P') {
+            return true;
+        }
+
+        return auth()->user()?->hasRole(Santri::PERAN_LIHAT_FOTO_PUTRI) ?? false;
+    }
+
+    /** URL avatar inisial nama (pengganti foto bila tak boleh dilihat / kosong). */
+    public function avatarInisialUrl(): string
+    {
+        $warna = $this->jenis_kelamin === 'P' ? 'be185d' : '047857';
+
+        return 'https://ui-avatars.com/api/?background='.$warna.'&color=fff&bold=true&name='
+            .urlencode($this->nama ?? 'Calon Santri');
+    }
+
     public function santri(): BelongsTo
     {
         return $this->belongsTo(Santri::class, 'santri_id');

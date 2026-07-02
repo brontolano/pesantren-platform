@@ -2,9 +2,9 @@
 
 namespace Modules\PPDB\Filament\Resources\JadwalUjian\Pages;
 
-use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 
 class EditJadwalUjian extends EditRecord
 {

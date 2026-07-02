@@ -61,7 +61,7 @@ class SidangKenaikan extends Page implements HasForms
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['manage_santri', 'view_santri']) ?? false);
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -162,7 +162,7 @@ class SidangKenaikan extends Page implements HasForms
      */
     private function authorizeMutation(): void
     {
-        abort_unless(auth()->user()?->can('manage_santri') ?? false, 403);
+        abort_unless(auth()->user()?->can('manage_akademik') ?? false, 403);
     }
 
     public function simpanDraft(): bool

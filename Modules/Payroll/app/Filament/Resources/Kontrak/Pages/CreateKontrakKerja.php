@@ -2,8 +2,8 @@
 
 namespace Modules\Payroll\Filament\Resources\Kontrak\Pages;
 
-use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
 
 class CreateKontrakKerja extends CreateRecord
 {

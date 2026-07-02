@@ -73,12 +73,39 @@ class PengaturanBranding extends Page implements HasForms
      */
     public ?string $currentFaviconPath = null;
 
+    /**
+     * Path foto tokoh/hero login (mis. foto pengasuh/sesepuh) yang tampil di
+     * panel kiri halaman /masuk, di samping kalimat Bismillah. Pola sama logo.
+     */
+    public ?string $currentHeroPath = null;
+
     /** Pilihan font branding (key => label). */
     public const FONTS = [
         'default' => 'Default Sans',
         'serif' => 'Serif Elegan',
         'modern' => 'Modern Sans',
         'mono' => 'Mono Editorial',
+    ];
+
+    /**
+     * Default tautan konten Aplikasi (Beranda & Ibadah) — sinkron dengan
+     * AppShellController::DEFAULTS. Admin bisa menimpa via form ini.
+     *
+     * @var array<string,string>
+     */
+    public const APP_LINKS = [
+        'app_profil_pondok_url' => 'https://asy-syifaa.com/profil-pondok-pesantren',
+        'app_profil_abuya_url' => 'https://asy-syifaa.com/profil-abuya',
+        'app_profil_guru_url' => 'https://asy-syifaa.com/profil-guru',
+        'app_struktur_url' => 'https://asy-syifaa.com/struktur-organisasi',
+        'app_instagram_url' => 'https://www.instagram.com/ponpes.asysyifaa',
+        'app_instagram2_url' => 'https://www.instagram.com/asysyifaapusat/',
+        'app_instagram3_url' => 'https://www.instagram.com/syifaalawiyyahofficial/',
+        'app_youtube_url' => 'https://www.youtube.com/@AsySyifaaTVOfficial/videos',
+        'app_facebook_url' => 'https://www.facebook.com/AsySyifaaTV/live_videos',
+        'app_jadwal_kajian_url' => '',
+        'app_donasi_url' => '/donasi',
+        'app_zakat_wakaf_url' => '',
     ];
 
     /** Warna default mengikuti fallback di TenantWebsiteService. */
@@ -113,6 +140,9 @@ class PengaturanBranding extends Page implements HasForms
         $this->currentFaviconPath = data_get($settings->get('branding_favicon')?->value, 'favicon_path')
             ?? data_get($settings->get('branding_favicon')?->value, 'text');
 
+        // Foto tokoh/hero login — path tersimpan dipegang property terpisah.
+        $this->currentHeroPath = data_get($settings->get('branding_hero_image')?->value, 'path');
+
         // gap-131: default Tahun Ajaran mengikuti PeriodeAkademik aktif bila ada,
         // fallback ke nilai tersimpan, lalu '2026/2027'.
         $defaultAcademicYear = data_get($settings->get('admission_academic_year')?->value, 'text', '2026/2027');
@@ -130,6 +160,7 @@ class PengaturanBranding extends Page implements HasForms
             'branding_secondary_color' => data_get($settings->get('branding_secondary_color')?->value, 'color', self::DEFAULT_SECONDARY),
             'branding_logo' => null,   // SENGAJA null — lihat komentar di atas
             'branding_favicon' => null,   // SENGAJA null — pola sama dengan logo
+            'branding_hero_image' => null,   // SENGAJA null — pola sama dengan logo
             'branding_font' => data_get($settings->get('branding_font')?->value, 'text', 'default'),
             'branding_latitude' => data_get($settings->get('branding_latitude')?->value, 'text'),
             'branding_longitude' => data_get($settings->get('branding_longitude')?->value, 'text'),
@@ -143,6 +174,10 @@ class PengaturanBranding extends Page implements HasForms
             'admission_transfer_amount' => data_get($settings->get('admission_transfer_amount')?->value, 'text'),
             'admission_transfer_instructions' => data_get($settings->get('admission_transfer_instructions')?->value, 'text'),
             'admission_success_message' => data_get($settings->get('admission_success_message')?->value, 'text'),
+            // Konten Aplikasi (Beranda & Ibadah) — saved value atau default.
+            ...collect(self::APP_LINKS)->mapWithKeys(fn ($default, $key) => [
+                $key => data_get($settings->get($key)?->value, 'text', $default),
+            ])->all(),
         ]);
     }
 
@@ -204,6 +239,19 @@ class PengaturanBranding extends Page implements HasForms
                     ])
                     ->columns(2),
 
+                Section::make('Foto Tokoh (Hero Login)')
+                    ->description('Foto pengasuh/sesepuh pesantren yang tampil di sisi kiri halaman masuk, di samping kalimat Bismillah. Sebaiknya foto dengan latar transparan (PNG/WebP) agar menyatu rapi.')
+                    ->schema([
+                        FileUpload::make('branding_hero_image')
+                            ->label('Upload Foto Tokoh Baru')
+                            ->disk(StorageQuotaService::diskName())
+                            ->directory('branding')
+                            ->image()
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->maxSize(4096)
+                            ->helperText('JPG/PNG/WebP (PNG transparan disarankan), maks 4 MB. Foto lama tetap aktif sampai ada yang baru.'),
+                    ]),
+
                 Section::make('Lokasi & Jadwal Sholat')
                     ->description('Koordinat pesantren untuk perhitungan jadwal sholat di dashboard (metode Kemenag, zona WIB). Kosongkan untuk memakai default Bandung.')
                     ->schema([
@@ -231,6 +279,33 @@ class PengaturanBranding extends Page implements HasForms
                             ->valueLabel('Mode')
                             ->addActionLabel('Tambah field'),
                     ]),
+
+                Section::make('Konten Aplikasi — Beranda')
+                    ->description('Tautan yang tampil di menu Beranda aplikasi (membuka situs/akun resmi). Kosongkan untuk memakai default.')
+                    ->schema([
+                        TextInput::make('app_profil_pondok_url')->label('Profil Pondok (URL)')->url(),
+                        TextInput::make('app_profil_abuya_url')->label('Profil Abuya (URL)')->url(),
+                        TextInput::make('app_profil_guru_url')->label('Profil Para Guru (URL)')->url(),
+                        TextInput::make('app_struktur_url')->label('Struktur Organisasi (URL)')->url(),
+                        TextInput::make('app_instagram_url')->label('Instagram — Ponpes (URL)')->url(),
+                        TextInput::make('app_instagram2_url')->label('Instagram — Pusat (URL)')->url(),
+                        TextInput::make('app_instagram3_url')->label('Instagram — Putri (URL)')->url(),
+                        TextInput::make('app_youtube_url')->label('Asy-Syifaa TV — YouTube (URL)')->url(),
+                        TextInput::make('app_facebook_url')->label('Asy-Syifaa TV — Facebook (URL)')->url(),
+                    ])
+                    ->columns(2),
+
+                Section::make('Konten Aplikasi — Ibadah')
+                    ->description('Layanan ibadah di aplikasi. Kosongkan salah satu untuk menyembunyikannya dari menu Ibadah.')
+                    ->schema([
+                        TextInput::make('app_jadwal_kajian_url')->label('Jadwal Kajian (URL)')->url()
+                            ->helperText('Tautan halaman jadwal kajian/majelis. Kosong = disembunyikan.'),
+                        TextInput::make('app_donasi_url')->label('Donasi / Infaq (URL atau /donasi)')
+                            ->helperText('Default /donasi (halaman donasi pesantren).'),
+                        TextInput::make('app_zakat_wakaf_url')->label('Zakat & Wakaf (URL)')->url()
+                            ->helperText('Tautan halaman zakat/wakaf. Kosong = disembunyikan.'),
+                    ])
+                    ->columns(2),
 
                 Section::make('Landing Registration')
                     ->description('Pengaturan form inline di landing page, termasuk admin WhatsApp dan informasi transfer.')
@@ -291,6 +366,16 @@ class PengaturanBranding extends Page implements HasForms
             $this->currentFaviconPath = $newFaviconPath;
         }
 
+        // Foto tokoh/hero: pola sama logo. Disimpan sebagai 'path' agar terbaca
+        // oleh TenantBranding::heroImageUrl (getTenantStringValue kandidat 'path').
+        $newHeroPath = $data['branding_hero_image'] ?? null;
+        $heroPath = $newHeroPath ?: $this->currentHeroPath;
+
+        if ($newHeroPath) {
+            $this->registerLogoAsMediaFile($newHeroPath);
+            $this->currentHeroPath = $newHeroPath;
+        }
+
         $payloads = [
             'branding_name' => ['text' => $data['branding_name'] ?? null],
             'branding_tagline' => ['text' => $data['branding_tagline'] ?? null],
@@ -298,6 +383,7 @@ class PengaturanBranding extends Page implements HasForms
             'branding_secondary_color' => ['color' => $data['branding_secondary_color'] ?? null],
             'branding_logo' => ['logo_path' => $logoPath],
             'branding_favicon' => ['favicon_path' => $faviconPath],
+            'branding_hero_image' => ['path' => $heroPath],
             'branding_font' => ['text' => $data['branding_font'] ?? 'default'],
             'branding_latitude' => ['text' => $data['branding_latitude'] ?? null],
             'branding_longitude' => ['text' => $data['branding_longitude'] ?? null],
@@ -313,6 +399,12 @@ class PengaturanBranding extends Page implements HasForms
             'admission_success_message' => ['text' => $data['admission_success_message'] ?? null],
         ];
 
+        // Konten Aplikasi (Beranda & Ibadah) — simpan sebagai ['text'=>...]
+        // (terbaca AppShellController via getTenantStringValue kandidat 'text').
+        foreach (array_keys(self::APP_LINKS) as $appKey) {
+            $payloads[$appKey] = ['text' => $data[$appKey] ?? null];
+        }
+
         foreach ($payloads as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
@@ -326,6 +418,7 @@ class PengaturanBranding extends Page implements HasForms
             'branding_secondary_color' => $data['branding_secondary_color'] ?? null,
             'branding_logo' => null,   // Selalu kosong pasca-save
             'branding_favicon' => null,   // Selalu kosong pasca-save (pola logo)
+            'branding_hero_image' => null,   // Selalu kosong pasca-save (pola logo)
             'branding_font' => $data['branding_font'] ?? 'default',
             'branding_latitude' => $data['branding_latitude'] ?? null,
             'branding_longitude' => $data['branding_longitude'] ?? null,
@@ -339,6 +432,8 @@ class PengaturanBranding extends Page implements HasForms
             'admission_transfer_amount' => $data['admission_transfer_amount'] ?? null,
             'admission_transfer_instructions' => $data['admission_transfer_instructions'] ?? null,
             'admission_success_message' => $data['admission_success_message'] ?? null,
+            // Pertahankan nilai konten aplikasi pasca-save.
+            ...collect(self::APP_LINKS)->mapWithKeys(fn ($d, $key) => [$key => $data[$key] ?? null])->all(),
         ]);
 
         Notification::make()

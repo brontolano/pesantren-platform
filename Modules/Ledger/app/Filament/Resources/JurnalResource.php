@@ -3,7 +3,6 @@
 namespace Modules\Ledger\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Ledger\Filament\Resources\Pages\ListJurnal;
 use App\Services\AuditLogger;
 use App\Support\UiMode;
 use Filament\Actions\Action;
@@ -15,6 +14,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Ledger\Filament\Resources\Pages\ListJurnal;
 use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Services\JurnalService;
 

@@ -2,9 +2,9 @@
 
 namespace Modules\Kegiatan\Filament\Resources\Template\Pages;
 
-use Modules\Kegiatan\Filament\Resources\Template\KegiatanTemplateResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Kegiatan\Filament\Resources\Template\KegiatanTemplateResource;
 
 class ListKegiatanTemplate extends ListRecords
 {

@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\Kitab\Pages;
 
-use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
 
 class EditKitab extends EditRecord
 {

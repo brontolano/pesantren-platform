@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\Kitab\Pages;
 
-use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
 
 class ListKitab extends ListRecords
 {

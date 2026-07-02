@@ -23,7 +23,7 @@ function submit() {
 </script>
 
 <template>
-    <div class="min-h-screen bg-stone-50 pb-10">
+    <div class="min-h-screen bg-[#fffaf3] pb-10">
         <header class="bg-gradient-to-b from-amber-700 to-amber-500 px-5 pb-10 pt-8 text-white">
             <div class="mx-auto max-w-md">
                 <Link href="/app/pengurus" class="text-xs text-amber-100">← Mode Pengurus</Link>

@@ -2,9 +2,10 @@
 
 namespace Modules\Payroll\Filament\Resources;
 
-use Modules\Payroll\Filament\Resources\Pages\CreateSlipGaji;
-use Modules\Payroll\Filament\Resources\Pages\ListSlipGaji;
+use App\Filament\Concerns\ModuleGate;
+use App\Models\User;
 use App\Services\AuditLogger;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -15,13 +16,15 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Payroll\Filament\Resources\Pages\CreateSlipGaji;
+use Modules\Payroll\Filament\Resources\Pages\ListSlipGaji;
 use Modules\Payroll\Models\SlipGaji;
 use Modules\Payroll\Services\PayrollService;
 
 class SlipGajiResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = SlipGaji::class;
 
@@ -39,7 +42,7 @@ class SlipGajiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
+        return UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
     }
 
     public static function canAccess(): bool
@@ -52,12 +55,12 @@ class SlipGajiResource extends Resource
         return auth()->user()?->can('run_payroll') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return false;
     }

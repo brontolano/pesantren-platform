@@ -2,12 +2,12 @@
 
 namespace Modules\Kegiatan\Services;
 
-use Modules\Kegiatan\Models\Kegiatan;
-use Modules\Kegiatan\Models\PresensiKegiatan;
-use Modules\Kegiatan\Models\IzinSantri;
-use Modules\Kegiatan\Models\KunjunganWali;
-use Modules\Kesantrian\Models\Santri;
 use Illuminate\Support\Collection;
+use Modules\Kegiatan\Models\IzinSantri;
+use Modules\Kegiatan\Models\Kegiatan;
+use Modules\Kegiatan\Models\KunjunganWali;
+use Modules\Kegiatan\Models\PresensiKegiatan;
+use Modules\Kesantrian\Models\Santri;
 
 class KegiatanService
 {
@@ -16,15 +16,15 @@ class KegiatanService
     public function buatKegiatan(string $tenantId, array $data): Kegiatan
     {
         return Kegiatan::create([
-            'tenant_id'            => $tenantId,
-            'nama'                 => $data['nama'],
-            'deskripsi'            => $data['deskripsi'] ?? null,
-            'jenis'                => $data['jenis'] ?? 'umum',
-            'mulai'                => $data['mulai'],
-            'selesai'              => $data['selesai'] ?? null,
-            'lokasi'               => $data['lokasi'] ?? null,
-            'status'               => 'terjadwal',
-            'penanggung_jawab_id'  => $data['penanggung_jawab_id'] ?? null,
+            'tenant_id' => $tenantId,
+            'nama' => $data['nama'],
+            'deskripsi' => $data['deskripsi'] ?? null,
+            'jenis' => $data['jenis'] ?? 'umum',
+            'mulai' => $data['mulai'],
+            'selesai' => $data['selesai'] ?? null,
+            'lokasi' => $data['lokasi'] ?? null,
+            'status' => 'terjadwal',
+            'penanggung_jawab_id' => $data['penanggung_jawab_id'] ?? null,
         ]);
     }
 
@@ -49,21 +49,21 @@ class KegiatanService
     public function ajukanIzin(Santri $santri, array $data): IzinSantri
     {
         return IzinSantri::create([
-            'tenant_id'      => $santri->tenant_id,
-            'santri_id'      => $santri->getKey(),
-            'jenis_izin'     => $data['jenis_izin'],
-            'tanggal_mulai'  => $data['tanggal_mulai'],
-            'tanggal_selesai'=> $data['tanggal_selesai'],
-            'alasan'         => $data['alasan'],
-            'status'         => 'diajukan',
+            'tenant_id' => $santri->tenant_id,
+            'santri_id' => $santri->getKey(),
+            'jenis_izin' => $data['jenis_izin'],
+            'tanggal_mulai' => $data['tanggal_mulai'],
+            'tanggal_selesai' => $data['tanggal_selesai'],
+            'alasan' => $data['alasan'],
+            'status' => 'diajukan',
         ]);
     }
 
     public function setujuiIzin(IzinSantri $izin, int $userId, ?string $catatan = null): IzinSantri
     {
         $izin->update([
-            'status'           => 'disetujui',
-            'disetujui_oleh'   => $userId,
+            'status' => 'disetujui',
+            'disetujui_oleh' => $userId,
             'catatan_pengurus' => $catatan,
         ]);
 
@@ -73,8 +73,8 @@ class KegiatanService
     public function tolakIzin(IzinSantri $izin, int $userId, ?string $catatan = null): IzinSantri
     {
         $izin->update([
-            'status'           => 'ditolak',
-            'disetujui_oleh'   => $userId,
+            'status' => 'ditolak',
+            'disetujui_oleh' => $userId,
             'catatan_pengurus' => $catatan,
         ]);
 
@@ -84,7 +84,7 @@ class KegiatanService
     public function konfirmasiKembali(IzinSantri $izin): IzinSantri
     {
         $izin->update([
-            'sudah_kembali'          => true,
+            'sudah_kembali' => true,
             'tanggal_kembali_aktual' => now(),
         ]);
 
@@ -105,14 +105,14 @@ class KegiatanService
     public function catatKunjungan(Santri $santri, array $data): KunjunganWali
     {
         return KunjunganWali::create([
-            'tenant_id'       => $santri->tenant_id,
-            'santri_id'       => $santri->getKey(),
+            'tenant_id' => $santri->tenant_id,
+            'santri_id' => $santri->getKey(),
             'nama_pengunjung' => $data['nama_pengunjung'],
-            'hubungan'        => $data['hubungan'],
-            'tanggal'         => $data['tanggal'] ?? today()->toDateString(),
-            'jam_datang'      => $data['jam_datang'] ?? null,
-            'keperluan'       => $data['keperluan'] ?? null,
-            'status'          => 'hadir',
+            'hubungan' => $data['hubungan'],
+            'tanggal' => $data['tanggal'] ?? today()->toDateString(),
+            'jam_datang' => $data['jam_datang'] ?? null,
+            'keperluan' => $data['keperluan'] ?? null,
+            'status' => 'hadir',
         ]);
     }
 }

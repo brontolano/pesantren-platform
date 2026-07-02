@@ -2,8 +2,8 @@
 
 namespace Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakan\Pages;
 
-use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakanResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakanResource;
 
 class ListLaporanKerusakan extends ListRecords
 {

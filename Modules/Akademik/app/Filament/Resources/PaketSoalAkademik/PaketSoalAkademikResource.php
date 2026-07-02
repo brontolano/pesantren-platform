@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\PaketSoalAkademik;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\PaketSoalAkademik\Pages\CreatePaketSoalAkademik;
-use Modules\Akademik\Filament\Resources\PaketSoalAkademik\Pages\EditPaketSoalAkademik;
-use Modules\Akademik\Filament\Resources\PaketSoalAkademik\Pages\ListPaketSoalAkademik;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
@@ -24,6 +21,9 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Modules\Akademik\Filament\Resources\PaketSoalAkademik\Pages\CreatePaketSoalAkademik;
+use Modules\Akademik\Filament\Resources\PaketSoalAkademik\Pages\EditPaketSoalAkademik;
+use Modules\Akademik\Filament\Resources\PaketSoalAkademik\Pages\ListPaketSoalAkademik;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Services\UjianAkademikService;
 use Modules\PPDB\Models\PaketSoal;

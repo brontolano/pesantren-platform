@@ -2,7 +2,8 @@
 
 namespace Modules\Payroll\Filament\Resources\PresensiStaf;
 
-use Modules\Payroll\Filament\Resources\PresensiStaf\Pages\ListPresensiStaf;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -16,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Payroll\Filament\Resources\PresensiStaf\Pages\ListPresensiStaf;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\PresensiStaf;
 
@@ -24,7 +26,7 @@ use Modules\Payroll\Models\PresensiStaf;
  */
 class PresensiStafResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = PresensiStaf::class;
 
@@ -42,7 +44,7 @@ class PresensiStafResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
+        return UiMode::advanced() && static::moduleVisible('payroll') && (auth()->user()?->can('run_payroll') ?? false);
     }
 
     public static function canAccess(): bool

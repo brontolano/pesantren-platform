@@ -3,13 +3,13 @@
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListDonasi;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListDonasi;
 use Modules\Keuangan\Models\Donasi;
 use Modules\Keuangan\Services\DonasiService;
 use Throwable;
@@ -39,7 +39,7 @@ class DonasiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_donasi', 'manage_donasi']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -92,7 +92,7 @@ class DonasiResource extends Resource
                     ->modalHeading('Konfirmasi donasi & posting jurnal?')
                     ->modalDescription('D Kas / K Pendapatan sesuai sumber dana program. Idempoten — konfirmasi ulang tidak menggandakan jurnal.')
                     ->visible(fn (Donasi $record): bool => $record->status === Donasi::STATUS_MENUNGGU
-                        && (auth()->user()?->can('manage_keuangan') ?? false))
+                        && (auth()->user()?->can('manage_donasi') ?? false))
                     ->action(function (Donasi $record): void {
                         try {
                             app(DonasiService::class)->konfirmasi($record, auth()->id());
@@ -107,7 +107,7 @@ class DonasiResource extends Resource
                     ->color('danger')
                     ->requiresConfirmation()
                     ->visible(fn (Donasi $record): bool => $record->status === Donasi::STATUS_MENUNGGU
-                        && (auth()->user()?->can('manage_keuangan') ?? false))
+                        && (auth()->user()?->can('manage_donasi') ?? false))
                     ->action(function (Donasi $record): void {
                         app(DonasiService::class)->tolak($record, auth()->id());
                         Notification::make()->success()->title('Donasi ditolak (tidak ada jurnal).')->send();

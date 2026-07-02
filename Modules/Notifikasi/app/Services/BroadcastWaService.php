@@ -6,13 +6,13 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Modules\Notifikasi\Jobs\BroadcastWaJob;
 use Modules\Notifikasi\Models\BroadcastWa;
+use Modules\Notifikasi\Support\NotifikasiSettings;
 
 class BroadcastWaService
 {
     public function __construct(
         private readonly RecipientResolver $recipientResolver,
-    ) {
-    }
+    ) {}
 
     public function create(array $attributes, ?User $creator = null): BroadcastWa
     {
@@ -59,7 +59,7 @@ class BroadcastWaService
         });
 
         $sender = app(WaNotificationService::class);
-        $interval = \Modules\Notifikasi\Support\NotifikasiSettings::broadcastInterval();
+        $interval = NotifikasiSettings::broadcastInterval();
         $recipientList = $recipients->values();
         $lastIndex = $recipientList->count() - 1;
 

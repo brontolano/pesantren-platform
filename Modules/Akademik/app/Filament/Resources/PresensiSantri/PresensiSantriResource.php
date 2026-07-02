@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\PresensiSantri;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\CreatePresensiSantri;
-use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\EditPresensiSantri;
-use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\ListPresensiSantri;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -17,6 +14,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\CreatePresensiSantri;
+use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\EditPresensiSantri;
+use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\ListPresensiSantri;
 use Modules\Akademik\Models\PresensiSantri;
 use Modules\Kesantrian\Models\Santri;
 

@@ -2,8 +2,10 @@
 
 namespace Modules\Keuangan\Filament\Resources\Pembayaran\Pages;
 
-use Modules\Keuangan\Filament\Resources\Pembayaran\PembayaranResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Keuangan\Filament\Resources\Pembayaran\PembayaranResource;
+use Modules\Keuangan\Models\Tagihan;
+use Modules\Keuangan\Services\PembayaranService;
 
 class CreatePembayaran extends CreateRecord
 {
@@ -15,7 +17,7 @@ class CreatePembayaran extends CreateRecord
 
         // Auto-fill santri_id dari tagihan
         if (! empty($data['tagihan_id']) && empty($data['santri_id'])) {
-            $tagihan = \Modules\Keuangan\Models\Tagihan::find($data['tagihan_id']);
+            $tagihan = Tagihan::find($data['tagihan_id']);
             $data['santri_id'] = $tagihan?->santri_id;
         }
 
@@ -27,8 +29,7 @@ class CreatePembayaran extends CreateRecord
         // Update status tagihan setelah pembayaran dibuat
         $pembayaran = $this->record;
         if ($pembayaran->tagihan) {
-            (new \Modules\Keuangan\Services\PembayaranService())->updateStatusTagihan($pembayaran->tagihan);
+            (new PembayaranService)->updateStatusTagihan($pembayaran->tagihan);
         }
     }
 }
-

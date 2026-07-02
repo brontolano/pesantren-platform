@@ -2,9 +2,9 @@
 
 namespace Modules\Mutu\Filament\Resources\MutuInspeksi\Pages;
 
-use Modules\Mutu\Filament\Resources\MutuInspeksiResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Mutu\Filament\Resources\MutuInspeksiResource;
 
 class EditMutuInspeksi extends EditRecord
 {

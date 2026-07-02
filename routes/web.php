@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\CmsPublicApiController;
+use App\Http\Controllers\Api\IbadahApiController;
+use App\Http\Controllers\Api\KomentarApiController;
 use App\Http\Controllers\Api\PpdbPublicApiController;
 use App\Http\Controllers\Api\PublicDirectoryApiController;
 use App\Http\Controllers\Api\TenantApiController;
@@ -13,6 +16,7 @@ use App\Support\KebijakanPrivasiSistem;
 use App\Support\TenantBranding;
 use Illuminate\Support\Facades\Route;
 use Modules\CMS\Http\Controllers\EmbedWidgetController;
+use Modules\CMS\Http\Controllers\AppShellController;
 use Modules\CMS\Http\Controllers\TenantLandingPageController;
 use Modules\PPDB\Http\Controllers\LandingRegistrationController;
 use Modules\PPDB\Http\Controllers\PpdbFileController;
@@ -123,6 +127,13 @@ Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('te
 // halaman login. (Domain 'sistem' tetap juga menampilkan login di '/'.) Form
 // mem-POST ke /masuk (store); sukses → tujuan per peran (staf → /admin) via
 // AppLauncher, jadi tak nyangkut di website publik.
+// ── Home publik "mode aplikasi" (1-app per pesantren) ──
+// Dipakai app Android (WebView memuat /app): tampilan ber-bottom-nav (Beranda ·
+// Ibadah · Kabar · Akun · Info) dari konten CMS/branding yang sama dgn landing,
+// agar pengunjung app tak "lari" ke halaman marketing. Aditif — tak mengubah '/'.
+Route::get('/beranda', AppShellController::class)->name('tenant.app-shell');
+Route::get('/beranda/manifest.webmanifest', [AppShellController::class, 'manifest'])->name('tenant.app-shell.manifest');
+
 Route::get('/masuk', [StaffLoginController::class, 'show'])->name('tenant.masuk.show');
 Route::post('/masuk', [StaffLoginController::class, 'store'])
     ->middleware('throttle:20,1')
@@ -167,15 +178,59 @@ Route::get('/disclaimer', fn () => view('legal.disclaimer'))->name('legal.discla
 Route::get('/cookie-policy', fn () => view('legal.cookie-policy'))->name('legal.cookies');
 Route::get('/kontak', fn () => view('legal.contact'))->name('legal.contact');
 
+// Halaman pemasaran "bahasa kiai" (issue #334) — manfaat platform dijelaskan
+// tanpa jargon teknis untuk pengasuh/pengurus pesantren. Hanya relevan di
+// central domain; di domain tenant diarahkan ke situs pusat.
+Route::get('/untuk-pesantren', function () {
+    if (! in_array(request()->getHost(), config('tenancy.central_domains', []), true)) {
+        return redirect('https://pesantren.online/untuk-pesantren');
+    }
+
+    return view('untuk-pesantren');
+})->name('landing.untuk-pesantren');
+
 // ── API publik konten CMS untuk website tenant (mis. api.asy-syifaa.com) ──
 // Tenant di-resolve dari domain oleh middleware tenancy web. CORS: config/cors.php.
 // Kontrak: docs/SPEC-API-WEBSITE-ASY-SYIFAA.md
-Route::get('/api/v1/posts', [CmsPublicApiController::class, 'posts']);
-Route::get('/api/v1/posts/{slug}', [CmsPublicApiController::class, 'post']);
-Route::get('/api/public/content/gallery', [CmsPublicApiController::class, 'gallery']);
-Route::get('/api/public/content/gallery/{slug}', [CmsPublicApiController::class, 'galleryItem']);
-Route::get('/api/public/content/profile', [CmsPublicApiController::class, 'profile']);
-Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'settings']);
+// HARDENING (red-team RATE-002): semua endpoint baca publik di-throttle per
+// tenant+IP (limiter 'public-api') agar tak bisa di-scrape/DoS tanpa batas.
+Route::middleware('throttle:public-api')->group(function () {
+    Route::get('/api/v1/posts', [CmsPublicApiController::class, 'posts']);
+    Route::get('/api/v1/posts/{slug}', [CmsPublicApiController::class, 'post']);
+    Route::get('/api/public/content/gallery', [CmsPublicApiController::class, 'gallery']);
+    Route::get('/api/public/content/gallery/{slug}', [CmsPublicApiController::class, 'galleryItem']);
+    Route::get('/api/public/content/profile', [CmsPublicApiController::class, 'profile']);
+    Route::get('/api/public/content/settings', [CmsPublicApiController::class, 'settings']);
+    // Ibadah publik (1-aplikasi / native Android): jadwal sholat + arah kiblat + donasi.
+    Route::get('/api/v1/jadwal-sholat', IbadahApiController::class);
+});
+
+// Auth aplikasi NATIVE (token Sanctum). login=jemaah; demo=per-peran (gerbang demo).
+// Throttle kasar per-IP di route + RateLimiter per-identifier di controller.
+Route::post('/api/v1/auth/login', [AuthApiController::class, 'login'])->middleware('throttle:20,1');
+Route::post('/api/v1/auth/demo/{peran}', [AuthApiController::class, 'demoLogin'])->middleware('throttle:30,1');
+// Registrasi mandiri jemaah (No.WA + OTP WhatsApp), mirror JemaahAuthController.
+Route::post('/api/v1/auth/daftar', [AuthApiController::class, 'daftar'])->middleware('throttle:10,1');
+Route::post('/api/v1/auth/aktivasi', [AuthApiController::class, 'aktivasi'])->middleware('throttle:15,1');
+Route::post('/api/v1/auth/kirim-ulang', [AuthApiController::class, 'kirimUlang'])->middleware('throttle:6,1');
+Route::middleware(['auth:sanctum', 'throttle:public-api'])->group(function () {
+    Route::get('/api/v1/auth/me', [AuthApiController::class, 'me']);
+    Route::post('/api/v1/auth/logout', [AuthApiController::class, 'logout']);
+    // SSO: tukar token → URL auto-login panel (untuk WebView app native).
+    Route::post('/api/v1/auth/panel-link', [AuthApiController::class, 'panelLink']);
+});
+
+// Auto-login panel web dari tautan signed (dibuka WebView native). Sekali-pakai, TTL pendek.
+Route::get('/auth/panel-masuk', \App\Http\Controllers\PanelMasukController::class)
+    ->middleware('signed')
+    ->name('auth.panel-masuk');
+
+// Komentar artikel (native): baca publik (approved) + kirim (token + izin komentar).
+// Gerbang sama dgn web CommentController: auth + can:komentar + throttle:komentar.
+Route::get('/api/v1/posts/{slug}/komentar', [KomentarApiController::class, 'index'])
+    ->middleware('throttle:public-api');
+Route::post('/api/v1/posts/{slug}/komentar', [KomentarApiController::class, 'store'])
+    ->middleware(['auth:sanctum', 'can:komentar', 'throttle:komentar']);
 
 // PPDB publik — terima pendaftaran dari form website (Fase minimal: simpan + e-tiket).
 // Anti-spam: rate-limit ketat per tenant+IP (honeypot ditangani di controller).

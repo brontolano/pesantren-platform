@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\Lembaga\Pages;
 
-use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
 
 class EditLembaga extends EditRecord
 {

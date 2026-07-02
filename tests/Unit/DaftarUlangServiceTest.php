@@ -16,27 +16,27 @@ class DaftarUlangServiceTest extends TestCase
 {
     public function test_tolak_peserta_non_lulus(): void
     {
-        $calon = new CalonSantri();
+        $calon = new CalonSantri;
         $calon->status_pendaftaran = 'pending';
 
         $this->expectException(RuntimeException::class);
 
-        (new DaftarUlangService())->process($calon);
+        (new DaftarUlangService)->process($calon);
     }
 
     public function test_tolak_lulus_tanpa_tanggal_lahir(): void
     {
-        $calon = new CalonSantri();
+        $calon = new CalonSantri;
         $calon->status_pendaftaran = 'lulus'; // tanggal_lahir null → ditolak sebelum DB
 
         $this->expectException(RuntimeException::class);
 
-        (new DaftarUlangService())->process($calon);
+        (new DaftarUlangService)->process($calon);
     }
 
     public function test_map_jenis_kelamin(): void
     {
-        $svc = new DaftarUlangService();
+        $svc = new DaftarUlangService;
         $m = new ReflectionMethod($svc, 'mapJenisKelamin');
         $m->setAccessible(true);
 

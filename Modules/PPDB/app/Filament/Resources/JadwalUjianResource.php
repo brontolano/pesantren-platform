@@ -2,9 +2,8 @@
 
 namespace Modules\PPDB\Filament\Resources;
 
-use Modules\PPDB\Filament\Resources\JadwalUjian\Pages\CreateJadwalUjian;
-use Modules\PPDB\Filament\Resources\JadwalUjian\Pages\EditJadwalUjian;
-use Modules\PPDB\Filament\Resources\JadwalUjian\Pages\ListJadwalUjian;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -18,6 +17,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Modules\PPDB\Filament\Resources\JadwalUjian\Pages\CreateJadwalUjian;
+use Modules\PPDB\Filament\Resources\JadwalUjian\Pages\EditJadwalUjian;
+use Modules\PPDB\Filament\Resources\JadwalUjian\Pages\ListJadwalUjian;
 use Modules\PPDB\Models\JadwalUjian;
 
 /**
@@ -25,7 +27,7 @@ use Modules\PPDB\Models\JadwalUjian;
  */
 class JadwalUjianResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = JadwalUjian::class;
 
@@ -45,27 +47,27 @@ class JadwalUjianResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('ppdb') && static::canAccess();
+        return UiMode::advanced() && static::moduleVisible('ppdb') && static::canAccess();
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function form(Schema $schema): Schema

@@ -2,8 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\SetorKeliling\Pages;
 
-use Modules\Keuangan\Filament\Resources\SetorKeliling\SetorKelilingResource;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\SetorKeliling\SetorKelilingResource;
 
 class ListSetorKeliling extends ListRecords
 {
@@ -11,6 +12,6 @@ class ListSetorKeliling extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [\Filament\Actions\CreateAction::make()->label('Buka Sesi Keliling')];
+        return [CreateAction::make()->label('Buka Sesi Keliling')];
     }
 }

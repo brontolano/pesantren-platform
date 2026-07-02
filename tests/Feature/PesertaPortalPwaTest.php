@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Setting;
-use App\Models\Tenant;
 use Illuminate\Support\Str;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;

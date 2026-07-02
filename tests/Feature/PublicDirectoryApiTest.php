@@ -28,7 +28,7 @@ class PublicDirectoryApiTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => true, 'data' => json_encode([]),
-             'created_at' => now(), 'updated_at' => now()],
+                'created_at' => now(), 'updated_at' => now()],
         );
 
         return $tenant;

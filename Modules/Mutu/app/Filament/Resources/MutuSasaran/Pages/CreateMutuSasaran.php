@@ -2,8 +2,8 @@
 
 namespace Modules\Mutu\Filament\Resources\MutuSasaran\Pages;
 
-use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 
 class CreateMutuSasaran extends CreateRecord
 {

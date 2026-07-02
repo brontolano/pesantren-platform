@@ -2,6 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Pages;
 
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
@@ -21,7 +23,7 @@ use Modules\Kesantrian\Models\Santri;
 class TunggakanAlumni extends Page implements HasTable
 {
     use InteractsWithTable;
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     /** Status tagihan yang dianggap menunggak. */
     private const STATUS_MENUNGGAK = ['belum_bayar', 'sebagian'];
@@ -41,12 +43,12 @@ class TunggakanAlumni extends Page implements HasTable
     public static function canAccess(): bool
     {
         return static::moduleVisible('keuangan')
-            && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+            && (auth()->user()?->canAny(['view_tagihan', 'manage_tagihan']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::canAccess();
+        return UiMode::advanced() && static::canAccess();
     }
 
     public function getSubheading(): ?string

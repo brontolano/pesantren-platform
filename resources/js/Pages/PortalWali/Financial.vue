@@ -96,6 +96,20 @@ function statusBadge(status) {
                         <p class="mt-0.5 text-xs text-slate-500">
                             {{ bill.status === 'lunas' ? `Dibayar ${bill.tanggalLunas || '-'}` : `Jatuh tempo ${bill.jatuhTempo || '-'}` }}
                         </p>
+                        <!-- #332: rincian komponen syahriah (transparansi) -->
+                        <ul v-if="bill.komponen && bill.komponen.length" class="mt-1.5 space-y-0.5 border-l-2 border-[#efe7da] pl-2">
+                            <li
+                                v-for="(k, ki) in bill.komponen"
+                                :key="ki"
+                                class="flex items-center justify-between gap-2 text-[11px] text-slate-500"
+                            >
+                                <span class="truncate">
+                                    {{ k.nama }}
+                                    <span v-if="k.masukTabungan" class="ml-1 rounded-full bg-emerald-50 px-1.5 py-px text-[9.5px] font-semibold text-emerald-700">→ Tabungan</span>
+                                </span>
+                                <span class="shrink-0 tabular-nums">{{ fmt(k.nominal) }}</span>
+                            </li>
+                        </ul>
                         <span
                             class="mt-1.5 inline-flex rounded-full px-2.5 py-[3px] font-jost text-[10.5px] font-semibold"
                             :class="[statusBadge(bill.status).bg, statusBadge(bill.status).text]"

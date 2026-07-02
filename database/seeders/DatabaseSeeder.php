@@ -21,9 +21,9 @@ class DatabaseSeeder extends Seeder
             tenancy()->initialize($tenant);
 
             $admin = User::withoutGlobalScopes()->firstOrCreate(
-                ['email' => 'admin@' . $tenant->id . '.localhost'],
+                ['email' => 'admin@'.$tenant->id.'.localhost'],
                 [
-                    'name' => 'Admin ' . $tenant->name,
+                    'name' => 'Admin '.$tenant->name,
                     'password' => Hash::make('password'),
                     'tenant_id' => $tenant->id,
                 ]
@@ -31,9 +31,9 @@ class DatabaseSeeder extends Seeder
             $admin->assignRole('super_admin');
 
             $tu = User::withoutGlobalScopes()->firstOrCreate(
-                ['email' => 'tu@' . $tenant->id . '.localhost'],
+                ['email' => 'tu@'.$tenant->id.'.localhost'],
                 [
-                    'name' => 'TU ' . $tenant->name,
+                    'name' => 'TU '.$tenant->name,
                     'password' => Hash::make('password'),
                     'tenant_id' => $tenant->id,
                 ]

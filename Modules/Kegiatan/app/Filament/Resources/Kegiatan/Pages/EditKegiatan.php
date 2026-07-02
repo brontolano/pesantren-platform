@@ -2,8 +2,8 @@
 
 namespace Modules\Kegiatan\Filament\Resources\Kegiatan\Pages;
 
-use Modules\Kegiatan\Filament\Resources\KegiatanResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Kegiatan\Filament\Resources\KegiatanResource;
 
 class EditKegiatan extends EditRecord
 {

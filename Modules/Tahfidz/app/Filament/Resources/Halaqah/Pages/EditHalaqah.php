@@ -2,8 +2,8 @@
 
 namespace Modules\Tahfidz\Filament\Resources\Halaqah\Pages;
 
-use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
 
 class EditHalaqah extends EditRecord
 {

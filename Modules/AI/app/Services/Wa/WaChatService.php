@@ -3,6 +3,7 @@
 namespace Modules\AI\Services\Wa;
 
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Modules\AI\Models\AiConversation;
 use Modules\AI\Models\AiMessage;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
@@ -468,7 +469,7 @@ class WaChatService
      * case-insensitive; token nama < 3 huruf diabaikan agar tidak false
      * positive). null = tidak ada/tidak yakin.
      *
-     * @param  \Illuminate\Support\Collection<int, Santri>  $anak
+     * @param  Collection<int, Santri>  $anak
      */
     private function cariNamaAnak(string $isi, $anak): ?Santri
     {

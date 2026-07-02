@@ -2,9 +2,9 @@
 
 namespace Modules\CMS\Filament\Resources\Gallery\Pages;
 
-use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
 
 class ListGalleries extends ListRecords
 {
@@ -17,4 +17,3 @@ class ListGalleries extends ListRecords
         ];
     }
 }
-

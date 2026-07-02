@@ -3,6 +3,7 @@
 namespace Modules\PPDB\Models;
 
 use App\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -71,7 +72,7 @@ class SoalUjian extends Model
         return $jwb === $kunci ? (int) $this->bobot : 0;
     }
 
-    /** @param \Illuminate\Database\Eloquent\Builder $query */
+    /** @param Builder $query */
     public function scopeAktif($query)
     {
         return $query->where('aktif', true);

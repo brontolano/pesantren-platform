@@ -89,7 +89,7 @@ const submit = () => {
                 <button
                     type="submit"
                     :disabled="form.processing"
-                    class="block w-full rounded-2xl bg-[var(--jemaah-primary)] px-4 py-3.5 text-center text-base font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
+                    class="block w-full rounded-full bg-[var(--jemaah-primary)] px-4 py-3.5 text-center text-base font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
                 >
                     {{ form.processing ? 'Memproses…' : 'Kirim Kode Aktivasi' }}
                 </button>

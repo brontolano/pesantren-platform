@@ -7,6 +7,7 @@ use App\Models\Setting;
 use App\Services\KebijakanService;
 use App\Services\MediaRegistrar;
 use App\Services\ModuleService;
+use App\Services\StorageQuotaService;
 use App\Services\TenantHealthCheck;
 use App\Support\KebijakanRegistry;
 use App\Support\UiMode;
@@ -32,6 +33,8 @@ use Modules\Akademik\Services\KalenderService;
 use Modules\Akademik\Services\KenaikanKelasService;
 use Modules\Core\Support\IstilahRegistry;
 use Modules\Kesantrian\Services\DisiplinService;
+use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
+use Modules\Keuangan\Models\SkemaBiaya;
 use Modules\Ledger\Support\FiturKeuangan;
 
 /**
@@ -82,7 +85,7 @@ class SetupPesantren extends Page implements HasForms
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
-            && (auth()->user()?->canAny(['manage_santri', 'manage_akademik', 'manage_keuangan']) ?? false);
+            && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -179,7 +182,7 @@ class SetupPesantren extends Page implements HasForms
                         FileUpload::make('logo')
                             ->label('Logo (opsional)')
                             ->image()
-                            ->disk(\App\Services\StorageQuotaService::diskName())
+                            ->disk(StorageQuotaService::diskName())
                             ->directory('branding')
                             ->maxSize(2048)
                             ->helperText('Maks 2MB. Boleh dilewati, unggah nanti.'),
@@ -514,7 +517,7 @@ class SetupPesantren extends Page implements HasForms
     protected function skemaBiayaTerisi(): bool
     {
         try {
-            return \Modules\Keuangan\Models\SkemaBiaya::query()->where('aktif', true)->exists();
+            return SkemaBiaya::query()->where('aktif', true)->exists();
         } catch (\Throwable) {
             // Modul/tabel belum tersedia → anggap belum terisi (tampilkan ajakan).
             return false;
@@ -525,7 +528,7 @@ class SetupPesantren extends Page implements HasForms
     protected function skemaBiayaUrl(): ?string
     {
         try {
-            $resource = \Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource::class;
+            $resource = SkemaBiayaResource::class;
 
             return $resource::canAccess() ? $resource::getUrl('index') : null;
         } catch (\Throwable) {

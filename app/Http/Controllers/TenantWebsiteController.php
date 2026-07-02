@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Modules\PPDB\Services\PpdbRegistrationNumberService;
 use Stancl\Tenancy\Database\Models\Domain;
 
 class TenantWebsiteController extends Controller
@@ -43,6 +45,7 @@ class TenantWebsiteController extends Controller
             ->pluck('value', 'key')
             ->map(function ($v) {
                 $decoded = json_decode($v, true);
+
                 return is_array($decoded) ? ($decoded['text'] ?? $v) : $v;
             })
             ->toArray();
@@ -76,7 +79,7 @@ class TenantWebsiteController extends Controller
         // alihkan "Isi Formulir Pendaftaran" ke URL itu (Setting ppdb_external_url).
         // Guard: jika /ppdb di-embed iframe (Sec-Fetch-Dest: iframe), tetap render
         // form agar tidak terjadi loop bila website mengembed halaman ini.
-        $external = trim((string) (\App\Models\Setting::getTenantStringValue('ppdb_external_url') ?? ''));
+        $external = trim((string) (Setting::getTenantStringValue('ppdb_external_url') ?? ''));
         if ($external !== '' && $request->header('Sec-Fetch-Dest') !== 'iframe') {
             return redirect()->away($external);
         }
@@ -119,7 +122,7 @@ class TenantWebsiteController extends Controller
 
         // Nomor + insert satu transaksi via service (race-safe, retry saat tabrakan).
         // Menggantikan count()+1 lama yang bisa duplikat (race & baris terhapus).
-        $calon = app(\Modules\PPDB\Services\PpdbRegistrationNumberService::class)->createWithNomor([
+        $calon = app(PpdbRegistrationNumberService::class)->createWithNomor([
             'tenant_id' => $tenant->id,
             'tracking_token' => Str::random(40),
             'tracking_token_generated_at' => now(),

@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\Pelajaran\Pages;
 
-use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
 
 class EditPelajaran extends EditRecord
 {
@@ -17,4 +17,3 @@ class EditPelajaran extends EditRecord
         ];
     }
 }
-

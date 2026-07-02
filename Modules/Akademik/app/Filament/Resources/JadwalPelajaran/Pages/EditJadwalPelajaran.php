@@ -2,9 +2,10 @@
 
 namespace Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages;
 
-use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use Modules\Akademik\Services\JadwalPelajaranService;
 
 class EditJadwalPelajaran extends EditRecord
@@ -18,9 +19,8 @@ class EditJadwalPelajaran extends EditRecord
         ];
     }
 
-    protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(JadwalPelajaranService::class)->simpan($data, $record);
     }
 }
-

@@ -3,7 +3,6 @@
 namespace Modules\Kesantrian\Filament\Resources\Alumni\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use App\Models\Tenant;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -11,6 +10,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Services\KelulusanService;
+use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use Modules\Kesantrian\Models\Alumni;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Services\AlumniImportService;
@@ -35,14 +35,14 @@ class ListAlumni extends ListRecords
                 'label' => 'Import Alumni',
                 'service' => AlumniImportService::class,
                 'directory' => 'imports/kesantrian/alumni/uploads',
-                'ability' => 'manage_santri',
+                'ability' => 'manage_alumni',
                 'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nis (wajib, santri harus sudah ada), tahun_lulus (wajib), status_lanjutan, sekolah_tujuan, catatan. 1 alumni per santri (yang sudah ada dilewati). Dry-run dulu.',
             ]),
             // WP-08 — eksekusi keputusan 'lulus' FINAL hasil sidang WP-07.
             Action::make('proses_kelulusan')
                 ->label('Proses Kelulusan')
                 ->icon('heroicon-o-academic-cap')
-                ->visible(fn (): bool => auth()->user()?->can('manage_santri') ?? false)
+                ->visible(fn (): bool => auth()->user()?->can('manage_alumni') ?? false)
                 ->schema([
                     Select::make('periode_akademik_id')
                         ->label('Periode Akademik')

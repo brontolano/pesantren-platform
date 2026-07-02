@@ -2,8 +2,8 @@
 
 namespace Modules\Kegiatan\Filament\Resources\IzinSantri\Pages;
 
-use Modules\Kegiatan\Filament\Resources\IzinSantriResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Kegiatan\Filament\Resources\IzinSantriResource;
 
 class CreateIzinSantri extends CreateRecord
 {

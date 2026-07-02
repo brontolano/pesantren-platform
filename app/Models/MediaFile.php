@@ -80,7 +80,7 @@ class MediaFile extends Model
             return $this->path;
         }
 
-        return url('/_tenant-storage/' . ltrim($this->path, '/'));
+        return url('/_tenant-storage/'.ltrim($this->path, '/'));
     }
 
     /** Apakah file fisik benar-benar ada di disk tenant. */

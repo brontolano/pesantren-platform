@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\KalenderAkademik;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\KalenderAkademik\Pages\CreateKalenderAkademik;
-use Modules\Akademik\Filament\Resources\KalenderAkademik\Pages\EditKalenderAkademik;
-use Modules\Akademik\Filament\Resources\KalenderAkademik\Pages\ListKalenderAkademik;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
@@ -21,6 +18,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\KalenderAkademik\Pages\CreateKalenderAkademik;
+use Modules\Akademik\Filament\Resources\KalenderAkademik\Pages\EditKalenderAkademik;
+use Modules\Akademik\Filament\Resources\KalenderAkademik\Pages\ListKalenderAkademik;
 use Modules\Akademik\Models\KalenderAkademik;
 use Modules\Akademik\Models\Lembaga;
 use UnitEnum;

@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\Program;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\Program\Pages\CreateProgramStudi;
-use Modules\Akademik\Filament\Resources\Program\Pages\EditProgramStudi;
-use Modules\Akademik\Filament\Resources\Program\Pages\ListProgramStudi;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -19,6 +16,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Akademik\Filament\Resources\Program\Pages\CreateProgramStudi;
+use Modules\Akademik\Filament\Resources\Program\Pages\EditProgramStudi;
+use Modules\Akademik\Filament\Resources\Program\Pages\ListProgramStudi;
 use Modules\Akademik\Models\ProgramStudi;
 
 class ProgramStudiResource extends Resource

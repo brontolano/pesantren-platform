@@ -6,27 +6,30 @@ use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
-use App\Http\Controllers\DemoAutoLoginController;
-use App\Http\Controllers\DemoApps\UksDemoController;
-use App\Http\Controllers\DemoApps\TuDemoController;
+use App\Http\Controllers\CetakController;
 use App\Http\Controllers\DemoApps\HumasDemoController;
-use App\Http\Controllers\DemoApps\KepegawaianDemoController;
-use App\Http\Controllers\DemoApps\PpdbPanitiaDemoController;
-use App\Http\Controllers\DemoApps\PosKantinDemoController;
 use App\Http\Controllers\DemoApps\KeamananDemoController;
-use App\Http\Controllers\DemoApps\PengasuhanDemoController;
+use App\Http\Controllers\DemoApps\KepegawaianDemoController;
 use App\Http\Controllers\DemoApps\PengabdianDemoController;
+use App\Http\Controllers\DemoApps\PengasuhanDemoController;
+use App\Http\Controllers\DemoApps\PosKantinDemoController;
+use App\Http\Controllers\DemoApps\PpdbPanitiaDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
+use App\Http\Controllers\DemoApps\TuDemoController;
+use App\Http\Controllers\DemoApps\UksDemoController;
+use App\Http\Controllers\DemoAutoLoginController;
+use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\EmisExportController;
+use App\Http\Controllers\Jemaah\JemaahAuthController;
+use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
+use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
+use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\KeuanganPwaController;
 use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
 use App\Http\Controllers\PengadaanExportController;
-use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
-use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
-use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
 use App\Http\Controllers\PimpinanPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
@@ -44,7 +47,6 @@ use App\Http\Controllers\PortalGuru\PortalGuruTahfidzLanjutanController;
 use App\Http\Controllers\PortalGuru\PortalGuruUjianController;
 use App\Http\Controllers\PortalGuru\PortalGuruWaliKelasController;
 use App\Http\Controllers\PortalWali\PortalWaliAcademicController;
-use App\Http\Controllers\Jemaah\JemaahAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliAuthController;
 use App\Http\Controllers\PortalWali\PortalWaliDashboardController;
 use App\Http\Controllers\PortalWali\PortalWaliFinancialController;
@@ -62,11 +64,13 @@ use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
 use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
-use App\Http\Controllers\CetakController;
+use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\SantriExportController;
 use App\Http\Controllers\TahfidzExportController;
 use App\Support\TenantBranding;
 use App\Support\UiMode;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Modules\CMS\Http\Controllers\ArticleDetailController;
@@ -75,8 +79,6 @@ use Modules\CMS\Http\Controllers\SitemapController;
 use Modules\Keuangan\Models\Donasi;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\KontrakKerja;
-use chillerlan\QRCode\QRCode;
-use chillerlan\QRCode\QROptions;
 use Modules\Payroll\Services\RaporUstadzService;
 use Modules\Pembiayaan\Models\AreaPiket;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -146,6 +148,11 @@ Route::middleware([
      */
     Route::get('/demo-masuk/{peran}', DemoAutoLoginController::class)
         ->name('tenant.demo.autologin');
+
+    // Etalase demo — pemilih peran (satu klik login per peran). Gerbang sama:
+    // hanya tenant demo + DEMO_AUTOLOGIN (selain itu 404).
+    Route::get('/coba', [DemoPickerController::class, 'show'])->name('tenant.demo.picker');
+    Route::get('/demo', [DemoPickerController::class, 'show'])->name('tenant.demo.picker.alias');
 
     /*
      * ── App PWA demo peran (controller-dummy, gate auth saja) ──
@@ -312,6 +319,17 @@ Route::middleware([
 
     Route::get('/artikel/{slug}', ArticleDetailController::class)->name('tenant.cms.articles.show');
     Route::get('/sitemap.xml', SitemapController::class)->name('tenant.cms.sitemap');
+
+    // 1-aplikasi (Fase 4 fondasi) — PWA scope ROOT "/": manifest + ikon untuk
+    // SELURUH aplikasi (Beranda publik/Jemaah) agar installable & jadi dasar TWA
+    // root per tenant. Publik, pasif (JSON/SVG). Service worker root menyusul
+    // (Fase 3, butuh uji-perangkat sebelum deploy).
+    Route::get('/manifest.webmanifest', [RootPwaController::class, 'manifest'])->name('tenant.pwa.manifest');
+    Route::get('/icon.svg', [RootPwaController::class, 'icon'])->name('tenant.pwa.icon');
+    // Service worker scope "/" (Fase 3) — shell-only allow-list. Endpoint selalu
+    // tersedia, TAPI registrasi di app.blade.php digerbang flag pwa.root_sw_enabled
+    // (default OFF) → aktif hanya setelah owner uji-perangkat.
+    Route::get('/sw.js', [RootPwaController::class, 'serviceWorker'])->name('tenant.pwa.sw');
 
     // 1-aplikasi (Fase 2c) — kirim komentar artikel. Gerbang izin 'komentar'
     // (jemaah + semua peran internal/komunitas; calon santri 'peserta' eksternal
@@ -547,6 +565,8 @@ Route::middleware([
         Route::get('/rapor-diniyah/{raporDiniyah}/print', [AkademikExportController::class, 'raporDiniyahPrint'])->name('rapor-diniyah.print');
         // WP-08 — cetak syahadah (sertifikat internal) per alumni.
         Route::get('/syahadah/{alumni}/print', [AkademikExportController::class, 'syahadahPrint'])->name('syahadah.print');
+        // #328 — cetak ijazah Muadalah/PKPPS parameterik per jenjang ula/wustha/ulya.
+        Route::get('/ijazah/{alumni}/print', [AkademikExportController::class, 'ijazahPrint'])->name('ijazah.print');
     });
 
     // WP-11 — cetak daftar peserta wisuda tahfidz per periode (lulus + ditandai).

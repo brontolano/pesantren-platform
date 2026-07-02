@@ -43,7 +43,7 @@ class PengajuanJengukPanel extends Page
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('kegiatan') && (auth()->user()?->can('manage_santri') ?? false);
+        return static::moduleVisible('kegiatan') && (auth()->user()?->can('manage_kegiatan') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

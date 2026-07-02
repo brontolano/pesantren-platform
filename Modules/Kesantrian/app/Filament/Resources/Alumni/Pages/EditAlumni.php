@@ -2,8 +2,8 @@
 
 namespace Modules\Kesantrian\Filament\Resources\Alumni\Pages;
 
-use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 
 class EditAlumni extends EditRecord
 {

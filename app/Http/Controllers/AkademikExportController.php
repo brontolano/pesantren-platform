@@ -61,4 +61,37 @@ class AkademikExportController extends Controller
             'isi' => $service->renderSyahadah($alumni),
         ]);
     }
+
+    /**
+     * Issue #328 — Cetak Ijazah (Muadalah / PKPPS) parameterik per jenjang
+     * Ula/Wustha/Ulya. Memuat elemen wajib juknis: Garuda (placeholder aset),
+     * nomor ijazah, lembaga + NSPP, nama/TTL/NIS/NISN, jenjang, tanggal
+     * penerbitan, ttd pimpinan + slot stempel + slot pasfoto.
+     */
+    public function ijazahPrint(Request $request, Alumni $alumni): Response
+    {
+        abort_unless(auth()->user()?->canAny(['view_santri', 'manage_santri']), 403);
+        // Dokumen resmi tanpa nomor (ijazah negara ATAU syahadah) tidak boleh beredar.
+        abort_unless(filled($alumni->nomor_ijazah) || filled($alumni->nomor_syahadah), 404);
+
+        $alumni->load(['santri', 'lembaga']);
+
+        $jenis = $request->query('jenis', 'muadalah');
+        abort_unless(in_array($jenis, ['muadalah', 'pkpps'], true), 404);
+
+        $jenjang = strtolower((string) $request->query('jenjang', (string) $alumni->lembaga?->jenjang));
+        abort_unless(in_array($jenjang, ['ula', 'wustha', 'ulya'], true), 422,
+            'Jenjang lembaga belum diisi ula/wustha/ulya — lengkapi di data Lembaga atau kirim ?jenjang=.');
+
+        return response()->view('exports.ijazah-print', [
+            'tenantName' => tenant('name') ?? config('app.name'),
+            'alumni' => $alumni,
+            'jenis' => $jenis,
+            'jenjang' => $jenjang,
+            'tempatTerbit' => \App\Models\Setting::getTenantStringValue('akademik.tempat_terbit_ijazah'),
+            'namaPimpinan' => \App\Models\Setting::getTenantStringValue('akademik.nama_pimpinan_ijazah')
+                ?: $alumni->lembaga?->kepala?->name,
+            'tanggalTerbit' => $alumni->tanggal_lulus ?? now(),
+        ]);
+    }
 }

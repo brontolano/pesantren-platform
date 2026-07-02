@@ -3,9 +3,6 @@
 namespace Modules\Payroll\Filament\Resources\Kontrak;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Payroll\Filament\Resources\Kontrak\Pages\CreateKontrakKerja;
-use Modules\Payroll\Filament\Resources\Kontrak\Pages\EditKontrakKerja;
-use Modules\Payroll\Filament\Resources\Kontrak\Pages\ListKontrakKerja;
 use App\Services\StorageQuotaService;
 use App\Support\UiMode;
 use Filament\Actions\Action;
@@ -23,6 +20,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Payroll\Filament\Resources\Kontrak\Pages\CreateKontrakKerja;
+use Modules\Payroll\Filament\Resources\Kontrak\Pages\EditKontrakKerja;
+use Modules\Payroll\Filament\Resources\Kontrak\Pages\ListKontrakKerja;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\KontrakKerja;
 use Modules\Payroll\Services\KontrakService;

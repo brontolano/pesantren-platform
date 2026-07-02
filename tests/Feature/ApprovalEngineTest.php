@@ -184,8 +184,8 @@ class ApprovalEngineTest extends TestCase
  */
 class ApprovableTestModel extends Model
 {
-    use BelongsToTenant;
     use Approvable;
+    use BelongsToTenant;
 
     protected $table = 'inventory_item';
 

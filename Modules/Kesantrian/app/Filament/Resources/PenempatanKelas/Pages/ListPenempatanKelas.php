@@ -2,9 +2,9 @@
 
 namespace Modules\Kesantrian\Filament\Resources\PenempatanKelas\Pages;
 
-use Modules\Kesantrian\Filament\Resources\PenempatanKelas\PenempatanKelasResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Kesantrian\Filament\Resources\PenempatanKelas\PenempatanKelasResource;
 
 class ListPenempatanKelas extends ListRecords
 {
@@ -17,4 +17,3 @@ class ListPenempatanKelas extends ListRecords
         ];
     }
 }
-

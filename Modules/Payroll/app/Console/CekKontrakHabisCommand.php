@@ -5,6 +5,7 @@ namespace Modules\Payroll\Console;
 use App\Models\Setting;
 use App\Models\Tenant;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Schema;
 use Modules\Notifikasi\Services\NotifDispatcher;
 use Modules\Payroll\Models\KontrakKerja;
 
@@ -40,7 +41,7 @@ class CekKontrakHabisCommand extends Command
             // boleh menggugurkan sisa tenant di jadwal harian.
             try {
                 $hasil = $tenant->run(function (): array {
-                    if (! \Illuminate\Support\Facades\Schema::hasTable('kontrak_kerja')) {
+                    if (! Schema::hasTable('kontrak_kerja')) {
                         return ['kandidat' => 0, 'terkirim' => 0];
                     }
 

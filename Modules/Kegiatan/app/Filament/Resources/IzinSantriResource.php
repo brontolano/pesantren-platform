@@ -3,9 +3,6 @@
 namespace Modules\Kegiatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Kegiatan\Filament\Resources\IzinSantri\Pages\CreateIzinSantri;
-use Modules\Kegiatan\Filament\Resources\IzinSantri\Pages\EditIzinSantri;
-use Modules\Kegiatan\Filament\Resources\IzinSantri\Pages\ListIzinSantri;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -17,6 +14,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Kegiatan\Filament\Resources\IzinSantri\Pages\CreateIzinSantri;
+use Modules\Kegiatan\Filament\Resources\IzinSantri\Pages\EditIzinSantri;
+use Modules\Kegiatan\Filament\Resources\IzinSantri\Pages\ListIzinSantri;
 use Modules\Kegiatan\Models\IzinSantri;
 use UnitEnum;
 
@@ -91,6 +91,6 @@ class IzinSantriResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('kegiatan') && (auth()->user()?->can('manage_santri') ?? false);
+        return static::moduleVisible('kegiatan') && (auth()->user()?->can('manage_kegiatan') ?? false);
     }
 }

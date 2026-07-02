@@ -3,8 +3,6 @@
 namespace Modules\Mutu\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Mutu\Filament\Resources\MutuSkm\Pages\CreateMutuSkm;
-use Modules\Mutu\Filament\Resources\MutuSkm\Pages\ListMutuSkm;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Select;
@@ -16,6 +14,8 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Mutu\Filament\Resources\MutuSkm\Pages\CreateMutuSkm;
+use Modules\Mutu\Filament\Resources\MutuSkm\Pages\ListMutuSkm;
 use Modules\Mutu\Models\MutuSkm;
 
 class MutuSkmResource extends Resource

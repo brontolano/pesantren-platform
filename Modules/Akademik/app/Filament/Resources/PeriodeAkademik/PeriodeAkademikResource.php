@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\PeriodeAkademik;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\PeriodeAkademik\Pages\CreatePeriodeAkademik;
-use Modules\Akademik\Filament\Resources\PeriodeAkademik\Pages\EditPeriodeAkademik;
-use Modules\Akademik\Filament\Resources\PeriodeAkademik\Pages\ListPeriodeAkademik;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -20,6 +17,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\Pages\CreatePeriodeAkademik;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\Pages\EditPeriodeAkademik;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\Pages\ListPeriodeAkademik;
 use Modules\Akademik\Models\Lembaga;
 use Modules\Akademik\Models\PeriodeAkademik;
 

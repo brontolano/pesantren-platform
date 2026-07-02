@@ -2,8 +2,8 @@
 
 namespace Modules\PPDB\Filament\Resources;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Support\AlbaKidsTenant;
-use Modules\PPDB\Filament\Resources\TagihanPpdb\Pages\ListTagihanPpdb;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
@@ -12,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Modules\PPDB\Filament\Resources\TagihanPpdb\Pages\ListTagihanPpdb;
 use Modules\PPDB\Models\TagihanPpdb;
 use Modules\PPDB\Services\PpdbWhatsappNotifier;
 
@@ -21,7 +22,7 @@ use Modules\PPDB\Services\PpdbWhatsappNotifier;
  */
 class TagihanPpdbResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = TagihanPpdb::class;
 
@@ -40,7 +41,7 @@ class TagihanPpdbResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function canCreate(): bool
@@ -101,7 +102,7 @@ class TagihanPpdbResource extends Resource
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (TagihanPpdb $record): bool => $record->status !== 'lunas' && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (TagihanPpdb $record): bool => $record->status !== 'lunas' && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (TagihanPpdb $record): void {
                         $record->update(['status' => 'lunas']);
                         $calon = $record->calonSantri;
@@ -118,7 +119,7 @@ class TagihanPpdbResource extends Resource
                     ->label('Tolak Bukti')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (TagihanPpdb $record): bool => $record->bukti_transfer !== null && $record->status !== 'lunas' && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (TagihanPpdb $record): bool => $record->bukti_transfer !== null && $record->status !== 'lunas' && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->schema([
                         Textarea::make('keterangan')
                             ->label('Alasan / catatan (opsional)')

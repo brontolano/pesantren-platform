@@ -8,15 +8,16 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Modules\Asrama\Models\BlokAsrama;
 use Modules\Asrama\Models\KamarAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SetorKelilingItem;
 use Modules\Keuangan\Models\SetorKelilingSesi;
 use Modules\Keuangan\Models\TabunganTransaksi;
 use Modules\Keuangan\Services\SetorKelilingService;
 use Modules\Keuangan\Services\TabunganService;
-use Modules\Kesantrian\Models\Santri;
 use Spatie\Permission\PermissionRegistrar;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -247,7 +248,7 @@ class SetorKelilingPwaApiTest extends TestCase
                     'client_ref' => 'buruk-'.$i, 'santri_id' => $s1->id, 'nominal' => $buruk,
                 ]), $svc);
                 $this->assertSame(422, $res->getStatusCode(), 'Nominal '.$buruk.' harus ditolak.');
-            } catch (\Illuminate\Validation\ValidationException $e) {
+            } catch (ValidationException $e) {
                 $this->assertArrayHasKey('nominal', $e->errors());
             }
         }

@@ -1,10 +1,17 @@
 <?php
+
 namespace Modules\Payroll\Filament\Resources\Employee\Pages;
-use Modules\Payroll\Filament\Resources\Employee\EmployeeResource;
+
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Payroll\Filament\Resources\Employee\EmployeeResource;
+
 class EditEmployee extends EditRecord
 {
     protected static string $resource = EmployeeResource::class;
-    protected function getHeaderActions(): array { return [DeleteAction::make()]; }
+
+    protected function getHeaderActions(): array
+    {
+        return [DeleteAction::make()];
+    }
 }

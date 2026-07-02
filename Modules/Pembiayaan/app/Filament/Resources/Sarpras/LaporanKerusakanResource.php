@@ -3,8 +3,6 @@
 namespace Modules\Pembiayaan\Filament\Resources\Sarpras;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakan\Pages\EditLaporanKerusakan;
-use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakan\Pages\ListLaporanKerusakan;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -18,6 +16,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakan\Pages\EditLaporanKerusakan;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakan\Pages\ListLaporanKerusakan;
 use Modules\Pembiayaan\Models\LaporanKerusakan;
 use Modules\Pembiayaan\Services\SarprasService;
 use Throwable;
@@ -161,6 +161,6 @@ class LaporanKerusakanResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('pembiayaan') && auth()->check();
+        return static::moduleVisible('pembiayaan') && (auth()->user()?->canAny(['view_sarpras', 'manage_sarpras']) ?? false);
     }
 }

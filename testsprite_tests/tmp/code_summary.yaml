@@ -1,0 +1,135 @@
+version: "2"
+type: frontend
+tech_stack:
+  - PHP 8.3
+  - Laravel 11
+  - Filament v5 (admin panels)
+  - Livewire 3
+  - Inertia + Vue 3
+  - Tailwind CSS
+  - FrankenPHP (Caddy)
+  - PostgreSQL 16
+  - Redis
+routes:
+  - path: /
+    file: routes/web.php
+    auth_required: false
+    description: Public marketing landing page of the platform (central domain)
+  - path: /masuk
+    file: app/Http/Controllers/StaffLoginController.php
+    auth_required: false
+    description: Branded staff/portal login (AppLauncher). Email + password sign in, then role resolver redirects to the correct panel
+  - path: /login
+    file: routes/web.php
+    auth_required: false
+    description: Legacy login path, 302 redirects to /masuk
+  - path: /ppdb
+    file: app/Http/Controllers/TenantWebsiteController.php
+    auth_required: false
+    description: Public PPDB/SPMB admission registration form (tenant-scoped)
+  - path: /donasi
+    file: app/Http/Controllers/DonasiPublikController.php
+    auth_required: false
+    description: Public donation page (tenant-scoped)
+  - path: /kebijakan-privasi
+    file: routes/web.php
+    auth_required: false
+    description: Privacy policy page
+  - path: /syarat-layanan
+    file: resources/views/legal/terms-of-service.blade.php
+    auth_required: false
+    description: Terms of service page
+  - path: /disclaimer
+    file: resources/views/legal/disclaimer.blade.php
+    auth_required: false
+    description: Disclaimer page
+  - path: /cookie-policy
+    file: resources/views/legal/cookie-policy.blade.php
+    auth_required: false
+    description: Cookie policy page
+  - path: /kontak
+    file: resources/views/legal/contact.blade.php
+    auth_required: false
+    description: Contact page
+  - path: /hapus-akun
+    file: app/Http/Controllers/HapusAkunController.php
+    auth_required: false
+    description: Account deletion request page (Play Store compliance)
+  - path: /dokumentasi
+    file: public/dokumentasi
+    auth_required: false
+    description: Static user-guide documentation portal (served as static files)
+features:
+  - name: Marketing Landing
+    description: Public landing page presenting the platform with navigation to login and legal/info pages
+    files:
+      - routes/web.php
+      - resources/views
+    entry_route: /
+    user_interactions:
+      - Open the landing page
+      - See the platform headline and call-to-action
+      - Navigate to the login page via the Masuk link/button
+      - Navigate to documentation and legal pages from footer links
+    api_calls: []
+    auth_required: false
+  - name: Staff/Portal Login
+    description: Sign in with email and password; on success a role resolver routes the user to the appropriate panel, on failure an error is shown
+    files:
+      - app/Http/Controllers/StaffLoginController.php
+      - resources/views
+    entry_route: /masuk
+    user_interactions:
+      - Fill the email input field
+      - Fill the password input field
+      - Click the Masuk (Sign in) button to submit
+      - See a validation error when fields are empty
+      - See an authentication error message on invalid credentials
+    api_calls:
+      - method: POST
+        endpoint: /masuk
+    auth_required: false
+  - name: Public PPDB Registration
+    description: Prospective students submit an admission registration form
+    files:
+      - app/Http/Controllers/TenantWebsiteController.php
+    entry_route: /ppdb
+    user_interactions:
+      - Open the PPDB registration form
+      - Fill in applicant data fields
+      - Submit the registration form
+    api_calls:
+      - method: POST
+        endpoint: /ppdb
+    auth_required: false
+  - name: Legal and Info Pages
+    description: Static informational pages (privacy, terms, disclaimer, cookies, contact, account deletion)
+    files:
+      - resources/views/legal
+    entry_route: /kebijakan-privasi
+    user_interactions:
+      - Open each legal/info page
+      - Read the content
+      - Use back navigation to the landing page
+    api_calls: []
+    auth_required: false
+  - name: Documentation Portal
+    description: Static end-user guide documentation served under /dokumentasi
+    files:
+      - public/dokumentasi
+    entry_route: /dokumentasi
+    user_interactions:
+      - Open the documentation home
+      - Navigate between guide sections
+    api_calls: []
+    auth_required: false
+known_limitations:
+  - issue: Multi-tenant routing is domain based. Tenant admin panels (Filament) and tenant public websites live on subdomains (e.g. demo.localhost), which are not reachable through a single localhost:8000 tunnel. Only the central domain surface (landing, /masuk login, legal pages, documentation) is reliably testable in this setup.
+    location: config/tenancy.php, app/Http/Middleware/InitializeTenancyForWebRequests.php
+    impact: Deep admin navigation, role-based sidebar, and money/transaction flows cannot be reached from the root host and require subdomain access or a per-tenant base URL.
+  - issue: /ppdb and /donasi are tenant-scoped pages; on the central host without a resolved tenant they may redirect or return 404 rather than the full form.
+    location: routes/web.php
+    impact: Public PPDB/donation tests may need a tenant subdomain to exercise the real submission flow.
+  - issue: No central super_admin user is seeded in this local instance; the seeded admin (admin@demo.localhost) belongs to the demo tenant database, so a successful login at the central /masuk cannot be exercised without creating a central user.
+    location: database/seeders
+    impact: Login tests are limited to form validation and invalid-credential handling unless a central user is created.

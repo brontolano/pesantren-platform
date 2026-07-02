@@ -4590,7 +4590,7 @@ tests/Feature/
 | `tenant:setup-users {tenant}` | Setup 4 user default production |
 | `tenant:seed-templates {tenant}` | Seed 9 template notifikasi WA |
 | `santri:import {tenant} {file}` | Import data santri dari Excel |
-| `wali:import {tenant}` | Bulk create akun Portal Wali dari data santri |
+| `wali:import {tenant}` | Bulk create akun Portal Wali dari data santri — *kini tersedia via panel: tombol **Buat Akun Wali** + **Unduh Kredensial Wali** di halaman Santri (CLI opsional)* |
 
 ### Sisa yang Butuh VPS Production (T5.1.1)
 

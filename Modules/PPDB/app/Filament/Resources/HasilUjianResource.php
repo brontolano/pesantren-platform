@@ -2,27 +2,30 @@
 
 namespace Modules\PPDB\Filament\Resources;
 
-use Modules\PPDB\Filament\Resources\HasilUjian\Pages\CreateHasilUjian;
-use Modules\PPDB\Filament\Resources\HasilUjian\Pages\EditHasilUjian;
-use Modules\PPDB\Filament\Resources\HasilUjian\Pages\ListHasilUjian;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Modules\PPDB\Filament\Resources\HasilUjian\Pages\CreateHasilUjian;
+use Modules\PPDB\Filament\Resources\HasilUjian\Pages\EditHasilUjian;
+use Modules\PPDB\Filament\Resources\HasilUjian\Pages\ListHasilUjian;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\HasilUjian;
 
 class HasilUjianResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = HasilUjian::class;
 
@@ -42,27 +45,27 @@ class HasilUjianResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('ppdb') && (static::canAccess());
+        return UiMode::advanced() && static::moduleVisible('ppdb') && (static::canAccess());
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -127,4 +130,3 @@ class HasilUjianResource extends Resource
         ];
     }
 }
-

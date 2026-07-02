@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Cache\CacheManager;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Http;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
@@ -308,8 +310,8 @@ class AiGatewayTest extends TestCase
         $gateway->generate($this->request()); // kegagalan #1 (manager awal)
 
         // Simulasi bootstrapper tenancy: tukar manager cache di container.
-        \Illuminate\Support\Facades\Facade::clearResolvedInstance('cache');
-        $this->app->instance('cache', new \Illuminate\Cache\CacheManager($this->app));
+        Facade::clearResolvedInstance('cache');
+        $this->app->instance('cache', new CacheManager($this->app));
 
         $gateway->generate($this->request()); // kegagalan #2 (manager "tenant")
 

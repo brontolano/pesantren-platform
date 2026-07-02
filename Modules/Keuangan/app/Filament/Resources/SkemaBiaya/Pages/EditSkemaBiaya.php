@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\SkemaBiaya\Pages;
 
-use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
 
 class EditSkemaBiaya extends EditRecord
 {

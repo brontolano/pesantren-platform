@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\Nilai;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\Nilai\Pages\CreateNilai;
-use Modules\Akademik\Filament\Resources\Nilai\Pages\EditNilai;
-use Modules\Akademik\Filament\Resources\Nilai\Pages\ListNilai;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -19,6 +16,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Akademik\Filament\Resources\Nilai\Pages\CreateNilai;
+use Modules\Akademik\Filament\Resources\Nilai\Pages\EditNilai;
+use Modules\Akademik\Filament\Resources\Nilai\Pages\ListNilai;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\Pelajaran;

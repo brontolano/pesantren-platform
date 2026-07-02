@@ -3,9 +3,9 @@
 namespace Modules\Keuangan\Filament\Resources\Tabungan\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
 use App\Models\Tenant;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
 use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Services\TabunganSaldoImportService;
 
@@ -28,7 +28,7 @@ class ListTabungan extends ListRecords
                 'label' => 'Import Saldo Awal',
                 'service' => TabunganSaldoImportService::class,
                 'directory' => 'imports/keuangan/tabungan/uploads',
-                'ability' => 'manage_keuangan',
+                'ability' => 'manage_tabungan',
                 'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nis (wajib), saldo_awal (wajib, angka), keterangan. Membuat transaksi pembuka tabungan. Idempoten: santri yang sudah punya saldo awal dilewati. Dry-run dulu.',
             ]),
         ];

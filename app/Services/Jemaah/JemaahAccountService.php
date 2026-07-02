@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Jemaah;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -122,7 +123,9 @@ class JemaahAccountService
 
         $phone = $this->targetPhone($user);
 
+        $this->guardDailyOtpBudget();
         $this->otpService->issue($user, UserOtp::PURPOSE_JEMAAH_AKTIVASI, $phone, ['nama' => $user->name]);
+        $this->recordOtpSent();
 
         return ['user' => $user, 'phone' => $phone];
     }
@@ -144,7 +147,9 @@ class JemaahAccountService
 
         $phone = $this->targetPhone($user);
 
+        $this->guardDailyOtpBudget();
         $this->otpService->issue($user, UserOtp::PURPOSE_JEMAAH_RESET, $phone, ['nama' => $user->name]);
+        $this->recordOtpSent();
 
         return ['user' => $user, 'phone' => $phone];
     }
@@ -166,10 +171,50 @@ class JemaahAccountService
     private function silentlyIssueOtp(User $user, string $purpose, string $phone, string $name): void
     {
         try {
+            $this->guardDailyOtpBudget();
             $this->otpService->issue($user, $purpose, $phone, ['nama' => $name]);
+            $this->recordOtpSent();
         } catch (ValidationException) {
-            // rate-limit/cooldown OTP — sengaja tidak dibocorkan via daftar publik.
+            // rate-limit/cooldown/anggaran-harian OTP — sengaja tidak dibocorkan via daftar publik.
         }
+    }
+
+    /**
+     * Pagar anggaran harian OTP per tenant (red-team RATE-001/AUTH-8): membatasi
+     * TOTAL OTP WhatsApp jemaah (daftar + kirim-ulang + reset) per tenant per hari
+     * agar penyalahgunaan tak menguras biaya gateway / meneror nomor pihak ketiga.
+     * Default longgar (tak mengganggu pemakaian wajar) & dapat dikonfigurasi via
+     * env JEMAAH_OTP_DAILY_BUDGET; 0 = nonaktif. Melempar bila tercapai (di jalur
+     * daftar ditelan senyap demi anti-enumerasi; di kirim-ulang/reset jadi pesan
+     * netral). Mencatat peringatan sebagai tripwire pemantauan.
+     */
+    private function guardDailyOtpBudget(): void
+    {
+        $max = (int) config('services.jemaah.otp_daily_budget', 300);
+
+        if ($max > 0 && RateLimiter::tooManyAttempts($this->otpBudgetKey(), $max)) {
+            Log::warning('Anggaran OTP harian jemaah tercapai', [
+                'tenant' => tenant()?->getTenantKey(),
+                'max' => $max,
+            ]);
+
+            throw ValidationException::withMessages([
+                'phone' => 'Pengiriman kode sedang dibatasi sementara. Coba lagi besok atau hubungi pengurus.',
+            ]);
+        }
+    }
+
+    /** Tambah hitungan anggaran harian OTP (dipanggil HANYA setelah OTP benar terkirim). */
+    private function recordOtpSent(): void
+    {
+        if ((int) config('services.jemaah.otp_daily_budget', 300) > 0) {
+            RateLimiter::hit($this->otpBudgetKey(), 86400); // reset per 24 jam
+        }
+    }
+
+    private function otpBudgetKey(): string
+    {
+        return 'jemaah-otp-harian:'.(tenant()?->getTenantKey() ?? 'central').':'.now()->format('Ymd');
     }
 
     /**

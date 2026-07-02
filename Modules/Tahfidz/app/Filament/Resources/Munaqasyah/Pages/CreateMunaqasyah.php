@@ -2,8 +2,8 @@
 
 namespace Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages;
 
-use Modules\Tahfidz\Filament\Resources\Munaqasyah\MunaqasyahResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Tahfidz\Filament\Resources\Munaqasyah\MunaqasyahResource;
 
 class CreateMunaqasyah extends CreateRecord
 {

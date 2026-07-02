@@ -2,12 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tenant;
 use App\Services\StorageQuotaService;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Modules\AI\Models\AiAuditLog;
+use Modules\AI\Models\AiCitation;
 use Modules\AI\Models\AiCreditLedger;
 use Modules\AI\Models\AiEscalation;
 use Modules\AI\Services\Gateway\AiGenerateRequest;
@@ -56,7 +59,7 @@ class AiCitationEnforcerTest extends TestCase
         $this->ensurePpdbTestingSchemaReady(['ai_knowledge_source', 'ai_chunk', 'ai_citation']);
         $this->truncatePpdbTables(['domains', 'tenants']);
 
-        \Illuminate\Support\Facades\DB::table('module_registry')->delete();
+        DB::table('module_registry')->delete();
     }
 
     protected function tearDown(): void
@@ -72,7 +75,7 @@ class AiCitationEnforcerTest extends TestCase
     // Pendukung
     // ------------------------------------------------------------------
 
-    private function siapkanTenant(string $prefix): \App\Models\Tenant
+    private function siapkanTenant(string $prefix): Tenant
     {
         $tenant = $this->createRuntimeTenant($prefix, 'Pesantren '.$prefix);
         tenancy()->initialize($tenant);
@@ -299,7 +302,7 @@ class AiCitationEnforcerTest extends TestCase
         $this->assertNotSame([], $hasil->sitasi);
 
         // Sitasi tertaut baris audit panggilan yang MENJAWAB ('-regen').
-        $citation = \Modules\AI\Models\AiCitation::query()->orderBy('urutan')->firstOrFail();
+        $citation = AiCitation::query()->orderBy('urutan')->firstOrFail();
         $this->assertSame(
             $key.'-regen',
             AiAuditLog::query()->whereKey($citation->audit_log_id)->value('idempotency_key'),

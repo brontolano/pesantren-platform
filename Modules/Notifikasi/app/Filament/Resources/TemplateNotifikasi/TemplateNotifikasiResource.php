@@ -3,9 +3,6 @@
 namespace Modules\Notifikasi\Filament\Resources\TemplateNotifikasi;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\CreateTemplateNotifikasi;
-use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\EditTemplateNotifikasi;
-use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\ListTemplateNotifikasi;
 use App\Support\AlbaKidsTenant;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -22,6 +19,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\CreateTemplateNotifikasi;
+use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\EditTemplateNotifikasi;
+use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\Pages\ListTemplateNotifikasi;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
 
 class TemplateNotifikasiResource extends Resource
@@ -38,12 +38,12 @@ class TemplateNotifikasiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('notifikasi') && (auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false);
+        return static::moduleVisible('notifikasi') && (auth()->user()?->can('manage_notifikasi') ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('notifikasi') && (auth()->user()?->canAny(['view_notifikasi', 'manage_notifikasi']) ?? false);
+        return static::moduleVisible('notifikasi') && (auth()->user()?->can('manage_notifikasi') ?? false);
     }
 
     public static function canCreate(): bool

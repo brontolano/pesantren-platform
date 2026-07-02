@@ -3,10 +3,6 @@
 namespace Modules\Kesehatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Kesehatan\Filament\Resources\Obat\Pages\CreateObat;
-use Modules\Kesehatan\Filament\Resources\Obat\Pages\EditObat;
-use Modules\Kesehatan\Filament\Resources\Obat\Pages\ListObat;
-use Modules\Kesehatan\Filament\Resources\Obat\RelationManagers\MutasiRelationManager;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -20,6 +16,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Kesehatan\Filament\Resources\Obat\Pages\CreateObat;
+use Modules\Kesehatan\Filament\Resources\Obat\Pages\EditObat;
+use Modules\Kesehatan\Filament\Resources\Obat\Pages\ListObat;
+use Modules\Kesehatan\Filament\Resources\Obat\RelationManagers\MutasiRelationManager;
 use Modules\Kesehatan\Models\Obat;
 use Modules\Kesehatan\Services\ObatService;
 use Throwable;
@@ -172,6 +172,6 @@ class ObatResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_santri') ?? false);
+        return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_kesehatan') ?? false);
     }
 }

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Modules\PPDB\Database\Seeders\PesertaRoleSeeder;
 use Modules\PPDB\Models\CalonSantri;
@@ -17,6 +16,7 @@ class PesertaPortalDashboardTest extends TestCase
     use InteractsWithPpdbTestDatabase;
 
     private Tenant $tenant;
+
     private string $host;
 
     protected function setUp(): void

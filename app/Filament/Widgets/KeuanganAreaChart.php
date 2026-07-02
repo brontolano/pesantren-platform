@@ -18,7 +18,7 @@ class KeuanganAreaChart extends ChartWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->can('view_keuangan') ?? false;
+        return auth()->user()?->can('view_laporan_keuangan') ?? false;
     }
 
     protected static ?int $sort = -6;
@@ -68,25 +68,25 @@ class KeuanganAreaChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label'           => 'Pemasukan',
-                    'data'            => $pemasukan,
-                    'borderColor'     => '#22c55e',        // green-500 (WA-style)
+                    'label' => 'Pemasukan',
+                    'data' => $pemasukan,
+                    'borderColor' => '#22c55e',        // green-500 (WA-style)
                     'backgroundColor' => 'rgba(34,197,94,0.13)',
-                    'fill'            => true,
-                    'tension'         => 0.4,
-                    'borderWidth'     => 2,
-                    'pointRadius'     => 0,
+                    'fill' => true,
+                    'tension' => 0.4,
+                    'borderWidth' => 2,
+                    'pointRadius' => 0,
                     'pointHoverRadius' => 5,
                 ],
                 [
-                    'label'           => 'Pengeluaran',
-                    'data'            => $pengeluaran,
-                    'borderColor'     => '#f87171',        // red-400 softer
+                    'label' => 'Pengeluaran',
+                    'data' => $pengeluaran,
+                    'borderColor' => '#f87171',        // red-400 softer
                     'backgroundColor' => 'rgba(248,113,113,0.08)',
-                    'fill'            => true,
-                    'tension'         => 0.4,
-                    'borderWidth'     => 2,
-                    'pointRadius'     => 0,
+                    'fill' => true,
+                    'tension' => 0.4,
+                    'borderWidth' => 2,
+                    'pointRadius' => 0,
                     'pointHoverRadius' => 5,
                 ],
             ],

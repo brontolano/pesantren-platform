@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -31,7 +32,7 @@ class HapusAkunTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => true, 'data' => json_encode([]),
-             'created_at' => now(), 'updated_at' => now()],
+                'created_at' => now(), 'updated_at' => now()],
         );
         tenancy()->end();
 
@@ -54,7 +55,7 @@ class HapusAkunTest extends TestCase
 
         // Override redaksi per tenant (sama mekanisme dgn kebijakan privasi).
         tenancy()->initialize($tenant);
-        \App\Models\Setting::updateOrCreate(
+        Setting::updateOrCreate(
             ['key' => 'penghapusan_akun_sistem'],
             ['value' => ['text' => 'REDAKSI HAPUS KHUSUS PONDOK KAMI']],
         );

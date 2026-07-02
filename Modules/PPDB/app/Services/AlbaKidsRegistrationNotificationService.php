@@ -3,6 +3,7 @@
 namespace Modules\PPDB\Services;
 
 use App\Models\Setting;
+use App\Support\PhoneNumber;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -22,8 +23,7 @@ class AlbaKidsRegistrationNotificationService
     public function __construct(
         private readonly BroadcastWaService $broadcastWaService,
         private readonly WaGatewayService $waGateway,
-    ) {
-    }
+    ) {}
 
     /**
      * Kirim semua notifikasi pendaftaran: ucapan terima kasih ke orang tua +
@@ -377,7 +377,7 @@ class AlbaKidsRegistrationNotificationService
     private function normalizePhone(?string $value, bool $required = true): ?string
     {
         // Delegasi ke sumber kebenaran tunggal (idempoten, anti country-code ganda).
-        $phone = \App\Support\PhoneNumber::normalize($value);
+        $phone = PhoneNumber::normalize($value);
 
         if ($phone === '') {
             if ($required) {

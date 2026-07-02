@@ -3,12 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Tenant;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
-use Modules\Notifikasi\Models\BroadcastWa;
-use Modules\Notifikasi\Models\TemplateNotifikasi;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Services\PpdbDecisionNotificationService;
 use RuntimeException;
@@ -17,6 +16,7 @@ use Tests\TestCase;
 class PpdbDecisionNotificationServiceTest extends TestCase
 {
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void
@@ -159,7 +159,7 @@ class PpdbDecisionNotificationServiceTest extends TestCase
 
         tenancy()->initialize($this->tenantB);
 
-        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectException(ModelNotFoundException::class);
 
         app(PpdbDecisionNotificationService::class)->notifyDecision($candidate->id);
     }

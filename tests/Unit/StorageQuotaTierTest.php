@@ -47,6 +47,6 @@ class StorageQuotaTierTest extends TestCase
 
         $this->expectException(\InvalidArgumentException::class);
 
-        (new StorageQuotaService())->setQuota('tenant-x', 128);
+        (new StorageQuotaService)->setQuota('tenant-x', 128);
     }
 }

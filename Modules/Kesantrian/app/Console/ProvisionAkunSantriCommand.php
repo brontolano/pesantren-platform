@@ -2,6 +2,7 @@
 
 namespace Modules\Kesantrian\Console;
 
+use App\Models\Setting;
 use App\Models\Tenant;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
@@ -69,7 +70,7 @@ class ProvisionAkunSantriCommand extends Command
                             'nis' => (string) $santri->nis,
                             'username' => (string) $user->email,
                             'password' => $sementara,
-                            'nama_pesantren' => \App\Models\Setting::getTenantStringValue('branding_name')
+                            'nama_pesantren' => Setting::getTenantStringValue('branding_name')
                                 ?? (tenant('name') ?? 'Pesantren'),
                         ],
                     ]);

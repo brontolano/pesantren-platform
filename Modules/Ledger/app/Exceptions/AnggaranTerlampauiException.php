@@ -7,6 +7,4 @@ use RuntimeException;
 /**
  * Dilempar saat transaksi belanja melampaui pagu RKAM yang mode-nya 'blokir'.
  */
-class AnggaranTerlampauiException extends RuntimeException
-{
-}
+class AnggaranTerlampauiException extends RuntimeException {}

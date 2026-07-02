@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Mockery;
 use Mockery\MockInterface;
@@ -53,7 +54,7 @@ class KeuanganNotifikasiTest extends TestCase
         tenancy()->initialize($tenant);
         $this->seedTenantRow($tenant);
 
-        $this->userId = (int) \App\Models\User::withoutGlobalScopes()->create([
+        $this->userId = (int) User::withoutGlobalScopes()->create([
             'name' => 'Bendahara', 'email' => $prefix.'@uji.localhost',
             'password' => 'password', 'tenant_id' => tenant('id'),
         ])->id;
@@ -134,7 +135,7 @@ class KeuanganNotifikasiTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => $tenant->is_active,
-             'data' => json_encode([]), 'created_at' => now(), 'updated_at' => now()],
+                'data' => json_encode([]), 'created_at' => now(), 'updated_at' => now()],
         );
     }
 }

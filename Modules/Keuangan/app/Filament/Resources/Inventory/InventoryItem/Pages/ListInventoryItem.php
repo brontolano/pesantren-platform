@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages;
 
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryItemResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryItemResource;
 
 class ListInventoryItem extends ListRecords
 {

@@ -3,6 +3,7 @@
 namespace Modules\PPDB\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,8 +45,7 @@ class PesertaAuthController extends Controller
         private readonly PesertaAccountService $accountService,
         private readonly PesertaOtpService $otpService,
         private readonly PesertaIdentifierResolver $resolver,
-    ) {
-    }
+    ) {}
 
     /*
     |----------------------------------------------------------------------
@@ -68,7 +68,7 @@ class PesertaAuthController extends Controller
         // "Isi Formulir Pendaftaran": tenant dgn pendaftaran via website eksternal
         // (Setting ppdb_external_url, mis. asy-syifaa) → link ke URL itu; selain itu
         // form internal /ppdb.
-        $external = trim((string) (\App\Models\Setting::getTenantStringValue('ppdb_external_url') ?? ''));
+        $external = trim((string) (Setting::getTenantStringValue('ppdb_external_url') ?? ''));
 
         return Inertia::render('PPDB/Portal/Login', [
             'ppdbUrl' => $external !== '' ? $external : '/ppdb',

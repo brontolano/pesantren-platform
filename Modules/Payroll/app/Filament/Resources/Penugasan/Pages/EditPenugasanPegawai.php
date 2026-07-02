@@ -2,9 +2,9 @@
 
 namespace Modules\Payroll\Filament\Resources\Penugasan\Pages;
 
-use Modules\Payroll\Filament\Resources\Penugasan\PenugasanPegawaiResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Payroll\Filament\Resources\Penugasan\PenugasanPegawaiResource;
 
 class EditPenugasanPegawai extends EditRecord
 {

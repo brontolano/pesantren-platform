@@ -2,9 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\Rekonsiliasi;
 
-use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatement\Pages\CreateBankStatement;
-use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatement\Pages\EditBankStatement;
-use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatement\Pages\ListBankStatement;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -20,6 +19,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatement\Pages\CreateBankStatement;
+use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatement\Pages\EditBankStatement;
+use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatement\Pages\ListBankStatement;
 use Modules\Keuangan\Models\BankStatement;
 use Modules\Keuangan\Services\BankReconService;
 use Modules\Ledger\Models\Akun;
@@ -30,7 +32,7 @@ use Modules\Ledger\Models\Akun;
  */
 class BankStatementResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = BankStatement::class;
 
@@ -48,12 +50,12 @@ class BankStatementResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_laporan_keuangan', 'manage_keuangan']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_laporan_keuangan', 'manage_keuangan']) ?? false);
     }
 
     public static function canCreate(): bool

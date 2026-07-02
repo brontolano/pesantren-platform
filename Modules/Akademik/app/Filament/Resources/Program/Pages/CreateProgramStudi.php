@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\Program\Pages;
 
-use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
 
 class CreateProgramStudi extends CreateRecord
 {

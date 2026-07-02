@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal\Pages;
 
-use Modules\Keuangan\Filament\Resources\BaitulMaal\DonasiResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\DonasiResource;
 
 class ListDonasi extends ListRecords
 {

@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Services\AuditLogger;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Database\QueryException;
 use Modules\Asrama\Models\BlokAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SetorKelilingItem;
 use Modules\Keuangan\Models\SetorKelilingSesi;
 use Modules\Keuangan\Models\Tagihan;
@@ -15,6 +16,7 @@ use Modules\Keuangan\Services\PembayaranService;
 use Modules\Keuangan\Services\SetorKelilingService;
 use Modules\Ledger\Services\BukuBesarService;
 use Modules\Ledger\Services\LaporanService;
+use Modules\Payroll\Models\SlipGaji;
 use Modules\Pengadaan\Services\BelanjaService;
 use Throwable;
 
@@ -158,7 +160,7 @@ class KeuanganApiController extends Controller
         // Santri WAJIB ada di tenant ini (query ter-scope BelongsToTenant) —
         // tanpa ini santri_id tebakan lintas-tenant/asal-asalan ikut tercatat
         // lalu uangnya terposting saat bendahara approve.
-        if (! \Modules\Kesantrian\Models\Santri::query()->whereKey((int) $data['santri_id'])->exists()) {
+        if (! Santri::query()->whereKey((int) $data['santri_id'])->exists()) {
             return response()->json(['message' => 'Santri tidak ditemukan.'], 422);
         }
 
@@ -280,7 +282,7 @@ class KeuanganApiController extends Controller
     {
         abort_unless($request->user()?->can('view_slip_sendiri') ?? false, 403);
 
-        $slip = \Modules\Payroll\Models\SlipGaji::where('users_id', $request->user()->id)
+        $slip = SlipGaji::where('users_id', $request->user()->id)
             ->where('status', 'final')->orderByDesc('periode')->get()
             ->map(fn ($s) => [
                 'periode' => $s->periode,

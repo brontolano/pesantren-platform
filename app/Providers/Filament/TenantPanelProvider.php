@@ -5,139 +5,18 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\CadanganPemulihan;
 use App\Filament\Pages\CadanganWebsite;
-use Modules\Payroll\Filament\Pages\GenerateThr;
-use Modules\Akademik\Filament\Pages\GridNilai;
-use Modules\Keuangan\Filament\Pages\KasirKantin;
 use App\Filament\Pages\KebijakanPesantren;
 use App\Filament\Pages\KesiapanEmis;
-use Modules\Kegiatan\Filament\Pages\LogGerbangPanel;
-use Modules\Kesantrian\Filament\Pages\ModerasiPesanWali;
-use Modules\Mutu\Filament\Pages\MutuKelas;
-use Modules\Mutu\Filament\Pages\MutuLembaga;
-use Modules\Kegiatan\Filament\Pages\PengajuanJengukPanel;
-use Modules\Pembiayaan\Filament\Pages\PiketHariIni;
-use Modules\Payroll\Filament\Pages\PratinjauKhidmah;
-use Modules\Mutu\Filament\Pages\ProfilMutuSantri;
-use Modules\Akademik\Filament\Pages\RekapJurnalKbm;
-use Modules\Keuangan\Filament\Pages\RekonKantin;
-use Modules\Akademik\Filament\Pages\SidangKenaikan;
 use App\Filament\Pages\TenantDashboard;
-use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
-use Modules\Akademik\Filament\Resources\KomponenNilai\KomponenNilaiResource;
-use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
-use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
-use Modules\Akademik\Filament\Resources\Kurikulum\KurikulumResource;
-use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
-use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
-use Modules\Akademik\Filament\Resources\PaketSoalAkademik\PaketSoalAkademikResource;
-use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
-use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
-use Modules\Akademik\Filament\Resources\PresensiSantri\PresensiSantriResource;
-use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
-use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
-use Modules\Akademik\Filament\Resources\RaporDiniyah\RaporDiniyahResource;
-use Modules\Akademik\Filament\Resources\Rubrik\RubrikKriteriaResource;
-use Modules\Akademik\Filament\Resources\SesiUjianAkademik\SesiUjianAkademikResource;
-use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
 use App\Filament\Resources\Approval\ApprovalRequestResource;
 use App\Filament\Resources\Approval\ApprovalRuleResource;
-use Modules\Asrama\Filament\Resources\BiayaAsrama\BiayaAsramaResource;
-use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
-use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
-use Modules\Asrama\Filament\Resources\PenempatanAsrama\PenempatanAsramaResource;
 use App\Filament\Resources\Audit\AuditLogResource;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\BeasiswaResource;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\DonasiResource;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\ProgramDonasiResource;
-use Modules\Notifikasi\Filament\Resources\BroadcastWa\BroadcastWaResource;
-use Modules\Notifikasi\Filament\Resources\LogNotifikasi\LogNotifikasiResource;
-use Modules\CMS\Filament\Resources\Article\ArticleResource;
-use Modules\CMS\Filament\Resources\Comment\CommentResource;
-use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
-use Modules\CMS\Filament\Resources\Profile\ProfileResource;
-use Modules\CMS\Filament\Resources\WebsiteSetting\WebsiteSettingResource;
-use Modules\PPDB\Filament\Resources\Crm\CrmPenawaranResource;
 use App\Filament\Resources\Document\DocumentResource;
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryBatchResource;
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryItemResource;
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryLokasiResource;
-use Modules\Kegiatan\Filament\Resources\IzinSantriResource;
-use Modules\Kegiatan\Filament\Resources\KegiatanResource;
-use Modules\Kegiatan\Filament\Resources\KunjunganWaliResource;
-use Modules\Kegiatan\Filament\Resources\Recurring\KegiatanRecurringResource;
-use Modules\Kegiatan\Filament\Resources\Template\KegiatanTemplateResource;
-use Modules\Kesantrian\Filament\Resources\Kelas\KelasResource;
-use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
-use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\JenisPelanggaranResource;
-use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
-use Modules\Kesehatan\Filament\Resources\KunjunganUksResource;
-use Modules\Kesehatan\Filament\Resources\ObatResource;
-use Modules\Kesehatan\Filament\Resources\RiwayatKesehatanResource;
-use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
-use Modules\Keuangan\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
-use Modules\Ledger\Filament\Resources\AkunResource;
-use Modules\Ledger\Filament\Resources\AlokasiBiaya\AlokasiBiayaResource;
-use Modules\Ledger\Filament\Resources\AnggaranResource;
-use Modules\Ledger\Filament\Resources\DivisiUnitResource;
-use Modules\Ledger\Filament\Resources\JurnalResource;
-use Modules\Ledger\Filament\Resources\KebijakanKehalalanResource;
-use Modules\Ledger\Filament\Resources\KursValuta\KursValutaResource;
-use Modules\Ledger\Filament\Resources\PeriodeAkuntansiResource;
-use Modules\Ledger\Filament\Resources\SumberDanaResource;
 use App\Filament\Resources\Media\MediaAuditResource;
 use App\Filament\Resources\Media\MediaFileResource;
-use Modules\Keuangan\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
-use Modules\Mutu\Filament\Resources\DokumenMutuResource;
-use Modules\Mutu\Filament\Resources\MutuInspeksiResource;
-use Modules\Mutu\Filament\Resources\MutuSasaranResource;
-use Modules\Mutu\Filament\Resources\MutuSkmResource;
-use Modules\Mutu\Filament\Resources\MutuTemuanResource;
-use Modules\Pajak\Filament\Resources\TarifPajakResource;
-use Modules\Payroll\Filament\Resources\Cuti\CutiResource;
-use Modules\Payroll\Filament\Resources\Employee\EmployeeResource;
-use Modules\Payroll\Filament\Resources\Jabatan\JabatanResource;
-use Modules\Payroll\Filament\Resources\Khidmah\KhidmahResource;
-use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
-use Modules\Payroll\Filament\Resources\Pelamar\PelamarResource;
-use Modules\Payroll\Filament\Resources\Penugasan\PenugasanPegawaiResource;
-use Modules\Payroll\Filament\Resources\Pinjaman\PinjamanPegawaiResource;
-use Modules\Payroll\Filament\Resources\PresensiStaf\PresensiStafResource;
-use Modules\Payroll\Filament\Resources\SlipGajiResource;
-use Modules\Keuangan\Filament\Resources\Pembayaran\PembayaranResource;
-use Modules\Pembiayaan\Filament\Resources\AsetResource;
-use Modules\Pembiayaan\Filament\Resources\MutasiAsetResource;
-use Modules\Pembiayaan\Filament\Resources\PembiayaanResource;
-use Modules\Kesantrian\Filament\Resources\PenempatanKelas\PenempatanKelasResource;
-use Modules\Pengadaan\Filament\Resources\BelanjaResource;
-use Modules\Pengadaan\Filament\Resources\PurchaseOrder\PurchaseOrderResource;
-use Modules\Pengadaan\Filament\Resources\Supplier\SupplierResource;
-use Modules\Keuangan\Filament\Resources\Pos\PosKategoriResource;
-use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
-use Modules\PPDB\Filament\Resources\CalonSantriDokumenResource;
-use Modules\PPDB\Filament\Resources\CalonSantriResource;
-use Modules\PPDB\Filament\Resources\GelombangPpdbResource;
-use Modules\PPDB\Filament\Resources\HasilUjianResource;
-use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
-use Modules\PPDB\Filament\Resources\TagihanPpdbResource;
-use Modules\PPDB\Filament\Resources\UjianAttempt\UjianAttemptResource;
-use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatementResource;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Santri\SantriResource;
-use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiketResource;
-use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakanResource;
-use Modules\Keuangan\Filament\Resources\SetorKeliling\SetorKelilingResource;
-use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
 use App\Filament\Resources\Surat\SuratResource;
-use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
-use Modules\Keuangan\Filament\Resources\TabunganTopup\TabunganTopupResource;
-use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
-use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
-use Modules\Tahfidz\Filament\Resources\SimaAnResource;
-use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
-use Modules\Tahfidz\Filament\Resources\Munaqasyah\MunaqasyahResource;
-use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
-use Modules\Tahfidz\Filament\Resources\TahfidzTarget\TahfidzTargetResource;
-use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\AgendaPengumuman;
 use App\Filament\Widgets\GreetingBanner;
@@ -149,7 +28,7 @@ use App\Filament\Widgets\KeuanganOverviewWidget;
 use App\Filament\Widgets\KontrakAkanHabisWidget;
 use App\Filament\Widgets\OnboardingChecklist;
 use App\Filament\Widgets\PengajuanTerbaru;
-use App\Filament\Widgets\QuickAccessWidget;
+use App\Filament\Widgets\PondokOverviewWidget;
 use App\Filament\Widgets\StatsPesantren;
 use App\Filament\Widgets\TransaksiTerbaru;
 use App\Http\Middleware\ApplyPanelTheme;
@@ -176,6 +55,130 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Modules\Akademik\Filament\Pages\GridNilai;
+use Modules\Akademik\Filament\Pages\RekapJurnalKbm;
+use Modules\Akademik\Filament\Pages\SidangKenaikan;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
+use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
+use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
+use Modules\Akademik\Filament\Resources\NgajiSesi\NgajiSesiResource;
+use Modules\Akademik\Filament\Resources\KomponenNilai\KomponenNilaiResource;
+use Modules\Akademik\Filament\Resources\Kurikulum\KurikulumResource;
+use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
+use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
+use Modules\Akademik\Filament\Resources\PaketSoalAkademik\PaketSoalAkademikResource;
+use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
+use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
+use Modules\Akademik\Filament\Resources\PresensiSantri\PresensiSantriResource;
+use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
+use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
+use Modules\Akademik\Filament\Resources\RaporDiniyah\RaporDiniyahResource;
+use Modules\Akademik\Filament\Resources\Rubrik\RubrikKriteriaResource;
+use Modules\Akademik\Filament\Resources\SetoranSorogan\SetoranSoroganResource;
+use Modules\Akademik\Filament\Resources\SesiUjianAkademik\SesiUjianAkademikResource;
+use Modules\Asrama\Filament\Resources\BiayaAsrama\BiayaAsramaResource;
+use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
+use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
+use Modules\Asrama\Filament\Resources\PenempatanAsrama\PenempatanAsramaResource;
+use Modules\CMS\Filament\Resources\Article\ArticleResource;
+use Modules\CMS\Filament\Resources\Comment\CommentResource;
+use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
+use Modules\CMS\Filament\Resources\Profile\ProfileResource;
+use Modules\CMS\Filament\Resources\WebsiteSetting\WebsiteSettingResource;
+use Modules\Kegiatan\Filament\Pages\LogGerbangPanel;
+use Modules\Kegiatan\Filament\Pages\PengajuanJengukPanel;
+use Modules\Kegiatan\Filament\Resources\IzinSantriResource;
+use Modules\Kegiatan\Filament\Resources\KegiatanResource;
+use Modules\Kegiatan\Filament\Resources\KunjunganWaliResource;
+use Modules\Kegiatan\Filament\Resources\Recurring\KegiatanRecurringResource;
+use Modules\Kegiatan\Filament\Resources\Template\KegiatanTemplateResource;
+use Modules\Kesantrian\Filament\Pages\ModerasiPesanWali;
+use Modules\Kesantrian\Filament\Resources\Alumni\AlumniResource;
+use Modules\Kesantrian\Filament\Resources\JenisPelanggaran\JenisPelanggaranResource;
+use Modules\Kesantrian\Filament\Resources\Kelas\KelasResource;
+use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
+use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
+use Modules\Kesantrian\Filament\Resources\PenempatanKelas\PenempatanKelasResource;
+use Modules\Kesehatan\Filament\Resources\KunjunganUksResource;
+use Modules\Kesehatan\Filament\Resources\ObatResource;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatanResource;
+use Modules\Kesehatan\Filament\Resources\SesiKonselingResource;
+use Modules\Keuangan\Filament\Pages\KasirKantin;
+use Modules\Keuangan\Filament\Pages\RekonKantin;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\BeasiswaResource;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\DonasiResource;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\ProgramDonasiResource;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryBatchResource;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryItemResource;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryLokasiResource;
+use Modules\Keuangan\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
+use Modules\Keuangan\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
+use Modules\Keuangan\Filament\Resources\Pembayaran\PembayaranResource;
+use Modules\Keuangan\Filament\Resources\Pos\PosKategoriResource;
+use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
+use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatementResource;
+use Modules\Keuangan\Filament\Resources\SetorKeliling\SetorKelilingResource;
+use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
+use Modules\Keuangan\Filament\Resources\TagihanRutin\TagihanRutinResource;
+use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
+use Modules\Keuangan\Filament\Resources\TabunganTopup\TabunganTopupResource;
+use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
+use Modules\Ledger\Filament\Resources\AkunResource;
+use Modules\Ledger\Filament\Resources\AlokasiBiaya\AlokasiBiayaResource;
+use Modules\Ledger\Filament\Resources\AnggaranResource;
+use Modules\Ledger\Filament\Resources\DivisiUnitResource;
+use Modules\Ledger\Filament\Resources\JurnalResource;
+use Modules\Ledger\Filament\Resources\KebijakanKehalalanResource;
+use Modules\Ledger\Filament\Resources\KursValuta\KursValutaResource;
+use Modules\Ledger\Filament\Resources\PeriodeAkuntansiResource;
+use Modules\Ledger\Filament\Resources\SumberDanaResource;
+use Modules\Mutu\Filament\Pages\MutuKelas;
+use Modules\Mutu\Filament\Pages\MutuLembaga;
+use Modules\Mutu\Filament\Pages\ProfilMutuSantri;
+use Modules\Mutu\Filament\Resources\DokumenMutuResource;
+use Modules\Mutu\Filament\Resources\MutuInspeksiResource;
+use Modules\Mutu\Filament\Resources\MutuSasaranResource;
+use Modules\Mutu\Filament\Resources\MutuSkmResource;
+use Modules\Mutu\Filament\Resources\MutuTemuanResource;
+use Modules\Notifikasi\Filament\Resources\BroadcastWa\BroadcastWaResource;
+use Modules\Notifikasi\Filament\Resources\LogNotifikasi\LogNotifikasiResource;
+use Modules\Notifikasi\Filament\Resources\TemplateNotifikasi\TemplateNotifikasiResource;
+use Modules\Pajak\Filament\Resources\TarifPajakResource;
+use Modules\Payroll\Filament\Pages\GenerateThr;
+use Modules\Payroll\Filament\Pages\PratinjauKhidmah;
+use Modules\Payroll\Filament\Resources\Cuti\CutiResource;
+use Modules\Payroll\Filament\Resources\Employee\EmployeeResource;
+use Modules\Payroll\Filament\Resources\Jabatan\JabatanResource;
+use Modules\Payroll\Filament\Resources\Khidmah\KhidmahResource;
+use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
+use Modules\Payroll\Filament\Resources\Pelamar\PelamarResource;
+use Modules\Payroll\Filament\Resources\Penugasan\PenugasanPegawaiResource;
+use Modules\Payroll\Filament\Resources\Pinjaman\PinjamanPegawaiResource;
+use Modules\Payroll\Filament\Resources\PresensiStaf\PresensiStafResource;
+use Modules\Payroll\Filament\Resources\SlipGajiResource;
+use Modules\Pembiayaan\Filament\Pages\PiketHariIni;
+use Modules\Pembiayaan\Filament\Resources\AsetResource;
+use Modules\Pembiayaan\Filament\Resources\MutasiAsetResource;
+use Modules\Pembiayaan\Filament\Resources\PembiayaanResource;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiketResource;
+use Modules\Pembiayaan\Filament\Resources\Sarpras\LaporanKerusakanResource;
+use Modules\Pengadaan\Filament\Resources\BelanjaResource;
+use Modules\Pengadaan\Filament\Resources\PurchaseOrder\PurchaseOrderResource;
+use Modules\Pengadaan\Filament\Resources\Supplier\SupplierResource;
+use Modules\PPDB\Filament\Resources\CalonSantriDokumenResource;
+use Modules\PPDB\Filament\Resources\CalonSantriResource;
+use Modules\PPDB\Filament\Resources\Crm\CrmPenawaranResource;
+use Modules\PPDB\Filament\Resources\GelombangPpdbResource;
+use Modules\PPDB\Filament\Resources\HasilUjianResource;
+use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
+use Modules\PPDB\Filament\Resources\TagihanPpdbResource;
+use Modules\PPDB\Filament\Resources\UjianAttempt\UjianAttemptResource;
+use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
+use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
+use Modules\Tahfidz\Filament\Resources\Munaqasyah\MunaqasyahResource;
+use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
+use Modules\Tahfidz\Filament\Resources\SimaAnResource;
+use Modules\Tahfidz\Filament\Resources\TahfidzTarget\TahfidzTargetResource;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -195,22 +198,33 @@ class TenantPanelProvider extends PanelProvider
                 AccountWidget::class,
             ]
             : [
-                GreetingBanner::class,
-                OnboardingChecklist::class,
-                StatsPesantren::class,
-                KeuanganAreaChart::class,
-                KategoriPengeluaranChart::class,
-                TransaksiTerbaru::class,
-                // Ringkasan per-domain (gerbang canView per-permission: santri/keuangan)
-                KesantrianOverviewWidget::class,
-                KeuanganOverviewWidget::class,
-                // Penekanan keuangan tema Baitul Maal (canView = tema aktif saja)
-                KasOverviewWidget::class,
-                PengajuanTerbaru::class,
-                AgendaPengumuman::class,
-                QuickAccessWidget::class,
-                // WP-16 — pengingat kontrak/SK akan habis (canView: payroll + ada data)
-                KontrakAkanHabisWidget::class,
+                // === LAYER 1: Welcome & Onboarding ===
+                GreetingBanner::class,           // sort=-10: welcome
+                OnboardingChecklist::class,      // sort=-9: setup checklist (conditional)
+
+                // === LAYER 2: Key Metrics ===
+                StatsPesantren::class,           // sort=-8: 5 KPI cards (santri, pengurus, kas, tagihan)
+                PondokOverviewWidget::class,     // sort=0: indikator per pondok (Banin/Banat) — bila multi-pondok
+
+                // === LAYER 4: Financial Dashboard (for bendahara/tata usaha) ===
+                KeuanganAreaChart::class,        // sort=-6: chart pendapatan/pengeluaran
+                TransaksiTerbaru::class,         // sort=-4: tabel transaksi terbaru (4 cols)
+                KasOverviewWidget::class,        // sort=-5: ringkas kas harian (2 cols, samping chart)
+
+                // === LAYER 5: Ringkasan Sekunder ===
+                KategoriPengeluaranChart::class, // sort=-5: pie chart pengeluaran (conditional data)
+                AgendaPengumuman::class,         // sort=-3: agenda & pengumuman
+                PengajuanTerbaru::class,         // sort=-3: pengajuan terbaru (4 cols)
+
+                // === LAYER 6: Domain Ringkasan (Santri/Keuangan) ===
+                KesantrianOverviewWidget::class, // sort=1: santri stats (adaptive per role)
+                KeuanganOverviewWidget::class,   // sort=2: keuangan stats (adaptive per role)
+
+                // === LAYER 7: Departemen Spesifik ===
+                KontrakAkanHabisWidget::class,   // sort=12: pengingat kontrak (payroll only)
+
+                // === LAYER 8: Admin/Dev (rarely needed) ===
+                // BillingOverviewWidget (sort=10) + DevProgressWidget (sort=20) dihidden via canView() ===
             ];
 
         // PENTING: ->id() & ->path() HARUS dipanggil SEBELUM ->resources()/
@@ -284,6 +298,7 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Nilai & Rapor')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Nilai & Rapor')),
                 NavigationGroup::make('Ujian Online')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Ujian Online')),
                 NavigationGroup::make('Tahfidz')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tahfidz')),
+                NavigationGroup::make('Ngaji Kitab')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Ngaji Kitab')),
                 NavigationGroup::make('Master Akademik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Master Akademik')),
                 // ── Blok PPDB ──
                 NavigationGroup::make('Pendaftaran')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pendaftaran')),
@@ -353,8 +368,12 @@ class TenantPanelProvider extends PanelProvider
                 'logoUrl' => TenantBranding::logoUrl(),
             ]))
             ->brandLogoHeight('2.25rem')
+            // Pixio Design System: emerald #059669 sbg satu-satunya aksen (CTA,
+            // active, link). gray = Slate (ramp ink). Tenant boleh override via
+            // ApplyPanelTheme/preset warna.
+            ->font('Plus Jakarta Sans')
             ->colors([
-                'primary' => Color::Green,
+                'primary' => Color::Emerald,
                 'gray' => Color::Slate,
             ])
             ->middleware([
@@ -414,8 +433,8 @@ class TenantPanelProvider extends PanelProvider
     private const NAV_PRIMER_PER_PERAN = [
         // Label WAJIB persis sama dgn navigationGroups([...]) di atas.
         'guru' => ['Pembelajaran', 'Nilai & Rapor', 'Santri'],
-        'asatidz' => ['Pembelajaran', 'Nilai & Rapor', 'Tahfidz'],
-        'guru_tahfidz' => ['Tahfidz'],
+        'asatidz' => ['Pembelajaran', 'Nilai & Rapor', 'Tahfidz', 'Ngaji Kitab'],
+        'guru_tahfidz' => ['Tahfidz', 'Ngaji Kitab'],
         'bendahara' => ['Tagihan Santri', 'Tabungan Santri'],
         'kasir' => ['Kasir Kantin', 'Tagihan Santri', 'Stok Barang'],
         'kepala_keuangan' => ['Buku Besar', 'Laporan Keuangan', 'Anggaran & Perencanaan', 'Laporan'],
@@ -555,6 +574,9 @@ class TenantPanelProvider extends PanelProvider
             // F0-PWA Guru: halaqah + kitab
             HalaqahResource::class,
             KitabResource::class,
+            // Issue #330 — Sorogan & Ngaji Kitab
+            SetoranSoroganResource::class,
+            NgajiSesiResource::class,
             TahfidzTargetResource::class,
             PenilaianTahfidzResource::class,
             // WP-11 — munaqasyah + daftar wisuda
@@ -585,6 +607,8 @@ class TenantPanelProvider extends PanelProvider
             BankStatementResource::class,
             // Skema Biaya / Pricing (G2-16)
             SkemaBiayaResource::class,
+            // Tagihan Rutin (langganan SPP/makan/asrama — auto-generate terjadwal)
+            TagihanRutinResource::class,
             // Procurement (G2-09)
             SupplierResource::class,
             PurchaseOrderResource::class,

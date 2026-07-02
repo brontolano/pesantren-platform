@@ -98,6 +98,72 @@
             @endforeach
         </ul>
 
+        @if (! empty($stepsOpsional))
+            {{-- Importer historis — HANYA untuk migrasi tengah tahun dari sistem lama. --}}
+            <div class="mt-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-semibold text-stone-700 dark:text-stone-200">Data historis (opsional)</span>
+                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-500/15 dark:text-amber-300">
+                        Hanya untuk migrasi tengah tahun
+                    </span>
+                </div>
+                <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">
+                    Pesantren baru yang mulai dari nol boleh <strong>melewati semua langkah ini</strong>.
+                    Isi hanya bila pindahan dari sistem/pembukuan lama di tengah tahun ajaran.
+                </p>
+                <ul class="mt-2 space-y-2">
+                    @foreach ($stepsOpsional as $step)
+                        <li>
+                            <div class="flex items-center gap-3 rounded-xl border border-dashed px-4 py-3
+                                {{ $step['done'] ? 'border-emerald-200 bg-white/70 dark:border-emerald-900/40 dark:bg-white/5' : 'border-stone-300 bg-stone-50/60 dark:border-white/10 dark:bg-white/5' }}">
+                                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full
+                                    {{ $step['done'] ? 'bg-emerald-600 text-white' : 'bg-stone-100 text-stone-400 dark:bg-white/10 dark:text-stone-400' }}">
+                                    <x-filament::icon :icon="$step['done'] ? 'heroicon-m-check' : 'heroicon-o-archive-box-arrow-down'" class="h-5 w-5" />
+                                </span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block text-sm font-semibold {{ $step['done'] ? 'text-stone-400 dark:text-stone-500' : 'text-stone-800 dark:text-stone-100' }}">
+                                        {{ $step['label'] }}
+                                        <span class="ml-1 rounded bg-stone-200/70 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-stone-500 dark:bg-white/10 dark:text-stone-400">Opsional</span>
+                                    </span>
+                                    <span class="block text-xs text-stone-500 dark:text-stone-400">{{ $step['desc'] }}</span>
+                                </span>
+                                @if ($step['url'])
+                                    <a href="{{ $step['url'] }}"
+                                       class="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-white/10">
+                                        {{ $step['done'] ? 'Tinjau' : 'Buka' }}
+                                    </a>
+                                @endif
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        {{-- Gate verifikasi "siap go-live": langkah wajib + cek TenantHealthCheck relevan. --}}
+        @php
+            $vWarna = match ($verifikasi['status']) {
+                'hijau' => ['border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/50 dark:bg-emerald-950/20', 'text-emerald-800 dark:text-emerald-200', 'heroicon-m-check-badge', 'Siap go-live — verifikasi hijau'],
+                'merah' => ['border-red-300 bg-red-50/70 dark:border-red-900/50 dark:bg-red-950/20', 'text-red-800 dark:text-red-200', 'heroicon-m-x-circle', 'Belum siap go-live — ada cek kesehatan GAGAL'],
+                default => ['border-amber-300 bg-amber-50/60 dark:border-amber-800/50 dark:bg-amber-950/20', 'text-amber-800 dark:text-amber-200', 'heroicon-m-exclamation-triangle', 'Belum siap go-live — lengkapi langkah wajib'],
+            };
+        @endphp
+        <div class="mt-4 rounded-xl border px-4 py-3 {{ $vWarna[0] }}">
+            <p class="flex items-center gap-2 text-sm font-semibold {{ $vWarna[1] }}">
+                <x-filament::icon :icon="$vWarna[2]" class="h-5 w-5" />
+                {{ $vWarna[3] }}
+            </p>
+            <ul class="mt-2 space-y-1">
+                @foreach ($verifikasi['items'] as $item)
+                    <li class="flex items-start gap-2 text-xs {{ $vWarna[1] }}">
+                        <x-filament::icon :icon="$item['ok'] ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'"
+                            class="mt-0.5 h-4 w-4 shrink-0 {{ $item['ok'] ? 'text-emerald-600' : 'text-red-500' }}" />
+                        <span><span class="font-medium">{{ $item['label'] }}</span> — {{ $item['detail'] }}</span>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+
         @if ($progress['tuntas'])
             <div class="mt-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-200">
                 <x-filament::icon icon="heroicon-m-check-badge" class="mr-1 inline h-5 w-5" />

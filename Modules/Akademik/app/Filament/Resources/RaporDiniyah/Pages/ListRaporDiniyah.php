@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\RaporDiniyah\Pages;
 
-use Modules\Akademik\Filament\Resources\RaporDiniyah\RaporDiniyahResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\RaporDiniyah\RaporDiniyahResource;
 
 class ListRaporDiniyah extends ListRecords
 {

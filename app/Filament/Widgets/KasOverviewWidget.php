@@ -25,7 +25,7 @@ class KasOverviewWidget extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        return PanelTheme::theme() === 'baitul-maal';
+        return PanelTheme::theme() === 'baitul-maal' && (auth()->user()?->can('view_laporan_keuangan') ?? false);
     }
 
     protected function getColumns(): int|array

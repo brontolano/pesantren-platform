@@ -2,8 +2,8 @@
 
 namespace Modules\CMS\Filament\Resources\WebsiteSetting\Pages;
 
-use Modules\CMS\Filament\Resources\WebsiteSetting\WebsiteSettingResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\CMS\Filament\Resources\WebsiteSetting\WebsiteSettingResource;
 
 class ListWebsiteSettings extends ListRecords
 {
@@ -14,4 +14,3 @@ class ListWebsiteSettings extends ListRecords
         return [];
     }
 }
-

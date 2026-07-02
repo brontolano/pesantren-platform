@@ -16,7 +16,7 @@ class TransaksiTerbaru extends TableWidget
 {
     public static function canView(): bool
     {
-        return auth()->user()?->can('view_keuangan') ?? false;
+        return auth()->user()?->can('view_laporan_keuangan') ?? false;
     }
 
     protected static ?int $sort = -4;

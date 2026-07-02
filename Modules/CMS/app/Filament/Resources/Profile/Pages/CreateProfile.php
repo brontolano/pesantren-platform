@@ -2,8 +2,8 @@
 
 namespace Modules\CMS\Filament\Resources\Profile\Pages;
 
-use Modules\CMS\Filament\Resources\Profile\ProfileResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\CMS\Filament\Resources\Profile\ProfileResource;
 
 class CreateProfile extends CreateRecord
 {
@@ -18,4 +18,3 @@ class CreateProfile extends CreateRecord
         return $data;
     }
 }
-

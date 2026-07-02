@@ -2,8 +2,9 @@
 
 namespace Modules\PPDB\Filament\Resources\PaketSoal\Pages;
 
-use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
 
 class ListPaketSoal extends ListRecords
 {
@@ -11,6 +12,6 @@ class ListPaketSoal extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [\Filament\Actions\CreateAction::make()];
+        return [CreateAction::make()];
     }
 }

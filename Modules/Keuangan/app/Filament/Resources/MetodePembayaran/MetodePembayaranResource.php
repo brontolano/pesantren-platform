@@ -2,9 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\MetodePembayaran;
 
-use Modules\Keuangan\Filament\Resources\MetodePembayaran\Pages\CreateMetodePembayaran;
-use Modules\Keuangan\Filament\Resources\MetodePembayaran\Pages\EditMetodePembayaran;
-use Modules\Keuangan\Filament\Resources\MetodePembayaran\Pages\ListMetodePembayaran;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
@@ -20,11 +19,14 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Modules\Keuangan\Filament\Resources\MetodePembayaran\Pages\CreateMetodePembayaran;
+use Modules\Keuangan\Filament\Resources\MetodePembayaran\Pages\EditMetodePembayaran;
+use Modules\Keuangan\Filament\Resources\MetodePembayaran\Pages\ListMetodePembayaran;
 use Modules\Keuangan\Models\MetodePembayaran;
 
 class MetodePembayaranResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = MetodePembayaran::class;
 
@@ -42,27 +44,27 @@ class MetodePembayaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tagihan', 'manage_tagihan']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tagihan', 'manage_tagihan']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_tagihan') ?? false;
     }
 
     public static function canEdit($record): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_tagihan') ?? false;
     }
 
     public static function canDelete($record): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_tagihan') ?? false;
     }
 
     public static function form(Schema $schema): Schema

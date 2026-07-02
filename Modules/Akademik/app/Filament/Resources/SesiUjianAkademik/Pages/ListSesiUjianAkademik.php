@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\SesiUjianAkademik\Pages;
 
-use Modules\Akademik\Filament\Resources\SesiUjianAkademik\SesiUjianAkademikResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\SesiUjianAkademik\SesiUjianAkademikResource;
 
 class ListSesiUjianAkademik extends ListRecords
 {

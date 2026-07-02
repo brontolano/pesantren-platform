@@ -59,7 +59,7 @@ class LaporanPajak extends Page implements HasForms
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
             && static::moduleVisible('pajak')
-            && (Auth::user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_pajak']) ?? false);
+            && (Auth::user()?->canAny(['manage_keuangan', 'manage_pajak']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

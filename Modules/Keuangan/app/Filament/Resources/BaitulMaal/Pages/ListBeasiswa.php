@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal\Pages;
 
-use Modules\Keuangan\Filament\Resources\BaitulMaal\BeasiswaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\BeasiswaResource;
 
 class ListBeasiswa extends ListRecords
 {

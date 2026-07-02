@@ -8,24 +8,25 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Modules\Keuangan\Models\Pembayaran;
-use Modules\Keuangan\Models\Tagihan;
-use Modules\Keuangan\Models\Tabungan;
-use Modules\Keuangan\Models\TabunganTransaksi;
-use Modules\Keuangan\Models\InventoryItem;
-use Modules\Keuangan\Models\PosSesi;
-use Modules\Keuangan\Models\PosTransaksi;
-use Modules\Keuangan\Services\KantinService;
-use Modules\Keuangan\Services\PembayaranService;
-use Modules\Keuangan\Services\TagihanService;
 use Modules\Core\Models\ApprovalRequest;
 use Modules\Core\Services\ApprovalService;
+use Modules\Keuangan\Models\InventoryItem;
+use Modules\Keuangan\Models\Pembayaran;
+use Modules\Keuangan\Models\PosSesi;
+use Modules\Keuangan\Models\PosTransaksi;
+use Modules\Keuangan\Models\Tabungan;
+use Modules\Keuangan\Models\TabunganTransaksi;
+use Modules\Keuangan\Models\Tagihan;
+use Modules\Keuangan\Services\KantinService;
+use Modules\Keuangan\Services\LaporanKeuanganService;
+use Modules\Keuangan\Services\PembayaranService;
 use Modules\Ledger\Models\Akun;
 use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Models\JurnalBaris;
 use Modules\Ledger\Models\PeriodeAkuntansi;
 use Modules\Ledger\Services\BukuBesarService;
 use Modules\Ledger\Services\LaporanService;
+use Modules\Ledger\Services\PeriodClosingService;
 use Modules\Pajak\Services\EBupotService;
 use Modules\Pajak\Services\LaporanIsak35Service;
 use Modules\Pajak\Services\LaporanPsak109Service;
@@ -233,7 +234,7 @@ class KepalaKeuanganApiController extends Controller
         return response()->json($laporan->neraca($tanggal));
     }
 
-    public function laporanOperasional(Request $request, \Modules\Keuangan\Services\LaporanKeuanganService $laporan): JsonResponse
+    public function laporanOperasional(Request $request, LaporanKeuanganService $laporan): JsonResponse
     {
         $jenis = $request->input('jenis', 'harian');
 
@@ -244,7 +245,7 @@ class KepalaKeuanganApiController extends Controller
         });
     }
 
-    public function tutupBukuPratinjau(\Modules\Ledger\Services\PeriodClosingService $closing): JsonResponse
+    public function tutupBukuPratinjau(PeriodClosingService $closing): JsonResponse
     {
         abort_unless(Auth::user()?->can('close_period') ?? false, 403);
 
@@ -260,7 +261,7 @@ class KepalaKeuanganApiController extends Controller
         ]);
     }
 
-    public function tutupBuku(Request $request, \Modules\Ledger\Services\PeriodClosingService $closing): JsonResponse
+    public function tutupBuku(Request $request, PeriodClosingService $closing): JsonResponse
     {
         abort_unless(Auth::user()?->can('close_period') ?? false, 403);
 
@@ -563,18 +564,21 @@ class KepalaKeuanganApiController extends Controller
     public function sptMasa(Request $request, SptMasaService $svc): JsonResponse
     {
         $masa = $request->query('masa', now()->format('Y-m'));
+
         return response()->json($svc->rekap($masa));
     }
 
     public function sptMasaTahunan(Request $request, SptMasaService $svc): JsonResponse
     {
         $tahun = $request->query('tahun', now()->format('Y'));
+
         return response()->json($svc->rekapTahunan($tahun));
     }
 
     public function ebupot(Request $request, EBupotService $svc): JsonResponse
     {
         $masa = $request->query('masa', now()->format('Y-m'));
+
         return response()->json($svc->generate($masa));
     }
 
@@ -582,6 +586,7 @@ class KepalaKeuanganApiController extends Controller
     {
         $masa = $request->query('masa', now()->format('Y-m'));
         $csv = $svc->toCsv($masa);
+
         return response($csv, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=ebupot-pph21-{$masa}.csv",
@@ -591,12 +596,14 @@ class KepalaKeuanganApiController extends Controller
     public function ebupotTahunan(Request $request, EBupotService $svc): JsonResponse
     {
         $request->validate(['users_id' => 'required|integer', 'tahun' => 'required|string']);
+
         return response()->json($svc->rekapTahunan((int) $request->users_id, $request->tahun));
     }
 
     public function sptBadan(Request $request, SptBadanService $svc): JsonResponse
     {
         $tahun = $request->query('tahun', (string) (now()->year - 1));
+
         return response()->json($svc->worksheet($tahun));
     }
 

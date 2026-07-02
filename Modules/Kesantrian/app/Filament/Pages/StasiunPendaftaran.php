@@ -2,6 +2,7 @@
 
 namespace Modules\Kesantrian\Filament\Pages;
 
+use App\Filament\Resources\Santri\SantriResource;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -44,6 +45,13 @@ class StasiunPendaftaran extends Page
     public string $baruJk = 'L';
 
     public string $baruTanggalLahir = '';
+
+    /**
+     * Privasi foto putri (#340): foto TERSIMPAN santri putri tidak ditampilkan
+     * ke petugas loket tak berhak — kecuali foto baru saja dijepret pada sesi
+     * ini untuk santri tsb (kebutuhan operasional verifikasi hasil jepretan).
+     */
+    public ?int $fotoBaruSantriId = null;
 
     // Input langkah
     public string $nfcUid = '';
@@ -146,6 +154,19 @@ class StasiunPendaftaran extends Page
     public function simpanFoto(string $base64): void
     {
         $this->jalankan(fn (EnrollmentService $svc) => $svc->simpanFoto($this->santri, $base64), 'Foto tersimpan');
+        $this->fotoBaruSantriId = $this->santriId;
+    }
+
+    /** Apakah foto tersimpan santri aktif boleh ditampilkan di loket? */
+    public function getFotoLoketBolehTampilProperty(): bool
+    {
+        $santri = $this->santri;
+
+        if (! $santri) {
+            return false;
+        }
+
+        return $santri->fotoDapatDilihat() || $this->fotoBaruSantriId === $santri->id;
     }
 
     public function simpanTtd(string $svg, string $png): void
@@ -202,7 +223,7 @@ class StasiunPendaftaran extends Page
         }
         app(EnrollmentService::class)->catat($santri, 'cetak_kartu', 'done');
 
-        return \App\Filament\Resources\Santri\SantriResource::unduhIdCard(collect([$santri]));
+        return SantriResource::unduhIdCard(collect([$santri]));
     }
 
     private function jalankan(callable $fn, string $sukses): void

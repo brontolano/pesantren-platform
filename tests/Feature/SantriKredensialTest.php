@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Services\SantriAccountService;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -29,7 +29,7 @@ class SantriKredensialTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => true, 'data' => json_encode([]),
-             'created_at' => now(), 'updated_at' => now()],
+                'created_at' => now(), 'updated_at' => now()],
         );
         if (! DB::connection('tenant')->table('roles')->where('name', 'santri')->exists()) {
             DB::connection('tenant')->table('roles')->insert([
@@ -56,7 +56,7 @@ class SantriKredensialTest extends TestCase
         $this->assertTrue($user->hasRole('santri'));
 
         // PIN tersimpan ter-hash & cocok untuk login.
-        $this->assertTrue(\Illuminate\Support\Facades\Hash::check($pin, $user->fresh()->password));
+        $this->assertTrue(Hash::check($pin, $user->fresh()->password));
 
         // Login App Santri via NIS + PIN berhasil.
         $host = $tenant->id.'.localhost';

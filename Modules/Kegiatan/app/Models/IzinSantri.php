@@ -2,8 +2,8 @@
 
 namespace Modules\Kegiatan\Models;
 
-use App\Traits\BelongsToTenant;
 use App\Models\User;
+use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Kesantrian\Models\Santri;
@@ -22,10 +22,10 @@ class IzinSantri extends Model
     ];
 
     protected $casts = [
-        'tanggal_mulai'          => 'date',
-        'tanggal_selesai'        => 'date',
+        'tanggal_mulai' => 'date',
+        'tanggal_selesai' => 'date',
         'tanggal_kembali_aktual' => 'datetime',
-        'sudah_kembali'          => 'boolean',
+        'sudah_kembali' => 'boolean',
     ];
 
     public function santri(): BelongsTo

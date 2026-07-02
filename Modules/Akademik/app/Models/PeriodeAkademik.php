@@ -4,6 +4,7 @@ namespace Modules\Akademik\Models;
 
 use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PeriodeAkademik extends Model
@@ -32,7 +33,7 @@ class PeriodeAkademik extends Model
     ];
 
     /** WP-01: NULL = lembaga default tenant (perilaku lama). */
-    public function lembaga(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function lembaga(): BelongsTo
     {
         return $this->belongsTo(Lembaga::class, 'lembaga_id');
     }

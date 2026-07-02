@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Inventory\InventoryLokasi\Pages;
 
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryLokasiResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryLokasiResource;
 
 class ListInventoryLokasi extends ListRecords
 {

@@ -3,9 +3,6 @@
 namespace Modules\Payroll\Filament\Resources\Employee;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Payroll\Filament\Resources\Employee\Pages\CreateEmployee;
-use Modules\Payroll\Filament\Resources\Employee\Pages\EditEmployee;
-use Modules\Payroll\Filament\Resources\Employee\Pages\ListEmployee;
 use App\Models\User;
 use App\Services\StorageQuotaService;
 use App\Support\UiMode;
@@ -30,6 +27,9 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Payroll\Filament\Resources\Employee\Pages\CreateEmployee;
+use Modules\Payroll\Filament\Resources\Employee\Pages\EditEmployee;
+use Modules\Payroll\Filament\Resources\Employee\Pages\ListEmployee;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\PenilaianUstadz;
 use Modules\Payroll\Models\SertifikasiPegawai;

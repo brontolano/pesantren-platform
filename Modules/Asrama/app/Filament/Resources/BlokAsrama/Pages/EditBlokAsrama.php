@@ -2,9 +2,10 @@
 
 namespace Modules\Asrama\Filament\Resources\BlokAsrama\Pages;
 
-use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
 use Modules\Asrama\Services\BlokAsramaService;
 
 class EditBlokAsrama extends EditRecord
@@ -18,9 +19,8 @@ class EditBlokAsrama extends EditRecord
         ];
     }
 
-    protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
         return app(BlokAsramaService::class)->simpan($data, $record);
     }
 }
-

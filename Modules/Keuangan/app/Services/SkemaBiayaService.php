@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Services;
 
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SkemaBiaya;
 use Modules\Keuangan\Models\Tagihan;
-use Modules\Kesantrian\Models\Santri;
 use RuntimeException;
 
 /**

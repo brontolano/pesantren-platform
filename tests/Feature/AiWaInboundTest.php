@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Tenant;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
@@ -55,7 +56,7 @@ class AiWaInboundTest extends TestCase
         parent::tearDown();
     }
 
-    private function siapkanTenant(string $prefix): \App\Models\Tenant
+    private function siapkanTenant(string $prefix): Tenant
     {
         $tenant = $this->createRuntimeTenant($prefix, 'Pesantren '.$prefix);
 

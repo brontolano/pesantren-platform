@@ -4,8 +4,6 @@ namespace Modules\CMS\Filament\Resources\WebsiteSetting;
 
 use App\Filament\Concerns\BuiltInWebsiteGate;
 use App\Filament\Concerns\ModuleGate;
-use Modules\CMS\Filament\Resources\WebsiteSetting\Pages\EditWebsiteSetting;
-use Modules\CMS\Filament\Resources\WebsiteSetting\Pages\ListWebsiteSettings;
 use App\Support\UiMode;
 use Filament\Actions\EditAction;
 use Filament\Resources\Resource;
@@ -13,6 +11,8 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\CMS\Filament\Resources\WebsiteSetting\Pages\EditWebsiteSetting;
+use Modules\CMS\Filament\Resources\WebsiteSetting\Pages\ListWebsiteSettings;
 use Modules\CMS\Models\WebsiteSetting;
 
 class WebsiteSettingResource extends Resource

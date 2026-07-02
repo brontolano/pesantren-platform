@@ -47,7 +47,7 @@ class LogGerbangPanel extends Page
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('kegiatan') && (auth()->user()?->canAny(['manage_santri', 'view_santri']) ?? false);
+        return static::moduleVisible('kegiatan') && (auth()->user()?->canAny(['manage_kegiatan', 'view_kegiatan']) ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

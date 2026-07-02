@@ -6,11 +6,14 @@ use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Modules\Akademik\Models\Lembaga;
 use Modules\Payroll\Database\Seeders\JabatanSeeder;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\Jabatan;
 use Modules\Payroll\Models\PenugasanPegawai;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -47,7 +50,7 @@ class PenugasanPegawaiTest extends TestCase
         tenancy()->initialize($tenant);
         $this->seedTenantRow($tenant);
         Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\RolesAndPermissionsSeeder', '--force' => true]);
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         return $tenant;
     }
@@ -192,7 +195,7 @@ class PenugasanPegawaiTest extends TestCase
         // → partial unique index menolak primary aktif kedua di level DB.
         $this->expectException(QueryException::class);
 
-        \Illuminate\Support\Facades\DB::table('penugasan_pegawai')->insert([
+        DB::table('penugasan_pegawai')->insert([
             'tenant_id' => $tenant->id, 'employee_id' => $pegawai->id, 'jabatan_id' => $j1->id,
             'tanggal_mulai' => '2026-07-01', 'is_primary' => true,
             'created_at' => now(), 'updated_at' => now(),
@@ -355,7 +358,7 @@ class PenugasanPegawaiTest extends TestCase
         $this->assertFalse((bool) Jabatan::query()->where('nama', 'Lurah Pondok')->value('aktif'), 'Jabatan yang dinonaktifkan tenant TIDAK hidup lagi saat reprovision');
 
         // Mapping role_spatie HANYA ke role yang terdaftar.
-        $terdaftar = \Spatie\Permission\Models\Role::query()->pluck('name');
+        $terdaftar = Role::query()->pluck('name');
         Jabatan::query()->whereNotNull('role_spatie')->pluck('role_spatie')
             ->each(fn ($role) => $this->assertTrue($terdaftar->contains($role), "role_spatie '{$role}' tidak terdaftar di RolesAndPermissionsSeeder"));
     }

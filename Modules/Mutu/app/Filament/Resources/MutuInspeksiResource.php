@@ -3,9 +3,6 @@
 namespace Modules\Mutu\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Mutu\Filament\Resources\MutuInspeksi\Pages\CreateMutuInspeksi;
-use Modules\Mutu\Filament\Resources\MutuInspeksi\Pages\EditMutuInspeksi;
-use Modules\Mutu\Filament\Resources\MutuInspeksi\Pages\ListMutuInspeksi;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -18,6 +15,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Mutu\Filament\Resources\MutuInspeksi\Pages\CreateMutuInspeksi;
+use Modules\Mutu\Filament\Resources\MutuInspeksi\Pages\EditMutuInspeksi;
+use Modules\Mutu\Filament\Resources\MutuInspeksi\Pages\ListMutuInspeksi;
 use Modules\Mutu\Models\MutuInspeksi;
 use Modules\Mutu\Models\MutuSasaran;
 

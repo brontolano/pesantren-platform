@@ -2,8 +2,8 @@
 
 namespace Modules\PPDB\Filament\Resources\UjianAttempt\Pages;
 
-use Modules\PPDB\Filament\Resources\UjianAttempt\UjianAttemptResource;
 use Filament\Resources\Pages\ListRecords;
+use Modules\PPDB\Filament\Resources\UjianAttempt\UjianAttemptResource;
 
 class ListUjianAttempt extends ListRecords
 {

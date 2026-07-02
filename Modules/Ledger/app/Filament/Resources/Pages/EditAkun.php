@@ -2,9 +2,9 @@
 
 namespace Modules\Ledger\Filament\Resources\Pages;
 
-use Modules\Ledger\Filament\Resources\AkunResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Ledger\Filament\Resources\AkunResource;
 
 class EditAkun extends EditRecord
 {

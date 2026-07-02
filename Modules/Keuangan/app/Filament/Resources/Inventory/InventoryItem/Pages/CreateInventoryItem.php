@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\Inventory\InventoryItem\Pages;
 
-use Modules\Keuangan\Filament\Resources\Inventory\InventoryItemResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Keuangan\Filament\Resources\Inventory\InventoryItemResource;
 
 class CreateInventoryItem extends CreateRecord
 {

@@ -2,10 +2,10 @@
 
 namespace Modules\CMS\Filament\Resources\Gallery\Pages;
 
-use Modules\CMS\Filament\Resources\Gallery\Concerns\SyncsGalleryPhotos;
-use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Modules\CMS\Filament\Resources\Gallery\Concerns\SyncsGalleryPhotos;
+use Modules\CMS\Filament\Resources\Gallery\GalleryResource;
 
 class EditGallery extends EditRecord
 {

@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\PaketSoalAkademik\Pages;
 
-use Modules\Akademik\Filament\Resources\PaketSoalAkademik\PaketSoalAkademikResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Akademik\Filament\Resources\PaketSoalAkademik\PaketSoalAkademikResource;
 use Modules\Akademik\Services\UjianAkademikService;
 
 class EditPaketSoalAkademik extends EditRecord

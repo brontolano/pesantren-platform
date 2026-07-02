@@ -3,12 +3,12 @@
 namespace Modules\Akademik\Filament\Resources\JadwalPelajaran\Pages;
 
 use App\Filament\Concerns\HasImportAction;
-use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use App\Models\Tenant;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Services\JadwalImportService;
 use Modules\Kesantrian\Models\Kelas;

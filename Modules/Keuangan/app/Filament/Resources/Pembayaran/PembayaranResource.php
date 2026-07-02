@@ -2,32 +2,33 @@
 
 namespace Modules\Keuangan\Filament\Resources\Pembayaran;
 
-use Modules\Keuangan\Filament\Resources\Pembayaran\Pages\CreatePembayaran;
-use Modules\Keuangan\Filament\Resources\Pembayaran\Pages\ListPembayaran;
+use App\Filament\Concerns\ModuleGate;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Filament\Actions\Action;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Filament\Resources\Pembayaran\Pages\CreatePembayaran;
+use Modules\Keuangan\Filament\Resources\Pembayaran\Pages\ListPembayaran;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\PembayaranService;
 
 class PembayaranResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = Pembayaran::class;
 
@@ -70,17 +71,17 @@ class PembayaranResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tagihan', 'manage_tagihan']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tagihan', 'manage_tagihan']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_tagihan') ?? false;
     }
 
     /**
@@ -94,13 +95,13 @@ class PembayaranResource extends Resource
         return ['santri.nama', 'santri.nis', 'nomor_bukti', 'tagihan.jenis_tagihan'];
     }
 
-    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+    public static function getGlobalSearchResultTitle(Model $record): string
     {
         return (string) ($record->santri?->nama ?? 'Pembayaran');
     }
 
     /** @return array<string, string> */
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    public static function getGlobalSearchResultDetails(Model $record): array
     {
         return [
             'NIS' => (string) ($record->santri?->nis ?? '—'),
@@ -120,7 +121,7 @@ class PembayaranResource extends Resource
                         ->with('santri')
                         ->get()
                         ->mapWithKeys(fn ($t) => [
-                            $t->id => ($t->santri?->nama ?? '?') . ' - ' . $t->jenis_tagihan . ' (Rp ' . number_format($t->sisa_tagihan) . ')',
+                            $t->id => ($t->santri?->nama ?? '?').' - '.$t->jenis_tagihan.' (Rp '.number_format($t->sisa_tagihan).')',
                         ]))
                     ->searchable()
                     ->required(),
@@ -208,15 +209,15 @@ class PembayaranResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_tagihan'))
                     ->action(function (Pembayaran $record): void {
-                        (new PembayaranService())->verifikasiPembayaran($record, auth()->id());
+                        (new PembayaranService)->verifikasiPembayaran($record, auth()->id());
                     }),
                 Action::make('tolak')
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn (Pembayaran $record) => ! $record->is_verified && auth()->user()?->can('manage_tagihan'))
                     ->form([
                         Textarea::make('alasan_penolakan')
                             ->label('Alasan Penolakan')
@@ -224,7 +225,7 @@ class PembayaranResource extends Resource
                             ->rows(3),
                     ])
                     ->action(function (Pembayaran $record, array $data): void {
-                        (new PembayaranService())->tolakPembayaran($record, auth()->id(), $data['alasan_penolakan']);
+                        (new PembayaranService)->tolakPembayaran($record, auth()->id(), $data['alasan_penolakan']);
                     }),
             ]);
     }
@@ -242,4 +243,3 @@ class PembayaranResource extends Resource
         ];
     }
 }
-

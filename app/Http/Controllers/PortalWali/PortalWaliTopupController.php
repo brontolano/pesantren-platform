@@ -12,6 +12,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\TabunganTopup;
+use Modules\Keuangan\Services\KeuanganNotifikasiService;
 use Modules\Keuangan\Services\PaymentMethodCatalog;
 use Modules\Keuangan\Services\TabunganService;
 use Modules\Keuangan\Services\TopupService;
@@ -39,9 +40,8 @@ class PortalWaliTopupController extends Controller
     private const PRESETS = [25000, 50000, 100000, 200000, 500000, 1000000];
 
     public function __construct(
-        private readonly PaymentMethodCatalog $catalog = new PaymentMethodCatalog(),
-    ) {
-    }
+        private readonly PaymentMethodCatalog $catalog = new PaymentMethodCatalog,
+    ) {}
 
     /**
      * GET — halaman checkout: pilih nominal + metode pembayaran.
@@ -94,7 +94,7 @@ class PortalWaliTopupController extends Controller
         ]);
 
         // Notif WA admin: pengajuan topup baru menunggu verifikasi (fire-and-forget).
-        app(\Modules\Keuangan\Services\KeuanganNotifikasiService::class)
+        app(KeuanganNotifikasiService::class)
             ->buktiMasuk('Setor saldo tabungan', $child->nama, (float) $validated['nominal']);
 
         return redirect()->route('tenant.portal-wali.topup.instruksi', [

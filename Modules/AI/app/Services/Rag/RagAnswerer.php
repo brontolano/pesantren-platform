@@ -16,6 +16,7 @@ use Modules\AI\Services\Guardrails\CitationEnforcer;
 use Modules\AI\Services\Guardrails\DisclaimerInjector;
 use Modules\AI\Services\Guardrails\EnforcementVerdict;
 use Modules\AI\Services\Privacy\PiiRedactor;
+use Modules\AI\Services\Research\ResearchTelemetry;
 
 /**
  * T-A031 — jembatan RAG: retrieval → generate → sitasi DETERMINISTIK
@@ -50,8 +51,8 @@ class RagAnswerer
 
     /**
      * @param  array{kategori?: string|null, topK?: int, minSkor?: float|null, kategori_jawaban?: string|null}  $opsi
-     *         kategori_jawaban (T-A022): agama|keuangan|akademik|umum —
-     *         default dari config ai.guardrails.kategori_map[agent] → 'umum'.
+     *                                                                                                                 kategori_jawaban (T-A022): agama|keuangan|akademik|umum —
+     *                                                                                                                 default dari config ai.guardrails.kategori_map[agent] → 'umum'.
      */
     public function jawab(AiGenerateRequest $request, array $opsi = []): AiGenerateResult
     {
@@ -200,7 +201,7 @@ class RagAnswerer
             // T-A013: hanya baris BARU (retry idempoten tidak menggandakan
             // statistik); ResearchTelemetry sendiri best-effort + opt-in.
             if ($eskalasi->wasRecentlyCreated && tenancy()->initialized) {
-                app(\Modules\AI\Services\Research\ResearchTelemetry::class)
+                app(ResearchTelemetry::class)
                     ->rekamEskalasiKategori((string) tenant()->getKey(), $kategori);
             }
         } catch (\Throwable $e) {

@@ -3,10 +3,6 @@
 namespace Modules\Kegiatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\CreateKegiatan;
-use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\EditKegiatan;
-use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\ListKegiatan;
-use Modules\Kegiatan\Filament\Resources\Kegiatan\RelationManagers\PresensiRelationManager;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -23,6 +19,10 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\CreateKegiatan;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\EditKegiatan;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\Pages\ListKegiatan;
+use Modules\Kegiatan\Filament\Resources\Kegiatan\RelationManagers\PresensiRelationManager;
 use Modules\Kegiatan\Models\Kegiatan;
 use UnitEnum;
 
@@ -31,7 +31,7 @@ class KegiatanResource extends Resource
     /** Mode simple: menu lanjutan disembunyikan (fungsi & route tetap aktif). */
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced();
+        return UiMode::advanced() && static::canAccess();
     }
 
     use ModuleGate;
@@ -133,6 +133,6 @@ class KegiatanResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('kegiatan') && (auth()->user()?->can('view_santri') ?? false);
+        return static::moduleVisible('kegiatan') && (auth()->user()?->can('view_kegiatan') ?? false);
     }
 }

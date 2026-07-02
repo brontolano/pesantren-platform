@@ -21,9 +21,8 @@ use RuntimeException;
 class TopupService
 {
     public function __construct(
-        private TabunganService $tabunganService = new TabunganService()
-    ) {
-    }
+        private TabunganService $tabunganService = new TabunganService
+    ) {}
 
     /**
      * Ajukan permintaan setor saldo (oleh wali). Belum menambah saldo.

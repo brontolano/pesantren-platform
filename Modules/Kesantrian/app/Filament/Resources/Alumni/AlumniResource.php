@@ -2,8 +2,6 @@
 
 namespace Modules\Kesantrian\Filament\Resources\Alumni;
 
-use Modules\Kesantrian\Filament\Resources\Alumni\Pages\EditAlumni;
-use Modules\Kesantrian\Filament\Resources\Alumni\Pages\ListAlumni;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
@@ -19,6 +17,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Services\KelulusanService;
+use Modules\Kesantrian\Filament\Resources\Alumni\Pages\EditAlumni;
+use Modules\Kesantrian\Filament\Resources\Alumni\Pages\ListAlumni;
 use Modules\Kesantrian\Models\Alumni;
 use Throwable;
 
@@ -45,12 +45,12 @@ class AlumniResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return UiMode::advanced() && auth()->user()?->canAny(['view_alumni', 'manage_alumni']) ?? false;
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_alumni', 'manage_alumni']) ?? false;
     }
 
     public static function canCreate(): bool
@@ -60,7 +60,7 @@ class AlumniResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_alumni') ?? false;
     }
 
     public static function canDelete(Model $record): bool
@@ -133,7 +133,7 @@ class AlumniResource extends Resource
                     ->icon('heroicon-o-document-check')
                     ->requiresConfirmation()
                     ->visible(fn (Alumni $record): bool => $record->nomor_syahadah === null
-                        && (auth()->user()?->can('manage_santri') ?? false))
+                        && (auth()->user()?->can('manage_alumni') ?? false))
                     ->action(function (Alumni $record): void {
                         try {
                             $alumni = app(KelulusanService::class)->generateNomorSyahadah($record);
@@ -148,6 +148,19 @@ class AlumniResource extends Resource
                     ->icon('heroicon-o-printer')
                     ->visible(fn (Alumni $record): bool => $record->nomor_syahadah !== null)
                     ->url(fn (Alumni $record): string => route('tenant.akademik.export.syahadah.print', ['alumni' => $record]))
+                    ->openUrlInNewTab(),
+                // #328 — cetak ijazah (Muadalah/PKPPS) per jenjang lembaga.
+                Action::make('cetak_ijazah_muadalah')
+                    ->label('Cetak Ijazah Muadalah')
+                    ->icon('heroicon-o-academic-cap')
+                    ->visible(fn (Alumni $record): bool => filled($record->nomor_ijazah) || filled($record->nomor_syahadah))
+                    ->url(fn (Alumni $record): string => route('tenant.akademik.export.ijazah.print', ['alumni' => $record, 'jenis' => 'muadalah']))
+                    ->openUrlInNewTab(),
+                Action::make('cetak_ijazah_pkpps')
+                    ->label('Cetak Ijazah PKPPS')
+                    ->icon('heroicon-o-academic-cap')
+                    ->visible(fn (Alumni $record): bool => filled($record->nomor_ijazah) || filled($record->nomor_syahadah))
+                    ->url(fn (Alumni $record): string => route('tenant.akademik.export.ijazah.print', ['alumni' => $record, 'jenis' => 'pkpps']))
                     ->openUrlInNewTab(),
             ]);
     }

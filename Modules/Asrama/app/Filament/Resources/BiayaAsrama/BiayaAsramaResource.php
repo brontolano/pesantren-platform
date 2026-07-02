@@ -2,9 +2,8 @@
 
 namespace Modules\Asrama\Filament\Resources\BiayaAsrama;
 
-use Modules\Asrama\Filament\Resources\BiayaAsrama\Pages\CreateBiayaAsrama;
-use Modules\Asrama\Filament\Resources\BiayaAsrama\Pages\EditBiayaAsrama;
-use Modules\Asrama\Filament\Resources\BiayaAsrama\Pages\ListBiayaAsrama;
+use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -14,13 +13,19 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Asrama\Filament\Resources\BiayaAsrama\Pages\CreateBiayaAsrama;
+use Modules\Asrama\Filament\Resources\BiayaAsrama\Pages\EditBiayaAsrama;
+use Modules\Asrama\Filament\Resources\BiayaAsrama\Pages\ListBiayaAsrama;
 use Modules\Asrama\Models\BiayaAsrama;
 use Modules\Asrama\Models\KamarAsrama;
 use Modules\Kesantrian\Models\Santri;
 
 class BiayaAsramaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = BiayaAsrama::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
@@ -33,22 +38,22 @@ class BiayaAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_asrama']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan', 'manage_asrama']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_asrama']) ?? false);
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['manage_keuangan', 'manage_asrama']) ?? false);
     }
 
     public static function form(Schema $schema): Schema
@@ -64,7 +69,7 @@ class BiayaAsramaResource extends Resource
                 ->options(fn () => KamarAsrama::query()
                     ->with('blok')
                     ->get()
-                    ->mapWithKeys(fn (KamarAsrama $kamar) => [$kamar->id => $kamar->blok->nama_blok . ' - ' . $kamar->nomor_kamar]))
+                    ->mapWithKeys(fn (KamarAsrama $kamar) => [$kamar->id => $kamar->blok->nama_blok.' - '.$kamar->nomor_kamar]))
                 ->searchable()
                 ->live()
                 ->afterStateUpdated(function ($state, $set): void {
@@ -142,7 +147,7 @@ class BiayaAsramaResource extends Resource
             ]);
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with(['santri', 'tagihanKeuangan']);
     }
@@ -156,4 +161,3 @@ class BiayaAsramaResource extends Resource
         ];
     }
 }
-

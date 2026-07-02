@@ -2,11 +2,15 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Concerns\ModuleGate;
 use App\Filament\Widgets\KategoriPengeluaranChart;
 use App\Filament\Widgets\KeuanganAreaChart;
 use App\Filament\Widgets\KeuanganOverviewWidget;
+use App\Filament\Widgets\QuickAccessWidget;
 use App\Filament\Widgets\TransaksiTerbaru;
 use App\Models\User;
+use App\Providers\Filament\TenantPanelProvider;
+use App\Support\UiMode;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,9 +18,10 @@ use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
 /**
- * Super admin harus melihat & boleh SEMUANYA: Gate::before lolos semua
- * permission (termasuk yang belum ada di tabel), bypass gerbang modul,
- * dan default Mode Lengkap. User biasa tetap dievaluasi normal.
+ * Super admin: Gate::before lolos semua permission (termasuk yang belum ada di
+ * tabel) & default Mode Lengkap. Gerbang MODUL: HANYA pemilik PLATFORM
+ * (tenant_id null) yang bypass; super_admin PESANTREN (tenant_id terisi) IKUT
+ * gerbang modul tenantnya agar nav ramping. User biasa dievaluasi normal.
  */
 class SuperAdminAccessTest extends TestCase
 {
@@ -36,7 +41,7 @@ class SuperAdminAccessTest extends TestCase
         DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => true, 'data' => json_encode([]),
-             'created_at' => now(), 'updated_at' => now()],
+                'created_at' => now(), 'updated_at' => now()],
         );
         $this->seed(RolesAndPermissionsSeeder::class);
 
@@ -69,38 +74,74 @@ class SuperAdminAccessTest extends TestCase
         tenancy()->end();
     }
 
-    public function test_super_admin_pesantren_ikut_gerbang_modul_dan_default_mode_lengkap(): void
+    public function test_gerbang_modul_super_admin_tenant_ikut_platform_bypass(): void
     {
         [$super, $biasa] = $this->bootUsers('sa2');
 
+        // Gerbang modul via trait kanonik. Modul 'development' (file_storage)
+        // tersembunyi utk tenant non-dev. (Catatan: 'ai' kini 'released' sejak
+        // 2026-06-25, jadi contoh modul development memakai file_storage.)
+        //
         // Registry modul DETERMINISTIK. `module_registry` ada di koneksi CENTRAL
         // (ModuleRegistry::getConnectionName) dan PERSISTEN lintas test (setUp
         // hanya truncate domains+tenants), jadi tanpa seed eksplisit test ini
-        // bergantung pada apakah baris file_storage kebetulan ada — sumber drift.
+        // bergantung pada apakah baris file_storage kebetulan ada — bila hilang,
+        // isVisibleForTenant fail-open (true) dan assertFalse di bawah gagal.
         $this->seed(\Database\Seeders\ModuleRegistrySeeder::class);
-
         $gate = new class
         {
-            use \App\Filament\Concerns\ModuleGate;
+            use ModuleGate;
 
             public static function uji(string $key): bool
             {
-                return static::moduleVisible($key);
+                return self::moduleVisible($key);
             }
         };
 
-        // Super admin PESANTREN (punya tenant, non-demo) IKUT gerbang modul agar
-        // navigasi tetap ramping — bypass HANYA untuk pemilik PLATFORM (super_admin
-        // tanpa tenant), lihat App\Filament\Concerns\ModuleGate::moduleVisible.
-        // Maka modul 'development' (file_storage) TETAP tersembunyi untuknya,
-        // sementara modul INTI (kesantrian) tetap tampil.
+        // super_admin PESANTREN (tenant_id terisi) IKUT gerbang modul tenantnya:
+        // modul development tetap TERSEMBUNYI — agar nav ramping per tenant.
+        // (Bypass HANYA milik pemilik PLATFORM tenant_id=null — lihat
+        // User::isPlatformSuperAdmin; jalur itu tak berubah & tak diuji di sini.)
         Auth::login($super);
-        $this->assertFalse($gate::uji('file_storage'), 'super_admin pesantren TIDAK melihat modul development (nav ramping).');
+        $this->assertFalse($gate::uji('file_storage'), 'super_admin tenant ikut gerbang: modul development tersembunyi.');
         $this->assertTrue($gate::uji('kesantrian'), 'modul inti selalu terlihat.');
-        $this->assertSame('advanced', \App\Support\UiMode::current(), 'super_admin default Mode Lengkap.');
+        $this->assertSame('advanced', UiMode::current(), 'super_admin default Mode Lengkap.');
 
         Auth::login($biasa);
-        $this->assertSame('simple', \App\Support\UiMode::current(), 'user biasa default Mode Sederhana.');
+        $this->assertSame('simple', UiMode::current(), 'user biasa default Mode Sederhana.');
+        tenancy()->end();
+    }
+
+    /**
+     * Regresi B-01 (audit modul 2026-06-26): QuickAccessWidget TIDAK boleh
+     * meloloskan modul NONAKTIF untuk super_admin TENANT. Dulu gerbang lokalnya
+     * bypass SEMUA super_admin (hasRole) → tile pintasan ke modul OFF dirender →
+     * diklik = 403. Kini selaras isPlatformSuperAdmin (trait kanonik).
+     */
+    public function test_quick_access_gerbang_modul_selaras_is_platform_super_admin(): void
+    {
+        [$super] = $this->bootUsers('qaw');
+
+        // Registry deterministik (lihat catatan di test gerbang modul di atas):
+        // tanpa baris file_storage di module_registry, gerbang fail-open dan
+        // assertFalse di bawah rapuh terhadap drift data central.
+        $this->seed(\Database\Seeders\ModuleRegistrySeeder::class);
+
+        // Tenant runtime: payroll/ledger/file_storage TANPA baris tenant_modules
+        // (= nonaktif). super_admin tenant tak boleh menembusnya.
+        Auth::login($super);
+
+        $widget = new QuickAccessWidget;
+        $m = new \ReflectionMethod($widget, 'moduleVisible');
+        $m->setAccessible(true);
+
+        // Modul inti tetap tampil; modul development (file_storage) TIDAK tembus
+        // utk super_admin tenant — dulu gerbang lokal `hasRole('super_admin')`
+        // meloloskannya → tile dirender → klik = 403 (akar B-01). Kini selaras
+        // `isPlatformSuperAdmin` (assertFalse ini GAGAL sebelum perbaikan).
+        $this->assertTrue($m->invoke($widget, 'kesantrian'), 'modul inti tetap tampil');
+        $this->assertFalse($m->invoke($widget, 'file_storage'), 'super_admin tenant tak menembus gerbang modul (akar 403 B-01)');
+
         tenancy()->end();
     }
 
@@ -133,7 +174,7 @@ class SuperAdminAccessTest extends TestCase
         ]);
         $uks->assignRole('pengelola_uks');
 
-        $ciut = fn (string $g): bool => \App\Providers\Filament\TenantPanelProvider::grupTerciutUntukPeran($g);
+        $ciut = fn (string $g): bool => TenantPanelProvider::grupTerciutUntukPeran($g);
 
         // Guru: Akademik & Santri primer (terbuka), Keuangan/Mutu sekunder (terciut).
         Auth::login($guru);

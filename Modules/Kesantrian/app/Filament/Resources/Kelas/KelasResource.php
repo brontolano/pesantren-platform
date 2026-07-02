@@ -2,9 +2,6 @@
 
 namespace Modules\Kesantrian\Filament\Resources\Kelas;
 
-use Modules\Kesantrian\Filament\Resources\Kelas\Pages\CreateKelas;
-use Modules\Kesantrian\Filament\Resources\Kelas\Pages\EditKelas;
-use Modules\Kesantrian\Filament\Resources\Kelas\Pages\ListKelas;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -20,6 +17,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\Lembaga;
+use Modules\Kesantrian\Filament\Resources\Kelas\Pages\CreateKelas;
+use Modules\Kesantrian\Filament\Resources\Kelas\Pages\EditKelas;
+use Modules\Kesantrian\Filament\Resources\Kelas\Pages\ListKelas;
 use Modules\Kesantrian\Models\Kelas;
 
 class KelasResource extends Resource
@@ -40,22 +40,22 @@ class KelasResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_akademik', 'manage_akademik', 'manage_santri']) ?? false;
     }
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false;
+        return auth()->user()?->canAny(['view_akademik', 'manage_akademik', 'manage_santri']) ?? false;
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->canAny(['manage_akademik', 'manage_santri']) ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->canAny(['manage_akademik', 'manage_santri']) ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -71,6 +71,19 @@ class KelasResource extends Resource
                 ->required()
                 ->maxLength(20)
                 ->placeholder('e.g. 7, 10'),
+            Select::make('jenjang_kesetaraan')
+                ->label('Jenjang Kesetaraan (PKPPS/SPM)')
+                ->helperText('Pemetaan kelas internal ke jenjang formal untuk EMIS & ijazah. Kosong = ikut jenjang Lembaga saat dibuat.')
+                ->options(Kelas::opsiJenjangKesetaraan())
+                ->native(false)
+                ->nullable(),
+            TextInput::make('tingkat_kesetaraan')
+                ->label('Tingkat Kesetaraan')
+                ->helperText('Ula 1-6, Wustha 1-3, Ulya 1-3.')
+                ->numeric()
+                ->minValue(1)
+                ->maxValue(6)
+                ->nullable(),
             TextInput::make('jurusan')
                 ->label('Jurusan')
                 ->maxLength(50)
@@ -119,6 +132,11 @@ class KelasResource extends Resource
                 TextColumn::make('tingkat')
                     ->label('Tingkat')
                     ->sortable(),
+                TextColumn::make('label_kesetaraan')
+                    ->label('Kesetaraan')
+                    ->badge()
+                    ->color('success')
+                    ->placeholder('-'),
                 TextColumn::make('jurusan')
                     ->label('Jurusan')
                     ->placeholder('-'),

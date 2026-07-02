@@ -2,8 +2,8 @@
 
 namespace Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages;
 
-use Modules\Kesehatan\Filament\Resources\RiwayatKesehatanResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Kesehatan\Filament\Resources\RiwayatKesehatanResource;
 
 class EditRiwayatKesehatan extends EditRecord
 {

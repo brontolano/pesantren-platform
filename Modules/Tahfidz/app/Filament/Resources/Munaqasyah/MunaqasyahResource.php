@@ -3,9 +3,6 @@
 namespace Modules\Tahfidz\Filament\Resources\Munaqasyah;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\CreateMunaqasyah;
-use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\EditMunaqasyah;
-use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\ListMunaqasyah;
 use App\Models\User;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
@@ -21,6 +18,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\CreateMunaqasyah;
+use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\EditMunaqasyah;
+use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\ListMunaqasyah;
 use Modules\Tahfidz\Models\Munaqasyah;
 use UnitEnum;
 
@@ -42,12 +42,12 @@ class MunaqasyahResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('tahfidz');
+        return static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('tahfidz');
+        return static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     public static function form(Schema $schema): Schema

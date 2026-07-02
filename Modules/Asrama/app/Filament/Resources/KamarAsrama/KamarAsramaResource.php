@@ -2,9 +2,7 @@
 
 namespace Modules\Asrama\Filament\Resources\KamarAsrama;
 
-use Modules\Asrama\Filament\Resources\KamarAsrama\Pages\CreateKamarAsrama;
-use Modules\Asrama\Filament\Resources\KamarAsrama\Pages\EditKamarAsrama;
-use Modules\Asrama\Filament\Resources\KamarAsrama\Pages\ListKamarAsrama;
+use App\Filament\Concerns\ModuleGate;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -14,12 +12,18 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Asrama\Filament\Resources\KamarAsrama\Pages\CreateKamarAsrama;
+use Modules\Asrama\Filament\Resources\KamarAsrama\Pages\EditKamarAsrama;
+use Modules\Asrama\Filament\Resources\KamarAsrama\Pages\ListKamarAsrama;
 use Modules\Asrama\Models\BlokAsrama;
 use Modules\Asrama\Models\KamarAsrama;
 
 class KamarAsramaResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
+
     protected static ?string $model = KamarAsrama::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home-modern';
@@ -32,22 +36,22 @@ class KamarAsramaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_asrama', 'manage_asrama']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('asrama') && (auth()->user()?->canAny(['view_asrama', 'manage_asrama']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_asrama') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_santri') ?? false;
+        return auth()->user()?->can('manage_asrama') ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -93,7 +97,7 @@ class KamarAsramaResource extends Resource
             ]);
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with('blok');
     }
@@ -107,4 +111,3 @@ class KamarAsramaResource extends Resource
         ];
     }
 }
-

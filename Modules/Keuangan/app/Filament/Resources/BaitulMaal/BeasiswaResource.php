@@ -3,9 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateBeasiswa;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditBeasiswa;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListBeasiswa;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -20,6 +17,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateBeasiswa;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditBeasiswa;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListBeasiswa;
 use Modules\Keuangan\Models\Beasiswa;
 use Modules\Ledger\Models\SumberDana;
 
@@ -47,7 +47,7 @@ class BeasiswaResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_donasi', 'manage_donasi']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -57,12 +57,12 @@ class BeasiswaResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_donasi') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_donasi') ?? false;
     }
 
     public static function form(Schema $schema): Schema

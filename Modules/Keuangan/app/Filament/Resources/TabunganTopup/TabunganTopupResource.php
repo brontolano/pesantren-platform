@@ -3,7 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\TabunganTopup;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\TabunganTopup\Pages\ListTabunganTopup;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
@@ -12,6 +11,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Keuangan\Filament\Resources\TabunganTopup\Pages\ListTabunganTopup;
 use Modules\Keuangan\Models\TabunganTopup;
 use Modules\Keuangan\Services\TopupService;
 
@@ -35,12 +35,12 @@ class TabunganTopupResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tabungan', 'manage_tabungan']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_tabungan', 'manage_tabungan']) ?? false);
     }
 
     public static function canCreate(): bool
@@ -101,7 +101,7 @@ class TabunganTopupResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (TabunganTopup $record) => $record->status === 'menunggu' && auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn (TabunganTopup $record) => $record->status === 'menunggu' && auth()->user()?->can('manage_tabungan'))
                     ->action(function (TabunganTopup $record): void {
                         (new TopupService)->setujui($record, auth()->id());
                     }),
@@ -109,7 +109,7 @@ class TabunganTopupResource extends Resource
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (TabunganTopup $record) => $record->status === 'menunggu' && auth()->user()?->can('manage_keuangan'))
+                    ->visible(fn (TabunganTopup $record) => $record->status === 'menunggu' && auth()->user()?->can('manage_tabungan'))
                     ->form([
                         Textarea::make('alasan')
                             ->label('Alasan Penolakan')

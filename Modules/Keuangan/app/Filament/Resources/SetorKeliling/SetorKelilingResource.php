@@ -2,9 +2,6 @@
 
 namespace Modules\Keuangan\Filament\Resources\SetorKeliling;
 
-use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\CreateSetorKeliling;
-use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\EditSetorKeliling;
-use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\ListSetorKeliling;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -20,6 +17,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\CreateSetorKeliling;
+use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\EditSetorKeliling;
+use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\ListSetorKeliling;
 use Modules\Keuangan\Models\SetorKelilingSesi;
 use Modules\Keuangan\Services\SetorKelilingService;
 
@@ -43,7 +43,7 @@ class SetorKelilingResource extends Resource
     {
         $user = Auth::user();
 
-        return ($user?->can('operate_pos') || $user?->can('manage_keuangan')) ?? false;
+        return ($user?->can('operate_pos') || $user?->can('manage_tabungan')) ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -123,7 +123,7 @@ class SetorKelilingResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalDescription(fn (SetorKelilingSesi $record): string => 'Saldo '.$record->items()->count().' santri akan bertambah total Rp '.number_format((float) $record->total, 0, ',', '.').'. Pastikan uang fisik sudah diterima.')
-                    ->visible(fn (SetorKelilingSesi $record): bool => $record->status === 'diajukan' && (Auth::user()?->can('manage_keuangan') ?? false))
+                    ->visible(fn (SetorKelilingSesi $record): bool => $record->status === 'diajukan' && (Auth::user()?->can('manage_tabungan') ?? false))
                     ->action(function (SetorKelilingSesi $record): void {
                         try {
                             app(SetorKelilingService::class)->setujui($record, (int) Auth::id());
@@ -139,7 +139,7 @@ class SetorKelilingResource extends Resource
                     ->schema([
                         Textarea::make('alasan')->label('Alasan penolakan')->required()->rows(2),
                     ])
-                    ->visible(fn (SetorKelilingSesi $record): bool => $record->status === 'diajukan' && (Auth::user()?->can('manage_keuangan') ?? false))
+                    ->visible(fn (SetorKelilingSesi $record): bool => $record->status === 'diajukan' && (Auth::user()?->can('manage_tabungan') ?? false))
                     ->action(function (SetorKelilingSesi $record, array $data): void {
                         try {
                             app(SetorKelilingService::class)->tolak($record, (int) Auth::id(), (string) $data['alasan']);

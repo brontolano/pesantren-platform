@@ -3,9 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\Pos\PosProfil;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages\CreatePosProfil;
-use Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages\EditPosProfil;
-use Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages\ListPosProfil;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -18,6 +15,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages\CreatePosProfil;
+use Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages\EditPosProfil;
+use Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages\ListPosProfil;
 use Modules\Keuangan\Models\PosProfil;
 use Modules\Ledger\Models\Akun;
 
@@ -41,7 +41,7 @@ class PosProfilResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('keuangan') && (auth()->user()?->can('operate_pos') ?? false);
+        return UiMode::advanced() && static::moduleVisible('koperasi') && (auth()->user()?->can('operate_pos') ?? false);
     }
 
     public static function canAccess(): bool

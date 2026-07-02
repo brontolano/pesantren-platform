@@ -3,9 +3,6 @@
 namespace Modules\Tahfidz\Filament\Resources\TahfidzTarget;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\CreateTahfidzTarget;
-use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\EditTahfidzTarget;
-use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\ListTahfidzTarget;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -17,6 +14,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\CreateTahfidzTarget;
+use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\EditTahfidzTarget;
+use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\ListTahfidzTarget;
 use Modules\Tahfidz\Models\TahfidzTarget;
 use Modules\Tahfidz\Services\TahfidzKpiService;
 
@@ -40,7 +40,7 @@ class TahfidzTargetResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+        return UiMode::advanced() && static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     public static function canAccess(): bool

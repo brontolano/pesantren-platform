@@ -15,15 +15,15 @@ class MediaImageServiceTest extends TestCase
     public function test_lewati_mime_tak_didukung(): void
     {
         // Mime non-gambar → null lebih dulu (tak butuh GD / file).
-        $this->assertNull((new MediaImageService())->compress('public', 'dok.pdf', 'application/pdf'));
-        $this->assertNull((new MediaImageService())->compress('public', 'x', null));
+        $this->assertNull((new MediaImageService)->compress('public', 'dok.pdf', 'application/pdf'));
+        $this->assertNull((new MediaImageService)->compress('public', 'x', null));
     }
 
     public function test_lewati_file_hilang(): void
     {
         Storage::fake('public');
 
-        $this->assertNull((new MediaImageService())->compress('public', 'tidak-ada.jpg', 'image/jpeg'));
+        $this->assertNull((new MediaImageService)->compress('public', 'tidak-ada.jpg', 'image/jpeg'));
     }
 
     public function test_resize_gambar_lebar_berlebih(): void
@@ -42,7 +42,7 @@ class MediaImageServiceTest extends TestCase
 
         Storage::disk('public')->put('besar.png', $png);
 
-        $hasil = (new MediaImageService())->compress('public', 'besar.png', 'image/png');
+        $hasil = (new MediaImageService)->compress('public', 'besar.png', 'image/png');
 
         $this->assertIsInt($hasil);
 

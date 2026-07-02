@@ -3,6 +3,7 @@
 namespace Modules\Pajak\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -48,7 +49,7 @@ class KalkulatorPph21 extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return \App\Support\UiMode::navAdvanced('pajak') && static::canAccess();
+        return UiMode::navAdvanced('pajak') && static::canAccess();
     }
 
     public function mount(): void

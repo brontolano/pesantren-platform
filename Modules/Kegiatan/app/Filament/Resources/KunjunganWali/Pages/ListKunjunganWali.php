@@ -2,9 +2,9 @@
 
 namespace Modules\Kegiatan\Filament\Resources\KunjunganWali\Pages;
 
-use Modules\Kegiatan\Filament\Resources\KunjunganWaliResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Kegiatan\Filament\Resources\KunjunganWaliResource;
 
 class ListKunjunganWali extends ListRecords
 {

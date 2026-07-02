@@ -109,8 +109,8 @@ class AuditTrailTest extends TestCase
  */
 class AuditableTestModel extends Model
 {
-    use BelongsToTenant;
     use Auditable;
+    use BelongsToTenant;
 
     protected $table = 'inventory_item';
 

@@ -2,9 +2,9 @@
 
 namespace Modules\PPDB\Filament\Resources\SoalUjian\Pages;
 
-use Modules\PPDB\Filament\Resources\SoalUjianResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\PPDB\Filament\Resources\SoalUjianResource;
 
 class ListSoalUjian extends ListRecords
 {

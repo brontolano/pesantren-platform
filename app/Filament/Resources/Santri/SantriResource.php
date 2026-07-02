@@ -139,6 +139,14 @@ class SantriResource extends Resource
                     ->label('NISN')
                     ->maxLength(50)
                     ->placeholder('10 digit NISN'),
+                // Kependudukan wajib EMIS 4.0 (Refs #327)
+                TextInput::make('no_kk')
+                    ->label('No. Kartu Keluarga')
+                    ->maxLength(20)
+                    ->placeholder('16 digit No. KK'),
+                TextInput::make('no_akta_lahir')
+                    ->label('No. Akta Kelahiran')
+                    ->maxLength(60),
                 TextInput::make('asal_sekolah')
                     ->label('Asal Sekolah')
                     ->maxLength(255),
@@ -146,7 +154,11 @@ class SantriResource extends Resource
                     ->label('Foto')
                     ->image()
                     ->directory('santri-photos')
-                    ->maxSize(2048),
+                    ->maxSize(2048)
+                    // Privasi foto putri: sembunyikan field foto saat mengedit santri
+                    // perempuan bila pengguna bukan pimpinan pondok/super admin
+                    // (saat tambah baru / santri putra tetap tampil).
+                    ->visible(fn (?Santri $record): bool => $record === null || $record->fotoDapatDilihat()),
             ])->columns(2),
 
             Section::make('Alamat Santri')->schema([
@@ -420,7 +432,10 @@ class SantriResource extends Resource
                 ImageColumn::make('photo_url')
                     ->label('Foto')
                     ->circular()
-                    ->defaultImageUrl(fn () => 'https://ui-avatars.com/api/?background=random&name=S'),
+                    // Privasi foto putri: santri perempuan hanya tampil ke pimpinan
+                    // pondok/super admin; selain itu → avatar inisial nama.
+                    ->getStateUsing(fn (Santri $record): ?string => $record->fotoDapatDilihat() ? $record->photo_url : null)
+                    ->defaultImageUrl(fn (Santri $record): string => $record->avatarInisialUrl()),
                 TextColumn::make('nis')
                     ->label('NIS')
                     ->searchable()
@@ -435,6 +450,12 @@ class SantriResource extends Resource
                 TextColumn::make('kelas.nama_kelas')
                     ->label('Kelas')
                     ->sortable(),
+                TextColumn::make('label_kesetaraan')
+                    ->label('Jenjang Kesetaraan')
+                    ->badge()
+                    ->color('success')
+                    ->placeholder('-')
+                    ->toggleable(),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -475,6 +496,39 @@ class SantriResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where(
                         fn (Builder $q) => $q->whereNull('nisn')->orWhere('nisn', ''),
                     )),
+                // Refs #327 — drill-down halaman Kesiapan EMIS (field wajib EMIS 4.0).
+                Filter::make('tanpa_kk')
+                    ->label('Tanpa No. KK')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('no_kk')->orWhere('no_kk', ''),
+                    )),
+                Filter::make('tanpa_akta')
+                    ->label('Tanpa No. Akta Kelahiran')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('no_akta_lahir')->orWhere('no_akta_lahir', ''),
+                    )),
+                Filter::make('tanpa_ttl')
+                    ->label('Tempat/tanggal lahir kosong')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('tempat_lahir')->orWhere('tempat_lahir', '')->orWhereNull('tanggal_lahir'),
+                    )),
+                Filter::make('tanpa_alamat')
+                    ->label('Tanpa alamat')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('alamat')->orWhere('alamat', ''),
+                    )),
+                Filter::make('tanpa_ortu')
+                    ->label('Nama ayah/ibu kosong')
+                    ->query(fn (Builder $query): Builder => $query->where(
+                        fn (Builder $q) => $q->whereNull('nama_ayah')->orWhere('nama_ayah', '')
+                            ->orWhereNull('nama_ibu')->orWhere('nama_ibu', ''),
+                    )),
+                Filter::make('mukim_belum_didata')
+                    ->label('Status mukim belum didata')
+                    ->query(fn (Builder $query): Builder => $query->whereNull('is_mukim')),
+                Filter::make('tanpa_rombel')
+                    ->label('Belum punya rombel/kelas')
+                    ->query(fn (Builder $query): Builder => $query->whereNull('kelas_id')),
             ])
             ->actions([
                 Action::make('id_card')

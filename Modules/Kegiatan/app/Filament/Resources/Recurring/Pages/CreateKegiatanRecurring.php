@@ -2,8 +2,8 @@
 
 namespace Modules\Kegiatan\Filament\Resources\Recurring\Pages;
 
-use Modules\Kegiatan\Filament\Resources\Recurring\KegiatanRecurringResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Kegiatan\Filament\Resources\Recurring\KegiatanRecurringResource;
 
 class CreateKegiatanRecurring extends CreateRecord
 {

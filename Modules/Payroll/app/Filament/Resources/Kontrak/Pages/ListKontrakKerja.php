@@ -2,9 +2,9 @@
 
 namespace Modules\Payroll\Filament\Resources\Kontrak\Pages;
 
-use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Payroll\Filament\Resources\Kontrak\KontrakKerjaResource;
 
 class ListKontrakKerja extends ListRecords
 {

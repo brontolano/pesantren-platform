@@ -2,10 +2,10 @@
 
 namespace Modules\Payroll\Filament\Resources\Pinjaman\Pages;
 
-use Modules\Payroll\Filament\Resources\Pinjaman\PinjamanPegawaiResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Modules\Payroll\Filament\Resources\Pinjaman\PinjamanPegawaiResource;
 use Modules\Payroll\Services\KasbonService;
 
 class CreatePinjamanPegawai extends CreateRecord

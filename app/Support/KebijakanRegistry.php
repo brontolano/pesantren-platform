@@ -66,6 +66,11 @@ class KebijakanRegistry
                 'deskripsi' => 'Bila AKTIF (disarankan): komentar masuk berstatus "menunggu" dan baru tampil setelah staf menyetujui. Bila non-aktif: komentar langsung tampil dan staf bisa menyembunyikan belakangan.',
                 'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
             ],
+            'pwa.root_sw_enabled' => [
+                'label' => 'Aktifkan mode aplikasi (service worker) untuk Beranda',
+                'deskripsi' => 'Bila AKTIF: Beranda dapat "dipasang" sebagai aplikasi & memuat lebih ringan. JANGAN aktifkan sebelum tim menguji di HP — jika bermasalah dapat membuat halaman gagal tampil. Default non-aktif demi keamanan.',
+                'default' => false, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
             // ---------------- Disiplin ----------------
             DisiplinService::SETTING_WAJIB_VERIFIKASI => [
                 'label' => 'Catatan pelanggaran wajib diverifikasi ustadz',

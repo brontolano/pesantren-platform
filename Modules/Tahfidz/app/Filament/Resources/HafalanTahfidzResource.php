@@ -3,9 +3,6 @@
 namespace Modules\Tahfidz\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource\Pages\CreateHafalanTahfidz;
-use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource\Pages\EditHafalanTahfidz;
-use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource\Pages\ListHafalanTahfidz;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
@@ -18,6 +15,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource\Pages\CreateHafalanTahfidz;
+use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource\Pages\EditHafalanTahfidz;
+use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource\Pages\ListHafalanTahfidz;
 use Modules\Tahfidz\Models\HafalanTahfidz;
 use UnitEnum;
 
@@ -27,12 +27,12 @@ class HafalanTahfidzResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('tahfidz');
+        return UiMode::advanced() && static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('tahfidz');
+        return static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
     protected static ?string $model = HafalanTahfidz::class;

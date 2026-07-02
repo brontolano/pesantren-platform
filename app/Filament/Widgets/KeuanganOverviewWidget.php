@@ -11,14 +11,14 @@ class KeuanganOverviewWidget extends StatsOverviewWidget
 {
     public static function canView(): bool
     {
-        return auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false;
+        return auth()->user()?->can('view_laporan_keuangan') ?? false;
     }
 
     protected static ?int $sort = 2;
 
     protected function getStats(): array
     {
-        if (! auth()->user()?->canAny(['view_keuangan', 'manage_keuangan'])) {
+        if (! auth()->user()?->can('view_laporan_keuangan')) {
             return [];
         }
 
@@ -43,18 +43,18 @@ class KeuanganOverviewWidget extends StatsOverviewWidget
             ->sum('nominal');
 
         return [
-            Stat::make('Total Tagihan Aktif', 'Rp ' . number_format($totalTagihan, 0, ',', '.'))
+            Stat::make('Total Tagihan Aktif', 'Rp '.number_format($totalTagihan, 0, ',', '.'))
                 ->icon('heroicon-o-banknotes'),
-            Stat::make('Total Terkumpul', 'Rp ' . number_format($totalTerkumpul, 0, ',', '.'))
+            Stat::make('Total Terkumpul', 'Rp '.number_format($totalTerkumpul, 0, ',', '.'))
                 ->icon('heroicon-o-check-circle')
                 ->color('success'),
-            Stat::make('Piutang', 'Rp ' . number_format($totalTagihan - $totalTerkumpul, 0, ',', '.'))
+            Stat::make('Piutang', 'Rp '.number_format($totalTagihan - $totalTerkumpul, 0, ',', '.'))
                 ->icon('heroicon-o-exclamation-triangle')
                 ->color($totalTagihan - $totalTerkumpul > 0 ? 'danger' : 'success'),
-            Stat::make('Jatuh Tempo', $jatuhTempo . ' tagihan')
+            Stat::make('Jatuh Tempo', $jatuhTempo.' tagihan')
                 ->icon('heroicon-o-clock')
                 ->color($jatuhTempo > 0 ? 'warning' : 'success'),
-            Stat::make('Pembayaran Hari Ini', 'Rp ' . number_format($hariIni, 0, ',', '.'))
+            Stat::make('Pembayaran Hari Ini', 'Rp '.number_format($hariIni, 0, ',', '.'))
                 ->icon('heroicon-o-currency-dollar'),
         ];
     }

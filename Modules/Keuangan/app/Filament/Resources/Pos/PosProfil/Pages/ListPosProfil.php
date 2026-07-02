@@ -2,9 +2,9 @@
 
 namespace Modules\Keuangan\Filament\Resources\Pos\PosProfil\Pages;
 
-use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 
 class ListPosProfil extends ListRecords
 {

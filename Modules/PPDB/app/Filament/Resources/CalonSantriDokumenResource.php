@@ -2,9 +2,7 @@
 
 namespace Modules\PPDB\Filament\Resources;
 
-use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\CreateCalonSantriDokumen;
-use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\EditCalonSantriDokumen;
-use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\ListCalonSantriDokumen;
+use App\Filament\Concerns\ModuleGate;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -12,12 +10,16 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\CreateCalonSantriDokumen;
+use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\EditCalonSantriDokumen;
+use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\ListCalonSantriDokumen;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\CalonSantriDokumen;
 use Modules\PPDB\Services\PpdbWhatsappNotifier;
@@ -25,7 +27,7 @@ use Modules\PPDB\Support\PpdbDocumentTypes;
 
 class CalonSantriDokumenResource extends Resource
 {
-    use \App\Filament\Concerns\ModuleGate;
+    use ModuleGate;
 
     protected static ?string $model = CalonSantriDokumen::class;
 
@@ -50,22 +52,22 @@ class CalonSantriDokumenResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_santri', 'manage_santri']) ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->canAny(['view_ppdb', 'manage_ppdb']) ?? false);
     }
 
     public static function canCreate(): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
-        return Auth::user()?->can('manage_santri') ?? false;
+        return Auth::user()?->can('manage_ppdb') ?? false;
     }
 
     public static function form(Schema $schema): Schema
@@ -118,14 +120,17 @@ class CalonSantriDokumenResource extends Resource
                 Action::make('lihatFile')
                     ->label('Lihat')
                     ->icon('heroicon-o-eye')
-                    ->visible(fn (CalonSantriDokumen $record): bool => $record->file_url !== null)
+                    // Privasi foto putri (#340): pas foto calon PEREMPUAN hanya
+                    // bisa dibuka peran berhak (pimpinan/super admin).
+                    ->visible(fn (CalonSantriDokumen $record): bool => $record->file_url !== null
+                        && static::fotoCalonBolehDilihat($record))
                     ->url(fn (CalonSantriDokumen $record): string => route('ppdb.file.dokumen', $record), shouldOpenInNewTab: true),
                 Action::make('verifikasi')
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isVerified() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isVerified() && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->action(function (CalonSantriDokumen $record): void {
                         $record->update([
                             'status' => CalonSantriDokumen::STATUS_VERIFIED,
@@ -147,7 +152,7 @@ class CalonSantriDokumenResource extends Resource
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isRejected() && (Auth::user()?->can('manage_santri') ?? false))
+                    ->visible(fn (CalonSantriDokumen $record): bool => ! $record->isRejected() && (Auth::user()?->can('manage_ppdb') ?? false))
                     ->schema([
                         Textarea::make('catatan_verifikasi')
                             ->label('Alasan penolakan')
@@ -177,6 +182,20 @@ class CalonSantriDokumenResource extends Resource
             ]);
     }
 
+    /**
+     * Privasi foto putri (#340): dokumen jenis 'foto' milik calon santri
+     * PEREMPUAN hanya boleh dibuka peran berhak (Santri::PERAN_LIHAT_FOTO_PUTRI).
+     * Dokumen lain (ijazah, KK, akta) tidak digerbang.
+     */
+    public static function fotoCalonBolehDilihat(CalonSantriDokumen $record): bool
+    {
+        if ($record->jenis_dokumen !== 'foto') {
+            return true;
+        }
+
+        return $record->calonSantri?->fotoDapatDilihat() ?? true;
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with('calonSantri');
@@ -191,4 +210,3 @@ class CalonSantriDokumenResource extends Resource
         ];
     }
 }
-

@@ -43,6 +43,8 @@ class EmisExportKategoriTest extends TestCase
             'tanggal_lahir' => '2012-03-05', 'tempat_lahir' => 'Sumedang',
             'jenis_kelamin' => 'L', 'nik' => '3211000000000001', 'nisn' => '0051234567',
             'alamat' => 'Jl. Pesantren 1', 'is_mukim' => true,
+            // Refs #327 — field kependudukan wajib EMIS 4.0.
+            'no_kk' => '3211000000000099', 'no_akta_lahir' => 'AL-1234/2012',
         ]);
         // Kurang NIK + NISN → kolom kosong + peringatan, BUKAN gagal.
         Santri::create([
@@ -65,6 +67,13 @@ class EmisExportKategoriTest extends TestCase
         $this->assertSame('2012-03-05', $lengkap[$iTglLahir]);
         $this->assertSame('MUKIM', $lengkap[$iMukim]);
         $this->assertSame('', $kurang[$iNik]); // kosong, tidak meledak
+
+        // Refs #327 — kolom EMIS 4.0 tambahan ikut terekspor.
+        $iKk = array_search('NO_KK', EmisExportService::HEADER, true);
+        $iAkta = array_search('NO_AKTA_LAHIR', EmisExportService::HEADER, true);
+        $this->assertSame('3211000000000099', $lengkap[$iKk]);
+        $this->assertSame('AL-1234/2012', $lengkap[$iAkta]);
+        $this->assertSame('', $kurang[$iKk]);
 
         $peringatan = $svc->peringatan('santri');
         $this->assertCount(1, $peringatan);

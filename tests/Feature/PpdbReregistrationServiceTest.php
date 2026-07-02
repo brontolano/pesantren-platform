@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use App\Models\Tenant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use InvalidArgumentException;
+use Modules\Asrama\Models\BlokAsrama;
+use Modules\Asrama\Models\KamarAsrama;
+use Modules\Asrama\Models\PenempatanAsrama;
 use Modules\Kesantrian\Models\Santri;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\HasilUjian;
@@ -18,6 +21,7 @@ class PpdbReregistrationServiceTest extends TestCase
     use InteractsWithPpdbTestDatabase;
 
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void
@@ -170,13 +174,13 @@ class PpdbReregistrationServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenantA);
 
-        $blok = \Modules\Asrama\Models\BlokAsrama::create([
+        $blok = BlokAsrama::create([
             'tenant_id' => $this->tenantA->getKey(),
             'nama_blok' => 'Blok A',
             'is_active' => true,
         ]);
 
-        $kamar = \Modules\Asrama\Models\KamarAsrama::create([
+        $kamar = KamarAsrama::create([
             'tenant_id' => $this->tenantA->getKey(),
             'blok_id' => $blok->id,
             'nomor_kamar' => 'A-101',
@@ -191,7 +195,7 @@ class PpdbReregistrationServiceTest extends TestCase
             'kamar_asrama_id' => $kamar->id,
         ]);
 
-        $penempatan = \Modules\Asrama\Models\PenempatanAsrama::query()
+        $penempatan = PenempatanAsrama::query()
             ->where('santri_id', $updated->santri_id)
             ->where('is_current', true)
             ->first();
@@ -206,12 +210,12 @@ class PpdbReregistrationServiceTest extends TestCase
     {
         tenancy()->initialize($this->tenantA);
 
-        $blok = \Modules\Asrama\Models\BlokAsrama::create([
+        $blok = BlokAsrama::create([
             'tenant_id' => $this->tenantA->getKey(),
             'nama_blok' => 'Blok B',
             'is_active' => true,
         ]);
-        $kamar = \Modules\Asrama\Models\KamarAsrama::create([
+        $kamar = KamarAsrama::create([
             'tenant_id' => $this->tenantA->getKey(),
             'blok_id' => $blok->id,
             'nomor_kamar' => 'B-101',
@@ -228,7 +232,7 @@ class PpdbReregistrationServiceTest extends TestCase
             'jenis_kelamin' => 'L',
             'status' => 'aktif',
         ]);
-        \Modules\Asrama\Models\PenempatanAsrama::create([
+        PenempatanAsrama::create([
             'tenant_id' => $this->tenantA->getKey(),
             'santri_id' => $santriLama->id,
             'kamar_id' => $kamar->id,

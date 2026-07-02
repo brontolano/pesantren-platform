@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Setting;
 use App\Models\Tenant;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -32,6 +33,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
             'tenants', 'domains', 'users', 'roles', 'permissions', 'model_has_roles', 'model_has_permissions',
             'santri', 'tagihan', 'pembayaran', 'calon_santri', 'gelombang_ppdb',
             'jenis_pelanggaran', 'pelanggaran_santri', 'sanksi_santri', 'eskalasi_disiplin',
+            'kitab', 'sorogan_setoran', 'ngaji_sesi', 'ngaji_sesi_peserta',
         ]);
         $this->truncatePpdbTables(['domains', 'tenants']);
     }
@@ -66,7 +68,7 @@ class TenantPanelAuthedSmokeTest extends TestCase
         // tenant non-dev. Promosikan ke released + aktifkan agar halaman/resource-nya
         // benar-benar ter-render (assert 200 di bawah), bukan 403 yang lolos diam-diam.
         // Ditulis SEBELUM request pertama agar cache modul memuat nilai terbaru.
-        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu', 'asrama', 'pajak', 'akademik', 'ppdb', 'ai'] as $modul) {
+        foreach (['kegiatan', 'notifikasi', 'kesehatan', 'tahfidz', 'mutu', 'asrama', 'pajak', 'akademik', 'ppdb', 'ai', 'keuangan'] as $modul) {
             DB::connection('pgsql')->table('module_registry')->where('key', $modul)->update(['status' => 'released']);
             DB::connection('pgsql')->table('tenant_modules')->insert([
                 'tenant_id' => $tenant->id, 'module_name' => $modul, 'is_active' => true,
@@ -150,6 +152,36 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $halaqahReq->headers->set('Host', $host);
         $halaqahStatus = $kernel->handle($halaqahReq)->getStatusCode();
         $this->assertSame(200, $halaqahStatus, "Edit Halaqah (KeanggotaanRelationManager) status {$halaqahStatus}, harusnya 200.");
+
+        // Issue #330 — Sorogan & Ngaji Kitab WAJIB 200 → bukti resource TERDAFTAR
+        // + form penilaian (create) & halaman progres per santri ter-render.
+        foreach ([
+            'admin/setoran-sorogan' => 'ListSetoranSorogan',
+            'admin/setoran-sorogan/create' => 'CreateSetoranSorogan (form penilaian)',
+            'admin/setoran-sorogan/progres' => 'ProgresSorogan (progres per santri)',
+            'admin/ngaji-sesi' => 'ListNgajiSesi',
+            'admin/ngaji-sesi/create' => 'CreateNgajiSesi',
+        ] as $soroganPath => $soroganLabel) {
+            $soroganReq = Request::create("http://{$host}/{$soroganPath}", 'GET');
+            $soroganReq->headers->set('Host', $host);
+            $soroganStatus = $kernel->handle($soroganReq)->getStatusCode();
+            $this->assertSame(200, $soroganStatus, "Sorogan/Ngaji Kitab ({$soroganLabel}) status {$soroganStatus}, harusnya 200.");
+        }
+
+        // Edit Sesi Ngaji WAJIB 200 → bukti PesertaRelationManager ter-mount
+        // (RM hanya tampil di halaman edit).
+        $kitabSmokeId = DB::connection('tenant')->table('kitab')->insertGetId([
+            'tenant_id' => $tenant->id, 'nama' => 'Kitab Smoke',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $ngajiSesiId = DB::connection('tenant')->table('ngaji_sesi')->insertGetId([
+            'tenant_id' => $tenant->id, 'kitab_id' => $kitabSmokeId, 'tanggal' => now()->toDateString(),
+            'metode' => 'bandongan', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $ngajiEditReq = Request::create("http://{$host}/admin/ngaji-sesi/{$ngajiSesiId}/edit", 'GET');
+        $ngajiEditReq->headers->set('Host', $host);
+        $ngajiEditStatus = $kernel->handle($ngajiEditReq)->getStatusCode();
+        $this->assertSame(200, $ngajiEditStatus, "Edit Sesi Ngaji (PesertaRelationManager) status {$ngajiEditStatus}, harusnya 200.");
 
         // Sima'an (SimaAnResource baru, slug eksplisit tahfidz/simaan) WAJIB 200 →
         // bukti resource TERDAFTAR di panel.
@@ -251,6 +283,43 @@ class TenantPanelAuthedSmokeTest extends TestCase
             $aiStatus = $kernel->handle($aiReq)->getStatusCode();
             $this->assertSame(200, $aiStatus, "Halaman AI /{$aiPath} status {$aiStatus}, harusnya 200 (modul AI released).");
         }
+
+        // Tagihan Rutin (mesin langganan SPP/makan/asrama — jalur uang, issue #335)
+        // WAJIB 200: daftar aturan + form create (Select target lembaga/kelas,
+        // sumber dana, divisi — hanya ter-render di halaman create/edit).
+        foreach (['admin/tagihan-rutin/tagihan-rutins', 'admin/tagihan-rutin/tagihan-rutins/create'] as $trPath) {
+            $trReq = Request::create("http://{$host}/{$trPath}", 'GET');
+            $trReq->headers->set('Host', $host);
+            $trStatus = $kernel->handle($trReq)->getStatusCode();
+            $this->assertSame(200, $trStatus, "Tagihan Rutin /{$trPath} status {$trStatus}, harusnya 200.");
+        }
+
+        // CAKUPAN MENYELURUH (issue #335): render halaman INDEX dari SEMUA resource
+        // yang terdaftar di panel tenant, secara DINAMIS — resource baru otomatis
+        // ikut teruji tanpa perlu menambah path manual. Assert <500 (403 modul
+        // nonaktif boleh; 500 = panel rusak — regresi ikon nav/statePath/dll).
+        $sudah = array_map(fn (string $p) => strtok($p, '?'), $paths);
+        $panel = Filament::getPanel('tenant');
+        $resourceDicek = 0;
+        foreach ($panel->getResources() as $resourceClass) {
+            try {
+                $url = $resourceClass::getUrl('index', panel: 'tenant');
+            } catch (\Throwable) {
+                continue; // resource tanpa halaman index (mis. simple/no pages)
+            }
+            $path = ltrim((string) parse_url($url, PHP_URL_PATH), '/');
+            if ($path === '' || in_array($path, $sudah, true)) {
+                continue; // sudah teruji di daftar eksplisit di atas
+            }
+            $sudah[] = $path;
+
+            $rReq = Request::create("http://{$host}/{$path}", 'GET');
+            $rReq->headers->set('Host', $host);
+            $rStatus = $kernel->handle($rReq)->getStatusCode();
+            $this->assertLessThan(500, $rStatus, "Render /{$path} ({$resourceClass}) mengembalikan {$rStatus} (>=500). Panel rusak utk user login.");
+            $resourceDicek++;
+        }
+        $this->assertGreaterThan(50, $resourceDicek, 'Sweep dinamis resource panel terlalu sedikit — kemungkinan panel tidak ter-boot.');
 
         tenancy()->end();
     }

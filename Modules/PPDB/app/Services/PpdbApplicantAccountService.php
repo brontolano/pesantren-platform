@@ -36,7 +36,7 @@ class PpdbApplicantAccountService
         $user = $calon->user;
 
         if ($user === null) {
-            $user = new User();
+            $user = new User;
             $user->name = $calon->nama;
             $user->email = null;                 // peserta login via No. HP, email tak wajib
             $user->phone = $phone;

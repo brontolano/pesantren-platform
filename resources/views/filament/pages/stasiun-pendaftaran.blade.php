@@ -69,7 +69,9 @@
 
                 <x-filament::section>
                     <div class="flex items-center gap-4">
-                        <img src="{{ $this->santri->photo_url ? url('/_tenant-storage/'.$this->santri->photo_url) : 'https://ui-avatars.com/api/?background=059669&color=fff&name='.urlencode($this->santri->nama) }}"
+                        {{-- Privasi foto putri (#340): foto tersimpan hanya tampil bila petugas berhak
+                             atau foto baru dijepret sesi ini; selain itu avatar inisial. --}}
+                        <img src="{{ ($this->santri->photo_url && $this->fotoLoketBolehTampil) ? url('/_tenant-storage/'.$this->santri->photo_url) : $this->santri->avatarInisialUrl() }}"
                             class="h-20 w-16 rounded-xl object-cover" alt="foto">
                         <div>
                             <h2 class="text-lg font-bold">{{ $this->santri->nama }}</h2>

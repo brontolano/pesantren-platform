@@ -3,9 +3,6 @@
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateProgramDonasi;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditProgramDonasi;
-use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListProgramDonasi;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -19,6 +16,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateProgramDonasi;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditProgramDonasi;
+use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListProgramDonasi;
 use Modules\Keuangan\Models\ProgramDonasi;
 use Modules\Ledger\Models\SumberDana;
 
@@ -45,7 +45,7 @@ class ProgramDonasiResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_keuangan', 'manage_keuangan']) ?? false);
+        return static::moduleVisible('keuangan') && (auth()->user()?->canAny(['view_donasi', 'manage_donasi']) ?? false);
     }
 
     public static function canAccess(): bool
@@ -55,12 +55,12 @@ class ProgramDonasiResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_donasi') ?? false;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return auth()->user()?->can('manage_keuangan') ?? false;
+        return auth()->user()?->can('manage_donasi') ?? false;
     }
 
     public static function form(Schema $schema): Schema

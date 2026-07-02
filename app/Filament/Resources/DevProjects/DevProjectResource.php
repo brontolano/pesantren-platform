@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class DevProjectResource extends Resource
 {
@@ -88,7 +89,7 @@ class DevProjectResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->label('Proyek')->searchable()->sortable()
-                    ->description(fn (DevProject $r): ?string => $r->description ? \Illuminate\Support\Str::limit($r->description, 60) : null),
+                    ->description(fn (DevProject $r): ?string => $r->description ? Str::limit($r->description, 60) : null),
                 TextColumn::make('status')->label('Status')->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'planning' => 'Perencanaan',

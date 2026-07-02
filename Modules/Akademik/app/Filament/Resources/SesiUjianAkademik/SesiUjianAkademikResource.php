@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\SesiUjianAkademik;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\SesiUjianAkademik\Pages\CreateSesiUjianAkademik;
-use Modules\Akademik\Filament\Resources\SesiUjianAkademik\Pages\EditSesiUjianAkademik;
-use Modules\Akademik\Filament\Resources\SesiUjianAkademik\Pages\ListSesiUjianAkademik;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -20,6 +17,9 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Modules\Akademik\Filament\Resources\SesiUjianAkademik\Pages\CreateSesiUjianAkademik;
+use Modules\Akademik\Filament\Resources\SesiUjianAkademik\Pages\EditSesiUjianAkademik;
+use Modules\Akademik\Filament\Resources\SesiUjianAkademik\Pages\ListSesiUjianAkademik;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Models\SesiUjianAkademik;

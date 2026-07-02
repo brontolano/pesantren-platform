@@ -2,8 +2,8 @@
 
 namespace Modules\Keuangan\Filament\Resources\SkemaBiaya\Pages;
 
-use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
 use Filament\Resources\Pages\CreateRecord;
+use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
 
 class CreateSkemaBiaya extends CreateRecord
 {

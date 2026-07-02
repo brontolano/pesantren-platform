@@ -3,7 +3,6 @@
 namespace Modules\PPDB\Filament\Resources\UjianAttempt;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\PPDB\Filament\Resources\UjianAttempt\Pages\ListUjianAttempt;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -13,6 +12,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Modules\PPDB\Filament\Resources\UjianAttempt\Pages\ListUjianAttempt;
 use Modules\PPDB\Models\Soal;
 use Modules\PPDB\Models\UjianAttempt;
 use Modules\PPDB\Services\UjianOnlineService;
@@ -42,7 +42,7 @@ class UjianAttemptResource extends Resource
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('ppdb') && (Auth::user()?->can('manage_santri') ?? false);
+        return static::moduleVisible('ppdb') && (Auth::user()?->can('manage_ppdb') ?? false);
     }
 
     public static function canCreate(): bool

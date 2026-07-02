@@ -2,8 +2,8 @@
 
 namespace Modules\Kegiatan\Filament\Resources\IzinSantri\Pages;
 
-use Modules\Kegiatan\Filament\Resources\IzinSantriResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Kegiatan\Filament\Resources\IzinSantriResource;
 
 class EditIzinSantri extends EditRecord
 {

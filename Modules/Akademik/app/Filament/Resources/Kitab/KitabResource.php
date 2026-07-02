@@ -3,9 +3,6 @@
 namespace Modules\Akademik\Filament\Resources\Kitab;
 
 use App\Filament\Concerns\ModuleGate;
-use Modules\Akademik\Filament\Resources\Kitab\Pages\CreateKitab;
-use Modules\Akademik\Filament\Resources\Kitab\Pages\EditKitab;
-use Modules\Akademik\Filament\Resources\Kitab\Pages\ListKitab;
 use BackedEnum;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -13,6 +10,9 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Akademik\Filament\Resources\Kitab\Pages\CreateKitab;
+use Modules\Akademik\Filament\Resources\Kitab\Pages\EditKitab;
+use Modules\Akademik\Filament\Resources\Kitab\Pages\ListKitab;
 use Modules\Akademik\Models\Kitab;
 use UnitEnum;
 
@@ -34,12 +34,12 @@ class KitabResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return static::moduleVisible('akademik');
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function canAccess(): bool
     {
-        return static::moduleVisible('akademik');
+        return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
     }
 
     public static function form(Schema $schema): Schema

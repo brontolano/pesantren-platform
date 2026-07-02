@@ -46,8 +46,8 @@ class AppLauncherTest extends TestCase
     private function user(array $roles): User
     {
         $u = User::withoutGlobalScopes()->create([
-            'name' => 'U ' . implode('-', $roles),
-            'email' => str()->lower(str()->random(8)) . '@' . tenant('id') . '.localhost',
+            'name' => 'U '.implode('-', $roles),
+            'email' => str()->lower(str()->random(8)).'@'.tenant('id').'.localhost',
             'password' => 'password',
             'tenant_id' => tenant('id'),
         ]);

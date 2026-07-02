@@ -2,9 +2,9 @@
 
 namespace Modules\Akademik\Filament\Resources\Program\Pages;
 
-use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
 
 class ListProgramStudi extends ListRecords
 {

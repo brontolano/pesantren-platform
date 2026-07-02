@@ -20,6 +20,7 @@ class PortalWaliDemoSeeder extends Seeder
         $wali = DB::table('users')->where('email', 'wali@demo.pesantren.online')->first();
         if (! $wali) {
             $this->command?->error('Wali user not found — run TenantDemoSeeder first.');
+
             return;
         }
 
@@ -28,6 +29,7 @@ class PortalWaliDemoSeeder extends Seeder
 
         if (! $santri1 || ! $santri2) {
             $this->command?->error('Santri demo not found.');
+
             return;
         }
 
@@ -62,7 +64,9 @@ class PortalWaliDemoSeeder extends Seeder
 
     private function seedHafalan(string $t, object $santri, $now, int $idx): void
     {
-        if (! DB::getSchemaBuilder()->hasTable('tahfidz_hafalan')) return;
+        if (! DB::getSchemaBuilder()->hasTable('tahfidz_hafalan')) {
+            return;
+        }
 
         $surahs = [
             ['surah' => 'Al-Baqarah', 'ayat_awal' => 1, 'ayat_akhir' => 20, 'status' => 'selesai'],
@@ -117,7 +121,9 @@ class PortalWaliDemoSeeder extends Seeder
 
     private function seedNilaiRapor(string $t, object $santri, ?int $periodeId, array $pelajaranIds, $now, int $idx): void
     {
-        if (! $periodeId || ! DB::getSchemaBuilder()->hasTable('rapor')) return;
+        if (! $periodeId || ! DB::getSchemaBuilder()->hasTable('rapor')) {
+            return;
+        }
 
         $kelasId = $santri->kelas_id;
         $ipk = $idx === 0 ? 87.5 : 91.2;
@@ -139,14 +145,18 @@ class PortalWaliDemoSeeder extends Seeder
             ]
         );
 
-        if (! DB::getSchemaBuilder()->hasTable('nilai')) return;
+        if (! DB::getSchemaBuilder()->hasTable('nilai')) {
+            return;
+        }
 
         $nilaiSet = $idx === 0
             ? ['FQH' => 88, 'AQD' => 85, 'QHD' => 92, 'BAR' => 80, 'NHS' => 78, 'MTK' => 75, 'BIN' => 88, 'IPA' => 82]
             : ['FQH' => 95, 'AQD' => 92, 'QHD' => 94, 'BAR' => 88, 'NHS' => 85, 'MTK' => 90, 'BIN' => 91, 'IPA' => 93];
 
         foreach ($nilaiSet as $kode => $nilaiAkhir) {
-            if (! isset($pelajaranIds[$kode])) continue;
+            if (! isset($pelajaranIds[$kode])) {
+                continue;
+            }
             DB::table('nilai')->updateOrInsert(
                 ['santri_id' => $santri->id, 'pelajaran_id' => $pelajaranIds[$kode], 'periode_akademik_id' => $periodeId],
                 [
@@ -165,7 +175,9 @@ class PortalWaliDemoSeeder extends Seeder
 
     private function seedKesehatan(string $t, object $santri, $now, int $idx): void
     {
-        if (! DB::getSchemaBuilder()->hasTable('riwayat_kesehatan')) return;
+        if (! DB::getSchemaBuilder()->hasTable('riwayat_kesehatan')) {
+            return;
+        }
 
         $riwayat = $idx === 0
             ? [
@@ -194,7 +206,9 @@ class PortalWaliDemoSeeder extends Seeder
 
     private function seedIzin(string $t, object $santri, $now, int $idx, ?int $approvedBy = null): void
     {
-        if (! DB::getSchemaBuilder()->hasTable('izin_santri')) return;
+        if (! DB::getSchemaBuilder()->hasTable('izin_santri')) {
+            return;
+        }
 
         $izinData = $idx === 0
             ? [

@@ -19,6 +19,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\PPDB\Models\UserOtp;
+use Modules\PPDB\Services\PesertaOtpService;
 
 class PortalWaliAuthController extends Controller
 {
@@ -30,8 +31,7 @@ class PortalWaliAuthController extends Controller
         private readonly WaliAccountService $accountService,
         private readonly PortalWaliIdentifierResolver $resolver,
         private readonly PortalWaliBrandingService $brandingService,
-    ) {
-    }
+    ) {}
 
     public function showLogin(Request $request): Response|RedirectResponse
     {
@@ -87,7 +87,7 @@ class PortalWaliAuthController extends Controller
             ]);
         }
 
-        app(\Modules\PPDB\Services\PesertaOtpService::class)
+        app(PesertaOtpService::class)
             ->verify($user, UserOtp::PURPOSE_AKTIVASI, $validated['kode']);
 
         $this->accountService->markActivated($user, $validated['password']);
@@ -201,7 +201,7 @@ class PortalWaliAuthController extends Controller
             ]);
         }
 
-        app(\Modules\PPDB\Services\PesertaOtpService::class)
+        app(PesertaOtpService::class)
             ->verify($user, UserOtp::PURPOSE_RESET, $validated['kode']);
 
         $this->accountService->markActivated($user, $validated['password']);

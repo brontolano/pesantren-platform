@@ -2,11 +2,12 @@
 
 namespace Modules\Keuangan\Filament\Resources\LaporanKeuangan\Pages;
 
-use Modules\Keuangan\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Keuangan\Filament\Resources\LaporanKeuangan\LaporanKeuanganResource;
+use Modules\Keuangan\Models\Tagihan;
 
 class ListLaporanKeuangan extends ListRecords
 {
@@ -70,7 +71,7 @@ class ListLaporanKeuangan extends ListRecords
                 ->default(''),
             Select::make('periode_akademik')
                 ->label('Periode Akademik')
-                ->options(fn (): array => \Modules\Keuangan\Models\Tagihan::query()
+                ->options(fn (): array => Tagihan::query()
                     ->whereNotNull('periode_akademik')
                     ->distinct()
                     ->orderByDesc('periode_akademik')
@@ -120,4 +121,3 @@ class ListLaporanKeuangan extends ListRecords
             ->all();
     }
 }
-

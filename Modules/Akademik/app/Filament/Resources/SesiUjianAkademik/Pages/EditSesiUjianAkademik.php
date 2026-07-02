@@ -2,8 +2,8 @@
 
 namespace Modules\Akademik\Filament\Resources\SesiUjianAkademik\Pages;
 
-use Modules\Akademik\Filament\Resources\SesiUjianAkademik\SesiUjianAkademikResource;
 use Filament\Resources\Pages\EditRecord;
+use Modules\Akademik\Filament\Resources\SesiUjianAkademik\SesiUjianAkademikResource;
 use Modules\Akademik\Services\UjianAkademikService;
 
 class EditSesiUjianAkademik extends EditRecord

@@ -6,24 +6,34 @@ namespace App\Models;
 use App\Traits\BelongsToTenant;
 use Database\Factories\UserFactory;
 use Filament\Auth\MultiFactor\Email\Contracts\HasEmailAuthentication;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Filament\Models\Contracts\FilamentUser;
-use Filament\Panel;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 use Modules\Kesantrian\Models\Santri;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'phone', 'password', 'must_reset_password', 'tenant_id', 'email_authentication_enabled'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements HasEmailAuthentication, FilamentUser
+class User extends Authenticatable implements FilamentUser, HasEmailAuthentication
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, BelongsToTenant, HasRoles;
+    use BelongsToTenant, HasApiTokens, HasFactory, HasRoles, Notifiable;
+
+    /**
+     * Pin guard Spatie ke 'web'. Semua peran/izin di-seed di guard 'web'; tanpa
+     * pin ini, request via guard 'sanctum' (aplikasi native) membuat Spatie
+     * Guard::getDefaultName ikut driver aktif → 'sanctum' → izin 'web' tak ketemu
+     * → can()/can:izin palsu-false (mis. can:komentar 403 padahal user berhak).
+     * Konsisten dgn Filament & web yang juga guard 'web'. NOL logika uang/nilai.
+     */
+    protected $guard_name = 'web';
 
     /**
      * Get the attributes that should be cast.

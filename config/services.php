@@ -47,4 +47,10 @@ return [
         'rate_per_minute' => (int) env('PUBLIC_API_RATE_PER_MINUTE', 60),
     ],
 
+    // Anggaran harian OTP WhatsApp jemaah per tenant (pagar biaya/anti-abuse,
+    // red-team RATE-001/AUTH-8). Longgar agar tak ganggu pemakaian wajar; 0 = mati.
+    'jemaah' => [
+        'otp_daily_budget' => (int) env('JEMAAH_OTP_DAILY_BUDGET', 300),
+    ],
+
 ];
