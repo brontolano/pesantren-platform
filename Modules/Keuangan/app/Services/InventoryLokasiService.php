@@ -34,8 +34,7 @@ class InventoryLokasiService
     public function __construct(
         private readonly InventoryService $inventoryService,
         private readonly JurnalService $jurnalService,
-    ) {
-    }
+    ) {}
 
     /** Penerimaan ke satu lokasi (+ batch opsional). Valuasi via InventoryService. */
     public function terimaDiLokasi(InventoryItem|int $item, int $lokasiId, float $qty, float $hargaBeli, array $opts = []): InventoryMutasi
@@ -209,7 +208,7 @@ class InventoryLokasiService
 
                 $this->jurnalService->postJurnal([
                     'tanggal' => $opts['tanggal'] ?? Carbon::now(),
-                    'deskripsi' => 'Opname persediaan — ' . $item->nama,
+                    'deskripsi' => 'Opname persediaan — '.$item->nama,
                     'tipe_sumber' => 'inventory_opname',
                     'ref_type' => 'InventoryOpname',
                     'ref_id' => (string) $mutasi->id,

@@ -11,6 +11,7 @@ use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\Jabatan;
 use Modules\Payroll\Models\PenugasanPegawai;
 use Modules\Payroll\Services\PayrollService;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -166,7 +167,7 @@ class EmployeeEmisTest extends TestCase
     {
         $this->boot('emis5');
         Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\RolesAndPermissionsSeeder', '--force' => true]);
-        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $user = $this->user();
         $e = Employee::create(['nama' => 'Purna Role', 'status_kepegawaian' => 'gty', 'users_id' => $user->id, 'aktif' => true]);

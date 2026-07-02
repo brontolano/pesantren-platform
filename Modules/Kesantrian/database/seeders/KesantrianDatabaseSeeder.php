@@ -15,6 +15,7 @@ class KesantrianDatabaseSeeder extends Seeder
 
         if (! tenancy()->initialized) {
             $this->command->warn('Seeder Kesantrian harus dijalankan dalam konteks tenant. Lewati.');
+
             return;
         }
 
@@ -55,11 +56,11 @@ class KesantrianDatabaseSeeder extends Seeder
                     'tanggal_lahir' => now()->subYears(rand(12, 16))->subDays(rand(0, 365)),
                     'tempat_lahir' => ['Bandung', 'Jakarta', 'Surabaya', 'Sumedang', 'Garut'][array_rand(['Bandung', 'Jakarta', 'Surabaya', 'Sumedang', 'Garut'])],
                     'jenis_kelamin' => $isLaki ? 'L' : 'P',
-                    'asal_sekolah' => 'SD/MI ' . ['Al-Ikhlas', 'Nurul Huda', 'Baitul Ilmi', 'An-Nuur', 'Al-Hikmah'][array_rand(['Al-Ikhlas', 'Nurul Huda', 'Baitul Ilmi', 'An-Nuur', 'Al-Hikmah'])],
-                    'alamat' => "Jl. Contoh No. " . rand(1, 100) . ", Kota " . ['Bandung', 'Jakarta', 'Surabaya'][array_rand(['Bandung', 'Jakarta', 'Surabaya'])],
-                    'no_hp_wali' => '08' . rand(1000000000, 9999999999),
-                    'nama_ayah' => $namaLaki[array_rand($namaLaki)] . ' ' . $namaBelakang,
-                    'nama_ibu' => $namaPerempuan[array_rand($namaPerempuan)] . ' ' . $namaKeluarga[array_rand($namaKeluarga)],
+                    'asal_sekolah' => 'SD/MI '.['Al-Ikhlas', 'Nurul Huda', 'Baitul Ilmi', 'An-Nuur', 'Al-Hikmah'][array_rand(['Al-Ikhlas', 'Nurul Huda', 'Baitul Ilmi', 'An-Nuur', 'Al-Hikmah'])],
+                    'alamat' => 'Jl. Contoh No. '.rand(1, 100).', Kota '.['Bandung', 'Jakarta', 'Surabaya'][array_rand(['Bandung', 'Jakarta', 'Surabaya'])],
+                    'no_hp_wali' => '08'.rand(1000000000, 9999999999),
+                    'nama_ayah' => $namaLaki[array_rand($namaLaki)].' '.$namaBelakang,
+                    'nama_ibu' => $namaPerempuan[array_rand($namaPerempuan)].' '.$namaKeluarga[array_rand($namaKeluarga)],
                     'status' => 'aktif',
                     'tahun_angkatan' => '2026/2027',
                     'kelas_id' => $kelas->id,

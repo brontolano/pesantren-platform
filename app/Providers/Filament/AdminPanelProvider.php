@@ -2,6 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\AktivasiModulTenant;
+use App\Filament\Pages\InstalasiTenant;
+use App\Filament\Pages\KalkulatorLangganan;
+use App\Filament\Pages\KelolaKuotaPenyimpanan;
 use App\Filament\Resources\Billing\PlanResource;
 use App\Filament\Resources\Billing\PlatformInvoiceResource;
 use App\Filament\Resources\Billing\TenantSubscriptionResource;
@@ -12,6 +16,7 @@ use App\Filament\Resources\Tenants\TenantResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\BillingOverviewWidget;
 use App\Filament\Widgets\DevProgressWidget;
+use App\Filament\Widgets\GreetingBanner;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -82,13 +87,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->pages([
                 Dashboard::class,
-                \App\Filament\Pages\InstalasiTenant::class,
-                \App\Filament\Pages\KalkulatorLangganan::class,
-                \App\Filament\Pages\AktivasiModulTenant::class,
-                \App\Filament\Pages\KelolaKuotaPenyimpanan::class,
+                InstalasiTenant::class,
+                KalkulatorLangganan::class,
+                AktivasiModulTenant::class,
+                KelolaKuotaPenyimpanan::class,
             ])
             ->widgets([
-                \App\Filament\Widgets\GreetingBanner::class,
+                GreetingBanner::class,
                 AccountWidget::class,
                 BillingOverviewWidget::class,
                 DevProgressWidget::class,

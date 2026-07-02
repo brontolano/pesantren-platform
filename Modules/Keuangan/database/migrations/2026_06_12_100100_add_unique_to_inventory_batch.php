@@ -47,7 +47,7 @@ return new class extends Migration
     {
         try {
             return DB::table('pg_indexes')->where('indexname', $index)->exists();
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return false;
         }
     }

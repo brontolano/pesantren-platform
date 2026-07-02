@@ -2,6 +2,7 @@
 
 namespace Modules\Pajak\Services;
 
+use App\Models\Setting;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\SlipGaji;
 
@@ -28,6 +29,13 @@ class EBupotService
     {
         $tahun = substr($masaPajak, 0, 4);
         $bulan = substr($masaPajak, 5, 2);
+
+        // Identitas pemotong per-tenant (Pusat Kebijakan). Param eksplisit menang;
+        // bila null, baca dari Setting tenant; bila kosong, perilaku lama ('').
+        $identitas = $this->identitasPemotong();
+        $npwpPemotong ??= $identitas['npwp_pemotong'];
+        $namaPenandatangan = $identitas['nama_penandatangan'];
+        $kodeKpp = $identitas['kode_kpp'];
 
         $slips = SlipGaji::query()
             ->where('periode', $masaPajak)
@@ -63,6 +71,8 @@ class EBupotService
                 'pph21_dipotong' => (float) $slip->pph21_dipotong,
                 'tanggal_potong' => $tahun.'-'.$bulan.'-25',
                 'npwp_pemotong' => $npwpPemotong ?? '',
+                'nama_penandatangan' => $namaPenandatangan,
+                'kode_kpp' => $kodeKpp,
                 'metode' => 'ter',
             ];
         }
@@ -153,6 +163,21 @@ class EBupotService
         ];
     }
 
+    /**
+     * Identitas pemotong pajak per-tenant dari Pusat Kebijakan (Setting).
+     * Default '' bila belum diisi → mempertahankan perilaku sebelumnya.
+     *
+     * @return array{npwp_pemotong: string, nama_penandatangan: string, kode_kpp: string}
+     */
+    private function identitasPemotong(): array
+    {
+        return [
+            'npwp_pemotong' => Setting::getTenantStringValue('pajak.npwp_pemotong', '') ?? '',
+            'nama_penandatangan' => Setting::getTenantStringValue('pajak.nama_penandatangan', '') ?? '',
+            'kode_kpp' => Setting::getTenantStringValue('pajak.kode_kpp', '') ?? '',
+        ];
+    }
+
     private function emptyRow(): array
     {
         return [
@@ -160,7 +185,7 @@ class EBupotService
             'pembetulan_ke' => '', 'nik' => '', 'npwp' => '', 'nama' => '',
             'kode_objek_pajak' => '', 'ptkp_status' => '', 'bruto' => '',
             'pph21_dipotong' => '', 'tanggal_potong' => '', 'npwp_pemotong' => '',
-            'metode' => '',
+            'nama_penandatangan' => '', 'kode_kpp' => '', 'metode' => '',
         ];
     }
 }

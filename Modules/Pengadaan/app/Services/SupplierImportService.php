@@ -32,6 +32,7 @@ class SupplierImportService
         'bank_nama' => ['bank_nama', 'bank', 'nama_bank'],
         'bank_rekening' => ['bank_rekening', 'rekening', 'no_rekening', 'norek'],
         'kehalalan' => ['kehalalan', 'status_halal', 'halal'],
+        'aktif' => ['aktif', 'status_aktif', 'is_active'],
     ];
 
     /**
@@ -117,6 +118,9 @@ class SupplierImportService
                             'bank_nama' => isset($payload['bank_nama']) ? trim((string) $payload['bank_nama']) : null,
                             'bank_rekening' => isset($payload['bank_rekening']) ? trim((string) $payload['bank_rekening']) : null,
                             'kehalalan' => $payload['kehalalan'] ?? 'halal',
+                            'aktif' => isset($payload['aktif']) && trim((string) $payload['aktif']) !== ''
+                                ? (in_array(mb_strtolower(trim((string) $payload['aktif'])), ['1', 'ya', 'y', 'true', 'aktif', 'iya'], true) ? 1 : 0)
+                                : 1,
                         ]);
                     }
 

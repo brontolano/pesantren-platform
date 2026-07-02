@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Tagihan\Pages\CreateTagihan;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Artisan;
@@ -11,6 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Keuangan\Filament\Resources\Tagihan\Pages\CreateTagihan;
 use Modules\Keuangan\Models\Beasiswa;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\BeasiswaService;

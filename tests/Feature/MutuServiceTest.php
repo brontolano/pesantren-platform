@@ -4,8 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use App\Models\User;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Schema;
 use InvalidArgumentException;
 use Modules\Mutu\Models\DokumenMutu;
 use Modules\Mutu\Services\MutuService;
@@ -61,7 +59,7 @@ class MutuServiceTest extends TestCase
     public function test_buat_dokumen_draft_versi_satu_dengan_snapshot(): void
     {
         $this->bootTenant('mutu1');
-        $svc = new MutuService();
+        $svc = new MutuService;
 
         $doc = $this->buat($svc);
 
@@ -74,7 +72,7 @@ class MutuServiceTest extends TestCase
     public function test_alur_ajukan_lalu_setujui(): void
     {
         $this->bootTenant('mutu2');
-        $svc = new MutuService();
+        $svc = new MutuService;
         $reviewer = $this->reviewer();
 
         $doc = $this->buat($svc);
@@ -91,7 +89,7 @@ class MutuServiceTest extends TestCase
     public function test_tolak_menyimpan_alasan(): void
     {
         $this->bootTenant('mutu3');
-        $svc = new MutuService();
+        $svc = new MutuService;
         $reviewer = $this->reviewer();
 
         $doc = $svc->ajukan($this->buat($svc), $reviewer->id);
@@ -104,7 +102,7 @@ class MutuServiceTest extends TestCase
     public function test_ajukan_dokumen_non_draft_ditolak(): void
     {
         $this->bootTenant('mutu4');
-        $svc = new MutuService();
+        $svc = new MutuService;
         $reviewer = $this->reviewer();
 
         $doc = $svc->ajukan($this->buat($svc), $reviewer->id); // sudah diajukan
@@ -116,7 +114,7 @@ class MutuServiceTest extends TestCase
     public function test_setujui_dokumen_belum_diajukan_ditolak(): void
     {
         $this->bootTenant('mutu5');
-        $svc = new MutuService();
+        $svc = new MutuService;
 
         $doc = $this->buat($svc); // masih draft
 
@@ -127,7 +125,7 @@ class MutuServiceTest extends TestCase
     public function test_revisi_menaikkan_versi_dan_reset_draft(): void
     {
         $this->bootTenant('mutu6');
-        $svc = new MutuService();
+        $svc = new MutuService;
         $reviewer = $this->reviewer();
 
         $doc = $svc->setujui($svc->ajukan($this->buat($svc), $reviewer->id), $reviewer->id);
@@ -149,7 +147,7 @@ class MutuServiceTest extends TestCase
     public function test_isolasi_tenant_dokumen_a_tidak_terlihat_di_b(): void
     {
         $this->bootTenant('mutuA');
-        $svc = new MutuService();
+        $svc = new MutuService;
         $this->buat($svc);
         $this->assertSame(1, DokumenMutu::query()->count());
 

@@ -4,13 +4,13 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Modules\PPDB\Database\Seeders\PesertaRoleSeeder;
 use Modules\PPDB\Jobs\SendPesertaOtpJob;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\UserOtp;
+use Modules\PPDB\Services\PesertaAccountService;
 use Modules\PPDB\Services\PpdbStatusTrackingService;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -119,7 +119,7 @@ class PesertaAuthFlowTest extends TestCase
             'email_wali' => 'aktivasi@example.test',
             'data_ortu' => [],
         ]);
-        app(\Modules\PPDB\Services\PesertaAccountService::class)->provisionAndSendActivationOtp($candidate);
+        app(PesertaAccountService::class)->provisionAndSendActivationOtp($candidate);
         tenancy()->end();
 
         $activationCode = null;
@@ -321,6 +321,7 @@ class PesertaAuthFlowTest extends TestCase
         ]);
         $spmbResponse->assertForbidden();
     }
+
     private function makePeserta(string $name, string $email, string $phone, string $password): User
     {
         $user = User::create([

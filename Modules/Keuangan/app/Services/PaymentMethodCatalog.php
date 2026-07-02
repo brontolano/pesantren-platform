@@ -60,11 +60,11 @@ class PaymentMethodCatalog
      * Label kategori (Bahasa Indonesia) untuk pengelompokan di frontend.
      */
     private const CATEGORY_LABELS = [
-        'VA'      => 'Transfer Virtual Account',
+        'VA' => 'Transfer Virtual Account',
         'EWALLET' => 'E-Wallet',
-        'QRIS'    => 'QRIS',
-        'RETAIL'  => 'Bayar di Gerai/Retail',
-        'CARD'    => 'Kartu Kredit / Debit',
+        'QRIS' => 'QRIS',
+        'RETAIL' => 'Bayar di Gerai/Retail',
+        'CARD' => 'Kartu Kredit / Debit',
     ];
 
     /**
@@ -173,7 +173,7 @@ class PaymentMethodCatalog
         $total = $nominal + $fee;
 
         // Seed deterministik dari id topup + code → angka stabil tiap render.
-        $seed = abs(crc32($topup->id . '|' . $method['code']));
+        $seed = abs(crc32($topup->id.'|'.$method['code']));
         $expiresAt = ($topup->created_at ?? now())->copy()->addHours(24)->toIso8601String();
 
         $detail = [
@@ -198,7 +198,7 @@ class PaymentMethodCatalog
                 $prefix = $this->vaPrefix($method['code']);
                 // 8 digit dari seed, dipadkan; gabung prefix bank.
                 $body = str_pad((string) ($seed % 100000000), 8, '0', STR_PAD_LEFT);
-                $va = $prefix . $body;
+                $va = $prefix.$body;
 
                 $detail['vaNumber'] = $va;
                 $detail['paymentCode'] = $va;
@@ -213,12 +213,12 @@ class PaymentMethodCatalog
                 break;
 
             case 'ewallet_redirect':
-                $ref = strtoupper($method['code']) . '-' . str_pad((string) ($seed % 1000000), 6, '0', STR_PAD_LEFT);
+                $ref = strtoupper($method['code']).'-'.str_pad((string) ($seed % 1000000), 6, '0', STR_PAD_LEFT);
                 $detail['paymentCode'] = $ref;
-                $detail['ewalletDeeplink'] = strtolower($method['code']) . '://pay/demo/' . $ref;
+                $detail['ewalletDeeplink'] = strtolower($method['code']).'://pay/demo/'.$ref;
                 $detail['steps'] = [
                     "Anda akan diarahkan ke aplikasi {$method['name']} (simulasi).",
-                    "Periksa nominal pembayaran: lihat ringkasan di atas.",
+                    'Periksa nominal pembayaran: lihat ringkasan di atas.',
                     "Setujui pembayaran di aplikasi {$method['name']}.",
                     'Kembali ke halaman ini, lalu tekan "Saya Sudah Bayar".',
                 ];
@@ -227,10 +227,10 @@ class PaymentMethodCatalog
             case 'qris':
                 $qrPayload = $this->qrisPayload($topup, $total, $seed);
                 $detail['qrString'] = $qrPayload;
-                $detail['paymentCode'] = 'QRIS-' . str_pad((string) ($seed % 1000000), 6, '0', STR_PAD_LEFT);
+                $detail['paymentCode'] = 'QRIS-'.str_pad((string) ($seed % 1000000), 6, '0', STR_PAD_LEFT);
                 // Fallback render: tidak ada lib QR di server, frontend boleh
                 // pakai qrImageUrl ini ATAU render qrString sendiri (mis. qrcode.vue).
-                $detail['qrImageUrl'] = 'https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=' . rawurlencode($qrPayload);
+                $detail['qrImageUrl'] = 'https://api.qrserver.com/v1/create-qr-code/?size=320x320&data='.rawurlencode($qrPayload);
                 $detail['steps'] = [
                     'Buka aplikasi pembayaran apa pun yang mendukung QRIS.',
                     'Pindai (scan) kode QR di atas.',
@@ -240,7 +240,7 @@ class PaymentMethodCatalog
                 break;
 
             case 'retail_code':
-                $retail = strtoupper(substr($method['code'], 0, 3)) . str_pad((string) ($seed % 1000000000), 9, '0', STR_PAD_LEFT);
+                $retail = strtoupper(substr($method['code'], 0, 3)).str_pad((string) ($seed % 1000000000), 9, '0', STR_PAD_LEFT);
                 $detail['retailCode'] = $retail;
                 $detail['paymentCode'] = $retail;
                 $detail['steps'] = [
@@ -254,7 +254,7 @@ class PaymentMethodCatalog
 
             case 'card_form':
             default:
-                $detail['paymentCode'] = 'CARD-' . str_pad((string) ($seed % 1000000), 6, '0', STR_PAD_LEFT);
+                $detail['paymentCode'] = 'CARD-'.str_pad((string) ($seed % 1000000), 6, '0', STR_PAD_LEFT);
                 $detail['steps'] = [
                     'Masukkan nomor kartu, masa berlaku, dan CVV (simulasi).',
                     'Sistem akan memverifikasi melalui 3D Secure (simulasi).',
@@ -298,9 +298,9 @@ class PaymentMethodCatalog
             $merchant,
             '52040000',
             '5303360',
-            '54' . str_pad((string) strlen($amount), 2, '0', STR_PAD_LEFT) . $amount,
+            '54'.str_pad((string) strlen($amount), 2, '0', STR_PAD_LEFT).$amount,
             '5802ID',
-            '6304' . substr($ref, 0, 4),
-        ]) . '|TOPUP#' . $topup->id . '|REF' . $ref;
+            '6304'.substr($ref, 0, 4),
+        ]).'|TOPUP#'.$topup->id.'|REF'.$ref;
     }
 }

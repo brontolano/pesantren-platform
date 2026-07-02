@@ -2,23 +2,23 @@
 
 namespace App\Filament\Resources\Billing;
 
-use BackedEnum;
-use UnitEnum;
 use App\Filament\Resources\Billing\TenantSubscription\Pages\CreateTenantSubscription;
 use App\Filament\Resources\Billing\TenantSubscription\Pages\EditTenantSubscription;
 use App\Filament\Resources\Billing\TenantSubscription\Pages\ListTenantSubscriptions;
 use App\Models\TenantSubscription;
 use App\Services\BillingService;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class TenantSubscriptionResource extends Resource
 {
@@ -74,10 +74,10 @@ class TenantSubscriptionResource extends Resource
                 TextColumn::make('billing_cycle')->label('Siklus')->badge(),
                 TextColumn::make('status')->label('Status')->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'active'    => 'success',
+                        'active' => 'success',
                         'suspended' => 'warning',
                         'cancelled' => 'danger',
-                        default     => 'gray',
+                        default => 'gray',
                     }),
                 TextColumn::make('starts_at')->label('Mulai')->date('d M Y'),
                 TextColumn::make('ends_at')->label('Berakhir')->date('d M Y')->placeholder('Tidak terbatas'),
@@ -94,7 +94,7 @@ class TenantSubscriptionResource extends Resource
                     ->color('info')
                     ->action(function (TenantSubscription $record): void {
                         $billing = app(BillingService::class);
-                        $period  = now()->format('Y-m');
+                        $period = now()->format('Y-m');
                         $billing->generateInvoice($record->tenant, $period, $record->effectivePrice());
                     })
                     ->requiresConfirmation(),
@@ -104,9 +104,9 @@ class TenantSubscriptionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListTenantSubscriptions::route('/'),
+            'index' => ListTenantSubscriptions::route('/'),
             'create' => CreateTenantSubscription::route('/create'),
-            'edit'   => EditTenantSubscription::route('/{record}/edit'),
+            'edit' => EditTenantSubscription::route('/{record}/edit'),
         ];
     }
 

@@ -18,8 +18,7 @@ class KepalaKeuanganPwaController extends Controller
 {
     public function __construct(
         private readonly KepalaKeuanganBrandingService $brandingService,
-    ) {
-    }
+    ) {}
 
     private function can(): array
     {

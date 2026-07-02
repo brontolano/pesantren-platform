@@ -2,6 +2,8 @@
 
 namespace Modules\AI\Providers;
 
+use Filament\PanelRegistry;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Modules\AI\Console\AiAnomaliCommand;
 use Modules\AI\Console\AiBersihkanPercakapanCommand;
@@ -11,9 +13,22 @@ use Modules\AI\Console\AiFaqMiningCommand;
 use Modules\AI\Console\AiHealthCommand;
 use Modules\AI\Console\AiLaporanEskalasiCommand;
 use Modules\AI\Console\AiPromptCommand;
+use Modules\AI\Filament\Pages\EskalasiTanyaUstadz;
+use Modules\AI\Filament\Pages\GeneratorRpp;
+use Modules\AI\Filament\Pages\GeneratorSoal;
+use Modules\AI\Filament\Pages\IkhtisarKitab;
+use Modules\AI\Filament\Pages\KotakMasukWa;
+use Modules\AI\Filament\Pages\PengaturanAi;
+use Modules\AI\Filament\Pages\PersetujuanAi;
+use Modules\AI\Filament\Pages\SuaraPasar;
+use Modules\AI\Filament\Pages\SumberPengetahuan;
+use Modules\AI\Filament\Pages\UsulanFaq;
 use Modules\AI\Services\Gateway\AiGateway;
 use Modules\AI\Services\Gateway\CircuitBreaker;
 use Modules\AI\Services\Gateway\ModelRouter;
+use Modules\AI\Services\Prompts\PromptRegistry;
+use Modules\AI\Services\Research\ResearchTelemetry;
+use Modules\AI\Services\Tools\ToolRegistry;
 
 class AIServiceProvider extends ServiceProvider
 {
@@ -34,7 +49,7 @@ class AIServiceProvider extends ServiceProvider
         // <x-ai::panel-asisten>, <x-ai::rating-jawaban>.
         // Registrasi EKSPLISIT (tidak hanya menumpang loadViewsFrom) supaya
         // resolusi komponen tidak bergantung urutan namespace view lain.
-        \Illuminate\Support\Facades\Blade::anonymousComponentPath(
+        Blade::anonymousComponentPath(
             module_path($this->moduleName, 'resources/views/components'),
             $this->moduleNameLower,
         );
@@ -76,17 +91,17 @@ class AIServiceProvider extends ServiceProvider
         $this->app->singleton(CircuitBreaker::class, fn () => CircuitBreaker::fromConfig());
         $this->app->singleton(ModelRouter::class);
         $this->app->singleton(AiGateway::class);
-        $this->app->singleton(\Modules\AI\Services\Prompts\PromptRegistry::class);
+        $this->app->singleton(PromptRegistry::class);
 
         // T-A033 — registry tools data resmi (read-only). Singleton aman:
         // definisi tool stateless; scope/peran dibaca config per panggilan,
         // setting tenant diresolusi FRESH di dalam call().
-        $this->app->singleton(\Modules\AI\Services\Tools\ToolRegistry::class);
+        $this->app->singleton(ToolRegistry::class);
 
         // T-A013 — telemetri riset opt-in. SCOPED (bukan singleton): memo
         // status opt-in benar-benar per request/job — tidak nyangkut basi
         // antar job di queue worker berumur panjang.
-        $this->app->scoped(\Modules\AI\Services\Research\ResearchTelemetry::class);
+        $this->app->scoped(ResearchTelemetry::class);
 
         $this->registerHalamanPanel();
     }
@@ -104,33 +119,33 @@ class AIServiceProvider extends ServiceProvider
      */
     protected function registerHalamanPanel(): void
     {
-        $daftarkan = function (\Filament\PanelRegistry $registry): void {
+        $daftarkan = function (PanelRegistry $registry): void {
             $registry->get('tenant')?->pages([
-                \Modules\AI\Filament\Pages\PengaturanAi::class,
-                \Modules\AI\Filament\Pages\PersetujuanAi::class,
-                \Modules\AI\Filament\Pages\SumberPengetahuan::class,
-                \Modules\AI\Filament\Pages\EskalasiTanyaUstadz::class,
-                \Modules\AI\Filament\Pages\GeneratorSoal::class,
-                \Modules\AI\Filament\Pages\GeneratorRpp::class,
-                \Modules\AI\Filament\Pages\IkhtisarKitab::class,
-                \Modules\AI\Filament\Pages\KotakMasukWa::class,
-                \Modules\AI\Filament\Pages\UsulanFaq::class,
+                PengaturanAi::class,
+                PersetujuanAi::class,
+                SumberPengetahuan::class,
+                EskalasiTanyaUstadz::class,
+                GeneratorSoal::class,
+                GeneratorRpp::class,
+                IkhtisarKitab::class,
+                KotakMasukWa::class,
+                UsulanFaq::class,
             ]);
 
             // T-A013 — dashboard internal "Suara Pasar" di panel PLATFORM
             // (central, super_admin only — BUKAN panel tenant).
             $registry->get('admin')?->pages([
-                \Modules\AI\Filament\Pages\SuaraPasar::class,
+                SuaraPasar::class,
             ]);
         };
 
-        if ($this->app->resolved(\Filament\PanelRegistry::class)) {
-            $daftarkan($this->app->make(\Filament\PanelRegistry::class));
+        if ($this->app->resolved(PanelRegistry::class)) {
+            $daftarkan($this->app->make(PanelRegistry::class));
 
             return;
         }
 
-        $this->app->afterResolving(\Filament\PanelRegistry::class, $daftarkan);
+        $this->app->afterResolving(PanelRegistry::class, $daftarkan);
     }
 
     protected function registerConfig(): void

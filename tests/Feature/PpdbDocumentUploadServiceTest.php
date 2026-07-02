@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Tenant;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
@@ -16,6 +17,7 @@ use Tests\TestCase;
 class PpdbDocumentUploadServiceTest extends TestCase
 {
     private Tenant $tenantA;
+
     private Tenant $tenantB;
 
     protected function setUp(): void
@@ -88,7 +90,7 @@ class PpdbDocumentUploadServiceTest extends TestCase
         tenancy()->end();
         tenancy()->initialize($this->tenantB);
 
-        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectException(ModelNotFoundException::class);
 
         $file = UploadedFile::fake()->create('foto.png', 128, 'image/png');
         app(PpdbDocumentUploadService::class)->upload(1, 'foto', $file, 'local');

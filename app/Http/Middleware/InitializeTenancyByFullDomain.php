@@ -2,10 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
-use Illuminate\Http\Request;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Wrapper di atas InitializeTenancyByDomain dari stancl/tenancy.

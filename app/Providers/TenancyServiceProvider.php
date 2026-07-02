@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Modules\Core\Support\IstilahRegistry;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
@@ -47,11 +48,11 @@ class TenancyServiceProvider extends ServiceProvider
                 // tanpa ini, label lama tertahan di memori proses walau tenant sudah
                 // mengubah Setting dari panel (proses lain). Web FrankenPHP classic
                 // mode tidak terdampak (state mati per request), tapi flush ini aman.
-                fn () => \Modules\Core\Support\IstilahRegistry::flushCache(),
+                fn () => IstilahRegistry::flushCache(),
             ],
             Events\TenancyEnded::class => [
                 Listeners\RevertToCentralContext::class,
-                fn () => \Modules\Core\Support\IstilahRegistry::flushCache(),
+                fn () => IstilahRegistry::flushCache(),
             ],
         ];
     }

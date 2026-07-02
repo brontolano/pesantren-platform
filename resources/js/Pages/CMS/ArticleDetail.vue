@@ -1,5 +1,6 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { computed } from 'vue'
+import { Head, useForm, usePage } from '@inertiajs/vue3'
 
 const props = defineProps({
     tenant: {
@@ -22,9 +23,28 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    comments: {
+        type: Array,
+        default: () => [],
+    },
+    comment: {
+        type: Object,
+        default: () => ({ isLoggedIn: false, authorName: null, storeUrl: '', loginUrl: '/jemaah/login' }),
+    },
 })
 
 const schemaMarkup = props.seo.schema ? JSON.stringify(props.seo.schema) : null
+
+const page = usePage()
+const flashSuccess = computed(() => page.props.flash?.success ?? null)
+
+const form = useForm({ body: '' })
+const submitComment = () => {
+    form.post(props.comment.storeUrl, {
+        preserveScroll: true,
+        onSuccess: () => form.reset('body'),
+    })
+}
 </script>
 
 <template>
@@ -115,6 +135,68 @@ const schemaMarkup = props.seo.schema ? JSON.stringify(props.seo.schema) : null
                     </div>
                 </div>
             </article>
+
+            <!-- KOMENTAR (1-aplikasi, Fase 2c) -->
+            <section class="rounded-[2rem] border border-black/5 bg-white px-6 py-7 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.2)] sm:px-8 lg:px-10">
+                <h3 class="font-serif text-2xl">
+                    Komentar
+                    <span class="text-base font-normal text-slate-400">({{ comments.length }})</span>
+                </h3>
+
+                <p
+                    v-if="flashSuccess"
+                    class="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800"
+                >
+                    {{ flashSuccess }}
+                </p>
+
+                <!-- Daftar komentar (approved) — body di-escape otomatis ({{ }}) -->
+                <ul v-if="comments.length" class="mt-6 space-y-5">
+                    <li
+                        v-for="c in comments"
+                        :key="c.id"
+                        class="border-b border-black/5 pb-5 last:border-0 last:pb-0"
+                    >
+                        <div class="flex items-baseline justify-between gap-3">
+                            <span class="font-semibold text-slate-800">{{ c.author }}</span>
+                            <span v-if="c.createdAt" class="text-xs text-slate-400">{{ c.createdAt }}</span>
+                        </div>
+                        <p class="mt-1 whitespace-pre-line text-[15px] leading-7 text-slate-600">{{ c.body }}</p>
+                    </li>
+                </ul>
+                <p v-else class="mt-6 text-sm text-slate-500">
+                    Belum ada komentar. Jadilah yang pertama berbagi tanggapan yang baik.
+                </p>
+
+                <!-- Form (hanya untuk yang sudah login) -->
+                <form v-if="comment.isLoggedIn" class="mt-7 space-y-3" @submit.prevent="submitComment">
+                    <label for="komentar-body" class="block text-sm font-medium text-slate-700">
+                        Tulis komentar sebagai <span class="font-semibold">{{ comment.authorName }}</span>
+                    </label>
+                    <textarea
+                        id="komentar-body"
+                        v-model="form.body"
+                        rows="3"
+                        maxlength="2000"
+                        required
+                        placeholder="Tulis tanggapan yang santun…"
+                        class="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base shadow-sm outline-none transition focus:border-[color:var(--brand-primary)] focus:ring-2 focus:ring-[color:var(--brand-primary)]/15"
+                    />
+                    <p v-if="form.errors.body" class="text-sm text-red-600">{{ form.errors.body }}</p>
+                    <button
+                        type="submit"
+                        :disabled="form.processing"
+                        class="rounded-full px-6 py-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:opacity-60"
+                        :style="{ backgroundColor: 'var(--brand-primary)' }"
+                    >
+                        {{ form.processing ? 'Mengirim…' : 'Kirim Komentar' }}
+                    </button>
+                </form>
+                <p v-else class="mt-7 rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
+                    <a :href="comment.loginUrl" class="font-semibold" :style="{ color: 'var(--brand-primary)' }">Masuk</a>
+                    untuk ikut berkomentar. Pengunjung tanpa akun dapat membaca komentar yang sudah tayang.
+                </p>
+            </section>
         </main>
         </div>
     </div>

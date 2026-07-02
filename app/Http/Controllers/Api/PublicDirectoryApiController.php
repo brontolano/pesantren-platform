@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Modules\Kesantrian\Models\Alumni;
 use Modules\Kesantrian\Models\Santri;
+use Modules\Payroll\Models\Employee;
 use Modules\PPDB\Models\CalonSantri;
 
 /**
@@ -89,7 +91,7 @@ class PublicDirectoryApiController extends Controller
 
         $data = Cache::remember('pubdir-staff-'.tenant('id'), 300, function () {
             try {
-                return \Modules\Payroll\Models\Employee::query()
+                return Employee::query()
                     ->where('aktif', true)
                     ->orderBy('nama')
                     ->limit(500)
@@ -112,7 +114,7 @@ class PublicDirectoryApiController extends Controller
         abort_unless(tenant(), 404);
 
         $data = Cache::remember('pubdir-guardians-'.tenant('id'), 300, function () {
-            return \App\Models\User::withoutGlobalScopes()
+            return User::withoutGlobalScopes()
                 ->where('tenant_id', tenant('id'))
                 ->whereHas('roles', fn ($q) => $q->where('name', 'wali'))
                 ->orderBy('name')

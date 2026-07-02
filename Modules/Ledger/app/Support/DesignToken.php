@@ -9,13 +9,19 @@ namespace Modules\Ledger\Support;
 class DesignToken
 {
     public const PRIMARY = '#0A5C36';   // Forest Green
+
     public const ACCENT = '#D4AF37';    // Gold
+
     public const SURFACE = '#FDFBF7';   // Cream
+
     public const SUCCESS = '#0A5C36';
+
     public const WARNING = '#D4AF37';
+
     public const DANGER = '#B3261E';
 
     public const FONT_DISPLAY = 'Marcellus';
+
     public const FONT_BODY = 'Plus Jakarta Sans';
 
     /** Palette untuk Filament panel `->colors([...])`. */

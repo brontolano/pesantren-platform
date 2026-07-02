@@ -6,12 +6,14 @@ use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Modules\Akademik\Database\Seeders\LembagaSeeder;
 use Modules\Akademik\Models\Lembaga;
 use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Models\PresensiSantri;
+use Modules\Akademik\Services\PeriodeAkademikService;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Ledger\Models\DivisiUnit;
@@ -80,7 +82,7 @@ class LembagaFondasiTest extends TestCase
         // dengan firstOrCreate kunci sama TIDAK boleh menambah baris kedua.
         $tenant = $this->bootTenant('lbbf');
 
-        \Illuminate\Support\Facades\DB::table('lembaga')->insert([
+        DB::table('lembaga')->insert([
             'tenant_id' => $tenant->id,
             'nama' => 'Pondok',
             'jenis' => 'pondok',
@@ -104,7 +106,7 @@ class LembagaFondasiTest extends TestCase
         $formal = Lembaga::create(['nama' => 'MTs', 'jenis' => 'formal']);
         $diniyah = Lembaga::create(['nama' => 'Madin', 'jenis' => 'diniyah']);
 
-        $svc = app(\Modules\Akademik\Services\PeriodeAkademikService::class);
+        $svc = app(PeriodeAkademikService::class);
 
         $pNull = $svc->simpan([
             'nama' => 'Ganjil Pondok', 'tahun_akademik' => '2026/2027', 'semester' => 'ganjil',

@@ -369,8 +369,9 @@ class PwaGuruFondasiTest extends TestCase
             'nilai_komponen' => ['999' => 100],
         ]);
 
-        // Default lama (Setting kosong): harian 30 / uts 30 / uas 40.
-        $this->assertSame(round((80 * 30 + 70 * 30 + 90 * 40) / 100, 2), $hasil);
+        // gap-85: default tunggal (Setting kosong) kini harian 40 / uts 30 / uas 30
+        // (= KomponenNilaiSeeder::DEFAULTS; double-default 30/30/40 dihapus).
+        $this->assertSame(round((80 * 40 + 70 * 30 + 90 * 30) / 100, 2), $hasil);
     }
 
     public function test_komponen_per_pelajaran_mengalahkan_default_tenant(): void

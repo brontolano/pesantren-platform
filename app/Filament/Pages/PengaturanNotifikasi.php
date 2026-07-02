@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting;
-use App\Support\UiMode;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -50,7 +49,9 @@ class PengaturanNotifikasi extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::canAccess();
+        // gap-132: halaman setting harus SELALU terjangkau (samakan dgn
+        // PengaturanBranding) — tak digerbang Mode Sederhana.
+        return static::canAccess();
     }
 
     public function mount(): void
@@ -112,9 +113,33 @@ class PengaturanNotifikasi extends Page implements HasForms
                     ->schema([
                         Toggle::make('notif_email_enabled')
                             ->label('Aktifkan notifikasi email')
-                            ->default(true),
+                            ->default(true)
+                            ->helperText($this->smtpStatusHint()),
                     ]),
             ]);
+    }
+
+    /**
+     * Status server email (config mail global) agar staf tahu: mengaktifkan toggle
+     * benar-benar mengirim, atau hanya tersimpan tanpa efek (gap 138: ON gagal diam-diam).
+     */
+    private function smtpStatusHint(): string
+    {
+        $mailer = (string) config('mail.default');
+        $terkonfigurasi = match (true) {
+            in_array($mailer, ['log', 'array', ''], true) => false,
+            $mailer === 'smtp' => filled(config('mail.mailers.smtp.host')),
+            default => true,
+        };
+
+        if (! $terkonfigurasi) {
+            return '⚠ Server email BELUM dikonfigurasi (MAIL_MAILER='.($mailer ?: 'kosong')
+                .'). Mengaktifkan ini TIDAK mengirim email apa pun sampai SMTP diatur di server — hubungi admin platform.';
+        }
+
+        $host = config('mail.mailers.smtp.host');
+
+        return 'Server email AKTIF (mailer: '.$mailer.($host ? ', '.$host : '').'). Email notifikasi akan dikirim.';
     }
 
     public function save(): void

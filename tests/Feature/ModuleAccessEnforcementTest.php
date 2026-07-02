@@ -2,12 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use App\Models\Tenant;
+use App\Models\TenantModule;
 use App\Services\ModuleService;
 use Database\Seeders\ModuleRegistrySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
 use ReflectionMethod;
 use Tests\TestCase;
 
@@ -37,7 +38,7 @@ class ModuleAccessEnforcementTest extends TestCase
         $this->assertFalse($svc->isVisibleForTenant('asrama', $tenant));
 
         // Aktifkan untuk tenant ini (lewat model → event membuang cache set modul) → terlihat.
-        \App\Models\TenantModule::create([
+        TenantModule::create([
             'tenant_id' => 'pesx', 'module_name' => 'asrama', 'is_active' => true,
         ]);
         $this->assertTrue($svc->isVisibleForTenant('asrama', $tenant));

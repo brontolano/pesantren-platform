@@ -8,7 +8,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f8fafc;
+            background: #fffaf3;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -22,7 +22,7 @@
             max-width: 480px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 20px 60px -20px rgba(15,23,42,0.15);
+            box-shadow: inset 0 0 0 1px #efe7da, 0 16px 44px -24px rgba(17,17,17,0.22);
         }
         .icon {
             width: 64px;
@@ -53,15 +53,19 @@
         .contact {
             margin-top: 2rem;
             padding: 1.25rem;
-            background: #f1f5f9;
+            background: #f6f0e6;
             border-radius: 1rem;
             font-size: 0.875rem;
             color: #475569;
         }
         .contact strong { display: block; margin-bottom: 0.25rem; color: #1e293b; }
+        /* AlbaKids (tenant custom): kembalikan ke tampilan asli, jangan ikut Pixio. */
+        body.tenant-albakids { background: #f8fafc; }
+        body.tenant-albakids .card { box-shadow: 0 20px 60px -20px rgba(15,23,42,0.15); }
+        body.tenant-albakids .contact { background: #f1f5f9; }
     </style>
 </head>
-<body>
+<body class="@if(\App\Support\AlbaKidsTenant::isActive())tenant-albakids @endif">
     <div class="card">
         <div class="icon">⚠️</div>
         <h1>Layanan Sementara Ditangguhkan</h1>

@@ -90,6 +90,30 @@ Jika ingin menjalankan test dari dalam container `app`, override host database s
 docker compose exec -e DB_HOST=postgres app php artisan test
 ```
 
+### Gate WAJIB pra-deploy: render-test panel ter-autentikasi
+
+Setiap perubahan yang menyentuh panel Filament (resource, page, widget, ikon
+navigasi, `navigationGroup`, provider panel) **WAJIB** lulus smoke test authed
+sebelum deploy — halaman login tetap 200 walau dashboard/resource 500, jadi
+smoke tak-login TIDAK cukup (riwayat insiden 500 produksi: ikon grup nav
+Filament v5, `statePath`, unwrap Setting array):
+
+```bash
+php -d memory_limit=2G vendor/bin/phpunit --filter TenantPanelAuthedSmokeTest
+```
+
+Test ini me-render dashboard + daftar path inti + **sweep dinamis semua
+resource yang terdaftar di panel tenant** (resource baru otomatis ikut teruji).
+Perubahan jalur uang (Tagihan/Pembayaran/Ledger) juga wajib lulus
+`TagihanRutinIdempotencyTest`, `PembayaranInvarianTest`, `IntegritasUangTest`,
+dan `LedgerAutoJurnalTest`.
+
+### Gate CI hijau: Lint
+
+`/.github/workflows/lint.yml` menjalankan `vendor/bin/pint --test` tanpa
+DB — cepat dan selalu bisa hijau; jadikan ini required check. `test.yml`
+merah permanen di CI karena arsitektur DB-per-tenant — **bukan** gate.
+
 ## CI/CD
 
 ### CI

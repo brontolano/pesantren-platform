@@ -17,16 +17,18 @@ class SeedTenantTemplatesCommand extends Command
     public function handle(): int
     {
         $tenantId = (string) $this->argument('tenant');
-        $tenant   = Tenant::find($tenantId);
+        $tenant = Tenant::find($tenantId);
 
         if (! $tenant) {
             $this->error("Tenant '{$tenantId}' tidak ditemukan.");
+
             return self::FAILURE;
         }
 
         if (! $this->option('force')) {
             if (! $this->confirm("Seed template notifikasi ke tenant '{$tenant->name}'?")) {
                 $this->info('Dibatalkan.');
+
                 return self::SUCCESS;
             }
         }
@@ -34,7 +36,7 @@ class SeedTenantTemplatesCommand extends Command
         tenancy()->initialize($tenant);
 
         try {
-            (new TemplateNotifikasiSeeder())->run();
+            (new TemplateNotifikasiSeeder)->run();
             $this->info("✅ Template notifikasi berhasil di-seed ke '{$tenant->name}'.");
         } finally {
             tenancy()->end();

@@ -33,7 +33,7 @@ return new class extends Migration
             $table->text('current_state')->nullable();    // kondisi saat ini (gap note)
             $table->string('phase')->nullable();          // pengelompokan fase
             $table->string('status')->default('todo');    // todo | in_progress | blocked | done
-            $table->string('priority')->default('medium');// low | medium | high | critical
+            $table->string('priority')->default('medium'); // low | medium | high | critical
             $table->unsignedTinyInteger('progress')->default(0); // 0-100
             $table->string('effort')->nullable();         // estimasi (S/M/L atau hari)
             $table->unsignedSmallInteger('sort')->default(0);

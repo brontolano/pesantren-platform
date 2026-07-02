@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pengadaan (Supplier, PO, Belanja) · Panduan Pesantren.online</title>
+<meta name="description" content="Alur pengadaan barang/jasa: data Supplier, Purchase Order (PO), terima barang (GRN), Belanja, setujui & cairkan, cetak BKK, plus glosarium istilah keuangan.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a><a class="nav-item" href="../cara-setup/">🚀 Cara Setup Pesantren</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama & Kehidupan Santri</a><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a><a class="nav-item active" href="../pengadaan/">🛒 Pengadaan (Supplier, PO, Belanja)</a><div class="nav-sub"><a href="#1-mengenal-alur-pengadaan">1. Mengenal Alur Pengadaan</a><a href="#2-mendaftarkan-supplier">2. Mendaftarkan Supplier</a><a href="#3-membuat-purchase-order">3. Membuat Purchase Order (PO)</a><a href="#4-menyetujui-po">4. Menyetujui PO</a><a href="#5-menerima-barang-grn">5. Menerima Barang (GRN)</a><a href="#6-belanja-setujui-cairkan">6. Belanja: Setujui &amp; Cairkan</a><a href="#7-mencetak-bkk">7. Mencetak BKK</a><a href="#8-belanja-tanpa-po">8. Belanja Tanpa PO</a><a href="#9-pengingat-penting">9. Pengingat Penting</a><a href="#glosarium">Glosarium Istilah</a><a href="#contekan-cepat-pengadaan">Contekan Cepat</a></div></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">🛒</div>
+        <div>
+          <h1>Pengadaan (Supplier, PO, Belanja)</h1>
+          <p class="lead">Alur pembelian barang/jasa yang rapi dan tercatat: dari data Supplier, Purchase Order, terima barang, sampai pencairan uang dan cetak bukti kas keluar (BKK).</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>. Ini alur <strong>uang</strong>, jadi tenang dan teliti — setiap langkah aman karena uang baru benar-benar tercatat di buku besar saat Bapak/Ibu menekan <strong>Setujui &amp; Cairkan</strong>.</p>
+<p>Menu Pengadaan hanya muncul bila: (1) pesantren memakai <strong>Mode Lanjutan</strong>, (2) modul <strong>Pengadaan</strong> aktif, dan (3) akun Bapak/Ibu punya hak keuangan/belanja. Bila menunya tidak terlihat, mintalah admin mengaktifkannya. Semua menu di bawah ada di grup <strong>Sarana &amp; Logistik</strong> pada menu kiri.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Mengenal alur pengadaan</li>
+<li>Mendaftarkan Supplier</li>
+<li>Membuat Purchase Order (PO)</li>
+<li>Menyetujui PO</li>
+<li>Menerima barang (GRN)</li>
+<li>Belanja: Setujui &amp; Cairkan</li>
+<li>Mencetak BKK</li>
+<li>Belanja tanpa PO</li>
+<li>Pengingat penting</li>
+<li>Glosarium istilah</li>
+</ol>
+<hr>
+<h2 id="1-mengenal-alur-pengadaan">1. Mengenal Alur Pengadaan<a class="anchor" href="#1-mengenal-alur-pengadaan" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Pengadaan adalah cara pesantren membeli barang/jasa dengan jejak yang jelas — siapa pemasoknya, apa yang dipesan, sudah diterima atau belum, dan kapan uangnya keluar. Semua tercatat sehingga laporan keuangan rapi dan bisa diaudit.</p>
+<p><strong>Urutannya begini (mudah diingat):</strong></p>
+<ol>
+<li><strong>Supplier</strong> — daftarkan dulu pemasok/toko (sekali saja, lalu dipakai berulang).</li>
+<li><strong>Purchase Order (PO)</strong> — buat pesanan: pemasok mana, barang apa, berapa banyak, harga berapa.</li>
+<li><strong>Setujui PO</strong> — pejabat yang berwenang menyetujui pesanan.</li>
+<li><strong>Terima barang (GRN)</strong> — saat barang datang, catat penerimaannya. Saat diterima penuh, sistem otomatis membuat catatan <strong>Belanja</strong> (tagihan).</li>
+<li><strong>Belanja → Setujui &amp; Cairkan</strong> — periksa tagihan, lalu cairkan. Saat inilah uang dibukukan otomatis (beban, pajak, kas).</li>
+<li><strong>Cetak BKK</strong> — cetak Bukti Kas Keluar sebagai arsip fisik.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> diagram alur Supplier → PO → Terima → Belanja → Cairkan → BKK <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<blockquote>
+<p>💡 Tidak semua belanja harus lewat PO. Untuk pengeluaran kecil/mendesak, Bapak/Ibu bisa langsung mencatat di menu <strong>Belanja &amp; Pajak</strong> (lihat <a href="#8-belanja-tanpa-po">Bagian 8</a>). PO dipakai untuk pembelian yang perlu pesanan resmi dan persetujuan dulu.</p>
+</blockquote>
+<hr>
+<h2 id="2-mendaftarkan-supplier">2. Mendaftarkan Supplier<a class="anchor" href="#2-mendaftarkan-supplier" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> sebelum membuat PO, pemasok/tokonya harus ada dulu di daftar. Cukup didaftarkan sekali; setelah itu tinggal dipilih.</p>
+<p><strong>Siapkan dulu:</strong> nama toko/pemasok, nomor telepon, dan (kalau ada) NPWP serta nomor rekening bank untuk transfer.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Sarana &amp; Logistik</strong> → <strong>Supplier</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong> (di kanan atas).</li>
+<li>Isi formulir:<ul>
+<li><strong>Nama</strong> — nama toko/pemasok. Wajib diisi.</li>
+<li><strong>NPWP</strong> — nomor NPWP pemasok bila punya (boleh dikosongkan).</li>
+<li><strong>PKP (ber-NPWP)</strong> — geser aktif bila pemasok adalah Pengusaha Kena Pajak. Ini memengaruhi perhitungan pajak nanti (lihat <a href="#glosarium">Glosarium</a>).</li>
+<li><strong>Kehalalan</strong> — pilih <strong>Halal</strong>, <strong>Syubhat</strong>, atau <strong>Non-halal</strong>. Bawaannya Halal.</li>
+<li><strong>Telepon</strong>, <strong>Alamat</strong>, <strong>Bank</strong>, dan <strong>No. Rekening</strong> — untuk memudahkan pembayaran dan kontak.</li>
+<li><strong>Aktif</strong> — biarkan menyala. Matikan hanya bila pemasok sudah tidak dipakai (agar tidak muncul lagi di pilihan PO).</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Supplier dengan kolom Nama, NPWP, dan tombol PKP <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> pemasok muncul di tabel Supplier dengan lencana Kehalalan (hijau = Halal, kuning = Syubhat/Non-halal). Sekarang pemasok ini bisa dipilih saat membuat PO.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Tombol + Tambah tidak ada</em> → akun Bapak/Ibu belum punya hak <strong>input belanja</strong>. Minta admin menambahkan peran keuangan.</li>
+<li><em>Salah ketik data</em> → ketuk <strong>Edit</strong> (pensil) di baris pemasok itu, betulkan, lalu <strong>Simpan</strong>.</li>
+</ul>
+<hr>
+<h2 id="3-membuat-purchase-order">3. Membuat Purchase Order (PO)<a class="anchor" href="#3-membuat-purchase-order" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> saat akan memesan barang/jasa dari pemasok dan butuh pesanan resmi yang disetujui dulu.</p>
+<p><strong>Siapkan dulu:</strong> nama pemasok (sudah terdaftar), daftar barang + jumlah + harga satuan, serta akun beban dan sumber dana yang sesuai (tanyakan bendahara bila ragu).</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Sarana &amp; Logistik</strong> → <strong>Purchase Order</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi bagian <strong>Purchase Order</strong>:<ul>
+<li><strong>Supplier</strong> — ketik sebagian nama, pilih dari daftar. (Hanya pemasok aktif yang muncul.)</li>
+<li><strong>Tanggal</strong> — tanggal pesanan (biasanya sudah terisi hari ini).</li>
+<li><strong>Jenis</strong> — Barang / Jasa / Sewa.</li>
+<li><strong>Akun Beban</strong> — pilih akun beban yang akan dibebani (mis. <code>5-xxxx Beban Pengadaan</code>).</li>
+<li><strong>Divisi</strong> dan <strong>Sumber Dana</strong> — pilih unit dan dari dana mana pembeliannya.</li>
+<li><strong>Keterangan</strong> — catatan singkat bila perlu.</li>
+</ul>
+</li>
+<li>Isi bagian <strong>Item</strong> (daftar barang). Untuk tiap baris:<ul>
+<li><strong>Uraian</strong> — nama barang/jasa. Contoh: <code>Beras 50 kg</code>.</li>
+<li><strong>Qty</strong> — jumlah. Contoh: <code>10</code>.</li>
+<li><strong>Harga Satuan</strong> — harga per unit dalam Rupiah. Contoh: <code>650000</code>.</li>
+</ul>
+Ketuk <strong>Tambah Item</strong> untuk baris berikutnya.</li>
+<li>Ketuk <strong>Simpan</strong>. Total PO dihitung otomatis dari semua item.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir PO dengan daftar Item (Uraian, Qty, Harga Satuan) <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> PO muncul di tabel dengan nomor otomatis (mis. <code>PO/2026/06/0001</code>) dan status <strong>Draft</strong>. Totalnya sudah terhitung.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Mau membetulkan item PO</em> → selama status masih <strong>Draft</strong>, ketuk <strong>Edit</strong>, ubah item, lalu <strong>Simpan</strong>. Setelah PO disetujui/diterima, item terkunci agar nilai yang sudah disetujui tidak berubah.</li>
+<li><em>Pemasok tidak muncul di pilihan</em> → pemasok belum terdaftar atau statusnya tidak aktif. Daftarkan/aktifkan dulu (lihat <a href="#2-mendaftarkan-supplier">Bagian 2</a>).</li>
+</ul>
+<hr>
+<h2 id="4-menyetujui-po">4. Menyetujui PO<a class="anchor" href="#4-menyetujui-po" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Persetujuan adalah lampu hijau dari pejabat berwenang sebelum barang dipesan ke pemasok. Hanya pemegang hak <strong>persetujuan pencairan</strong> yang dapat menyetujui.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Buka menu <strong>Purchase Order</strong>. Cari PO yang berstatus <strong>Draft</strong> atau <strong>Diajukan</strong>.</li>
+<li>Pada baris PO itu, ketuk tombol <strong>Setujui</strong> (ikon centang hijau).</li>
+<li>Muncul kotak konfirmasi — periksa lalu tegaskan <strong>Setujui</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> baris PO dengan tombol Setujui dan kotak konfirmasi <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pemberitahuan <em>"PO disetujui"</em> dan status berubah menjadi <strong>Disetujui</strong> (lencana biru). PO siap untuk tahap terima barang.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Muncul "Gagal menyetujui"</em> dengan pesan soal anggaran/pagu → pembelian melampaui pagu RKAM untuk akun itu (mode blokir). Kurangi nilai PO atau koordinasi dengan bendahara untuk menyesuaikan pagu.</li>
+<li><em>Muncul pesan persetujuan wajib</em> → ada aturan persetujuan yang belum dipenuhi. Pastikan PO sudah melewati jalur pengajuan yang ditetapkan pesantren.</li>
+<li><em>Tombol Setujui tidak ada</em> → akun Bapak/Ibu belum punya hak persetujuan pencairan. Ini memang sengaja dipisah dari pembuat PO.</li>
+</ul>
+<hr>
+<h2 id="5-menerima-barang-grn">5. Menerima Barang (GRN)<a class="anchor" href="#5-menerima-barang-grn" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> GRN (<em>Goods Receipt Note</em> / catatan penerimaan barang) adalah pencatatan saat barang benar-benar datang. Inilah pencocokan antara yang dipesan dan yang diterima. <strong>Saat barang diterima penuh, sistem otomatis membuat catatan Belanja (tagihan)</strong> yang nanti tinggal disetujui &amp; dicairkan.</p>
+<p><strong>Siapkan dulu:</strong> barang sudah datang dan sudah dicek jumlahnya. PO harus sudah berstatus <strong>Disetujui</strong>.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Buka menu <strong>Purchase Order</strong>. Cari PO yang berstatus <strong>Disetujui</strong>.</li>
+<li>Pada baris PO itu, ketuk tombol <strong>Terima (GRN)</strong> (ikon truk).</li>
+<li>Akan muncul kotak <strong>Terima Barang (GRN)</strong>:<ul>
+<li><strong>Bila pesantren memakai penerimaan penuh (bawaan):</strong> cukup tegaskan konfirmasi. Seluruh item dianggap diterima penuh.</li>
+<li><strong>Bila pesantren mengaktifkan penerimaan sebagian:</strong> muncul daftar item dengan kolom <strong>Qty Diterima</strong>. Isi jumlah yang benar-benar diterima per item (boleh kurang dari Qty PO, tidak boleh lebih).</li>
+</ul>
+</li>
+<li>Tegaskan untuk menyimpan penerimaan.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> kotak Terima Barang (GRN) dengan kolom Qty PO dan Qty Diterima per item <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong></p>
+<ul>
+<li>Bila <strong>seluruh item diterima penuh</strong> → muncul <em>"Barang diterima &amp; Belanja dibuat"</em>. Status PO menjadi <strong>Diterima</strong>, dan catatan <strong>Belanja</strong> baru muncul di menu <strong>Belanja &amp; Pajak</strong> (siap disetujui &amp; dicairkan — lihat <a href="#6-belanja-setujui-cairkan">Bagian 6</a>).</li>
+<li>Bila <strong>baru sebagian</strong> diterima → muncul <em>"Penerimaan dicatat"</em>. Belanja belum dibuat sampai semua item lengkap diterima.</li>
+</ul>
+<blockquote>
+<p>⚙️ <strong>Tentang "terima sebagian":</strong> fitur menerima barang kurang dari jumlah pesanan adalah <strong>setelan opsional</strong>. Secara bawaan setelan ini <strong>mati</strong> (penerimaan selalu penuh sekaligus). Admin bisa menyalakannya lewat menu <strong>Setelan / Kebijakan</strong> pesantren (kelompok Keuangan) → <em>"Izinkan penerimaan barang sebagian (GRN parsial)"</em>. Bila ragu, biarkan bawaan.</p>
+</blockquote>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Muncul "Gagal menerima" — qty diterima melebihi PO</em> → angka yang diisi lebih besar dari Qty yang dipesan. Betulkan agar tidak melebihi.</li>
+<li><em>Tombol Terima (GRN) tidak ada</em> → PO belum berstatus Disetujui, atau akun Bapak/Ibu belum punya hak input belanja.</li>
+</ul>
+<hr>
+<h2 id="6-belanja-setujui-cairkan">6. Belanja: Setujui &amp; Cairkan<a class="anchor" href="#6-belanja-setujui-cairkan" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Belanja adalah catatan tagihan/pengeluaran. Di sinilah uang benar-benar <strong>dibukukan</strong>: saat Bapak/Ibu menekan <strong>Setujui &amp; Cairkan</strong>, sistem membuat jurnal otomatis (beban, pajak bila ada, dan kas keluar). Pajak (PPN/PPh) sudah dihitung otomatis saat Belanja dibuat.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Sarana &amp; Logistik</strong> → <strong>Belanja &amp; Pajak</strong>.</li>
+<li>Cari Belanja berstatus <strong>Diajukan</strong> (lencana kuning). Untuk Belanja dari PO, uraiannya berisi nomor PO dan nama pemasok.</li>
+<li>Ketuk barisnya untuk memeriksa: tanggal, uraian, DPP, PPN, PPh, dan Total. Pastikan benar.</li>
+<li>Bila sudah benar, ketuk <strong>Setujui &amp; Cairkan</strong> (ikon centang hijau).</li>
+<li>Muncul konfirmasi yang menjelaskan bahwa belanja akan disetujui, dijurnal otomatis (beban, pajak, kas), dan ditandai dicairkan. Tegaskan.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> tabel Belanja dengan kolom DPP, PPN, PPh, Total dan tombol Setujui &amp; Cairkan <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> muncul <em>"Belanja disetujui &amp; dijurnal"</em>, status berubah menjadi <strong>Dicairkan</strong> (lencana hijau), dan jurnalnya otomatis masuk ke Buku Besar. Bukti BKK siap dicetak (lihat <a href="#7-mencetak-bkk">Bagian 7</a>).</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Muncul pesan "Bagan Akun (COA) belum lengkap"</em> → akun beban atau akun kas/bank belum tersedia. Minta bendahara/admin melengkapi <strong>Bagan Akun</strong> (menu Keuangan → Bagan Akun) lalu coba lagi.</li>
+<li><em>Muncul pesan soal pagu/anggaran</em> → pengeluaran melampaui pagu RKAM (mode blokir). Koordinasi dengan bendahara.</li>
+<li><em>Belanja salah</em> dan belum dicairkan → gunakan tombol <strong>Tolak</strong> (ikon silang merah). Belanja yang sudah dicairkan <strong>tidak bisa diubah/dihapus</strong> — koreksi dilakukan lewat jurnal pembalik oleh bendahara.</li>
+</ul>
+<blockquote>
+<p>⚠️ <strong>Penting — pemisahan tugas:</strong> tombol <strong>Setujui &amp; Cairkan</strong> hanya muncul untuk pemegang hak <strong>persetujuan pencairan</strong>. Pembuat belanja dan penyetuju sengaja dipisah demi keamanan keuangan.</p>
+</blockquote>
+<hr>
+<h2 id="7-mencetak-bkk">7. Mencetak BKK<a class="anchor" href="#7-mencetak-bkk" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> BKK (<strong>Bukti Kas Keluar</strong>) adalah lembar bukti resmi bahwa uang dikeluarkan untuk belanja itu — untuk ditandatangani dan diarsipkan.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Di menu <strong>Belanja &amp; Pajak</strong>, cari baris belanja yang dimaksud.</li>
+<li>Ketuk tombol <strong>Cetak BKK</strong> (ikon printer).</li>
+<li>BKK terbuka di tab baru. Cetak lewat menu cetak peramban (Ctrl+P), atau simpan sebagai PDF.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> lembar BKK siap cetak di tab baru <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> lembar BKK tampil rapi berisi rincian belanja, siap dicetak dan ditandatangani.</p>
+<hr>
+<h2 id="8-belanja-tanpa-po">8. Belanja Tanpa PO<a class="anchor" href="#8-belanja-tanpa-po" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> untuk pengeluaran kecil/mendesak yang tidak perlu pesanan resmi lebih dulu (mis. beli ATK, ongkos kirim). Bapak/Ibu bisa langsung mencatat Belanja.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Sarana &amp; Logistik</strong> → <strong>Belanja &amp; Pajak</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi bagian <strong>Data Belanja</strong>:<ul>
+<li><strong>Tanggal</strong>, <strong>Uraian</strong> — tanggal dan keterangan singkat pengeluaran.</li>
+<li><strong>Jenis</strong> — Barang / Jasa / Sewa Tanah/Bangunan.</li>
+<li><strong>Kategori RKAM</strong> — opsional, untuk pengelompokan anggaran.</li>
+<li><strong>Divisi/Unit</strong> dan <strong>Sumber Dana</strong> — dari unit dan dana mana. Sumber Dana wajib dipilih.</li>
+<li><strong>DPP (sebelum pajak)</strong> — nilai dasar belanja dalam Rupiah (lihat <a href="#glosarium">Glosarium</a>). Wajib lebih dari 0.</li>
+<li><strong>Vendor ber-NPWP</strong> — nyalakan bila pemasok punya NPWP. Memengaruhi perhitungan pajak.</li>
+</ul>
+</li>
+<li>Isi bagian <strong>Pembukuan</strong>:<ul>
+<li><strong>Akun Beban/Aset (Debit)</strong> — akun yang dibebani belanja ini.</li>
+<li><strong>Akun Kas/Bank (Kredit)</strong> — dari kas/bank mana uangnya keluar.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>. PPN/PPh dihitung otomatis. Belanja muncul berstatus <strong>Diajukan</strong>.</li>
+<li>Lanjutkan ke <a href="#6-belanja-setujui-cairkan">Setujui &amp; Cairkan</a> seperti Bagian 6.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Belanja dengan bagian Data Belanja dan Pembukuan <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> belanja tercatat berstatus Diajukan, dengan PPN/PPh sudah terhitung otomatis.</p>
+<p>⚠️ <em>Tidak yakin akun beban/kas mana yang dipilih?</em> → tanyakan bendahara. Salah akun bisa membuat laporan keuangan keliru.</p>
+<hr>
+<h2 id="9-pengingat-penting">9. Pengingat Penting<a class="anchor" href="#9-pengingat-penting" aria-hidden="true">#</a></h2>
+<ol>
+<li>🔐 <strong>Pembuat ≠ penyetuju.</strong> Yang membuat PO/Belanja sengaja berbeda dari yang menyetujui &amp; mencairkan. Ini melindungi pesantren.</li>
+<li>💸 <strong>Uang baru terbukukan saat "Setujui &amp; Cairkan".</strong> Membuat PO atau Belanja saja belum mengeluarkan uang dari pembukuan.</li>
+<li>🔒 <strong>Belanja yang sudah dicairkan tidak bisa diubah/dihapus.</strong> Salah? Lapor bendahara untuk jurnal pembalik.</li>
+<li>📦 <strong>Catat penerimaan barang dengan jujur.</strong> Qty diterima tidak boleh melebihi yang dipesan.</li>
+<li>🧾 <strong>Cetak &amp; arsipkan BKK</strong> untuk setiap pencairan sebagai bukti fisik.</li>
+<li>🚪 <strong>Keluar (logout)</strong> bila memakai komputer kantor bersama.</li>
+</ol>
+<hr>
+<h2 id="glosarium">Glosarium Istilah<a class="anchor" href="#glosarium" aria-hidden="true">#</a></h2>
+<p>Istilah keuangan/pengadaan yang muncul di layar, dijelaskan sederhana:</p>
+<table>
+<thead>
+<tr>
+<th>Istilah</th>
+<th>Artinya</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Supplier</strong></td>
+<td>Pemasok / toko / penyedia barang/jasa yang menjadi sumber pembelian pesantren.</td>
+</tr>
+<tr>
+<td><strong>PO (Purchase Order)</strong></td>
+<td>Surat pesanan resmi: pemasok mana, barang apa, berapa banyak, harga berapa. Dibuat sebelum barang dibeli, lalu disetujui.</td>
+</tr>
+<tr>
+<td><strong>GRN</strong></td>
+<td><em>Goods Receipt Note</em> — catatan penerimaan barang. Diisi saat barang datang untuk mencocokkan pesanan dengan yang benar-benar diterima.</td>
+</tr>
+<tr>
+<td><strong>Belanja</strong></td>
+<td>Catatan tagihan/pengeluaran. Bisa lahir otomatis dari PO yang diterima penuh, atau dicatat langsung. Saat disetujui &amp; dicairkan, uang dibukukan.</td>
+</tr>
+<tr>
+<td><strong>DPP</strong></td>
+<td>Dasar Pengenaan Pajak — nilai belanja <em>sebelum</em> ditambah pajak. Pajak (PPN/PPh) dihitung dari angka ini.</td>
+</tr>
+<tr>
+<td><strong>PKP</strong></td>
+<td>Pengusaha Kena Pajak — pemasok ber-NPWP yang resmi memungut PPN. Status ini memengaruhi perhitungan pajak belanja.</td>
+</tr>
+<tr>
+<td><strong>PPN / PPh</strong></td>
+<td>Pajak yang dihitung otomatis: <strong>PPN</strong> (Pajak Pertambahan Nilai) dan <strong>PPh</strong> (Pajak Penghasilan). Sistem menghitungnya sesuai jenis belanja, status NPWP, dan sumber dana.</td>
+</tr>
+<tr>
+<td><strong>BKK</strong></td>
+<td>Bukti Kas Keluar — lembar bukti resmi pengeluaran uang, untuk ditandatangani dan diarsipkan.</td>
+</tr>
+<tr>
+<td><strong>Akun Beban</strong></td>
+<td>Pos pembukuan yang menampung biaya/pengeluaran (mis. Beban Pengadaan, Beban ATK). "Didebit" saat belanja.</td>
+</tr>
+<tr>
+<td><strong>Akun Kas/Bank</strong></td>
+<td>Pos pembukuan tempat uang berada (kas tunai atau rekening bank). "Dikredit" (berkurang) saat uang keluar untuk belanja.</td>
+</tr>
+<tr>
+<td><strong>Sumber Dana</strong></td>
+<td>Dari kantong mana pembelian dibiayai (mis. dana umum, dana BOS/negara, infak). Memengaruhi pencatatan dan pajak.</td>
+</tr>
+<tr>
+<td><strong>Syubhat</strong></td>
+<td>Status kehalalan yang <em>meragukan</em> (belum jelas halal/haram). Bisa ditandai pada pemasok/dana agar pesantren bisa berhati-hati. Untuk dana syubhat/non-halal, pajak negara tidak dipungut.</td>
+</tr>
+<tr>
+<td><strong>RKAM</strong></td>
+<td>Rencana Kegiatan dan Anggaran Madrasah/pesantren — pagu/anggaran. Bila pembelian melampaui pagu (mode blokir), persetujuan akan ditolak.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="contekan-cepat-pengadaan">Contekan Cepat<a class="anchor" href="#contekan-cepat-pengadaan" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daftarkan pemasok baru</td>
+<td>Sarana &amp; Logistik → Supplier → + Tambah</td>
+</tr>
+<tr>
+<td>Buat pesanan (PO)</td>
+<td>Sarana &amp; Logistik → Purchase Order → + Tambah</td>
+</tr>
+<tr>
+<td>Setujui PO</td>
+<td>Purchase Order → baris PO → Setujui</td>
+</tr>
+<tr>
+<td>Catat barang datang</td>
+<td>Purchase Order → baris PO (Disetujui) → Terima (GRN)</td>
+</tr>
+<tr>
+<td>Cairkan tagihan</td>
+<td>Sarana &amp; Logistik → Belanja &amp; Pajak → Setujui &amp; Cairkan</td>
+</tr>
+<tr>
+<td>Belanja kecil tanpa PO</td>
+<td>Sarana &amp; Logistik → Belanja &amp; Pajak → + Tambah</td>
+</tr>
+<tr>
+<td>Cetak bukti kas keluar</td>
+<td>Belanja &amp; Pajak → baris belanja → Cetak BKK</td>
+</tr>
+<tr>
+<td>Nyalakan terima sebagian</td>
+<td>Setelan / Kebijakan (kelompok Keuangan) → Izinkan penerimaan sebagian</td>
+</tr>
+</tbody>
+</table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../akademik/"><span>‹ Sebelumnya</span><b>Akademik Lanjutan</b></a>
+      <a class="pager-link next" href="../wali-santri/"><span>Berikutnya ›</span><b>Wali Santri</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-mengenal-alur-pengadaan">1. Mengenal Alur Pengadaan</a><a href="#2-mendaftarkan-supplier">2. Mendaftarkan Supplier</a><a href="#3-membuat-purchase-order">3. Membuat Purchase Order (PO)</a><a href="#4-menyetujui-po">4. Menyetujui PO</a><a href="#5-menerima-barang-grn">5. Menerima Barang (GRN)</a><a href="#6-belanja-setujui-cairkan">6. Belanja: Setujui &amp; Cairkan</a><a href="#7-mencetak-bkk">7. Mencetak BKK</a><a href="#8-belanja-tanpa-po">8. Belanja Tanpa PO</a><a href="#9-pengingat-penting">9. Pengingat Penting</a><a href="#glosarium">Glosarium Istilah</a><a href="#contekan-cepat-pengadaan">Contekan Cepat</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

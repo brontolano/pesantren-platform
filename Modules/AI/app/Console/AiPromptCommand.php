@@ -105,7 +105,7 @@ class AiPromptCommand extends Command
 
     private function salahPakai(): int
     {
-        $this->error("Aksi tidak dikenal. Pilihan: list | aktifkan | rollback.");
+        $this->error('Aksi tidak dikenal. Pilihan: list | aktifkan | rollback.');
 
         return self::INVALID;
     }

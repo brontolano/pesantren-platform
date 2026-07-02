@@ -159,7 +159,7 @@ class SantriImportCommandTest extends TestCase
      */
     private function makeCsv(array $rows): string
     {
-        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('santri-import-', true) . '.csv';
+        $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.uniqid('santri-import-', true).'.csv';
         $handle = fopen($path, 'wb');
 
         foreach ($rows as $row) {

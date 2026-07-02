@@ -23,14 +23,20 @@ use Filament\Schemas\Schema;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Modules\AI\Models\AiApproval;
+use Modules\AI\Models\AiTenantBudget;
 use Modules\AI\Models\AiTenantSetting;
+use Modules\AI\Services\Gateway\AiGateway;
+use Modules\AI\Services\Metering\AiBudgetProvisioner;
+use Modules\AI\Services\Metering\BudgetGuard;
 use Modules\AI\Services\Settings\AiTenantSettingDefaults;
 use Modules\AI\Services\Settings\RingkasanKebijakan;
 use Modules\AI\Services\Settings\TenantSettingService;
+use Throwable;
 
 /**
  * T-A011 — Wizard "Wawancara Digital" 6 langkah (PRD §6.2–6.3).
@@ -47,7 +53,7 @@ class PengaturanAi extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim Digital';
+    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim';
 
     protected static ?string $navigationLabel = 'Pengaturan Asisten AI';
 
@@ -67,8 +73,10 @@ class PengaturanAi extends Page implements HasForms
 
     /**
      * Payload dasar tempat nilai form ditimpakan. Menjaga field yang TIDAK
-     * diedit lewat form (mis. whitelist_kitab — menunggu seed tinjauan
-     * Dewan Ustadz, GATE-3) agar tidak hilang saat draf disimpan.
+     * diedit lewat form (mis. matriks fitur_per_peran preset) agar tidak
+     * hilang saat draf disimpan. whitelist_kitab kini DIKELOLA MANDIRI oleh
+     * pesantren lewat form (gap-83) — perubahannya tergolong sensitif →
+     * menunggu persetujuan Kyai/Mudir (config ai.settings.sensitive_fields).
      */
     public array $payloadDasar = [];
 
@@ -220,9 +228,17 @@ class PengaturanAi extends Page implements HasForms
                     ])
                     ->required()
                     ->columnSpanFull(),
-                Section::make('Daftar rujukan (whitelist kitab)')
-                    ->description($this->keteranganWhitelist())
-                    ->schema([])
+                TagsInput::make('whitelist_kitab')
+                    ->label('Daftar rujukan yang diizinkan (whitelist kitab)')
+                    ->helperText(new HtmlString(
+                        'Daftar kitab/rujukan yang BOLEH dirujuk asisten saat menjawab pertanyaan keagamaan. '
+                        .'Disusun dan menjadi tanggung jawab pesantren (mis. atas arahan Dewan Asatidz) — '
+                        .'asisten tetap tidak pernah mengarang isi keagamaan, hanya merujuk daftar ini. '
+                        .'Kosongkan bila asisten cukup mempersilakan bertanya langsung kepada Asatidz. '
+                        .'Unggah dokumen rujukannya di menu <strong>Sumber Pengetahuan</strong>. '
+                        .'Perubahan daftar ini menunggu persetujuan Kyai/Mudir sebelum berlaku.'
+                    ))
+                    ->placeholder('Ketik nama kitab/rujukan lalu tekan Enter')
                     ->columnSpanFull(),
                 TagsInput::make('blacklist_topik')
                     ->label('Topik yang dilarang dibahas')
@@ -250,15 +266,6 @@ class PengaturanAi extends Page implements HasForms
                     ->columns(3)
                     ->columnSpanFull(),
             ]);
-    }
-
-    protected function keteranganWhitelist(): string
-    {
-        $whitelist = (array) ($this->payloadDasar['whitelist_kitab'] ?? []);
-
-        return $whitelist === []
-            ? 'Daftar rujukan akan tersedia setelah ditinjau Dewan Ustadz. Selama daftar masih kosong, asisten menjawab pertanyaan keagamaan dengan mempersilakan bertanya langsung kepada Asatidz.'
-            : 'Saat ini terdaftar '.count($whitelist).' rujukan hasil tinjauan Dewan Ustadz. Perubahan daftar dilakukan melalui proses tinjauan, bukan dari halaman ini.';
     }
 
     // ------------------------------------------------------------------
@@ -399,6 +406,15 @@ class PengaturanAi extends Page implements HasForms
             ->description('Kapan asisten melayani, dan apa pesannya di luar jam itu')
             ->afterValidation(fn () => $this->simpanLangkah())
             ->schema([
+                Section::make('Chatbot WhatsApp')
+                    ->description('Atur perilaku balasan otomatis asisten di WhatsApp.')
+                    ->schema([
+                        Toggle::make('mode_uji_wa')
+                            ->label('Mode uji coba WhatsApp (balasan template, tanpa AI)')
+                            ->helperText('AKTIF: setiap pesan masuk dibalas pesan template singkat tanpa melibatkan AI — aman untuk uji coba. NONAKTIF: asisten menjawab sungguhan (verifikasi wali, intent, lalu tanya-jawab). Disarankan tetap AKTIF sampai pesantren siap melayani lewat WhatsApp.')
+                            ->inline(false),
+                    ])
+                    ->columnSpanFull(),
                 TimePicker::make('jam_layanan.mulai')
                     ->label('Jam mulai layanan')
                     ->seconds(false)
@@ -469,6 +485,13 @@ class PengaturanAi extends Page implements HasForms
             (array) ($payload['blacklist_topik'] ?? []),
         ), fn (string $t): bool => $t !== ''));
 
+        // whitelist_kitab (gap-83 — dikelola mandiri pesantren): array string
+        // rujukan, buang entri kosong agar lolos validasi (string, max:255).
+        $payload['whitelist_kitab'] = array_values(array_filter(array_map(
+            'strval',
+            (array) ($payload['whitelist_kitab'] ?? []),
+        ), fn (string $t): bool => $t !== ''));
+
         $payload['eskalasi_tujuan'] = [
             'penerima' => array_values(array_map('intval', (array) data_get($payload, 'eskalasi_tujuan.penerima', []))),
             'kanal' => (string) data_get($payload, 'eskalasi_tujuan.kanal', 'panel'),
@@ -496,6 +519,9 @@ class PengaturanAi extends Page implements HasForms
         $payload['ambang_alert_persen'] = (int) $payload['ambang_alert_persen'];
         $payload['consent_ortu'] = (bool) $payload['consent_ortu'];
         $payload['optin_riset'] = (bool) $payload['optin_riset'];
+        // gap-135 — toggle mode uji WA (fallback default true bila absen pada
+        // payload dasar tenant lama → kompat-mundur, perilaku tak berubah).
+        $payload['mode_uji_wa'] = (bool) ($payload['mode_uji_wa'] ?? true);
 
         $anggaran = $payload['anggaran_kredit_bulanan'] ?? null;
         $payload['anggaran_kredit_bulanan'] = ($anggaran === null || $anggaran === '')
@@ -620,5 +646,202 @@ class PengaturanAi extends Page implements HasForms
     public function tautanRingkasanJam(): int
     {
         return max(1, (int) config('ai.settings.tautan_ringkasan_jam', 72));
+    }
+
+    // ------------------------------------------------------------------
+    // gap-136 — Status Infrastruktur AI (READ-ONLY swa-periksa di panel)
+    //
+    // Menampilkan ringkasan yang sebelumnya hanya tersedia lewat CLI
+    // `php artisan ai:health`: Ollama terjangkau + model, kedalaman antrian
+    // queue 'ai', dan sisa anggaran kredit tenant. SEMUA logika memanggil
+    // service yang SUDAH ADA (AiGateway::providerHealth, BudgetGuard::cek,
+    // AiTenantBudget) — halaman ini hanya merangkai & menampilkan, TIDAK
+    // mengubah logika kesehatan/anggaran/inferensi.
+    //
+    // Provisioning baris anggaran dilakukan idempoten (AiBudgetProvisioner
+    // memakai insertOrIgnore) HANYA bila baris tenant belum ada — sehingga
+    // status "BELUM ADA" tidak menetap untuk tenant yang valid.
+    // ------------------------------------------------------------------
+
+    /** Id tenant aktif (panel tenant) atau null bila konteks central. */
+    protected function tenantIdKini(): ?string
+    {
+        return tenancy()->initialized ? (string) tenant()?->getTenantKey() : null;
+    }
+
+    /**
+     * Ringkasan status infrastruktur AI untuk ditampilkan di blade.
+     * Tiap blok toleran: kegagalan satu pemeriksaan tidak menggugurkan
+     * blok lainnya maupun render halaman.
+     *
+     * @return array{
+     *     provider: list<array{nama: string, ok: bool, detail: string, model: list<string>}>,
+     *     antrian: array{label: string, ok: bool, detail: string},
+     *     anggaran: array{tersedia: bool, ok: bool, killSwitch: bool, detail: string},
+     * }
+     */
+    public function statusInfra(): array
+    {
+        return [
+            'provider' => $this->statusProvider(),
+            'antrian' => $this->statusAntrian(),
+            'anggaran' => $this->statusAnggaran(),
+        ];
+    }
+
+    /**
+     * Kesehatan provider nyata (Ollama dst) + daftar model — memanggil
+     * AiGateway::providerHealth() yang sama dengan ai:health.
+     *
+     * @return list<array{nama: string, ok: bool, detail: string, model: list<string>}>
+     */
+    protected function statusProvider(): array
+    {
+        try {
+            $laporan = [];
+            foreach (app(AiGateway::class)->providerHealth() as $nama => $health) {
+                $laporan[] = [
+                    'nama' => (string) $nama,
+                    'ok' => (bool) ($health['ok'] ?? false),
+                    'detail' => (string) ($health['detail'] ?? ''),
+                    'model' => array_values(array_map('strval', (array) ($health['models'] ?? []))),
+                ];
+            }
+
+            return $laporan;
+        } catch (Throwable $e) {
+            return [[
+                'nama' => 'Provider AI',
+                'ok' => false,
+                'detail' => 'Tidak dapat diperiksa: '.$e->getMessage(),
+                'model' => [],
+            ]];
+        }
+    }
+
+    /**
+     * Kedalaman antrian queue 'ai' di Redis — read-only, meniru logika
+     * laporan AiHealthCommand tanpa memodifikasi apa pun.
+     *
+     * @return array{label: string, ok: bool, detail: string}
+     */
+    protected function statusAntrian(): array
+    {
+        $queue = (string) config('ai.queue.name', 'ai');
+        $queueConnection = (string) config('ai.queue.connection', 'redis-ai');
+
+        if (! is_array(config("queue.connections.{$queueConnection}"))) {
+            return [
+                'label' => "Antrian '{$queue}'",
+                'ok' => false,
+                'detail' => "Koneksi queue '{$queueConnection}' belum dikonfigurasi.",
+            ];
+        }
+
+        $connection = (string) config("queue.connections.{$queueConnection}.connection", 'default');
+
+        try {
+            $redis = Redis::connection($connection);
+            $pending = (int) $redis->llen("queues:{$queue}");
+            $delayed = (int) $redis->zcard("queues:{$queue}:delayed");
+            $reserved = (int) $redis->zcard("queues:{$queue}:reserved");
+
+            return [
+                'label' => "Antrian '{$queue}'",
+                'ok' => true,
+                'detail' => sprintf('%d menunggu, %d tertunda, %d diproses', $pending, $delayed, $reserved),
+            ];
+        } catch (Throwable $e) {
+            return [
+                'label' => "Antrian '{$queue}'",
+                'ok' => false,
+                'detail' => 'Tidak terjangkau: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Sisa anggaran kredit AI tenant. Memanggil BudgetGuard::cek() &
+     * membaca AiTenantBudget (central) — sama dengan baris anggaran
+     * ai:health. Bila baris belum ada, provisioning idempoten dijalankan
+     * sekali (AiBudgetProvisioner) lalu dibaca ulang; tetap toleran.
+     *
+     * @return array{tersedia: bool, ok: bool, killSwitch: bool, detail: string}
+     */
+    protected function statusAnggaran(): array
+    {
+        $tenantId = $this->tenantIdKini();
+
+        if ($tenantId === null) {
+            return [
+                'tersedia' => false,
+                'ok' => false,
+                'killSwitch' => false,
+                'detail' => 'Konteks tenant tidak terdeteksi.',
+            ];
+        }
+
+        try {
+            $budget = AiTenantBudget::query()->where('tenant_id', $tenantId)->first();
+
+            // Provisioning idempoten: hanya bila baris belum ada. Provisioner
+            // memakai insertOrIgnore + tidak mengubah riwayat ledger berjalan.
+            if ($budget === null) {
+                app(AiBudgetProvisioner::class)->provision($tenantId);
+                $budget = AiTenantBudget::query()->where('tenant_id', $tenantId)->first();
+            }
+
+            if ($budget === null) {
+                return [
+                    'tersedia' => false,
+                    'ok' => false,
+                    'killSwitch' => false,
+                    'detail' => 'Baris anggaran belum dapat disiapkan (tabel metering AI mungkin belum termigrasi).',
+                ];
+            }
+
+            $status = app(BudgetGuard::class)->cek($tenantId);
+
+            if ($status->killSwitch) {
+                return [
+                    'tersedia' => true,
+                    'ok' => false,
+                    'killSwitch' => true,
+                    'detail' => sprintf(
+                        'Anggaran bulan ini habis (terpakai %s%%) — panggilan AI dibalas pesan top-up.',
+                        number_format($status->persenTerpakai, 1, ',', '.'),
+                    ),
+                ];
+            }
+
+            $detail = $budget->anggaran_kredit_bulanan === null
+                ? sprintf('Tanpa batas anggaran — terpakai %s kredit periode ini.', $this->angkaKredit($budget->terpakai_periode))
+                : sprintf(
+                    'Terpakai %s dari %s kredit (%s%%), peringatan di %d%%.',
+                    $this->angkaKredit($budget->terpakai_periode),
+                    $this->angkaKredit($budget->anggaran_kredit_bulanan),
+                    number_format($status->persenTerpakai, 1, ',', '.'),
+                    (int) $budget->ambang_alert_persen,
+                );
+
+            return [
+                'tersedia' => true,
+                'ok' => true,
+                'killSwitch' => false,
+                'detail' => $detail,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'tersedia' => false,
+                'ok' => false,
+                'killSwitch' => false,
+                'detail' => 'Tidak dapat diperiksa: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    private function angkaKredit(int|float|string|null $n): string
+    {
+        return number_format((float) $n, 0, ',', '.');
     }
 }

@@ -23,6 +23,14 @@ class PpdbFileController extends Controller
 
         $this->authorizeAccess($request, $doc->calonSantri?->user_id);
 
+        // Privasi foto putri (#340): pas foto calon PEREMPUAN hanya untuk
+        // peran berhak — kecuali pemilik pendaftaran (peserta) sendiri.
+        if ($doc->jenis_dokumen === 'foto'
+            && $doc->calonSantri !== null
+            && (int) ($doc->calonSantri->user_id ?? 0) !== (int) $request->user()?->id) {
+            abort_unless($doc->calonSantri->fotoDapatDilihat(), 403);
+        }
+
         $disk = (is_array($doc->metadata) ? ($doc->metadata['disk'] ?? null) : null)
             ?: config('filesystems.default', 'local');
 

@@ -3,9 +3,12 @@
 namespace App\Filament\Pages;
 
 use App\Models\Setting;
+use App\Support\KebijakanPrivasiSistem;
 use App\Support\SantriLoginMethod;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -28,7 +31,7 @@ class PengaturanAppSantri extends Page implements HasForms
 
     protected static ?string $title = 'Pengaturan App Santri';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kesantrian';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
     protected static ?int $navigationSort = 20;
 
@@ -55,8 +58,8 @@ class PengaturanAppSantri extends Page implements HasForms
     {
         $this->form->fill([
             'metode' => SantriLoginMethod::enabled(),
-            'kebijakan' => \App\Models\Setting::getTenantStringValue(\App\Support\KebijakanPrivasiSistem::SETTING_KEY)
-                ?? \App\Support\KebijakanPrivasiSistem::default(),
+            'kebijakan' => Setting::getTenantStringValue(KebijakanPrivasiSistem::SETTING_KEY)
+                ?? KebijakanPrivasiSistem::default(),
         ]);
     }
 
@@ -86,14 +89,22 @@ class PengaturanAppSantri extends Page implements HasForms
                     ]),
 
                 Section::make('Kebijakan Privasi Sistem')
-                    ->description('Dipublikasikan di /kebijakan-privasi dan disetujui wali (checkbox) saat mendaftar PPDB. Redaksi default disediakan platform — sesuaikan bila perlu.')
+                    ->description('Editor redaksi privasi kini berada di Pusat Kebijakan (Kebijakan Pesantren → kelompok Umum), bersama setelan legal lainnya. Editor di sini tetap berfungsi & menyimpan ke tempat yang SAMA — silakan gunakan salah satu.')
                     ->icon('heroicon-o-shield-check')
+                    ->headerActions([
+                        Action::make('buka_pusat_kebijakan')
+                            ->label('Buka di Pusat Kebijakan')
+                            ->icon('heroicon-o-scale')
+                            ->color('gray')
+                            ->url(fn (): string => KebijakanPesantren::getUrl())
+                            ->openUrlInNewTab(),
+                    ])
                     ->collapsed()
                     ->schema([
-                        \Filament\Forms\Components\Textarea::make('kebijakan')
+                        Textarea::make('kebijakan')
                             ->label('')
                             ->rows(16)
-                            ->helperText('Wajib tetap menyebut: data yang dikumpulkan, tujuan (termasuk contoh tulisan utk teknologi internal), hak wali menarik persetujuan.'),
+                            ->helperText('Dipublikasikan di /kebijakan-privasi dan disetujui wali (checkbox) saat mendaftar PPDB. Wajib tetap menyebut: data yang dikumpulkan, tujuan (termasuk contoh tulisan utk teknologi internal), hak wali menarik persetujuan.'),
                     ]),
             ]);
     }
@@ -109,7 +120,7 @@ class PengaturanAppSantri extends Page implements HasForms
         $kebijakan = trim((string) ($this->form->getState()['kebijakan'] ?? ''));
         if ($kebijakan !== '') {
             Setting::updateOrCreate(
-                ['key' => \App\Support\KebijakanPrivasiSistem::SETTING_KEY],
+                ['key' => KebijakanPrivasiSistem::SETTING_KEY],
                 ['value' => ['text' => $kebijakan]],
             );
         }

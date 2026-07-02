@@ -5,9 +5,11 @@ namespace Modules\PPDB\Services;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Modules\Akademik\Services\PresensiSantriService;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\SkemaBiayaService;
-use Modules\Kesantrian\Models\Santri;
+use Modules\Notifikasi\Services\NotifDispatcher;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\CrmAktivitas;
 use Modules\PPDB\Models\CrmPenawaran;
@@ -139,7 +141,7 @@ class CrmService
     public function kirimCampaignDaftarUlang(string $tahun, array $opts = []): int
     {
         $this->ensureTenantContext();
-        $ref = 'daftar_ulang:' . $tahun;
+        $ref = 'daftar_ulang:'.$tahun;
 
         $calon = CalonSantri::query()
             ->where('tahun_ajaran', $tahun)
@@ -159,7 +161,7 @@ class CrmService
                     'kanal' => $opts['kanal'] ?? 'log',
                     'ref' => $ref,
                     'status' => 'terkirim',
-                    'keterangan' => 'Reminder daftar ulang ' . $tahun,
+                    'keterangan' => 'Reminder daftar ulang '.$tahun,
                     'dikirim_pada' => now(),
                     'dibuat_oleh' => $opts['dibuat_oleh'] ?? null,
                 ]);
@@ -178,7 +180,7 @@ class CrmService
     private function kirimNotifBestEffort(CalonSantri $calon, string $tahun): void
     {
         try {
-            app(\Modules\Notifikasi\Services\NotifDispatcher::class)
+            app(NotifDispatcher::class)
                 ->kirim('crm.daftar_ulang', ['calon_santri_id' => $calon->id, 'tahun' => $tahun]);
         } catch (\Throwable) {
             // Best-effort: kegagalan kanal tak membatalkan log campaign.
@@ -188,7 +190,7 @@ class CrmService
     private function kehadiranPersen(int $santriId, string $dari, string $sampai): ?float
     {
         try {
-            return app(\Modules\Akademik\Services\PresensiSantriService::class)
+            return app(PresensiSantriService::class)
                 ->rekap($santriId, $dari, $sampai)['persen'];
         } catch (\Throwable) {
             return null;

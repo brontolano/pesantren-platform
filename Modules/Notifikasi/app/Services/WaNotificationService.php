@@ -2,9 +2,9 @@
 
 namespace Modules\Notifikasi\Services;
 
-use Throwable;
 use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
+use Throwable;
 
 class WaNotificationService
 {
@@ -12,8 +12,7 @@ class WaNotificationService
         private readonly TemplateRenderer $renderer,
         private readonly WaGatewayService $gatewayService,
         private readonly LogNotifikasiService $logService,
-    ) {
-    }
+    ) {}
 
     public function sendToRecipient(
         BroadcastWa $broadcast,
@@ -29,6 +28,35 @@ class WaNotificationService
                 'subject' => $subject,
                 'variables' => $variables,
             ]);
+
+            // Gateway tak benar-benar mengirim — 'simulated' (WA belum dikonfigurasi)
+            // atau 'disabled' (WA dimatikan). JANGAN catat 'sent': log jujur + hitung
+            // sebagai TIDAK terkirim agar staf tak salah kira pesan sampai.
+            $status = is_array($response) ? ($response['status'] ?? null) : null;
+            if (in_array($status, ['simulated', 'disabled'], true)) {
+                $this->logService->forUndelivered($broadcast, $target, $status, is_array($response) ? $response : []);
+
+                return false;
+            }
+
+            // JEBAKAN WAHA: workflow n8n "Send WAHA" menelan error → HTTP 200
+            // "hijau" walau pesan GAGAL terkirim. Kebenaran ada di field
+            // `sent`/`gateway_status` pada body respons — periksa itu, bukan
+            // sekadar status sukses.
+            $sent = is_array($response) ? ($response['sent'] ?? null) : null;
+            $gatewayStatus = is_array($response) ? ($response['gateway_status'] ?? null) : null;
+            if ($sent === false
+                || in_array($status, ['failed', 'error'], true)
+                || in_array($gatewayStatus, ['failed', 'error'], true)) {
+                $this->logService->forFailure(
+                    $broadcast,
+                    $target,
+                    'Gateway melaporkan gagal kirim (sent=false / gateway_status='.($gatewayStatus ?? $status ?? '-').').',
+                    is_array($response) ? $response : []
+                );
+
+                return false;
+            }
 
             $this->logService->forSuccess($broadcast, $target, $response);
 

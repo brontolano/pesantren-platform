@@ -26,7 +26,7 @@ class UsulanFaq extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-light-bulb';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim Digital';
+    protected static string|\UnitEnum|null $navigationGroup = 'AI Khadim';
 
     protected static ?string $navigationLabel = 'Usulan FAQ';
 

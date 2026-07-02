@@ -20,6 +20,5 @@ class PembayaranDiverifikasi
     public function __construct(
         public readonly Pembayaran $pembayaran,
         public readonly int $verifiedBy,
-    ) {
-    }
+    ) {}
 }

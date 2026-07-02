@@ -5,6 +5,7 @@ namespace Modules\PPDB\Providers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Modules\PPDB\Console\IngatkanDaftarUlangCommand;
 use Modules\PPDB\Http\Middleware\EnsureUserIsPeserta;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Policies\CalonSantriPolicy;
@@ -28,7 +29,7 @@ class PPDBServiceProvider extends ModuleServiceProvider
      * @var string[]
      */
     protected array $commands = [
-        \Modules\PPDB\Console\IngatkanDaftarUlangCommand::class,
+        IngatkanDaftarUlangCommand::class,
     ];
 
     /**
@@ -57,8 +58,8 @@ class PPDBServiceProvider extends ModuleServiceProvider
 
     /**
      * Define module schedules.
-     * 
-     * @param $schedule
+     *
+     * @param  $schedule
      */
     // protected function configureSchedules(Schedule $schedule): void
     // {

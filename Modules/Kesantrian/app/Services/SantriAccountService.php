@@ -21,9 +21,7 @@ use Throwable;
  */
 class SantriAccountService
 {
-    public function __construct(private readonly WaliAccountService $waliAccounts)
-    {
-    }
+    public function __construct(private readonly WaliAccountService $waliAccounts) {}
 
     /** Buat/ambil akun login untuk santri. Idempoten. */
     public function provision(Santri $santri): User

@@ -25,9 +25,13 @@ use RuntimeException;
  */
 class AsetMovementService
 {
-    public function __construct(private readonly JurnalService $jurnalService)
-    {
-    }
+    /** gap-96c — langkah perbaikan ramah-pengguna untuk pesan COA belum siap. */
+    private const COA_LANGKAH = 'Minta admin keuangan menyiapkan Bagan Akun (Pengaturan Keuangan) terlebih dahulu, lalu ulangi pelepasan aset ini.';
+
+    /** gap-96c — pesan utama saat bagan akun inti (kas/aset tetap) belum tersedia. */
+    private const COA_BELUM_SIAP = 'Bagan akun keuangan belum siap untuk mencatat pelepasan aset (akun Kas/Aset Tetap belum tersedia). '.self::COA_LANGKAH;
+
+    public function __construct(private readonly JurnalService $jurnalService) {}
 
     /** Pindah lokasi aset (tanpa dampak buku besar). */
     public function mutasiLokasi(Aset $aset, string $keLokasi, array $opsi = []): MutasiAset
@@ -88,17 +92,20 @@ class AsetMovementService
             $akumAkun = Akun::where('kode', '1-2900')->first();
             $labaAkun = Akun::where('kode', '4-6000')->first();
             $rugiAkun = Akun::where('kode', '5-8000')->first();
+            // gap-96c — Guard ramah: bila bagan akun (COA) belum disiapkan, beri pesan
+            // yang dapat dipahami staf + langkah perbaikan (buka Pengaturan Keuangan →
+            // siapkan/seed bagan akun), BUKAN istilah teknis "belum di-seed".
             if ($kas === null || $asetAkun === null) {
-                throw new RuntimeException('Akun kas / aset tetap belum di-seed (jalankan LedgerSeeder).');
+                throw new RuntimeException(self::COA_BELUM_SIAP);
             }
             if ($akum > 0 && $akumAkun === null) {
-                throw new RuntimeException('Akun 1-2900 (akumulasi penyusutan) belum di-seed.');
+                throw new RuntimeException('Bagan akun belum lengkap: akun Akumulasi Penyusutan (1-2900) belum tersedia. '.self::COA_LANGKAH);
             }
             if ($labaRugi < 0 && $rugiAkun === null) {
-                throw new RuntimeException('Akun 5-8000 (rugi pelepasan aset) belum di-seed.');
+                throw new RuntimeException('Bagan akun belum lengkap: akun Rugi Pelepasan Aset (5-8000) belum tersedia. '.self::COA_LANGKAH);
             }
             if ($labaRugi > 0 && $labaAkun === null) {
-                throw new RuntimeException('Akun 4-6000 (laba pelepasan aset) belum di-seed.');
+                throw new RuntimeException('Bagan akun belum lengkap: akun Laba Pelepasan Aset (4-6000) belum tersedia. '.self::COA_LANGKAH);
             }
         }
 
@@ -160,7 +167,7 @@ class AsetMovementService
 
             $jurnal = $this->jurnalService->postJurnal([
                 'tanggal' => $mutasi->tanggal,
-                'deskripsi' => 'Pelepasan aset — ' . $aset->nama_aset,
+                'deskripsi' => 'Pelepasan aset — '.$aset->nama_aset,
                 'tipe_sumber' => 'disposal_aset',
                 'ref_type' => 'MutasiAset',
                 'ref_id' => (string) $mutasi->id,

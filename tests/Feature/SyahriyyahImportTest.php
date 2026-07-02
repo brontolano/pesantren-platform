@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Tenant;
 use App\Models\User;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\SyahriyyahImportService;
-use Modules\Kesantrian\Models\Santri;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -68,7 +68,7 @@ class SyahriyyahImportTest extends TestCase
     private function xlsx(array $rows): string
     {
         $path = tempnam(sys_get_temp_dir(), 'sya-import-').'.xlsx';
-        $writer = new Writer();
+        $writer = new Writer;
         $writer->openToFile($path);
         $writer->addRow(Row::fromValues(['No', 'NIS', 'NAMA SANTRI', 'P/L', 'PEMBAYARAN', 'CASH', 'BSI', 'BCA', 'LAINNYA', 'TANGGAL', 'CATATAN']));
         foreach ($rows as $r) {

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Schema;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Exceptions\PelanggaranKehalalanException;
 use Modules\Ledger\Models\Akun;
+use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Models\SumberDana;
 use Modules\Ledger\Services\DanaKebajikanService;
 use Modules\Ledger\Services\JurnalService;
@@ -65,7 +66,7 @@ class LedgerKehalalanTest extends TestCase
 
         // Tanpa pemisahan, posting yang "melanggar" pun lolos (keuangan biasa).
         $this->postSyubhatKePendapatan();
-        $this->assertSame(1, \Modules\Ledger\Models\Jurnal::count());
+        $this->assertSame(1, Jurnal::count());
     }
 
     public function test_terima_dana_syubhat_sebagai_dana_kebajikan_bukan_pendapatan(): void

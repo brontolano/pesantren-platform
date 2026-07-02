@@ -4,6 +4,7 @@ namespace Modules\Payroll\Services;
 
 use App\Models\Tenant;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Modules\Payroll\Models\Employee;
 use OpenSpout\Common\Entity\Row;
@@ -19,7 +20,9 @@ use RuntimeException;
  * Jabatan = string bebas (master Jabatan terpisah sudah di-seed provisioner;
  * importer tak menyentuhnya agar tak tumpang tindih).
  *
- * Kolom: nip* | nama* | jabatan | status_kepegawaian | nik | nuptk | tanggal_masuk | email
+ * Kolom: nip* | nama* | jabatan | status_kepegawaian | email | npwp | ptkp_status |
+ *        tanggal_masuk | tanggal_selesai | aktif | nik | nuptk | nrg | pendidikan_terakhir |
+ *        is_mukim | asal_alumni  (struktur gaji & sertifikasi = repeater, via UI form)
  */
 class PegawaiImportService
 {
@@ -31,7 +34,15 @@ class PegawaiImportService
         'status_kepegawaian' => ['status_kepegawaian', 'status', 'status_pegawai'],
         'nik' => ['nik', 'no_ktp', 'nomor_ktp'],
         'nuptk' => ['nuptk'],
+        'nrg' => ['nrg', 'nrg_sertifikasi', 'nomor_registrasi_guru'],
+        'npwp' => ['npwp', 'no_npwp', 'nomor_npwp'],
+        'ptkp_status' => ['ptkp_status', 'ptkp', 'status_ptkp'],
+        'pendidikan_terakhir' => ['pendidikan_terakhir', 'pendidikan', 'pendidikan_akhir'],
         'tanggal_masuk' => ['tanggal_masuk', 'tgl_masuk', 'tmt', 'mulai_tugas'],
+        'tanggal_selesai' => ['tanggal_selesai', 'tgl_selesai', 'tst', 'resign', 'tanggal_resign', 'tanggal_purna'],
+        'is_mukim' => ['is_mukim', 'mukim', 'tinggal_di_pondok', 'mondok'],
+        'asal_alumni' => ['asal_alumni', 'alumni', 'alumni_pesantren_ini'],
+        'aktif' => ['aktif', 'status_aktif', 'is_active'],
         'email' => ['email', 'email_pegawai', 'email_guru'],
     ];
 
@@ -93,12 +104,20 @@ class PegawaiImportService
                     if (isset($payload['status_kepegawaian'])) {
                         $payload['status_kepegawaian'] = mb_strtolower(trim((string) $payload['status_kepegawaian']));
                     }
+                    foreach (['is_mukim', 'asal_alumni', 'aktif'] as $kolomBool) {
+                        if (isset($payload[$kolomBool]) && trim((string) $payload[$kolomBool]) !== '') {
+                            $payload[$kolomBool] = $this->normalizeBoolean((string) $payload[$kolomBool]);
+                        } else {
+                            unset($payload[$kolomBool]);
+                        }
+                    }
 
                     $validator = Validator::make($payload, [
                         'nip' => ['required', 'string', 'max:40'],
                         'nama' => ['required', 'string', 'max:255'],
                         'status_kepegawaian' => ['nullable', 'in:'.implode(',', self::STATUS_VALID)],
                         'tanggal_masuk' => ['nullable', 'date'],
+                        'tanggal_selesai' => ['nullable', 'date'],
                         'email' => ['nullable', 'email'],
                     ]);
 
@@ -145,6 +164,24 @@ class PegawaiImportService
                         if (isset($payload['tanggal_masuk'])) {
                             $atribut['tanggal_masuk'] = $payload['tanggal_masuk'];
                         }
+                        // Field tambahan agar selaras dengan form panel admin
+                        // (struktur gaji & sertifikasi = repeater, dikelola via UI terpisah).
+                        foreach (['nrg', 'npwp', 'pendidikan_terakhir'] as $kolomTeks) {
+                            if (isset($payload[$kolomTeks]) && trim((string) $payload[$kolomTeks]) !== '') {
+                                $atribut[$kolomTeks] = trim((string) $payload[$kolomTeks]);
+                            }
+                        }
+                        if (isset($payload['ptkp_status']) && trim((string) $payload['ptkp_status']) !== '') {
+                            $atribut['ptkp_status'] = mb_strtoupper(trim((string) $payload['ptkp_status']));
+                        }
+                        if (isset($payload['tanggal_selesai'])) {
+                            $atribut['tanggal_selesai'] = $payload['tanggal_selesai'];
+                        }
+                        foreach (['is_mukim', 'asal_alumni', 'aktif'] as $kolomBool) {
+                            if (isset($payload[$kolomBool])) {
+                                $atribut[$kolomBool] = $payload[$kolomBool];
+                            }
+                        }
                         Employee::create($atribut);
                     }
 
@@ -183,6 +220,13 @@ class PegawaiImportService
             'ref' => isset($payload['nip']) ? (string) $payload['nip'] : null,
             'error' => $pesan,
         ];
+    }
+
+    private function normalizeBoolean(string $value): string
+    {
+        $normalized = mb_strtolower(trim($value));
+
+        return in_array($normalized, ['1', 'ya', 'y', 'true', 'aktif', 'mukim', 'mondok', 'alumni', 'iya'], true) ? '1' : '0';
     }
 
     /** @return list<mixed> */
@@ -237,7 +281,7 @@ class PegawaiImportService
         foreach ($headers as $index => $key) {
             $value = $values[$index] ?? null;
             if ($value instanceof \DateTimeInterface) {
-                $payload[$key] = \Carbon\Carbon::instance($value)->toDateString();
+                $payload[$key] = Carbon::instance($value)->toDateString();
 
                 continue;
             }

@@ -23,8 +23,9 @@ const flash = computed(() => page.props.flash ?? {});
 
 const brandName = computed(() => branding.value.name || 'Pesantren');
 const themeVars = computed(() => ({
-    '--spmb-primary': branding.value.primaryColor || '#14532d',
-    '--spmb-secondary': branding.value.secondaryColor || '#c2410c',
+    // Default Pixio (emerald). Tenant white-label tetap menimpa via branding.
+    '--spmb-primary': branding.value.primaryColor || '#059669',
+    '--spmb-secondary': branding.value.secondaryColor || '#047857',
 }));
 const faviconUrl = computed(() => branding.value.faviconUrl || branding.value.icon192Url || branding.value.logoUrl || '/favicon.ico');
 
@@ -57,7 +58,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
     <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
         <link rel="manifest" href="/spmb/manifest.json">
-        <meta name="theme-color" :content="branding.primaryColor || '#14532d'">
+        <meta name="theme-color" :content="branding.primaryColor || '#059669'">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -67,7 +68,7 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll));
 
     <div
         :style="themeVars"
-        class="spmb-app min-h-screen bg-stone-100 text-stone-900 antialiased"
+        class="spmb-app min-h-screen bg-[#fffaf3] text-stone-900 antialiased"
     >
         <AppBar
             :title="title"

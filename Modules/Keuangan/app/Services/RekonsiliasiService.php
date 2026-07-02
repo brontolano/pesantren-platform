@@ -2,7 +2,6 @@
 
 namespace Modules\Keuangan\Services;
 
-use Illuminate\Support\Facades\DB;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use RuntimeException;

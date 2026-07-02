@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Tenants\Pages;
 
 use App\Filament\Resources\Tenants\TenantResource;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditTenant extends EditRecord
 {
@@ -19,7 +20,7 @@ class EditTenant extends EditRecord
         return $data;
     }
 
-    protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $primaryDomain = $data['primary_domain'] ?? null;
         $websiteDomain = $data['website_domain'] ?? null;
@@ -34,6 +35,7 @@ class EditTenant extends EditRecord
         ] as $mapping) {
             if (! filled($mapping['domain'])) {
                 $record->domains()->where('type', $mapping['type'])->delete();
+
                 continue;
             }
 

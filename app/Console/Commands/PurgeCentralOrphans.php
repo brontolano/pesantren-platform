@@ -68,9 +68,9 @@ class PurgeCentralOrphans extends Command
         // 3. Kosongkan tabel operasional tenant (CASCADE untuk FK)
         $existing = array_values(array_filter($this->tenantTables, fn ($t) => Schema::hasTable($t)));
         if ($existing) {
-            $list = implode(', ', array_map(fn ($t) => '"' . $t . '"', $existing));
+            $list = implode(', ', array_map(fn ($t) => '"'.$t.'"', $existing));
             DB::statement("TRUNCATE TABLE {$list} RESTART IDENTITY CASCADE");
-            $this->info('Tabel operasional dikosongkan: ' . count($existing));
+            $this->info('Tabel operasional dikosongkan: '.count($existing));
         }
 
         $this->info('Selesai — DB central kini hanya berisi data SaaS.');

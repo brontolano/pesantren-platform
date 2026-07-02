@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cara Setup Pesantren · Panduan Pesantren.online</title>
+<meta name="description" content="Langkah demi langkah menyiapkan pesantren baru di aplikasi: identitas, modul, struktur akademik, akun staf, lalu data pokok. Setting dulu, baru isi data.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a><a class="nav-item active" href="../cara-setup/">🚀 Cara Setup Pesantren</a><div class="nav-sub"><a href="#sebelum-mulai">Sebelum Mulai</a><a href="#langkah-1-identitas">1. Identitas Pesantren</a><a href="#langkah-2-modul">2. Pilih Modul</a><a href="#langkah-3-struktur">3. Struktur Akademik</a><a href="#langkah-4-akun">4. Akun Staf &amp; Peran</a><a href="#langkah-5-data-pokok">5. Data Pokok</a><a href="#langkah-6-keuangan">6. Keuangan</a><a href="#langkah-7-cek">7. Cek &amp; Mulai Pakai</a><a href="#ringkasan">Ringkasan Urutan</a></div></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama & Kehidupan Santri</a><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a></div><div class="nav-group"><div class="nav-group-title">Modul Khusus</div><a class="nav-item" href="../akuntansi/">📊 Akuntansi & Pajak</a><a class="nav-item" href="../ai-khadim/">🤖 AI Khadim Digital</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a><a class="nav-item" href="../navigasi-baru/">🗺️ Peta Menu Aplikasi</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">🚀</div>
+        <div>
+          <span class="badge" style="background:#10b981;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;margin-bottom:4px;display:inline-block">BARU</span>
+          <h1>Cara Setup Pesantren</h1>
+          <p class="lead">Panduan menyiapkan pesantren baru di aplikasi, langkah demi langkah. Prinsipnya: <strong>atur pengaturan dulu, baru isi data</strong> — supaya rapi sejak awal.</p>
+        </div>
+      </div>
+
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Identitas Pesantren</li>
+<li>Pilih Modul yang Dipakai</li>
+<li>Struktur Akademik (lembaga, kelas, pelajaran)</li>
+<li>Akun Staf &amp; Peran</li>
+<li>Data Pokok (santri, pegawai)</li>
+<li>Keuangan (skema biaya &amp; pembayaran)</li>
+<li>Cek &amp; Mulai Pakai</li>
+</ol>
+
+<hr>
+
+<h2 id="sebelum-mulai">Sebelum Mulai<a class="anchor" href="#sebelum-mulai" aria-hidden="true">#</a></h2>
+<p><strong>Siapa yang melakukan ini:</strong> admin pesantren (akun dengan hak penuh).</p>
+<p><strong>Siapkan dulu:</strong></p>
+<ul>
+<li>Alamat aplikasi, email, dan kata sandi admin (dari penyedia/admin platform).</li>
+<li>Logo pesantren (file gambar) dan data identitas (nama resmi, alamat, kontak, NSPP/NPSN bila ada).</li>
+<li>Daftar lembaga/unit, kelas, dan mata pelajaran.</li>
+<li>Daftar staf yang akan diberi akun beserta tugasnya.</li>
+</ul>
+<blockquote>
+<p>💡 Belum pernah masuk aplikasi sama sekali? Baca <a href="../panduan-dasar/"><strong>🌱 Panduan Dasar</strong></a> dulu (cara login &amp; mengenal layar), baru kembali ke sini.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="langkah-1-identitas">1. Identitas Pesantren<a class="anchor" href="#langkah-1-identitas" aria-hidden="true">#</a></h2>
+<p>Buka blok <strong>⚙️ Pengaturan</strong> → grup <strong>Pengaturan Sistem</strong>. Kerjakan berurutan:</p>
+<ol>
+<li><strong>Setup Pesantren</strong> — isi nama resmi, alamat, kontak, dan identitas lembaga.</li>
+<li><strong>Settings &amp; Branding</strong> — unggah logo, atur warna &amp; nama tampilan yang muncul di layar dan kartu.</li>
+<li><strong>Istilah Pesantren</strong> — sesuaikan istilah dengan kebiasaan pesantren Anda (misalnya "santri" / "siswa", "ustadz" / "guru"). Istilah ini akan dipakai di seluruh aplikasi.</li>
+</ol>
+<blockquote>
+<p>Atur identitas lebih dulu supaya logo &amp; istilah yang benar langsung muncul saat Anda mengisi data berikutnya.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="langkah-2-modul">2. Pilih Modul yang Dipakai<a class="anchor" href="#langkah-2-modul" aria-hidden="true">#</a></h2>
+<p>Masih di grup <strong>Pengaturan Sistem</strong>, buka <strong>Pusat Modul</strong>.</p>
+<ol>
+<li>Aktifkan hanya modul yang benar-benar dipakai pesantren Anda (contoh: Akademik, Tahfidz, Keuangan, Kepegawaian). Modul yang tidak diaktifkan tidak akan tampil di menu — supaya layar tidak penuh.</li>
+<li>Modul bisa diaktifkan/dinonaktifkan kapan saja; tidak harus semua sekarang.</li>
+</ol>
+<blockquote>
+<p>💡 Mulai dari sedikit modul inti dulu (Santri + Akademik + Keuangan). Tambah modul lain setelah yang dasar berjalan.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="langkah-3-struktur">3. Struktur Akademik<a class="anchor" href="#langkah-3-struktur" aria-hidden="true">#</a></h2>
+<p>Buka blok <strong>📚 Akademik</strong> → grup <strong>Master Akademik</strong>. Ini "kerangka" pesantren; isi sekali di awal:</p>
+<ol>
+<li><strong>Lembaga</strong> &amp; <strong>Program Studi</strong> — unit pendidikan (mis. MTs, MA, Madin) dan jenjangnya.</li>
+<li><strong>Kelas</strong> &amp; <strong>Penempatan Kelas</strong> — daftar kelas dan rombongan belajar.</li>
+<li><strong>Kurikulum</strong>, <strong>Mata Pelajaran</strong>, dan <strong>Kitab</strong>.</li>
+<li><strong>Periode Akademik</strong> &amp; <strong>Kalender Akademik</strong> — tahun ajaran &amp; semester yang aktif.</li>
+</ol>
+<blockquote>
+<p>Tetapkan Periode Akademik aktif sebelum mengisi nilai/presensi, supaya data masuk ke tahun ajaran yang benar.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="langkah-4-akun">4. Akun Staf &amp; Peran<a class="anchor" href="#langkah-4-akun" aria-hidden="true">#</a></h2>
+<p>Di grup <strong>Pengaturan Sistem</strong>, buat akun untuk tiap staf lalu beri <strong>peran</strong> yang sesuai. Peran menentukan menu apa yang dilihat staf tersebut — dan menu yang bukan haknya otomatis disembunyikan.</p>
+<table>
+<thead><tr><th>Beri peran…</th><th>Untuk…</th></tr></thead>
+<tbody>
+<tr><td>Guru / Ustadz</td><td>pengajar (input nilai, presensi)</td></tr>
+<tr><td>Bendahara</td><td>tagihan &amp; pembayaran santri</td></tr>
+<tr><td>Tata Usaha (TU)</td><td>data santri &amp; pendaftaran</td></tr>
+<tr><td>Kepegawaian / Penggajian</td><td>data pegawai &amp; gaji</td></tr>
+<tr><td>Pengelola Asrama / UKS / Konselor</td><td>pengasuhan, kesehatan, konseling</td></tr>
+<tr><td>Kepala / Pimpinan</td><td>dasbor mutu &amp; laporan</td></tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 Beri staf peran sesuai tugasnya saja. Makin tepat perannya, makin ringkas menu yang ia lihat. Lihat daftar peran &amp; grup di <a href="../navigasi-baru/#tips-cepat"><strong>Peta Menu → Tips per Peran</strong></a>.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="langkah-5-data-pokok">5. Data Pokok (Santri &amp; Pegawai)<a class="anchor" href="#langkah-5-data-pokok" aria-hidden="true">#</a></h2>
+<ol>
+<li><strong>Santri</strong> — buka blok <strong>🏫 Kesantrian</strong> → grup <strong>Santri</strong>. Tambah santri satu per satu, atau impor banyak sekaligus bila tersedia tombol impor. Setelah ada santri, atur penempatan kelas/kamar di grup terkait (Asrama &amp; Pengasuhan).</li>
+<li><strong>Pegawai</strong> — buka blok <strong>👥 SDM</strong> → grup <strong>Kepegawaian</strong>. Isi data pegawai (untuk presensi, penugasan, dan gaji).</li>
+</ol>
+<blockquote>
+<p>💡 Isi struktur (Langkah 3) <em>sebelum</em> data santri, supaya kelas &amp; lembaga tujuan sudah tersedia saat menempatkan santri.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="langkah-6-keuangan">6. Keuangan<a class="anchor" href="#langkah-6-keuangan" aria-hidden="true">#</a></h2>
+<p>Buka blok <strong>💰 Keuangan</strong> → grup <strong>Tagihan Santri</strong>:</p>
+<ol>
+<li><strong>Skema Biaya</strong> — tetapkan jenis &amp; nominal iuran (SPP, makan, asrama, dll.) per jenjang/kelas.</li>
+<li><strong>Metode Pembayaran</strong> — daftar cara bayar yang diterima (tunai/loket, transfer, dll.).</li>
+<li>Setelah skema siap, sistem dapat membuat <strong>Tagihan</strong> untuk santri.</li>
+</ol>
+<blockquote>
+<p>Untuk pembukuan resmi (jurnal, buku besar, pajak), lihat panduan <a href="../akuntansi/"><strong>📊 Akuntansi &amp; Pajak</strong></a>. Untuk operasional bendahara harian, lihat <a href="../bendahara/"><strong>💰 Bendahara</strong></a>.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="langkah-7-cek">7. Cek &amp; Mulai Pakai<a class="anchor" href="#langkah-7-cek" aria-hidden="true">#</a></h2>
+<ol>
+<li>Coba <strong>login dengan satu akun staf</strong> (mis. guru) untuk memastikan menu yang muncul sudah sesuai perannya.</li>
+<li>Buat <strong>satu data contoh</strong> (mis. 1 santri, 1 tagihan) dan pastikan alurnya berjalan.</li>
+<li>Bila ada menu yang dicari tapi tidak terlihat, tekan <strong>Ctrl+K</strong> untuk mencarinya, atau periksa apakah modulnya sudah diaktifkan (Langkah 2) dan peran akunnya sudah benar (Langkah 4).</li>
+</ol>
+<blockquote>
+<p>🎉 Selesai! Pesantren Anda siap dipakai. Bagikan panduan per peran ke staf masing-masing dari halaman depan <a href="../index.html"><strong>Pusat Panduan</strong></a>.</p>
+</blockquote>
+
+<hr>
+
+<h2 id="ringkasan">Ringkasan Urutan<a class="anchor" href="#ringkasan" aria-hidden="true">#</a></h2>
+<ol>
+<li>✅ Identitas — Setup Pesantren · Settings &amp; Branding · Istilah Pesantren</li>
+<li>✅ Modul — Pusat Modul (aktifkan yang dipakai)</li>
+<li>✅ Struktur — Master Akademik (lembaga, kelas, pelajaran, periode)</li>
+<li>✅ Akun — buat akun staf &amp; beri peran</li>
+<li>✅ Data pokok — Santri lalu Pegawai</li>
+<li>✅ Keuangan — Skema Biaya &amp; Metode Pembayaran</li>
+<li>✅ Cek — login per peran &amp; buat data contoh</li>
+</ol>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../panduan-dasar/"><span>‹ Sebelumnya</span><b>Panduan Dasar</b></a>
+      <a class="pager-link next" href="../navigasi-baru/"><span>Berikutnya ›</span><b>Peta Menu Aplikasi</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#sebelum-mulai">Sebelum Mulai</a><a href="#langkah-1-identitas">1. Identitas Pesantren</a><a href="#langkah-2-modul">2. Pilih Modul</a><a href="#langkah-3-struktur">3. Struktur Akademik</a><a href="#langkah-4-akun">4. Akun Staf &amp; Peran</a><a href="#langkah-5-data-pokok">5. Data Pokok</a><a href="#langkah-6-keuangan">6. Keuangan</a><a href="#langkah-7-cek">7. Cek &amp; Mulai Pakai</a><a href="#ringkasan">Ringkasan Urutan</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

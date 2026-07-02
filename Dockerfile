@@ -51,6 +51,12 @@ opcache.max_accelerated_files=20000\n\
 opcache.validate_timestamps=0\n\
 opcache.interned_strings_buffer=16" > /usr/local/etc/php/conf.d/opcache-prod.ini
 
+# Batas upload (default PHP 2M terlalu kecil untuk foto branding/hero & dokumen).
+RUN echo "upload_max_filesize=16M\n\
+post_max_size=20M\n\
+memory_limit=256M\n\
+max_file_uploads=30" > /usr/local/etc/php/conf.d/uploads-prod.ini
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
@@ -61,7 +67,12 @@ COPY --from=frontend /app/public/build public/build
 # Override FrankenPHP default Caddyfile dengan konfigurasi on-demand TLS kita
 COPY Caddyfile /etc/caddy/Caddyfile
 
-RUN composer install --no-dev --optimize-autoloader
+# Pakai vendor/ dari stage cache (composer.lock sama) lalu cukup bangun autoloader
+# optimal + package:discover (post-autoload-dump). MENGHINDARI composer install
+# ulang dari nol setiap perubahan kode app — yang sebelumnya mengunduh seluruh
+# paket lagi (rapuh terhadap blip download GitHub/codeload, mis. HTTP 400).
+COPY --from=vendor /app/vendor vendor
+RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
 
 # Buat direktori temp Livewire (disk 'livewire-tmp', lihat config/filesystems.php).
 # Direktori ini tidak ada di git (file-nya di-gitignore). Tanpa ini,

@@ -5,9 +5,11 @@ namespace App\Support;
 use Modules\Akademik\Services\KalenderService;
 use Modules\Akademik\Services\KelulusanService;
 use Modules\Akademik\Services\KenaikanKelasService;
+use Modules\Core\Services\SuratService;
 use Modules\Kesantrian\Services\DisiplinService;
 use Modules\Kesantrian\Services\PresensiAsramaService;
 use Modules\Payroll\Models\KontrakKerja;
+use Modules\Payroll\Services\SkPenugasanService;
 
 /**
  * WP-34 — Registry SEMUA kebijakan (Setting policy) yang sudah dibuka modul
@@ -30,6 +32,7 @@ class KebijakanRegistry
         'akademik' => 'Akademik',
         'keuangan' => 'Keuangan & Payroll',
         'migrasi' => 'Impor & Migrasi Data',
+        'beranda' => 'Beranda Publik & Jemaah',
         'umum' => 'Umum',
     ];
 
@@ -42,6 +45,32 @@ class KebijakanRegistry
     public static function entries(): array
     {
         return [
+            // ---------------- Beranda Publik (1-aplikasi) ----------------
+            'beranda.tampil_jadwal_sholat' => [
+                'label' => 'Tampilkan jadwal sholat di Beranda publik',
+                'deskripsi' => 'Bila aktif, lima waktu sholat hari ini muncul di halaman depan (Beranda) yang dilihat tamu/umum. Dihitung otomatis dari lokasi pesantren.',
+                'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
+            'beranda.tampil_arah_kiblat' => [
+                'label' => 'Tampilkan arah kiblat di Beranda publik',
+                'deskripsi' => 'Bila aktif, arah kiblat (derajat dari utara) muncul bersama jadwal sholat di Beranda.',
+                'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
+            'beranda.tampil_donasi' => [
+                'label' => 'Tampilkan ajakan donasi di Beranda publik',
+                'deskripsi' => 'Bila aktif, kartu Donasi/Infaq/Zakat dengan tautan ke halaman donasi muncul di Beranda.',
+                'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
+            'komentar.moderasi_dulu' => [
+                'label' => 'Komentar perlu disetujui dulu sebelum tampil (pra-moderasi)',
+                'deskripsi' => 'Bila AKTIF (disarankan): komentar masuk berstatus "menunggu" dan baru tampil setelah staf menyetujui. Bila non-aktif: komentar langsung tampil dan staf bisa menyembunyikan belakangan.',
+                'default' => true, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
+            'pwa.root_sw_enabled' => [
+                'label' => 'Aktifkan mode aplikasi (service worker) untuk Beranda',
+                'deskripsi' => 'Bila AKTIF: Beranda dapat "dipasang" sebagai aplikasi & memuat lebih ringan. JANGAN aktifkan sebelum tim menguji di HP — jika bermasalah dapat membuat halaman gagal tampil. Default non-aktif demi keamanan.',
+                'default' => false, 'kelompok' => 'beranda', 'tipe' => 'bool',
+            ],
             // ---------------- Disiplin ----------------
             DisiplinService::SETTING_WAJIB_VERIFIKASI => [
                 'label' => 'Catatan pelanggaran wajib diverifikasi ustadz',
@@ -143,8 +172,57 @@ class KebijakanRegistry
             ],
             'akademik_grade_weights' => [
                 'label' => 'Bobot nilai harian / UTS / UAS',
-                'deskripsi' => 'Persentase bobot nilai akhir bila tidak memakai komponen nilai kustom.',
-                'default' => ['harian' => 30, 'uts' => 30, 'uas' => 40], 'kelompok' => 'akademik', 'tipe' => 'json',
+                'deskripsi' => 'Persentase bobot nilai akhir bila pesantren tidak memakai komponen nilai kustom per pelajaran. Total harian+UTS+UAS harus 100.',
+                'default' => ['harian' => 40, 'uts' => 30, 'uas' => 30], 'kelompok' => 'akademik', 'tipe' => 'json',
+            ],
+            'pengadaan.izinkan_terima_sebagian' => [
+                'label' => 'Izinkan penerimaan barang sebagian (GRN parsial)',
+                'deskripsi' => 'Bila aktif, aksi "Terima (GRN)" pada Purchase Order menampilkan form jumlah-diterima per item (boleh kurang dari qty PO). Bila mati (bawaan), penerimaan selalu penuh sekaligus seperti sebelumnya.',
+                'default' => false, 'kelompok' => 'keuangan', 'tipe' => 'bool',
+            ],
+            // gap-129 — identitas pemotong pajak per-tenant (dipakai EBupotService utk CSV e-Bupot Coretax).
+            'pajak.npwp_pemotong' => [
+                'label' => 'NPWP Pemotong Pajak',
+                'deskripsi' => 'NPWP badan/yayasan sebagai pemotong PPh 21 (kolom npwp_pemotong CSV e-Bupot Coretax). Kosongkan bila belum ada.',
+                'default' => '', 'kelompok' => 'keuangan', 'tipe' => 'text',
+            ],
+            'pajak.nama_penandatangan' => [
+                'label' => 'Nama Penandatangan Bukti Potong',
+                'deskripsi' => 'Nama pejabat penandatangan bukti potong PPh 21 (e-Bupot Coretax).',
+                'default' => '', 'kelompok' => 'keuangan', 'tipe' => 'text',
+            ],
+            'pajak.kode_kpp' => [
+                'label' => 'Kode KPP Terdaftar',
+                'deskripsi' => 'Kode Kantor Pelayanan Pajak tempat pemotong terdaftar (melengkapi identitas CSV e-Bupot).',
+                'default' => '', 'kelompok' => 'keuangan', 'tipe' => 'text',
+            ],
+            // gap-137 — redaksi Kebijakan Privasi (rumah legal kanonik; key SAMA dgn editor lama).
+            'kebijakan_privasi_sistem' => [
+                'label' => 'Redaksi Kebijakan Privasi Sistem',
+                'deskripsi' => 'Teks kebijakan privasi pesantren — tampil di /kebijakan-privasi & disetujui wali saat daftar PPDB. Kosong = pakai redaksi bawaan platform.',
+                'default' => '', 'kelompok' => 'umum', 'tipe' => 'textarea',
+            ],
+            // gap-112 — toggle munculkan menu inti di Mode Sederhana (default false = perilaku lama,
+            // menu disembunyikan; UiMode::navAdvanced(key) baca key-key ini).
+            'ui.sederhana_tampilkan_ledger' => [
+                'label' => 'Tampilkan menu Buku Besar/Laporan Keuangan di Mode Sederhana',
+                'deskripsi' => 'Saat aktif, menu modul Ledger (Buku Besar, Neraca Saldo, Jurnal Manual, semua Laporan Keuangan/Dana/RKAM) tetap muncul walau pengguna memakai Mode Sederhana. Default nonaktif = perilaku lama.',
+                'default' => false, 'kelompok' => 'umum', 'tipe' => 'bool',
+            ],
+            'ui.sederhana_tampilkan_akademik_inti' => [
+                'label' => 'Tampilkan menu Akademik inti di Mode Sederhana',
+                'deskripsi' => 'Saat aktif, menu Periode Akademik, Pelajaran, dan Jadwal Pelajaran tetap muncul di Mode Sederhana. Default nonaktif = perilaku lama.',
+                'default' => false, 'kelompok' => 'umum', 'tipe' => 'bool',
+            ],
+            'ui.sederhana_tampilkan_kesehatan_lanjut' => [
+                'label' => 'Tampilkan menu Kesehatan lanjutan di Mode Sederhana',
+                'deskripsi' => 'Saat aktif, menu Riwayat Kesehatan dan Sesi Konseling (UKS) tetap muncul di Mode Sederhana. Default nonaktif = perilaku lama.',
+                'default' => false, 'kelompok' => 'umum', 'tipe' => 'bool',
+            ],
+            'ui.sederhana_tampilkan_pajak' => [
+                'label' => 'Tampilkan menu Pajak di Mode Sederhana',
+                'deskripsi' => 'Saat aktif, menu Tarif Pajak, Laporan Pajak, dan Kalkulator Pajak/PPh21 tetap muncul di Mode Sederhana. Default nonaktif = perilaku lama.',
+                'default' => false, 'kelompok' => 'umum', 'tipe' => 'bool',
             ],
             'akademik_kehadiran_minimal' => [
                 'label' => 'Ambang kehadiran minimal (%)',
@@ -167,6 +245,18 @@ class KebijakanRegistry
                 'label' => 'Pengingat kontrak habis (hari)',
                 'deskripsi' => 'Berapa hari sebelum kontrak/SK berakhir sistem mulai mengingatkan.',
                 'default' => KontrakKerja::DEFAULT_REMINDER_HARI, 'kelompok' => 'keuangan', 'tipe' => 'number', 'min' => 1, 'max' => 365,
+            ],
+            // gap-134: ekspos setelan Kepegawaian yang sebelumnya hanya dibaca dari
+            // Setting tanpa UI di halaman Kebijakan (registry-driven → otomatis muncul).
+            'payroll_admin_whatsapp' => [
+                'label' => 'WhatsApp admin Kepegawaian',
+                'deskripsi' => 'Nomor WhatsApp penerima pengingat kontrak/SK akan habis. Kosong = ikut WhatsApp admin pendaftaran.',
+                'default' => null, 'kelompok' => 'keuangan', 'tipe' => 'text',
+            ],
+            SkPenugasanService::SETTING_KEY => [
+                'label' => 'Template SK Penugasan',
+                'deskripsi' => 'Template surat keputusan penugasan pegawai (boleh memuat placeholder). Kosong = pakai template bawaan modul.',
+                'default' => null, 'kelompok' => 'keuangan', 'tipe' => 'textarea',
             ],
             'payroll.thr_formula' => [
                 'label' => 'Rumus THR',
@@ -209,6 +299,18 @@ class KebijakanRegistry
                 'label' => 'Pemisahan dana halal & syubhat',
                 'deskripsi' => 'Bila aktif, dana syubhat (mis. bunga bank) dipisah sebagai Dana Kebajikan dan dijaga penyalurannya.',
                 'default' => false, 'kelompok' => 'keuangan', 'tipe' => 'bool',
+            ],
+
+            // ---------------- Umum (Administrasi Surat) ----------------
+            SuratService::SETTING_KODE_LEMBAGA => [
+                'label' => 'Kode lembaga pada nomor surat keluar',
+                'deskripsi' => 'Singkatan lembaga yang muncul di nomor surat keluar, mis. PES/MA/MTS (kosong = bawaan "PES").',
+                'default' => SuratService::DEFAULT_KODE_LEMBAGA, 'kelompok' => 'umum', 'tipe' => 'text',
+            ],
+            SuratService::SETTING_FORMAT_NOMOR => [
+                'label' => 'Format nomor surat keluar',
+                'deskripsi' => 'Pola penomoran surat keluar; {urut}, {kode}, {bulan} (romawi), {tahun} diganti otomatis.',
+                'default' => SuratService::DEFAULT_FORMAT_NOMOR, 'kelompok' => 'umum', 'tipe' => 'text',
             ],
 
             // ---------------- Impor & Migrasi Data ----------------

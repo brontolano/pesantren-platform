@@ -6,6 +6,14 @@ use App\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Core\Concerns\Auditable;
+use Modules\Keuangan\Models\Pembayaran;
+use Modules\Ledger\Models\Jurnal;
+use Modules\Mutu\Models\MutuTemuan;
+use Modules\Payroll\Models\Cuti;
+use Modules\Payroll\Models\SlipGaji;
+use Modules\Pembiayaan\Models\MutasiAset;
+use Modules\Pengadaan\Models\Belanja;
+use Modules\Pengadaan\Models\PurchaseOrder;
 
 /**
  * Aturan persetujuan: kapan sebuah model butuh approval + siapa penyetujunya.
@@ -19,14 +27,14 @@ class ApprovalRule extends Model
 
     /** Tipe model yang bisa di-approve (label untuk UI). Tambah di sini saat rollout. */
     public const APPROVABLE = [
-        \Modules\Pengadaan\Models\Belanja::class => 'Belanja / Pengadaan',
-        \Modules\Pengadaan\Models\PurchaseOrder::class => 'Purchase Order',
-        \Modules\Payroll\Models\SlipGaji::class => 'Slip Gaji',
-        \Modules\Keuangan\Models\Pembayaran::class => 'Pembayaran',
-        \Modules\Ledger\Models\Jurnal::class => 'Jurnal Manual',
-        \Modules\Payroll\Models\Cuti::class => 'Cuti / Leave',
-        \Modules\Pembiayaan\Models\MutasiAset::class => 'Mutasi / Pelepasan Aset',
-        \Modules\Mutu\Models\MutuTemuan::class => 'Temuan Mutu (Non-Conformance)',
+        Belanja::class => 'Belanja / Pengadaan',
+        PurchaseOrder::class => 'Purchase Order',
+        SlipGaji::class => 'Slip Gaji',
+        Pembayaran::class => 'Pembayaran',
+        Jurnal::class => 'Jurnal Manual',
+        Cuti::class => 'Cuti / Leave',
+        MutasiAset::class => 'Mutasi / Pelepasan Aset',
+        MutuTemuan::class => 'Temuan Mutu (Non-Conformance)',
     ];
 
     /**
@@ -35,14 +43,14 @@ class ApprovalRule extends Model
      * (terpicu() membaca $model->{field} ?? 0). UI ApprovalRuleResource memakai ini.
      */
     public const FIELD_OPTIONS = [
-        \Modules\Pengadaan\Models\Belanja::class => ['total' => 'Total (DPP + PPN)'],
-        \Modules\Pengadaan\Models\PurchaseOrder::class => ['total' => 'Total PO'],
-        \Modules\Payroll\Models\SlipGaji::class => ['bruto' => 'Bruto (gaji kotor)'],
-        \Modules\Keuangan\Models\Pembayaran::class => ['nominal' => 'Nominal'],
-        \Modules\Ledger\Models\Jurnal::class => ['total_debit' => 'Total Debit'],
-        \Modules\Payroll\Models\Cuti::class => ['jumlah_hari' => 'Jumlah Hari'],
-        \Modules\Pembiayaan\Models\MutasiAset::class => ['harga_jual' => 'Harga Jual / Pelepasan'],
-        \Modules\Mutu\Models\MutuTemuan::class => ['severity_level' => 'Tingkat Keparahan (1-3)'],
+        Belanja::class => ['total' => 'Total (DPP + PPN)'],
+        PurchaseOrder::class => ['total' => 'Total PO'],
+        SlipGaji::class => ['bruto' => 'Bruto (gaji kotor)'],
+        Pembayaran::class => ['nominal' => 'Nominal'],
+        Jurnal::class => ['total_debit' => 'Total Debit'],
+        Cuti::class => ['jumlah_hari' => 'Jumlah Hari'],
+        MutasiAset::class => ['harga_jual' => 'Harga Jual / Pelepasan'],
+        MutuTemuan::class => ['severity_level' => 'Tingkat Keparahan (1-3)'],
     ];
 
     /** Operator perbandingan yang didukung engine terpicu(). */

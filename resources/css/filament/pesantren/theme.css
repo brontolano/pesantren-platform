@@ -382,6 +382,143 @@ body.tema-navigasi-atas.dark .fi-topbar {
     border-bottom: 1px solid #2A2A35 !important;
 }
 
+/* ===================================================================
+   Tema "Pixio" (Emerald SaaS) — selaras TEMPLATE Design System (templates/
+   tenant-admin + platform-admin): kanvas slate dingin #f1f5f9, sidebar PUTIH
+   penuh (header putih, teks gelap), hairline dingin #e7ecf3, item aktif tint
+   emerald #ecfdf5 + teks emerald (tanpa garis inset), kartu putih radius 14px
+   + bayang halus. Mode gelap = navy DS #0a1018. Konsol desktop bersih.
+   =================================================================== */
+body.tema-pixio .fi-body {
+    background-color: #f1f5f9;
+}
+body.tema-pixio .fi-sidebar {
+    background: #ffffff !important;
+    border-inline-end: 1px solid #e7ecf3 !important;
+}
+/* Sidebar header PUTIH (DS): batalkan teks-putih bawaan tema WA → teks gelap. */
+body.tema-pixio .fi-sidebar-header,
+body.tema-pixio .fi-sidebar-header * {
+    color: #0f172a !important;
+}
+body.tema-pixio .fi-sidebar-header .fi-logo [class*="bg-primary"],
+body.tema-pixio .fi-sidebar-header .fi-logo span:first-child {
+    background-color: #ecfdf5 !important;
+    box-shadow: inset 0 0 0 1px #d1fae5 !important;
+}
+/* Label grup: faint dingin */
+body.tema-pixio .fi-sidebar-group-label {
+    color: #94a3b8 !important;
+}
+/* Item normal: slate-700 */
+body.tema-pixio .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-pixio .fi-sidebar-item-label {
+    color: #334155 !important;
+}
+body.tema-pixio .fi-sidebar-item-btn > .fi-icon,
+body.tema-pixio .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-pixio .fi-sidebar-item-btn .fi-icon {
+    color: #64748b !important;
+}
+/* Hover: wash slate dingin */
+body.tema-pixio .fi-sidebar-item-btn:hover {
+    background-color: #f8fafc !important;
+}
+body.tema-pixio .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
+body.tema-pixio .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
+    color: #0f172a !important;
+}
+body.tema-pixio .fi-sidebar-item-btn:hover > .fi-icon,
+body.tema-pixio .fi-sidebar-item-btn:hover .fi-icon {
+    color: #047857 !important;
+}
+/* Aktif: tint emerald + teks emerald (DS — tanpa garis inset) */
+body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: #ecfdf5 !important;
+}
+body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-pixio .fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: #047857 !important;
+}
+body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+body.tema-pixio .fi-sidebar-item.fi-active .fi-icon {
+    color: #059669 !important;
+}
+/* Topbar: putih + hairline dingin (tanpa ornamen emas) */
+body.tema-pixio .fi-topbar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #e7ecf3 !important;
+}
+/* Kartu/section: cream Pixio + border dingin + radius 14px + bayang halus (DS) */
+body.tema-pixio .fi-section,
+body.tema-pixio .fi-wi-stats-overview-stat,
+body.tema-pixio .fi-ta-ctn {
+    border-radius: 14px !important;
+    border: 1px solid #e7ecf3 !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+    background-color: #fffaf3;
+}
+/* ---- Pixio SaaS MODE GELAP: navy DS #0a1018 (bukan emerald-ink) ---- */
+.dark body.tema-pixio .fi-body,
+body.tema-pixio.dark .fi-body {
+    background-color: #0a1018 !important;
+}
+.dark body.tema-pixio .fi-sidebar,
+body.tema-pixio.dark .fi-sidebar {
+    background: #111a26 !important;
+    border-inline-end: 1px solid #1e2a3a !important;
+}
+/* Header gelap: navy + teks terang (var --tema-sidebar-header putih hanya utk terang). */
+.dark body.tema-pixio .fi-sidebar-header,
+body.tema-pixio.dark .fi-sidebar-header {
+    background: #111a26 !important;
+    border-bottom: 1px solid #1e2a3a !important;
+}
+.dark body.tema-pixio .fi-sidebar-header,
+.dark body.tema-pixio .fi-sidebar-header *,
+body.tema-pixio.dark .fi-sidebar-header,
+body.tema-pixio.dark .fi-sidebar-header * {
+    color: #f1f5f9 !important;
+}
+.dark body.tema-pixio .fi-topbar,
+.dark body.tema-pixio .fi-header,
+body.tema-pixio.dark .fi-topbar,
+body.tema-pixio.dark .fi-header {
+    background: #111a26 !important;
+    border-bottom: 1px solid #1e2a3a !important;
+}
+.dark body.tema-pixio .fi-section,
+.dark body.tema-pixio .fi-wi-stats-overview-stat,
+.dark body.tema-pixio .fi-ta-ctn,
+body.tema-pixio.dark .fi-section,
+body.tema-pixio.dark .fi-wi-stats-overview-stat,
+body.tema-pixio.dark .fi-ta-ctn {
+    border: 1px solid #1e2a3a !important;
+    background-color: #111a26 !important;
+}
+/* Widget dasbor ikut Pixio saat tema-pixio aktif (tema WA default & AlbaKids TIDAK kena). */
+body.tema-pixio .tema-greeting {
+    background-image: linear-gradient(to right, #0b8f63, #059669, #047857) !important;
+}
+.dark body.tema-pixio .tema-greeting,
+body.tema-pixio.dark .tema-greeting {
+    background-image: linear-gradient(to right, #064e3b, #065f46, #047857) !important;
+}
+.dark body.tema-pixio .tema-quick,
+body.tema-pixio.dark .tema-quick {
+    background-color: #111a26 !important;
+}
+/* Font display: Jost untuk heading di tema-pixio (sesuai Pixio DS) */
+body.tema-pixio .fi-header-heading,
+body.tema-pixio .fi-section-header-heading,
+body.tema-pixio .fi-wi-stats-overview-stat-label,
+body.tema-pixio .fi-modal-heading,
+body.tema-pixio .fi-sidebar-header .fi-logo {
+    font-family: 'Jost', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    font-weight: 600;
+}
+
 /* Tema "Baitul Maal" (desain pesantren-online-admin / PRD Keuangan Digital):
    sidebar gradien hijau hutan #06351F→#04281A, aksen emas #D4AF37, item
    aktif bergaris emas kiri, latar konten krim #FDFBF7. */

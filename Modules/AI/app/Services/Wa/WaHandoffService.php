@@ -40,9 +40,7 @@ class WaHandoffService
     /** Permission penerima notifikasi & pengelola Kotak Masuk WA. */
     public const PERMISSION_KELOLA = 'ai.chat.kelola';
 
-    public function __construct(private readonly WaBalasanService $balasan)
-    {
-    }
+    public function __construct(private readonly WaBalasanService $balasan) {}
 
     /**
      * Apakah teks wali merupakan permintaan dilayani manusia? Pola hidup di

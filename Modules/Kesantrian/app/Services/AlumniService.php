@@ -21,6 +21,7 @@ class AlumniService
     public function update(Alumni $alumni, array $data): Alumni
     {
         $alumni->update($data);
+
         return $alumni->fresh();
     }
 }

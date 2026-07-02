@@ -3,11 +3,11 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\HasilUjian;
 use Modules\PPDB\Models\PaketSoal;
-use Modules\PPDB\Models\UjianAttempt;
 use Modules\PPDB\Services\UjianOnlineService;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -32,10 +32,10 @@ class UjianOnlineTest extends TestCase
     {
         $tenant = $this->createRuntimeTenant($prefix, 'Pesantren '.$prefix);
         tenancy()->initialize($tenant);
-        \Illuminate\Support\Facades\DB::connection('tenant')->table('tenants')->updateOrInsert(
+        DB::connection('tenant')->table('tenants')->updateOrInsert(
             ['id' => $tenant->id],
             ['name' => $tenant->name, 'is_active' => true, 'data' => json_encode([]),
-             'created_at' => now(), 'updated_at' => now()],
+                'created_at' => now(), 'updated_at' => now()],
         );
 
         $calon = CalonSantri::create([

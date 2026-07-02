@@ -18,6 +18,12 @@ Platform Laravel ──POST──> https://n8n.asy-syifaa.com/webhook/ppdb-wa
 Webhook **generik**: node `Validate Payload` menerima `to` **atau** `target`, jadi 3 jalur
 (registrasi sukses, push notifikasi, broadcast) memakai pipa yang sama.
 
+**Lampiran file (opsional):** bila payload memuat `file` ({`data` base64 / `url`, `mimetype`,
+`filename`}), node `Send WAHA` memanggil `/api/sendImage` (gambar) atau `/api/sendFile`
+(lainnya) dengan `caption` = `message`; tanpa `file` tetap `/api/sendText` (backward-compatible).
+Dipakai notif admin Alba Kids untuk melampirkan Bukti Transfer/KK/Akta (lihat
+`AlbaKidsRegistrationNotificationService` + `WaGatewayService::sendFile`).
+
 ## Variabel environment (di service `n8n`, docker-compose.production.yml)
 
 | Var | Nilai |

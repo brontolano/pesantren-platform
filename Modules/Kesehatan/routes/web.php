@@ -1,8 +1,4 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Modules\Kesehatan\Http\Controllers\KesehatanController;
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('kesehatans', KesehatanController::class)->names('kesehatan');
-});
+// UI modul Kesehatan disajikan via panel Filament — tak ada rute web kustom.
+// (Scaffold nwidart Route::resource dihapus: cegah 500/404 di /kesehatans utk user login.)

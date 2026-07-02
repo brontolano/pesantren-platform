@@ -3,6 +3,7 @@
 namespace Modules\Payroll\Services;
 
 use App\Models\Tenant;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Modules\Akademik\Models\Lembaga;
 use Modules\Payroll\Models\Employee;
@@ -210,7 +211,7 @@ class PenugasanImportService
         foreach ($headers as $index => $key) {
             $value = $values[$index] ?? null;
             if ($value instanceof \DateTimeInterface) {
-                $payload[$key] = \Carbon\Carbon::instance($value)->toDateString();
+                $payload[$key] = Carbon::instance($value)->toDateString();
 
                 continue;
             }

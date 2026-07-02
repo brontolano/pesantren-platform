@@ -5,11 +5,11 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Events\PembayaranDiverifikasi;
 use Modules\Keuangan\Models\Pembayaran;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Keuangan\Services\PembayaranService;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Listeners\PostingPembayaranListener;
 use Modules\Ledger\Models\Jurnal;
@@ -44,13 +44,13 @@ class LedgerAutoJurnalTest extends TestCase
 
         $user = User::withoutGlobalScopes()->create([
             'name' => 'Bendahara',
-            'email' => 'bendahara@' . tenant('id') . '.localhost',
+            'email' => 'bendahara@'.tenant('id').'.localhost',
             'password' => 'password',
             'tenant_id' => tenant('id'),
         ]);
 
         $santri = Santri::create([
-            'nis' => 'S-' . str()->random(5),
+            'nis' => 'S-'.str()->random(5),
             'nama' => 'Santri Uji',
             'tanggal_lahir' => '2012-01-01',
             'jenis_kelamin' => 'L',

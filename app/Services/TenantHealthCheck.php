@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Tenant;
 use App\Models\TenantModule;
 use App\Models\TenantStorage;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Schema;
@@ -94,7 +95,7 @@ class TenantHealthCheck
             $adminExists = DB::table('users')
                 ->join('model_has_roles', fn ($j) => $j
                     ->on('users.id', '=', 'model_has_roles.model_id')
-                    ->where('model_has_roles.model_type', \App\Models\User::class))
+                    ->where('model_has_roles.model_type', User::class))
                 ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
                 ->where('roles.name', 'super_admin')
                 ->exists();

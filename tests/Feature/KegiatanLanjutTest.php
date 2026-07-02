@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use InvalidArgumentException;
 use Modules\Kegiatan\Models\Kegiatan;
-use Modules\Kegiatan\Models\KegiatanRecurring;
+use Modules\Kegiatan\Models\KegiatanTemplate;
 use Modules\Kegiatan\Models\PresensiKegiatan;
 use Modules\Kegiatan\Services\KegiatanLanjutService;
 use Modules\Kesantrian\Models\Santri;
@@ -166,11 +166,11 @@ class KegiatanLanjutTest extends TestCase
     {
         $this->boot('kegA');
         $this->svc()->buatTemplate(['nama' => 'T']);
-        $this->assertSame(1, \Modules\Kegiatan\Models\KegiatanTemplate::query()->count());
+        $this->assertSame(1, KegiatanTemplate::query()->count());
         tenancy()->end();
 
         $this->boot('kegB');
-        $this->assertSame(0, \Modules\Kegiatan\Models\KegiatanTemplate::query()->count(), 'Template tenant lain tak boleh terlihat.');
+        $this->assertSame(0, KegiatanTemplate::query()->count(), 'Template tenant lain tak boleh terlihat.');
         tenancy()->end();
     }
 

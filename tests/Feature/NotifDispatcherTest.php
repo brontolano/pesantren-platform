@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Modules\Notifikasi\Mail\GenericNotificationMail;
@@ -9,6 +10,7 @@ use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\LogNotifikasi;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
 use Modules\Notifikasi\Services\NotifDispatcher;
+use Modules\Notifikasi\Support\NotifikasiSettings;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -80,10 +82,12 @@ class NotifDispatcherTest extends TestCase
         tenancy()->end();
     }
 
-    public function test_kirim_wa_channel_simulasi(): void
+    public function test_kirim_wa_channel_terkirim(): void
     {
         $this->boot('ntf3');
-        Http::fake(['*' => Http::response(['status' => 'ok'], 200)]); // netralkan gateway WA (n8n/waha)
+        // Endpoint dikonfigurasi → gateway POST nyata (di-fake 'ok') → benar terkirim.
+        config(['notifikasi.n8n_webhook_url' => 'https://example.test/webhook']);
+        Http::fake(['*' => Http::response(['status' => 'ok'], 200)]);
         $this->template('approval_chasing', 'wa');
 
         $hasil = app(NotifDispatcher::class)->kirim('approval_chasing', [
@@ -93,8 +97,32 @@ class NotifDispatcherTest extends TestCase
 
         $this->assertSame('wa', $hasil['channel']);
         $this->assertSame(1, $hasil['terkirim']);
+        $this->assertSame(0, $hasil['gagal']);
         $this->assertSame(1, BroadcastWa::query()->count());
+        // Kosakata kanonik: status broadcast = 'sent' (bukan 'selesai').
+        $this->assertSame('sent', BroadcastWa::query()->value('status'));
         $this->assertTrue(LogNotifikasi::query()->where('status', 'sent')->exists());
+        tenancy()->end();
+    }
+
+    public function test_wa_tanpa_endpoint_tidak_dihitung_terkirim(): void
+    {
+        $this->boot('ntf3b');
+        // Tanpa webhook/waha → gateway 'simulated' → JUJUR: tak dihitung terkirim,
+        // log status 'simulated' (bukan 'sent'), broadcast 'partial_failed'.
+        config(['notifikasi.n8n_webhook_url' => null, 'notifikasi.waha_base_url' => null]);
+        $this->template('approval_chasing', 'wa');
+
+        $hasil = app(NotifDispatcher::class)->kirim('approval_chasing', [
+            'wa' => ['6281234567890'],
+            'data' => ['nama' => 'X'],
+        ]);
+
+        $this->assertSame(0, $hasil['terkirim']);
+        $this->assertSame(1, $hasil['gagal']);
+        $this->assertFalse(LogNotifikasi::query()->where('status', 'sent')->exists());
+        $this->assertTrue(LogNotifikasi::query()->where('status', 'simulated')->exists());
+        $this->assertSame('partial_failed', BroadcastWa::query()->value('status'));
         tenancy()->end();
     }
 
@@ -135,21 +163,21 @@ class NotifDispatcherTest extends TestCase
         config(['notifikasi.n8n_webhook_url' => 'http://n8n:5678/webhook/global']);
 
         // Tanpa setting → fallback config global.
-        $this->assertSame('http://n8n:5678/webhook/global', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+        $this->assertSame('http://n8n:5678/webhook/global', NotifikasiSettings::webhookUrl());
 
         // Dengan setting tenant → override.
-        \App\Models\Setting::updateOrCreate(
-            ['key' => \Modules\Notifikasi\Support\NotifikasiSettings::KEY_WA_WEBHOOK],
+        Setting::updateOrCreate(
+            ['key' => NotifikasiSettings::KEY_WA_WEBHOOK],
             ['value' => ['url' => 'http://n8n:5678/webhook/tenant-khusus']]
         );
-        $this->assertSame('http://n8n:5678/webhook/tenant-khusus', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+        $this->assertSame('http://n8n:5678/webhook/tenant-khusus', NotifikasiSettings::webhookUrl());
 
         // Setting kosong → kembali fallback.
-        \App\Models\Setting::updateOrCreate(
-            ['key' => \Modules\Notifikasi\Support\NotifikasiSettings::KEY_WA_WEBHOOK],
+        Setting::updateOrCreate(
+            ['key' => NotifikasiSettings::KEY_WA_WEBHOOK],
             ['value' => ['url' => '  ']]
         );
-        $this->assertSame('http://n8n:5678/webhook/global', \Modules\Notifikasi\Support\NotifikasiSettings::webhookUrl());
+        $this->assertSame('http://n8n:5678/webhook/global', NotifikasiSettings::webhookUrl());
         tenancy()->end();
     }
 }

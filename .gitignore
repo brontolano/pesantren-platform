@@ -20,8 +20,13 @@
 /public/storage
 /storage/*.key
 /storage/pail
+# Artefak runtime per-tenant (stancl/tenancy) + sisa Storage::fake() saat test.
+# Bukan data nyata (data tenant asli ada di volume VPS), jangan ter-commit.
+/storage/tenant*
 /vendor
 _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+testsprite_tests\tmp\config.json

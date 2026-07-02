@@ -41,7 +41,7 @@ class MediaFileResource extends Resource
 
     protected static ?string $pluralModelLabel = 'File Media';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Kelembagaan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Audit & Arsip';
 
     protected static ?int $navigationSort = 1;
 

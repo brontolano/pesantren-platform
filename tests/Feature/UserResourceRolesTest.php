@@ -7,6 +7,7 @@ use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Select;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
@@ -75,7 +76,7 @@ class UserResourceRolesTest extends TestCase
         $this->actingAs($this->admin());
 
         Livewire::test(CreateUser::class)
-            ->assertFormFieldExists('roles', function (\Filament\Forms\Components\Select $field): bool {
+            ->assertFormFieldExists('roles', function (Select $field): bool {
                 $options = $field->getOptions();
 
                 return ! array_key_exists('asatidz', $options) // nama BUKAN kunci

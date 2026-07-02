@@ -7,6 +7,7 @@ use App\Models\Setting;
 use App\Services\KebijakanService;
 use App\Services\MediaRegistrar;
 use App\Services\ModuleService;
+use App\Services\StorageQuotaService;
 use App\Services\TenantHealthCheck;
 use App\Support\KebijakanRegistry;
 use App\Support\UiMode;
@@ -32,6 +33,8 @@ use Modules\Akademik\Services\KalenderService;
 use Modules\Akademik\Services\KenaikanKelasService;
 use Modules\Core\Support\IstilahRegistry;
 use Modules\Kesantrian\Services\DisiplinService;
+use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
+use Modules\Keuangan\Models\SkemaBiaya;
 use Modules\Ledger\Support\FiturKeuangan;
 
 /**
@@ -59,7 +62,7 @@ class SetupPesantren extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Setup Pesantren';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
     protected static ?int $navigationSort = -10;
 
@@ -82,7 +85,7 @@ class SetupPesantren extends Page implements HasForms
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
-            && (auth()->user()?->canAny(['manage_santri', 'manage_akademik', 'manage_keuangan']) ?? false);
+            && (auth()->user()?->can('manage_tenant_settings') ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -179,7 +182,7 @@ class SetupPesantren extends Page implements HasForms
                         FileUpload::make('logo')
                             ->label('Logo (opsional)')
                             ->image()
-                            ->disk(\App\Services\StorageQuotaService::diskName())
+                            ->disk(StorageQuotaService::diskName())
                             ->directory('branding')
                             ->maxSize(2048)
                             ->helperText('Maks 2MB. Boleh dilewati, unggah nanti.'),
@@ -301,6 +304,10 @@ class SetupPesantren extends Page implements HasForms
                         Placeholder::make('keuangan_info')
                             ->hiddenLabel()
                             ->content(new HtmlString('<p class="text-sm">Pengaturan dasar keuangan. Bila belum mengurus dana BOS/BOP, lewati saja — bisa diatur nanti.</p>')),
+                        Placeholder::make('skema_biaya_nudge')
+                            ->hiddenLabel()
+                            ->visible(fn (): bool => $this->keuanganAktif())
+                            ->content(fn (): HtmlString => new HtmlString($this->skemaBiayaNudgeHtml())),
                         Select::make('keuangan_jenis')
                             ->label('Jenis lembaga (untuk dana negara)')
                             ->options(['pesantren' => 'Pesantren (BOP)', 'madrasah' => 'Madrasah (BOS)'])
@@ -488,6 +495,67 @@ class SetupPesantren extends Page implements HasForms
         } catch (\Throwable) {
             return true;
         }
+    }
+
+    /** Apakah modul keuangan tampil untuk tenant ini (gerbang nudge Skema Biaya). */
+    protected function keuanganAktif(): bool
+    {
+        try {
+            return app(ModuleService::class)->isVisibleForTenant('keuangan', tenancy()->initialized ? tenant() : null);
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Apakah Skema Biaya (tarif baku) sudah diisi tenant ini?
+     *
+     * Penting: bila kosong, importer Syahriyyah memakai nominal fallback bawaan
+     * (700rb) saat membuat Tagihan baru. Mengisi Skema Biaya membuat tarif sesuai
+     * pondok. Nudge ini HANYA membaca data — tak mengubah fallback/logika import.
+     */
+    protected function skemaBiayaTerisi(): bool
+    {
+        try {
+            return SkemaBiaya::query()->where('aktif', true)->exists();
+        } catch (\Throwable) {
+            // Modul/tabel belum tersedia → anggap belum terisi (tampilkan ajakan).
+            return false;
+        }
+    }
+
+    /** Tautan ke menu pengisian Skema Biaya, bila resource dapat diakses. */
+    protected function skemaBiayaUrl(): ?string
+    {
+        try {
+            $resource = SkemaBiayaResource::class;
+
+            return $resource::canAccess() ? $resource::getUrl('index') : null;
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /** HTML indikator ramah: status Skema Biaya + arahan ke menu pengisiannya. */
+    protected function skemaBiayaNudgeHtml(): string
+    {
+        if ($this->skemaBiayaTerisi()) {
+            return '<div class="rounded-lg bg-green-50 px-4 py-3 ring-1 ring-green-200 dark:bg-green-500/10 dark:ring-green-500/20">'
+                .'<p class="text-sm font-semibold text-green-800 dark:text-green-300">Skema Biaya sudah diisi ✓</p>'
+                .'<p class="text-sm text-green-700 dark:text-green-400">Tarif baku tagihan akan memakai skema pondok Anda.</p>'
+                .'</div>';
+        }
+
+        $url = $this->skemaBiayaUrl();
+        $ajakan = $url !== null
+            ? ' Buka menu <a href="'.e($url).'" class="font-semibold underline">Keuangan → Skema Biaya</a> untuk mengaturnya.'
+            : ' Atur lewat menu <strong>Keuangan → Skema Biaya</strong> (mode Lanjutan).';
+
+        return '<div class="rounded-lg bg-amber-50 px-4 py-3 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:ring-amber-500/20">'
+            .'<p class="text-sm font-semibold text-amber-800 dark:text-amber-300">Skema Biaya belum diisi</p>'
+            .'<p class="text-sm text-amber-700 dark:text-amber-400">Tanpa Skema Biaya, tarif baku tagihan (mis. saat impor pembayaran syahriyyah) memakai nominal bawaan <strong>Rp 700.000</strong>. Isi Skema Biaya agar tarif sesuai pondok Anda.'
+            .$ajakan.'</p>'
+            .'</div>';
     }
 
     /** Fondasi WAJIB: nama terisi + (akademik mati ATAU ada lembaga & periode aktif). */

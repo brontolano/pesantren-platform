@@ -27,56 +27,58 @@ class SantriPatchAddressCommand extends Command
 
     // Mapping: field DB → [alias header yang dinormalisasi]
     private const FIELD_ALIASES = [
-        'nik'                 => ['nik', 'nomer_induk_kependudukan_(nik)', 'nomer_induk_kependudukan'],
-        'nisn'                => ['nisn', 'nomer_induk_siswa_nasional'],
-        'rt_rw'               => ['rt_rw_santri', 'rt_rw'],
-        'desa_kelurahan'      => ['desa_kelurahan_santri', 'desa_kelurahan'],
-        'kecamatan'           => ['kecamatan_santri', 'kecamatan'],
-        'kabupaten_kota'      => ['kabupaten_kota_santri', 'kabupaten_kota'],
-        'provinsi'            => ['provinsi_santri', 'provinsi'],
-        'kode_pos'            => ['kode_pos_santri', 'kode_pos'],
-        'rt_rw_wali'          => ['rt_rw_wali'],
+        'nik' => ['nik', 'nomer_induk_kependudukan_(nik)', 'nomer_induk_kependudukan'],
+        'nisn' => ['nisn', 'nomer_induk_siswa_nasional'],
+        'rt_rw' => ['rt_rw_santri', 'rt_rw'],
+        'desa_kelurahan' => ['desa_kelurahan_santri', 'desa_kelurahan'],
+        'kecamatan' => ['kecamatan_santri', 'kecamatan'],
+        'kabupaten_kota' => ['kabupaten_kota_santri', 'kabupaten_kota'],
+        'provinsi' => ['provinsi_santri', 'provinsi'],
+        'kode_pos' => ['kode_pos_santri', 'kode_pos'],
+        'rt_rw_wali' => ['rt_rw_wali'],
         'desa_kelurahan_wali' => ['desa_kelurahan_wali'],
-        'kecamatan_wali'      => ['kecamatan_wali'],
+        'kecamatan_wali' => ['kecamatan_wali'],
         'kabupaten_kota_wali' => ['kabupaten_kota_wali'],
-        'provinsi_wali'       => ['provinsi_wali'],
-        'kode_pos_wali'       => ['kode_pos_wali'],
+        'provinsi_wali' => ['provinsi_wali'],
+        'kode_pos_wali' => ['kode_pos_wali'],
     ];
 
     public function handle(): int
     {
         $tenantId = $this->argument('tenant');
         $filePath = $this->argument('file');
-        $force    = (bool) $this->option('force');
-        $dryRun   = (bool) $this->option('dry-run');
+        $force = (bool) $this->option('force');
+        $dryRun = (bool) $this->option('dry-run');
 
         $tenant = Tenant::find($tenantId);
         if (! $tenant) {
             $this->error("Tenant tidak ditemukan: {$tenantId}");
+
             return self::FAILURE;
         }
 
         if (! is_file($filePath)) {
             $this->error("File tidak ditemukan: {$filePath}");
+
             return self::FAILURE;
         }
 
         $this->info("Tenant   : {$tenantId}");
         $this->info("File     : {$filePath}");
-        $this->info("Force    : " . ($force ? 'ya (timpa nilai yang ada)' : 'tidak (hanya isi yang kosong)'));
-        $this->info("Dry-run  : " . ($dryRun ? 'ya' : 'tidak'));
+        $this->info('Force    : '.($force ? 'ya (timpa nilai yang ada)' : 'tidak (hanya isi yang kosong)'));
+        $this->info('Dry-run  : '.($dryRun ? 'ya' : 'tidak'));
         $this->newLine();
 
         // Baca Excel
-        $reader = new XlsxReader();
+        $reader = new XlsxReader;
         $reader->open($filePath);
 
         $headerMap = null; // [dbField => colIndex]
-        $nisCol    = null;
-        $updated   = 0;
-        $skipped   = 0;
-        $notFound  = 0;
-        $rowNum    = 0;
+        $nisCol = null;
+        $updated = 0;
+        $skipped = 0;
+        $notFound = 0;
+        $rowNum = 0;
 
         tenancy()->initialize($tenant);
 
@@ -84,22 +86,24 @@ class SantriPatchAddressCommand extends Command
             foreach ($reader->getSheetIterator() as $sheet) {
                 foreach ($sheet->getRowIterator() as $row) {
                     $rowNum++;
-                    $cells  = $row->getCells();
-                    $values = array_map(fn($c) => trim((string) $c->getValue()), $cells);
+                    $cells = $row->getCells();
+                    $values = array_map(fn ($c) => trim((string) $c->getValue()), $cells);
 
                     // Baris pertama = header
                     if ($headerMap === null) {
                         $headerMap = $this->buildHeaderMap($values);
-                        $nisCol    = $this->findNisCol($values);
+                        $nisCol = $this->findNisCol($values);
 
                         if ($nisCol === null) {
                             $this->error('Kolom NIS tidak ditemukan di header baris 1.');
+
                             return self::FAILURE;
                         }
 
                         $detected = array_keys($headerMap);
-                        $this->line('Field terdeteksi: ' . implode(', ', $detected));
+                        $this->line('Field terdeteksi: '.implode(', ', $detected));
                         $this->newLine();
+
                         continue;
                     }
 
@@ -128,6 +132,7 @@ class SantriPatchAddressCommand extends Command
 
                     if (! $santri) {
                         $notFound++;
+
                         continue;
                     }
 
@@ -141,6 +146,7 @@ class SantriPatchAddressCommand extends Command
 
                     if (empty($toUpdate)) {
                         $skipped++;
+
                         continue;
                     }
 
@@ -198,6 +204,7 @@ class SantriPatchAddressCommand extends Command
                 return $idx;
             }
         }
+
         return null;
     }
 

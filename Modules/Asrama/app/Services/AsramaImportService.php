@@ -38,9 +38,8 @@ class AsramaImportService
     private const KAPASITAS_DEFAULT = 8;
 
     public function __construct(
-        private readonly AsramaService $asramaService = new AsramaService(),
-    ) {
-    }
+        private readonly AsramaService $asramaService = new AsramaService,
+    ) {}
 
     /**
      * @return array{
@@ -90,6 +89,7 @@ class AsramaImportService
 
                     if ($headers === null) {
                         $headers = $this->mapHeaders($values);
+
                         continue;
                     }
 
@@ -98,6 +98,7 @@ class AsramaImportService
 
                     if ($payload === []) {
                         $summary['skipped']++;
+
                         continue;
                     }
 
@@ -112,6 +113,7 @@ class AsramaImportService
 
                     if ($validator->fails()) {
                         $this->gagal($summary, $rowNumber, $payload, $validator->errors()->first());
+
                         continue;
                     }
 
@@ -120,6 +122,7 @@ class AsramaImportService
                             'NIS dobel di file (sudah ditempatkan baris %d).',
                             $santriDitempatkan[$payload['nis']],
                         ));
+
                         continue;
                     }
 
@@ -130,6 +133,7 @@ class AsramaImportService
 
                     if (! $santri) {
                         $this->gagal($summary, $rowNumber, $payload, 'NIS tidak ditemukan pada tenant ini — import santri dulu.');
+
                         continue;
                     }
 
@@ -192,6 +196,7 @@ class AsramaImportService
                             'Kamar %s/%s penuh (kapasitas %d, terisi %d).',
                             $namaBlok, $nomorKamar, $kapasitasEfektif, $terisiDb + $terisiFile,
                         ));
+
                         continue;
                     }
 
@@ -204,6 +209,7 @@ class AsramaImportService
                             ]);
                         } catch (\Throwable $e) {
                             $this->gagal($summary, $rowNumber, $payload, $e->getMessage());
+
                             continue;
                         }
                     }
@@ -324,6 +330,7 @@ class AsramaImportService
 
             if ($value instanceof \DateTimeInterface) {
                 $payload[$key] = $value;
+
                 continue;
             }
 

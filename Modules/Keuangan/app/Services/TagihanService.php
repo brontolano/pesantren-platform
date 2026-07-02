@@ -7,10 +7,10 @@ use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\Tagihan;
-use InvalidArgumentException;
 use RuntimeException;
 
 class TagihanService
@@ -50,6 +50,8 @@ class TagihanService
             'jenis_tagihan' => $payload['jenis_tagihan'],
             'keterangan' => $payload['keterangan'] ?? null,
             'nominal' => $nominal,
+            // #332: rincian komponen syahriah (opsional, transparansi wali).
+            'komponen' => $payload['komponen'] ?? null,
             'diskon' => $diskon,
             'nominal_akhir' => max($nominal - $diskon, 0),
             'jatuh_tempo' => $payload['jatuh_tempo'],
@@ -235,6 +237,6 @@ class TagihanService
             'Ramadhan', 'Syawal', "Dzulqa'dah", 'Dzulhijjah',
         ];
 
-        return ($namaBulan[$bulanIndex] ?? 'Unknown') . " {$tahun}";
+        return ($namaBulan[$bulanIndex] ?? 'Unknown')." {$tahun}";
     }
 }

@@ -53,14 +53,14 @@ class DemoKeuanganLengkapSeeder extends Seeder
         $periodeId = DB::table('periode_akuntansi')->where('status', 'open')->value('id');
         $jurnalId = DB::table('jurnal')->insertGetId([
             'tenant_id' => $this->tid,
-            'nomor' => 'JU-' . strtoupper(substr(md5($key), 0, 8)),
+            'nomor' => 'JU-'.strtoupper(substr(md5($key), 0, 8)),
             'tanggal' => $tanggal,
             'deskripsi' => $deskripsi,
             'status' => 'posted',
             'idempotency_key' => $key,
             'periode_id' => $periodeId,
             'dibuat_oleh' => DB::table('users')->orderBy('id')->value('id'),
-            'created_at' => $tanggal . ' 09:00:00',
+            'created_at' => $tanggal.' 09:00:00',
             'updated_at' => now(),
         ]);
 
@@ -169,15 +169,15 @@ class DemoKeuanganLengkapSeeder extends Seeder
                 'tenant_id' => $this->tid,
                 'program_donasi_id' => $d['program'],
                 'nama_donatur' => $d['nama'],
-                'kontak' => '08120000' . str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT),
+                'kontak' => '08120000'.str_pad((string) ($i + 1), 4, '0', STR_PAD_LEFT),
                 'nominal' => $d['nominal'],
                 'pesan' => 'Semoga berkah dan bermanfaat',
                 'status' => $d['status'],
                 'dikonfirmasi_oleh' => $d['status'] === 'dikonfirmasi' ? $adminId : null,
                 'dikonfirmasi_at' => $d['status'] === 'dikonfirmasi' ? now()->subDays($d['hari']) : null,
-                'nomor_kuitansi' => $d['urut'] ? 'KW-DON-2026-' . str_pad((string) $d['urut'], 4, '0', STR_PAD_LEFT) : null,
+                'nomor_kuitansi' => $d['urut'] ? 'KW-DON-2026-'.str_pad((string) $d['urut'], 4, '0', STR_PAD_LEFT) : null,
                 'nomor_kuitansi_urut' => $d['urut'],
-                'client_ref' => 'demo-donasi-' . $i,
+                'client_ref' => 'demo-donasi-'.$i,
                 'created_at' => now()->subDays($d['hari']),
                 'updated_at' => now(),
             ]);
@@ -442,7 +442,7 @@ class DemoKeuanganLengkapSeeder extends Seeder
                 'santri_id' => $sid,
                 'nominal' => $nominal,
                 'catatan' => 'Titipan kiriman wali',
-                'client_ref' => 'demo-sk-' . $sesiId . '-' . $i,
+                'client_ref' => 'demo-sk-'.$sesiId.'-'.$i,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -478,9 +478,9 @@ class DemoKeuanganLengkapSeeder extends Seeder
         foreach ($template as $i => $t) {
             $tanggal = sprintf('2026-06-%02d', $t['d']);
             if ($t['arah'] === 'masuk') {
-                $this->buatJurnal($tanggal, $t['desk'], $kas->id, $pendapatan->id, $t['n'], 'demo-juni-' . $i);
+                $this->buatJurnal($tanggal, $t['desk'], $kas->id, $pendapatan->id, $t['n'], 'demo-juni-'.$i);
             } else {
-                $this->buatJurnal($tanggal, $t['desk'], $beban->id, $kas->id, $t['n'], 'demo-juni-' . $i);
+                $this->buatJurnal($tanggal, $t['desk'], $beban->id, $kas->id, $t['n'], 'demo-juni-'.$i);
             }
         }
     }
@@ -582,7 +582,7 @@ class DemoKeuanganLengkapSeeder extends Seeder
         foreach ($riwayat as $i => $r) {
             $belanjaId = DB::table('belanja')->insertGetId([
                 'tenant_id' => $this->tid,
-                'client_ref' => 'demo-belanja-riwayat-' . $i,
+                'client_ref' => 'demo-belanja-riwayat-'.$i,
                 'tanggal' => now()->subDays($r['hari'])->toDateString(),
                 'uraian' => $r['uraian'],
                 'jenis' => 'barang',
@@ -635,7 +635,7 @@ class DemoKeuanganLengkapSeeder extends Seeder
                     'tenant_id' => $this->tid,
                     'santri_id' => $s->id,
                     'jenis_tagihan' => $jenis,
-                    'keterangan' => strtoupper($jenis) . ' ' . now()->translatedFormat('F Y'),
+                    'keterangan' => strtoupper($jenis).' '.now()->translatedFormat('F Y'),
                     'nominal' => $nominal,
                     'diskon' => 0,
                     'nominal_akhir' => $nominal,

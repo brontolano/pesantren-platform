@@ -63,5 +63,13 @@
                 <p class="mt-2 text-xs text-gray-400">Lampu 🟡 dihitung job harian (mutu:hitung-lampu, 05:00). Warna sel: hijau baik, kuning waspada, merah perlu perhatian.</p>
             @endif
         </x-filament::section>
+    @else
+        <x-filament::section>
+            @if ($kelasList->isEmpty())
+                <p class="text-sm text-gray-700 dark:text-gray-300"><strong>Belum ada kelas aktif.</strong> Buat/aktifkan kelas dulu di menu <strong>Kelas</strong> (grup Akademik) agar heatmap mutu per kelas bisa ditampilkan.</p>
+            @else
+                <p class="text-sm text-gray-700 dark:text-gray-300"><strong>Pilih kelas dulu.</strong> Gunakan dropdown <strong>"Pilih Kelas"</strong> di atas untuk menampilkan heatmap mutu santri (nilai rata, kehadiran, setoran hafalan, poin disiplin, lampu kuning). Halaman ini bukan rusak — datanya muncul setelah kelas dipilih.</p>
+            @endif
+        </x-filament::section>
     @endif
 </x-filament-panels::page>

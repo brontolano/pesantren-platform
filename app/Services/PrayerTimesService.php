@@ -40,8 +40,8 @@ class PrayerTimesService
      *
      * @param  float  $lat  Lintang (derajat, selatan negatif)
      * @param  float  $lng  Bujur (derajat, timur positif)
-     * @param  float  $tz   Offset zona waktu jam (WIB = 7)
-     * @return array<string,string>  label => "HH:MM"
+     * @param  float  $tz  Offset zona waktu jam (WIB = 7)
+     * @return array<string,string> label => "HH:MM"
      */
     public function times(
         float $lat,
@@ -61,12 +61,12 @@ class PrayerTimesService
         $jDate = $this->julian($y, $m, $d) - $lng / (15 * 24);
 
         // Tebakan awal porsi hari (jam/24) — sesuai default PrayTimes.
-        $fajr    = $this->sunAngleTime($this->fajrAngle, $jDate, $lat, 5 / 24, true);
+        $fajr = $this->sunAngleTime($this->fajrAngle, $jDate, $lat, 5 / 24, true);
         $sunrise = $this->sunAngleTime($this->riseSetAngle, $jDate, $lat, 6 / 24, true);
-        $dhuhr   = $this->midDay($jDate, 12 / 24);
-        $asr     = $this->asrTime($this->asrFactor, $jDate, $lat, 13 / 24);
-        $sunset  = $this->sunAngleTime($this->riseSetAngle, $jDate, $lat, 18 / 24, false);
-        $isha    = $this->sunAngleTime($this->ishaAngle, $jDate, $lat, 18 / 24, false);
+        $dhuhr = $this->midDay($jDate, 12 / 24);
+        $asr = $this->asrTime($this->asrFactor, $jDate, $lat, 13 / 24);
+        $sunset = $this->sunAngleTime($this->riseSetAngle, $jDate, $lat, 18 / 24, false);
+        $isha = $this->sunAngleTime($this->ishaAngle, $jDate, $lat, 18 / 24, false);
 
         // Konversi waktu surya → waktu jam lokal.
         $offset = $tz - $lng / 15;
@@ -88,13 +88,13 @@ class PrayerTimesService
         $imsak = $fajr - 10 / 60;
 
         return [
-            'imsak'   => $this->fmt($imsak),
-            'subuh'   => $this->fmt($fajr),
-            'terbit'  => $this->fmt($sunrise),
-            'dzuhur'  => $this->fmt($dhuhr),
-            'ashar'   => $this->fmt($asr),
+            'imsak' => $this->fmt($imsak),
+            'subuh' => $this->fmt($fajr),
+            'terbit' => $this->fmt($sunrise),
+            'dzuhur' => $this->fmt($dhuhr),
+            'ashar' => $this->fmt($asr),
             'maghrib' => $this->fmt($maghrib),
-            'isya'    => $this->fmt($isha),
+            'isya' => $this->fmt($isha),
         ];
     }
 
@@ -176,7 +176,7 @@ class PrayerTimesService
     }
 
     /**
-     * @return array{0:float,1:float}  [deklinasi (deg), equation of time (jam)]
+     * @return array{0:float,1:float} [deklinasi (deg), equation of time (jam)]
      */
     private function sunPosition(float $jd): array
     {

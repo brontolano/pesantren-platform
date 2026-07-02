@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\ModuleRegistry;
+use App\Models\Setting;
 use App\Models\TenantModule;
 use App\Services\ModuleService;
 use App\Support\ModuleRecommendationRegistry;
@@ -32,7 +33,7 @@ class PusatModul extends Page
 
     protected static ?string $navigationLabel = 'Pusat Modul';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
     protected static ?int $navigationSort = -10;
 
@@ -131,6 +132,15 @@ class PusatModul extends Page
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('modeSalaf')
+                ->label('Terapkan Mode Salaf')
+                ->icon('heroicon-o-moon')
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalHeading('Terapkan Mode Salaf?')
+                ->modalDescription(fn (): string => $this->ringkasanModeSalaf())
+                ->modalSubmitActionLabel('Ya, terapkan Mode Salaf')
+                ->action(fn () => $this->terapkanModeSalaf()),
             Action::make('pasangDisarankan')
                 ->label('Pasang Semua yang Disarankan')
                 ->icon('heroicon-o-sparkles')
@@ -201,6 +211,99 @@ class PusatModul extends Page
             ->send();
 
         $this->redirect(static::getUrl());
+    }
+
+    /**
+     * Mode Salaf (issue #331) — preset minimalis: nyalakan modul inti pesantren
+     * salaf, matikan SEMUA modul lanjutan lain. Idempoten; modul yang dimatikan
+     * tetap bisa dipasang lagi kapan saja dari halaman ini (data tak dihapus).
+     */
+    public function terapkanModeSalaf(): void
+    {
+        $this->pastikanBoleh();
+
+        [$nyalakan, $matikan] = $this->rencanaModeSalaf();
+
+        $dipasang = $this->installModules($nyalakan);
+
+        if ($matikan !== []) {
+            $tid = tenant('id');
+            // JEBAKAN: tenant_modules = tabel CENTRAL → wajib tenancy()->central().
+            tenancy()->central(function () use ($tid, $matikan): void {
+                TenantModule::query()
+                    ->where('tenant_id', $tid)
+                    ->whereIn('module_name', $matikan)
+                    ->update(['is_active' => false, 'updated_at' => now()]);
+            });
+            app()->forgetInstance('__active_modules_'.$tid);
+            app()->forgetInstance('__configured_modules_'.$tid);
+        }
+
+        // Selaraskan arketipe rekomendasi (Setting tenant, aman ditulis dari panel tenant).
+        try {
+            Setting::updateOrCreate(['key' => 'setup.preset'], ['value' => ['text' => 'salafiyah-kecil']]);
+        } catch (\Throwable) {
+            // settings belum siap → rekomendasi pakai fallback; bukan penghalang.
+        }
+
+        if ($dipasang === [] && $matikan === []) {
+            Notification::make()
+                ->title('Sudah dalam Mode Salaf')
+                ->body('Tidak ada yang perlu diubah.')
+                ->info()
+                ->send();
+
+            return;
+        }
+
+        Notification::make()
+            ->title('Mode Salaf diterapkan 🎉')
+            ->body(count($dipasang).' fitur dinyalakan, '.count($matikan).' fitur lanjutan disembunyikan. Semua bisa diaktifkan lagi dari halaman ini.')
+            ->success()
+            ->send();
+
+        $this->redirect(static::getUrl());
+    }
+
+    /**
+     * Rencana Mode Salaf: [modul yang akan dinyalakan, modul aktif yang akan dimatikan].
+     *
+     * @return array{0: list<string>, 1: list<string>}
+     */
+    private function rencanaModeSalaf(): array
+    {
+        $svc = app(ModuleService::class);
+        $tenant = tenancy()->initialized ? tenant() : null;
+
+        $nyalakan = [];
+        $matikan = [];
+
+        foreach (ModuleRegistry::query()->where('is_core', false)->orderBy('sort')->get() as $m) {
+            $status = $svc->moduleStatus($m->key, $tenant);
+            $target = in_array($m->key, ModuleRecommendationRegistry::MODE_SALAF_ON, true);
+
+            if ($target && $status === ModuleService::STATUS_AVAILABLE) {
+                $nyalakan[] = $m->key;
+            } elseif (! $target && in_array($status, [ModuleService::STATUS_INSTALLED, ModuleService::STATUS_READY], true)) {
+                $matikan[] = $m->key;
+            }
+        }
+
+        return [$nyalakan, $matikan];
+    }
+
+    /** Ringkasan awam untuk modal konfirmasi Mode Salaf. */
+    private function ringkasanModeSalaf(): string
+    {
+        [$nyalakan, $matikan] = $this->rencanaModeSalaf();
+        $label = fn (array $keys): string => $keys === []
+            ? '—'
+            : ModuleRegistry::query()->whereIn('key', $keys)->orderBy('sort')->pluck('label')->implode(', ');
+
+        return 'Paket ramping untuk pesantren salaf: hanya menu inti yang tampil. '
+            .'Dinyalakan: '.$label($nyalakan).'. '
+            .'Disembunyikan: '.$label($matikan).'. '
+            .'Fitur yang disembunyikan TIDAK dihapus — datanya aman & bisa diaktifkan lagi kapan saja dari halaman ini.';
     }
 
     /** Nonaktifkan fitur (reversible — data TIDAK dihapus). */

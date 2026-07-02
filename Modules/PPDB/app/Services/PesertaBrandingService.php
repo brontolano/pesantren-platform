@@ -65,6 +65,6 @@ class PesertaBrandingService
         // File di disk 'public' tenant: serve via route /_tenant-storage/{path}.
         // Storage::disk('public')->url() TIDAK dipakai karena menghasilkan
         // APP_URL/storage/{path} yang 404 di Docker (symlink hanya non-tenant).
-        return url('/_tenant-storage/' . ltrim($value, '/'));
+        return url('/_tenant-storage/'.ltrim($value, '/'));
     }
 }

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Penjaminan Mutu (SPMI) · Panduan Pesantren.online</title>
+<meta name="description" content="Mengisi Sasaran/KPI mutu, mengelola Temuan ketidaksesuaian, inspeksi, survei kepuasan (SKM), dan membaca Dashboard KPI mutu pesantren.">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f172a'/><text x='13' y='47' font-family='Arial,sans-serif' font-weight='800' font-size='42' fill='white'>P</text><circle cx='49' cy='45' r='7' fill='%2310b981'/></svg>">
+</head>
+<body>
+<header class="topbar">
+  <button class="nav-toggle" id="navToggle" aria-label="Buka menu">☰</button>
+  <a class="brand" href="../index.html"><span class="wordmark">Pesantren<span class="dot">.</span>online</span><span class="brand-tag">Panduan</span></a>
+  <div class="search" id="search">
+    <input id="searchInput" type="search" placeholder="Cari panduan… (contoh: tagihan, nilai, login)" autocomplete="off">
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
+  <a class="site-link" href="https://pesantren.online" title="Kembali ke situs utama pesantren.online">← pesantren.online</a>
+</header>
+<div class="layout">
+  <nav class="sidebar" id="sidebar"><a class="nav-back" href="https://pesantren.online">← Kembali ke pesantren.online</a><div class="nav-group"><div class="nav-group-title">Mulai di Sini</div><a class="nav-item" href="../panduan-dasar/">🌱 Panduan Dasar</a><a class="nav-item" href="../cara-setup/">🚀 Cara Setup Pesantren</a></div><div class="nav-group"><div class="nav-group-title">Panduan per Peran</div><a class="nav-item" href="../tata-usaha/">🗂️ Tata Usaha (TU)</a><a class="nav-item" href="../bendahara/">💰 Bendahara</a><a class="nav-item" href="../guru/">📚 Guru / Ustadz</a><a class="nav-item" href="../website/">🌐 Pengurus Website</a><a class="nav-item" href="../kepegawaian/">👔 Kepegawaian / SDM</a><a class="nav-item active" href="../mutu/">✅ Penjaminan Mutu (SPMI)</a><div class="nav-sub"><a href="#1-mengisi-sasaran-kpi">1. Mengisi Sasaran / KPI</a><a href="#2-mencatat-realisasi">2. Mencatat Realisasi</a><a href="#3-mencatat-temuan">3. Mencatat Temuan</a><a href="#4-siklus-temuan">4. Siklus Temuan (Tutup)</a><a href="#5-inspeksi-audit">5. Inspeksi / Audit</a><a href="#6-survei-kepuasan-skm">6. Survei Kepuasan (SKM)</a><a href="#7-dosir-mutu">7. Dosir / Dokumen Mutu</a><a href="#8-membaca-dashboard">8. Membaca Dashboard KPI</a><a href="#9-glosarium">9. Glosarium</a><a href="#contekan-cepat-mutu">Contekan Cepat Mutu</a></div><a class="nav-item" href="../pimpinan/">🏛️ Pimpinan</a></div><div class="nav-group"><div class="nav-group-title">Kehidupan Pesantren</div><a class="nav-item" href="../asrama/">🏠 Asrama & Kehidupan Santri</a><a class="nav-item" href="../akademik/">🎓 Akademik Lanjutan</a></div><div class="nav-group"><div class="nav-group-title">Untuk Orang Tua</div><a class="nav-item" href="../wali-santri/">🏠 Wali Santri</a></div><div class="nav-group"><div class="nav-group-title">Alat Bantu</div><a class="nav-item" href="../kartu-bantuan/">🪪 Kartu Bantuan Cepat</a><a class="nav-item" href="../naskah-video/">🎬 Naskah Video Tutorial</a></div><div class="nav-group"><div class="nav-group-title">Untuk Penyusun Panduan</div><a class="nav-item" href="../prinsip-penulisan/">✍️ Prinsip Penulisan</a></div></nav>
+  <main class="content">
+    <article>
+      <div class="page-head">
+        <div class="page-icon">✅</div>
+        <div>
+
+          <h1>Penjaminan Mutu (SPMI)</h1>
+          <p class="lead">Menetapkan sasaran/KPI mutu, menindaklanjuti temuan ketidaksesuaian sampai tuntas, mencatat inspeksi & survei kepuasan, dan memantau capaian lewat satu dashboard.</p>
+        </div>
+      </div>
+      <blockquote>
+<p><strong>Syarat:</strong> sudah menyelesaikan <a href="../panduan-dasar/">🌱 Panduan Dasar</a>.
+Menu Mutu hanya muncul bila: (1) modul <strong>Mutu / SYAMIL</strong> aktif untuk pesantren Bapak/Ibu, (2) tampilan diatur ke <strong>Mode Lanjutan</strong> (bukan Mode Sederhana), dan (3) akun Bapak/Ibu punya izin <strong>kelola mutu</strong>. Bila menu <strong>Mutu</strong> tidak terlihat di sisi kiri, hubungi admin pesantren untuk mengaktifkannya.
+Modul ini menggantikan: map dokumen SOP, buku temuan audit, dan rekap survei kepuasan yang biasanya tercecer.</p>
+</blockquote>
+<p><strong>Daftar isi:</strong></p>
+<ol>
+<li>Mengisi sasaran / KPI</li>
+<li>Mencatat realisasi capaian</li>
+<li>Mencatat temuan ketidaksesuaian</li>
+<li>Siklus temuan sampai ditutup</li>
+<li>Inspeksi / audit</li>
+<li>Survei kepuasan (SKM)</li>
+<li>Dosir / dokumen mutu</li>
+<li>Membaca dashboard KPI</li>
+<li>Glosarium istilah mutu</li>
+</ol>
+<hr>
+<h2 id="1-mengisi-sasaran-kpi">1. Mengisi Sasaran / KPI<a class="anchor" href="#1-mengisi-sasaran-kpi" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> <strong>Sasaran Mutu (KPI)</strong> adalah target yang ingin dicapai pesantren — misalnya "Kelulusan tepat waktu 95%" atau "Rata-rata kepuasan wali 4 dari 5". Tiap sasaran punya <strong>target</strong> dan <strong>realisasi</strong> (capaian nyata); aplikasi otomatis menghitung persentase capaiannya.</p>
+<p><strong>Kapan dipakai:</strong> di awal tahun/semester saat menyusun rencana mutu, atau ketika menambah indikator baru.</p>
+<p><strong>Siapkan dulu:</strong> daftar indikator mutu, angka target masing-masing, dan satuannya (%, nilai, orang).</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Mutu</strong> → <strong>Sasaran Mutu (KPI)</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong> (New).</li>
+<li>Isi formulir:<ul>
+<li><strong>Nama Sasaran</strong> — tulis jelas. Contoh: <code>Kehadiran ustadz mengajar</code>.</li>
+<li><strong>Kode</strong> — opsional, kode singkat bila pesantren punya penomoran sendiri.</li>
+<li><strong>Area</strong> — pilih: Akademik / Tahfidz / Layanan / Umum.</li>
+<li><strong>Satuan</strong> — contoh: <code>%</code>, <code>nilai</code>, atau <code>orang</code>.</li>
+<li><strong>Target</strong> — angka yang dituju. Contoh: <code>95</code>.</li>
+<li><strong>Realisasi</strong> — capaian saat ini (boleh diisi <code>0</code> dulu, nanti diperbarui).</li>
+<li><strong>Periode</strong> — tahun/semester. Contoh: <code>2026</code> atau <code>2026-S1</code>.</li>
+<li><strong>Regulasi Acuan</strong> — opsional. Contoh: <code>KMA 939/2018</code>.</li>
+<li><strong>Aktif</strong> — biarkan menyala agar ikut dihitung di dashboard.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong> (Create).</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> formulir Sasaran Mutu dengan kotak Target dan Realisasi dilingkari <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> sasaran muncul di tabel, lengkap dengan kolom <strong>Capaian %</strong> yang berwarna — hijau bila ≥100%, kuning bila ≥75%, merah bila di bawahnya.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Capaian % tampil 0 padahal sudah diisi</em> → biasanya <strong>Target</strong> masih <code>0</code>. Capaian dihitung dari realisasi dibagi target, jadi target harus diisi lebih dulu.</li>
+<li><em>Sasaran tidak muncul di dashboard</em> → pastikan tombol <strong>Aktif</strong> menyala dan <strong>Periode</strong> sudah diisi.</li>
+</ul>
+<hr>
+<h2 id="2-mencatat-realisasi">2. Mencatat Realisasi Capaian<a class="anchor" href="#2-mencatat-realisasi" aria-hidden="true">#</a></h2>
+<p><strong>Kapan dipakai:</strong> berkala (bulanan/semester) saat angka capaian nyata sudah diketahui, tanpa perlu membuka seluruh formulir.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Buka <strong>Mutu</strong> → <strong>Sasaran Mutu (KPI)</strong>.</li>
+<li>Cari sasaran yang mau diperbarui.</li>
+<li>Di ujung kanan barisnya, ketuk tombol hijau <strong>Catat Realisasi</strong>.</li>
+<li>Masukkan <strong>Nilai realisasi</strong> terbaru (angka, tidak boleh negatif). Contoh: <code>88</code>.</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> muncul pesan "Realisasi diperbarui" dan kolom <strong>Capaian %</strong> berubah warna sesuai angka baru.</p>
+<blockquote>
+<p>💡 Bedanya dengan <strong>Edit</strong>: tombol <strong>Catat Realisasi</strong> hanya mengubah satu angka realisasi — cepat dan kecil risiko salah. Pakai <strong>Edit</strong> (pensil) bila perlu mengubah nama, target, atau periode.</p>
+</blockquote>
+<hr>
+<h2 id="3-mencatat-temuan">3. Mencatat Temuan Ketidaksesuaian<a class="anchor" href="#3-mencatat-temuan" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> <strong>Temuan</strong> (istilah mutu: <em>Non-Conformance</em>) adalah catatan masalah atau ketidaksesuaian yang ditemukan — misalnya dokumen SOP belum ada, jadwal tidak berjalan, atau standar tidak terpenuhi. Setiap temuan akan ditindaklanjuti sampai benar-benar tuntas.</p>
+<p><strong>Kapan dipakai:</strong> setiap kali ditemukan masalah, biasanya saat atau sesudah inspeksi/audit.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Mutu</strong> → <strong>Temuan (Non-Conformance)</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi formulir:<ul>
+<li><strong>Judul</strong> — ringkas dan jelas. Contoh: <code>Daftar hadir ustadz belum lengkap Maret</code>.</li>
+<li><strong>Severity</strong> — tingkat keseriusan: <strong>Minor</strong>, <strong>Major</strong>, atau <strong>Kritis</strong>. (Pilih hati-hati — setelah tindakan dimulai, tingkat ini <strong>tidak bisa diubah lagi</strong>.)</li>
+<li><strong>Inspeksi (opsional)</strong> — kaitkan dengan inspeksi/audit yang melahirkan temuan ini, bila ada.</li>
+<li><strong>Tenggat</strong> — batas waktu penyelesaian yang diharapkan.</li>
+<li><strong>Deskripsi</strong> — uraikan masalahnya secukupnya.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> tabel Temuan dengan badge Status "terbuka" dan Severity berwarna <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> temuan baru muncul di tabel dengan status <strong>terbuka</strong> (badge merah). Itulah titik awal siklus penyelesaian di Bagian 4.</p>
+<p>⚠️ <strong>Pilih Severity sekali, baik-baik.</strong> Aplikasi sengaja mengunci tingkat keseriusan begitu tindakan dimulai. Ini supaya temuan berat tidak diam-diam "diturunkan" jadi ringan lalu ditutup tanpa pemeriksaan yang semestinya.</p>
+<hr>
+<h2 id="4-siklus-temuan">4. Siklus Temuan Sampai Ditutup<a class="anchor" href="#4-siklus-temuan" aria-hidden="true">#</a></h2>
+<p><strong>Inti modul ini.</strong> Sebuah temuan tidak bisa langsung "dihapus" begitu saja — ia berjalan melewati empat tahap berurutan, sehingga ada jejak yang jelas siapa menindak dan siapa memverifikasi:</p>
+<ol>
+<li><strong>Terbuka</strong> — baru dicatat, belum ditangani.</li>
+<li><strong>Tindakan</strong> — sedang diperbaiki (tindakan korektif sudah dicatat).</li>
+<li><strong>Verifikasi</strong> — perbaikan selesai, menunggu diperiksa/disahkan.</li>
+<li><strong>Tutup</strong> — sudah diverifikasi dan dinyatakan selesai.</li>
+</ol>
+<p>Setiap tahap punya tombolnya sendiri di ujung kanan baris temuan. Tombol hanya muncul bila statusnya pas — jadi Bapak/Ibu tidak akan bingung harus menekan yang mana.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li><strong>Mulai Tindakan</strong> (tombol kuning, muncul saat status <em>terbuka</em>) — ketuk, lalu tulis <strong>Tindakan korektif</strong> yang akan/sedang dilakukan. Contoh: <code>Wali kelas merekap ulang absensi & memasang papan kontrol harian</code>. Setelah disimpan, status menjadi <strong>tindakan</strong>.</li>
+<li><strong>Ajukan Verifikasi</strong> (tombol biru, muncul saat status <em>tindakan</em>) — ketuk bila perbaikan sudah selesai. Aplikasi minta konfirmasi, lalu status menjadi <strong>verifikasi</strong> (menunggu diperiksa).</li>
+<li><strong>Tutup (Verifikasi)</strong> (tombol hijau, muncul saat status <em>verifikasi</em>) — ketuk untuk menyatakan temuan benar-benar selesai. Status menjadi <strong>tutup</strong>.</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> baris temuan dengan tombol "Mulai Tindakan" / "Ajukan Verifikasi" / "Tutup (Verifikasi)" sesuai status <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Tanda berhasil:</strong> setiap kali tombol ditekan, badge <strong>Status</strong> berubah warna mengikuti tahap, dan kolom <strong>Ditutup</strong> terisi tanggal saat temuan akhirnya ditutup.</p>
+<p>⚠️ <strong>Kalau ada masalah:</strong></p>
+<ul>
+<li><em>Tombol "Tutup (Verifikasi)" tidak muncul</em> → menutup temuan adalah wewenang khusus (izin <strong>setujui/verifikasi mutu</strong>). Bila Bapak/Ibu hanya bertugas menangani, biarkan di status <strong>verifikasi</strong>; petugas berwenang yang akan menutupnya.</li>
+<li><em>Tidak bisa lompat tahap</em> → memang sengaja. Urutannya harus runtut: terbuka → tindakan → verifikasi → tutup. Tidak ada jalan pintas.</li>
+<li><em>Tombol Edit hilang setelah tindakan dimulai</em> → wajar. Begitu temuan keluar dari status <strong>terbuka</strong>, isinya dikunci demi menjaga jejak audit; perubahan hanya lewat tombol tahap di atas.</li>
+</ul>
+<blockquote>
+<p>💡 Untuk temuan berat, pesantren bisa mengatur agar penutupan memerlukan <strong>persetujuan</strong> lebih dulu (lewat kotak masuk persetujuan). Bila itu aktif, tombol <strong>Tutup</strong> baru berfungsi setelah disetujui pihak berwenang.</p>
+</blockquote>
+<hr>
+<h2 id="5-inspeksi-audit">5. Inspeksi / Audit<a class="anchor" href="#5-inspeksi-audit" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> <strong>Inspeksi / Audit</strong> adalah catatan kegiatan pemeriksaan mutu — kapan dilakukan, siapa auditornya, area apa, dan ringkasan hasilnya. Temuan-temuan (Bagian 3) bisa dikaitkan ke sebuah inspeksi agar rapi.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Mutu</strong> → <strong>Inspeksi / Audit Mutu</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Judul</strong> — contoh: <code>Audit Internal Semester Ganjil 2026</code>.</li>
+<li><strong>Area</strong> — Akademik / Tahfidz / Layanan / Umum.</li>
+<li><strong>Tanggal</strong> — kapan inspeksi dilakukan.</li>
+<li><strong>Auditor</strong> — nama pemeriksa.</li>
+<li><strong>Status</strong> — <strong>Draft</strong> (masih berjalan) atau <strong>Selesai</strong>.</li>
+<li><strong>Ringkasan</strong> — catatan hasil pemeriksaan.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> inspeksi muncul di tabel. Kolom <strong>Temuan</strong> menampilkan angka berapa banyak temuan yang sudah dikaitkan ke inspeksi itu.</p>
+<blockquote>
+<p>💡 Alur yang rapi: buat <strong>Inspeksi</strong> dulu, lalu saat mencatat <strong>Temuan</strong> (Bagian 3) pilih inspeksi itu di kolom <strong>Inspeksi (opsional)</strong>. Dengan begitu hasil audit dan tindak lanjutnya saling terhubung.</p>
+</blockquote>
+<hr>
+<h2 id="6-survei-kepuasan-skm">6. Survei Kepuasan (SKM)<a class="anchor" href="#6-survei-kepuasan-skm" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> <strong>SKM</strong> (Survei Kepuasan Masyarakat) merekam penilaian kepuasan wali/masyarakat terhadap layanan pesantren, dalam skor <strong>1 sampai 5</strong>. Hasil rata-ratanya muncul di dashboard sebagai indeks kepuasan.</p>
+<p><strong>Kapan dipakai:</strong> saat memasukkan jawaban survei kepuasan, satu baris per responden/jawaban.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Mutu</strong> → <strong>Survei Kepuasan (SKM)</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi:<ul>
+<li><strong>Periode</strong> — contoh: <code>2026</code> atau <code>2026-S1</code>.</li>
+<li><strong>Aspek</strong> — Layanan / Akademik / Sarana / Umum.</li>
+<li><strong>Responden</strong> — boleh nama, boleh dikosongkan (anonim).</li>
+<li><strong>Skor (1-5)</strong> — wajib, angka <code>1</code> sampai <code>5</code>.</li>
+<li><strong>Komentar</strong> — masukan bebas dari responden, opsional.</li>
+</ul>
+</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> baris baru muncul dengan badge <strong>Skor</strong> berwarna — hijau (4–5), kuning (3), merah (di bawah 3). Semua skor ini otomatis dirata-rata menjadi indeks SKM di dashboard.</p>
+<p>⚠️ <em>Skor ditolak?</em> → skor harus bilangan 1 sampai 5. Angka di luar itu tidak diterima.</p>
+<hr>
+<h2 id="7-dosir-mutu">7. Dosir / Dokumen Mutu<a class="anchor" href="#7-dosir-mutu" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> <strong>Dosir Mutu</strong> adalah daftar dokumen mutu pesantren — SOP, hasil SKM, MoU, SK tim, rubrik — beserta status kelengkapan dan persetujuannya. Dokumen melewati alur sederhana: <strong>Draft → Diajukan → Disetujui</strong> (atau <strong>Ditolak</strong>).</p>
+<p><strong>Langkahnya (membuat dokumen):</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Mutu</strong> → <strong>Dosir Mutu (SYAMIL)</strong>.</li>
+<li>Ketuk <strong>+ Tambah</strong>.</li>
+<li>Isi: <strong>Judul</strong>, <strong>Jenis</strong> (SOP / Hasil SKM / MoU / SK Tim / Rubrik), <strong>Regulasi Acuan</strong>, <strong>Berkas (URL/path)</strong> bila ada, dan <strong>Kelengkapan</strong> (Lengkap / Belum).</li>
+<li>Ketuk <strong>Simpan</strong>.</li>
+</ol>
+<p><strong>Alur persetujuan (lewat tombol di baris):</strong></p>
+<ol>
+<li><strong>Ajukan</strong> — penyusun mengirim dokumen untuk disetujui (status menjadi <em>Diajukan</em>).</li>
+<li><strong>Setujui</strong> atau <strong>Tolak</strong> — pihak berwenang memutuskan. Bila menolak, wajib menulis <strong>Alasan penolakan</strong> agar penyusun bisa memperbaiki.</li>
+</ol>
+<p>✅ <strong>Tanda berhasil:</strong> kolom <strong>Approval</strong> berubah (Diajukan kuning, Disetujui hijau, Ditolak merah) dan nomor <strong>Versi</strong> tercatat.</p>
+<blockquote>
+<p>💡 <strong>Pemisahan tugas:</strong> yang mengajukan dan yang menyetujui dirancang sebagai dua peran berbeda. Bila tombol <strong>Setujui/Tolak</strong> tidak muncul untuk Bapak/Ibu, itu wewenang petugas lain — bukan kesalahan.</p>
+</blockquote>
+<hr>
+<h2 id="8-membaca-dashboard">8. Membaca Dashboard KPI<a class="anchor" href="#8-membaca-dashboard" aria-hidden="true">#</a></h2>
+<p><strong>Apa ini?</strong> Satu halaman ringkasan yang menggabungkan semua data di atas, supaya pimpinan bisa melihat kondisi mutu sekilas tanpa membuka satu per satu.</p>
+<p><strong>Langkahnya:</strong></p>
+<ol>
+<li>Menu kiri → grup <strong>Mutu</strong> → <strong>Dashboard Mutu</strong>.</li>
+<li>Baca tiga kelompok angka:<ul>
+<li><strong>Sasaran / KPI</strong> — jumlah sasaran aktif, rata-rata capaian, dan capaian per area.</li>
+<li><strong>Temuan</strong> — berapa yang masih <strong>terbuka</strong> (belum tuntas) versus yang sudah <strong>tutup</strong>.</li>
+<li><strong>SKM</strong> — rata-rata skor kepuasan dan indeksnya (skala 0–100), serta jumlah responden.</li>
+</ul>
+</li>
+</ol>
+<figure class="shot"><div class="shot-frame">📷</div><figcaption><b>Cuplikan layar:</b> Dashboard KPI Mutu dengan kartu Sasaran, Temuan, dan SKM <span class="soon">(gambar menyusul)</span></figcaption></figure>
+<p>✅ <strong>Cara membacanya:</strong> angka <strong>Temuan terbuka</strong> yang besar berarti banyak masalah belum tuntas — jadikan prioritas. <strong>Capaian rata-rata</strong> yang rendah menandakan target belum tercapai. <strong>Indeks SKM</strong> mendekati 100 berarti wali makin puas.</p>
+<p>⚠️ <em>Angka di dashboard terasa kosong?</em> → dashboard hanya menghitung sasaran yang <strong>Aktif</strong>, dan SKM/temuan yang sudah dimasukkan. Lengkapi datanya di bagian-bagian sebelumnya.</p>
+<hr>
+<h2 id="9-glosarium">9. Glosarium Istilah Mutu<a class="anchor" href="#9-glosarium" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Istilah</th>
+<th>Artinya (bahasa sehari-hari)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>SPMI</strong></td>
+<td>Sistem Penjaminan Mutu Internal — cara pesantren menjaga & meningkatkan mutunya sendiri secara terencana: tetapkan target, periksa, perbaiki, ulangi.</td>
+</tr>
+<tr>
+<td><strong>Sasaran / KPI</strong></td>
+<td>Indikator terukur yang ingin dicapai (target). KPI = <em>Key Performance Indicator</em>, indikator kinerja utama.</td>
+</tr>
+<tr>
+<td><strong>Temuan (Non-Conformance)</strong></td>
+<td>Catatan ketidaksesuaian/masalah yang ditemukan — sesuatu yang belum sesuai standar dan perlu diperbaiki.</td>
+</tr>
+<tr>
+<td><strong>Severity</strong></td>
+<td>Tingkat keseriusan temuan: <strong>Minor</strong> (ringan), <strong>Major</strong> (sedang/berarti), <strong>Kritis</strong> (berat). Menentukan seberapa serius penanganannya.</td>
+</tr>
+<tr>
+<td><strong>Tindakan korektif</strong></td>
+<td>Langkah perbaikan yang diambil untuk menutaskan sebuah temuan.</td>
+</tr>
+<tr>
+<td><strong>SKM</strong></td>
+<td>Survei Kepuasan Masyarakat — pengukuran tingkat kepuasan wali/masyarakat terhadap layanan, dalam skor 1–5.</td>
+</tr>
+<tr>
+<td><strong>Inspeksi / Audit</strong></td>
+<td>Kegiatan pemeriksaan mutu terencana yang biasanya menghasilkan satu atau beberapa temuan.</td>
+</tr>
+<tr>
+<td><strong>Dosir Mutu</strong></td>
+<td>Berkas/arsip dokumen mutu (SOP, SK, MoU, rubrik, hasil SKM) beserta status persetujuannya.</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="contekan-cepat-mutu">Contekan Cepat Mutu<a class="anchor" href="#contekan-cepat-mutu" aria-hidden="true">#</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mau apa?</th>
+<th>Buka di mana?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tambah sasaran / KPI</td>
+<td>Mutu → Sasaran Mutu (KPI) → + Tambah</td>
+</tr>
+<tr>
+<td>Perbarui angka capaian</td>
+<td>Mutu → Sasaran Mutu (KPI) → Catat Realisasi</td>
+</tr>
+<tr>
+<td>Catat masalah/temuan</td>
+<td>Mutu → Temuan (Non-Conformance) → + Tambah</td>
+</tr>
+<tr>
+<td>Tindak lanjut temuan</td>
+<td>Mutu → Temuan → Mulai Tindakan → Ajukan Verifikasi → Tutup</td>
+</tr>
+<tr>
+<td>Catat inspeksi/audit</td>
+<td>Mutu → Inspeksi / Audit Mutu → + Tambah</td>
+</tr>
+<tr>
+<td>Masukkan survei kepuasan</td>
+<td>Mutu → Survei Kepuasan (SKM) → + Tambah</td>
+</tr>
+<tr>
+<td>Kelola dokumen mutu</td>
+<td>Mutu → Dosir Mutu (SYAMIL)</td>
+</tr>
+<tr>
+<td>Lihat ringkasan mutu</td>
+<td>Mutu → Dashboard Mutu</td>
+</tr>
+</tbody></table>
+
+    </article>
+    <div class="pager">
+      <a class="pager-link prev" href="../kepegawaian/"><span>‹ Sebelumnya</span><b>Kepegawaian / SDM</b></a>
+      <a class="pager-link next" href="../pimpinan/"><span>Berikutnya ›</span><b>Pimpinan</b></a>
+    </div>
+    <footer class="page-foot">🙋 Masih bingung? Foto layar Bapak/Ibu, lalu kirim ke admin lewat WA. Bertanya tidak merepotkan.</footer>
+  </main>
+  <aside class="toc"><div class="toc-title">Di halaman ini</div><a href="#1-mengisi-sasaran-kpi">1. Mengisi Sasaran / KPI</a><a href="#2-mencatat-realisasi">2. Mencatat Realisasi</a><a href="#3-mencatat-temuan">3. Mencatat Temuan</a><a href="#4-siklus-temuan">4. Siklus Temuan (Tutup)</a><a href="#5-inspeksi-audit">5. Inspeksi / Audit</a><a href="#6-survei-kepuasan-skm">6. Survei Kepuasan (SKM)</a><a href="#7-dosir-mutu">7. Dosir / Dokumen Mutu</a><a href="#8-membaca-dashboard">8. Membaca Dashboard KPI</a><a href="#9-glosarium">9. Glosarium</a><a href="#contekan-cepat-mutu">Contekan Cepat Mutu</a></aside>
+</div>
+<script src="../assets/search-index.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

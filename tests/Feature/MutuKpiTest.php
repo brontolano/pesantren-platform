@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use InvalidArgumentException;
 use Modules\Core\Exceptions\PersetujuanBelumLengkapException;
 use Modules\Core\Models\ApprovalRule;
+use Modules\Core\Services\ApprovalService;
 use Modules\Mutu\Models\MutuSasaran;
 use Modules\Mutu\Models\MutuTemuan;
 use Modules\Mutu\Services\MutuKpiService;
@@ -142,7 +144,7 @@ class MutuKpiTest extends TestCase
         $this->assertNotNull($req, 'ajukanVerifikasi harus membuat permintaan persetujuan.');
 
         // Penyetuju menyetujui via engine F1.
-        app(\Modules\Core\Services\ApprovalService::class)->setujui($req, $approver->id);
+        app(ApprovalService::class)->setujui($req, $approver->id);
 
         // Setelah disetujui, penutupan BERHASIL.
         $t = $svc->tutup($t->fresh(), $approver->id);
@@ -200,9 +202,9 @@ class MutuKpiTest extends TestCase
         tenancy()->end();
     }
 
-    private function user(): \App\Models\User
+    private function user(): User
     {
-        return \App\Models\User::withoutGlobalScopes()->create([
+        return User::withoutGlobalScopes()->create([
             'name' => 'U', 'email' => 'u'.str()->random(5).'@'.tenant('id').'.localhost',
             'password' => 'password', 'tenant_id' => tenant('id'),
         ]);

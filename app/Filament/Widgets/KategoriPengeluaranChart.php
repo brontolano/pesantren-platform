@@ -16,6 +16,11 @@ class KategoriPengeluaranChart extends ChartWidget
 
     protected ?string $description = 'Modul pengeluaran belum aktif';
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->can('view_laporan_keuangan') ?? false;
+    }
+
     protected static ?int $sort = -5;
 
     protected int|string|array $columnSpan = 2;

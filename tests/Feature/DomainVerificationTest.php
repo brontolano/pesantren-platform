@@ -2,8 +2,11 @@
 
 namespace Tests\Feature;
 
-use Stancl\Tenancy\Database\Models\Domain;
+use App\Models\Tenant;
 use App\Services\DomainVerificationService;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
+use Stancl\Tenancy\Database\Models\Domain;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -16,8 +19,8 @@ class DomainVerificationTest extends TestCase
     {
         parent::setUp();
         $this->ensurePpdbTestingSchemaReady(['tenants', 'domains', 'users']);
-        if (! \Illuminate\Support\Facades\Schema::connection('pgsql')->hasColumn('domains', 'verification_token')) {
-            \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--force' => true]);
+        if (! Schema::connection('pgsql')->hasColumn('domains', 'verification_token')) {
+            Artisan::call('migrate:fresh', ['--force' => true]);
         }
         $this->truncatePpdbTables(['domains', 'tenants']);
     }
@@ -27,9 +30,7 @@ class DomainVerificationTest extends TestCase
     {
         return new class($txt, $wellKnown) extends DomainVerificationService
         {
-            public function __construct(private array $txt, private ?string $wk)
-            {
-            }
+            public function __construct(private array $txt, private ?string $wk) {}
 
             protected function txtRecords(string $domain): array
             {
@@ -79,7 +80,7 @@ class DomainVerificationTest extends TestCase
         $this->assertNotNull($domain->fresh()->verified_at);
 
         // Fallback .well-known utk domain kedua.
-        $tenant = \App\Models\Tenant::find($domain->tenant_id);
+        $tenant = Tenant::find($domain->tenant_id);
         $d2 = $tenant->domains()->firstOrCreate(['domain' => 'kedua.sch.id']);
         $token2 = $this->svc()->issueToken($d2);
         $ok2 = $this->svc(wellKnown: "  {$token2}\n")->verify($d2->fresh());

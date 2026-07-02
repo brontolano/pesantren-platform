@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
+use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\SkemaBiaya;
 use Modules\Keuangan\Services\SkemaBiayaService;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Ledger\Database\Seeders\LedgerSeeder;
 use Modules\Ledger\Models\DivisiUnit;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
