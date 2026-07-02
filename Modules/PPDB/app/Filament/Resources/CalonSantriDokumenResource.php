@@ -9,6 +9,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -17,6 +18,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Joaopaulolndev\FilamentPdfViewer\Infolists\Components\PdfViewerEntry;
 use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\CreateCalonSantriDokumen;
 use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\EditCalonSantriDokumen;
 use Modules\PPDB\Filament\Resources\CalonSantriDokumen\Pages\ListCalonSantriDokumen;
@@ -117,6 +119,9 @@ class CalonSantriDokumenResource extends Resource
             ])
             ->defaultSort('id')
             ->actions([
+                // Preview in-panel: dokumen PDF tampil di PDF viewer, gambar
+                // (jpg/png ijazah scan) tampil sebagai ImageEntry, dalam modal.
+                // Dokumen tipe lain (belum bisa di-preview) tetap unduh tab baru.
                 Action::make('lihatFile')
                     ->label('Lihat')
                     ->icon('heroicon-o-eye')
@@ -124,7 +129,22 @@ class CalonSantriDokumenResource extends Resource
                     // bisa dibuka peran berhak (pimpinan/super admin).
                     ->visible(fn (CalonSantriDokumen $record): bool => $record->file_url !== null
                         && static::fotoCalonBolehDilihat($record))
-                    ->url(fn (CalonSantriDokumen $record): string => route('ppdb.file.dokumen', $record), shouldOpenInNewTab: true),
+                    // Dokumen tak-terpreview (bukan pdf/gambar) → unduh tab baru
+                    // memakai route yang sama (auth + gerbang privasi utuh).
+                    ->url(
+                        fn (CalonSantriDokumen $record): ?string => static::dokumenDapatDipreview($record)
+                            ? null
+                            : route('ppdb.file.dokumen', $record),
+                        shouldOpenInNewTab: true,
+                    )
+                    ->modalHeading(fn (CalonSantriDokumen $record): string => 'Pratinjau: '.PpdbDocumentTypes::label($record->jenis_dokumen))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalWidth('4xl')
+                    // Modal hanya untuk dokumen yang bisa dipreview in-panel.
+                    ->schema(fn (CalonSantriDokumen $record): array => static::dokumenDapatDipreview($record)
+                        ? [static::previewEntryUntuk($record)]
+                        : []),
                 Action::make('verifikasi')
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-circle')
@@ -194,6 +214,63 @@ class CalonSantriDokumenResource extends Resource
         }
 
         return $record->calonSantri?->fotoDapatDilihat() ?? true;
+    }
+
+    /** Ekstensi file (lowercase) dari path/URL dokumen. */
+    protected static function ekstensiDokumen(CalonSantriDokumen $record): string
+    {
+        $path = (string) parse_url((string) $record->file_url, PHP_URL_PATH);
+        if ($path === '') {
+            $path = (string) $record->file_url;
+        }
+
+        return strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    }
+
+    protected static function dokumenPdf(CalonSantriDokumen $record): bool
+    {
+        return static::ekstensiDokumen($record) === 'pdf';
+    }
+
+    protected static function dokumenGambar(CalonSantriDokumen $record): bool
+    {
+        return in_array(static::ekstensiDokumen($record), ['jpg', 'jpeg', 'png', 'webp', 'gif'], true);
+    }
+
+    /** Dokumen bisa dipreview in-panel bila PDF atau gambar. */
+    protected static function dokumenDapatDipreview(CalonSantriDokumen $record): bool
+    {
+        return static::dokumenPdf($record) || static::dokumenGambar($record);
+    }
+
+    /**
+     * URL serve inline (bukan unduh) via PpdbFileController — auth + gerbang
+     * privasi #340 tetap berlaku; path/disk tidak pernah bocor ke klien.
+     */
+    protected static function urlPreview(CalonSantriDokumen $record): string
+    {
+        return route('ppdb.file.dokumen', ['dokumen' => $record, 'inline' => 1]);
+    }
+
+    /**
+     * Komponen preview sesuai tipe: PDF → PdfViewerEntry (iframe in-panel),
+     * gambar → ImageEntry. Keduanya menunjuk ke URL inline yang tergerbang.
+     */
+    protected static function previewEntryUntuk(CalonSantriDokumen $record)
+    {
+        if (static::dokumenPdf($record)) {
+            return PdfViewerEntry::make('preview_pdf')
+                ->hiddenLabel()
+                ->fileUrl(static::urlPreview($record))
+                ->minHeight('70svh')
+                ->columnSpanFull();
+        }
+
+        return ImageEntry::make('preview_gambar')
+            ->hiddenLabel()
+            ->state(static::urlPreview($record))
+            ->imageHeight('60svh')
+            ->columnSpanFull();
     }
 
     public static function getEloquentQuery(): Builder
