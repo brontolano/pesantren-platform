@@ -20,6 +20,9 @@
         <p><strong>Nama:</strong> {{ $rapor->santri->nama }}</p>
         <p><strong>NIS:</strong> {{ $rapor->santri->nis }}</p>
         <p><strong>Kelas:</strong> {{ $rapor->santri->kelas->nama_kelas ?? '-' }}</p>
+        @if ($rapor->santri->kelas?->label_kesetaraan)
+            <p><strong>Jenjang Kesetaraan:</strong> {{ $rapor->santri->kelas->label_kesetaraan }}</p>
+        @endif
         <p><strong>Periode:</strong> {{ $periode?->nama ?? '-' }} ({{ $periode?->tahun_akademik ?? '-' }})</p>
     </div>
 

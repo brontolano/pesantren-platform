@@ -27,6 +27,7 @@ class EmisExportService
     public const HEADER = [
         'NISN', 'NIS', 'NAMA', 'JENIS_KELAMIN', 'TAHUN_ANGKATAN', 'STATUS_SANTRI', 'STATUS_SPP', 'TUNGGAKAN',
         'NIK', 'TEMPAT_LAHIR', 'TANGGAL_LAHIR', 'ALAMAT', 'MUKIM',
+        'JENJANG_KESETARAAN', 'TINGKAT_KESETARAAN',
     ];
 
     public const HEADER_PEGAWAI = [
@@ -63,7 +64,7 @@ class EmisExportService
      */
     public function barisSantri(): array
     {
-        return Santri::query()->orderBy('nama')->get()->map(function (Santri $s) {
+        return Santri::query()->with('kelas')->orderBy('nama')->get()->map(function (Santri $s) {
             $tunggakan = Tagihan::where('santri_id', $s->id)->belumLunas()->get()
                 ->sum(fn (Tagihan $t) => $t->sisa_tagihan);
 
@@ -81,6 +82,9 @@ class EmisExportService
                 $s->tanggal_lahir?->format('Y-m-d') ?? '',
                 $s->alamat ?? '',
                 $s->is_mukim === null ? '' : ($s->is_mukim ? 'MUKIM' : 'NON-MUKIM'),
+                // #338: jenjang formal kesetaraan diturunkan dari kelas aktif santri
+                strtoupper((string) ($s->jenjang_kesetaraan ?? '')),
+                $s->tingkat_kesetaraan !== null ? (string) $s->tingkat_kesetaraan : '',
             ];
         })->all();
     }
