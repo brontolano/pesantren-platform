@@ -61,6 +61,7 @@ use Modules\Akademik\Filament\Pages\SidangKenaikan;
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
 use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
+use Modules\Akademik\Filament\Resources\NgajiSesi\NgajiSesiResource;
 use Modules\Akademik\Filament\Resources\KomponenNilai\KomponenNilaiResource;
 use Modules\Akademik\Filament\Resources\Kurikulum\KurikulumResource;
 use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
@@ -73,6 +74,7 @@ use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
 use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
 use Modules\Akademik\Filament\Resources\RaporDiniyah\RaporDiniyahResource;
 use Modules\Akademik\Filament\Resources\Rubrik\RubrikKriteriaResource;
+use Modules\Akademik\Filament\Resources\SetoranSorogan\SetoranSoroganResource;
 use Modules\Akademik\Filament\Resources\SesiUjianAkademik\SesiUjianAkademikResource;
 use Modules\Asrama\Filament\Resources\BiayaAsrama\BiayaAsramaResource;
 use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
@@ -296,6 +298,7 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Nilai & Rapor')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Nilai & Rapor')),
                 NavigationGroup::make('Ujian Online')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Ujian Online')),
                 NavigationGroup::make('Tahfidz')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Tahfidz')),
+                NavigationGroup::make('Ngaji Kitab')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Ngaji Kitab')),
                 NavigationGroup::make('Master Akademik')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Master Akademik')),
                 // ── Blok PPDB ──
                 NavigationGroup::make('Pendaftaran')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pendaftaran')),
@@ -430,8 +433,8 @@ class TenantPanelProvider extends PanelProvider
     private const NAV_PRIMER_PER_PERAN = [
         // Label WAJIB persis sama dgn navigationGroups([...]) di atas.
         'guru' => ['Pembelajaran', 'Nilai & Rapor', 'Santri'],
-        'asatidz' => ['Pembelajaran', 'Nilai & Rapor', 'Tahfidz'],
-        'guru_tahfidz' => ['Tahfidz'],
+        'asatidz' => ['Pembelajaran', 'Nilai & Rapor', 'Tahfidz', 'Ngaji Kitab'],
+        'guru_tahfidz' => ['Tahfidz', 'Ngaji Kitab'],
         'bendahara' => ['Tagihan Santri', 'Tabungan Santri'],
         'kasir' => ['Kasir Kantin', 'Tagihan Santri', 'Stok Barang'],
         'kepala_keuangan' => ['Buku Besar', 'Laporan Keuangan', 'Anggaran & Perencanaan', 'Laporan'],
@@ -571,6 +574,9 @@ class TenantPanelProvider extends PanelProvider
             // F0-PWA Guru: halaqah + kitab
             HalaqahResource::class,
             KitabResource::class,
+            // Issue #330 — Sorogan & Ngaji Kitab
+            SetoranSoroganResource::class,
+            NgajiSesiResource::class,
             TahfidzTargetResource::class,
             PenilaianTahfidzResource::class,
             // WP-11 — munaqasyah + daftar wisuda
