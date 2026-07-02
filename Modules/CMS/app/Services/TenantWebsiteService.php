@@ -3,6 +3,7 @@
 namespace Modules\CMS\Services;
 
 use App\Models\Setting;
+use App\Support\TenantCustomizationRegistry;
 use Illuminate\Support\Str;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Models\Gallery;
@@ -38,6 +39,9 @@ class TenantWebsiteService
         );
 
         $logoUrl = $this->resolveAssetUrl(Setting::getTenantStringValue('branding_logo', null));
+        // OG image landing: pakai gambar SEO khusus bila di-set editor, jika tidak
+        // jatuh ke logo brand tenant (biar kartu share WA/FB tetap ada gambar).
+        $ogImageUrl = $this->resolveAssetUrl($seo['image_url'] ?? null) ?? $logoUrl;
         // Favicon kini bisa berupa path file (kunci 'favicon_path') ATAU URL lama
         // (kunci 'text'). resolveAssetUrl meneruskan URL absolut apa adanya dan
         // mengubah path relatif → /_tenant-storage/{path} (kompat-mundur).
@@ -66,22 +70,25 @@ class TenantWebsiteService
                 'description' => $description,
                 'canonicalUrl' => $canonicalUrl,
                 'siteName' => $brandingName,
-                'imageUrl' => $seo['image_url'] ?? null,
+                'imageUrl' => $ogImageUrl,
                 'robots' => $seo['robots'] ?? 'index,follow',
                 'sitemapUrl' => url('/sitemap.xml'),
-                'schema' => [
+                'schema' => array_filter([
                     '@context' => 'https://schema.org',
                     '@type' => 'EducationalOrganization',
                     'name' => $brandingName,
                     'description' => $description,
                     'url' => $canonicalUrl,
+                    // Logo brand → dipakai Google Knowledge Panel & kartu share.
+                    'logo' => $logoUrl,
+                    'image' => $ogImageUrl,
                     'telephone' => $contact['phone'] ?? null,
                     'email' => $contact['email'] ?? null,
-                    'address' => [
+                    'address' => array_filter([
                         '@type' => 'PostalAddress',
                         'streetAddress' => $contact['address'] ?? null,
-                    ],
-                ],
+                    ], fn ($v) => $v !== null && $v !== ''),
+                ], fn ($v) => $v !== null && $v !== '' && $v !== []),
             ],
             'admission' => $this->buildAdmissionPayload($isAlbaKids),
             'sections' => $this->resolveSections($brandingName, $brandingTagline),
@@ -92,36 +99,55 @@ class TenantWebsiteService
     {
         $website = $this->buildLandingPagePayload();
         $canonicalUrl = url('/artikel/'.$article->slug);
+
+        // SEO Pro: relasi `seo` (seo_meta) diisi editor via panel = PALING spesifik.
+        // Rantai HORMAT nilai manual — plugin sbagai augment/fallback, BUKAN override:
+        //   judul     : seo.title       → meta_title (lama) → judul artikel
+        //   deskripsi : seo.description  → meta_description  → excerpt → deskripsi situs
+        //   gambar OG : seo.og_image    → featured_image     → OG situs (logo)
+        // Guard method_exists: bila trait/relasi belum ada (DB tenant lama belum
+        // migrasi seo_meta), tetap jalan tanpa 500.
+        $seoMeta = method_exists($article, 'seo') ? $article->seo : null;
+
         $title = $this->resolveSeoTitle(
-            $article->meta_title ?: $article->title,
+            ($seoMeta?->title ?: null) ?: ($article->meta_title ?: $article->title),
             $website['branding']['name']
         );
         $description = $this->resolveSeoDescription(
-            $article->meta_description ?: $article->excerpt,
+            ($seoMeta?->description ?: null) ?: ($article->meta_description ?: $article->excerpt),
             $website['seo']['description']
         );
+
+        $ogImage = $this->resolveAssetUrl($seoMeta?->og_image ?: null)
+            ?? $this->resolveAssetUrl($article->featured_image_url ?: null)
+            ?? $website['seo']['imageUrl'];
+
+        $robots = $seoMeta?->robots ?: 'index,follow';
+        $schemaType = $seoMeta?->schema_type ?: 'BlogPosting';
+        $canonical = $seoMeta?->canonical_url ?: $canonicalUrl;
 
         return [
             'title' => $title,
             'description' => $description,
-            'canonicalUrl' => $canonicalUrl,
+            'canonicalUrl' => $canonical,
             'siteName' => $website['branding']['name'],
-            'imageUrl' => $article->featured_image_url ?: $website['seo']['imageUrl'],
-            'robots' => 'index,follow',
-            'schema' => [
+            'imageUrl' => $ogImage,
+            'robots' => $robots,
+            'schema' => array_filter([
                 '@context' => 'https://schema.org',
-                '@type' => 'BlogPosting',
+                '@type' => $schemaType,
                 'headline' => $article->title,
                 'description' => $description,
-                'url' => $canonicalUrl,
+                'url' => $canonical,
                 'datePublished' => optional($article->published_at)?->toIso8601String(),
                 'dateModified' => optional($article->updated_at)?->toIso8601String(),
-                'image' => $article->featured_image_url ? [$article->featured_image_url] : [],
-                'publisher' => [
+                'image' => $ogImage ? [$ogImage] : [],
+                'publisher' => array_filter([
                     '@type' => 'Organization',
                     'name' => $website['branding']['name'],
-                ],
-            ],
+                    'logo' => $website['branding']['logoUrl'] ?? null,
+                ], fn ($v) => $v !== null && $v !== ''),
+            ], fn ($v) => $v !== null && $v !== '' && $v !== []),
         ];
     }
 
@@ -641,6 +667,6 @@ class TenantWebsiteService
      */
     protected function isAlbaKidsTenant(): bool
     {
-        return \App\Support\TenantCustomizationRegistry::stringValue('website_defaults') === 'albakids';
+        return TenantCustomizationRegistry::stringValue('website_defaults') === 'albakids';
     }
 }

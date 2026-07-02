@@ -30,6 +30,7 @@ use Modules\CMS\Filament\Resources\Article\Pages\EditArticle;
 use Modules\CMS\Filament\Resources\Article\Pages\ListArticles;
 use Modules\CMS\Filament\RichContent\VideoKajianBlock;
 use Modules\CMS\Models\Article;
+use Nomanur\FilamentSeoPro\Forms\SeoSection;
 
 class ArticleResource extends Resource
 {
@@ -181,8 +182,9 @@ class ArticleResource extends Resource
                                     ->maxSize(2048)
                                     ->helperText('Maks 2MB. Rasio 16:9 direkomendasikan.'),
                             ]),
-                        Section::make('SEO (Opsional)')
+                        Section::make('SEO Ringkas')
                             ->icon('heroicon-o-magnifying-glass')
+                            ->description('Isi cepat. Kosong = otomatis dari judul & ringkasan. Untuk kontrol penuh (Open Graph, Twitter, schema) buka panel "SEO Lanjutan" di bawah.')
                             ->collapsed()
                             ->schema([
                                 TextInput::make('meta_title')
@@ -197,6 +199,18 @@ class ArticleResource extends Resource
                             ]),
                     ])->columnSpan(['default' => 1, 'lg' => 1]),
                 ]),
+
+            // ── SEO LANJUTAN (SEO Pro) — lebar penuh di bawah grid ──
+            // Menulis ke relasi polimorfik `seo` (tabel seo_meta): Open Graph,
+            // Twitter Card, schema.org, canonical, robots, focus keyword + skor
+            // & pratinjau Google live. Field analisis dipetakan ke kolom Article.
+            // Nilai di sini DIPRIORITASKAN saat render publik; kolom meta_* lama
+            // jadi fallback (lihat TenantWebsiteService::buildArticleSeoPayload).
+            SeoSection::make('SEO Lanjutan')
+                ->titleField('title')
+                ->slugField('slug')
+                ->contentField('content')
+                ->columnSpanFull(),
         ]);
     }
 

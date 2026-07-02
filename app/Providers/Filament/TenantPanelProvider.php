@@ -61,10 +61,10 @@ use Modules\Akademik\Filament\Pages\SidangKenaikan;
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use Modules\Akademik\Filament\Resources\KalenderAkademik\KalenderAkademikResource;
 use Modules\Akademik\Filament\Resources\Kitab\KitabResource;
-use Modules\Akademik\Filament\Resources\NgajiSesi\NgajiSesiResource;
 use Modules\Akademik\Filament\Resources\KomponenNilai\KomponenNilaiResource;
 use Modules\Akademik\Filament\Resources\Kurikulum\KurikulumResource;
 use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
+use Modules\Akademik\Filament\Resources\NgajiSesi\NgajiSesiResource;
 use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
 use Modules\Akademik\Filament\Resources\PaketSoalAkademik\PaketSoalAkademikResource;
 use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
@@ -74,8 +74,8 @@ use Modules\Akademik\Filament\Resources\Program\ProgramStudiResource;
 use Modules\Akademik\Filament\Resources\Rapor\RaporResource;
 use Modules\Akademik\Filament\Resources\RaporDiniyah\RaporDiniyahResource;
 use Modules\Akademik\Filament\Resources\Rubrik\RubrikKriteriaResource;
-use Modules\Akademik\Filament\Resources\SetoranSorogan\SetoranSoroganResource;
 use Modules\Akademik\Filament\Resources\SesiUjianAkademik\SesiUjianAkademikResource;
+use Modules\Akademik\Filament\Resources\SetoranSorogan\SetoranSoroganResource;
 use Modules\Asrama\Filament\Resources\BiayaAsrama\BiayaAsramaResource;
 use Modules\Asrama\Filament\Resources\BlokAsrama\BlokAsramaResource;
 use Modules\Asrama\Filament\Resources\KamarAsrama\KamarAsramaResource;
@@ -119,10 +119,10 @@ use Modules\Keuangan\Filament\Resources\Pos\PosProfil\PosProfilResource;
 use Modules\Keuangan\Filament\Resources\Rekonsiliasi\BankStatementResource;
 use Modules\Keuangan\Filament\Resources\SetorKeliling\SetorKelilingResource;
 use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
-use Modules\Keuangan\Filament\Resources\TagihanRutin\TagihanRutinResource;
 use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
 use Modules\Keuangan\Filament\Resources\TabunganTopup\TabunganTopupResource;
 use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
+use Modules\Keuangan\Filament\Resources\TagihanRutin\TagihanRutinResource;
 use Modules\Ledger\Filament\Resources\AkunResource;
 use Modules\Ledger\Filament\Resources\AlokasiBiaya\AlokasiBiayaResource;
 use Modules\Ledger\Filament\Resources\AnggaranResource;
@@ -179,6 +179,7 @@ use Modules\Tahfidz\Filament\Resources\Munaqasyah\MunaqasyahResource;
 use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource;
 use Modules\Tahfidz\Filament\Resources\SimaAnResource;
 use Modules\Tahfidz\Filament\Resources\TahfidzTarget\TahfidzTargetResource;
+use Nomanur\FilamentSeoPro\SeoPlugin;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -381,6 +382,21 @@ class TenantPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Emerald,
                 'gray' => Color::Slate,
+            ])
+            // SEO Pro (nomanur/filament-seo-pro): hanya komponen FORM (SeoSection
+            // di ArticleResource) yang dipakai. Halaman "SEO Management" & widget
+            // dashboard SENGAJA dimatikan agar:
+            //  (1) tidak menambah grup nav 'SEO' tak-terdaftar (grup asing =
+            //      risiko tampil ganjil / 500-trap ikon-grup Filament v5.6.6),
+            //  (2) panel ringkas albakids tetap bersih (PPDB+WA saja).
+            // Field mapping default diselaraskan dgn Article (title/slug/content).
+            ->plugins([
+                SeoPlugin::make()
+                    ->enableManagementPage(false)
+                    ->enableDashboardWidget(false)
+                    ->defaultTitleField('title')
+                    ->defaultSlugField('slug')
+                    ->defaultContentField('content'),
             ])
             ->middleware([
                 // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user
