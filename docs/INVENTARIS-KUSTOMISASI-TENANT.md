@@ -18,9 +18,9 @@ asy-syifaa. Total **±40 titik kustomisasi** di 8 kategori:
 | Panel Filament (resources/pages/widgets/nav) | 3 blok besar | ✅ **SELESAI tahap 3** — profil panel via registry (`panel_profile` = `default`\|`albakids_ringkas`) |
 | Label & gating resource Filament (PPDB, Notifikasi) | ~25 pemanggilan di 4 resource | ✅ **SELESAI tahap 2** — semua via registry (`feature`/`label`/`stringValue`/`value`) |
 | Tema panel (PanelTheme) | 1 | ✅ **SELESAI tahap 3** — default tema via registry (`panel_theme_default`) |
-| Guard Pixio body-class di blade | 6 blade | belum — JANGAN disentuh dulu (keputusan sprint Pixio) |
+| Guard Pixio body-class di blade | 6 blade | ✅ **SELESAI tahap 4** — kelas body dari registry (`body_class`), blade tidak cek slug tenant |
 | Perilaku login/launcher | 3 | ✅ **SELESAI tahap 3** — `guest_home` + `login_variant` via registry |
-| Default konten asy-syifaa (AppShell/Branding) | 2 file | sudah overridable via Setting; default saja yang hardcoded |
+| Default konten asy-syifaa (AppShell/Branding) | 2 file | ✅ **SELESAI tahap 4** — default satu sumber di registry (`app_content_links`); Setting per-key tetap menang |
 | Data/tipe hardcoded (`pendaftaran_albakids`, template `albakids_%`) | 4 | belum; butuh migrasi data hati-hati |
 
 `app/Console/Commands/*` (importer per-tenant) dan komentar/dokumentasi TIDAK
@@ -45,16 +45,16 @@ Risiko: L (kosmetik), M (fitur tenant salah tampil), H (perilaku/uang/keamanan).
 | 10 | `Modules/PPDB/app/Services/AlbaKidsRegistrationNotificationService.php` | perilaku | Service notif WA khusus, kode template `albakids_*` | M | interface `RegistrationNotifier` + binding per registry |
 | 11 | `Modules/Notifikasi/.../BroadcastWaResource.php:67,146-179` | panel+nav+data | Filter template `albakids_%`, label & grup nav custom | M | ✅ **SELESAI tahap 2** → `stringValue('notif_template_prefix')` + `label('notifikasi.broadcast_wa.*')` |
 | 12 | `Modules/Notifikasi/.../TemplateNotifikasiResource.php:141-165` | panel+nav+data | idem #11 | M | ✅ **SELESAI tahap 2** → `stringValue('notif_template_prefix')` + `label('notifikasi.template.*')` |
-| 13 | `resources/views/tenant/login.blade.php:51-73` | tema | Guard Pixio: `body.tenant-albakids` pulihkan gaya tombol asli | L | **JANGAN sentuh dulu** — catat saja; nanti kelas body dari registry (`body_class`) |
-| 14 | `resources/views/tenant/ppdb-form.blade.php:16-61` | tema | Guard Pixio body-class + variabel warna forest asli | L | idem #13 |
-| 15 | `resources/views/tenant/donasi/index.blade.php:9,23` | tema | Guard Pixio body-class | L | idem #13 |
-| 16 | `resources/views/tenant/hapus-akun.blade.php:10,26` | tema | Guard Pixio body-class | L | idem #13 |
-| 17 | `resources/views/tenant/kebijakan-privasi.blade.php:9,19` | tema | Guard Pixio body-class | L | idem #13 |
-| 18 | `resources/views/tenant/suspended.blade.php:62-68` | tema | Guard Pixio body-class | L | idem #13 |
+| 13 | `resources/views/tenant/login.blade.php:51-73` | tema | Guard Pixio: `body.tenant-albakids` pulihkan gaya tombol asli | L | ✅ **SELESAI tahap 4** → registry `body_class`; kelas `tenant-albakids` dipertahankan utk kompat CSS |
+| 14 | `resources/views/tenant/ppdb-form.blade.php:16-61` | tema | Guard Pixio body-class + variabel warna forest asli | L | ✅ **SELESAI tahap 4** (idem #13; blok CSS `body.tenant-albakids` tetap) |
+| 15 | `resources/views/tenant/donasi/index.blade.php:9,23` | tema | Guard Pixio body-class | L | ✅ **SELESAI tahap 4** (idem #13; sekaligus FIX guard rusak `AppSupportAlbaKidsTenant` tanpa backslash) |
+| 16 | `resources/views/tenant/hapus-akun.blade.php:10,26` | tema | Guard Pixio body-class | L | ✅ **SELESAI tahap 4** (idem #13; sekaligus FIX guard rusak `AppSupportAlbaKidsTenant` tanpa backslash) |
+| 17 | `resources/views/tenant/kebijakan-privasi.blade.php:9,19` | tema | Guard Pixio body-class | L | ✅ **SELESAI tahap 4** (idem #13; sekaligus FIX guard rusak `AppSupportAlbaKidsTenant` tanpa backslash) |
+| 18 | `resources/views/tenant/suspended.blade.php:62-68` | tema | Guard Pixio body-class | L | ✅ **SELESAI tahap 4** (idem #13) |
 | 19 | `resources/views/albakids/landing.blade.php` (seluruh file) | landing | Landing blade legacy penuh konten AlbaKids (rute lama) | L | arsip/hapus setelah dipastikan tak dirujuk rute |
 | 20 | `resources/js/Pages/CMS/AlbaKidsLanding.vue`, `AlbaKidsLandingV2.vue` | landing | Konten, SEO, URL `albakids.pesantren.online` hardcoded di komponen | L | wajar utk komponen custom; jangka panjang: props dari CMS |
-| 21 | `Modules/CMS/.../AppShellController.php:28-36,101` | landing | Default URL konten asy-syifaa (fallback bila Setting kosong) | L | pindahkan default ke seeder Setting per-tenant |
-| 22 | `app/Filament/Pages/PengaturanBranding.php:97-105` | panel | Default URL asy-syifaa yg sama (duplikat #21) | L | satu sumber default (registry/seeder) |
+| 21 | `Modules/CMS/.../AppShellController.php:28-36,101` | landing | Default URL konten asy-syifaa (fallback bila Setting kosong) | L | ✅ **SELESAI tahap 4** → registry `app_content_links` (satu sumber; Setting per-key tetap menang) |
+| 22 | `app/Filament/Pages/PengaturanBranding.php:97-105` | panel | Default URL asy-syifaa yg sama (duplikat #21) | L | ✅ **SELESAI tahap 4** → konstanta `APP_LINKS` dihapus, baca `TenantCustomizationRegistry::appContentLinks()` |
 | 23 | `app/Support/TenantBranding.php:18` | perilaku | Koordinat default = Asy-Syifaa Padalarang | L | default netral + seeder per-tenant |
 | 24 | `app/Support/AlbaKidsTenant.php` | (resolver) | Host + tenant key hardcoded | — | dipertahankan sementara; jangka panjang semua pemanggil pindah ke registry lalu kelas ini dihapus |
 | 25 | `Modules/AI/config/config.php:701` | perilaku | Placeholder default tenant AI (komentar; nilai kosong) | L | sudah config-driven, biarkan |
@@ -112,6 +112,41 @@ memiliki domain itu) dan menambah query per-request.
 - TIDAK disentuh: guard Pixio 6 blade, data hardcoded DB
   (`pendaftaran_albakids`, prefix `albakids_%`), default konten asy-syifaa,
   `AlbaKidsTenant` (masih dirujuk blade + TenantWebsiteService).
+
+## 2d. Catatan tahap 4 (Refs #343)
+
+- **Lapisan Setting per-tenant di registry**: `TenantCustomizationRegistry::value()`
+  kini resolve berlapis **Setting tenant (`customization.{key}`) > config
+  per-tenant > config default** — white-label per tenant TANPA deploy config.
+  Nilai Setting boleh mentah atau dibungkus `['value' => ...]`. Lookup dimemo
+  per-request (`$settingMemo`, 1 query per key; `flushSettingMemo()` utk test) —
+  aman karena runtime non-worker mereset statik tiap request. Defensif pola
+  `PanelTheme::resolve()`: tenancy belum siap / tabel settings belum ada →
+  fallback config tanpa melempar.
+- **Guard Pixio 6 blade (#13-18)**: cek `AlbaKidsTenant::isActive()` /
+  prop `$isAlbaKids` di `<body class=...>` diganti SATU sumber
+  `TenantCustomizationRegistry::bodyClass()` (kunci `body_class`; default `''`,
+  albakids `'tenant-albakids'`). Nilai kelas TETAP `tenant-albakids` untuk
+  kompat blok CSS `body.tenant-albakids` yang dipertahankan di blade —
+  keputusan kini dari registry, bukan slug tenant. Prop `isAlbaKids`
+  StaffLoginController dihapus (blade baca registry langsung).
+  **Bonus fix**: 3 blade (donasi, hapus-akun, kebijakan-privasi) ternyata
+  memanggil `AppSupportAlbaKidsTenant::isActive()` TANPA backslash (backslash
+  tertelan shell saat sprint Pixio b52b7f7) → render halaman itu fatal
+  "class not found"; kini benar via registry.
+- **Default konten asy-syifaa (#21/#22)**: konstanta duplikat
+  `AppShellController::DEFAULTS` + `PengaturanBranding::APP_LINKS` dihapus →
+  satu sumber `TenantCustomizationRegistry::appContentLinks()` (config
+  `app_content_links`). Perilaku identik: Setting per-key (mis.
+  `app_profil_pondok_url`) tetap menang; default hanya fallback.
+  #23 (koordinat TenantBranding) & #4 (default konten TenantWebsiteService)
+  sudah Setting-overridable — default netral menyusul (bukan hot path).
+- Guard: `tests/Feature/TenantCustomizationSettingOverrideTest.php` (resolve
+  berlapis, memo+flush, blade Pixio identik albakids vs lain, peta
+  `app_content_links` identik konstanta lama) + suite tahap 1-3 +
+  `TenantPanelAuthedSmokeTest`.
+- TIDAK disentuh (tahap 5): data DB produksi (`pendaftaran_albakids`, template
+  `albakids_%`) + penghapusan `AlbaKidsTenant`.
 
 ## 3. Desain mekanisme: `TenantCustomizationRegistry`
 

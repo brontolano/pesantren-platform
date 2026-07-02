@@ -7,7 +7,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Support\AppLauncher;
 use App\Support\TenantBranding;
-use App\Support\TenantCustomizationRegistry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,8 +46,9 @@ class StaffLoginController extends Controller
             'waliLoginUrl' => $this->routeOr('tenant.portal-wali.auth.login', '/wali/login'),
             'ppdbUrl' => $this->routeOr('spmb.login', '/spmb/login'),
             // Tenant custom (varian login 'albakids') DIPAGARI dari perubahan
-            // desain platform — via registry (tahap 3 #343), bukan cek tenant.
-            'isAlbaKids' => TenantCustomizationRegistry::stringValue('login_variant') === 'albakids',
+            // desain platform — blade kini membaca kelas body langsung dari
+            // registry (TenantCustomizationRegistry::bodyClass(), tahap 4 #343);
+            // prop isAlbaKids tidak diperlukan lagi.
         ]);
     }
 

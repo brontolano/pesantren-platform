@@ -36,7 +36,9 @@ return [
         'guest_home' => 'landing',
 
         // Varian form login bermerek ('default' = gaya platform/Pixio;
-        // 'albakids' = body class tenant-albakids → guard gaya asli).
+        // 'albakids' = gaya asli tenant custom). Sejak tahap 4, kelas body
+        // guard tema dibaca langsung dari 'body_class'; kunci ini disimpan
+        // untuk varian perilaku login lain ke depan.
         'login_variant' => 'default',
 
         // PPDB: alur custom (verifikasi pembayaran tanpa ujian/OTP/portal peserta).
@@ -57,6 +59,31 @@ return [
 
         // Peta override label Filament (kosong = pakai label default resource).
         'labels' => [],
+
+        // Kelas body halaman publik tenant (guard tema di blade; '' = tanpa
+        // kelas). Tenant custom pra-Pixio memakai 'tenant-albakids' agar blok
+        // CSS `body.tenant-albakids` (gaya asli) tetap aktif — nilai kelas
+        // dipertahankan untuk kompat CSS, keputusannya dari registry.
+        'body_class' => '',
+
+        // Default tautan konten Aplikasi (Beranda & Ibadah) — dipakai bila
+        // admin belum mengisi Setting per-key. Satu sumber untuk
+        // AppShellController + PengaturanBranding (dulu dua konstanta duplikat).
+        // Nilai default = tautan resmi asy-syifaa.com (tenant perdana).
+        'app_content_links' => [
+            'app_profil_pondok_url' => 'https://asy-syifaa.com/profil-pondok-pesantren',
+            'app_profil_abuya_url' => 'https://asy-syifaa.com/profil-abuya',
+            'app_profil_guru_url' => 'https://asy-syifaa.com/profil-guru',
+            'app_struktur_url' => 'https://asy-syifaa.com/struktur-organisasi',
+            'app_instagram_url' => 'https://www.instagram.com/ponpes.asysyifaa',
+            'app_instagram2_url' => 'https://www.instagram.com/asysyifaapusat/',
+            'app_instagram3_url' => 'https://www.instagram.com/syifaalawiyyahofficial/',
+            'app_youtube_url' => 'https://www.youtube.com/@AsySyifaaTVOfficial/videos',
+            'app_facebook_url' => 'https://www.facebook.com/AsySyifaaTV/live_videos',
+            'app_jadwal_kajian_url' => '',
+            'app_donasi_url' => '/donasi',
+            'app_zakat_wakaf_url' => '',
+        ],
     ],
 
     'tenants' => [
@@ -68,6 +95,7 @@ return [
             'panel_theme_default' => 'bawaan',
             'guest_home' => 'login',
             'login_variant' => 'albakids',
+            'body_class' => 'tenant-albakids',
 
             'ppdb_custom_flow' => true,
             'ppdb_program_options' => [

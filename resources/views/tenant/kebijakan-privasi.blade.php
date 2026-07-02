@@ -16,7 +16,7 @@
         footer { margin-top: 28px; font-size: .8rem; color: #78716c; }
     </style>
 </head>
-<body class="@if(AppSupportAlbaKidsTenant::isActive())tenant-albakids @endif">
+<body class="{{ \App\Support\TenantCustomizationRegistry::bodyClass() }}">
     <main>
         <h1>Kebijakan Privasi Sistem<br><span style="font-size:1rem;color:#57534e">{{ $nama }}</span></h1>
         <div class="kartu"><pre>{{ $isi }}</pre></div>
