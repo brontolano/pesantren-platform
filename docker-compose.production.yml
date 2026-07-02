@@ -37,6 +37,8 @@ services:
       - ./.env:/app/.env:ro
       - caddy_data:/data
       - caddy_config:/config
+      # Route tenant dedicated (T2 #342) — file include per tenant, reload tanpa rebuild
+      - ./caddy/tenants:/etc/caddy/tenants:ro
     depends_on:
       postgres:
         condition: service_healthy
