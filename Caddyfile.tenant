@@ -1,0 +1,22 @@
+# Caddyfile.tenant — konfigurasi FrankenPHP MINIMAL untuk container tenant dedicated (T2, issue #342).
+# Container tenant TIDAK menangani TLS/domain — Caddy di pool utama (pesantren-app)
+# tetap menjadi terminator TLS dan mem-proxy per-Host ke container ini via
+# caddy/tenants/*.caddy. Di sini cukup :80 + php_server.
+{
+	frankenphp
+	order php_server before file_server
+	auto_https off
+}
+
+:80 {
+	root * /app/public
+	encode zstd br gzip
+
+	# Pusat Panduan statis — sama seperti blok :80 pool (lihat Caddyfile utama).
+	@dokumentasi path /dokumentasi /dokumentasi/*
+	route @dokumentasi {
+		file_server
+	}
+
+	php_server
+}

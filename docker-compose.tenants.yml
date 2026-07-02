@@ -1,0 +1,39 @@
+# docker-compose.tenants.yml — container PHP dedicated per tenant (T2, issue #342).
+# PoC: tenant demo. Pakai IMAGE HASIL BUILD service `app` (kode identik) dengan
+# Caddyfile minimal :80 (Caddyfile.tenant) — TLS tetap di pool (pesantren-app).
+# Jalankan BERSAMA compose produksi:
+#   docker compose -f docker-compose.production.yml -f docker-compose.tenants.yml up -d app-demo
+# Scheduler/queue TIDAK dijalankan di container tenant (tetap 1 tempat: worker pool)
+# dan `tenants:migrate` hanya lewat deploy.sh (anti race, lihat blueprint §6).
+
+services:
+  app-demo:
+    image: pesantren-platform-app:latest
+    container_name: pesantren-app-demo
+    restart: unless-stopped
+    command: ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile.tenant"]
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost/up | grep -q . || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    labels:
+      - autoheal=true
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    env_file:
+      - .env
+    volumes:
+      - app_storage:/app/storage
+      - ./.env:/app/.env:ro
+      - ./Caddyfile.tenant:/etc/caddy/Caddyfile.tenant:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal

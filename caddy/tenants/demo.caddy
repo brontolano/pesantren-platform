@@ -1,0 +1,8 @@
+# PoC T2 (issue #342): tenant demo dilayani container dedicated pesantren-app-demo.
+# Host-match eksplisit menang atas catch-all :443 → tenant lain tak terpengaruh.
+# ROLLBACK: hapus file ini lalu `docker exec pesantren-app caddy reload --config /etc/caddy/Caddyfile`
+# (trafik demo kembali ke pool), lalu `docker rm -f pesantren-app-demo`.
+demo.pesantren.online {
+	encode zstd br gzip
+	reverse_proxy pesantren-app-demo:80
+}
