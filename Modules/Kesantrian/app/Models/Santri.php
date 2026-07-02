@@ -161,6 +161,21 @@ class Santri extends Model
             .urlencode($this->nama ?? 'Santri');
     }
 
+    /**
+     * URL foto yang AMAN ditampilkan ke pengguna saat ini:
+     * foto asli (via /_tenant-storage) bila boleh dilihat & ada,
+     * selain itu avatar inisial. Dipakai permukaan non-Filament
+     * (portal guru gerbang, loket pendaftaran, dsb).
+     */
+    public function urlFotoAman(): string
+    {
+        if ($this->photo_url && $this->fotoDapatDilihat()) {
+            return url('/_tenant-storage/'.ltrim($this->photo_url, '/'));
+        }
+
+        return $this->avatarInisialUrl();
+    }
+
     public function enrollments(): HasMany
     {
         return $this->hasMany(SantriEnrollment::class, 'santri_id');
