@@ -4,8 +4,72 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0f2aacf5904d1786d0025498197493c7",
+    "content-hash": "8687c5c513d482010f89a3abac1e9a5b",
     "packages": [
+        {
+            "name": "alkoumi/filament-n8n-chat",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/alkoumi/filament-n8n-chat.git",
+                "reference": "248009141dcded59a16c246d6f785aa933e3a64b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/alkoumi/filament-n8n-chat/zipball/248009141dcded59a16c246d6f785aa933e3a64b",
+                "reference": "248009141dcded59a16c246d6f785aa933e3a64b",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0 || ^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.16"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Alkoumi\\FilamentN8nChat\\FilamentN8nChatServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Alkoumi\\FilamentN8nChat\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mohamed alkoumi",
+                    "email": "mohammedelkoumi@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A seamless integration of n8n chat widget into your FilamentPHP applications",
+            "homepage": "https://github.com/alkoumi/filament-n8n-chat",
+            "keywords": [
+                "alkoumi",
+                "chat",
+                "chatbot",
+                "filament",
+                "laravel",
+                "n8n",
+                "widget"
+            ],
+            "support": {
+                "issues": "https://github.com/alkoumi/filament-n8n-chat/issues",
+                "source": "https://github.com/alkoumi/filament-n8n-chat"
+            },
+            "time": "2026-01-22T13:27:19+00:00"
+        },
         {
             "name": "aws/aws-crt-php",
             "version": "v1.2.7",
@@ -3631,6 +3695,72 @@
                 }
             ],
             "time": "2026-03-08T20:05:35+00:00"
+        },
+        {
+            "name": "leek/filament-right-click",
+            "version": "v1.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/leek/filament-right-click.git",
+                "reference": "21ff14c0a5c4ac426c6bbd292e8bdc449e7b7eaf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/leek/filament-right-click/zipball/21ff14c0a5c4ac426c6bbd292e8bdc449e7b7eaf",
+                "reference": "21ff14c0a5c4ac426c6bbd292e8bdc449e7b7eaf",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0 || ^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0 || ^10.0 || ^11.0",
+                "pestphp/pest": "^3.0 || ^4.0",
+                "pestphp/pest-plugin-laravel": "^3.0 || ^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Leek\\FilamentRightClick\\FilamentRightClickServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Leek\\FilamentRightClick\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Jones",
+                    "email": "leeked@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Right-click table row menus for Filament panels that trigger native Filament actions.",
+            "keywords": [
+                "actions",
+                "context-menu",
+                "filament",
+                "filamentphp",
+                "laravel",
+                "leek",
+                "right-click",
+                "tables"
+            ],
+            "support": {
+                "issues": "https://github.com/leek/filament-right-click/issues",
+                "source": "https://github.com/leek/filament-right-click"
+            },
+            "time": "2026-07-01T17:35:57+00:00"
         },
         {
             "name": "livewire/livewire",

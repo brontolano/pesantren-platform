@@ -55,6 +55,9 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Alkoumi\FilamentN8nChat\FilamentN8nChatPlugin;
+use App\Services\ModuleService;
+use Leek\FilamentRightClick\FilamentRightClickPlugin;
 use Modules\Akademik\Filament\Pages\GridNilai;
 use Modules\Akademik\Filament\Pages\RekapJurnalKbm;
 use Modules\Akademik\Filament\Pages\SidangKenaikan;
@@ -397,6 +400,43 @@ class TenantPanelProvider extends PanelProvider
                     ->defaultTitleField('title')
                     ->defaultSlugField('slug')
                     ->defaultContentField('content'),
+
+                // A5 — Menu klik-kanan tabel (leek/filament-right-click).
+                // Macro Table::contextMenuActions() dipanggil di resource inti
+                // (Santri/Tagihan/PelanggaranSantri) yang MEMAKAI ULANG action
+                // baris existing (nol logika/izin baru). Aset di-load-on-request
+                // (hanya saat tabel ber-context-menu dirender). Registrasi
+                // DILEWATI untuk profil 'albakids_ringkas' (surface PPDB+WA
+                // ringkas — hindari risiko/beban tak perlu di panel ringkas).
+                ...(! $ringkas ? [FilamentRightClickPlugin::make()] : []),
+
+                // A4 — Widget chat "Khadim Digital" (alkoumi/filament-n8n-chat).
+                // NONAKTIF secara default: 'enabled' closure = modul 'ai' aktif
+                // DAN flag ai.n8n_chat.enabled (default OFF) → widget TIDAK tampil
+                // sampai operator menyalakan flag pada tenant ber-modul AI.
+                // webhookUrl diarahkan ke endpoint INTERNAL /ai/khadim-chat yang
+                // BERMUARA ke AiGateway (audit+budget+policy) — bukan n8n/LLM
+                // eksternal (Aturan Emas #4). Dilewati untuk profil ringkas.
+                ...(! $ringkas ? [
+                    FilamentN8nChatPlugin::make()
+                        ->enabled(fn (): bool => self::widgetChatKhadimAktif())
+                        ->showOnGuest(false)
+                        ->webhookUrl(fn (): ?string => self::widgetChatKhadimAktif()
+                            ? url('/ai/khadim-chat')
+                            : null)
+                        ->config(fn (): array => [
+                            'defaultLanguage' => 'en',
+                            'i18n' => [
+                                'en' => [
+                                    'title' => 'Khadim Digital',
+                                    'subtitle' => 'Asisten AI pesantren',
+                                    'getStarted' => 'Mulai Percakapan',
+                                    'inputPlaceholder' => 'Tulis pertanyaan Anda...',
+                                    'footer' => '',
+                                ],
+                            ],
+                        ]),
+                ] : []),
             ])
             ->middleware([
                 // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user
@@ -498,6 +538,31 @@ class TenantPanelProvider extends PanelProvider
         }
 
         return false;
+    }
+
+    /**
+     * A4 — apakah widget chat Khadim (n8n-chat) boleh tampil untuk tenant ini?
+     * Syarat KUMULATIF: (1) tenancy aktif, (2) modul 'ai' terlihat untuk tenant
+     * (moduleVisible), (3) flag ai.n8n_chat.enabled ON. Default flag OFF →
+     * widget tidak tampil di mana pun sampai operator menyalakannya. Defensif:
+     * error apa pun → false (widget tersembunyi, fail-safe). Dievaluasi
+     * per-request (closure plugin) — konsisten dgn gerbang endpoint controller.
+     */
+    public static function widgetChatKhadimAktif(): bool
+    {
+        try {
+            if (! tenancy()->initialized) {
+                return false;
+            }
+
+            if (! (bool) config('ai.n8n_chat.enabled', false)) {
+                return false;
+            }
+
+            return app(ModuleService::class)->isVisibleForTenant('ai', tenant());
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /**

@@ -17,6 +17,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Widget chat "Khadim Digital" (plugin alkoumi/filament-n8n-chat)
+    |--------------------------------------------------------------------------
+    | Widget @n8n/chat di panel tenant. KRUSIAL (Aturan Emas #4): widget
+    | MENEMBAK endpoint internal /ai/khadim-chat yang BERMUARA ke AiGateway
+    | (audit + budget + policy + PII + guardrails) — BUKAN webhook n8n / LLM
+    | eksternal. Tidak ada traffic LLM tak-teraudit.
+    |
+    | DEFAULT NONAKTIF: 'enabled' = false → widget TIDAK tampil di mana pun,
+    | endpoint fail-close 404. Operator menyalakan per deployment (env
+    | AI_N8N_CHAT_ENABLED=true) SETELAH modul 'ai' aktif & agen 'wali_chat'
+    | diizinkan tenant (guardrails). Registrasi plugin tetap TERGERBANG modul
+    | 'ai' + panel 'tenant' saja (AlbaKids ringkas / panel admin tak tersentuh).
+    */
+    'n8n_chat' => [
+        'enabled' => (bool) env('AI_N8N_CHAT_ENABLED', false),
+        // Agen chat free-form (terpetakan di guardrails.agent_feature_map).
+        'agent' => env('AI_N8N_CHAT_AGENT', 'wali_chat'),
+        // Tier LLM murah untuk chat ringan (ModelRouter).
+        'tier' => env('AI_N8N_CHAT_TIER', 'ekonomis'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Provider Ollama (LLM lokal self-hosted, keputusan K3)
     |--------------------------------------------------------------------------
     */

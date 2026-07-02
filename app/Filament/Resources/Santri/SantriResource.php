@@ -544,12 +544,63 @@ class SantriResource extends Resource
                     ->label('Belum punya rombel/kelas')
                     ->query(fn (Builder $query): Builder => $query->whereNull('kelas_id')),
             ])
-            ->actions([
-                Action::make('id_card')
-                    ->label('ID Card')
+            ->actions(static::rowActions())
+            // A5 — menu klik-kanan (leek/filament-right-click): MEMAKAI ULANG
+            // action baris yang SAMA (nol logika/izin baru; ->visible() &
+            // otorisasi existing tetap berlaku). Klik-kanan baris santri → ID
+            // Card / PDF ID Card / Kirim Kredensial / Mutasi Keluar / Edit / Hapus.
+            ->contextMenuActions(static::rowActions())
+            ->bulkActions([
+                BulkAction::make('id_card_massal')
+                    ->label('Cetak ID Card')
                     ->icon('heroicon-o-identification')
-                    ->action(fn ($record) => static::unduhIdCard(collect([$record]))),
-                // Adopsi html2media: pratinjau + unduh PDF / cetak kartu rapi dari
+                    ->action(fn ($records) => static::unduhIdCard(collect($records)))
+                    ->deselectRecordsAfterCompletion(),
+                BulkAction::make('kirim_kredensial_massal')
+                    ->label('Kirim Kredensial')
+                    ->icon('heroicon-o-key')
+                    ->color('warning')
+                    ->visible(fn (): bool => auth()->user()?->can('manage_santri') ?? false)
+                    ->requiresConfirmation()
+                    ->modalDescription('Buat PIN baru & kirim info login ke nomor WALI UTAMA masing-masing santri terpilih. Santri tanpa nomor wali dilewati.')
+                    ->action(function ($records): void {
+                        $ok = 0;
+                        $lewat = 0;
+                        foreach ($records as $record) {
+                            $phone = $record->no_hp_wali ?: ($record->no_hp_ayah ?: $record->no_hp_ibu);
+                            if (! $phone) {
+                                $lewat++;
+
+                                continue;
+                            }
+                            if (static::kirimKredensialSantri($record, (string) $phone)) {
+                                $ok++;
+                            }
+                        }
+                        Notification::make()
+                            ->title("Kredensial terkirim: {$ok}")
+                            ->body($lewat > 0 ? "{$lewat} santri dilewati (tanpa nomor wali)." : 'Selesai.')
+                            ->success()->send();
+                    })
+                    ->deselectRecordsAfterCompletion(),
+            ]);
+    }
+
+    /**
+     * Action baris tabel Santri — SATU sumber dipakai ulang oleh ->actions()
+     * DAN ->contextMenuActions() (menu klik-kanan A5). Ekstraksi verbatim dari
+     * blok actions lama; nol logika baru; ->visible()/otorisasi tetap berlaku.
+     *
+     * @return array<int, \Filament\Actions\Action>
+     */
+    protected static function rowActions(): array
+    {
+        return [
+            Action::make('id_card')
+                ->label('ID Card')
+                ->icon('heroicon-o-identification')
+                ->action(fn ($record) => static::unduhIdCard(collect([$record]))),
+            // Adopsi html2media: pratinjau + unduh PDF / cetak kartu rapi dari
                 // modal (jalur unduh lama via ReportExportService dipertahankan sbg
                 // fallback). Render template 'id-card-santri' berikut kop brand.
                 Html2MediaAction::make('pdf_id_card')
@@ -623,43 +674,9 @@ class SantriResource extends Resource
                                 ->title('Gagal mutasi keluar')->body($e->getMessage())->send();
                         }
                     }),
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
-            ->bulkActions([
-                BulkAction::make('id_card_massal')
-                    ->label('Cetak ID Card')
-                    ->icon('heroicon-o-identification')
-                    ->action(fn ($records) => static::unduhIdCard(collect($records)))
-                    ->deselectRecordsAfterCompletion(),
-                BulkAction::make('kirim_kredensial_massal')
-                    ->label('Kirim Kredensial')
-                    ->icon('heroicon-o-key')
-                    ->color('warning')
-                    ->visible(fn (): bool => auth()->user()?->can('manage_santri') ?? false)
-                    ->requiresConfirmation()
-                    ->modalDescription('Buat PIN baru & kirim info login ke nomor WALI UTAMA masing-masing santri terpilih. Santri tanpa nomor wali dilewati.')
-                    ->action(function ($records): void {
-                        $ok = 0;
-                        $lewat = 0;
-                        foreach ($records as $record) {
-                            $phone = $record->no_hp_wali ?: ($record->no_hp_ayah ?: $record->no_hp_ibu);
-                            if (! $phone) {
-                                $lewat++;
-
-                                continue;
-                            }
-                            if (static::kirimKredensialSantri($record, (string) $phone)) {
-                                $ok++;
-                            }
-                        }
-                        Notification::make()
-                            ->title("Kredensial terkirim: {$ok}")
-                            ->body($lewat > 0 ? "{$lewat} santri dilewati (tanpa nomor wali)." : 'Selesai.')
-                            ->success()->send();
-                    })
-                    ->deselectRecordsAfterCompletion(),
-            ]);
+            EditAction::make(),
+            DeleteAction::make(),
+        ];
     }
 
     /**
