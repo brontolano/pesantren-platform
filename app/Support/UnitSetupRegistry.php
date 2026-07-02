@@ -8,40 +8,56 @@ use App\Filament\Resources\Santri\SantriResource;
 use App\Models\Setting;
 use App\Models\TenantApiKey;
 use App\Models\User;
+use App\Services\TenantHealthCheck;
 use Modules\Akademik\Filament\Resources\JadwalPelajaran\JadwalPelajaranResource;
 use Modules\Akademik\Filament\Resources\Lembaga\LembagaResource;
+use Modules\Akademik\Filament\Resources\Nilai\NilaiResource;
 use Modules\Akademik\Filament\Resources\Pelajaran\PelajaranResource;
 use Modules\Akademik\Filament\Resources\PeriodeAkademik\PeriodeAkademikResource;
+use Modules\Akademik\Filament\Resources\PresensiSantri\PresensiSantriResource;
 use Modules\Akademik\Models\JadwalPelajaran;
 use Modules\Akademik\Models\Lembaga;
+use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\PeriodeAkademik;
+use Modules\Akademik\Models\PresensiSantri;
 use Modules\Asrama\Filament\Resources\PenempatanAsrama\PenempatanAsramaResource;
 use Modules\Asrama\Models\PenempatanAsrama;
 use Modules\CMS\Filament\Resources\Article\ArticleResource;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Models\Gallery;
+use Modules\Kesantrian\Filament\Resources\Kepengasuhan\PresensiAsrama\PresensiAsramaResource;
+use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\PelanggaranSantriResource;
+use Modules\Kesantrian\Models\PelanggaranSantri;
+use Modules\Kesantrian\Models\PresensiAsrama;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesehatan\Filament\Resources\ObatResource;
 use Modules\Kesehatan\Models\Obat;
 use Modules\Keuangan\Filament\Resources\MetodePembayaran\MetodePembayaranResource;
 use Modules\Keuangan\Filament\Resources\SkemaBiaya\SkemaBiayaResource;
+use Modules\Keuangan\Filament\Resources\Tabungan\TabunganResource;
 use Modules\Keuangan\Filament\Resources\Tagihan\TagihanResource;
 use Modules\Keuangan\Models\MetodePembayaran;
 use Modules\Keuangan\Models\SkemaBiaya;
+use Modules\Keuangan\Models\Tabungan;
 use Modules\Keuangan\Models\Tagihan;
 use Modules\Ledger\Filament\Resources\AkunResource;
 use Modules\Ledger\Filament\Resources\PeriodeAkuntansiResource;
 use Modules\Ledger\Filament\Resources\SumberDanaResource;
 use Modules\Ledger\Models\Akun;
+use Modules\Ledger\Models\Jurnal;
 use Modules\Ledger\Models\PeriodeAkuntansi;
 use Modules\Ledger\Models\SumberDana;
 use Modules\Mutu\Filament\Resources\MutuSasaranResource;
 use Modules\Mutu\Models\MutuSasaran;
 use Modules\Payroll\Filament\Resources\Employee\EmployeeResource;
 use Modules\Payroll\Filament\Resources\Jabatan\JabatanResource;
+use Modules\Payroll\Filament\Resources\Penugasan\PenugasanPegawaiResource;
+use Modules\Payroll\Filament\Resources\PresensiStaf\PresensiStafResource;
 use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\Jabatan;
+use Modules\Payroll\Models\PenugasanPegawai;
+use Modules\Payroll\Models\PresensiStaf;
 use Modules\Pembiayaan\Filament\Resources\AsetResource;
 use Modules\Pembiayaan\Models\Aset;
 use Modules\Pengadaan\Filament\Resources\Supplier\SupplierResource;
@@ -50,7 +66,9 @@ use Modules\PPDB\Filament\Resources\JadwalUjianResource;
 use Modules\PPDB\Filament\Resources\PaketSoal\PaketSoalResource;
 use Modules\PPDB\Models\JadwalUjian;
 use Modules\PPDB\Models\PaketSoal;
+use Modules\Tahfidz\Filament\Resources\HafalanTahfidzResource;
 use Modules\Tahfidz\Filament\Resources\Halaqah\HalaqahResource;
+use Modules\Tahfidz\Models\HafalanTahfidz;
 use Modules\Tahfidz\Models\Halaqah;
 
 /**
@@ -71,7 +89,7 @@ class UnitSetupRegistry
     /**
      * @return array<string, array{
      *   label:string, icon:string, permission:string,
-     *   steps: list<array{key:string, label:string, desc:string, done:bool, url:?string}>
+     *   steps: list<array{key:string, label:string, desc:string, done:bool, url:?string, opsional:bool}>
      * }>
      */
     public static function units(): array
@@ -95,6 +113,12 @@ class UnitSetupRegistry
                     self::step('obat', 'Master obat (UKS)', 'Daftar obat (bisa impor).',
                         self::adaData(Obat::class),
                         self::resourceUrl(ObatResource::class)),
+                    self::stepOpsional('presensi_asrama', 'Impor presensi asrama (historis)', 'Impor rekap presensi kepengasuhan dari sistem lama.',
+                        self::adaData(PresensiAsrama::class),
+                        self::resourceUrl(PresensiAsramaResource::class)),
+                    self::stepOpsional('pelanggaran', 'Impor catatan pelanggaran (historis)', 'Impor riwayat pelanggaran santri dari sistem lama.',
+                        self::adaData(PelanggaranSantri::class),
+                        self::resourceUrl(PelanggaranSantriResource::class)),
                 ],
             ],
             // 2 — PPDB
@@ -129,6 +153,12 @@ class UnitSetupRegistry
                     self::step('jadwal', 'Jadwal pelajaran', 'Jadwal per kelas (bisa impor).',
                         self::adaData(JadwalPelajaran::class),
                         self::resourceUrl(JadwalPelajaranResource::class)),
+                    self::stepOpsional('nilai', 'Impor nilai (historis)', 'Impor nilai rapor semester berjalan/lalu dari sistem lama.',
+                        self::adaData(Nilai::class),
+                        self::resourceUrl(NilaiResource::class)),
+                    self::stepOpsional('presensi_santri', 'Impor presensi santri (historis)', 'Impor rekap kehadiran kelas dari sistem lama.',
+                        self::adaData(PresensiSantri::class),
+                        self::resourceUrl(PresensiSantriResource::class)),
                 ],
             ],
             // 3b — TAHFIDZ
@@ -140,6 +170,9 @@ class UnitSetupRegistry
                     self::step('halaqah', 'Halaqah tahfidz', 'Kelompok hafalan + musyrif (bisa impor).',
                         self::adaData(Halaqah::class),
                         self::resourceUrl(HalaqahResource::class)),
+                    self::stepOpsional('hafalan', 'Impor capaian hafalan (historis)', 'Impor riwayat setoran/capaian hafalan dari sistem lama.',
+                        self::adaData(HafalanTahfidz::class),
+                        self::resourceUrl(HafalanTahfidzResource::class)),
                 ],
             ],
             // 4 — KEUANGAN (operasional)
@@ -157,6 +190,9 @@ class UnitSetupRegistry
                     self::step('tagihan', 'Tagihan / SPP', 'Buat atau impor tagihan santri.',
                         self::adaData(Tagihan::class),
                         self::resourceUrl(TagihanResource::class)),
+                    self::stepOpsional('saldo_tabungan', 'Impor saldo tabungan (historis)', 'Impor saldo tabungan santri dari sistem lama (per santri).',
+                        self::adaData(Tabungan::class),
+                        self::resourceUrl(TabunganResource::class)),
                 ],
             ],
             // 5 — AKUNTANSI & PAJAK (fondasi uang)
@@ -174,6 +210,9 @@ class UnitSetupRegistry
                     self::step('periode_akuntansi', 'Periode akuntansi', 'Periode buku berjalan.',
                         self::adaData(PeriodeAkuntansi::class),
                         self::resourceUrl(PeriodeAkuntansiResource::class)),
+                    self::stepOpsional('saldo_awal', 'Impor saldo awal buku besar (historis)', 'Jurnal pembuka berimbang dari neraca sistem lama (menu Bagan Akun → Impor Saldo Awal).',
+                        self::adaSaldoAwalLedger(),
+                        self::resourceUrl(AkunResource::class)),
                 ],
             ],
             // 6 — KEPEGAWAIAN (fold: sdm)
@@ -188,6 +227,12 @@ class UnitSetupRegistry
                     self::step('pegawai', 'Data pegawai', 'Guru & karyawan (bisa impor).',
                         self::adaData(Employee::class),
                         self::resourceUrl(EmployeeResource::class)),
+                    self::stepOpsional('penugasan', 'Impor penugasan pegawai (historis)', 'Impor penugasan/penempatan pegawai dari sistem lama.',
+                        self::adaData(PenugasanPegawai::class),
+                        self::resourceUrl(PenugasanPegawaiResource::class)),
+                    self::stepOpsional('presensi_staf', 'Impor presensi staf (historis)', 'Impor rekap kehadiran pegawai dari sistem lama.',
+                        self::adaData(PresensiStaf::class),
+                        self::resourceUrl(PresensiStafResource::class)),
                 ],
             ],
             // 7 — KELEMBAGAAN & KOMUNIKASI
@@ -240,7 +285,7 @@ class UnitSetupRegistry
      * request/test). Dipakai jalur PANAS (gerbang nav memanggil kesiapan modul
      * untuk ~115 resource) agar cek DB unit tak diulang berkali-kali.
      *
-     * @return array<string, array{label:string, icon:string, permission:string, steps: list<array{key:string, label:string, desc:string, done:bool, url:?string}>}>
+     * @return array<string, array{label:string, icon:string, permission:string, steps: list<array{key:string, label:string, desc:string, done:bool, url:?string, opsional:bool}>}>
      */
     public static function unitsCached(): array
     {
@@ -259,31 +304,166 @@ class UnitSetupRegistry
         return $units;
     }
 
-    /** Ringkasan progres satu unit: {selesai, total, persen, tuntas}. */
+    /** Buang memo per-request (units + health) tenant aktif — dipakai test/setelah tulis data. */
+    public static function flushCache(): void
+    {
+        $tenantId = tenancy()->initialized ? (tenant('id') ?? 'central') : 'central';
+        foreach (['__unit_setup_registry_units_'.$tenantId, '__unit_setup_registry_health_'.$tenantId] as $key) {
+            if (app()->bound($key)) {
+                app()->forgetInstance($key);
+            }
+        }
+    }
+
+    /**
+     * Status "done" SATU langkah (sumber kebenaran bersama — dipakai
+     * OnboardingChecklist agar definisi "selesai" tidak diduplikasi/drift).
+     */
+    public static function stepDone(string $unit, string $stepKey): bool
+    {
+        foreach (self::unitsCached()[$unit]['steps'] ?? [] as $step) {
+            if ($step['key'] === $stepKey) {
+                return $step['done'];
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Ringkasan progres satu unit: {selesai, total, persen, tuntas}.
+     *
+     * HANYA langkah WAJIB yang dihitung — langkah opsional (importer historis
+     * "migrasi tengah tahun") tidak boleh menahan unit dari status tuntas,
+     * agar pesantren baru bersih tetap bisa 100% tanpa data historis.
+     * Jumlah opsional dilaporkan terpisah (opsional_selesai/opsional_total).
+     */
     public static function progress(string $kode): array
     {
         $unit = self::units()[$kode] ?? null;
         if ($unit === null) {
-            return ['selesai' => 0, 'total' => 0, 'persen' => 0, 'tuntas' => false];
+            return ['selesai' => 0, 'total' => 0, 'persen' => 0, 'tuntas' => false, 'opsional_selesai' => 0, 'opsional_total' => 0];
         }
 
-        $total = count($unit['steps']);
-        $selesai = collect($unit['steps'])->where('done', true)->count();
+        $wajib = collect($unit['steps'])->where('opsional', false);
+        $opsional = collect($unit['steps'])->where('opsional', true);
+        $total = $wajib->count();
+        $selesai = $wajib->where('done', true)->count();
 
         return [
             'selesai' => $selesai,
             'total' => $total,
             'persen' => $total > 0 ? (int) round($selesai / $total * 100) : 0,
             'tuntas' => $total > 0 && $selesai === $total,
+            'opsional_selesai' => $opsional->where('done', true)->count(),
+            'opsional_total' => $opsional->count(),
         ];
     }
 
     /**
-     * @return array{key:string, label:string, desc:string, done:bool, url:?string}
+     * Cek TenantHealthCheck yang relevan per unit (kunci dari TenantHealthCheck::run).
+     * Unit tanpa entri hanya diverifikasi lewat kelengkapan langkah wajib.
+     */
+    private const HEALTH_KEYS_PER_UNIT = [
+        'kesantrian' => ['db', 'tables'],
+        'keuangan' => ['coa', 'tables'],
+        'akuntansi' => ['coa', 'tables'],
+        'kepegawaian' => ['roles'],
+        'pengaturan' => ['branding', 'roles'],
+    ];
+
+    /**
+     * Gate verifikasi "siap go-live" satu unit (dipakai SetupUnit).
+     *
+     * Menggabungkan (a) kelengkapan langkah WAJIB registry + (b) cek relevan
+     * TenantHealthCheck (tanpa render — ringan, aman dipanggil dari panel tenant).
+     *
+     * Status: 'hijau' = langkah wajib lengkap & semua cek kesehatan lolos;
+     * 'merah' = ada cek kesehatan GAGAL (fondasi rusak, jangan go-live);
+     * 'kuning' = kesehatan oke tapi langkah wajib belum lengkap.
+     *
+     * @return array{status:'hijau'|'kuning'|'merah', items:list<array{label:string, ok:bool, detail:string}>}
+     */
+    public static function verifikasi(string $kode): array
+    {
+        $prog = self::progress($kode);
+        $items = [[
+            'label' => 'Langkah wajib unit lengkap',
+            'ok' => $prog['tuntas'],
+            'detail' => $prog['selesai'].' dari '.$prog['total'].' langkah wajib selesai',
+        ]];
+
+        $relevan = self::HEALTH_KEYS_PER_UNIT[$kode] ?? [];
+        $adaGagalKesehatan = false;
+        if ($relevan !== []) {
+            foreach (self::healthChecksCached() as $check) {
+                if (in_array($check['key'], $relevan, true)) {
+                    $items[] = ['label' => $check['label'], 'ok' => $check['ok'], 'detail' => $check['detail']];
+                    $adaGagalKesehatan = $adaGagalKesehatan || ! $check['ok'];
+                }
+            }
+        }
+
+        return [
+            'status' => $adaGagalKesehatan ? 'merah' : ($prog['tuntas'] ? 'hijau' : 'kuning'),
+            'items' => $items,
+        ];
+    }
+
+    /**
+     * Hasil TenantHealthCheck (tanpa render) di-memo per request per tenant.
+     * Gagal total (mis. di central / tenancy belum init) → list kosong, tak melempar.
+     *
+     * @return list<array{key:string, label:string, ok:bool, detail:string}>
+     */
+    private static function healthChecksCached(): array
+    {
+        try {
+            if (! tenancy()->initialized) {
+                return [];
+            }
+            $key = '__unit_setup_registry_health_'.tenant('id');
+            if (app()->bound($key)) {
+                return app()->make($key);
+            }
+            $checks = app(TenantHealthCheck::class)->run(tenant(), withRender: false);
+            app()->instance($key, $checks);
+
+            return $checks;
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    /**
+     * @return array{key:string, label:string, desc:string, done:bool, url:?string, opsional:bool}
      */
     private static function step(string $key, string $label, string $desc, bool $done, ?string $url): array
     {
-        return ['key' => $key, 'label' => $label, 'desc' => $desc, 'done' => $done, 'url' => $url];
+        return ['key' => $key, 'label' => $label, 'desc' => $desc, 'done' => $done, 'url' => $url, 'opsional' => false];
+    }
+
+    /**
+     * Langkah OPSIONAL — importer data historis, hanya relevan untuk migrasi
+     * tengah tahun dari sistem lama. Tidak dihitung ke progres/tuntas unit.
+     *
+     * @return array{key:string, label:string, desc:string, done:bool, url:?string, opsional:bool}
+     */
+    private static function stepOpsional(string $key, string $label, string $desc, bool $done, ?string $url): array
+    {
+        return [...self::step($key, $label, $desc, $done, $url), 'opsional' => true];
+    }
+
+    /** Saldo awal buku besar sudah diimpor = ada jurnal pembuka idempoten 'saldo-awal:{tenant}'. */
+    private static function adaSaldoAwalLedger(): bool
+    {
+        try {
+            return class_exists(Jurnal::class) && Jurnal::query()
+                ->where('idempotency_key', 'saldo-awal:'.tenant('id'))
+                ->exists();
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     private static function settingTerisi(string $key): bool
