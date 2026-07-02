@@ -53,6 +53,7 @@ Pimpinan {{pesantren}} menyatakan bahwa:
 
 Nama          : {{nama}}
 NIS           : {{nis}}
+NISN          : {{nisn}}
 Tempat/Tgl Lahir : {{ttl}}
 
 telah menyelesaikan pendidikan pada {{lembaga}} dan dinyatakan LULUS pada tahun {{tahun_lulus}}.
@@ -223,6 +224,10 @@ TXT;
             '{{nomor}}' => $alumni->nomor_syahadah ?? '.../SYH/...',
             '{{nama}}' => $santri?->nama ?? '—',
             '{{nis}}' => $santri?->nis ?? '—',
+            '{{nisn}}' => ($santri?->nisn ?: null) ?? '—',
+            '{{nspp}}' => ($alumni->lembaga?->nomor_statistik ?: null) ?? '—',
+            '{{jenjang}}' => ($alumni->lembaga?->jenjang ?: null) ?? '—',
+            '{{nomor_ijazah}}' => $alumni->nomor_ijazah ?? '—',
             '{{ttl}}' => trim(($santri?->tempat_lahir ? $santri->tempat_lahir.', ' : '')
                 .($santri?->tanggal_lahir?->translatedFormat('d F Y') ?? '—')),
             '{{lembaga}}' => $alumni->lembaga?->nama ?? 'pesantren ini',
