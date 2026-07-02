@@ -112,6 +112,7 @@ class Santri extends Model
         'photo_url',
         'wali_user_id',
         'user_id',
+        'custom_fields',
     ];
 
     protected $casts = [
@@ -121,6 +122,7 @@ class Santri extends Model
         'jumlah_saudara' => 'integer',
         'tinggi_badan' => 'integer',
         'berat_badan' => 'integer',
+        'custom_fields' => 'array',
     ];
 
     public function kelas(): BelongsTo

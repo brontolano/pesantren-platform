@@ -7,6 +7,7 @@ use App\Filament\Resources\Santri\Pages\EditSantri;
 use App\Filament\Resources\Santri\Pages\ListSantri;
 use App\Models\Setting;
 use App\Services\StorageQuotaService;
+use App\Support\CustomFieldRegistry;
 use App\Support\PrintContent;
 use Filament\Actions\Action;
 use Filament\Actions\Action as FormAction;
@@ -293,6 +294,17 @@ class SantriResource extends Resource
                     ->default('aktif')
                     ->required(),
             ])->columns(2),
+
+            // Data Tambahan (Custom Field per-tenant): field kustom yang
+            // didefinisikan admin tenant sendiri (CustomFieldRegistry). Seksi
+            // hanya muncul bila tenant sudah mendefinisikan minimal 1 field →
+            // nol beban untuk tenant polos. Nilai disimpan di kolom JSON
+            // santri.custom_fields; key tak-terdefinisi diabaikan saat render.
+            Section::make('Data Tambahan')
+                ->description('Field kustom khusus pesantren ini. Kelola daftarnya di menu "Field Kustom Santri".')
+                ->visible(fn (): bool => CustomFieldRegistry::hasDefinitions(CustomFieldRegistry::ENTITY_SANTRI))
+                ->schema(CustomFieldRegistry::formComponents(CustomFieldRegistry::ENTITY_SANTRI))
+                ->columns(2),
         ]);
     }
 
@@ -711,11 +723,38 @@ class SantriResource extends Resource
         return parent::getEloquentQuery()->with('kelas');
     }
 
+    /**
+     * Infolist detail Santri. Menampilkan identitas inti + seksi "Data Tambahan"
+     * dinamis (field kustom per-tenant). Seksi tambahan hanya muncul bila tenant
+     * mendefinisikan field; nilai key tak-terdefinisi diabaikan (tak error).
+     */
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            \Filament\Infolists\Components\Section::make('Identitas')
+                ->schema([
+                    \Filament\Infolists\Components\TextEntry::make('nis')->label('NIS'),
+                    \Filament\Infolists\Components\TextEntry::make('nama')->label('Nama Lengkap'),
+                    \Filament\Infolists\Components\TextEntry::make('tempat_lahir')->label('Tempat Lahir')->placeholder('—'),
+                    \Filament\Infolists\Components\TextEntry::make('tanggal_lahir')->label('Tanggal Lahir')->date('d M Y')->placeholder('—'),
+                    \Filament\Infolists\Components\TextEntry::make('kelas.nama_kelas')->label('Kelas')->placeholder('—'),
+                    \Filament\Infolists\Components\TextEntry::make('status')->label('Status')->badge(),
+                ])
+                ->columns(2),
+
+            \Filament\Infolists\Components\Section::make('Data Tambahan')
+                ->visible(fn (): bool => CustomFieldRegistry::hasDefinitions(CustomFieldRegistry::ENTITY_SANTRI))
+                ->schema(CustomFieldRegistry::infolistEntries(CustomFieldRegistry::ENTITY_SANTRI))
+                ->columns(2),
+        ]);
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListSantri::route('/'),
             'create' => CreateSantri::route('/create'),
+            'view' => \App\Filament\Resources\Santri\Pages\ViewSantri::route('/{record}'),
             'edit' => EditSantri::route('/{record}/edit'),
         ];
     }
