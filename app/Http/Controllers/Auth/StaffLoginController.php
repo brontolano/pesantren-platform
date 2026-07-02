@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Support\AlbaKidsTenant;
 use App\Support\AppLauncher;
 use App\Support\TenantBranding;
+use App\Support\TenantCustomizationRegistry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,8 +46,9 @@ class StaffLoginController extends Controller
             'primaryColor' => TenantBranding::primaryColor('#0f5132'),
             'waliLoginUrl' => $this->routeOr('tenant.portal-wali.auth.login', '/wali/login'),
             'ppdbUrl' => $this->routeOr('spmb.login', '/spmb/login'),
-            // Tenant custom (AlbaKids) DIPAGARI dari perubahan desain platform.
-            'isAlbaKids' => AlbaKidsTenant::isActive(),
+            // Tenant custom (varian login 'albakids') DIPAGARI dari perubahan
+            // desain platform — via registry (tahap 3 #343), bukan cek tenant.
+            'isAlbaKids' => TenantCustomizationRegistry::stringValue('login_variant') === 'albakids',
         ]);
     }
 

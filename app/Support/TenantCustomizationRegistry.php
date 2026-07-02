@@ -26,6 +26,16 @@ class TenantCustomizationRegistry
     }
 
     /**
+     * Profil panel Filament tenant saat ini ('default' | 'albakids_ringkas').
+     * Dibaca TenantPanelProvider untuk memilih set resources/pages/widgets —
+     * menggantikan cabang AlbaKidsTenant::isActive() inline (tahap 3 #343).
+     */
+    public static function panelProfile(): string
+    {
+        return static::stringValue('panel_profile') ?? 'default';
+    }
+
+    /**
      * Flag fitur kustomisasi untuk tenant saat ini (mis. 'ppdb_custom_flow').
      * Resource bertanya "apakah alur X aktif?", BUKAN "apakah ini albakids?".
      */

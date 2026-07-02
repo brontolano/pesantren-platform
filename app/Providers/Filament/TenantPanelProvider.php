@@ -34,8 +34,8 @@ use App\Filament\Widgets\TransaksiTerbaru;
 use App\Http\Middleware\ApplyPanelTheme;
 use App\Http\Middleware\RedirectCentralToPlatform;
 use App\Models\Setting;
-use App\Support\AlbaKidsTenant;
 use App\Support\TenantBranding;
+use App\Support\TenantCustomizationRegistry;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -186,13 +186,19 @@ class TenantPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $isAlbaKids = AlbaKidsTenant::isActive();
-        $resources = $isAlbaKids ? $this->albaKidsResources() : $this->defaultResources();
+        // Tahap 3 #343: definisi panel per-tenant = "profil panel" di registry
+        // (config/tenant-customization.php, kunci 'panel_profile') — provider
+        // TIDAK lagi cek AlbaKidsTenant::isActive() inline. Resolusi registry
+        // identik (tenant key → alias host), perilaku HARUS sama:
+        // 'albakids_ringkas' = surface admin ringkas (PPDB + WA; /admin/*
+        // resource lain 404 BY DESIGN), 'default' = panel penuh.
+        $ringkas = TenantCustomizationRegistry::panelProfile() === 'albakids_ringkas';
+        $resources = $ringkas ? $this->ringkasResources() : $this->defaultResources();
         // WP-13: PratinjauKhidmah didaftar EKSPLISIT (aturan WP uang) — aman
         // dobel dengan discoverPages karena getPages() = array_unique.
         // WP-07: SidangKenaikan didaftar eksplisit (pola layar kerja).
-        $pages = $isAlbaKids ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class, GridNilai::class, RekapJurnalKbm::class, KesiapanEmis::class, LogGerbangPanel::class, PengajuanJengukPanel::class, ModerasiPesanWali::class, KebijakanPesantren::class, ProfilMutuSantri::class, MutuKelas::class, MutuLembaga::class, KasirKantin::class, RekonKantin::class, PiketHariIni::class, CadanganPemulihan::class, CadanganWebsite::class];
-        $widgets = $isAlbaKids
+        $pages = $ringkas ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class, GridNilai::class, RekapJurnalKbm::class, KesiapanEmis::class, LogGerbangPanel::class, PengajuanJengukPanel::class, ModerasiPesanWali::class, KebijakanPesantren::class, ProfilMutuSantri::class, MutuKelas::class, MutuLembaga::class, KasirKantin::class, RekonKantin::class, PiketHariIni::class, CadanganPemulihan::class, CadanganWebsite::class];
+        $widgets = $ringkas
             ? [
                 GreetingBanner::class,
                 AccountWidget::class,
@@ -338,7 +344,7 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Cadangan & Integrasi')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Cadangan & Integrasi')),
             ]);
 
-        if (! $isAlbaKids) {
+        if (! $ringkas) {
             $panel->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages');
             // Halaman Filament yang sudah pindah ke modulnya (vertical slice) —
             // daftarkan otomatis dari tiap Modules/{X}/app/Filament/Pages.
@@ -631,11 +637,12 @@ class TenantPanelProvider extends PanelProvider
     }
 
     /**
-     * Surface admin khusus tenant Alba Kids.
+     * Surface admin profil 'albakids_ringkas' (dulu khusus AlbaKids):
+     * hanya PPDB + notifikasi WA; resource lain sengaja tidak terdaftar.
      *
      * @return array<int, class-string>
      */
-    protected function albaKidsResources(): array
+    protected function ringkasResources(): array
     {
         return [
             CalonSantriResource::class,

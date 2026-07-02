@@ -19,6 +19,26 @@ return [
     'default' => [
         'landing_component' => 'CMS/LandingPage',
 
+        // Profil panel Filament tenant (set resources/pages/widgets).
+        // 'default' = panel penuh; 'albakids_ringkas' = surface admin ringkas
+        // (PPDB + WA saja; resource lain sengaja TIDAK terdaftar → /admin/* 404
+        // BY DESIGN). Dibaca TenantPanelProvider.
+        'panel_profile' => 'default',
+
+        // Tema panel default bila tenant belum memilih via Setting
+        // (App\Support\PanelTheme::SETTING_THEME). Pilihan eksplisit tenant
+        // tetap menang.
+        'panel_theme_default' => 'pixio',
+
+        // Halaman '/' domain 'sistem' untuk tamu & peran jemaah:
+        // 'landing' = Beranda publik CMS (fallback login bila gagal render);
+        // 'login'   = langsung form login bermerek (perilaku tenant custom).
+        'guest_home' => 'landing',
+
+        // Varian form login bermerek ('default' = gaya platform/Pixio;
+        // 'albakids' = body class tenant-albakids → guard gaya asli).
+        'login_variant' => 'default',
+
         // PPDB: alur custom (verifikasi pembayaran tanpa ujian/OTP/portal peserta).
         // false = alur PPDB standar penuh.
         'ppdb_custom_flow' => false,
@@ -43,6 +63,11 @@ return [
         'albakids' => [
             'hosts' => ['albakids.pesantren.online'],
             'landing_component' => 'CMS/AlbaKidsLandingV2',
+
+            'panel_profile' => 'albakids_ringkas',
+            'panel_theme_default' => 'bawaan',
+            'guest_home' => 'login',
+            'login_variant' => 'albakids',
 
             'ppdb_custom_flow' => true,
             'ppdb_program_options' => [

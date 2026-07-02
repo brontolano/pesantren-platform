@@ -15,11 +15,11 @@ asy-syifaa. Total **±40 titik kustomisasi** di 8 kategori:
 | Kategori | Titik | Status |
 |---|---|---|
 | Landing / halaman publik | 4 | 1 titik SUDAH di-registry (tahap 1); resolver duplikat TenantWebsiteService dikonsolidasi (tahap 2) |
-| Panel Filament (resources/pages/widgets/nav) | 3 blok besar | belum (tahap 3) |
+| Panel Filament (resources/pages/widgets/nav) | 3 blok besar | ✅ **SELESAI tahap 3** — profil panel via registry (`panel_profile` = `default`\|`albakids_ringkas`) |
 | Label & gating resource Filament (PPDB, Notifikasi) | ~25 pemanggilan di 4 resource | ✅ **SELESAI tahap 2** — semua via registry (`feature`/`label`/`stringValue`/`value`) |
-| Tema panel (PanelTheme) | 1 | belum (pola registry SUDAH ada, tinggal entri) |
+| Tema panel (PanelTheme) | 1 | ✅ **SELESAI tahap 3** — default tema via registry (`panel_theme_default`) |
 | Guard Pixio body-class di blade | 6 blade | belum — JANGAN disentuh dulu (keputusan sprint Pixio) |
-| Perilaku login/launcher | 3 | belum |
+| Perilaku login/launcher | 3 | ✅ **SELESAI tahap 3** — `guest_home` + `login_variant` via registry |
 | Default konten asy-syifaa (AppShell/Branding) | 2 file | sudah overridable via Setting; default saja yang hardcoded |
 | Data/tipe hardcoded (`pendaftaran_albakids`, template `albakids_%`) | 4 | belum; butuh migrasi data hati-hati |
 
@@ -34,11 +34,11 @@ Risiko: L (kosmetik), M (fitur tenant salah tampil), H (perilaku/uang/keamanan).
 | # | File:baris | Jenis | Apa yang di-hardcode | Risiko | Usulan pengganti |
 |---|---|---|---|---|---|
 | 1 | `Modules/CMS/.../TenantLandingPageController.php:23` | landing | Pilih komponen `CMS/AlbaKidsLandingV2` vs `CMS/LandingPage` | M | ✅ **SELESAI slice ini** → `TenantCustomizationRegistry::landingComponent()` |
-| 2 | `app/Http/Controllers/LauncherController.php:38,58` | perilaku | AlbaKids: tamu & jemaah dipaksa ke form login (bukan landing) | M | kunci registry `guest_home` = `landing`\|`login` |
-| 3 | `app/Http/Controllers/Auth/StaffLoginController.php:50` | landing | prop `isAlbaKids` ke view login (branding form) | L | kunci registry `login_variant` / branding Setting |
+| 2 | `app/Http/Controllers/LauncherController.php:38,58` | perilaku | AlbaKids: tamu & jemaah dipaksa ke form login (bukan landing) | M | ✅ **SELESAI tahap 3** → kunci registry `guest_home` = `landing`\|`login` |
+| 3 | `app/Http/Controllers/Auth/StaffLoginController.php:50` | landing | prop `isAlbaKids` ke view login (branding form) | L | ✅ **SELESAI tahap 3** → kunci registry `login_variant` (`default`\|`albakids`) |
 | 4 | `Modules/CMS/app/Services/TenantWebsiteService.php:17-27,45,130-131,602-646` | landing | Default branding, warna, font, seksi default, payload admisi khusus AlbaKids + `isAlbaKidsTenant()` sendiri (duplikat logika host/key!) | M | seed Setting per-tenant + kunci registry `website_defaults`; ✅ **resolver duplikat DIKONSOLIDASI tahap 2** (`isAlbaKidsTenant()` kini delegasi ke `AlbaKidsTenant::isActive()`); default konten masih hardcoded (menyusul) |
-| 5 | `app/Providers/Filament/TenantPanelProvider.php:189-195,341,638` | panel | Set resources/pages/widgets panel TERPISAH utk AlbaKids (`albaKidsResources()`) | **H** | kunci registry `panel_profile` = `default`\|`albakids` → provider baca profil dari registry; jangka panjang: modul aktif per-tenant (Pusat Modul) |
-| 6 | `app/Support/PanelTheme.php:244` | tema | AlbaKids dipaksa default tema `bawaan` | L | entri registry `panel_theme_default`; PanelTheme::THEMES = acuan pola |
+| 5 | `app/Providers/Filament/TenantPanelProvider.php:189-195,341,638` | panel | Set resources/pages/widgets panel TERPISAH utk AlbaKids (`albaKidsResources()`) | **H** | ✅ **SELESAI tahap 3** → kunci registry `panel_profile` = `default`\|`albakids_ringkas`; provider baca `TenantCustomizationRegistry::panelProfile()` (metode `ringkasResources()`); jangka panjang: modul aktif per-tenant (Pusat Modul) |
+| 6 | `app/Support/PanelTheme.php:244` | tema | AlbaKids dipaksa default tema `bawaan` | L | ✅ **SELESAI tahap 3** → kunci registry `panel_theme_default` (`pixio` default, `bawaan` utk albakids); pilihan eksplisit via Setting tetap menang |
 | 7 | `Modules/PPDB/.../CalonSantriResource.php` (±15 titik: 106,125,217,236-284,312,346,364,406-469,487-502) | panel+nav | Label, opsi program, status default, aksi WA khusus, grup nav 'PPDB Custom' | M | ✅ **SELESAI tahap 2** → `feature('ppdb_custom_flow')` + `label('ppdb.calon_santri.*')` + `value('ppdb_program_options')` + `stringValue('ppdb_status_default'/'ppdb_gelombang_scope')`; jangka panjang: konfigurasi PPDB per-tenant di DB |
 | 8 | `Modules/PPDB/.../TagihanPpdbResource.php:60-70,141-142,157-172` | panel+data | Label + filter `tipe = 'pendaftaran_albakids'` | M | ✅ **SELESAI tahap 2** → `feature('ppdb_custom_flow')` + `label('ppdb.tagihan.*')` + `stringValue('ppdb_tagihan_tipe_scope')` (nilai tipe di DATA belum dimigrasi — lihat #9) |
 | 9 | `Modules/PPDB/.../LandingRegistrationController.php:145,184` | data+perilaku | Tulis `tipe='pendaftaran_albakids'`; cek key `albakids` utk notif | M | registry `ppdb_variant` + service notifikasi via binding |
@@ -81,9 +81,37 @@ memiliki domain itu) dan menambah query per-request.
   "apakah ini albakids?".
 - Guard: `tests/Feature/TenantCustomizationRegistryTest.php` (default vs
   override vs fallback label) + `TenantPanelAuthedSmokeTest`.
-- Sisa pemakai `AlbaKidsTenant::isActive()`: TenantPanelProvider (tahap 3),
-  PanelTheme, StaffLoginController, LauncherController, guard Pixio 2 blade
-  (suspended, ppdb-form) — belum disentuh sesuai keputusan sprint.
+- ~~Sisa pemakai `AlbaKidsTenant::isActive()`: TenantPanelProvider (tahap 3),
+  PanelTheme, StaffLoginController, LauncherController~~ → ✅ SELESAI tahap 3
+  (lihat §2c). Sisa: guard Pixio blade (delegasi `TenantWebsiteService::
+  isAlbaKidsTenant()` juga masih memanggil) — belum disentuh sesuai keputusan
+  sprint.
+
+## 2c. Catatan tahap 3 (Refs #343)
+
+- **Titik paling berisiko (H, #5)** — blok panel Filament AlbaKids di
+  `TenantPanelProvider`: kini "profil panel" dari registry
+  (`TenantCustomizationRegistry::panelProfile()`, kunci `panel_profile` =
+  `default` | `albakids_ringkas`). Metode `albaKidsResources()` di-rename
+  `ringkasResources()` (isi identik: CalonSantri, TagihanPpdb,
+  TemplateNotifikasi, BroadcastWa). Perilaku IDENTIK: profil ringkas = pages
+  `[Dashboard]` + 2 widget + tanpa `discoverPages`; `/admin/*` resource lain
+  tetap 404 BY DESIGN.
+- `PanelTheme::theme()` (#6): default per-tenant dari kunci registry
+  `panel_theme_default` (`pixio` default, `bawaan` entri albakids); pilihan
+  eksplisit tenant via Setting tetap menang; fallback defensif ke `pixio`
+  bila nilai registry bukan tema valid.
+- `LauncherController` (#2): cabang AlbaKids → kunci `guest_home` =
+  `landing` | `login` (tamu & peran jemaah).
+- `StaffLoginController` (#3): prop `isAlbaKids` view login → kunci
+  `login_variant` (`albakids` → body class `tenant-albakids`; blade TIDAK
+  diubah).
+- Guard: `tests/Feature/TenantPanelProfileTest.php` (registry profil, alias
+  host, panel penuh vs ringkas persis 4 resource, tema default, guest_home
+  login di domain sistem) + `TenantPanelAuthedSmokeTest`.
+- TIDAK disentuh: guard Pixio 6 blade, data hardcoded DB
+  (`pendaftaran_albakids`, prefix `albakids_%`), default konten asy-syifaa,
+  `AlbaKidsTenant` (masih dirujuk blade + TenantWebsiteService).
 
 ## 3. Desain mekanisme: `TenantCustomizationRegistry`
 
