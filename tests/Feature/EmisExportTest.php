@@ -41,8 +41,8 @@ class EmisExportTest extends TestCase
         $rows = app(EmisExportService::class)->barisSantri();
 
         // WP-22: 8 kolom lama tetap di depan (urutan TIDAK berubah), kolom EMIS 4.0 di-append.
-        // Refs #327: +7 kolom EMIS 4.0 (NO_KK..JENJANG) di-append → 20.
-        $this->assertCount(20, EmisExportService::HEADER);
+        // Refs #327 (+7) dan #338 (+2 kesetaraan) di-append → 22.
+        $this->assertCount(22, EmisExportService::HEADER);
         $this->assertSame(['NISN', 'NIS', 'NAMA', 'JENIS_KELAMIN', 'TAHUN_ANGKATAN', 'STATUS_SANTRI', 'STATUS_SPP', 'TUNGGAKAN'], array_slice(EmisExportService::HEADER, 0, 8));
         $this->assertCount(1, $rows);
         $this->assertSame('Ahmad', $rows[0][2]);          // NAMA
