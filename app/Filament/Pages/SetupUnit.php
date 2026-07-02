@@ -125,7 +125,9 @@ class SetupUnit extends Page
     private function dataUnit(string $kode): array
     {
         $def = UnitSetupRegistry::units()[$kode];
-        $steps = $def['steps'];
+        // Pisahkan langkah wajib vs opsional (importer historis migrasi tengah tahun).
+        $steps = array_values(array_filter($def['steps'], fn (array $s): bool => ! $s['opsional']));
+        $stepsOpsional = array_values(array_filter($def['steps'], fn (array $s): bool => $s['opsional']));
 
         $nextKey = null;
         foreach ($steps as $s) {
@@ -145,7 +147,9 @@ class SetupUnit extends Page
             'label' => $def['label'],
             'icon' => $def['icon'],
             'steps' => $steps,
+            'stepsOpsional' => $stepsOpsional,
             'progress' => UnitSetupRegistry::progress($kode),
+            'verifikasi' => UnitSetupRegistry::verifikasi($kode),
             'nextKey' => $nextKey,
             'hubUrl' => static::getUrl(),
             'tokoUrl' => $tokoUrl,
