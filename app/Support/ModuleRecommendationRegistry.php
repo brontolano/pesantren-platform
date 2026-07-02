@@ -34,6 +34,21 @@ class ModuleRecommendationRegistry
     public const FALLBACK = ['akademik', 'ppdb', 'portal_wali'];
 
     /**
+     * Mode Salaf (issue #331) — preset onboarding minimalis untuk pesantren salaf.
+     *
+     * Modul non-inti yang DINYALAKAN. Modul inti (core/kesantrian/keuangan/
+     * notifikasi/cms) selalu aktif, sudah mencakup Santri, Ta'zir/Pelanggaran,
+     * Presensi Asrama (absensi jamaah), Syahriah/Tagihan, dan Notifikasi WA wali.
+     * Non-inti di sini melengkapi: Asrama, Ngaji Kitab + absensi ngaji (akademik),
+     * Tahfidz, Izin/Jenguk (kegiatan), Portal Wali.
+     * SEMUA modul released non-inti lain (pajak, ledger, payroll, mutu, ai, crm,
+     * koperasi, ppdb, dst.) dimatikan default — tetap bisa dipasang manual.
+     *
+     * @var list<string>
+     */
+    public const MODE_SALAF_ON = ['asrama', 'tahfidz', 'kegiatan', 'akademik', 'portal_wali'];
+
+    /**
      * Modul yang disarankan untuk sebuah arketipe (atau fallback bila null/asing).
      *
      * @return list<string>
