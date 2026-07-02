@@ -3,7 +3,7 @@
 namespace Modules\Notifikasi\Filament\Resources\BroadcastWa;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Support\AlbaKidsTenant;
+use App\Support\TenantCustomizationRegistry;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -64,7 +64,7 @@ class BroadcastWaResource extends Resource
                     ->options(fn () => TemplateNotifikasi::query()
                         ->where('channel', 'wa')
                         ->where('is_active', true)
-                        ->when(AlbaKidsTenant::isActive(), fn ($query) => $query->where('kode_template', 'like', 'albakids_%'))
+                        ->when(TenantCustomizationRegistry::stringValue('notif_template_prefix'), fn ($query, string $prefix) => $query->where('kode_template', 'like', $prefix.'%'))
                         ->pluck('judul', 'id'))
                     ->searchable()
                     ->required(),
@@ -143,8 +143,8 @@ class BroadcastWaResource extends Resource
     {
         $query = parent::getEloquentQuery()->with('template');
 
-        if (AlbaKidsTenant::isActive()) {
-            $query->whereHas('template', fn (Builder $builder) => $builder->where('kode_template', 'like', 'albakids_%'));
+        if (($prefix = TenantCustomizationRegistry::stringValue('notif_template_prefix')) !== null) {
+            $query->whereHas('template', fn (Builder $builder) => $builder->where('kode_template', 'like', $prefix.'%'));
         }
 
         return $query;
@@ -161,21 +161,21 @@ class BroadcastWaResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Broadcast Pesan' : 'Broadcast WA';
+        return TenantCustomizationRegistry::label('notifikasi.broadcast_wa.navigation', 'Broadcast WA');
     }
 
     public static function getModelLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Broadcast Pesan Alba Kids' : 'Broadcast WA';
+        return TenantCustomizationRegistry::label('notifikasi.broadcast_wa.model', 'Broadcast WA');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return AlbaKidsTenant::isActive() ? 'Broadcast Pesan' : 'Broadcast WA';
+        return TenantCustomizationRegistry::label('notifikasi.broadcast_wa.plural', 'Broadcast WA');
     }
 
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
-        return AlbaKidsTenant::isActive() ? 'Notifikasi Custom' : 'Komunikasi';
+        return TenantCustomizationRegistry::label('notifikasi.broadcast_wa.nav_group', 'Komunikasi');
     }
 }
