@@ -226,6 +226,27 @@ class TenantPanelAuthedSmokeTest extends TestCase
         $pengaturanPpdbStatus = $kernel->handle($pengaturanPpdbReq)->getStatusCode();
         $this->assertSame(200, $pengaturanPpdbStatus, "Pengaturan PPDB (PengaturanPpdb) status {$pengaturanPpdbStatus}, harusnya 200.");
 
+        // Field Kustom Santri (custom field per-tenant, Page baru) WAJIB 200 →
+        // bukti halaman kelola definisi ter-render (membaca Setting custom_fields.santri).
+        $fieldKustomReq = Request::create("http://{$host}/admin/field-kustom-santri", 'GET');
+        $fieldKustomReq->headers->set('Host', $host);
+        $fieldKustomStatus = $kernel->handle($fieldKustomReq)->getStatusCode();
+        $this->assertSame(200, $fieldKustomStatus, "Field Kustom Santri (FieldKustomSantri) status {$fieldKustomStatus}, harusnya 200.");
+
+        // Regresi custom field: dengan minimal 1 definisi field tersimpan, form
+        // Santri (create) yang merender seksi dinamis "Data Tambahan" WAJIB 200.
+        Setting::updateOrCreate(
+            ['key' => 'custom_fields.santri'],
+            ['value' => ['fields' => [
+                ['key' => 'golongan_darah', 'label' => 'Golongan Darah', 'type' => 'select', 'options' => ['A', 'B', 'AB', 'O'], 'required' => false],
+                ['key' => 'hobi', 'label' => 'Hobi', 'type' => 'text', 'options' => [], 'required' => false],
+            ]]],
+        );
+        $santriCreateReq = Request::create("http://{$host}/admin/santri/santris/create", 'GET');
+        $santriCreateReq->headers->set('Host', $host);
+        $santriCreateStatus = $kernel->handle($santriCreateReq)->getStatusCode();
+        $this->assertSame(200, $santriCreateStatus, "Buat Santri (seksi Data Tambahan dinamis) status {$santriCreateStatus}, harusnya 200.");
+
         // Daftar Kamar Asrama WAJIB 200 → bukti OkupansiAsramaWidget (getStats →
         // getOccupancySummary, gap 102) ter-render di header tanpa error.
         $kamarReq = Request::create("http://{$host}/admin/kamar-asrama/kamar-asramas", 'GET');
