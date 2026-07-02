@@ -45,9 +45,4 @@ class BillingOverviewWidget extends BaseWidget
                 ->icon('heroicon-o-chart-bar'),
         ];
     }
-
-    public static function canView(): bool
-    {
-        return auth()->user()?->hasRole('super_admin') ?? false;
-    }
 }
