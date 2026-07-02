@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Services\PrayerTimesService;
 use App\Services\QiblaService;
-use App\Support\AlbaKidsTenant;
 use App\Support\TenantBranding;
+use App\Support\TenantCustomizationRegistry;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\CMS\Models\Article;
@@ -19,8 +19,10 @@ class TenantLandingPageController extends Controller
     {
         // Tenant dengan landing custom dirender komponen sendiri agar LandingPage
         // default tetap bersih & tenant lain tidak terdampak perubahan custom.
-        // Landing utama Alba Kids = V2 (dipromosikan dari /v2 menjadi halaman utama).
-        $component = AlbaKidsTenant::isActive() ? 'CMS/AlbaKidsLandingV2' : 'CMS/LandingPage';
+        // Pemilihan komponen via registry deklaratif (Refs #343) — entri albakids
+        // → 'CMS/AlbaKidsLandingV2' (V2 dipromosikan dari /v2 jadi halaman utama),
+        // tenant lain → default 'CMS/LandingPage'. Lihat config/tenant-customization.php.
+        $component = TenantCustomizationRegistry::landingComponent();
 
         return Inertia::render($component, $this->payload($websiteService));
     }
