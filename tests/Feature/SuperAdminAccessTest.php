@@ -81,6 +81,13 @@ class SuperAdminAccessTest extends TestCase
         // Gerbang modul via trait kanonik. Modul 'development' (file_storage)
         // tersembunyi utk tenant non-dev. (Catatan: 'ai' kini 'released' sejak
         // 2026-06-25, jadi contoh modul development memakai file_storage.)
+        //
+        // Registry modul DETERMINISTIK. `module_registry` ada di koneksi CENTRAL
+        // (ModuleRegistry::getConnectionName) dan PERSISTEN lintas test (setUp
+        // hanya truncate domains+tenants), jadi tanpa seed eksplisit test ini
+        // bergantung pada apakah baris file_storage kebetulan ada — bila hilang,
+        // isVisibleForTenant fail-open (true) dan assertFalse di bawah gagal.
+        $this->seed(\Database\Seeders\ModuleRegistrySeeder::class);
         $gate = new class
         {
             use ModuleGate;
@@ -97,6 +104,7 @@ class SuperAdminAccessTest extends TestCase
         // User::isPlatformSuperAdmin; jalur itu tak berubah & tak diuji di sini.)
         Auth::login($super);
         $this->assertFalse($gate::uji('file_storage'), 'super_admin tenant ikut gerbang: modul development tersembunyi.');
+        $this->assertTrue($gate::uji('kesantrian'), 'modul inti selalu terlihat.');
         $this->assertSame('advanced', UiMode::current(), 'super_admin default Mode Lengkap.');
 
         Auth::login($biasa);
@@ -113,6 +121,11 @@ class SuperAdminAccessTest extends TestCase
     public function test_quick_access_gerbang_modul_selaras_is_platform_super_admin(): void
     {
         [$super] = $this->bootUsers('qaw');
+
+        // Registry deterministik (lihat catatan di test gerbang modul di atas):
+        // tanpa baris file_storage di module_registry, gerbang fail-open dan
+        // assertFalse di bawah rapuh terhadap drift data central.
+        $this->seed(\Database\Seeders\ModuleRegistrySeeder::class);
 
         // Tenant runtime: payroll/ledger/file_storage TANPA baris tenant_modules
         // (= nonaktif). super_admin tenant tak boleh menembusnya.
