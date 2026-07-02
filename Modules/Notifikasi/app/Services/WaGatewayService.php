@@ -42,7 +42,7 @@ class WaGatewayService
         }
 
         if ($wahaBaseUrl = config('notifikasi.waha_base_url')) {
-            $response = $this->client()
+            $response = $this->wahaClient()
                 ->baseUrl(rtrim($wahaBaseUrl, '/'))
                 ->post('/api/sendText', [
                     'session' => config('notifikasi.waha_session'),
@@ -99,7 +99,7 @@ class WaGatewayService
 
         if ($wahaBaseUrl = config('notifikasi.waha_base_url')) {
             $isImage = str_starts_with((string) ($file['mimetype'] ?? ''), 'image/');
-            $response = $this->client(30)
+            $response = $this->wahaClient(30)
                 ->baseUrl(rtrim($wahaBaseUrl, '/'))
                 ->post($isImage ? '/api/sendImage' : '/api/sendFile', [
                     'session' => config('notifikasi.waha_session'),
@@ -122,5 +122,20 @@ class WaGatewayService
     protected function client(int $timeout = 15): PendingRequest
     {
         return Http::acceptJson()->timeout($timeout);
+    }
+
+    /**
+     * Klien untuk WAHA langsung — menambahkan header X-Api-Key bila WAHA
+     * dijalankan dengan auth (config notifikasi.waha_api_key / Setting per-tenant).
+     */
+    protected function wahaClient(int $timeout = 15): PendingRequest
+    {
+        $client = $this->client($timeout);
+
+        if ($apiKey = NotifikasiSettings::wahaApiKey()) {
+            $client = $client->withHeaders(['X-Api-Key' => $apiKey]);
+        }
+
+        return $client;
     }
 }
