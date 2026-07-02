@@ -39,6 +39,25 @@ class WaNotificationService
                 return false;
             }
 
+            // JEBAKAN WAHA: workflow n8n "Send WAHA" menelan error → HTTP 200
+            // "hijau" walau pesan GAGAL terkirim. Kebenaran ada di field
+            // `sent`/`gateway_status` pada body respons — periksa itu, bukan
+            // sekadar status sukses.
+            $sent = is_array($response) ? ($response['sent'] ?? null) : null;
+            $gatewayStatus = is_array($response) ? ($response['gateway_status'] ?? null) : null;
+            if ($sent === false
+                || in_array($status, ['failed', 'error'], true)
+                || in_array($gatewayStatus, ['failed', 'error'], true)) {
+                $this->logService->forFailure(
+                    $broadcast,
+                    $target,
+                    'Gateway melaporkan gagal kirim (sent=false / gateway_status='.($gatewayStatus ?? $status ?? '-').').',
+                    is_array($response) ? $response : []
+                );
+
+                return false;
+            }
+
             $this->logService->forSuccess($broadcast, $target, $response);
 
             return true;

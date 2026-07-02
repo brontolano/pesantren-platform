@@ -44,6 +44,7 @@ class Tagihan extends Model
         'nominal_akhir' => 'decimal:2',
         'jatuh_tempo' => 'date',
         'is_dibayar_dimuka' => 'boolean',
+        'notif_wa_sent_at' => 'datetime',
     ];
 
     // --- Relationships ---
