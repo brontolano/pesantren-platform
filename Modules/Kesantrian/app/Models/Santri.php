@@ -230,6 +230,24 @@ class Santri extends Model
         return $this->hasMany(BiayaAsrama::class, 'santri_id');
     }
 
+    /** #338: jenjang formal kesetaraan (ula/wustha/ulya) diturunkan dari kelas aktif. */
+    public function getJenjangKesetaraanAttribute(): ?string
+    {
+        return $this->kelas?->jenjang_kesetaraan;
+    }
+
+    /** #338: tingkat kesetaraan (Ula 1-6, Wustha 1-3, Ulya 1-3) dari kelas aktif. */
+    public function getTingkatKesetaraanAttribute(): ?int
+    {
+        return $this->kelas?->tingkat_kesetaraan;
+    }
+
+    /** #338: label ringkas jenjang formal, mis. "Ula 3"; null bila belum terpetakan. */
+    public function getLabelKesetaraanAttribute(): ?string
+    {
+        return $this->kelas?->label_kesetaraan;
+    }
+
     public function penempatanAktif(): HasOne
     {
         return $this->hasOne(PenempatanKelas::class, 'santri_id')

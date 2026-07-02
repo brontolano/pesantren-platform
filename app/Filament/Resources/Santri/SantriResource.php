@@ -442,6 +442,12 @@ class SantriResource extends Resource
                 TextColumn::make('kelas.nama_kelas')
                     ->label('Kelas')
                     ->sortable(),
+                TextColumn::make('label_kesetaraan')
+                    ->label('Jenjang Kesetaraan')
+                    ->badge()
+                    ->color('success')
+                    ->placeholder('-')
+                    ->toggleable(),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
