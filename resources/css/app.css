@@ -145,6 +145,32 @@
     --wali-gold-soft: var(--pst-gold-soft);  /* gold lembut — highlight/halo */
 
     /* ========================================================================
+       TOKEN NETRAL --app-* (F0, additif) — alias 1:1 nilai --wali-* di atas
+       untuk komponen @/Shared lintas-peran agar tak "berbau wali".
+       JANGAN ubah --wali-* — Portal Wali tetap memakainya apa adanya.
+       ====================================================================== */
+    --app-primary:        var(--wali-primary);
+    --app-primary-strong: var(--wali-primary-strong);
+    --app-primary-tint:   var(--wali-primary-tint);
+
+    --app-success: var(--wali-success);
+    --app-warning: var(--wali-warning);
+    --app-danger:  var(--wali-danger);
+    --app-info:    var(--wali-info);
+
+    --app-surface: var(--wali-surface);
+    --app-bg:      var(--wali-bg);
+    --app-ink:     var(--wali-ink);
+    --app-muted:   var(--wali-muted);
+    --app-border:  var(--wali-border);
+
+    --app-accent:      var(--wali-accent);
+    --app-accent-soft: var(--wali-accent-soft);
+
+    --app-gold:      var(--wali-gold);
+    --app-gold-soft: var(--wali-gold-soft);
+
+    /* ========================================================================
        TIPOGRAFI — dua keluarga bekerja: Jost (display/chrome) + Plus Jakarta Sans
        (body). Marcellus (serif) khusus tema keuangan. Uang selalu tabular-nums.
        ====================================================================== */

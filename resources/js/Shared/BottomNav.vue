@@ -9,6 +9,7 @@ import UiIcon from '@/Components/Ui/UiIcon.vue'
  * (default), atau di-override via prop `items`.
  * Ikon dipetakan dari `key` lewat DEFAULT_ICONS + `iconMap` (override per app),
  * atau properti `item.icon` langsung dari backend.
+ * Item mendukung `badge` (angka, opsional; F0): >0 → bulatan merah di ikon.
  */
 const props = defineProps({
     items: { type: Array, default: null },
@@ -52,12 +53,19 @@ function iconFor(item) {
                 :aria-current="item.active ? 'page' : undefined"
             >
                 <span
-                    class="flex h-[34px] w-[34px] items-center justify-center rounded-full transition-all duration-200"
+                    class="relative flex h-[34px] w-[34px] items-center justify-center rounded-full transition-all duration-200"
                     :class="item.active
                         ? 'bg-emerald-50 text-emerald-700'
                         : 'bg-transparent text-slate-400 group-hover:bg-slate-900/[0.04]'"
                 >
                     <UiIcon :name="iconFor(item)" class="h-[19px] w-[19px]" />
+                    <!-- Badge angka opsional (F0, additif): item.badge > 0 → bulatan merah. -->
+                    <span
+                        v-if="Number(item.badge) > 0"
+                        class="absolute -right-0.5 -top-0.5 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-rose-500 px-[3px] text-[9px] font-bold leading-none text-white ring-2 ring-white"
+                    >
+                        {{ Number(item.badge) > 99 ? '99+' : Number(item.badge) }}
+                    </span>
                 </span>
                 <span
                     class="font-jost text-[9.5px] leading-none tracking-tight transition-all duration-200"
