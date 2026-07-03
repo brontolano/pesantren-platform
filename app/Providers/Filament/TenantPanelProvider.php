@@ -21,12 +21,11 @@ use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\AgendaPengumuman;
 use App\Filament\Widgets\GreetingBanner;
 use App\Filament\Widgets\KategoriPengeluaranChart;
-use App\Filament\Widgets\KesantrianOverviewWidget;
 use App\Filament\Widgets\KeuanganAreaChart;
-use App\Filament\Widgets\KeuanganOverviewWidget;
 use App\Filament\Widgets\KontrakAkanHabisWidget;
 use App\Filament\Widgets\OnboardingChecklist;
 use App\Filament\Widgets\PondokOverviewWidget;
+use App\Filament\Widgets\QuickAccessWidget;
 use App\Filament\Widgets\StatsPesantren;
 use App\Filament\Widgets\TransaksiTerbaru;
 use App\Http\Middleware\ApplyPanelTheme;
@@ -212,6 +211,7 @@ class TenantPanelProvider extends PanelProvider
 
                 // === LAYER 2: Key Metrics ===
                 StatsPesantren::class,           // sort=-8: 5 KPI cards (santri, pengurus, kas, tagihan)
+                QuickAccessWidget::class,        // sort=-7: grid pintasan menu tersering (gerbang modul+izin)
                 PondokOverviewWidget::class,     // sort=0: indikator per pondok (Banin/Banat) — bila multi-pondok
 
                 // === LAYER 4: Financial Dashboard (for bendahara/tata usaha) ===
@@ -222,9 +222,13 @@ class TenantPanelProvider extends PanelProvider
                 KategoriPengeluaranChart::class, // sort=-5: pie chart pengeluaran (conditional data)
                 AgendaPengumuman::class,         // sort=-3: agenda & pengumuman
 
-                // === LAYER 6: Domain Ringkasan (Santri/Keuangan) ===
-                KesantrianOverviewWidget::class, // sort=1: santri stats (adaptive per role)
-                KeuanganOverviewWidget::class,   // sort=2: keuangan stats (adaptive per role)
+                // === LAYER 6: (dikonsolidasi) ===
+                // KesantrianOverviewWidget & KeuanganOverviewWidget DICABUT dari
+                // dasbor utama — angkanya dobel definisi dgn StatsPesantren
+                // (super_admin dulu melihat 3 baris stats). Metrik unik yang
+                // penting (santri cuti, sisa nominal tunggakan jatuh tempo)
+                // sudah DISERAP ke StatsPesantren. Kelasnya dipertahankan utk
+                // pemakaian di halaman domain bila dibutuhkan kelak.
 
                 // === LAYER 7: Departemen Spesifik ===
                 KontrakAkanHabisWidget::class,   // sort=12: pengingat kontrak (payroll only)
@@ -250,13 +254,10 @@ class TenantPanelProvider extends PanelProvider
                 PanelsRenderHook::BODY_START,
                 fn (): View => view('filament.theme-vars'),
             )
-            // Tema topNav (mis. Korporat): bar prioritas + waffle "Semua Menu"
-            // (mega-panel) menggantikan deretan grup bawaan yang tak muat
-            // (self-guard: kosong bila tema aktif bukan topNav).
-            ->renderHook(
-                PanelsRenderHook::TOPBAR_LOGO_AFTER,
-                fn (): View => view('filament.tema.topnav-megamenu'),
-            )
+            // (Kode mati dihapus: renderhook TOPBAR_LOGO_AFTER utk mega-menu
+            // topNav — tak ada lagi tema ber-topNav=true di PanelTheme::THEMES.
+            // Bila tema topNav dihidupkan kembali, pulihkan blade
+            // filament/tema/topnav-megamenu dari riwayat git.)
             ->resources($resources)
             ->pages($pages)
             ->widgets($widgets)
@@ -357,6 +358,11 @@ class TenantPanelProvider extends PanelProvider
                 'logoUrl' => TenantBranding::logoUrl(),
             ]))
             ->brandLogoHeight('2.25rem')
+            // Favicon tab browser: pakai favicon branding tenant bila diunggah
+            // (di-serve via /_tenant-storage — Storage::url 404 di Docker),
+            // fallback aset default platform. Closure = dievaluasi saat render,
+            // tenancy sudah aktif.
+            ->favicon(fn (): string => TenantBranding::faviconUrl() ?? asset('favicon.ico'))
             // Pixio Design System: emerald #059669 sbg satu-satunya aksen (CTA,
             // active, link). gray = Slate (ramp ink). Tenant boleh override via
             // ApplyPanelTheme/preset warna.

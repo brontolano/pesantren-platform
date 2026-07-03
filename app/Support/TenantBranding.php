@@ -47,6 +47,31 @@ final class TenantBranding
     }
 
     /**
+     * URL favicon tenant (kunci 'branding_favicon', file 'favicon_path' —
+     * Setting::getTenantStringValue sudah paham kandidat itu), atau null bila
+     * belum diunggah. Pola serve sama dengan logo: /_tenant-storage
+     * (Storage::url() 404 di Docker + stancl/tenancy).
+     */
+    public static function faviconUrl(): ?string
+    {
+        try {
+            $path = Setting::getTenantStringValue('branding_favicon', null);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($path === null || trim($path) === '') {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://') || str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        return url('/_tenant-storage/'.ltrim($path, '/'));
+    }
+
+    /**
      * URL foto/figur hero untuk halaman login (mis. foto pengasuh), atau null.
      * Sumber: Setting `branding_hero_image` — boleh URL absolut, path absolut
      * (aset statis di public/), atau path disk tenant (di-serve /_tenant-storage).
