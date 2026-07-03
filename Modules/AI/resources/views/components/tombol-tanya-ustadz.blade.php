@@ -21,8 +21,7 @@
     <input type="hidden" name="pertanyaan" value="{{ $pertanyaan }}">
     <button
         type="submit"
-        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border bg-white px-4 py-2.5 text-sm font-semibold shadow-sm transition hover:opacity-90"
-        style="border-color: #14532d; color: #14532d;"
+        class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-green-900 bg-white px-4 py-2.5 text-sm font-semibold text-green-900 shadow-sm transition hover:opacity-90 dark:border-green-500 dark:bg-gray-900 dark:text-green-400"
         aria-label="Teruskan pertanyaan ini ke antrean Tanya Ustadz agar dijawab manusia"
     >
         <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

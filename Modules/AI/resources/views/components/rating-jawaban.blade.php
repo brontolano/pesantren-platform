@@ -30,8 +30,7 @@
                     type="submit"
                     name="rating"
                     value="{{ $i }}"
-                    class="inline-flex h-11 w-11 items-center justify-center rounded-lg text-2xl leading-none transition hover:bg-gray-100 dark:hover:bg-gray-700"
-                    style="color: #b45309;"
+                    class="inline-flex h-11 w-11 items-center justify-center rounded-lg text-2xl leading-none text-amber-700 transition hover:bg-gray-100 dark:text-amber-400 dark:hover:bg-gray-700"
                     aria-label="Beri nilai {{ $i }} dari 5"
                 >
                     <span aria-hidden="true">&#9733;</span>

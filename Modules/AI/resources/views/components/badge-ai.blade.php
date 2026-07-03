@@ -6,9 +6,9 @@
       - data            : "Jawaban AI — dihasilkan sistem"
       - draf            : "DRAF — perlu pengesahan"
 
-    Warna memakai token eksplisit (inline style) supaya kontras AA terjamin
-    di mana pun komponen dipakai (Filament/Portal) tanpa bergantung pada
-    kelas warna Tailwind yang belum tentu ter-compile dari Modules/*.
+    Warna memakai kelas Tailwind + varian dark: (kontras AA di kedua mode) —
+    Modules/AI/resources/views/components dipindai @source di semua build
+    theme.css sehingga kelasnya pasti ter-compile.
 --}}
 @props([
     'varian' => 'agama',
@@ -21,18 +21,17 @@
         default => 'Jawaban AI — bukan fatwa/keputusan',
     };
 
-    // Pasangan latar/teks lolos kontras WCAG AA (≥ 4,5:1).
+    // Pasangan latar/teks lolos kontras WCAG AA (≥ 4,5:1) di light & dark.
     $warna = match ($varian) {
-        // amber-100 / amber-900 / amber-300 — menonjol: draf perlu tindakan.
-        'draf' => ['latar' => '#fef3c7', 'teks' => '#78350f', 'garis' => '#fcd34d'],
-        // slate-100 / slate-800 / slate-300 — netral informatif.
-        default => ['latar' => '#f1f5f9', 'teks' => '#1e293b', 'garis' => '#cbd5e1'],
+        // amber — menonjol: draf perlu tindakan.
+        'draf' => 'border-amber-300 bg-amber-100 text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/15 dark:text-amber-300',
+        // slate — netral informatif.
+        default => 'border-slate-300 bg-slate-100 text-slate-800 dark:border-slate-500/40 dark:bg-slate-500/15 dark:text-slate-200',
     };
 @endphp
 
 <span
-    {{ $attributes->merge(['class' => 'ai-badge inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium leading-none']) }}
-    style="background-color: {{ $warna['latar'] }}; color: {{ $warna['teks'] }}; border-color: {{ $warna['garis'] }};"
+    {{ $attributes->merge(['class' => "ai-badge inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium leading-none {$warna}"]) }}
     role="note"
     aria-label="{{ $teks }}"
 >

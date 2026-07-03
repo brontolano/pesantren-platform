@@ -3,6 +3,7 @@
 /* Pindai kelas Tailwind yang dipakai di widget & view Filament custom */
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';
+@source '../../../../Modules/AI/resources/views/components';
 
 /*
  |--------------------------------------------------------------------------

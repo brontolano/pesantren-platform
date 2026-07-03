@@ -9,9 +9,9 @@
                 </div>
             </div>
             @if($tenant->is_active)
-                <span style="white-space:nowrap;border-radius:9999px;padding:0.3rem 0.9rem;font-size:0.8rem;font-weight:600;background:rgba(34,197,94,0.15);color:#22c55e;">Aktif</span>
+                <span class="whitespace-nowrap rounded-full bg-green-100 px-3.5 py-1 text-xs font-semibold text-green-800 dark:bg-green-500/15 dark:text-green-400">Aktif</span>
             @else
-                <span style="white-space:nowrap;border-radius:9999px;padding:0.3rem 0.9rem;font-size:0.8rem;font-weight:600;background:rgba(239,68,68,0.15);color:#ef4444;">Nonaktif</span>
+                <span class="whitespace-nowrap rounded-full bg-red-100 px-3.5 py-1 text-xs font-semibold text-red-800 dark:bg-red-500/15 dark:text-red-400">Nonaktif</span>
             @endif
         </div>
     @endif
