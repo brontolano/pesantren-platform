@@ -67,13 +67,13 @@ class ThemePackage
         ],
         'moonlight' => [
             'name' => 'Moonlight (Gelap)',
-            'description' => 'Tema gelap ala JetBrains Moonlight — biru malam dengan aksen pastel; efek penuh saat mode gelap dinyalakan.',
+            'description' => 'Tema gelap ala JetBrains Moonlight — biru malam dengan aksen pastel; mode gelap otomatis aktif (bisa di-toggle).',
             'theme' => 'moonlight',
             'color' => null,
             'typography' => 'Plus Jakarta Sans',
             'category' => 'eksternal',
             'recommended_for' => ['operator_divisi', 'admin_pesantren'],
-            'features' => ['Gelap ala JetBrains Moonlight', 'Aksen pastel lembut', 'Teduh untuk kerja malam', 'Aktif penuh di mode gelap'],
+            'features' => ['Gelap ala JetBrains Moonlight', 'Aksen pastel lembut', 'Teduh untuk kerja malam', 'Mode gelap otomatis aktif'],
         ],
         'neobrutalism' => [
             'name' => 'Neo-Brutalis',

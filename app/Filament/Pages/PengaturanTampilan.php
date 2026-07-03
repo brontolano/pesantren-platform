@@ -132,7 +132,14 @@ class PengaturanTampilan extends Page
             // Tema eksternal = file CSS di <head> — hanya termuat pada full page
             // load. Muat ulang otomatis (jeda singkat agar toast sempat terlihat)
             // supaya pergantian terasa LANGSUNG seperti versi CSS-vars dulu.
-            $this->js('setTimeout(() => window.location.reload(), 500)');
+            //
+            // Mode gelap: pilihan lama user tersimpan di localStorage('theme')
+            // dan MENGALAHKAN defaultThemeMode panel. Saat ganti paket, ikuti
+            // mode bawaan tema barunya (Moonlight → dark; lainnya → system)
+            // agar tema gelap-default benar-benar terlihat gelap. User tetap
+            // bisa toggle sesudahnya.
+            $mode = PanelTheme::defaultDarkFor($pkg['theme']) ? 'dark' : 'system';
+            $this->js("localStorage.setItem('theme', '{$mode}'); setTimeout(() => window.location.reload(), 500)");
         } catch (\Throwable $e) {
             Notification::make()
                 ->title('Error menerapkan paket')
