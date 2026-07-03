@@ -15,6 +15,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Filament\Resources\SetoranSorogan\Pages\CreateSetoranSorogan;
 use Modules\Akademik\Filament\Resources\SetoranSorogan\Pages\EditSetoranSorogan;
 use Modules\Akademik\Filament\Resources\SetoranSorogan\Pages\ListSetoranSorogan;
@@ -55,6 +56,30 @@ class SetoranSoroganResource extends Resource
     public static function canAccess(): bool
     {
         return static::moduleVisible('akademik') && (auth()->user()?->canAny(['view_akademik', 'manage_akademik']) ?? false);
+    }
+
+    /**
+     * Gerbang mutasi (audit RBAC 2026-07 P0-1): `view_*` = baca-saja;
+     * create/edit/delete WAJIB permission `manage_akademik`.
+     */
+    public static function canCreate(): bool
+    {
+        return static::canAccess() && (auth()->user()?->can('manage_akademik') ?? false);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::canCreate();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canCreate();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return static::canCreate();
     }
 
     public static function form(Schema $schema): Schema

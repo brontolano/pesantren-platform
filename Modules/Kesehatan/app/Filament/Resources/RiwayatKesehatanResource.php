@@ -15,6 +15,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\CreateRiwayatKesehatan;
 use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\EditRiwayatKesehatan;
 use Modules\Kesehatan\Filament\Resources\RiwayatKesehatan\Pages\ListRiwayatKesehatan;
@@ -116,5 +117,29 @@ class RiwayatKesehatanResource extends Resource
     public static function canAccess(): bool
     {
         return static::moduleVisible('kesehatan') && (auth()->user()?->can('view_kesehatan') ?? false);
+    }
+
+    /**
+     * Gerbang mutasi (audit RBAC 2026-07 P0-1): `view_*` = baca-saja;
+     * create/edit/delete WAJIB permission `manage_kesehatan`.
+     */
+    public static function canCreate(): bool
+    {
+        return static::canAccess() && (auth()->user()?->can('manage_kesehatan') ?? false);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::canCreate();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canCreate();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return static::canCreate();
     }
 }
