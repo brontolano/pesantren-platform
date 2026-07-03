@@ -21,7 +21,7 @@ class RoleResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shield-check';
 
-    protected static ?string $navigationLabel = 'Roles & Permissions';
+    protected static ?string $navigationLabel = 'Peran & Izin';
 
     protected static ?string $modelLabel = 'Role';
 
