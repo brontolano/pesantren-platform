@@ -46,6 +46,7 @@ class PanelTheme
             'recommended_roles' => ['admin_pesantren', 'tu'],
             'features' => ['Familiar seperti WhatsApp', 'Cocok untuk entry-level', 'Tidak perlu adaptasi'],
             'efficiency' => 'normal',
+            'typography' => 'Plus Jakarta Sans',
         ],
         'pixio' => [
             'label' => 'Pixio (Emerald SaaS)',
@@ -66,6 +67,7 @@ class PanelTheme
             'recommended_roles' => ['admin_pesantren', 'bendahara_pusat', 'akuntan'],
             'features' => ['Premium SaaS look', 'Brand identity emerald', 'Cream hangat, sidebar putih', 'Aksen profesional'],
             'efficiency' => 'normal',
+            'typography' => 'Jost + Plus Jakarta Sans',
         ],
         'baitul-maal' => [
             'label' => 'Baitul Maal (Hijau–Emas)',
@@ -86,6 +88,7 @@ class PanelTheme
             'recommended_roles' => ['bendahara_pusat', 'akuntan', 'kepala_keuangan'],
             'features' => ['Hijau hutan profesional', 'Aksen emas islami', 'Latar hangat krim', 'Fokus keuangan'],
             'efficiency' => 'normal',
+            'typography' => 'Marcellus (serif) + Plus Jakarta Sans',
         ],
         'pimpinan-biru' => [
             'label' => 'Pimpinan Biru (Navigasi Atas)',
@@ -106,6 +109,7 @@ class PanelTheme
             'recommended_roles' => ['kepala', 'dewan_pembina', 'pimpinan'],
             'features' => ['Navy profesional', 'Menu di atas (top-nav)', 'Dashboard pimpinan', 'Lebih luas kerja'],
             'efficiency' => 'spacious',
+            'typography' => 'Jost + Plus Jakarta Sans',
         ],
         'merah-putih' => [
             'label' => 'Merah Putih',
@@ -126,6 +130,7 @@ class PanelTheme
             'recommended_roles' => ['admin_pesantren', 'kepala', 'tu'],
             'features' => ['Merah marun elegan', 'Nuansa kebangsaan', 'Kontras putih bersih', 'Identitas NKRI'],
             'efficiency' => 'normal',
+            'typography' => 'Plus Jakarta Sans',
         ],
         'hijau-malam' => [
             'label' => 'Hijau Malam (Emas)',
@@ -146,6 +151,7 @@ class PanelTheme
             'recommended_roles' => ['kepala', 'dewan_pembina'],
             'features' => ['Hijau mewah gelap', 'Emas islami', 'Menu top-nav', 'Elegan & formal'],
             'efficiency' => 'spacious',
+            'typography' => 'Jost + Plus Jakarta Sans',
         ],
         'navigasi-atas' => [
             'label' => 'Navigasi Atas',
@@ -158,6 +164,7 @@ class PanelTheme
             'recommended_roles' => ['admin_pesantren', 'tu', 'bendahara_pusat'],
             'features' => ['Menu di atas', 'Area kerja maksimal', 'Cocok layar lebar', 'Tidak ada sidebar'],
             'efficiency' => 'spacious',
+            'typography' => 'Plus Jakarta Sans',
         ],
         'kompak' => [
             'label' => 'Kompak',
@@ -170,6 +177,7 @@ class PanelTheme
             'recommended_roles' => ['operator_divisi', 'kasir', 'petugas_payroll'],
             'features' => ['Data-dense', 'Spasi minimal', 'Banyak baris/layar', 'Efisien untuk entry'],
             'efficiency' => 'compact',
+            'typography' => 'Plus Jakarta Sans',
         ],
     ];
 
