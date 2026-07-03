@@ -53,4 +53,12 @@ return [
         'otp_daily_budget' => (int) env('JEMAAH_OTP_DAILY_BUDGET', 300),
     ],
 
+    // F6 Web Push (VAPID) — kanal PELENGKAP, WA tetap kanal utama.
+    // Kunci TIDAK pernah di-commit; generate per lingkungan & set via ENV VPS.
+    'webpush' => [
+        'public_key' => env('VAPID_PUBLIC_KEY'),
+        'private_key' => env('VAPID_PRIVATE_KEY'),
+        'subject' => env('VAPID_SUBJECT', 'mailto:admin@example.com'),
+    ],
+
 ];

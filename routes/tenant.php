@@ -65,6 +65,7 @@ use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
 use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
+use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\SantriExportController;
 use App\Http\Controllers\TahfidzExportController;
@@ -363,6 +364,13 @@ Route::middleware([
 
         return back();
     })->middleware('auth')->name('tenant.ui-mode.toggle');
+
+    // F6 — Web Push (VAPID) opt-in: subscribe/unsubscribe browser. Auth-gated
+    // saja (peran apa pun) — kanal SUPLEMEN, WA tetap kanal utama.
+    Route::middleware('auth')->prefix('push')->name('tenant.push.')->group(function () {
+        Route::post('/subscribe', [PushSubscriptionController::class, 'store'])->name('subscribe');
+        Route::delete('/unsubscribe', [PushSubscriptionController::class, 'destroy'])->name('unsubscribe');
+    });
 
     // App Santri (/app) — login NIS + dashboard ringkas (tahap 1; lanjut: WebAuthn).
     Route::prefix('app')->name('tenant.app-santri.')->group(function () {

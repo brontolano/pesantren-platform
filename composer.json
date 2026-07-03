@@ -19,6 +19,7 @@
         "laravel/tinker": "^3.0",
         "league/flysystem-aws-s3-v3": "^3.0",
         "leek/filament-right-click": "^1.3",
+        "minishlink/web-push": "^10.1",
         "nomanur/filament-seo-pro": "^1.0",
         "notwonderful/filament-moonlight-theme": "*",
         "nwidart/laravel-modules": "*",

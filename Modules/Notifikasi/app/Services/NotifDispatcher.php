@@ -2,6 +2,7 @@
 
 namespace Modules\Notifikasi\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Modules\Notifikasi\Models\BroadcastWa;
 use Modules\Notifikasi\Models\TemplateNotifikasi;
@@ -60,6 +61,7 @@ class NotifDispatcher
         private readonly WaNotificationService $waService,
         private readonly EmailNotificationService $emailService,
         private readonly RecipientResolver $resolver,
+        private readonly PushNotificationService $pushService,
     ) {}
 
     /** Daftar event yang terdaftar. */
@@ -103,6 +105,14 @@ class NotifDispatcher
             if (empty($penerima)) {
                 return $hasil + ['alasan' => 'tanpa_penerima'];
             }
+
+            // F6 — Web Push (pelengkap, WA/email tetap kanal utama). Hanya
+            // dikirim bila pemanggil melampirkan target User berakun (mis.
+            // staf/pimpinan) via payload['push_users'] = User[]|int[], dan
+            // user tsb punya subscription aktif. Diam-diam dilewati bila
+            // tidak ada — tak menambah noise log untuk penerima wali/santri
+            // tanpa akun (target berupa nomor HP/email, bukan User model).
+            $this->kirimPushOpsional($payload, $template->judul, $varsGlobal);
 
             if ($template->channel === 'email') {
                 foreach ($penerima as $p) {
@@ -184,6 +194,35 @@ class NotifDispatcher
         }
 
         return [];
+    }
+
+    /**
+     * F6 — kirim push opsional ke User yang eksplisit dilampirkan pemanggil.
+     * Fire-and-forget, TIDAK PERNAH melempar ke pemanggil dispatch utama.
+     */
+    private function kirimPushOpsional(array $payload, string $judulTemplate, array $varsGlobal): void
+    {
+        $pushUsers = $payload['push_users'] ?? [];
+        if (empty($pushUsers) || ! is_array($pushUsers)) {
+            return;
+        }
+
+        foreach ($pushUsers as $userOrId) {
+            try {
+                $user = $userOrId instanceof User
+                    ? $userOrId
+                    : User::query()->find($userOrId);
+
+                if (! $user || ! $this->pushService->hasSubscription($user)) {
+                    continue;
+                }
+
+                $judul = $judulTemplate !== '' ? $judulTemplate : 'Notifikasi';
+                $this->pushService->send($user, $judul, (string) ($varsGlobal['ringkas'] ?? 'Anda memiliki notifikasi baru.'));
+            } catch (Throwable $e) {
+                Log::warning('NotifDispatcher push gagal', ['error' => $e->getMessage()]);
+            }
+        }
     }
 
     private function ensureTenantContext(): void
