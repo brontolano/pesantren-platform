@@ -1,8 +1,8 @@
 <x-filament-widgets::widget>
     <div class="flex flex-col gap-4">
         {{-- ===== Pengumuman Terbaru ===== --}}
-        <section class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5
-                        dark:bg-[#1C1C24] dark:ring-[#2A2A35]">
+        <section class="tema-card rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5
+                        dark:bg-gray-900 dark:ring-white/10">
             <div class="mb-2.5 flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Pengumuman</h3>
             </div>
@@ -15,8 +15,8 @@
         </section>
 
         {{-- ===== Agenda Mendatang ===== --}}
-        <section class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5
-                        dark:bg-[#1C1C24] dark:ring-[#2A2A35]">
+        <section class="tema-card rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-950/5
+                        dark:bg-gray-900 dark:ring-white/10">
             <div class="mb-2.5 flex items-center justify-between">
                 <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Agenda Mendatang</h3>
             </div>
@@ -28,7 +28,7 @@
                     <p class="text-xs text-gray-500 dark:text-gray-400">Belum ada agenda mendatang.</p>
                 </div>
             @else
-                <ul class="flex flex-col divide-y divide-gray-100 dark:divide-[#2A2A35]">
+                <ul class="flex flex-col divide-y divide-gray-100 dark:divide-white/10">
                     @foreach ($agenda as $item)
                         <li class="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
                             <div class="flex h-10 w-10 shrink-0 flex-col items-center justify-center

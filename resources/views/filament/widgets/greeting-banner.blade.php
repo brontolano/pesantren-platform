@@ -1,8 +1,12 @@
 <x-filament-widgets::widget>
-    {{-- ===== Banner sambutan — gradient WA-green (light) / TikTok-dark (dark) ===== --}}
+    {{-- ===== Banner sambutan — THEME-AWARE =====
+         Netral: gradient dari palet PRIMER panel (ikut tema eksternal via
+         FilamentColor → --primary-*). Identitas bawaan (gradient hijau WA
+         light / TikTok dark) dipulihkan oleh blok .tema-greeting di
+         theme.css BAWAAN saja — build tema eksternal tidak memuatnya. --}}
     <div class="tema-greeting relative isolate overflow-hidden rounded-2xl px-6 py-5 text-white shadow-sm sm:px-8 sm:py-6
-                bg-gradient-to-r from-[#0b8f63] via-[#059669] to-[#047857]
-                dark:from-[#0f1c14] dark:via-[#161823] dark:to-[#1a243a]">
+                bg-gradient-to-r from-primary-700 via-primary-600 to-primary-800
+                dark:from-gray-900 dark:via-gray-950 dark:to-gray-900">
 
         {{-- Ornamen bulat samar kanan atas --}}
         <div class="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-white/10 blur-2xl"></div>
@@ -191,11 +195,11 @@
                         <div
                             class="flex min-w-[3.25rem] flex-col items-center rounded-xl px-2.5 py-2 text-center transition"
                             :class="p.key === nextKey
-                                ? 'bg-white text-[#059669] shadow-sm dark:bg-[#10b981] dark:text-white'
+                                ? 'bg-white text-primary-600 shadow-sm dark:bg-primary-500 dark:text-white'
                                 : 'text-white/85'"
                         >
                             <span class="text-[10px] font-semibold uppercase tracking-wide"
-                                  :class="p.key === nextKey ? 'text-[#059669]/80 dark:text-white/90' : 'text-white/60'"
+                                  :class="p.key === nextKey ? 'text-primary-600/80 dark:text-white/90' : 'text-white/60'"
                                   x-text="p.label"></span>
                             <span class="mt-0.5 text-sm font-bold tabular-nums" x-text="p.time"></span>
                         </div>

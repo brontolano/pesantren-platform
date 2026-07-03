@@ -264,6 +264,17 @@ class PanelTheme
         return (bool) self::THEMES[self::theme()]['topNav'];
     }
 
+    /**
+     * Tema aktif kategori 'eksternal'? Dipakai widget dasbor theme-aware:
+     * identitas bawaan (gradient hijau WA dsb.) hidup di theme.css bawaan;
+     * saat tema eksternal aktif widget tampil netral mengikuti token tema
+     * (--primary-*, gray) — bukan warna hardcode.
+     */
+    public static function isEksternal(): bool
+    {
+        return (self::THEMES[self::theme()]['category'] ?? null) === 'eksternal';
+    }
+
     /** Kelas body utk blok CSS tema (null = tanpa kelas tambahan). */
     public static function bodyClass(): ?string
     {

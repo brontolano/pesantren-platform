@@ -15,7 +15,7 @@
      bukan cuma Baitul Maal. Hanya elemen ber-.text-arabic atau [lang="ar"]
      yang terpengaruh — TIDAK memaksa RTL/serif ke seluruh halaman. --}}
 <link rel="preconnect" href="https://fonts.bunny.net">
-<link href="https://fonts.bunny.net/css?family=amiri:400,700" rel="stylesheet">
+<link href="https://fonts.bunny.net/css?family=amiri:400,700&display=swap" rel="stylesheet">
 
 {{-- Font tema EKSTERNAL (mis. Brisk → Kumbh Sans) dimuat lewat
      Panel::font() di ApplyPanelTheme (provider Bunny bawaan Filament) —

@@ -61,6 +61,11 @@ import /etc/caddy/tenants/*.caddy
 		file_server
 	}
 
+	# Aset Vite ber-hash (immutable) → cache browser 1 tahun: reload halaman
+	# tidak mengunduh/revalidasi ulang CSS tema (~70KB gzip) & JS (#B reload berat).
+	@aset_build path /build/*
+	header @aset_build Cache-Control "public, max-age=31536000, immutable"
+
 	php_server
 }
 
@@ -77,6 +82,11 @@ import /etc/caddy/tenants/*.caddy
 	route @dokumentasi {
 		file_server
 	}
+
+	# Aset Vite ber-hash (immutable) → cache browser 1 tahun: reload halaman
+	# tidak mengunduh/revalidasi ulang CSS tema (~70KB gzip) & JS (#B reload berat).
+	@aset_build path /build/*
+	header @aset_build Cache-Control "public, max-age=31536000, immutable"
 
 	php_server
 }
