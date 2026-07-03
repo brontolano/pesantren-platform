@@ -74,9 +74,42 @@ class RootPwaTest extends TestCase
         $this->assertStringContainsString('<svg', $resp->getContent());
     }
 
+    private function setRootSwFlag(Tenant $tenant, bool $enabled): void
+    {
+        tenancy()->initialize($tenant);
+        Setting::updateOrCreate(
+            ['tenant_id' => $tenant->id, 'key' => 'pwa.root_sw_enabled'],
+            ['value' => $enabled],
+        );
+        tenancy()->end();
+    }
+
+    public function test_service_worker_flag_off_mengembalikan_self_destruct(): void
+    {
+        // Default flag OFF → /sw.js WAJIB berupa kill-switch: unregister diri,
+        // hapus cache 'root-shell-*', dan fetch no-op (tak intercept apa pun).
+        [, $host] = $this->boot('swoff');
+
+        $resp = $this->get("http://{$host}/sw.js", $this->headers($host));
+
+        $resp->assertOk();
+        $resp->assertHeader('Service-Worker-Allowed', '/');
+        $this->assertStringContainsString('application/javascript', (string) $resp->headers->get('content-type'));
+        $js = $resp->getContent();
+
+        $this->assertStringContainsString('unregister', $js);
+        $this->assertStringContainsString('caches.keys', $js);
+        $this->assertStringContainsString('"root-shell-"', $js);
+        $this->assertStringContainsString('skipWaiting', $js);
+        $this->assertStringContainsString('clients.claim', $js);
+        // Bukan SW normal: tak boleh ada SHELL_URLS / strategi cache shell.
+        $this->assertStringNotContainsString('SHELL_URLS', $js);
+    }
+
     public function test_service_worker_shell_only_allowlist_aman(): void
     {
-        [, $host] = $this->boot('sw');
+        [$tenant, $host] = $this->boot('sw');
+        $this->setRootSwFlag($tenant, true);
 
         $resp = $this->get("http://{$host}/sw.js", $this->headers($host));
 
