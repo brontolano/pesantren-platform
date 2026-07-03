@@ -207,10 +207,11 @@ class TenantResource extends Resource
                     ->button()
                     ->visible(fn (Tenant $record): bool => static::customDomains($record) !== []),
 
-                // === Domain kanonis (OVERRIDE manual): tanpa pilihan pun,
-                // subdomain platform sudah OTOMATIS di-redirect 301 ke custom
-                // domain ber-type sama (bila ada). Aksi ini utk memaksa target
-                // lain atau kembali ke perilaku otomatis. ===
+                // === Domain kanonis: OPT-IN MURNI. Tanpa aksi ini dijalankan,
+                // TIDAK ADA redirect sama sekali — keberadaan custom domain
+                // saja tidak pernah cukup (insiden 2026-07-04: versi otomatis
+                // lama meredirect albakids ke host tak valid). Owner memilih
+                // domain utama secara sadar per tenant, kapan pun diperlukan. ===
                 Action::make('domain_kanonis')
                     ->label('Domain Utama')
                     ->icon('heroicon-o-arrow-uturn-right')
@@ -219,11 +220,11 @@ class TenantResource extends Resource
                     ->form(fn (Tenant $record): array => [
                         Select::make('canonical_domain')
                             ->label('Jadikan Domain Utama (kanonis)')
-                            ->helperText('OVERRIDE manual. Default sudah OTOMATIS: subdomain platform dialihkan 301 ke custom domain ber-type sama (bila ada). Pilih di sini untuk memaksa target tertentu; pilih "(tanpa kanonis)" untuk kembali ke perilaku otomatis.')
+                            ->helperText('Pengaturan eksplisit — TANPA ini, tidak ada redirect apa pun (default untuk semua tenant). Pilih satu domain agar domain lain ber-type sama dialihkan 301 ke domain itu; pilih "(tanpa domain utama)" untuk menonaktifkan kembali.')
                             ->options(
                                 $record->domains
                                     ->mapWithKeys(fn ($d) => [$d->domain => "{$d->domain} ({$d->type})"])
-                                    ->prepend('(tanpa kanonis — pakai otomatis: subdomain → custom domain)', '')
+                                    ->prepend('(tanpa domain utama — tidak ada redirect)', '')
                                     ->all()
                             )
                             ->default((string) $record->domains->firstWhere('is_canonical', true)?->domain),
@@ -240,7 +241,7 @@ class TenantResource extends Resource
                         Notification::make()
                             ->title($pilihan !== ''
                                 ? "Domain utama tenant {$record->id}: {$pilihan}"
-                                : "Override kanonis tenant {$record->id} dihapus — kembali ke otomatis (subdomain platform → custom domain bila ada).")
+                                : "Domain utama tenant {$record->id} dinonaktifkan — tidak ada redirect.")
                             ->body($pilihan !== ''
                                 ? 'Domain lain ber-type sama akan dialihkan 301 ke domain ini (hanya GET; POST/API/livewire/signed-URL tidak disentuh).'
                                 : null)
