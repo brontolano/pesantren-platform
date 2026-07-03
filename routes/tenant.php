@@ -16,7 +16,6 @@ use App\Http\Controllers\DemoApps\PosKantinDemoController;
 use App\Http\Controllers\DemoApps\PpdbPanitiaDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoApps\TuDemoController;
-use App\Http\Controllers\DemoApps\UksDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
 use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\EmisExportController;
@@ -67,6 +66,7 @@ use App\Http\Controllers\PortalWali\PortalWaliTopupController;
 use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\SantriExportController;
 use App\Http\Controllers\TahfidzExportController;
+use App\Http\Controllers\UksController;
 use App\Support\TenantBranding;
 use App\Support\UiMode;
 use chillerlan\QRCode\QRCode;
@@ -155,19 +155,21 @@ Route::middleware([
     Route::get('/demo', [DemoPickerController::class, 'show'])->name('tenant.demo.picker.alias');
 
     /*
-     * ── App PWA demo peran (controller-dummy, gate auth saja) ──
-     * 9 aplikasi showcase: UKS, TU, Humas, Kepegawaian, PPDB Panitia,
-     * POS Kantin, Keamanan, Pengasuhan, Pengabdian. Data dummy inline di
-     * controller (nol query) → layar selalu penuh & aman. Auto-login persona
-     * via /demo-masuk/{key}. Semua pakai UI kit @/Shared.
+     * ── App PWA "Kesehatan UKS" (F4 — data nyata) ──
+     * Menggantikan UksDemoController: query nyata ke Modules\Kesehatan
+     * (kunjungan_uks, obat, riwayat_kesehatan). Gate permission `view_kesehatan`
+     * (read) / `manage_kesehatan` (tulis) — sudah dimiliki role pengelola_uks
+     * di RolesAndPermissionsSeeder.
      */
-    Route::middleware('auth')->prefix('uks')->name('tenant.uks.')->group(function () {
-        Route::get('/', [UksDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/kunjungan', [UksDemoController::class, 'kunjungan'])->name('kunjungan');
-        Route::get('/kunjungan/catat', [UksDemoController::class, 'catatKunjungan'])->name('kunjungan.catat');
-        Route::get('/obat', [UksDemoController::class, 'obat'])->name('obat');
-        Route::get('/rujukan', [UksDemoController::class, 'rujukan'])->name('rujukan');
-        Route::get('/riwayat', [UksDemoController::class, 'riwayat'])->name('riwayat');
+    Route::middleware(['auth', 'can:view_kesehatan'])->prefix('uks')->name('tenant.uks.')->group(function () {
+        Route::get('/', [UksController::class, 'beranda'])->name('beranda');
+        Route::get('/kunjungan', [UksController::class, 'kunjungan'])->name('kunjungan');
+        Route::get('/kunjungan/catat', [UksController::class, 'catatKunjunganForm'])->name('kunjungan.catat');
+        Route::post('/kunjungan/catat', [UksController::class, 'catatKunjunganStore'])
+            ->middleware('can:manage_kesehatan')->name('kunjungan.catat.store');
+        Route::get('/obat', [UksController::class, 'obat'])->name('obat');
+        Route::get('/rujukan', [UksController::class, 'rujukan'])->name('rujukan');
+        Route::get('/riwayat', [UksController::class, 'riwayat'])->name('riwayat');
     });
 
     Route::middleware('auth')->prefix('tu')->name('tenant.tu.')->group(function () {
