@@ -4,14 +4,16 @@
             'success' => 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400',
             'warning' => 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
             'info'    => 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
-            'primary' => 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+            'primary' => 'bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-400',
             'danger'  => 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
             'gray'    => 'bg-gray-100 text-gray-600 dark:bg-gray-700/30 dark:text-gray-400',
         ];
     @endphp
 
-    <section class="tema-quick rounded-lg bg-gradient-to-b from-[#fffaf3] to-white p-5 shadow-sm ring-1 ring-[#efe7da]
-                    dark:from-gray-800 dark:to-[#1C1C24] dark:ring-gray-700">
+    {{-- THEME-AWARE: netral (kartu putih standar); identitas krem bawaan
+         dipulihkan blok .tema-quick di theme.css BAWAAN saja. --}}
+    <section class="tema-quick rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-950/5
+                    dark:bg-gray-900 dark:ring-white/10">
         <h3 class="mb-4 text-sm font-semibold font-display text-gray-900 dark:text-white">
             🚀 Akses Cepat
         </h3>

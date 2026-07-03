@@ -510,3 +510,36 @@ body[class*="tema-"] .fi-topbar-start {
 
 [x-cloak] { display: none !important; }
 [x-cloak] { display: none !important; }
+
+/* ===================================================================
+   IDENTITAS WIDGET DASBOR — HANYA TEMA BAWAAN.
+   Blade widget kini theme-aware (token primary/gray netral); blok ini
+   memulihkan identitas visual bawaan persis seperti semula:
+   - Banner sambutan: gradient hijau WA (light) / TikTok deep (dark)
+   - Akses Cepat: kartu krem hangat (light) / gradasi #1C1C24 (dark)
+   - Kartu agenda/pengumuman: permukaan #1C1C24 + ring #2A2A35 (dark)
+   Build tema EKSTERNAL tidak memuat file ini → widget tampil netral
+   mengikuti palet tema (tidak "setengah bertema").
+   =================================================================== */
+.tema-greeting {
+    background: linear-gradient(to right, #0b8f63, #059669, #047857) !important;
+}
+.dark .tema-greeting {
+    background: linear-gradient(to right, #0f1c14, #161823, #1a243a) !important;
+}
+.tema-quick {
+    background: linear-gradient(to bottom, #fffaf3, #ffffff) !important;
+    --tw-ring-color: #efe7da !important;
+}
+.dark .tema-quick {
+    background: linear-gradient(to bottom, #1f2937, #1C1C24) !important;
+    --tw-ring-color: #374151 !important;
+}
+.dark .tema-card {
+    background-color: #1C1C24 !important;
+    --tw-ring-color: #2A2A35 !important;
+}
+.dark .tema-card li {
+    /* replika dark:divide-[#2A2A35] lama (divide-y memberi border-top) */
+    border-color: #2A2A35 !important;
+}

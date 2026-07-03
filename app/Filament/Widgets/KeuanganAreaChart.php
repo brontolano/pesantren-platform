@@ -65,13 +65,20 @@ class KeuanganAreaChart extends ChartWidget
             $pengeluaran[] = 0;
         }
 
+        // THEME-AWARE: tema EKSTERNAL memakai primer paletnya (mis. Nord biru
+        // es, Brisk near-black) — tema bawaan tetap hijau WA persis.
+        $primer = \App\Support\PanelTheme::isEksternal()
+            ? (\App\Support\PanelTheme::primaryHex() ?? '#22c55e')
+            : '#22c55e';
+        [$r, $g, $b] = sscanf(ltrim($primer, '#'), '%02x%02x%02x');
+
         return [
             'datasets' => [
                 [
                     'label' => 'Pemasukan',
                     'data' => $pemasukan,
-                    'borderColor' => '#22c55e',        // green-500 (WA-style)
-                    'backgroundColor' => 'rgba(34,197,94,0.13)',
+                    'borderColor' => $primer,          // bawaan: green-500 (WA-style)
+                    'backgroundColor' => "rgba({$r},{$g},{$b},0.13)",
                     'fill' => true,
                     'tension' => 0.4,
                     'borderWidth' => 2,
