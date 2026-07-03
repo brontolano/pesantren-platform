@@ -30,7 +30,8 @@ use Tests\TestCase;
  * - Kartu stats dasbor JUJUR: "Tagihan Lewat Jatuh Tempo" (satu definisi dgn
  *   KeuanganOverviewWidget) + deskripsi dinamis kas masuk/keluar.
  * - Konsolidasi dasbor: satu baris stats saja (Overview domain dicabut).
- * - QuickAccessWidget terdaftar kembali; favicon branding tenant; label Indo.
+ * - QuickAccessWidget TIDAK terdaftar (dicabut lagi, owner 2026-07-03);
+ *   favicon branding tenant; label Indo.
  */
 class UiAuditDasborTest extends TestCase
 {
@@ -193,12 +194,12 @@ class UiAuditDasborTest extends TestCase
         $this->assertStringContainsString('belum terposting', (string) $stat->getDescription());
     }
 
-    public function test_dasbor_tenant_hanya_satu_baris_stats_dan_quick_access_terdaftar(): void
+    public function test_dasbor_tenant_hanya_satu_baris_stats_dan_quick_access_tidak_terdaftar(): void
     {
         $widgets = Filament::getPanel('tenant')->getWidgets();
 
         $this->assertContains(StatsPesantren::class, $widgets, 'StatsPesantren = satu-satunya baris stats dasbor.');
-        $this->assertContains(QuickAccessWidget::class, $widgets, 'QuickAccessWidget didaftarkan kembali (fix widget mati).');
+        $this->assertNotContains(QuickAccessWidget::class, $widgets, 'QuickAccessWidget DICABUT (keputusan owner 2026-07-03: pintasan tak diinginkan; super admin melihat semuanya).');
         $this->assertNotContains(KesantrianOverviewWidget::class, $widgets, 'Ringkasan Kesantrian dicabut dari dasbor utama (dobel definisi).');
         $this->assertNotContains(KeuanganOverviewWidget::class, $widgets, 'Ringkasan Keuangan dicabut dari dasbor utama (dobel definisi).');
     }

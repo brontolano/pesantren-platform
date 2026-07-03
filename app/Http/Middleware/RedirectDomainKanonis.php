@@ -8,7 +8,8 @@ use Stancl\Tenancy\Database\Models\Domain;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Kanonisasi domain per-tenant (OPT-IN) — menghapus "dualitas panel admin".
+ * Kanonisasi domain per-tenant (OTOMATIS + override manual) — menghapus
+ * "dualitas panel admin".
  *
  * Kasus nyata: pesantren.asy-syifaa.com/admin dan asy-syifaa.pesantren.online/admin
  * adalah panel yang SAMA (dua record type='sistem' menunjuk tenant yang sama).
@@ -17,16 +18,23 @@ use Symfony\Component\HttpFoundation\Response;
  * (SEO), dan nanti PWA: service worker + manifest ter-scope per origin sehingga
  * pengguna bisa punya DUA instalasi PWA berbeda untuk satu pesantren.
  *
- * Perilaku: bila salah satu domain tenant ditandai is_canonical=true DAN request
- * masuk lewat domain lain milik tenant yang sama dengan `type` yang sama
- * (mis. sesama 'sistem'), request web GET/HEAD di-redirect 301 ke host kanonis
- * dengan path + query utuh. Domain ber-type beda (mis. 'website' vs 'sistem')
- * TIDAK disentuh — kontennya memang berbeda.
+ * Aturan resolusi target kanonis (keputusan owner 2026-07-03: "subdomain
+ * *.pesantren.online DISABLE bila ada custom domain" — otomatis, bukan opt-in):
+ * 1. Bila salah satu domain tenant (type sama) ditandai is_canonical=true →
+ *    pakai itu (override manual via aksi UI "Domain Utama").
+ * 2. Bila TIDAK ada is_canonical: OTOMATIS — bila host request adalah
+ *    subdomain platform (*.{suffix central, dari config tenancy.central_domains})
+ *    DAN tenant punya ≥1 domain CUSTOM (bukan subdomain platform) dengan `type`
+ *    SAMA → 301 ke custom domain itu. Bila lebih dari satu custom ber-type
+ *    sama, pilihan deterministik: is_primary=true dulu, lalu ID terkecil
+ *    (yang paling lama didaftarkan).
+ * 3. Custom domain TIDAK PERNAH di-redirect otomatis — hanya oleh
+ *    is_canonical eksplisit.
+ * Tenant yang hanya punya subdomain platform (demo, albakids) → nol perubahan.
  *
  * Konservatif by design:
  * - Hanya GET/HEAD (301). POST/PUT/... dibiarkan lewat — tidak mengganggu
  *   Livewire, webhook, atau form submit yang sedang berjalan.
- * - Tenant tanpa domain kanonis = perilaku lama, nol perubahan (demo/albakids).
  * - Berjalan SEBELUM inisialisasi tenancy (query langsung ke tabel domains
  *   central) sehingga resolusi tenancy sama sekali tidak berubah.
  * - Rute infrastruktur dikecualikan (lihat $kecuali) — terutama signed URL
@@ -70,11 +78,7 @@ class RedirectDomainKanonis
             return $next($request);
         }
 
-        $kanonis = Domain::query()
-            ->where('tenant_id', $saatIni->tenant_id)
-            ->where('is_canonical', true)
-            ->where('type', $saatIni->type)
-            ->value('domain');
+        $kanonis = $this->resolveTargetKanonis($saatIni, $host);
 
         if (! is_string($kanonis) || $kanonis === '' || $kanonis === $host) {
             return $next($request);
@@ -84,5 +88,55 @@ class RedirectDomainKanonis
             $request->getScheme().'://'.$kanonis.$request->getRequestUri(),
             301,
         );
+    }
+
+    /**
+     * Resolusi target kanonis untuk host saat ini (lihat aturan di docblock kelas).
+     */
+    protected function resolveTargetKanonis(Domain $saatIni, string $host): ?string
+    {
+        // Aturan 1: override manual (is_canonical) menang — berlaku dari host
+        // apa pun, termasuk custom domain.
+        $eksplisit = Domain::query()
+            ->where('tenant_id', $saatIni->tenant_id)
+            ->where('is_canonical', true)
+            ->where('type', $saatIni->type)
+            ->value('domain');
+
+        if (is_string($eksplisit) && $eksplisit !== '') {
+            return $eksplisit;
+        }
+
+        // Aturan 3: custom domain tidak pernah di-redirect otomatis.
+        if (! $this->adalahSubdomainPlatform($host)) {
+            return null;
+        }
+
+        // Aturan 2: otomatis — subdomain platform → custom domain ber-type sama.
+        // Deterministik: is_primary dulu, lalu ID terkecil (terdaftar paling lama).
+        return Domain::query()
+            ->where('tenant_id', $saatIni->tenant_id)
+            ->where('type', $saatIni->type)
+            ->where('domain', '!=', $host)
+            ->orderByDesc('is_primary')
+            ->orderBy('id')
+            ->get(['domain', 'is_primary'])
+            ->first(fn (Domain $d): bool => ! $this->adalahSubdomainPlatform($d->domain))
+            ?->domain;
+    }
+
+    /**
+     * Host adalah subdomain platform bila berakhiran ".{central_domain}"
+     * (suffix dari config tenancy.central_domains — tidak di-hardcode).
+     */
+    protected function adalahSubdomainPlatform(string $host): bool
+    {
+        foreach (config('tenancy.central_domains', []) as $suffix) {
+            if (is_string($suffix) && $suffix !== '' && str_ends_with($host, '.'.$suffix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
