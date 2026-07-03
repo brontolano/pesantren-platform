@@ -1,5 +1,6 @@
 <script setup>
 import { Link, router, usePage } from '@inertiajs/vue3'
+import { HeroHeader, SectionCard, EmptyState, UiButton, StatusBadge } from '@/Shared'
 
 defineProps({
     nama: String,
@@ -15,32 +16,34 @@ function mulai(id) {
 
 <template>
     <div class="min-h-screen bg-[#fffaf3] pb-10">
-        <header class="bg-gradient-to-b from-emerald-800 to-emerald-600 px-5 pb-12 pt-8 text-white">
-            <div class="mx-auto max-w-md">
-                <Link href="/app" class="text-xs text-emerald-200">← Beranda</Link>
-                <h1 class="mt-1 text-xl font-bold">Ujian Online</h1>
-                <p class="text-xs text-emerald-200">{{ nama }}</p>
-            </div>
-        </header>
+        <HeroHeader :name="nama" greeting="Ujian Online">
+            <template #action>
+                <Link href="/app" class="text-xs text-white/80">← Beranda</Link>
+            </template>
+        </HeroHeader>
 
         <main class="mx-auto -mt-7 max-w-md space-y-3 px-5">
             <p v-if="errors.sesi" class="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{{ errors.sesi }}</p>
 
-            <section v-if="sesi.length === 0" class="rounded-2xl border border-dashed border-stone-300 bg-white/60 px-5 py-6 text-center text-sm text-stone-500">
-                Belum ada jadwal ujian untuk kelasmu.
-            </section>
+            <EmptyState
+                v-if="sesi.length === 0"
+                icon="document"
+                title="Belum ada jadwal ujian"
+                message="Belum ada jadwal ujian untuk kelasmu."
+            />
 
-            <section v-for="s in sesi" :key="s.id" class="rounded-2xl border border-stone-200 bg-white px-5 py-4 shadow-sm">
+            <SectionCard v-for="s in sesi" :key="s.id">
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <p class="truncate text-sm font-bold text-stone-800">{{ s.nama }}</p>
                         <p class="text-xs text-stone-400">{{ s.pelajaran }} · {{ s.durasi_menit }} menit</p>
                         <p class="mt-1 text-xs text-stone-500">{{ s.mulai_at }} → {{ s.selesai_at }}</p>
                     </div>
-                    <span
-                        class="shrink-0 rounded-full px-2 py-1 text-[10px] font-bold uppercase"
-                        :class="s.berlangsung ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-500'"
-                    >{{ s.berlangsung ? 'Dibuka' : 'Tutup' }}</span>
+                    <StatusBadge
+                        :status="s.berlangsung ? 'berlangsung' : 'nonaktif'"
+                        :label="s.berlangsung ? 'Dibuka' : 'Tutup'"
+                        size="sm"
+                    />
                 </div>
 
                 <div class="mt-3">
@@ -50,20 +53,20 @@ function mulai(id) {
                     <p v-else-if="s.status_attempt === 'menunggu_nilai'" class="text-sm font-semibold text-amber-700">
                         Dikumpulkan — menunggu penilaian essay.
                     </p>
-                    <Link
+                    <UiButton
                         v-else-if="s.status_attempt === 'berjalan'"
                         :href="`/app/ujian/${s.id}`"
-                        class="block w-full rounded-xl bg-emerald-600 py-2.5 text-center text-sm font-bold text-white"
-                    >Lanjutkan Ujian</Link>
-                    <button
+                        block
+                    >Lanjutkan Ujian</UiButton>
+                    <UiButton
                         v-else-if="s.berlangsung"
                         type="button"
-                        class="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white"
+                        block
                         @click="mulai(s.id)"
-                    >Mulai Ujian</button>
+                    >Mulai Ujian</UiButton>
                     <p v-else class="text-xs text-stone-400">Belum dibuka / sudah ditutup.</p>
                 </div>
-            </section>
+            </SectionCard>
         </main>
     </div>
 </template>
