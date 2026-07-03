@@ -8,3 +8,4 @@
 
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';
+@source '../../../../Modules/AI/resources/views/components';

@@ -7,6 +7,7 @@ use Closure;
 use Filament\Enums\ThemeMode;
 use Filament\Facades\Filament;
 use Filament\Support\Colors\Color;
+use Filament\Support\Colors\ColorManager;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -28,6 +29,17 @@ class ApplyPanelTheme
             // lalu DITIMPA palet vendor tema aktif (replika ->colors() plugin
             // vendor — mis. Nord: gray polar-night + primer frost) atau
             // primer preset warna utk tema tanpa palet.
+            //
+            // JEBAKAN CACHE LINTAS-REQUEST (multi-tenant, worker long-running):
+            // ColorManager Filament v5 di-bind SCOPED dan meng-cache hasil
+            // getColors() di properti $cachedColors. Bila scoped instance tidak
+            // di-flush antar request (kernel dipanggil berulang dalam satu
+            // proses), register() di bawah hanya MENUMPUK entri baru sementara
+            // cache lama tetap dipakai → request ke-2 membawa warna tenant
+            // sebelumnya. Solusi aman: buang instance scoped + resolved facade
+            // agar register() bekerja pada ColorManager SEGAR tanpa cache.
+            app()->forgetInstance(ColorManager::class);
+            FilamentColor::clearResolvedInstance(ColorManager::class);
             FilamentColor::register($this->resolveColors());
 
             $panel = Filament::getCurrentPanel();

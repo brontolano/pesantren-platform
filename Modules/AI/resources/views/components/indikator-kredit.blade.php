@@ -19,10 +19,12 @@
     $tanpaBatas = $anggaran === null || (float) $anggaran <= 0;
     $persen = $tanpaBatas ? null : round($terpakai / (float) $anggaran * 100, 1);
     $lebarBar = $persen === null ? 0 : min(100.0, $persen);
+    // Kelas Tailwind dark-aware (di mode gelap pakai shade lebih terang agar
+    // tetap kontras terhadap track gray-700).
     $warnaBar = match (true) {
-        $persen !== null && $persen >= 100 => '#b91c1c', // red-700
-        $persen !== null && $persen >= 80 => '#b45309',  // amber-700
-        default => '#14532d',                            // Forest Green brand
+        $persen !== null && $persen >= 100 => 'bg-red-700 dark:bg-red-500',
+        $persen !== null && $persen >= 80 => 'bg-amber-700 dark:bg-amber-500',
+        default => 'bg-green-900 dark:bg-green-500', // Forest Green brand
     };
     $angka = fn ($n): string => number_format((float) $n, 0, ',', '.');
     $persenLabel = $persen === null ? '' : str_replace('.', ',', rtrim(rtrim(number_format($persen, 1, '.', ''), '0'), '.'));
@@ -42,7 +44,7 @@
             aria-valuenow="{{ $lebarBar }}"
             aria-label="Pemakaian kredit AI {{ $persenLabel }} persen dari anggaran bulanan"
         >
-            <div class="h-full rounded-full" style="width: {{ $lebarBar }}%; background-color: {{ $warnaBar }};"></div>
+            <div class="h-full rounded-full {{ $warnaBar }}" style="width: {{ $lebarBar }}%;"></div>
         </div>
         <p class="text-xs text-gray-600 dark:text-gray-300">
             Kredit AI terpakai {{ $angka($terpakai) }} dari {{ $angka($anggaran) }} ({{ $persenLabel }}%).

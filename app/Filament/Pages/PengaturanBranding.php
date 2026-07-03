@@ -45,11 +45,11 @@ class PengaturanBranding extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
-    protected static ?string $navigationLabel = 'Settings & Branding';
+    protected static ?string $navigationLabel = 'Pengaturan & Branding';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan Sistem';
 
-    protected static ?string $title = 'Settings & Branding';
+    protected static ?string $title = 'Pengaturan & Branding';
 
     protected static ?int $navigationSort = 4;
 

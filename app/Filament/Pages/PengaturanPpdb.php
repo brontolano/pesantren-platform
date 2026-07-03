@@ -113,7 +113,7 @@ class PengaturanPpdb extends Page implements HasForms
                     ]),
 
                 Section::make('Konfigurasi Field Formulir PPDB')
-                    ->description('Atur mode tiap field formulir pendaftaran. Isi nilai dengan: required, optional, hidden, atau staf (diisi panitia). Sama dengan konfigurasi di Settings & Branding — disimpan ke kunci yang sama.')
+                    ->description('Atur mode tiap field formulir pendaftaran. Isi nilai dengan: required, optional, hidden, atau staf (diisi panitia). Sama dengan konfigurasi di Pengaturan & Branding — disimpan ke kunci yang sama.')
                     ->icon('heroicon-o-list-bullet')
                     ->schema([
                         KeyValue::make('ppdb_form_fields')

@@ -34,8 +34,7 @@
             <button
                 type="button"
                 wire:click="{{ $aksi }}"
-                class="ai-tombol-sahkan inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
-                style="background-color: #14532d;"
+                class="ai-tombol-sahkan inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-green-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 dark:bg-green-700"
             >
                 <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m4.5 12.75 6 6 9-13.5" />

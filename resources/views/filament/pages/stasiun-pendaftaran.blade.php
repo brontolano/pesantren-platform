@@ -105,7 +105,10 @@
                     <x-filament::section>
                         <x-slot name="heading">✍️ Tanda Tangan <x-filament::badge :color="$badge('ttd')">{{ $st['ttd'] }}</x-filament::badge></x-slot>
                         <div x-data="ttdStasiun()" class="space-y-2">
-                            <canvas x-ref="pad" class="h-40 w-full touch-none rounded-xl border border-gray-300 bg-white"
+                            {{-- Kanvas TTD SENGAJA tetap putih di kedua mode (tinta gelap di
+                                 atas putih = hasil gambar tanda tangan yang disimpan); hanya
+                                 border yang dark-aware. --}}
+                            <canvas x-ref="pad" class="h-40 w-full touch-none rounded-xl border border-gray-300 bg-white dark:border-gray-600"
                                 @pointerdown="mulaiGores($event)" @pointermove="gores($event)" @pointerup="selesaiGores()" @pointerleave="selesaiGores()"></canvas>
                             <div class="flex gap-2">
                                 <x-filament::button icon="heroicon-o-check" @click="simpan()">Simpan TTD</x-filament::button>
