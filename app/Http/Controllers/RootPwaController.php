@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Support\Pwa\SelfDestructSw;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 /**
  * Manifest + ikon PWA scope ROOT "/" untuk aplikasi 1-pintu per pesantren
@@ -108,6 +111,16 @@ class RootPwaController extends Controller
     }
 
     /**
+     * Halaman offline (F1) — precache-able, blade statis (bukan Inertia/Vue
+     * berat), branding tenant. Ditampilkan SW saat navigasi gagal karena
+     * jaringan mati.
+     */
+    public function offline(): View
+    {
+        return view('tenant.pwa-offline', $this->branding());
+    }
+
+    /**
      * Service worker scope ROOT "/" (Fase 3). Pola ALLOW-LIST aman a la PWA Guru:
      * HANYA shell statis publik (manifest + ikon) yang di-intercept & di-cache.
      * SEMUA permintaan lain (Beranda dinamis, /admin, /platform, /livewire,
@@ -127,24 +140,54 @@ class RootPwaController extends Controller
         // di perangkat walau owner mematikan flag.
         if (! (bool) Setting::getTenantValue('pwa.root_sw_enabled', false)) {
             return response(
-                \App\Support\Pwa\SelfDestructSw::script('root-shell-'),
+                SelfDestructSw::script('root-shell-'),
                 200,
-                \App\Support\Pwa\SelfDestructSw::headers('/'),
+                SelfDestructSw::headers('/'),
             );
         }
 
         $b = $this->branding();
-        $versionSeed = implode('|', [$b['tenantId'], $b['name'], $b['primaryColor'], $b['secondaryColor']]);
+        // F1: hash manifest build Vite masuk versionSeed → cache auto-bust tiap
+        // deploy (aset /build/* ber-hash berubah nama, tapi precache list &
+        // strategi SW sendiri bisa berubah tanpa itu — manifest.json adalah
+        // proxy murah utk "build baru telah di-deploy").
+        $buildManifestPath = public_path('build/manifest.json');
+        $buildHash = File::exists($buildManifestPath)
+            ? substr(sha1((string) File::get($buildManifestPath)), 0, 10)
+            : 'nobuild';
+        $versionSeed = implode('|', [$b['tenantId'], $b['name'], $b['primaryColor'], $b['secondaryColor'], $buildHash]);
         $cacheName = 'root-shell-'.$b['tenantId'].'-'.substr(sha1($versionSeed), 0, 12);
         $shellUrls = [
             '/manifest.webmanifest',
             '/icon.svg?size=192',
             '/icon.svg?size=512',
+            '/offline',
+        ];
+        // F1: deny-list eksplisit — scope portal ber-SW-sendiri + jalur backend
+        // TIDAK PERNAH ditangani SW root (defense-in-depth; longest-scope-wins
+        // browser sudah menjamin ini, tapi kegagalan itu mahal — cegah dobel).
+        $denyPrefixes = [
+            '/admin',
+            '/platform',
+            '/livewire',
+            '/api',
+            '/filament',
+            '/guru',
+            '/wali',
+            '/spmb',
+            '/keuangan',
         ];
 
         $script = <<<'JS'
         const CACHE_NAME = %s;
         const SHELL_URLS = %s;
+        const OFFLINE_URL = '/offline';
+        const DENY_PREFIXES = %s;
+        const BUILD_ASSET_RE = /^\/build\//;
+
+        function isDenied(pathname) {
+            return DENY_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(prefix + '/'));
+        }
 
         self.addEventListener('install', (event) => {
             event.waitUntil((async () => {
@@ -167,7 +210,6 @@ class RootPwaController extends Controller
         });
 
         self.addEventListener('fetch', (event) => {
-            // ALLOW-LIST ketat: hanya GET shell publik same-origin yang ditangani.
             if (event.request.method !== 'GET') {
                 return;
             }
@@ -178,34 +220,82 @@ class RootPwaController extends Controller
                 return;
             }
 
-            // Hanya manifest + ikon. Beranda dinamis, /admin, /platform, /livewire,
-            // /api, halaman ber-auth: DILEWATKAN ke jaringan (tak di-cache).
-            const isShellUrl = SHELL_URLS.includes(url.pathname + url.search);
-
-            if (!isShellUrl) {
+            // Deny-list eksplisit: jangan sentuh sama sekali — biar network murni.
+            if (isDenied(url.pathname)) {
                 return;
             }
 
-            event.respondWith((async () => {
-                const cache = await caches.open(CACHE_NAME);
-                const cached = await cache.match(event.request);
+            const isShellUrl = SHELL_URLS.includes(url.pathname + url.search);
 
-                try {
-                    const response = await fetch(event.request);
+            // Lapis 1 — shell (manifest/ikon/offline): network-then-cache, fallback cache.
+            if (isShellUrl) {
+                event.respondWith((async () => {
+                    const cache = await caches.open(CACHE_NAME);
+                    const cached = await cache.match(event.request);
 
-                    if (response.ok) {
-                        await cache.put(event.request, response.clone());
+                    try {
+                        const response = await fetch(event.request);
+
+                        if (response.ok) {
+                            await cache.put(event.request, response.clone());
+                        }
+
+                        return response;
+                    } catch (error) {
+                        if (cached) {
+                            return cached;
+                        }
+
+                        return new Response('', { status: 503, statusText: 'Offline' });
                     }
+                })());
 
-                    return response;
-                } catch (error) {
+                return;
+            }
+
+            // Lapis 2 — aset build ber-hash (immutable): cache-first.
+            if (BUILD_ASSET_RE.test(url.pathname)) {
+                event.respondWith((async () => {
+                    const cache = await caches.open(CACHE_NAME);
+                    const cached = await cache.match(event.request);
+
                     if (cached) {
                         return cached;
                     }
 
-                    return new Response('', { status: 503, statusText: 'Offline' });
-                }
-            })());
+                    try {
+                        const response = await fetch(event.request);
+
+                        if (response.ok) {
+                            await cache.put(event.request, response.clone());
+                        }
+
+                        return response;
+                    } catch (error) {
+                        return new Response('', { status: 503, statusText: 'Offline' });
+                    }
+                })());
+
+                return;
+            }
+
+            // Lapis 3 — navigasi HTML (halaman dinamis, mis. beranda publik):
+            // network-first, fallback ke halaman /offline (TIDAK cache HTML
+            // ber-auth apa pun — pelajaran insiden SW /wali di F0).
+            const acceptsHtml = (event.request.headers.get('accept') || '').includes('text/html');
+
+            if (event.request.mode === 'navigate' || acceptsHtml) {
+                event.respondWith((async () => {
+                    try {
+                        return await fetch(event.request);
+                    } catch (error) {
+                        const cache = await caches.open(CACHE_NAME);
+                        const offline = await cache.match(OFFLINE_URL);
+
+                        return offline || new Response('', { status: 503, statusText: 'Offline' });
+                    }
+                })());
+            }
         });
         JS;
 
@@ -213,6 +303,7 @@ class RootPwaController extends Controller
             $script,
             json_encode($cacheName, JSON_THROW_ON_ERROR),
             json_encode($shellUrls, JSON_THROW_ON_ERROR),
+            json_encode($denyPrefixes, JSON_THROW_ON_ERROR),
         ), 200, [
             'Content-Type' => 'application/javascript; charset=UTF-8',
             'Cache-Control' => 'no-cache, must-revalidate',

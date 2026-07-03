@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Setting;
 use App\Models\Tenant;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -117,13 +118,79 @@ class RootPwaTest extends TestCase
         $resp->assertHeader('Service-Worker-Allowed', '/');
         $js = $resp->getContent();
 
-        // Shell allow-list HANYA manifest + ikon (3 URL); tak ada area dinamis/sensitif.
-        $this->assertStringContainsString('const SHELL_URLS = ["\/manifest.webmanifest","\/icon.svg?size=192","\/icon.svg?size=512"]', $js);
-        // Penjaga keamanan: non-GET dilewati, lintas-origin dilewati, non-shell dilewati
-        // (allow-list → /admin /platform /livewire /api & halaman ber-auth TAK PERNAH di-cache).
+        // F1: shell allow-list kini 4 URL (manifest, 2 ikon, /offline).
+        $this->assertStringContainsString('const SHELL_URLS = ["\/manifest.webmanifest","\/icon.svg?size=192","\/icon.svg?size=512","\/offline"]', $js);
+        // Penjaga keamanan dasar tetap ada: non-GET dilewati, lintas-origin dilewati.
         $this->assertStringContainsString("method !== 'GET'", $js);
         $this->assertStringContainsString('self.location.origin', $js);
-        $this->assertStringContainsString('if (!isShellUrl)', $js);
+    }
+
+    public function test_service_worker_hybrid_f1_deny_list_dan_lapis_cache(): void
+    {
+        [$tenant, $host] = $this->boot('hyb');
+        $this->setRootSwFlag($tenant, true);
+
+        $js = $this->get("http://{$host}/sw.js", $this->headers($host))->getContent();
+
+        // Deny-list eksplisit: scope portal ber-SW-sendiri + jalur backend TAK
+        // PERNAH ditangani SW root (defense-in-depth).
+        foreach (['\/admin', '\/platform', '\/livewire', '\/api', '\/filament', '\/guru', '\/wali', '\/spmb', '\/keuangan'] as $prefix) {
+            $this->assertStringContainsString($prefix, $js);
+        }
+        $this->assertStringContainsString('DENY_PREFIXES', $js);
+        $this->assertStringContainsString('isDenied', $js);
+        // Lapis 2: aset build ber-hash cache-first.
+        $this->assertStringContainsString('BUILD_ASSET_RE', $js);
+        $this->assertStringContainsString('/^\/build\//', $js);
+        // Lapis 3: navigasi HTML network-first, fallback /offline — TIDAK cache
+        // HTML ber-auth apa pun (pelajaran insiden SW /wali di F0).
+        $this->assertStringContainsString('OFFLINE_URL', $js);
+        $this->assertStringContainsString("mode === 'navigate'", $js);
+    }
+
+    public function test_cache_version_berubah_bila_build_manifest_vite_berubah(): void
+    {
+        [$tenant, $host] = $this->boot('ver');
+        $this->setRootSwFlag($tenant, true);
+
+        $buildManifest = public_path('build/manifest.json');
+        $original = File::exists($buildManifest) ? File::get($buildManifest) : null;
+
+        try {
+            File::ensureDirectoryExists(public_path('build'));
+            File::put($buildManifest, '{"version":"satu"}');
+            $js1 = $this->get("http://{$host}/sw.js", $this->headers($host))->getContent();
+            preg_match('/CACHE_NAME = "([^"]+)"/', $js1, $m1);
+
+            File::put($buildManifest, '{"version":"dua-beda-total"}');
+            $js2 = $this->get("http://{$host}/sw.js", $this->headers($host))->getContent();
+            preg_match('/CACHE_NAME = "([^"]+)"/', $js2, $m2);
+
+            $this->assertNotSame('', $m1[1] ?? '');
+            $this->assertNotSame('', $m2[1] ?? '');
+            $this->assertNotSame($m1[1], $m2[1], 'Cache name harus berubah saat manifest build Vite berubah.');
+        } finally {
+            if ($original !== null) {
+                File::put($buildManifest, $original);
+            } elseif (File::exists($buildManifest)) {
+                File::delete($buildManifest);
+            }
+        }
+    }
+
+    public function test_halaman_offline_render_dengan_branding_tenant(): void
+    {
+        [$tenant, $host] = $this->boot('off');
+
+        tenancy()->initialize($tenant);
+        Setting::updateOrCreate(['tenant_id' => $tenant->id, 'key' => 'branding_name'], ['value' => 'Pondok Offline Uji']);
+        tenancy()->end();
+
+        $resp = $this->get("http://{$host}/offline", $this->headers($host));
+
+        $resp->assertOk();
+        $this->assertStringContainsString('Pondok Offline Uji', $resp->getContent());
+        $this->assertStringContainsString('Coba Lagi', $resp->getContent());
     }
 
     public function test_manifest_pakai_branding_tenant(): void
@@ -155,5 +222,31 @@ class RootPwaTest extends TestCase
         $icon = $this->get("http://{$host}/icon.svg?size=192", $this->headers($host));
         $icon->assertOk();
         $this->assertStringNotContainsString('javascript:alert', $icon->getContent());
+    }
+
+    public function test_halaman_spmb_tidak_memuat_manifest_root_dobel(): void
+    {
+        // TWA /spmb live bergantung pada satu manifest tunggal (/spmb/manifest.json,
+        // disuntik client-side oleh SpmbLayout.vue via Inertia <Head>). Manifest
+        // root statis (app.blade.php) HARUS dikecualikan di path /spmb — kalau
+        // tidak, DOM akhir (setelah Vue mount) bisa memuat DUA tag manifest.
+        [, $host] = $this->boot('spmbmf');
+
+        $resp = $this->get("http://{$host}/spmb/login", $this->headers($host));
+
+        $resp->assertOk();
+        $this->assertStringNotContainsString('/manifest.webmanifest', $resp->getContent());
+    }
+
+    public function test_halaman_root_tenant_tetap_memuat_manifest_root(): void
+    {
+        // Kontrol: path DI LUAR portal ber-manifest-sendiri tetap dapat manifest
+        // root statis (perilaku F1 tidak menghilangkan manifest root di mana pun).
+        [, $host] = $this->boot('rootmf');
+
+        $resp = $this->get("http://{$host}/", $this->headers($host));
+
+        $resp->assertOk();
+        $this->assertStringContainsString('/manifest.webmanifest', $resp->getContent());
     }
 }
