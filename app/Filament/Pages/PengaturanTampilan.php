@@ -4,6 +4,8 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use App\Support\PanelTheme;
+use App\Support\ThemePackage;
+use App\Support\ThemeThumbnail;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -20,7 +22,6 @@ use Livewire\Attributes\Computed;
  */
 class PengaturanTampilan extends Page
 {
-
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-paint-brush';
 
     protected static ?string $navigationLabel = 'Tampilan & Tema';
@@ -37,8 +38,11 @@ class PengaturanTampilan extends Page
 
     // State: pilihan user (preview vs saved)
     public ?string $selectedTheme = null;
+
     public ?string $selectedColor = null;
+
     public ?string $previewTheme = null;
+
     public ?string $previewColor = null;
 
     public static function canAccess(): bool
@@ -60,6 +64,95 @@ class PengaturanTampilan extends Page
         $this->previewColor = $this->selectedColor;
     }
 
+    // ==== PAKET TEMA siap-pakai (bundel tema+warna 1-klik) ====
+
+    /** Semua paket bundel untuk kartu grid. */
+    #[Computed]
+    public function packages()
+    {
+        return ThemePackage::all();
+    }
+
+    /** Peran user login (untuk badge "Disarankan untuk Anda"). */
+    #[Computed]
+    public function currentRoles(): array
+    {
+        $user = Auth::user();
+
+        if ($user === null || ! method_exists($user, 'getRoleNames')) {
+            return [];
+        }
+
+        try {
+            return $user->getRoleNames()->all();
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    /** Key paket yang cocok dgn tema+warna tersimpan (highlight kartu aktif). */
+    #[Computed]
+    public function activePackageKey(): ?string
+    {
+        return ThemePackage::activeKey($this->selectedTheme ?? '', $this->selectedColor ?? '');
+    }
+
+    /** SVG thumbnail generatif untuk satu paket (dipakai blade). */
+    public function packageThumbnail(string $packageKey): string
+    {
+        return ThemeThumbnail::inlineForPackage($packageKey);
+    }
+
+    /** SVG thumbnail generatif untuk satu tema (dipakai blade, seksi lanjutan). */
+    public function themeThumbnail(string $themeKey): string
+    {
+        return ThemeThumbnail::inlineForTheme($themeKey);
+    }
+
+    /** Apakah paket ini disarankan untuk peran user login? */
+    public function packageRecommended(string $packageKey): bool
+    {
+        return ThemePackage::isRecommendedForRoles($packageKey, $this->currentRoles());
+    }
+
+    /** Terapkan paket bundel 1-klik: set tema + warna sekaligus, lalu simpan. */
+    public function applyPackage(string $packageKey): void
+    {
+        $pkg = ThemePackage::get($packageKey);
+
+        if ($pkg === null) {
+            Notification::make()
+                ->title('Paket tidak dikenal')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        try {
+            if (! ThemePackage::applyToSetting($packageKey)) {
+                throw new \RuntimeException('Paket merujuk tema/warna tidak valid.');
+            }
+
+            $this->selectedTheme = $pkg['theme'];
+            $this->selectedColor = ThemePackage::effectiveColor($packageKey);
+            $this->previewTheme = $this->selectedTheme;
+            $this->previewColor = $this->selectedColor;
+
+            Notification::make()
+                ->title('✓ Paket "'.$pkg['name'].'" diterapkan')
+                ->body('Muat ulang halaman untuk melihat tampilan baru diterapkan penuh.')
+                ->success()
+                ->send();
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('Error menerapkan paket')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
+
     // Computed properties untuk UI
     #[Computed]
     public function themes()
@@ -72,7 +165,7 @@ class PengaturanTampilan extends Page
     {
         return collect(PanelTheme::categories())
             ->mapWithKeys(fn (string $cat) => [
-                $cat => PanelTheme::themesByCategory($cat)
+                $cat => PanelTheme::themesByCategory($cat),
             ])
             ->all();
     }
@@ -146,7 +239,7 @@ class PengaturanTampilan extends Page
     public function selectColor(string $colorKey): void
     {
         // Hanya allow jika tidak locked
-        if (!$this->applicableColors()['locked'] && array_key_exists($colorKey, PanelTheme::COLORS)) {
+        if (! $this->applicableColors()['locked'] && array_key_exists($colorKey, PanelTheme::COLORS)) {
             $this->previewColor = $colorKey;
         }
     }
@@ -393,5 +486,4 @@ class PengaturanTampilan extends Page
 </html>
 HTML;
     }
-
 }
