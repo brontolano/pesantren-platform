@@ -28,7 +28,7 @@ return [
         // Tema panel default bila tenant belum memilih via Setting
         // (App\Support\PanelTheme::SETTING_THEME). Pilihan eksplisit tenant
         // tetap menang.
-        'panel_theme_default' => 'pixio',
+        'panel_theme_default' => 'bawaan',
 
         // Halaman '/' domain 'sistem' untuk tamu & peran jemaah:
         // 'landing' = Beranda publik CMS (fallback login bila gagal render);

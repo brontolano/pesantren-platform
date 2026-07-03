@@ -111,8 +111,8 @@ class TenantPanelProfileTest extends TestCase
         $this->assertContains(TenantDashboard::class, array_values($panel->getPages()));
         $this->assertContains(StatsPesantren::class, array_values($panel->getWidgets()));
 
-        // Default tema tenant biasa: pixio (perilaku lama, kini via registry).
-        $this->assertSame('pixio', PanelTheme::theme());
+        // Default tema tenant biasa: bawaan (Standar Sidebar Putih, via registry).
+        $this->assertSame('bawaan', PanelTheme::theme());
 
         tenancy()->end();
     }

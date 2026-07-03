@@ -69,15 +69,15 @@ class TenantCustomizationSettingOverrideTest extends TestCase
         $this->assertSame('login', TenantCustomizationRegistry::stringValue('guest_home'));
 
         // Setting per-tenant menimpa config per-tenant — white-label TANPA deploy.
-        Setting::updateOrCreate(['key' => 'customization.panel_theme_default'], ['value' => ['value' => 'pixio']]);
+        Setting::updateOrCreate(['key' => 'customization.panel_theme_default'], ['value' => ['value' => 'slate-pro']]);
         Setting::updateOrCreate(['key' => 'customization.guest_home'], ['value' => ['value' => 'landing']]);
         TenantCustomizationRegistry::flushSettingMemo();
 
-        $this->assertSame('pixio', TenantCustomizationRegistry::stringValue('panel_theme_default'));
+        $this->assertSame('slate-pro', TenantCustomizationRegistry::stringValue('panel_theme_default'));
         $this->assertSame('landing', TenantCustomizationRegistry::stringValue('guest_home'));
 
         // PanelTheme ikut: default tema kini dari Setting override.
-        $this->assertSame('pixio', PanelTheme::theme());
+        $this->assertSame('slate-pro', PanelTheme::theme());
 
         tenancy()->end();
     }
@@ -89,7 +89,7 @@ class TenantCustomizationSettingOverrideTest extends TestCase
         // Tenant tanpa entri config & tanpa Setting → default global.
         $this->assertSame('default', TenantCustomizationRegistry::panelProfile());
         $this->assertSame('', TenantCustomizationRegistry::bodyClass());
-        $this->assertSame('pixio', TenantCustomizationRegistry::stringValue('panel_theme_default'));
+        $this->assertSame('bawaan', TenantCustomizationRegistry::stringValue('panel_theme_default'));
 
         // Dengan entri config per-tenant → entri menang atas default.
         $this->applyAlbaKidsEntryFor((string) $tenant->getTenantKey());

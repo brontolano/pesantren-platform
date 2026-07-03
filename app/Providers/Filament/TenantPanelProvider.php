@@ -20,14 +20,12 @@ use App\Filament\Resources\Surat\SuratResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Filament\Widgets\AgendaPengumuman;
 use App\Filament\Widgets\GreetingBanner;
-use App\Filament\Widgets\KasOverviewWidget;
 use App\Filament\Widgets\KategoriPengeluaranChart;
 use App\Filament\Widgets\KesantrianOverviewWidget;
 use App\Filament\Widgets\KeuanganAreaChart;
 use App\Filament\Widgets\KeuanganOverviewWidget;
 use App\Filament\Widgets\KontrakAkanHabisWidget;
 use App\Filament\Widgets\OnboardingChecklist;
-use App\Filament\Widgets\PengajuanTerbaru;
 use App\Filament\Widgets\PondokOverviewWidget;
 use App\Filament\Widgets\StatsPesantren;
 use App\Filament\Widgets\TransaksiTerbaru;
@@ -219,12 +217,10 @@ class TenantPanelProvider extends PanelProvider
                 // === LAYER 4: Financial Dashboard (for bendahara/tata usaha) ===
                 KeuanganAreaChart::class,        // sort=-6: chart pendapatan/pengeluaran
                 TransaksiTerbaru::class,         // sort=-4: tabel transaksi terbaru (4 cols)
-                KasOverviewWidget::class,        // sort=-5: ringkas kas harian (2 cols, samping chart)
 
                 // === LAYER 5: Ringkasan Sekunder ===
                 KategoriPengeluaranChart::class, // sort=-5: pie chart pengeluaran (conditional data)
                 AgendaPengumuman::class,         // sort=-3: agenda & pengumuman
-                PengajuanTerbaru::class,         // sort=-3: pengajuan terbaru (4 cols)
 
                 // === LAYER 6: Domain Ringkasan (Santri/Keuangan) ===
                 KesantrianOverviewWidget::class, // sort=1: santri stats (adaptive per role)
@@ -254,29 +250,12 @@ class TenantPanelProvider extends PanelProvider
                 PanelsRenderHook::BODY_START,
                 fn (): View => view('filament.theme-vars'),
             )
-            // Elemen LAYOUT tema Baitul Maal — tiap view self-guard (kosong
-            // bila tema lain aktif): font, badge periode, kartu tenant, footer.
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): View => view('filament.tema.baitul-maal-head'),
-            )
-            ->renderHook(
-                PanelsRenderHook::TOPBAR_END,
-                fn (): View => view('filament.tema.baitul-maal-topbar'),
-            )
-            // Tema topNav: bar prioritas + waffle "Semua Menu" (mega-panel)
-            // menggantikan deretan grup bawaan yang tak muat (self-guard).
+            // Tema topNav (mis. Korporat): bar prioritas + waffle "Semua Menu"
+            // (mega-panel) menggantikan deretan grup bawaan yang tak muat
+            // (self-guard: kosong bila tema aktif bukan topNav).
             ->renderHook(
                 PanelsRenderHook::TOPBAR_LOGO_AFTER,
                 fn (): View => view('filament.tema.topnav-megamenu'),
-            )
-            ->renderHook(
-                PanelsRenderHook::SIDEBAR_FOOTER,
-                fn (): View => view('filament.tema.baitul-maal-sidebar-footer'),
-            )
-            ->renderHook(
-                PanelsRenderHook::FOOTER,
-                fn (): View => view('filament.tema.baitul-maal-footer'),
             )
             ->resources($resources)
             ->pages($pages)

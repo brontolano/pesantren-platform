@@ -3,15 +3,21 @@
 Panduan developer untuk sistem **tema panel per-tenant**. Ringkas & akurat ke
 kode; semua path relatif ke akar repo.
 
+**8 paket tema** (default `bawaan`): `bawaan` (Standar Sidebar Putih) +
+7 gaya Aura UI: `slate-pro`, `glass`, `corporate` (top-nav), `midnight`,
+`warm`, `aurora`, `nature`.
+
 Sumber kebenaran:
 
 - `app/Support/PanelTheme.php` — registry `THEMES` & `COLORS`, resolver aktif.
+- `app/Support/ThemePackage.php` — registry `PACKAGES` (bundel siap-pilih).
+- `app/Support/ThemeThumbnail.php` — generator SVG thumbnail dari palet tema.
 - `app/Http/Middleware/ApplyPanelTheme.php` — terapkan warna primer + top-nav saat runtime.
 - `resources/views/filament/theme-vars.blade.php` — inject CSS var + bodyClass ke `<head>`.
 - `resources/css/filament/pesantren/theme.css` — gaya CSS per tema (light & dark).
 - `app/Filament/Pages/PengaturanTampilan.php` + `resources/views/filament/pages/pengaturan-tampilan.blade.php` — UI pemilih tema + pratinjau iFrame.
 - `config/tenant-customization.php` — kunci `panel_theme_default` per tenant.
-- `tests/Feature/PanelThemeTest.php` — kontrak resolver.
+- `tests/Feature/PanelThemeTest.php` + `tests/Feature/ThemePackageTest.php` — kontrak resolver & paket.
 
 ---
 
@@ -21,15 +27,15 @@ Sumber kebenaran:
 | --- | --- | --- |
 | **TEMA** (layout) | Tata letak / susunan panel: sidebar klasik, navigasi atas (top-nav), kompak. Boleh membawa palet bawaan. | `PanelTheme::THEMES` |
 | **WARNA** (preset) | Preset palet lepas (header sidebar, item aktif, warna primer) untuk tema yang **tidak** berpalet bawaan. | `PanelTheme::COLORS` |
-| **PAKET** (bundel) | Kombinasi TEMA + WARNA siap-pilih (opsional, belum diimplementasikan di repo ini). Bila ditambahkan, letakkan sebagai registry `ThemePackage::PACKAGES` — lihat §6. | — |
+| **PAKET** (bundel) | Kombinasi TEMA + WARNA siap-pilih sekali-klik (8 paket). | `ThemePackage::PACKAGES` |
 
 Aturan pengikatan penting:
 
-- Tema **berpalet penuh** (punya key `primary` di entri `THEMES`, mis. `pixio`,
-  `baitul-maal`) **MENGIKAT** paletnya. Preset WARNA apa pun tidak akan menimpa —
+- Tema **berpalet penuh** (punya key `primary` di entri `THEMES`, mis. `slate-pro`,
+  `warm`, `corporate`) **MENGIKAT** paletnya. Preset WARNA apa pun tidak akan menimpa —
   identitas desain tetap utuh. Lihat `PanelTheme::cssVars()` dan `applicableColors()`.
-- Tema **tanpa palet** (mis. `bawaan`, `navigasi-atas`, `kompak`) menerima preset
-  WARNA bebas dari `COLORS`.
+- Tema **tanpa palet** (hanya `bawaan`) menerima preset WARNA bebas dari `COLORS`
+  (`emerald`, `navy`, `amber`).
 
 ---
 
@@ -76,7 +82,7 @@ Injeksi ke halaman: `theme-vars.blade.php` menulis `:root { … }` dari
        ],
        'category' => 'sidebar',      // 'sidebar' | 'topnav' | 'utility'
        'icon' => 'heroicon-o-swatch',
-       'thumbnail' => '/images/theme-thumbnails/ungu-senja.webp',
+       'thumbnail' => '/images/theme-thumbnails/ungu-senja.svg',
        'recommended_roles' => ['admin_pesantren'],
        'features' => ['Ungu elegan', 'Aksen lavender'],
        'efficiency' => 'normal',     // 'compact' | 'normal' | 'spacious'
@@ -89,9 +95,9 @@ Injeksi ke halaman: `theme-vars.blade.php` menulis `:root { … }` dari
    iFrame (`PengaturanTampilan::generatePreviewHtml()`), agar pratinjau
    mencerminkan layout sebenarnya.
 
-3. Sediakan thumbnail di path `thumbnail` (mis. `public/images/theme-thumbnails/…`).
-   Belum ada generator SVG otomatis di repo ini; sediakan gambar manual atau
-   kartu tetap tampil tanpa thumbnail.
+3. Regenerasi thumbnail: `php scripts/generate-theme-thumbnails.php` menulis
+   `public/images/theme-thumbnails/{key}.svg` dari palet tema (deterministik,
+   idempoten). Set `thumbnail` di metadata ke path `.svg` tersebut.
 
 4. Jalankan `npm run build` bila menyentuh CSS/aset, lalu uji.
 
@@ -130,22 +136,25 @@ Untuk tema tanpa palet bawaan. Tambah 1 entri ke `PanelTheme::COLORS`:
 1. Setting tenant `panel_theme` (pilihan eksplisit tenant) → menang bila valid.
 2. Bila kosong/tak dikenal → default `panel_theme_default` dari
    `config/tenant-customization.php`.
-   - Tenant **umum** → `pixio`.
-   - Tenant **custom** `albakids` → `bawaan` (perilaku lama dipertahankan).
+   - **SEMUA tenant** → `bawaan` (Standar Sidebar Putih), termasuk `albakids`.
+   - Nilai tersimpan yang tak dikenal (mis. tema lama yang sudah dihapus) →
+     jatuh mulus ke `bawaan`.
 
 Preset WARNA (`PanelTheme::color()`) resolver **terpisah** dan selalu fallback
-ke `bawaan` bila kosong/tak dikenal. Tema berpalet penuh (mis. pixio) tetap
+ke `bawaan` bila kosong/tak dikenal. Tema berpalet penuh (mis. slate-pro) tetap
 mengikat paletnya sekalipun warna = `bawaan`.
 
 ---
 
-## 6. (Opsional) Menambah PAKET (ThemePackage)
+## 6. Menambah PAKET (ThemePackage)
 
-Kelas `ThemePackage` **belum ada** di repo ini. Bila di masa depan dibuat,
-polanya: registry `ThemePackage::PACKAGES` berisi bundel `['theme' => …,
-'color' => …, 'label' => …, 'desc' => …]`, dipakai UI sebagai pilihan sekali-klik
-yang mengeset `previewTheme` + `previewColor` sekaligus. Menambah paket = tambah
-1 entri di `PACKAGES` (tanpa mengubah resolver TEMA/WARNA).
+`ThemePackage::PACKAGES` (`app/Support/ThemePackage.php`) berisi 8 bundel
+siap-pilih `{name, description, theme, color, typography, category,
+recommended_for, features}`. `theme` WAJIB key valid di `THEMES`; `color`
+`null` (ikut palet tema/bawaan) atau key valid di `COLORS`. `applyToSetting()`
+menulis `panel_theme` + `panel_color_preset` per-tenant sekaligus. Menambah
+paket = tambah 1 entri di `PACKAGES` (tanpa mengubah resolver TEMA/WARNA).
+`standar-putih` (tema `bawaan`) = default & disarankan umum.
 
 ---
 
