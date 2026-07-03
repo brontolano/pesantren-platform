@@ -330,6 +330,9 @@ Route::middleware([
     // tersedia, TAPI registrasi di app.blade.php digerbang flag pwa.root_sw_enabled
     // (default OFF) → aktif hanya setelah owner uji-perangkat.
     Route::get('/sw.js', [RootPwaController::class, 'serviceWorker'])->name('tenant.pwa.sw');
+    // F1 — halaman fallback offline (precache-able, blade statis, branding
+    // tenant). Ditampilkan SW root saat navigasi gagal karena jaringan mati.
+    Route::get('/offline', [RootPwaController::class, 'offline'])->name('tenant.pwa.offline');
 
     // 1-aplikasi (Fase 2c) — kirim komentar artikel. Gerbang izin 'komentar'
     // (jemaah + semua peran internal/komunitas; calon santri 'peserta' eksternal
