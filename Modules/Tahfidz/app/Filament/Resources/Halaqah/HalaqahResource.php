@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\CreateHalaqah;
 use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\EditHalaqah;
 use Modules\Tahfidz\Filament\Resources\Halaqah\Pages\ListHalaqah;
@@ -54,6 +55,30 @@ class HalaqahResource extends Resource
     public static function canAccess(): bool
     {
         return static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
+    }
+
+    /**
+     * Gerbang mutasi (audit RBAC 2026-07 P0-1): `view_*` = baca-saja;
+     * create/edit/delete WAJIB permission `manage_tahfidz`.
+     */
+    public static function canCreate(): bool
+    {
+        return static::canAccess() && (auth()->user()?->can('manage_tahfidz') ?? false);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::canCreate();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canCreate();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return static::canCreate();
     }
 
     public static function form(Schema $schema): Schema

@@ -13,6 +13,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\CreateAreaPiket;
 use Modules\Pembiayaan\Filament\Resources\Sarpras\AreaPiket\Pages\EditAreaPiket;
@@ -96,5 +97,29 @@ class AreaPiketResource extends Resource
     public static function canAccess(): bool
     {
         return static::moduleVisible('pembiayaan') && (auth()->user()?->canAny(['view_sarpras', 'manage_sarpras']) ?? false);
+    }
+
+    /**
+     * Gerbang mutasi (audit RBAC 2026-07 P0-1): `view_*` = baca-saja;
+     * create/edit/delete WAJIB permission `manage_sarpras`.
+     */
+    public static function canCreate(): bool
+    {
+        return static::canAccess() && (auth()->user()?->can('manage_sarpras') ?? false);
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::canCreate();
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return static::canCreate();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return static::canCreate();
     }
 }

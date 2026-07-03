@@ -37,9 +37,54 @@ class ApprovalRequestResource extends Resource
 
     protected static ?int $navigationSort = 29;
 
+    /**
+     * Audit RBAC 2026-07 (P1-3): menu hanya untuk APPROVER POTENSIAL —
+     * pemegang `kelola_approval` (konfigurator aturan) atau pemilik role yang
+     * terdaftar sebagai approver_role (di aturan aktif ATAU permintaan yang
+     * masih menunggu). Role lain (santri/jemaah/kasir dst) tidak melihat menu.
+     */
     public static function canAccess(): bool
     {
-        return Filament::getCurrentPanel()?->getId() === 'tenant' && Auth::check();
+        if (Filament::getCurrentPanel()?->getId() !== 'tenant') {
+            return false;
+        }
+        $user = Auth::user();
+        if ($user === null) {
+            return false;
+        }
+        if ($user->hasRole('super_admin') || $user->can('kelola_approval')) {
+            return true;
+        }
+
+        return static::approverPotensial($user);
+    }
+
+    /** Memo per-request (atribut Request — aman utk worker long-running). */
+    private static function approverPotensial($user): bool
+    {
+        $key = 'approval_menu_'.$user->getKey();
+        $req = request();
+        if ($req->attributes->has($key)) {
+            return (bool) $req->attributes->get($key);
+        }
+
+        $roles = $user->getRoleNames()->all();
+        $boleh = $roles !== [] && (
+            ApprovalRule::query()->where('aktif', true)->whereIn('approver_role', $roles)->exists()
+            || ApprovalRequest::query()->where('status', 'menunggu')->whereIn('approver_role', $roles)->exists()
+        );
+        $req->attributes->set($key, $boleh);
+
+        return $boleh;
+    }
+
+    /** Gerbang eksplisit aksi Setujui/Tolak: hanya pemegang role approver ybs. */
+    public static function bolehMemutus(ApprovalRequest $record): bool
+    {
+        $user = Auth::user();
+
+        return $user !== null
+            && ($user->hasRole('super_admin') || $user->hasRole((string) $record->approver_role));
     }
 
     public static function shouldRegisterNavigation(): bool
@@ -90,16 +135,20 @@ class ApprovalRequestResource extends Resource
                 Action::make('setujui')
                     ->label('Setujui')->icon('heroicon-o-check-circle')->color('success')
                     ->requiresConfirmation()
+                    ->visible(fn (ApprovalRequest $record): bool => static::bolehMemutus($record))
                     ->action(function (ApprovalRequest $record): void {
+                        abort_unless(static::bolehMemutus($record), 403);
                         app(ApprovalService::class)->setujui($record, (int) Auth::id());
                         Notification::make()->title('Disetujui')->success()->send();
                     }),
                 Action::make('tolak')
                     ->label('Tolak')->icon('heroicon-o-x-circle')->color('danger')
+                    ->visible(fn (ApprovalRequest $record): bool => static::bolehMemutus($record))
                     ->schema([
                         Textarea::make('alasan')->label('Alasan penolakan')->required()->rows(3)->maxLength(1000),
                     ])
                     ->action(function (array $data, ApprovalRequest $record): void {
+                        abort_unless(static::bolehMemutus($record), 403);
                         app(ApprovalService::class)->tolak($record, (int) Auth::id(), $data['alasan']);
                         Notification::make()->title('Ditolak')->warning()->send();
                     }),

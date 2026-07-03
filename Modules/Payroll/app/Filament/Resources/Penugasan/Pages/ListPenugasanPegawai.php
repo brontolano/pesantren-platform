@@ -34,7 +34,7 @@ class ListPenugasanPegawai extends ListRecords
                 'label' => 'Import Penugasan',
                 'service' => PenugasanImportService::class,
                 'directory' => 'imports/payroll/penugasan/uploads',
-                'ability' => 'manage_payroll',
+                'ability' => 'run_payroll',
                 'petunjuk' => 'Unggah .xlsx/.csv/.ods kolom: nip (wajib, pegawai harus ada), jabatan (nama, wajib & harus ada), lembaga (opsional), tanggal_mulai (wajib), nomor_sk, is_primary (ya/tidak), keterangan. Penugasan sama dilewati. Dry-run dulu.',
             ]),
         ];

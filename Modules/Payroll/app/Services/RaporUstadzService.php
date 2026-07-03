@@ -99,14 +99,14 @@ class RaporUstadzService
 
     /**
      * Simpan/perbarui penilaian kualitatif mudir. GATE: hanya pemegang
-     * manage_payroll/run_payroll — pegawai biasa 403 (AuthorizationException).
+     * run_payroll — pegawai biasa 403 (AuthorizationException).
      *
      * @param  array<string, int|float|string>  $skor  {kriteria: skor 0..100}
      */
     public function simpanPenilaian(Employee $employee, int $tahun, array $skor, ?string $catatan, User $penilai): PenilaianUstadz
     {
-        if (! $penilai->canAny(['manage_payroll', 'run_payroll'])) {
-            throw new AuthorizationException('Hanya mudir/atasan (manage_payroll/run_payroll) yang boleh menilai.');
+        if (! $penilai->can('run_payroll')) {
+            throw new AuthorizationException('Hanya mudir/atasan (run_payroll) yang boleh menilai.');
         }
 
         return PenilaianUstadz::query()->updateOrCreate(
@@ -118,7 +118,7 @@ class RaporUstadzService
     /** Boleh lihat rapor: mudir/atasan ATAU pegawai ybs (read-only). */
     public function bolehLihat(Employee $employee, User $user): bool
     {
-        return $user->canAny(['manage_payroll', 'run_payroll'])
+        return $user->can('run_payroll')
             || ($employee->users_id !== null && $employee->users_id === $user->id);
     }
 }

@@ -27,7 +27,7 @@ class EmisExportController extends Controller
 
         // PII pegawai (NIK/NUPTK) lebih ketat: hak payroll, bukan view_santri.
         if ($kategori === 'pegawai') {
-            abort_unless(Auth::user()?->canAny(['run_payroll', 'manage_payroll', 'manage_keuangan']) ?? false, 403);
+            abort_unless(Auth::user()?->canAny(['run_payroll', 'manage_keuangan']) ?? false, 403);
         }
 
         $header = EmisExportService::headerFor($kategori);
