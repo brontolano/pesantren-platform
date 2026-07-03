@@ -315,6 +315,14 @@ class TenantPanelAuthedSmokeTest extends TestCase
             $this->assertSame(200, $trStatus, "Tagihan Rutin /{$trPath} status {$trStatus}, harusnya 200.");
         }
 
+        // Tampilan & Tema (PengaturanTampilan) WAJIB 200 → bukti seksi PAKET TEMA
+        // (kartu bundel + thumbnail SVG generatif + badge peran) & seksi Custom
+        // ter-render tanpa error untuk user login (auth()->getRoleNames, x-filament::icon).
+        $tampilanReq = Request::create("http://{$host}/admin/pengaturan/tampilan", 'GET');
+        $tampilanReq->headers->set('Host', $host);
+        $tampilanStatus = $kernel->handle($tampilanReq)->getStatusCode();
+        $this->assertSame(200, $tampilanStatus, "Tampilan & Tema (PengaturanTampilan + Paket Tema) status {$tampilanStatus}, harusnya 200.");
+
         // CAKUPAN MENYELURUH (issue #335): render halaman INDEX dari SEMUA resource
         // yang terdaftar di panel tenant, secara DINAMIS — resource baru otomatis
         // ikut teruji tanpa perlu menambah path manual. Assert <500 (403 modul

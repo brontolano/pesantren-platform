@@ -8,6 +8,89 @@
             </p>
         </div>
 
+        {{-- ==== PAKET TEMA SIAP-PAKAI (bundel 1-klik) ==== --}}
+        <div class="space-y-4">
+            <div>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">📦 Paket Tema Siap-Pakai</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Pilih satu paket lengkap (tata letak + warna + tipografi) — langsung diterapkan dalam satu klik.
+                    Ingin atur manual? Gunakan seksi <em>Custom</em> di bawah.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                @foreach ($this->packages as $pkg)
+                    @php($isActivePkg = $this->activePackageKey === $pkg['key'])
+                    @php($isRecommended = $this->packageRecommended($pkg['key']))
+                    <div
+                        class="group relative flex flex-col overflow-hidden rounded-xl border-2 transition-all
+                            {{ $isActivePkg
+                                ? 'border-emerald-500 ring-2 ring-emerald-200 dark:border-emerald-400 dark:ring-emerald-900'
+                                : 'border-gray-200 bg-white hover:border-emerald-300 dark:border-gray-700 dark:bg-gray-800/50 dark:hover:border-emerald-400'
+                            }}">
+
+                        {{-- Thumbnail SVG generatif (warna asli tema) --}}
+                        <div class="aspect-[16/10] w-full overflow-hidden border-b border-gray-100 bg-gray-50 dark:border-gray-700">
+                            {!! $this->packageThumbnail($pkg['key']) !!}
+                        </div>
+
+                        {{-- Badge status --}}
+                        <div class="absolute right-2 top-2 flex flex-col items-end gap-1">
+                            @if ($isActivePkg)
+                                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-semibold text-white shadow">
+                                    ✓ Aktif
+                                </span>
+                            @endif
+                            @if ($isRecommended)
+                                <span class="inline-flex items-center gap-1 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-semibold text-amber-900 shadow">
+                                    ★ Disarankan untuk Anda
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="flex flex-1 flex-col p-4">
+                            <h3 class="font-bold text-gray-900 dark:text-white">{{ $pkg['name'] }}</h3>
+                            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ $pkg['description'] }}</p>
+
+                            <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+                                <span>🔤 {{ $pkg['typography'] }}</span>
+                                <span>🧭 {{ $pkg['category'] === 'topnav' ? 'Menu Atas' : 'Sidebar' }}</span>
+                            </div>
+
+                            @if ($pkg['features'] ?? false)
+                                <ul class="mt-2 space-y-1">
+                                    @foreach (array_slice($pkg['features'], 0, 3) as $feature)
+                                        <li class="text-xs text-gray-500 dark:text-gray-500">• {{ $feature }}</li>
+                                    @endforeach
+                                </ul>
+                            @endif
+
+                            <div class="mt-auto pt-3">
+                                <button
+                                    wire:click="applyPackage('{{ $pkg['key'] }}')"
+                                    type="button"
+                                    @class([
+                                        'inline-flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-all',
+                                        'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' => $isActivePkg,
+                                        'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600' => ! $isActivePkg,
+                                    ])>
+                                    {{ $isActivePkg ? '✓ Sedang Dipakai' : 'Terapkan Paket' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- ==== CUSTOM (Tema + Warna) — pengaturan manual lanjutan ==== --}}
+        <div class="border-t border-gray-200 pt-8 dark:border-gray-700">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white">🛠️ Custom (Tema + Warna)</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Untuk pengguna lanjutan — pilih tata letak & palet warna secara terpisah.
+            </p>
+        </div>
+
         {{-- Themes by Category --}}
         @foreach ($this->themesByCategory as $category => $themes)
             <div class="space-y-4">
@@ -46,7 +129,17 @@
                                 </div>
                             @endif
 
-                            <h3 class="font-semibold text-gray-900 dark:text-white">{{ $theme['label'] }}</h3>
+                            {{-- Thumbnail SVG generatif (warna asli tema) --}}
+                            <div class="mb-3 aspect-[16/10] w-full overflow-hidden rounded-md border border-gray-100 bg-gray-50 dark:border-gray-700">
+                                {!! $this->themeThumbnail($theme['key']) !!}
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                @if ($theme['icon'] ?? false)
+                                    <x-filament::icon :icon="$theme['icon']" class="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                                @endif
+                                <h3 class="font-semibold text-gray-900 dark:text-white">{{ $theme['label'] }}</h3>
+                            </div>
                             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">{{ $theme['desc'] }}</p>
 
                             @if ($theme['features'] ?? false)
