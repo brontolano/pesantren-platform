@@ -10,7 +10,7 @@ use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
 /**
- * PAKET TEMA siap-pakai (8 paket = Standar + 7 gaya Aura): tiap paket
+ * PAKET TEMA siap-pakai (9 paket = Standar + 8 skin lengkap incl. Neon): tiap paket
  * merujuk theme/color yang VALID di PanelTheme; applyToSetting menulis dua
  * Setting per-tenant dengan benar; recommendedForRoles menghitung irisan
  * peran; thumbnail SVG deterministik.
@@ -34,10 +34,10 @@ class ThemePackageTest extends TestCase
         $this->seedTenantRow($tenant);
     }
 
-    public function test_delapan_paket_merujuk_theme_dan_color_yang_valid(): void
+    public function test_sembilan_paket_merujuk_theme_dan_color_yang_valid(): void
     {
-        $this->assertCount(8, ThemePackage::PACKAGES);
-        $expected = ['standar-putih', 'slate-pro', 'glass', 'corporate', 'midnight', 'warm', 'aurora', 'nature'];
+        $this->assertCount(9, ThemePackage::PACKAGES);
+        $expected = ['standar-putih', 'slate-pro', 'glass', 'corporate', 'midnight', 'warm', 'aurora', 'nature', 'neon'];
         $this->assertSame($expected, array_keys(ThemePackage::PACKAGES));
 
         foreach (ThemePackage::PACKAGES as $key => $pkg) {

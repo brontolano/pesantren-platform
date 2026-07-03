@@ -8,8 +8,21 @@ use App\Models\Setting;
  * Tema panel admin per PESANTREN (Setting per tenant, tanpa migrasi DB).
  *
  * Dua konsep TERPISAH:
- * - TEMA  = layout/susunan panel (sidebar klasik, navigasi atas, kompak, ...).
- * - WARNA = preset palet (header sidebar, item aktif, warna primer Filament).
+ * - TEMA  = SKIN LENGKAP: layout + font + radius + bayangan + gaya tombol/
+ *           kartu/input + palet. Tiap tema mengganti "kulit" panel menyeluruh
+ *           (bukan cuma warna) lewat kontrak var --tema-* di theme.css.
+ * - WARNA = preset palet (header sidebar, item aktif, warna primer Filament)
+ *           untuk tema tanpa palet bawaan.
+ *
+ * KONTRAK SKIN (var yang di-drive theme.css, di-scope body.tema-{key}):
+ *   Warna : --tema-sidebar-header, --tema-sidebar-header-border,
+ *           --tema-active-bg, --tema-active-fg, --tema-active-dark.
+ *   Skin  : --tema-font-sans (+ opsional --tema-font-heading), --tema-radius,
+ *           --tema-btn-radius, --tema-input-radius, --tema-card-shadow,
+ *           --tema-card-border, --tema-btn-shadow, --tema-btn-weight,
+ *           --tema-heading-weight.
+ *   Tema 'bawaan' TIDAK punya bodyClass → CSS skin generik tak berlaku,
+ *   tampilan Filament standar tetap (aman untuk AlbaKids/default).
  *
  * Menambah tema/warna baru = tambah 1 entry di THEMES/COLORS (+ blok CSS
  * `.tema-{key}` di resources/css/filament/pesantren/theme.css bila tema butuh
@@ -60,6 +73,16 @@ class PanelTheme
                 '--tema-active-bg' => '#ecfdf5',
                 '--tema-active-fg' => '#047857',
                 '--tema-active-dark' => 'linear-gradient(90deg, #10b981 0%, #047857 100%)',
+                // --- KONTRAK SKIN (SaaS bersih) ---
+                '--tema-font-sans' => "'Jost', system-ui, sans-serif",
+                '--tema-radius' => '0.5rem',
+                '--tema-btn-radius' => '0.5rem',
+                '--tema-input-radius' => '0.5rem',
+                '--tema-card-shadow' => '0 1px 2px rgba(15, 23, 42, 0.04), 0 6px 18px -12px rgba(15, 23, 42, 0.14)',
+                '--tema-card-border' => '1px solid #e7ecf3',
+                '--tema-btn-shadow' => '0 1px 2px rgba(15, 23, 42, 0.06)',
+                '--tema-btn-weight' => '600',
+                '--tema-heading-weight' => '700',
             ],
             'category' => 'sidebar',
             'icon' => 'heroicon-o-sparkles',
@@ -81,6 +104,16 @@ class PanelTheme
                 '--tema-active-bg' => '#eef2ff',
                 '--tema-active-fg' => '#4338ca',
                 '--tema-active-dark' => 'linear-gradient(90deg, #6366f1 0%, #4338ca 100%)',
+                // --- KONTRAK SKIN (glassmorphism: radius besar, blur, shadow lembut) ---
+                '--tema-font-sans' => "'Inter', system-ui, sans-serif",
+                '--tema-radius' => '1rem',
+                '--tema-btn-radius' => '0.75rem',
+                '--tema-input-radius' => '0.75rem',
+                '--tema-card-shadow' => '0 8px 24px -12px rgba(79, 70, 229, 0.18)',
+                '--tema-card-border' => '1px solid rgba(255, 255, 255, 0.6)',
+                '--tema-btn-shadow' => '0 2px 8px -2px rgba(99, 102, 241, 0.24)',
+                '--tema-btn-weight' => '600',
+                '--tema-heading-weight' => '600',
             ],
             'category' => 'sidebar',
             'icon' => 'heroicon-o-square-3-stack-3d',
@@ -102,6 +135,16 @@ class PanelTheme
                 '--tema-active-bg' => '#dbeafe',
                 '--tema-active-fg' => '#1d4ed8',
                 '--tema-active-dark' => 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)',
+                // --- KONTRAK SKIN (korporat: radius kecil, border tegas, shadow minimal) ---
+                '--tema-font-sans' => "'IBM Plex Sans', system-ui, sans-serif",
+                '--tema-radius' => '0.375rem',
+                '--tema-btn-radius' => '0.375rem',
+                '--tema-input-radius' => '0.375rem',
+                '--tema-card-shadow' => '0 1px 2px rgba(15, 23, 42, 0.06)',
+                '--tema-card-border' => '1px solid #cbd5e1',
+                '--tema-btn-shadow' => 'none',
+                '--tema-btn-weight' => '600',
+                '--tema-heading-weight' => '700',
             ],
             'category' => 'topnav',
             'icon' => 'heroicon-o-building-office-2',
@@ -123,6 +166,16 @@ class PanelTheme
                 '--tema-active-bg' => '#eef2ff',
                 '--tema-active-fg' => '#4f46e5',
                 '--tema-active-dark' => 'linear-gradient(90deg, #818cf8 0%, #6366f1 100%)',
+                // --- KONTRAK SKIN (dark-first: radius sedang, glow tipis indigo) ---
+                '--tema-font-sans' => "'Space Grotesk', system-ui, sans-serif",
+                '--tema-radius' => '0.75rem',
+                '--tema-btn-radius' => '0.625rem',
+                '--tema-input-radius' => '0.625rem',
+                '--tema-card-shadow' => '0 6px 20px -12px rgba(99, 102, 241, 0.35)',
+                '--tema-card-border' => '1px solid #232338',
+                '--tema-btn-shadow' => '0 2px 10px -3px rgba(129, 140, 248, 0.4)',
+                '--tema-btn-weight' => '600',
+                '--tema-heading-weight' => '600',
             ],
             'category' => 'sidebar',
             'icon' => 'heroicon-o-moon',
@@ -144,6 +197,16 @@ class PanelTheme
                 '--tema-active-bg' => '#fffbeb',
                 '--tema-active-fg' => '#b45309',
                 '--tema-active-dark' => 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)',
+                // --- KONTRAK SKIN (hangat: radius membulat ramah, shadow hangat lembut) ---
+                '--tema-font-sans' => "'Nunito', system-ui, sans-serif",
+                '--tema-radius' => '0.75rem',
+                '--tema-btn-radius' => '0.875rem',
+                '--tema-input-radius' => '0.75rem',
+                '--tema-card-shadow' => '0 4px 14px rgba(120, 53, 15, 0.08)',
+                '--tema-card-border' => '1px solid #efe4d3',
+                '--tema-btn-shadow' => '0 2px 8px -2px rgba(217, 119, 6, 0.28)',
+                '--tema-btn-weight' => '700',
+                '--tema-heading-weight' => '700',
             ],
             'category' => 'sidebar',
             'icon' => 'heroicon-o-sun',
@@ -165,6 +228,16 @@ class PanelTheme
                 '--tema-active-bg' => '#f5f3ff',
                 '--tema-active-fg' => '#7c3aed',
                 '--tema-active-dark' => 'linear-gradient(90deg, #a78bfa 0%, #ec4899 100%)',
+                // --- KONTRAK SKIN (aurora: membulat, tombol gradasi lembut) ---
+                '--tema-font-sans' => "'Outfit', system-ui, sans-serif",
+                '--tema-radius' => '1rem',
+                '--tema-btn-radius' => '0.75rem',
+                '--tema-input-radius' => '0.75rem',
+                '--tema-card-shadow' => '0 8px 24px -14px rgba(124, 58, 237, 0.22)',
+                '--tema-card-border' => '1px solid rgba(139, 92, 246, 0.14)',
+                '--tema-btn-shadow' => '0 3px 12px -3px rgba(139, 92, 246, 0.4)',
+                '--tema-btn-weight' => '600',
+                '--tema-heading-weight' => '600',
             ],
             'category' => 'sidebar',
             'icon' => 'heroicon-o-swatch',
@@ -186,6 +259,17 @@ class PanelTheme
                 '--tema-active-bg' => '#ecfdf3',
                 '--tema-active-fg' => '#166534',
                 '--tema-active-dark' => 'linear-gradient(90deg, #22c55e 0%, #15803d 100%)',
+                // --- KONTRAK SKIN (alam: heading serif Lora, radius organik, earthy) ---
+                '--tema-font-sans' => "'Plus Jakarta Sans', system-ui, sans-serif",
+                '--tema-font-heading' => "'Lora', Georgia, serif",
+                '--tema-radius' => '0.875rem',
+                '--tema-btn-radius' => '0.75rem',
+                '--tema-input-radius' => '0.625rem',
+                '--tema-card-shadow' => '0 4px 14px rgba(20, 83, 45, 0.07)',
+                '--tema-card-border' => '1px solid #e2ead9',
+                '--tema-btn-shadow' => '0 2px 8px -2px rgba(21, 128, 61, 0.24)',
+                '--tema-btn-weight' => '600',
+                '--tema-heading-weight' => '600',
             ],
             'category' => 'sidebar',
             'icon' => 'heroicon-o-sparkles',
@@ -193,7 +277,39 @@ class PanelTheme
             'recommended_roles' => ['admin_pesantren', 'kepala', 'tu'],
             'features' => ['Nuansa earthy alami', 'Primer forest green', 'Aksen olive/cokelat', 'Kanvas sage lembut'],
             'efficiency' => 'normal',
-            'typography' => 'Plus Jakarta Sans',
+            'typography' => 'Lora + Plus Jakarta Sans',
+        ],
+        'neon' => [
+            'label' => 'Neon (Cyber)',
+            'desc' => 'Kanvas gelap #0a0a12, aksen neon cyan/lime dengan glow, heading Orbitron — futuristik & berenergi.',
+            'topNav' => false,
+            'bodyClass' => 'tema-neon',
+            'primary' => '#22d3ee',
+            'vars' => [
+                '--tema-sidebar-header' => '#0a0a12',
+                '--tema-sidebar-header-border' => '#1b2735',
+                '--tema-active-bg' => 'rgba(34, 211, 238, 0.14)',
+                '--tema-active-fg' => '#22d3ee',
+                '--tema-active-dark' => 'linear-gradient(90deg, #22d3ee 0%, #a3e635 100%)',
+                // --- KONTRAK SKIN (neon: radius kecil-sedang + GLOW neon, heading Orbitron) ---
+                '--tema-font-sans' => "'Inter', system-ui, sans-serif",
+                '--tema-font-heading' => "'Orbitron', 'Space Grotesk', sans-serif",
+                '--tema-radius' => '0.5rem',
+                '--tema-btn-radius' => '0.375rem',
+                '--tema-input-radius' => '0.375rem',
+                '--tema-card-shadow' => '0 0 0 1px rgba(34, 211, 238, 0.12), 0 8px 24px -14px rgba(34, 211, 238, 0.3)',
+                '--tema-card-border' => '1px solid rgba(34, 211, 238, 0.25)',
+                '--tema-btn-shadow' => '0 0 12px -2px rgba(34, 211, 238, 0.55)',
+                '--tema-btn-weight' => '700',
+                '--tema-heading-weight' => '700',
+            ],
+            'category' => 'sidebar',
+            'icon' => 'heroicon-o-bolt',
+            'thumbnail' => '/images/theme-thumbnails/neon.svg',
+            'recommended_roles' => ['operator_divisi', 'admin_pesantren'],
+            'features' => ['Kanvas cyber gelap', 'Aksen neon cyan/lime', 'Glow pada tombol & item aktif', 'Heading Orbitron futuristik'],
+            'efficiency' => 'normal',
+            'typography' => 'Orbitron + Inter',
         ],
     ];
 

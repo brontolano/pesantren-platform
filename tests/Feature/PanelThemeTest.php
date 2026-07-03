@@ -13,8 +13,10 @@ use Tests\TestCase;
  * di Setting, nilai tak dikenal/error → jatuh ke 'bawaan'. Preset WARNA
  * punya resolver terpisah yang juga fallback ke 'bawaan'.
  *
- * 8 tema: bawaan (default) + 7 gaya Aura (slate-pro, glass, corporate,
- * midnight, warm, aurora, nature).
+ * 9 tema: bawaan (default) + 8 skin lengkap (slate-pro, glass, corporate,
+ * midnight, warm, aurora, nature, neon). Tiap tema non-bawaan mengganti
+ * KULIT menyeluruh (font/radius/bayangan/tombol/kartu/input) lewat kontrak
+ * var --tema-* — bukan cuma warna.
  */
 class PanelThemeTest extends TestCase
 {
@@ -88,6 +90,41 @@ class PanelThemeTest extends TestCase
         tenancy()->end();
     }
 
+    public function test_tema_neon_skin_lengkap_dan_glow(): void
+    {
+        $this->boot('tema');
+
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'neon']]);
+
+        $this->assertSame('neon', PanelTheme::theme());
+        $this->assertSame('tema-neon', PanelTheme::bodyClass());
+        $this->assertFalse(PanelTheme::topNavigation());
+        $this->assertSame('#22d3ee', PanelTheme::primaryHex());
+
+        $vars = PanelTheme::cssVars();
+        // Kanvas gelap + aksen neon.
+        $this->assertStringContainsString('--tema-sidebar-header:#0a0a12;', $vars);
+        // Skin lengkap: font heading Orbitron + bayang tombol glow.
+        $this->assertStringContainsString('Orbitron', $vars);
+        $this->assertStringContainsString('--tema-btn-shadow:', $vars);
+
+        tenancy()->end();
+    }
+
+    public function test_cssvars_memancarkan_kontrak_skin(): void
+    {
+        $this->boot('tema');
+
+        // Tema berpalet penuh memancarkan var skin (font/radius) ke :root.
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'glass']]);
+        $vars = PanelTheme::cssVars();
+        $this->assertStringContainsString('--tema-font-sans:', $vars);
+        $this->assertStringContainsString('--tema-radius:1rem;', $vars);
+        $this->assertStringContainsString('--tema-btn-radius:', $vars);
+
+        tenancy()->end();
+    }
+
     public function test_tema_berpalet_penuh_mengikat_paletnya(): void
     {
         $this->boot('tema');
@@ -133,11 +170,11 @@ class PanelThemeTest extends TestCase
         tenancy()->end();
     }
 
-    public function test_registry_delapan_tema_lengkap_dan_konsisten(): void
+    public function test_registry_sembilan_tema_lengkap_dan_konsisten(): void
     {
-        // Tepat 8 tema: bawaan + 7 gaya Aura.
-        $this->assertCount(8, PanelTheme::THEMES);
-        $expected = ['bawaan', 'slate-pro', 'glass', 'corporate', 'midnight', 'warm', 'aurora', 'nature'];
+        // Tepat 9 tema: bawaan + 8 skin lengkap.
+        $this->assertCount(9, PanelTheme::THEMES);
+        $expected = ['bawaan', 'slate-pro', 'glass', 'corporate', 'midnight', 'warm', 'aurora', 'nature', 'neon'];
         $this->assertSame($expected, array_keys(PanelTheme::THEMES));
 
         // Setiap tema punya metadata inti.
@@ -165,6 +202,18 @@ class PanelThemeTest extends TestCase
             $this->assertSame('tema-'.$key, $t['bodyClass'], $key);
             foreach (['--tema-sidebar-header', '--tema-sidebar-header-border', '--tema-active-bg', '--tema-active-fg', '--tema-active-dark'] as $var) {
                 $this->assertArrayHasKey($var, $t['vars'], "{$key} kehilangan {$var}");
+            }
+
+            // KONTRAK SKIN: tiap tema non-bawaan set var kulit inti (SKIN LENGKAP,
+            // bukan cuma warna) — font, radius kartu/tombol/input, bayangan,
+            // border kartu, bayang tombol, berat tombol/heading.
+            foreach ([
+                '--tema-font-sans', '--tema-radius', '--tema-btn-radius',
+                '--tema-input-radius', '--tema-card-shadow', '--tema-card-border',
+                '--tema-btn-shadow', '--tema-btn-weight', '--tema-heading-weight',
+            ] as $skinVar) {
+                $this->assertArrayHasKey($skinVar, $t['vars'], "{$key} kehilangan skin var {$skinVar}");
+                $this->assertNotSame('', trim((string) $t['vars'][$skinVar]), "{$key} skin var {$skinVar} kosong");
             }
         }
 
