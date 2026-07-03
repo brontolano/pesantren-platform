@@ -3,9 +3,18 @@
 Panduan developer untuk sistem **tema panel per-tenant**. Ringkas & akurat ke
 kode; semua path relatif ke akar repo.
 
-**8 paket tema** (default `bawaan`): `bawaan` (Standar Sidebar Putih) +
-7 gaya Aura UI: `slate-pro`, `glass`, `corporate` (top-nav), `midnight`,
-`warm`, `aurora`, `nature`.
+**9 paket tema** (default `bawaan`): `bawaan` (Standar Sidebar Putih) +
+8 **skin lengkap** gaya Aura UI: `slate-pro`, `glass`, `corporate` (top-nav),
+`midnight`, `warm`, `aurora`, `nature`, `neon`.
+
+Setiap paket = **SKIN LENGKAP**: mengganti KULIT panel menyeluruh — font,
+gaya tombol, kartu, input, heading, radius, bayangan — bukan sekadar warna.
+Digerakkan oleh kontrak var `--tema-*` (lihat §2) yang di-drive `theme.css`
+DI-SCOPE `body.tema-{key}`. Tema `bawaan` (tanpa `bodyClass`) TIDAK terpengaruh
+skin generik → tampilan Filament standar tetap (aman untuk AlbaKids/default).
+
+Font tiap tema dimuat via bunny.net (privacy-friendly) di
+`theme-vars.blade.php`, hanya untuk tema aktif (peta `bodyClass` → family).
 
 Sumber kebenaran:
 
@@ -27,7 +36,7 @@ Sumber kebenaran:
 | --- | --- | --- |
 | **TEMA** (layout) | Tata letak / susunan panel: sidebar klasik, navigasi atas (top-nav), kompak. Boleh membawa palet bawaan. | `PanelTheme::THEMES` |
 | **WARNA** (preset) | Preset palet lepas (header sidebar, item aktif, warna primer) untuk tema yang **tidak** berpalet bawaan. | `PanelTheme::COLORS` |
-| **PAKET** (bundel) | Kombinasi TEMA + WARNA siap-pilih sekali-klik (8 paket). | `ThemePackage::PACKAGES` |
+| **PAKET** (bundel) | Kombinasi TEMA + WARNA siap-pilih sekali-klik (9 paket). | `ThemePackage::PACKAGES` |
 
 Aturan pengikatan penting:
 
@@ -52,9 +61,34 @@ Setiap preset/tema berpalet mendeklarasikan variabel berikut (dipakai
 | `--tema-active-fg` | Warna teks item aktif (mode terang). |
 | `--tema-active-dark` | Latar item aktif untuk **mode gelap** (`html.dark`). |
 
-Uji `test_registry_lengkap_dan_konsisten` mewajibkan setiap preset warna
-non-`bawaan` memiliki keempat variabel inti + `-dark`. Tambahkan varian gelap
-tiap kali menambah palet baru.
+**Kontrak SKIN** (di-drive `theme.css` generik, di-scope `body[class*="tema-"]`)
+— tiap tema non-`bawaan` WAJIB set semuanya (dijaga uji
+`test_registry_sembilan_tema_lengkap_dan_konsisten`):
+
+| Variabel | Fungsi |
+| --- | --- |
+| `--tema-font-sans` | Font body (family). Fallback `system-ui`. |
+| `--tema-font-heading` | (opsional) Font heading; default = `--tema-font-sans`. |
+| `--tema-radius` | Radius kartu/section/widget/tabel. |
+| `--tema-btn-radius` | Radius tombol (+ badge). |
+| `--tema-input-radius` | Radius input & select. |
+| `--tema-card-shadow` | Bayangan kartu. |
+| `--tema-card-border` | Border kartu (mis. `1px solid #e7ecf3`). |
+| `--tema-btn-shadow` | Bayangan tombol (glow untuk neon/midnight). |
+| `--tema-btn-weight` | Ketebalan teks tombol. |
+| `--tema-heading-weight` | Ketebalan heading. |
+
+Komponen yang di-drive: `.fi-btn`, `.fi-section`, `.fi-wi`,
+`.fi-wi-stats-overview-stat`, `.fi-ta-ctn`, `[class*="fi-card"]`,
+`.fi-input-wrp`, `.fi-select-input`, `.fi-badge`, `.fi-header-heading` + h1–h3.
+Kelas diverifikasi dari `vendor/filament` (bukan tebakan).
+
+**Keterbatasan ikon**: Filament memakai Heroicons; mengganti SET ikon per tema
+tidak praktis. Skin hanya menyetel **warna/berat ikon** via aksen tema — bentuk
+ikon tetap Heroicons di semua tema.
+
+Uji juga mewajibkan setiap preset warna non-`bawaan` memiliki keempat variabel
+warna inti + `-dark`. Tambahkan varian gelap tiap kali menambah palet baru.
 
 Injeksi ke halaman: `theme-vars.blade.php` menulis `:root { … }` dari
 `PanelTheme::cssVars()` dan menambahkan `bodyClass` ke `<body>`. CSS var

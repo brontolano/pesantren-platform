@@ -324,7 +324,7 @@ class PengaturanTampilan extends Page
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: var(--tema-font-sans, 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
             background: #f3f4f6;
             color: #1f2937;
             transition: background 200ms, color 200ms;
@@ -368,19 +368,20 @@ class PengaturanTampilan extends Page
         }
         .header { margin-bottom: 24px; }
         .header h1 {
+            font-family: var(--tema-font-heading, var(--tema-font-sans, inherit));
             font-size: 24px;
-            font-weight: 700;
+            font-weight: var(--tema-heading-weight, 700);
             margin-bottom: 8px;
             color: #1f2937;
         }
         .header p { color: #6b7280; font-size: 14px; }
         .card {
             background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            border: var(--tema-card-border, 1px solid #e5e7eb);
+            border-radius: var(--tema-radius, 8px);
             padding: 20px;
             margin: 12px 0;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: var(--tema-card-shadow, 0 1px 2px rgba(0,0,0,0.05));
         }
         .card h3 {
             font-size: 16px;
@@ -397,13 +398,14 @@ class PengaturanTampilan extends Page
         .btn {
             display: inline-block;
             padding: 8px 16px;
-            border-radius: 6px;
+            border-radius: var(--tema-btn-radius, 6px);
             border: none;
-            background: var(--tema-sidebar-header, #059669);
+            background: var(--tema-active-fg, #059669);
             color: white;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: var(--tema-btn-weight, 500);
             font-size: 13px;
+            box-shadow: var(--tema-btn-shadow, none);
             transition: all 200ms;
         }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }

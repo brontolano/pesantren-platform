@@ -114,6 +114,16 @@ class ThemePackage
             'recommended_for' => ['admin_pesantren', 'kepala', 'tu'],
             'features' => ['Nuansa earthy alami', 'Primer forest green', 'Aksen olive/cokelat', 'Kanvas sage lembut'],
         ],
+        'neon' => [
+            'name' => 'Neon (Cyber)',
+            'description' => 'Kanvas gelap cyber, aksen neon cyan/lime dengan glow, heading Orbitron — futuristik & berenergi.',
+            'theme' => 'neon',
+            'color' => null,
+            'typography' => 'Orbitron + Inter',
+            'category' => 'sidebar',
+            'recommended_for' => ['operator_divisi', 'admin_pesantren'],
+            'features' => ['Kanvas cyber gelap', 'Aksen neon cyan/lime', 'Glow pada tombol & item aktif', 'Heading Orbitron futuristik'],
+        ],
     ];
 
     /** Semua paket dengan key ter-inline (untuk render card grid). */

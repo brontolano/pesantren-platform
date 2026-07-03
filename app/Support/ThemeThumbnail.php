@@ -44,12 +44,16 @@ class ThemeThumbnail
         $activeFg = $vars['--tema-active-fg'] ?? '#047857';
         $primary = $theme['primary'] ?? '#059669';
 
+        $headerSolid = self::solid($header, '#ffffff');
+
         return [
-            'header' => self::solid($header, '#ffffff'),
+            'header' => $headerSolid,
             'active' => self::solid($active, '#ecfdf5'),
             'activeFg' => self::solid($activeFg, '#047857'),
             'primary' => self::solid($primary, '#059669'),
             'topNav' => (bool) ($theme['topNav'] ?? false),
+            // Tema gelap (header pekat) → mock-up kanvas gelap agar akurat.
+            'dark' => self::isDark($headerSolid),
         ];
     }
 
@@ -75,6 +79,28 @@ class ThemeThumbnail
         }
 
         return $value;
+    }
+
+    /**
+     * Apakah warna (hex) tergolong gelap (luminance rendah) → thumbnail
+     * memakai kanvas gelap. Hanya menerima #rgb/#rrggbb; selain itu → false.
+     */
+    private static function isDark(string $hex): bool
+    {
+        if (preg_match('/^#([0-9a-fA-F]{6})$/', $hex, $m) !== 1) {
+            if (preg_match('/^#([0-9a-fA-F]{3})$/', $hex, $m3) === 1) {
+                $m[1] = $m3[1][0].$m3[1][0].$m3[1][1].$m3[1][1].$m3[1][2].$m3[1][2];
+            } else {
+                return false;
+            }
+        }
+
+        $r = hexdec(substr($m[1], 0, 2));
+        $g = hexdec(substr($m[1], 2, 2));
+        $b = hexdec(substr($m[1], 4, 2));
+
+        // Luminance perseptual (Rec. 601). < 60 = gelap.
+        return (0.299 * $r + 0.587 * $g + 0.114 * $b) < 60;
     }
 
     /** SVG mock-up untuk satu tema (by key). */
@@ -107,10 +133,12 @@ class ThemeThumbnail
         $active = self::esc($p['active']);
         $activeFg = self::esc($p['activeFg']);
         $primary = self::esc($p['primary']);
-        $canvas = self::CANVAS;
-        $card = self::CARD;
-        $line = self::LINE;
-        $muted = self::TEXT_MUTED;
+        $isDark = (bool) ($p['dark'] ?? false);
+        // Tema gelap → kanvas/kartu/garis gelap agar mock-up representatif.
+        $canvas = $isDark ? '#0a0a12' : self::CANVAS;
+        $card = $isDark ? '#10131e' : self::CARD;
+        $line = $isDark ? '#1b2735' : self::LINE;
+        $muted = $isDark ? '#3f4b5b' : self::TEXT_MUTED;
 
         if ($p['topNav']) {
             // Top navigation: bilah menu horizontal di atas.
