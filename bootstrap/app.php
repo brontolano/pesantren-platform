@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureUserIsJemaah;
 use App\Http\Middleware\EnsureUserIsWali;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InitializeTenancyForWebRequests;
+use App\Http\Middleware\RedirectDomainKanonis;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -27,6 +28,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(
             prepend: [
+                // Kanonisasi domain tenant (opt-in) SEBELUM tenancy init —
+                // 301 GET/HEAD ke domain kanonis bila diset (hapus dualitas panel).
+                RedirectDomainKanonis::class,
                 // Tenancy init untuk request grup web (Livewire dll) di domain tenant
                 InitializeTenancyForWebRequests::class,
             ],
