@@ -8,6 +8,7 @@ use Filament\Facades\Filament;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Terapkan tema panel per tenant SAAT RUNTIME (tanpa rebuild assets):
@@ -28,8 +29,19 @@ class ApplyPanelTheme
             if (PanelTheme::topNavigation()) {
                 Filament::getCurrentPanel()?->topNavigation();
             }
-        } catch (\Throwable) {
-            // Setting belum siap / tenant belum termigrasi → biarkan bawaan.
+        } catch (\Throwable $e) {
+            // Fail-soft: setting belum siap / tenant belum termigrasi → tema
+            // default dipakai, TIDAK melempar. Tapi jangan telan diam-diam:
+            // catat agar bisa didiagnosis (mis. kolom setting hilang).
+            Log::warning('ApplyPanelTheme gagal', [
+                'tenant' => tenant()?->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            // Teruskan ke Sentry hanya bila memang sudah terpasang (opsional).
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
         }
 
         return $next($request);

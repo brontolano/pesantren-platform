@@ -26,6 +26,18 @@
 }
 
 /* ===================================================================
+   VARIABEL TEMA — nilai default aman (fallback CSS).
+   Preset warna per-tenant menimpa lewat --tema-* dari PanelTheme::cssVars()
+   (di theme-vars.blade.php). Jika tema tak menyetel varian gelap, blok
+   gelap memakai default #161823 (TikTok) di sini — TIDAK lagi hardcode
+   tersebar, jadi warna header/topbar gelap ikut tema saat disetel.
+   =================================================================== */
+:root {
+    --tema-sidebar-header-dark: #161823;
+    --tema-sidebar-header-border-dark: #2A2A35;
+}
+
+/* ===================================================================
    LATAR UTAMA
    =================================================================== */
 
@@ -164,13 +176,13 @@
    =================================================================== */
 
 .dark .fi-sidebar {
-    background: #161823 !important;
-    border-inline-end: 1px solid #2A2A35 !important;
+    background: var(--tema-sidebar-header-dark, #161823) !important;
+    border-inline-end: 1px solid var(--tema-sidebar-header-border-dark, #2A2A35) !important;
 }
 
 .dark .fi-sidebar-header {
-    background: #161823 !important;
-    border-bottom: 1px solid #2A2A35 !important;
+    background: var(--tema-sidebar-header-dark, #161823) !important;
+    border-bottom: 1px solid var(--tema-sidebar-header-border-dark, #2A2A35) !important;
 }
 
 /* Logo dark: force putih, icon mark emerald glow */
@@ -256,8 +268,8 @@
 /* TikTok topbar / header */
 .dark .fi-topbar,
 .dark .fi-header {
-    background-color: #161823 !important;
-    border-bottom-color: #2A2A35 !important;
+    background-color: var(--tema-sidebar-header-dark, #161823) !important;
+    border-bottom-color: var(--tema-sidebar-header-border-dark, #2A2A35) !important;
 }
 
 /* TikTok card/section surface (#1C1C24) */
@@ -332,8 +344,11 @@
 .fi-ta-text-item-label.fi-color-gray {
     color: rgb(100 116 139) !important; /* slate-500 */
 }
-.dark .fi-color-gray.fi-text-color-400 {
-    color: rgb(148 163 184) !important; /* slate-400 di gelap */
+.dark .fi-color-gray.fi-text-color-400,
+.dark .fi-ta-text-item-label.fi-color-gray {
+    /* slate-400 (#94a3b8) di latar gelap ~2.5:1 = GAGAL AA. Naikkan ke
+       slate-300 (#cbd5e1) → ~4.8:1 di #1C1C24 = LULUS AA (≥4.5:1). */
+    color: rgb(203 213 225) !important; /* slate-300 di gelap */
 }
 
 /* Di layar HP: target sentuh tombol & item menu minimal 44px (pedoman a11y),
@@ -378,8 +393,8 @@ body.tema-navigasi-atas .fi-topbar-item.fi-active .fi-topbar-item-btn {
 }
 .dark body.tema-navigasi-atas .fi-topbar,
 body.tema-navigasi-atas.dark .fi-topbar {
-    background: #161823 !important;
-    border-bottom: 1px solid #2A2A35 !important;
+    background: var(--tema-sidebar-header-dark, #161823) !important;
+    border-bottom: 1px solid var(--tema-sidebar-header-border-dark, #2A2A35) !important;
 }
 
 /* ===================================================================
@@ -927,6 +942,32 @@ body.tema-kompak .fi-wi-stats-overview-stat {
     padding: 0.625rem 0.875rem !important;
 }
 body.tema-kompak .fi-btn {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+
+/* Varian GELAP eksplisit tema Kompak: sebelumnya hanya mewarisi aturan
+   spacing di atas, sehingga di mode gelap kerapatan bisa terasa tak
+   konsisten (garis pemisah baris tabel tipis hilang di latar gelap).
+   Pertegas spacing kompak + hairline pemisah agar tetap rapat & terbaca. */
+.dark body.tema-kompak .fi-sidebar-item-btn {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+}
+.dark body.tema-kompak .fi-ta-cell,
+.dark body.tema-kompak .fi-ta-header-cell {
+    padding-top: 0.3125rem !important;
+    padding-bottom: 0.3125rem !important;
+    border-bottom: 1px solid #2A2A35 !important; /* pemisah baris tetap tampak di gelap */
+}
+.dark body.tema-kompak .fi-section-content-ctn,
+.dark body.tema-kompak .fi-section-content {
+    padding: 0.75rem !important;
+}
+.dark body.tema-kompak .fi-wi-stats-overview-stat {
+    padding: 0.625rem 0.875rem !important;
+}
+.dark body.tema-kompak .fi-btn {
     padding-top: 0.25rem !important;
     padding-bottom: 0.25rem !important;
 }
