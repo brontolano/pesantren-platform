@@ -72,18 +72,28 @@ class StatsPesantren extends StatsOverviewWidget
     {
         $total = 0;
         $baru = 0;
+        $cuti = 0;
 
         if (class_exists(Santri::class)) {
             $santri = Santri::query();
             $total = (clone $santri)->where('status', 'aktif')->count();
+            $cuti = (clone $santri)->where('status', 'cuti')->count();
             $baru = (clone $santri)
                 ->whereYear('created_at', now()->year)
                 ->whereMonth('created_at', now()->month)
                 ->count();
         }
 
+        // Serapan dari KesantrianOverviewWidget (konsolidasi dasbor):
+        // info cuti ikut tampil di deskripsi agar tak hilang saat baris
+        // ringkasan domain dicabut dari dasbor utama.
+        $deskripsi = $baru > 0 ? "+{$baru} baru bulan ini" : 'Santri aktif';
+        if ($cuti > 0) {
+            $deskripsi .= " · {$cuti} cuti";
+        }
+
         return Stat::make('Total Santri', number_format($total, 0, ',', '.'))
-            ->description($baru > 0 ? "+{$baru} baru bulan ini" : 'Santri aktif')
+            ->description($deskripsi)
             ->descriptionIcon($baru > 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-users')
             ->color('success');
     }
@@ -107,17 +117,27 @@ class StatsPesantren extends StatsOverviewWidget
     private function statKasMasuk(): Stat
     {
         $total = 0.0;
+        $menungguVerifikasi = 0.0;
 
         if (class_exists(Pembayaran::class)) {
-            $total = (float) Pembayaran::query()
-                ->where('is_verified', true)
+            $bulanIni = Pembayaran::query()
                 ->whereYear('tanggal_pembayaran', now()->year)
-                ->whereMonth('tanggal_pembayaran', now()->month)
-                ->sum('nominal');
+                ->whereMonth('tanggal_pembayaran', now()->month);
+
+            $total = (float) (clone $bulanIni)->where('is_verified', true)->sum('nominal');
+            $menungguVerifikasi = (float) (clone $bulanIni)->where('is_verified', false)->sum('nominal');
+        }
+
+        // JUJUR saat Rp 0 tapi ada data mentah: angka utama tetap definisi
+        // ketat (terverifikasi), deskripsi menjelaskan pembayaran yang masih
+        // antre verifikasi agar tak terbaca "tidak ada pemasukan".
+        $deskripsi = 'Pembayaran terverifikasi';
+        if ($total <= 0 && $menungguVerifikasi > 0) {
+            $deskripsi = 'Rp '.number_format($menungguVerifikasi, 0, ',', '.').' menunggu verifikasi';
         }
 
         return Stat::make('Kas Masuk (Bulan Ini)', 'Rp '.number_format($total, 0, ',', '.'))
-            ->description('Pembayaran terverifikasi')
+            ->description($deskripsi)
             ->descriptionIcon('heroicon-m-arrow-down-left')
             ->color('success');
     }
@@ -125,18 +145,28 @@ class StatsPesantren extends StatsOverviewWidget
     private function statKasKeluar(): Stat
     {
         $total = 0.0;
+        $belumTerposting = 0.0;
 
         if (class_exists(Belanja::class)) {
-            // Belanja yang sudah terposting ke buku (punya jurnal) bulan ini.
-            $total = (float) Belanja::query()
-                ->whereNotNull('jurnal_id')
+            $bulanIni = Belanja::query()
                 ->whereYear('tanggal', now()->year)
-                ->whereMonth('tanggal', now()->month)
-                ->sum('total');
+                ->whereMonth('tanggal', now()->month);
+
+            // Belanja yang sudah terposting ke buku (punya jurnal) bulan ini.
+            $total = (float) (clone $bulanIni)->whereNotNull('jurnal_id')->sum('total');
+            $belumTerposting = (float) (clone $bulanIni)->whereNull('jurnal_id')->sum('total');
+        }
+
+        // JUJUR utk tenant yang tak memakai posting jurnal: angka utama tetap
+        // definisi ketat (terposting), deskripsi menampilkan total belanja
+        // bulan ini tanpa gerbang jurnal berlabel "(belum terposting)".
+        $deskripsi = 'Belanja terposting';
+        if ($total <= 0 && $belumTerposting > 0) {
+            $deskripsi = 'Rp '.number_format($belumTerposting, 0, ',', '.').' (belum terposting)';
         }
 
         return Stat::make('Kas Keluar (Bulan Ini)', 'Rp '.number_format($total, 0, ',', '.'))
-            ->description('Belanja terposting')
+            ->description($deskripsi)
             ->descriptionIcon('heroicon-m-arrow-up-right')
             ->color($total > 0 ? 'danger' : 'gray');
     }
@@ -144,15 +174,37 @@ class StatsPesantren extends StatsOverviewWidget
     private function statTagihan(): Stat
     {
         $count = 0;
+        $sisaNominal = 0.0;
 
         if (class_exists(Tagihan::class)) {
-            $count = Tagihan::query()
+            // SATU definisi dgn KeuanganOverviewWidget ("Jatuh Tempo"):
+            // tagihan belum lunas YANG sudah lewat jatuh tempo — bukan semua
+            // tagihan belum lunas (tagihan belum jatuh tempo itu normal).
+            $lewat = Tagihan::query()
                 ->whereIn('status', ['belum_bayar', 'sebagian'])
-                ->count();
+                ->where('jatuh_tempo', '<=', now());
+
+            $count = (clone $lewat)->count();
+
+            // Total nominal SISA (nominal akhir dikurangi pembayaran
+            // terverifikasi) dari tagihan yang lewat jatuh tempo tsb.
+            $nominalAkhir = (float) (clone $lewat)->sum('nominal_akhir');
+            $terbayar = 0.0;
+
+            if (class_exists(Pembayaran::class)) {
+                $terbayar = (float) Pembayaran::query()
+                    ->where('is_verified', true)
+                    ->whereIn('tagihan_id', (clone $lewat)->select('id'))
+                    ->sum('nominal');
+            }
+
+            $sisaNominal = max(0.0, $nominalAkhir - $terbayar);
         }
 
-        return Stat::make('Tagihan Belum Lunas', number_format($count, 0, ',', '.'))
-            ->description('Perlu ditindaklanjuti')
+        return Stat::make('Tagihan Lewat Jatuh Tempo', number_format($count, 0, ',', '.'))
+            ->description($count > 0
+                ? 'Sisa Rp '.number_format($sisaNominal, 0, ',', '.').' perlu ditindaklanjuti'
+                : 'Tidak ada tunggakan')
             ->descriptionIcon('heroicon-m-exclamation-triangle')
             ->color($count > 0 ? 'warning' : 'success');
     }
