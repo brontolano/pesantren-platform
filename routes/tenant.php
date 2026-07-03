@@ -127,7 +127,7 @@ Route::middleware([
         // wali ikut "login" — wajib hak payroll/keuangan, bukan sekadar authed.
         if (in_array($segmenPertama, ['pelamar', 'kontrak-kerja'], true)) {
             abort_unless(
-                auth()->user()?->canAny(['run_payroll', 'manage_payroll', 'manage_keuangan']) ?? false,
+                auth()->user()?->canAny(['run_payroll', 'manage_keuangan']) ?? false,
                 403,
             );
         }
@@ -270,7 +270,7 @@ Route::middleware([
     })->middleware('auth')->name('tenant.donasi.kuitansi');
 
     // WP-20 — Rapor Ustadz Tahunan (pola print blade). Gate: mudir/atasan
-    // (manage_payroll/run_payroll) ATAU pegawai ybs (lihat rapornya sendiri,
+    // (run_payroll) ATAU pegawai ybs (lihat rapornya sendiri,
     // read-only). Selain itu 403 — rapor memuat penilaian & rekap kinerja.
     Route::get('/payroll/rapor-ustadz/{employee}/{tahun}', function (int $employee, int $tahun) {
         abort_unless($tahun >= 2000 && $tahun <= 2100, 404);

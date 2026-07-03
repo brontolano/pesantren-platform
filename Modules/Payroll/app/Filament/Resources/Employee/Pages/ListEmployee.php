@@ -27,7 +27,7 @@ class ListEmployee extends ListRecords
                 ->color('gray')
                 ->url(fn (): string => route('tenant.cetak.pegawai', [], false))
                 ->openUrlInNewTab()
-                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('manage_payroll') ?? false)),
+                ->visible(fn (): bool => tenancy()->initialized && (auth()->user()?->can('run_payroll') ?? false)),
             ...$this->importActions([
                 'entitas' => 'pegawai',
                 // Template selaras field skalar form panel admin (Data Pegawai +
@@ -60,7 +60,7 @@ class ListEmployee extends ListRecords
                 'label' => 'Import Pegawai',
                 'service' => PegawaiImportService::class,
                 'directory' => 'imports/payroll/pegawai/uploads',
-                'ability' => 'manage_payroll',
+                'ability' => 'run_payroll',
                 'petunjuk' => 'Unggah .xlsx/.csv/.ods. WAJIB: nip (unik), nama. Opsional: jabatan, status_kepegawaian (tetap/honorer/kontrak), email (tautkan akun login), npwp, ptkp_status (mis. TK0/K1), tanggal_masuk, tanggal_selesai, nik, nuptk, nrg, pendidikan_terakhir, dan kolom Ya/Tidak: aktif, is_mukim, asal_alumni. NIP yang sudah ada dilewati. Aman diulang (dry-run dulu). Struktur gaji & sertifikasi diisi lewat form pegawai, bukan import.',
             ]),
         ];

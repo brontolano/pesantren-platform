@@ -212,7 +212,7 @@ class EmployeeResource extends Resource
                 // Gate ganda: visible + service simpanPenilaian (403 di service).
                 Action::make('nilai_ustadz')->label('Nilai Ustadz')
                     ->icon('heroicon-o-star')->color('warning')
-                    ->visible(fn (): bool => auth()->user()?->canAny(['manage_payroll', 'run_payroll']) ?? false)
+                    ->visible(fn (): bool => auth()->user()?->can('run_payroll') ?? false)
                     ->schema(function (Employee $r): array {
                         $tahun = (int) now()->year;
                         $ada = PenilaianUstadz::query()

@@ -145,7 +145,7 @@ class CetakController extends Controller
 
     public function pegawai()
     {
-        $this->izinkan(['manage_payroll']);
+        $this->izinkan(['run_payroll']);
 
         $pegawai = Employee::query()->orderBy('nama')->get();
 

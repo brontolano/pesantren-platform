@@ -26,7 +26,7 @@ use Tests\TestCase;
  * (a) Angka rekap cocok query manual: seed jurnal (2 terlaksana + 1 kosong
  *     tahun uji + 1 tahun lain), 1 slot jadwal, 2 nilai input_by, presensi
  *     3 hadir + 1 alpa → persentase persis.
- * (b) Gate: non-mudir (tanpa manage_payroll/run_payroll) tak bisa menilai
+ * (b) Gate: non-mudir (tanpa run_payroll) tak bisa menilai
  *     (AuthorizationException); mudir bisa (updateOrCreate per tahun).
  * (c) bolehLihat: mudir ya; pegawai ybs ya (read-only); user lain tidak.
  */
@@ -233,7 +233,7 @@ class RaporUstadzTest extends TestCase
     {
         $this->boot('rpu5');
         [$employee, $guru] = $this->buatUstadz();
-        $mudir = $this->buatUser('Mudir Lihat', ['manage_payroll']);
+        $mudir = $this->buatUser('Mudir Lihat', ['run_payroll']);
         $orangLain = $this->buatUser('Orang Lain');
 
         $svc = app(RaporUstadzService::class);
