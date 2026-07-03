@@ -125,9 +125,14 @@ class PengaturanTampilan extends Page
 
             Notification::make()
                 ->title('✓ Paket "'.$pkg['name'].'" diterapkan')
-                ->body('Muat ulang halaman untuk melihat tampilan baru diterapkan penuh.')
+                ->body('Memuat tampilan baru…')
                 ->success()
                 ->send();
+
+            // Tema eksternal = file CSS di <head> — hanya termuat pada full page
+            // load. Muat ulang otomatis (jeda singkat agar toast sempat terlihat)
+            // supaya pergantian terasa LANGSUNG seperti versi CSS-vars dulu.
+            $this->js('setTimeout(() => window.location.reload(), 500)');
         } catch (\Throwable $e) {
             Notification::make()
                 ->title('Error menerapkan paket')
