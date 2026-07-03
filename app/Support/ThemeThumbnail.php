@@ -38,11 +38,14 @@ class ThemeThumbnail
     {
         $theme = PanelTheme::THEMES[$themeKey] ?? [];
         $vars = $theme['vars'] ?? [];
+        // Tema eksternal: palet thumbnail eksplisit di key 'thumb'
+        // (CSS-nya milik vendor, tak lewat var --tema-*).
+        $thumb = $theme['thumb'] ?? [];
 
-        $header = $vars['--tema-sidebar-header'] ?? '#ffffff';
-        $active = $vars['--tema-active-bg'] ?? '#ecfdf5';
-        $activeFg = $vars['--tema-active-fg'] ?? '#047857';
-        $primary = $theme['primary'] ?? '#059669';
+        $header = $thumb['header'] ?? $vars['--tema-sidebar-header'] ?? '#ffffff';
+        $active = $thumb['active'] ?? $vars['--tema-active-bg'] ?? '#ecfdf5';
+        $activeFg = $thumb['activeFg'] ?? $vars['--tema-active-fg'] ?? '#047857';
+        $primary = $thumb['primary'] ?? $theme['primary'] ?? '#059669';
 
         $headerSolid = self::solid($header, '#ffffff');
 

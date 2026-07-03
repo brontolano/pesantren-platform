@@ -1,0 +1,11 @@
+/*
+ | Tema EKSTERNAL "Moonlight" (notwonderful/filament-moonlight-theme) —
+ | build Vite terpisah. Tema GELAP (semua rule di-scope .dark; mode terang
+ | tampil standar Filament — pengguna menyalakan mode gelap utk efek penuh).
+ | Dipilih per-tenant saat runtime lewat ApplyPanelTheme → viteTheme().
+ */
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/notwonderful/filament-moonlight-theme/resources/css/theme.css';
+
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';

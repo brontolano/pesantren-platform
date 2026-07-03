@@ -69,15 +69,15 @@ class TenantCustomizationSettingOverrideTest extends TestCase
         $this->assertSame('login', TenantCustomizationRegistry::stringValue('guest_home'));
 
         // Setting per-tenant menimpa config per-tenant — white-label TANPA deploy.
-        Setting::updateOrCreate(['key' => 'customization.panel_theme_default'], ['value' => ['value' => 'slate-pro']]);
+        Setting::updateOrCreate(['key' => 'customization.panel_theme_default'], ['value' => ['value' => 'nord']]);
         Setting::updateOrCreate(['key' => 'customization.guest_home'], ['value' => ['value' => 'landing']]);
         TenantCustomizationRegistry::flushSettingMemo();
 
-        $this->assertSame('slate-pro', TenantCustomizationRegistry::stringValue('panel_theme_default'));
+        $this->assertSame('nord', TenantCustomizationRegistry::stringValue('panel_theme_default'));
         $this->assertSame('landing', TenantCustomizationRegistry::stringValue('guest_home'));
 
         // PanelTheme ikut: default tema kini dari Setting override.
-        $this->assertSame('slate-pro', PanelTheme::theme());
+        $this->assertSame('nord', PanelTheme::theme());
 
         tenancy()->end();
     }

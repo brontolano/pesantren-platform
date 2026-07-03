@@ -11,7 +11,8 @@ use App\Models\Setting;
  * dalam satu klik. Owner-inti: pesantren memilih "paket" utuh, bukan
  * mengutak-atik tema & warna terpisah.
  *
- * Tiap paket MERUJUK key yang sudah ada di PanelTheme::THEMES (wajib) dan
+ * Paket kini = Standar (bawaan) + 4 TEMA EKSTERNAL asli (Brisk/Nord/
+ * Moonlight/Neo-Brutalis). Tiap paket MERUJUK key PanelTheme::THEMES (wajib) dan
  * PanelTheme::COLORS (opsional / null). ThemePackage TIDAK memperkenalkan
  * palet/vars baru — ia hanya mengkurasi kombinasi yang sudah teruji agar
  * konsisten & identitas visual utuh. Terapkan lewat applyToSetting() yang
@@ -44,85 +45,45 @@ class ThemePackage
             'recommended_for' => ['admin_pesantren', 'tu', 'operator_divisi'],
             'features' => ['Familiar & mudah', 'Tanpa adaptasi', 'Cocok untuk pemula', 'Netral untuk semua peran'],
         ],
-        'slate-pro' => [
-            'name' => 'Slate Pro',
-            'description' => 'Konsol bersih gaya Aura — kanvas slate dingin, sidebar putih, aksen emerald profesional.',
-            'theme' => 'slate-pro',
+        'brisk' => [
+            'name' => 'Brisk (Filafly)',
+            'description' => 'Tema eksternal premium dari Filafly — bersih, ramah, font Kumbh Sans; komponen tombol/kartu/tabel/modal di-restyle menyeluruh.',
+            'theme' => 'brisk',
             'color' => null,
-            'typography' => 'Plus Jakarta Sans',
-            'category' => 'sidebar',
-            'recommended_for' => ['admin_pesantren', 'bendahara_pusat', 'akuntan'],
-            'features' => ['Tampilan SaaS premium', 'Aksen emerald profesional', 'Sidebar putih bersih', 'Kanvas slate dingin'],
-        ],
-        'glass' => [
-            'name' => 'Kaca (Glass)',
-            'description' => 'Glassmorphism lembut — kartu semi-transparan berblur, kanvas gradasi slate/indigo, aksen indigo.',
-            'theme' => 'glass',
-            'color' => null,
-            'typography' => 'Plus Jakarta Sans',
-            'category' => 'sidebar',
+            'typography' => 'Kumbh Sans',
+            'category' => 'eksternal',
             'recommended_for' => ['admin_pesantren', 'tu'],
-            'features' => ['Glassmorphism modern', 'Kartu berblur halus', 'Aksen indigo', 'Kanvas gradasi lembut'],
+            'features' => ['Tema jadi dari Filafly', 'Gaya friendly & bersih', 'Font Kumbh Sans', 'Komponen di-restyle menyeluruh'],
         ],
-        'corporate' => [
-            'name' => 'Korporat',
-            'description' => 'Netral slate profesional dengan menu di bilah atas — band header navy, aksen biru eksekutif.',
-            'theme' => 'corporate',
+        'nord' => [
+            'name' => 'Nord (Arctic)',
+            'description' => 'Palet Nord asli — nuansa dingin nordic (polar night & frost), primer biru es; varian terang + gelap mengikuti toggle mode gelap.',
+            'theme' => 'nord',
+            'color' => null,
+            'typography' => 'Inter (bawaan Nord)',
+            'category' => 'eksternal',
+            'recommended_for' => ['admin_pesantren', 'operator_divisi'],
+            'features' => ['Palet Nord asli (Arctic)', 'Nuansa dingin menenangkan', 'Primer biru es', 'Varian terang + gelap'],
+        ],
+        'moonlight' => [
+            'name' => 'Moonlight (Gelap)',
+            'description' => 'Tema gelap ala JetBrains Moonlight — biru malam dengan aksen pastel; efek penuh saat mode gelap dinyalakan.',
+            'theme' => 'moonlight',
             'color' => null,
             'typography' => 'Plus Jakarta Sans',
-            'category' => 'topnav',
-            'recommended_for' => ['kepala', 'dewan_pembina', 'pimpinan'],
-            'features' => ['Netral & eksekutif', 'Menu di atas (top-nav)', 'Band header navy', 'Area kerja lega'],
-        ],
-        'midnight' => [
-            'name' => 'Tengah Malam',
-            'description' => 'Dark-first nyaris hitam, sidebar gelap pekat, aksen indigo/violet — teduh untuk mata.',
-            'theme' => 'midnight',
-            'color' => null,
-            'typography' => 'Plus Jakarta Sans',
-            'category' => 'sidebar',
+            'category' => 'eksternal',
             'recommended_for' => ['operator_divisi', 'admin_pesantren'],
-            'features' => ['Dark-first pekat', 'Aksen indigo/violet', 'Teduh untuk mata', 'Fokus malam hari'],
+            'features' => ['Gelap ala JetBrains Moonlight', 'Aksen pastel lembut', 'Teduh untuk kerja malam', 'Aktif penuh di mode gelap'],
         ],
-        'warm' => [
-            'name' => 'Hangat',
-            'description' => 'Kanvas krem hangat, sidebar warm-white, aksen amber — nuansa ramah & bersahaja.',
-            'theme' => 'warm',
+        'neobrutalism' => [
+            'name' => 'Neo-Brutalis',
+            'description' => 'Neo-brutalism — border tebal, bayangan offset, kontras berani; tombol/kartu/input berubah total, identitas visual kuat.',
+            'theme' => 'neobrutalism',
             'color' => null,
             'typography' => 'Plus Jakarta Sans',
-            'category' => 'sidebar',
-            'recommended_for' => ['admin_pesantren', 'tu'],
-            'features' => ['Kanvas krem hangat', 'Aksen amber ramah', 'Sidebar warm-white', 'Nuansa bersahaja'],
-        ],
-        'aurora' => [
-            'name' => 'Aurora',
-            'description' => 'Kanvas terang lapang beraksen gradasi ungu→merah muda→biru, primer violet — segar & ekspresif.',
-            'theme' => 'aurora',
-            'color' => null,
-            'typography' => 'Plus Jakarta Sans',
-            'category' => 'sidebar',
-            'recommended_for' => ['admin_pesantren', 'tu'],
-            'features' => ['Gradasi aurora ekspresif', 'Primer violet segar', 'Kanvas terang lapang', 'Aksen ungu–merah muda'],
-        ],
-        'nature' => [
-            'name' => 'Alam',
-            'description' => 'Earthy — kanvas sage lembut, sidebar putih kehijauan, primer forest, aksen olive/cokelat.',
-            'theme' => 'nature',
-            'color' => null,
-            'typography' => 'Plus Jakarta Sans',
-            'category' => 'sidebar',
-            'recommended_for' => ['admin_pesantren', 'kepala', 'tu'],
-            'features' => ['Nuansa earthy alami', 'Primer forest green', 'Aksen olive/cokelat', 'Kanvas sage lembut'],
-        ],
-        'neon' => [
-            'name' => 'Neon (Cyber)',
-            'description' => 'Kanvas gelap cyber, aksen neon cyan/lime dengan glow, heading Orbitron — futuristik & berenergi.',
-            'theme' => 'neon',
-            'color' => null,
-            'typography' => 'Orbitron + Inter',
-            'category' => 'sidebar',
-            'recommended_for' => ['operator_divisi', 'admin_pesantren'],
-            'features' => ['Kanvas cyber gelap', 'Aksen neon cyan/lime', 'Glow pada tombol & item aktif', 'Heading Orbitron futuristik'],
+            'category' => 'eksternal',
+            'recommended_for' => ['admin_pesantren'],
+            'features' => ['Gaya neo-brutalism berani', 'Border tebal + bayangan offset', 'Kontras tinggi mudah dibaca', 'Identitas visual kuat'],
         ],
     ];
 

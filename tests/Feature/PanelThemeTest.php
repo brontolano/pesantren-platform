@@ -8,15 +8,16 @@ use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
 /**
- * Tema panel per tenant. Default SEMUA tenant = 'bawaan' (Standar Sidebar
- * Putih; dari registry kustomisasi 'panel_theme_default'), pilihan tersimpan
- * di Setting, nilai tak dikenal/error → jatuh ke 'bawaan'. Preset WARNA
- * punya resolver terpisah yang juga fallback ke 'bawaan'.
+ * Tema panel per tenant — arsitektur "multi-build CSS + pilih runtime".
  *
- * 9 tema: bawaan (default) + 8 skin lengkap (slate-pro, glass, corporate,
- * midnight, warm, aurora, nature, neon). Tiap tema non-bawaan mengganti
- * KULIT menyeluruh (font/radius/bayangan/tombol/kartu/input) lewat kontrak
- * var --tema-* — bukan cuma warna.
+ * 5 tema: bawaan (default, build theme.css standar) + 4 TEMA EKSTERNAL asli
+ * (brisk/nord/moonlight/neobrutalism) — tiap tema eksternal punya build CSS
+ * Vite sendiri ('cssEntry') yang meng-import CSS paket vendor Composer-nya,
+ * dipilih per-request oleh ApplyPanelTheme lewat Panel::viteTheme().
+ *
+ * Skin custom lama (slate-pro/glass/corporate/midnight/warm/aurora/nature/
+ * neon) DIHAPUS BERSIH: Setting lama yang masih menyimpannya jatuh mulus ke
+ * 'bawaan'. Preset WARNA tetap ada untuk tema tanpa palet.
  */
 class PanelThemeTest extends TestCase
 {
@@ -39,12 +40,13 @@ class PanelThemeTest extends TestCase
 
     public function test_default_bawaan_tanpa_setting_dan_tanpa_tenancy(): void
     {
-        // Tanpa tenancy: tidak melempar. Default tema SEMUA tenant = 'bawaan';
-        // preset WARNA resolver terpisah juga fallback 'bawaan'.
+        // Tanpa tenancy: tidak melempar. Default tema SEMUA tenant = 'bawaan'.
         $this->assertSame('bawaan', PanelTheme::theme());
         $this->assertSame('bawaan', PanelTheme::color());
 
-        // 'bawaan' TANPA palet penuh → primer null, tanpa bodyClass & vars.
+        // 'bawaan' → build CSS standar, tanpa font khusus, tanpa palet.
+        $this->assertSame(PanelTheme::DEFAULT_CSS_ENTRY, PanelTheme::cssEntry());
+        $this->assertNull(PanelTheme::font());
         $this->assertNull(PanelTheme::primaryHex());
         $this->assertFalse(PanelTheme::topNavigation());
         $this->assertNull(PanelTheme::bodyClass());
@@ -53,131 +55,97 @@ class PanelThemeTest extends TestCase
         // Dengan tenancy tapi Setting kosong: tetap default 'bawaan'.
         $this->boot('tema');
         $this->assertSame('bawaan', PanelTheme::theme());
-        $this->assertSame('bawaan', PanelTheme::color());
+        $this->assertSame(PanelTheme::DEFAULT_CSS_ENTRY, PanelTheme::cssEntry());
         tenancy()->end();
     }
 
-    public function test_setting_tenant_mengubah_tema_ke_slate_pro(): void
+    public function test_setting_tenant_mengubah_tema_ke_brisk(): void
     {
         $this->boot('tema');
 
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'slate-pro']]);
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'brisk']]);
 
-        $this->assertSame('slate-pro', PanelTheme::theme());
+        $this->assertSame('brisk', PanelTheme::theme());
+        // Brisk = build CSS eksternal sendiri + font Kumbh Sans.
+        $this->assertSame('resources/css/filament/pesantren/theme-brisk.css', PanelTheme::cssEntry());
+        $this->assertSame('Kumbh Sans', PanelTheme::font());
+        // Brisk tanpa palet mengikat → primer ikut preset warna (default null).
+        $this->assertNull(PanelTheme::primaryHex());
+        $this->assertNull(PanelTheme::bodyClass());
         $this->assertFalse(PanelTheme::topNavigation());
-        $this->assertSame('tema-slate-pro', PanelTheme::bodyClass());
-
-        // Slate Pro berpalet penuh → primer emerald + vars terisi.
-        $this->assertSame('#059669', PanelTheme::primaryHex());
-        $this->assertStringContainsString('--tema-sidebar-header:#ffffff;', PanelTheme::cssVars());
-        $this->assertStringContainsString('--tema-active-bg:#ecfdf5;', PanelTheme::cssVars());
 
         tenancy()->end();
     }
 
-    public function test_tema_corporate_memakai_navigasi_atas(): void
+    public function test_tema_nord_berpalet_dan_build_sendiri(): void
     {
         $this->boot('tema');
 
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'corporate']]);
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'nord']]);
 
-        $this->assertSame('corporate', PanelTheme::theme());
-        $this->assertSame('tema-corporate', PanelTheme::bodyClass());
-        $this->assertTrue(PanelTheme::topNavigation());
-        $this->assertSame('#2563eb', PanelTheme::primaryHex());
-        $this->assertStringContainsString('--tema-sidebar-header:#1e293b;', PanelTheme::cssVars());
-
-        tenancy()->end();
-    }
-
-    public function test_tema_neon_skin_lengkap_dan_glow(): void
-    {
-        $this->boot('tema');
-
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'neon']]);
-
-        $this->assertSame('neon', PanelTheme::theme());
-        $this->assertSame('tema-neon', PanelTheme::bodyClass());
-        $this->assertFalse(PanelTheme::topNavigation());
-        $this->assertSame('#22d3ee', PanelTheme::primaryHex());
-
-        $vars = PanelTheme::cssVars();
-        // Kanvas gelap + aksen neon.
-        $this->assertStringContainsString('--tema-sidebar-header:#0a0a12;', $vars);
-        // Skin lengkap: font heading Orbitron + bayang tombol glow.
-        $this->assertStringContainsString('Orbitron', $vars);
-        $this->assertStringContainsString('--tema-btn-shadow:', $vars);
-
-        tenancy()->end();
-    }
-
-    public function test_cssvars_memancarkan_kontrak_skin(): void
-    {
-        $this->boot('tema');
-
-        // Tema berpalet penuh memancarkan var skin (font/radius) ke :root.
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'glass']]);
-        $vars = PanelTheme::cssVars();
-        $this->assertStringContainsString('--tema-font-sans:', $vars);
-        $this->assertStringContainsString('--tema-radius:1rem;', $vars);
-        $this->assertStringContainsString('--tema-btn-radius:', $vars);
-
-        tenancy()->end();
-    }
-
-    public function test_tema_berpalet_penuh_mengikat_paletnya(): void
-    {
-        $this->boot('tema');
-
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'warm']]);
-
-        $this->assertSame('warm', PanelTheme::theme());
-        $this->assertSame('tema-warm', PanelTheme::bodyClass());
-        $this->assertSame('#d97706', PanelTheme::primaryHex());
-        $this->assertStringContainsString('--tema-active-bg:#fffbeb;', PanelTheme::cssVars());
-
-        // Palet tema MENGIKAT: preset warna apa pun TIDAK menimpa palet
-        // tema berpalet penuh — identitas tema tetap utuh.
+        $this->assertSame('nord', PanelTheme::theme());
+        $this->assertSame('resources/css/filament/pesantren/theme-nord.css', PanelTheme::cssEntry());
+        // Nord berpalet penuh → primer biru es mengikat, preset warna tak menimpa.
+        $this->assertSame('#88c0d0', PanelTheme::primaryHex());
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'navy']]);
-        $this->assertSame('#d97706', PanelTheme::primaryHex());
-        $this->assertStringContainsString('--tema-sidebar-header:#fffaf3;', PanelTheme::cssVars());
+        $this->assertSame('#88c0d0', PanelTheme::primaryHex());
 
-        // Tema tanpa palet sendiri ('bawaan'): preset warna tetap berlaku.
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'bawaan']]);
+        tenancy()->end();
+    }
+
+    public function test_tema_moonlight_dan_neobrutalism(): void
+    {
+        $this->boot('tema');
+
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'moonlight']]);
+        $this->assertSame('resources/css/filament/pesantren/theme-moonlight.css', PanelTheme::cssEntry());
+        $this->assertSame('#82aaff', PanelTheme::primaryHex());
+
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'neobrutalism']]);
+        $this->assertSame('resources/css/filament/pesantren/theme-neobrutalism.css', PanelTheme::cssEntry());
+        $this->assertNull(PanelTheme::primaryHex());
+
+        tenancy()->end();
+    }
+
+    public function test_tema_tanpa_palet_masih_bisa_pakai_preset_warna(): void
+    {
+        $this->boot('tema');
+
+        // Tema 'bawaan': preset warna tetap berlaku (var --tema-* di theme.css).
+        Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'navy']]);
         $this->assertSame('#2563eb', PanelTheme::primaryHex());
         $this->assertStringContainsString('--tema-active-bg:#dbeafe;', PanelTheme::cssVars());
 
         tenancy()->end();
     }
 
-    public function test_nilai_tak_dikenal_jatuh_ke_default_bawaan(): void
+    public function test_nilai_lama_yang_dihapus_jatuh_ke_default_bawaan(): void
     {
         $this->boot('tema');
 
-        // Termasuk tema LAMA yang sudah dihapus (fallback mulus).
-        Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'baitul-maal']]);
+        // Skin custom LAMA yang sudah dihapus bersih → fallback mulus.
+        foreach (['slate-pro', 'glass', 'corporate', 'midnight', 'warm', 'aurora', 'nature', 'neon', 'baitul-maal'] as $lama) {
+            Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => $lama]]);
+            $this->assertSame('bawaan', PanelTheme::theme(), "Tema lama '{$lama}' harus jatuh ke bawaan");
+            $this->assertSame(PanelTheme::DEFAULT_CSS_ENTRY, PanelTheme::cssEntry(), $lama);
+        }
+
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'pimpinan-biru']]);
-
-        // Tema tak dikenal → default 'bawaan'; preset warna tak dikenal →
-        // resolver warna fallback 'bawaan'.
-        $this->assertSame('bawaan', PanelTheme::theme());
         $this->assertSame('bawaan', PanelTheme::color());
-
-        // 'bawaan' tanpa palet → cssVars kosong.
         $this->assertSame('', PanelTheme::cssVars());
         $this->assertNull(PanelTheme::bodyClass());
 
         tenancy()->end();
     }
 
-    public function test_registry_sembilan_tema_lengkap_dan_konsisten(): void
+    public function test_registry_lima_tema_lengkap_dan_konsisten(): void
     {
-        // Tepat 9 tema: bawaan + 8 skin lengkap.
-        $this->assertCount(9, PanelTheme::THEMES);
-        $expected = ['bawaan', 'slate-pro', 'glass', 'corporate', 'midnight', 'warm', 'aurora', 'nature', 'neon'];
+        // Tepat 5 tema: bawaan + 4 tema eksternal asli.
+        $this->assertCount(5, PanelTheme::THEMES);
+        $expected = ['bawaan', 'brisk', 'nord', 'moonlight', 'neobrutalism'];
         $this->assertSame($expected, array_keys(PanelTheme::THEMES));
 
-        // Setiap tema punya metadata inti.
         foreach (PanelTheme::THEMES as $key => $t) {
             $this->assertArrayHasKey('label', $t, $key);
             $this->assertArrayHasKey('desc', $t, $key);
@@ -189,31 +157,31 @@ class PanelThemeTest extends TestCase
             $this->assertArrayHasKey('features', $t, $key);
             $this->assertArrayHasKey('typography', $t, $key);
 
-            // Tiap tema berpalet penuh (selain bawaan) wajib 4 var inti.
             if ($key === 'bawaan') {
-                $this->assertNull($t['bodyClass'], $key);
-                $this->assertArrayNotHasKey('primary', $t, $key);
+                $this->assertArrayNotHasKey('cssEntry', $t, $key);
 
                 continue;
             }
 
-            $this->assertArrayHasKey('primary', $t, $key);
-            $this->assertMatchesRegularExpression('/^#[0-9a-f]{6}$/i', (string) $t['primary'], $key);
-            $this->assertSame('tema-'.$key, $t['bodyClass'], $key);
-            foreach (['--tema-sidebar-header', '--tema-sidebar-header-border', '--tema-active-bg', '--tema-active-fg', '--tema-active-dark'] as $var) {
-                $this->assertArrayHasKey($var, $t['vars'], "{$key} kehilangan {$var}");
+            // Tema eksternal: WAJIB build CSS Vite sendiri yang filenya ADA
+            // (jebakan: entry hilang dari vite.config.js/disk = layar polos).
+            $this->assertSame('eksternal', $t['category'], $key);
+            $this->assertArrayHasKey('cssEntry', $t, $key);
+            $this->assertFileExists(base_path($t['cssEntry']), $key);
+            $this->assertStringContainsString(
+                $t['cssEntry'],
+                file_get_contents(base_path('vite.config.js')),
+                "{$key}: cssEntry belum terdaftar di vite.config.js",
+            );
+
+            // Palet thumbnail eksplisit (CSS-nya milik vendor, tanpa var --tema-*).
+            $this->assertArrayHasKey('thumb', $t, $key);
+            foreach (['header', 'active', 'activeFg', 'primary'] as $thumbKey) {
+                $this->assertArrayHasKey($thumbKey, $t['thumb'], "{$key} thumb kehilangan {$thumbKey}");
             }
 
-            // KONTRAK SKIN: tiap tema non-bawaan set var kulit inti (SKIN LENGKAP,
-            // bukan cuma warna) — font, radius kartu/tombol/input, bayangan,
-            // border kartu, bayang tombol, berat tombol/heading.
-            foreach ([
-                '--tema-font-sans', '--tema-radius', '--tema-btn-radius',
-                '--tema-input-radius', '--tema-card-shadow', '--tema-card-border',
-                '--tema-btn-shadow', '--tema-btn-weight', '--tema-heading-weight',
-            ] as $skinVar) {
-                $this->assertArrayHasKey($skinVar, $t['vars'], "{$key} kehilangan skin var {$skinVar}");
-                $this->assertNotSame('', trim((string) $t['vars'][$skinVar]), "{$key} skin var {$skinVar} kosong");
+            if (isset($t['primary'])) {
+                $this->assertMatchesRegularExpression('/^#[0-9a-f]{6}$/i', (string) $t['primary'], $key);
             }
         }
 
@@ -231,6 +199,19 @@ class PanelThemeTest extends TestCase
             foreach (['--tema-sidebar-header', '--tema-active-bg', '--tema-active-fg', '--tema-active-dark'] as $var) {
                 $this->assertArrayHasKey($var, $w['vars'], "{$key} kehilangan {$var}");
             }
+        }
+    }
+
+    public function test_css_vendor_tema_eksternal_terpasang(): void
+    {
+        // Paket Composer tema eksternal harus ada di vendor (composer require).
+        foreach ([
+            'vendor/filafly/brisk/resources/css/theme.css',
+            'vendor/andreia/filament-nord-theme/resources/css/theme.css',
+            'vendor/notwonderful/filament-moonlight-theme/resources/css/theme.css',
+            'vendor/caresome/filament-neobrutalism-theme/resources/css/theme.css',
+        ] as $vendorCss) {
+            $this->assertFileExists(base_path($vendorCss));
         }
     }
 }

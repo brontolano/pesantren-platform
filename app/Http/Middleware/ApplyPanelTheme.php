@@ -26,8 +26,21 @@ class ApplyPanelTheme
                 FilamentColor::register(['primary' => Color::hex($primary)]);
             }
 
-            if (PanelTheme::topNavigation()) {
-                Filament::getCurrentPanel()?->topNavigation();
+            $panel = Filament::getCurrentPanel();
+
+            if ($panel !== null) {
+                // Arsitektur "multi-build CSS + pilih runtime": entry CSS Vite
+                // tema aktif dipilih per-request (getTheme() Filament baru
+                // dievaluasi saat render — setelah middleware ini). SELALU
+                // di-set (juga saat bawaan) agar tidak bocor antar request di
+                // worker long-running (FrankenPHP). Font idem (Brisk = Kumbh
+                // Sans via provider Bunny bawaan; null = font platform).
+                $panel->viteTheme(PanelTheme::cssEntry());
+                $panel->font(PanelTheme::font() ?? 'Plus Jakarta Sans');
+
+                if (PanelTheme::topNavigation()) {
+                    $panel->topNavigation();
+                }
             }
         } catch (\Throwable $e) {
             // Fail-soft: setting belum siap / tenant belum termigrasi → tema

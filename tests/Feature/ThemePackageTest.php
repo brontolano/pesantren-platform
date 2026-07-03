@@ -10,10 +10,10 @@ use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
 /**
- * PAKET TEMA siap-pakai (9 paket = Standar + 8 skin lengkap incl. Neon): tiap paket
- * merujuk theme/color yang VALID di PanelTheme; applyToSetting menulis dua
- * Setting per-tenant dengan benar; recommendedForRoles menghitung irisan
- * peran; thumbnail SVG deterministik.
+ * PAKET TEMA (5 paket = Standar + 4 tema EKSTERNAL asli: Brisk/Nord/
+ * Moonlight/Neo-Brutalis): tiap paket merujuk theme/color yang VALID di
+ * PanelTheme; applyToSetting menulis dua Setting per-tenant dengan benar;
+ * recommendedForRoles menghitung irisan peran; thumbnail SVG deterministik.
  */
 class ThemePackageTest extends TestCase
 {
@@ -34,10 +34,10 @@ class ThemePackageTest extends TestCase
         $this->seedTenantRow($tenant);
     }
 
-    public function test_sembilan_paket_merujuk_theme_dan_color_yang_valid(): void
+    public function test_lima_paket_merujuk_theme_dan_color_yang_valid(): void
     {
-        $this->assertCount(9, ThemePackage::PACKAGES);
-        $expected = ['standar-putih', 'slate-pro', 'glass', 'corporate', 'midnight', 'warm', 'aurora', 'nature', 'neon'];
+        $this->assertCount(5, ThemePackage::PACKAGES);
+        $expected = ['standar-putih', 'brisk', 'nord', 'moonlight', 'neobrutalism'];
         $this->assertSame($expected, array_keys(ThemePackage::PACKAGES));
 
         foreach (ThemePackage::PACKAGES as $key => $pkg) {
@@ -59,7 +59,7 @@ class ThemePackageTest extends TestCase
             }
 
             // category selaras kategori tema
-            $this->assertContains($pkg['category'], ['sidebar', 'topnav'], $key);
+            $this->assertContains($pkg['category'], ['sidebar', 'topnav', 'eksternal'], $key);
             $this->assertSame(PanelTheme::THEMES[$pkg['theme']]['category'], $pkg['category'], $key);
         }
     }
@@ -78,12 +78,15 @@ class ThemePackageTest extends TestCase
         $this->assertSameSize(ThemePackage::PACKAGES, $all);
         $this->assertArrayHasKey('key', $all[0]);
 
-        $pkg = ThemePackage::get('slate-pro');
+        $pkg = ThemePackage::get('brisk');
         $this->assertNotNull($pkg);
-        $this->assertSame('slate-pro', $pkg['key']);
-        $this->assertSame('slate-pro', $pkg['theme']);
+        $this->assertSame('brisk', $pkg['key']);
+        $this->assertSame('brisk', $pkg['theme']);
 
         $this->assertNull(ThemePackage::get('paket-tidak-ada'));
+        // Paket skin lama sudah dihapus bersih.
+        $this->assertNull(ThemePackage::get('slate-pro'));
+        $this->assertNull(ThemePackage::get('neon'));
     }
 
     public function test_apply_to_setting_menulis_theme_dan_color_per_tenant(): void
@@ -95,69 +98,73 @@ class ThemePackageTest extends TestCase
         $this->assertSame('bawaan', Setting::getTenantStringValue(PanelTheme::SETTING_THEME));
         $this->assertSame('bawaan', Setting::getTenantStringValue(PanelTheme::SETTING_COLOR));
         $this->assertSame('bawaan', PanelTheme::theme());
+        $this->assertSame(PanelTheme::DEFAULT_CSS_ENTRY, PanelTheme::cssEntry());
 
-        // Paket berpalet penuh (slate-pro) → tema mengikat primernya sendiri.
-        $this->assertTrue(ThemePackage::applyToSetting('slate-pro'));
-        $this->assertSame('slate-pro', Setting::getTenantStringValue(PanelTheme::SETTING_THEME));
+        // Paket eksternal Brisk → tema + build CSS-nya aktif.
+        $this->assertTrue(ThemePackage::applyToSetting('brisk'));
+        $this->assertSame('brisk', Setting::getTenantStringValue(PanelTheme::SETTING_THEME));
         $this->assertSame('bawaan', Setting::getTenantStringValue(PanelTheme::SETTING_COLOR));
-        $this->assertSame('#059669', PanelTheme::primaryHex());
+        $this->assertSame('resources/css/filament/pesantren/theme-brisk.css', PanelTheme::cssEntry());
 
-        // Paket top-nav (corporate).
-        $this->assertTrue(ThemePackage::applyToSetting('corporate'));
-        $this->assertSame('corporate', Setting::getTenantStringValue(PanelTheme::SETTING_THEME));
-        $this->assertSame('#2563eb', PanelTheme::primaryHex());
-        $this->assertTrue(PanelTheme::topNavigation());
+        // Paket eksternal berpalet (nord) → primer mengikat.
+        $this->assertTrue(ThemePackage::applyToSetting('nord'));
+        $this->assertSame('nord', Setting::getTenantStringValue(PanelTheme::SETTING_THEME));
+        $this->assertSame('#88c0d0', PanelTheme::primaryHex());
 
-        // Paket tidak dikenal → false, tidak menulis (nilai lama tetap).
+        // Paket tidak dikenal / paket lama → false, tidak menulis.
         $this->assertFalse(ThemePackage::applyToSetting('paket-hantu'));
-        $this->assertSame('corporate', Setting::getTenantStringValue(PanelTheme::SETTING_THEME));
+        $this->assertFalse(ThemePackage::applyToSetting('corporate'));
+        $this->assertSame('nord', Setting::getTenantStringValue(PanelTheme::SETTING_THEME));
 
         tenancy()->end();
     }
 
     public function test_recommended_for_roles_menghitung_irisan(): void
     {
-        // Peran bendahara → slate-pro (keuangan) muncul.
-        $forBendahara = collect(ThemePackage::recommendedForRoles(['bendahara_pusat']))->pluck('key')->all();
-        $this->assertContains('slate-pro', $forBendahara);
-        $this->assertNotContains('corporate', $forBendahara);
+        // Peran TU → brisk (ramah utk admin/tu) muncul.
+        $forTu = collect(ThemePackage::recommendedForRoles(['tu']))->pluck('key')->all();
+        $this->assertContains('brisk', $forTu);
+        $this->assertNotContains('moonlight', $forTu);
 
-        // Peran pimpinan → paket korporat.
-        $forPimpinan = collect(ThemePackage::recommendedForRoles(['kepala']))->pluck('key')->all();
-        $this->assertContains('corporate', $forPimpinan);
+        // Peran operator → nord & moonlight.
+        $forOperator = collect(ThemePackage::recommendedForRoles(['operator_divisi']))->pluck('key')->all();
+        $this->assertContains('nord', $forOperator);
+        $this->assertContains('moonlight', $forOperator);
 
         // Kosong / tak match → tak ada.
         $this->assertSame([], ThemePackage::recommendedForRoles([]));
         $this->assertSame([], ThemePackage::recommendedForRoles(['peran_asing']));
 
         // Helper boolean.
-        $this->assertTrue(ThemePackage::isRecommendedForRoles('corporate', ['kepala']));
-        $this->assertFalse(ThemePackage::isRecommendedForRoles('corporate', ['kasir']));
-        $this->assertFalse(ThemePackage::isRecommendedForRoles('paket-hantu', ['kepala']));
+        $this->assertTrue(ThemePackage::isRecommendedForRoles('brisk', ['tu']));
+        $this->assertFalse(ThemePackage::isRecommendedForRoles('moonlight', ['tu']));
+        $this->assertFalse(ThemePackage::isRecommendedForRoles('paket-hantu', ['tu']));
     }
 
     public function test_active_key_mendeteksi_kombinasi_tersimpan(): void
     {
         // standar-putih = bawaan + bawaan.
         $this->assertSame('standar-putih', ThemePackage::activeKey('bawaan', 'bawaan'));
-        // slate-pro + bawaan → paket slate-pro.
-        $this->assertSame('slate-pro', ThemePackage::activeKey('slate-pro', 'bawaan'));
-        // corporate + bawaan → paket corporate.
-        $this->assertSame('corporate', ThemePackage::activeKey('corporate', 'bawaan'));
-        // kombinasi acak → null.
+        // brisk + bawaan → paket brisk.
+        $this->assertSame('brisk', ThemePackage::activeKey('brisk', 'bawaan'));
+        // nord + bawaan → paket nord.
+        $this->assertSame('nord', ThemePackage::activeKey('nord', 'bawaan'));
+        // kombinasi acak / tema lama → null.
+        $this->assertNull(ThemePackage::activeKey('slate-pro', 'bawaan'));
         $this->assertNull(ThemePackage::activeKey('tema-hantu', 'bawaan'));
     }
 
     public function test_thumbnail_svg_valid_dan_memakai_warna_tema(): void
     {
-        // Tema corporate → header navy #1e293b harus muncul di SVG.
-        $svg = ThemeThumbnail::inlineForTheme('corporate');
+        // Tema nord → header polar night #2e3440 harus muncul di SVG (key 'thumb').
+        $svg = ThemeThumbnail::inlineForTheme('nord');
         $this->assertStringStartsWith('<svg', $svg);
-        $this->assertStringContainsString('#1e293b', $svg);
+        $this->assertStringContainsString('#2e3440', $svg);
+        $this->assertStringContainsString('#88c0d0', $svg);
 
-        // Paket slate-pro → primer emerald #059669.
-        $pkgSvg = ThemeThumbnail::inlineForPackage('slate-pro');
-        $this->assertStringContainsString('#059669', $pkgSvg);
+        // Paket moonlight → header biru malam #1e2030.
+        $pkgSvg = ThemeThumbnail::inlineForPackage('moonlight');
+        $this->assertStringContainsString('#1e2030', $pkgSvg);
 
         // Fallback aman untuk key tak dikenal (pakai palet bawaan, tetap SVG valid).
         $fallback = ThemeThumbnail::inlineForPackage('paket-hantu');
