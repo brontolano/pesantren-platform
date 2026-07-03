@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\PortalGuru;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Services\PortalGuru\PortalGuruBrandingService;
+use App\Support\Pwa\SelfDestructSw;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -103,6 +105,17 @@ SVG;
 
     public function serviceWorker(): Response
     {
+        // F5 (sunset instalasi lama): flag ON → SW /guru serve self-destruct.
+        // Flag default OFF di semua tenant — dormant sampai owner mengaktifkan
+        // setelah F1 stabil di produksi (lihat plan F5).
+        if ((bool) Setting::getTenantValue('pwa.legacy_sw_selfdestruct', false)) {
+            return response(
+                SelfDestructSw::script('guru-shell-'),
+                200,
+                SelfDestructSw::headers('/guru/'),
+            );
+        }
+
         $branding = $this->brandingService->resolve();
         $versionSeed = implode('|', [
             $branding['tenantId'],
