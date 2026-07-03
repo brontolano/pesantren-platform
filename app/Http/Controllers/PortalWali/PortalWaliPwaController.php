@@ -194,11 +194,17 @@ SVG;
             $branding['primaryColor'],
             $branding['secondaryColor'],
             $branding['description'],
+            // F0 hardening: seed diganti agar cache-name berubah → SW baru
+            // menghapus cache lama 'wali-shell-*' (yang berisi HTML ber-auth)
+            // lewat pembersihan by-prefix di handler 'activate'.
+            'f0-shell-only',
         ]);
 
         $cacheName = 'wali-shell-'.$branding['tenantId'].'-'.substr(sha1($versionSeed), 0, 12);
+        // KEAMANAN (F0): HANYA aset shell publik statis (manifest/ikon/screenshot).
+        // Halaman '/wali' & turunannya berisi data keuangan ber-auth — TIDAK PERNAH
+        // masuk Cache Storage (risiko bocor antar-user di HP bersama).
         $shellUrls = [
-            '/wali',
             '/wali/manifest.json',
             '/wali/icon.svg?size=192',
             '/wali/icon.svg?size=512',
@@ -241,13 +247,12 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    const isWaliPage = url.pathname === '/wali' || url.pathname.startsWith('/wali/');
-    const isWaliAsset =
-        url.pathname === '/wali/manifest.json' ||
-        url.pathname === '/wali/icon.svg' ||
-        url.pathname === '/wali/screenshot.svg';
+    // KEAMANAN: HANYA shell publik (manifest/ikon/screenshot) yang boleh masuk
+    // Cache Storage. Halaman ber-auth (/wali, /wali/tagihan, /wali/tabungan)
+    // berisi data keuangan wali — TIDAK PERNAH di-cache; offline = klien retry.
+    const isShellUrl = SHELL_URLS.includes(url.pathname + url.search);
 
-    if (!isWaliPage && !isWaliAsset) {
+    if (!isShellUrl) {
         return;
     }
 

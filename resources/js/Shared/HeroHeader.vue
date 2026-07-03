@@ -11,6 +11,7 @@ import IslamicPattern from '@/Components/Ui/IslamicPattern.vue'
  *
  * Slot:
  *   #subtitle — di bawah nama (mis. chip peran)
+ *   #actions  — aksi ekstra di kanan (additif; default kosong — utk bell/avatar)
  *   #action   — override area kanan (default: lonceng -> notifHref)
  *   #switcher — baris pills horizontal (child/role/periode switcher)
  *   default   — konten ringkasan di bawah (mis. grid StatCard kaca)
@@ -51,6 +52,12 @@ const initial = computed(() =>
                             <slot name="subtitle" />
                         </div>
                     </div>
+                </div>
+
+                <!-- #actions (F0, additif): tempat aksi ekstra di kanan header
+                     (mis. bell/avatar tambahan nanti). Default kosong. -->
+                <div v-if="$slots.actions" class="flex shrink-0 items-center gap-2">
+                    <slot name="actions" />
                 </div>
 
                 <slot name="action">

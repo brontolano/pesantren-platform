@@ -1,8 +1,16 @@
 import '../css/app.css';
 
 import { createApp, h } from 'vue';
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { clearSensitiveStorageIfGuest } from './Shared/authStorage';
+
+// Hygiene HP bersama (F0): tiap render halaman TANPA user login (pasca-logout,
+// full page load setelah POST /keluar, atau sesi kedaluwarsa) → hapus kunci
+// localStorage sensitif (token API disiplin, cache izin gerbang).
+router.on('navigate', (event) => {
+    clearSensitiveStorageIfGuest(event.detail.page?.props);
+});
 
 createInertiaApp({
     title: (title) => title || '',

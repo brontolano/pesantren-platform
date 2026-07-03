@@ -122,6 +122,17 @@ class RootPwaController extends Controller
      */
     public function serviceWorker(): Response
     {
+        // KILL-SWITCH (F0): flag OFF → sajikan skrip self-destruct. Tanpa ini,
+        // SW yang terlanjur terpasang saat flag pernah ON akan hidup selamanya
+        // di perangkat walau owner mematikan flag.
+        if (! (bool) Setting::getTenantValue('pwa.root_sw_enabled', false)) {
+            return response(
+                \App\Support\Pwa\SelfDestructSw::script('root-shell-'),
+                200,
+                \App\Support\Pwa\SelfDestructSw::headers('/'),
+            );
+        }
+
         $b = $this->branding();
         $versionSeed = implode('|', [$b['tenantId'], $b['name'], $b['primaryColor'], $b['secondaryColor']]);
         $cacheName = 'root-shell-'.$b['tenantId'].'-'.substr(sha1($versionSeed), 0, 12);

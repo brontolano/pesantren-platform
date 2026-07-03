@@ -40,26 +40,22 @@ class PortalWaliPwaTest extends TestCase
         $tenant = $this->createProvisionedTenant($tenantId, 'Pesantren Wali', $host);
 
         tenancy()->initialize($tenant);
-        Setting::create([
-            'tenant_id' => $tenant->id,
-            'key' => 'branding_name',
-            'value' => ['text' => 'Pondok Wali'],
-        ]);
-        Setting::create([
-            'tenant_id' => $tenant->id,
-            'key' => 'branding_tagline',
-            'value' => ['text' => 'Portal Wali Terkelola'],
-        ]);
-        Setting::create([
-            'tenant_id' => $tenant->id,
-            'key' => 'branding_primary_color',
-            'value' => ['color' => '#102a43'],
-        ]);
-        Setting::create([
-            'tenant_id' => $tenant->id,
-            'key' => 'branding_secondary_color',
-            'value' => ['color' => '#f59e0b'],
-        ]);
+        Setting::updateOrCreate(
+            ['tenant_id' => $tenant->id, 'key' => 'branding_name'],
+            ['value' => ['text' => 'Pondok Wali']],
+        );
+        Setting::updateOrCreate(
+            ['tenant_id' => $tenant->id, 'key' => 'branding_tagline'],
+            ['value' => ['text' => 'Portal Wali Terkelola']],
+        );
+        Setting::updateOrCreate(
+            ['tenant_id' => $tenant->id, 'key' => 'branding_primary_color'],
+            ['value' => ['color' => '#102a43']],
+        );
+        Setting::updateOrCreate(
+            ['tenant_id' => $tenant->id, 'key' => 'branding_secondary_color'],
+            ['value' => ['color' => '#f59e0b']],
+        );
         tenancy()->end();
 
         $response = $this->call('GET', "http://{$host}/wali/manifest.json", [], [], [], [
@@ -93,16 +89,14 @@ class PortalWaliPwaTest extends TestCase
         $tenant = $this->createProvisionedTenant($tenantId, 'Asy Syifaa Wali', $host);
 
         tenancy()->initialize($tenant);
-        Setting::create([
-            'tenant_id' => $tenant->id,
-            'key' => 'branding_primary_color',
-            'value' => ['color' => '#225588'],
-        ]);
-        Setting::create([
-            'tenant_id' => $tenant->id,
-            'key' => 'branding_secondary_color',
-            'value' => ['color' => '#d97706'],
-        ]);
+        Setting::updateOrCreate(
+            ['tenant_id' => $tenant->id, 'key' => 'branding_primary_color'],
+            ['value' => ['color' => '#225588']],
+        );
+        Setting::updateOrCreate(
+            ['tenant_id' => $tenant->id, 'key' => 'branding_secondary_color'],
+            ['value' => ['color' => '#d97706']],
+        );
         tenancy()->end();
 
         $iconResponse = $this->call('GET', "http://{$host}/wali/icon.svg?size=512", [], [], [], [
@@ -146,9 +140,16 @@ class PortalWaliPwaTest extends TestCase
         $body = $response->getContent();
         $this->assertIsString($body);
         $this->assertStringContainsString("wali-shell-{$tenantId}", $body);
-        $this->assertStringContainsString('"\\/wali"', $body);
         $this->assertStringContainsString('"\\/wali\\/manifest.json"', $body);
         $this->assertStringContainsString('"\\/wali\\/icon.svg?size=192"', $body);
         $this->assertStringContainsString('"\\/wali\\/screenshot.svg?viewport=wide"', $body);
+
+        // F0 KEAMANAN: halaman '/wali' (HTML ber-auth) TIDAK boleh masuk SHELL_URLS
+        // dan cabang cache-HTML (isWaliPage) harus hilang — allow-list shell-only.
+        $this->assertStringNotContainsString('"\\/wali",', $body);
+        $this->assertStringNotContainsString('isWaliPage', $body);
+        $this->assertStringContainsString('if (!isShellUrl)', $body);
+        // Mekanisme activate existing membersihkan cache lama by-prefix.
+        $this->assertStringContainsString("key.startsWith('wali-shell-')", $body);
     }
 }
