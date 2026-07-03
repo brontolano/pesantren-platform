@@ -8,8 +8,11 @@ use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
 /**
- * Tema panel per tenant: default 'bawaan' (tampilan saat ini), pilihan
- * tersimpan di Setting, nilai tak dikenal/error → selalu jatuh ke bawaan.
+ * Tema panel per tenant. Default tema tenant umum = 'pixio' (dari registry
+ * kustomisasi 'panel_theme_default'; tenant custom albakids → 'bawaan'),
+ * pilihan tersimpan di Setting, nilai tak dikenal/error → jatuh ke default
+ * tema tersebut. Preset WARNA punya resolver terpisah yang tetap fallback
+ * ke 'bawaan'.
  */
 class PanelThemeTest extends TestCase
 {
@@ -30,19 +33,23 @@ class PanelThemeTest extends TestCase
         $this->seedTenantRow($tenant);
     }
 
-    public function test_default_bawaan_tanpa_setting_dan_tanpa_tenancy(): void
+    public function test_default_pixio_tanpa_setting_dan_tanpa_tenancy(): void
     {
-        // Tanpa tenancy: tidak melempar, jatuh ke bawaan.
-        $this->assertSame('bawaan', PanelTheme::theme());
+        // Tanpa tenancy: tidak melempar. Default tema tenant umum = 'pixio'
+        // (registry 'panel_theme_default'); preset WARNA resolver terpisah
+        // tetap fallback 'bawaan'.
+        $this->assertSame('pixio', PanelTheme::theme());
         $this->assertSame('bawaan', PanelTheme::color());
-        $this->assertNull(PanelTheme::primaryHex());
-        $this->assertFalse(PanelTheme::topNavigation());
-        $this->assertNull(PanelTheme::bodyClass());
-        $this->assertSame('', PanelTheme::cssVars());
 
-        // Dengan tenancy tapi Setting kosong: tetap bawaan.
+        // Pixio berpalet penuh → primer emerald + bodyClass + vars terisi.
+        $this->assertSame('#059669', PanelTheme::primaryHex());
+        $this->assertFalse(PanelTheme::topNavigation());
+        $this->assertSame('tema-pixio', PanelTheme::bodyClass());
+        $this->assertStringContainsString('--tema-sidebar-header:#ffffff;', PanelTheme::cssVars());
+
+        // Dengan tenancy tapi Setting kosong: tetap default 'pixio'.
         $this->boot('tema');
-        $this->assertSame('bawaan', PanelTheme::theme());
+        $this->assertSame('pixio', PanelTheme::theme());
         $this->assertSame('bawaan', PanelTheme::color());
         tenancy()->end();
     }
@@ -96,16 +103,20 @@ class PanelThemeTest extends TestCase
         tenancy()->end();
     }
 
-    public function test_nilai_tak_dikenal_jatuh_ke_bawaan(): void
+    public function test_nilai_tak_dikenal_jatuh_ke_default(): void
     {
         $this->boot('tema');
 
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'tema-tidak-ada']]);
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_COLOR], ['value' => ['text' => 'warna-aneh']]);
 
-        $this->assertSame('bawaan', PanelTheme::theme());
+        // Tema tak dikenal → default tema tenant umum 'pixio'; preset warna
+        // tak dikenal → resolver warna fallback 'bawaan'.
+        $this->assertSame('pixio', PanelTheme::theme());
         $this->assertSame('bawaan', PanelTheme::color());
-        $this->assertSame('', PanelTheme::cssVars());
+
+        // cssVars berasal dari palet pixio (tema berpalet penuh mengikat).
+        $this->assertStringContainsString('--tema-active-bg:#ecfdf5;', PanelTheme::cssVars());
 
         tenancy()->end();
     }

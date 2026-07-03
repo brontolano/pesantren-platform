@@ -106,6 +106,29 @@ class PengaturanTampilan extends Page
         return $this->generateCssVars($this->previewTheme ?? PanelTheme::theme(), $this->previewColor ?? PanelTheme::color());
     }
 
+    /**
+     * bodyClass tema preview aktif ('' bila tanpa kelas). Diinject ke
+     * <body> iFrame supaya user melihat perubahan LAYOUT (kompak /
+     * top-nav), bukan hanya warna. Nilai berasal dari registry server
+     * (bukan input user) → aman untuk diinjek ke className.
+     */
+    #[Computed]
+    public function previewBodyClass(): string
+    {
+        $key = $this->previewTheme ?? PanelTheme::theme();
+
+        return (string) (PanelTheme::THEMES[$key]['bodyClass'] ?? '');
+    }
+
+    /** Tema preview aktif memakai navigasi atas (top-nav)? */
+    #[Computed]
+    public function previewTopNav(): bool
+    {
+        $key = $this->previewTheme ?? PanelTheme::theme();
+
+        return (bool) (PanelTheme::THEMES[$key]['topNav'] ?? false);
+    }
+
     // Methods untuk interaksi user
     public function selectTheme(string $themeKey): void
     {
@@ -192,6 +215,7 @@ class PengaturanTampilan extends Page
     public function generatePreviewHtml(): string
     {
         $cssVars = htmlspecialchars($this->previewCssVars());
+        $bodyClass = htmlspecialchars($this->previewBodyClass());
         $themeName = htmlspecialchars(PanelTheme::THEMES[$this->previewTheme]['label'] ?? '');
 
         return <<<HTML
@@ -210,6 +234,7 @@ class PengaturanTampilan extends Page
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: #f3f4f6;
             color: #1f2937;
+            transition: background 200ms, color 200ms;
         }
         .container { display: flex; min-height: 100vh; }
         .sidebar {
@@ -225,6 +250,7 @@ class PengaturanTampilan extends Page
             margin-bottom: 24px;
             color: #1f2937;
         }
+        .topbar-nav { display: none; }
         .sidebar-item {
             padding: 10px 12px;
             margin: 4px 0;
@@ -247,19 +273,14 @@ class PengaturanTampilan extends Page
             padding: 32px;
             background: #fafafa;
         }
-        .header {
-            margin-bottom: 24px;
-        }
+        .header { margin-bottom: 24px; }
         .header h1 {
             font-size: 24px;
             font-weight: 700;
             margin-bottom: 8px;
             color: #1f2937;
         }
-        .header p {
-            color: #6b7280;
-            font-size: 14px;
-        }
+        .header p { color: #6b7280; font-size: 14px; }
         .card {
             background: white;
             border: 1px solid #e5e7eb;
@@ -292,10 +313,7 @@ class PengaturanTampilan extends Page
             font-size: 13px;
             transition: all 200ms;
         }
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .theme-name {
             font-size: 12px;
             color: #9ca3af;
@@ -303,9 +321,52 @@ class PengaturanTampilan extends Page
             padding-top: 12px;
             border-top: 1px solid #e5e7eb;
         }
+
+        /* === Tema KOMPAK: spasi lebih rapat (data-dense) === */
+        body.tema-kompak .content { padding: 16px; }
+        body.tema-kompak .sidebar { padding: 8px; }
+        body.tema-kompak .sidebar-item { padding: 5px 10px; margin: 2px 0; font-size: 12px; }
+        body.tema-kompak .card { padding: 12px; margin: 8px 0; }
+        body.tema-kompak .header { margin-bottom: 12px; }
+        body.tema-kompak .header h1 { font-size: 20px; }
+
+        /* === Tema NAVIGASI ATAS / top-nav: menu pindah ke bilah atas === */
+        body.tema-navigasi-atas .container,
+        body.tema-pimpinan-biru .container,
+        body.tema-hijau-malam .container { flex-direction: column; }
+        body.tema-navigasi-atas .sidebar,
+        body.tema-pimpinan-biru .sidebar,
+        body.tema-hijau-malam .sidebar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            padding: 10px 16px;
+            border-right: none;
+            border-bottom: 1px solid var(--tema-sidebar-header-border, #e5e7eb);
+        }
+        body.tema-navigasi-atas .sidebar-logo,
+        body.tema-pimpinan-biru .sidebar-logo,
+        body.tema-hijau-malam .sidebar-logo { margin-bottom: 0; margin-right: 16px; }
+        body.tema-navigasi-atas .sidebar-item,
+        body.tema-pimpinan-biru .sidebar-item,
+        body.tema-hijau-malam .sidebar-item { margin: 0; }
+
+        /* === Dark mode (toggle preview) === */
+        html.dark body { background: #0f172a; color: #e2e8f0; }
+        html.dark .content { background: #0b1220; }
+        html.dark .header h1, html.dark .card h3 { color: #f1f5f9; }
+        html.dark .header p, html.dark .card p { color: #94a3b8; }
+        html.dark .card { background: #1e293b; border-color: #334155; }
+        html.dark .sidebar-logo { color: #f1f5f9; }
+        html.dark .sidebar-item.active {
+            background: var(--tema-active-dark, linear-gradient(90deg, #10b981 0%, #047857 100%));
+            color: #ffffff;
+        }
+        html.dark .theme-name { color: #64748b; border-top-color: #334155; }
     </style>
 </head>
-<body>
+<body class="{$bodyClass}">
     <div class="container">
         <div class="sidebar">
             <div class="sidebar-logo">Pesantren</div>
@@ -322,7 +383,7 @@ class PengaturanTampilan extends Page
             </div>
             <div class="card">
                 <h3>Contoh Kartu Panel</h3>
-                <p>Kartu ini menunjukkan styling dengan palet warna pilihan. Perhatikan warna sidebar & elemen interaktif.</p>
+                <p>Kartu ini menunjukkan styling dengan palet & tata letak pilihan. Perhatikan warna sidebar, spasi, dan posisi navigasi.</p>
                 <button class="btn">Aksi Contoh</button>
                 <div class="theme-name">Tema: {$themeName}</div>
             </div>

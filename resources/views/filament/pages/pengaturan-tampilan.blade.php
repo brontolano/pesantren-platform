@@ -116,33 +116,76 @@
         @endif
 
         {{-- Live Preview iFrame --}}
-        <div class="space-y-4 border-t border-gray-200 pt-8 dark:border-gray-700">
-            <div>
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white">👁️ Pratinjau Langsung</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Preview diperbarui real-time saat Anda memilih tema & warna.
-                </p>
+        <div
+            class="space-y-4 border-t border-gray-200 pt-8 dark:border-gray-700"
+            x-data="{ device: 'desktop', dark: false }"
+        >
+            <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">👁️ Pratinjau Langsung</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Preview diperbarui real-time saat Anda memilih tema, warna, tata letak, mode gelap & ukuran layar.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    {{-- Mode responsif --}}
+                    <div class="inline-flex rounded-lg border border-gray-300 p-0.5 dark:border-gray-600">
+                        @foreach (['desktop' => '🖥️ Desktop', 'tablet' => '📱 Tablet', 'mobile' => '📱 Mobile'] as $mode => $label)
+                            <button
+                                type="button"
+                                @click="device = '{{ $mode }}'"
+                                :class="device === '{{ $mode }}'
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'"
+                                class="rounded-md px-2.5 py-1 text-xs font-medium transition-colors"
+                            >{{ $label }}</button>
+                        @endforeach
+                    </div>
+
+                    {{-- Toggle dark mode --}}
+                    <button
+                        type="button"
+                        @click="dark = !dark; $refs.previewFrame && $refs.previewFrame.contentDocument && $refs.previewFrame.contentDocument.documentElement.classList.toggle('dark', dark)"
+                        :class="dark
+                            ? 'border-emerald-500 bg-emerald-600 text-white'
+                            : 'border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700'"
+                        class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                    >
+                        <span x-text="dark ? '🌙 Gelap' : '☀️ Terang'"></span>
+                    </button>
+                </div>
             </div>
 
-            <div class="overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+            <div class="flex justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900">
                 <iframe
                     id="theme-preview-frame"
-                    class="h-96 w-full"
+                    x-ref="previewFrame"
+                    class="h-96 rounded-md border border-gray-200 bg-white shadow-sm transition-all duration-300 dark:border-gray-700"
+                    :style="device === 'mobile' ? 'width:375px' : (device === 'tablet' ? 'width:768px' : 'width:100%')"
                     title="Preview Tema"
                     srcdoc="{{ htmlspecialchars($this->generatePreviewHtml()) }}"
+                    @load="$refs.previewFrame.contentDocument && $refs.previewFrame.contentDocument.documentElement.classList.toggle('dark', dark)"
                 ></iframe>
             </div>
 
             <script>
-                // Real-time CSS var injection ke iFrame saat Livewire update
-                document.addEventListener('livewire:updated', function(event) {
+                // Real-time injection ke iFrame saat Livewire update:
+                // CSS var (warna) + bodyClass (tata letak). Nilai berasal
+                // dari server (registry PanelTheme), bukan input user.
+                document.addEventListener('livewire:updated', function () {
                     const frame = document.getElementById('theme-preview-frame');
-                    if (frame && frame.contentDocument) {
-                        const style = frame.contentDocument.querySelector('style[data-theme-css]');
-                        if (style) {
-                            const cssVars = '{{ $this->previewCssVars() }}';
-                            style.textContent = ':root { ' + cssVars + ' }';
-                        }
+                    if (!frame || !frame.contentDocument) return;
+
+                    const style = frame.contentDocument.querySelector('style[data-theme-css]');
+                    if (style) {
+                        style.textContent = ':root { ' + @js($this->previewCssVars()) + ' }';
+                    }
+
+                    // Ganti className body → user melihat perubahan LAYOUT.
+                    const body = frame.contentDocument.body;
+                    if (body) {
+                        body.className = @js($this->previewBodyClass());
                     }
                 });
             </script>
