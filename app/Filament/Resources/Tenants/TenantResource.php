@@ -206,6 +206,45 @@ class TenantResource extends Resource
                     ->button()
                     ->visible(fn (Tenant $record): bool => static::customDomains($record) !== []),
 
+                // === Domain kanonis (opt-in): hapus dualitas panel admin — 301
+                // GET/HEAD dari domain kembar (type sama) ke domain utama. ===
+                Action::make('domain_kanonis')
+                    ->label('Domain Utama')
+                    ->icon('heroicon-o-arrow-uturn-right')
+                    ->color('gray')
+                    ->visible(fn (Tenant $record): bool => $record->domains->count() > 1)
+                    ->form(fn (Tenant $record): array => [
+                        \Filament\Forms\Components\Select::make('canonical_domain')
+                            ->label('Jadikan Domain Utama (kanonis)')
+                            ->helperText('Semua kunjungan GET ke domain lain ber-type sama milik tenant ini akan dialihkan permanen (301) ke domain ini. Pilih "(tanpa kanonis)" untuk mematikan pengalihan.')
+                            ->options(
+                                $record->domains
+                                    ->mapWithKeys(fn ($d) => [$d->domain => "{$d->domain} ({$d->type})"])
+                                    ->prepend('(tanpa kanonis — tanpa pengalihan)', '')
+                                    ->all()
+                            )
+                            ->default((string) $record->domains->firstWhere('is_canonical', true)?->domain),
+                    ])
+                    ->action(function (Tenant $record, array $data): void {
+                        abort_unless(static::userCanManageTenants(), 403);
+                        $pilihan = (string) ($data['canonical_domain'] ?? '');
+
+                        $record->domains()->update(['is_canonical' => false]);
+                        if ($pilihan !== '') {
+                            $record->domains()->where('domain', $pilihan)->update(['is_canonical' => true]);
+                        }
+
+                        Notification::make()
+                            ->title($pilihan !== ''
+                                ? "Domain utama tenant {$record->id}: {$pilihan}"
+                                : "Domain kanonis tenant {$record->id} dimatikan — tanpa pengalihan.")
+                            ->body($pilihan !== ''
+                                ? 'Domain lain ber-type sama akan dialihkan 301 ke domain ini (hanya GET; POST/API/livewire/signed-URL tidak disentuh).'
+                                : null)
+                            ->success()
+                            ->send();
+                    }),
+
                 // === Recovery database per tenant ===
                 ActionGroup::make([
                     Action::make('db_info')

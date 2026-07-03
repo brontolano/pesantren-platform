@@ -418,6 +418,10 @@ class TenantPanelProvider extends PanelProvider
                 ] : []),
             ])
             ->middleware([
+                // Kanonisasi domain (opt-in) PALING AWAL: panel Filament punya stack
+                // middleware sendiri (tidak lewat grup 'web' global), jadi harus
+                // didaftarkan juga di sini agar /admin di domain kembar ikut 301.
+                \App\Http\Middleware\RedirectDomainKanonis::class,
                 // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user
                 // di-resolve dari database tenant (bukan central). Mencegah redirect loop.
                 RedirectCentralToPlatform::class,
