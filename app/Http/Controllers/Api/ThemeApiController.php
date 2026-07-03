@@ -75,7 +75,7 @@ class ThemeApiController extends Controller
      * PUT /api/tenant/theme-settings
      * Simpan pilihan tema & warna untuk tenant aktif.
      *
-     * Payload: {theme: 'slate-pro', color: 'bawaan'}
+     * Payload: {theme: 'nord', color: 'bawaan'}
      */
     public function updateThemeSettings(Request $request): JsonResponse
     {

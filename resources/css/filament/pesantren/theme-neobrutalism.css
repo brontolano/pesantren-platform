@@ -1,0 +1,11 @@
+/*
+ | Tema EKSTERNAL "Neo-Brutalis" (caresome/filament-neobrutalism-theme) —
+ | build Vite terpisah. Border tebal, bayangan offset khas neo-brutalism —
+ | mengubah komponen nyata (tombol, kartu, input), bukan sekadar warna.
+ | Dipilih per-tenant saat runtime lewat ApplyPanelTheme → viteTheme().
+ */
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/caresome/filament-neobrutalism-theme/resources/css/theme.css';
+
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';

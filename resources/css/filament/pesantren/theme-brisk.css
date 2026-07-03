@@ -1,0 +1,11 @@
+/*
+ | Tema EKSTERNAL "Brisk" (filafly/brisk) — build Vite terpisah.
+ | Brisk meng-import base theme Filament sendiri di theme.css-nya, jadi
+ | entry ini cukup: CSS vendor + @source scan view custom kita (agar
+ | utility Tailwind yang dipakai blade/page Filament custom tetap ada).
+ | Dipilih per-tenant saat runtime lewat ApplyPanelTheme → viteTheme().
+ */
+@import '../../../../vendor/filafly/brisk/resources/css/theme.css';
+
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';

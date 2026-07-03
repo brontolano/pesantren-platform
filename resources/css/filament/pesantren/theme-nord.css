@@ -1,0 +1,10 @@
+/*
+ | Tema EKSTERNAL "Nord" (andreia/filament-nord-theme) — build Vite terpisah.
+ | Base theme Filament + CSS vendor Nord (palet Arctic polar night / frost).
+ | Dipilih per-tenant saat runtime lewat ApplyPanelTheme → viteTheme().
+ */
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/andreia/filament-nord-theme/resources/css/theme.css';
+
+@source '../../../../app/Filament';
+@source '../../../../resources/views/filament';

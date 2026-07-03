@@ -11,6 +11,12 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/css/filament/pesantren/theme.css',
+                // Tema EKSTERNAL (multi-build): tiap tema = build CSS terpisah,
+                // dipilih per-tenant saat runtime (PanelTheme::cssEntry()).
+                'resources/css/filament/pesantren/theme-brisk.css',
+                'resources/css/filament/pesantren/theme-nord.css',
+                'resources/css/filament/pesantren/theme-moonlight.css',
+                'resources/css/filament/pesantren/theme-neobrutalism.css',
             ],
             refresh: true,
             fonts: [
