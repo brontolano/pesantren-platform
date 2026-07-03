@@ -10,10 +10,12 @@ use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
 /**
- * Domain kanonis per-tenant (OTOMATIS + override) — hapus dualitas panel admin.
+ * Domain kanonis per-tenant — OPT-IN MURNI via pengaturan platform.
  * Kasus nyata: asy-syifaa.pesantren.online (sistem, subdomain platform) → 301
- * ke pesantren.asy-syifaa.com (sistem, custom) TANPA is_canonical.
- * Tenant hanya-subdomain (demo, albakids) tidak pernah di-redirect.
+ * ke pesantren.asy-syifaa.com (sistem, custom) HANYA setelah owner menandai
+ * pesantren.asy-syifaa.com sebagai is_canonical=true (aksi UI "Domain Utama").
+ * Tanpa penandaan eksplisit itu, TIDAK ADA redirect — berlaku default untuk
+ * semua tenant (demo, albakids, tenant baru).
  */
 class DomainKanonisTest extends TestCase
 {
@@ -52,26 +54,24 @@ class DomainKanonisTest extends TestCase
         return (new RedirectDomainKanonis)->handle($request, fn () => response('lolos'));
     }
 
-    public function test_record_label_telanjang_bukan_target_kanonis(): void
+    public function test_tanpa_is_canonical_subdomain_tidak_redirect(): void
     {
-        // REGRESI (F0): stancl/tenancy menyimpan record label-telanjang tanpa
-        // titik (mis. 'albakids') utk identifikasi subdomain. Record itu BUKAN
-        // host valid — tanpa guard, tenant subdomain platform di-301 ke
-        // http://albakids/ (host tak ada) dan seluruh PWA/panel mati.
-        $tenant = $this->createRuntimeTenant('kanonis', 'Pesantren Label');
-        $tenant->domains()->delete();
-        $tenant->domains()->create(['domain' => 'label-telanjang', 'type' => 'subdomain', 'is_canonical' => false]);
-        $tenant->domains()->create(['domain' => 'label-telanjang.pesantren.online', 'type' => 'subdomain', 'is_canonical' => false]);
+        // Default untuk SEMUA tenant: tanpa owner mengeset "Domain Utama"
+        // secara eksplisit, subdomain platform TIDAK di-redirect meski tenant
+        // punya custom domain ber-type sama. Ini yang membedakan dari versi
+        // otomatis (insiden 2026-07-04): keberadaan custom domain saja tidak
+        // pernah cukup untuk memicu redirect.
+        $this->buatTenantDuaDomain(kanonis: false);
 
-        $res = $this->jalankan('https://label-telanjang.pesantren.online/manifest.webmanifest');
+        $res = $this->jalankan('https://kanonis-test.pesantren.online/admin?x=1');
 
         $this->assertSame(200, $res->getStatusCode());
         $this->assertSame('lolos', $res->getContent());
     }
 
-    public function test_subdomain_kembar_redirect_301_ke_kanonis_dengan_path_dan_query(): void
+    public function test_dengan_is_canonical_eksplisit_subdomain_redirect_301_ke_kanonis(): void
     {
-        $this->buatTenantDuaDomain();
+        $this->buatTenantDuaDomain(kanonis: true);
 
         $res = $this->jalankan('https://kanonis-test.pesantren.online/admin/santri?page=2&q=abc');
 
@@ -82,24 +82,8 @@ class DomainKanonisTest extends TestCase
         );
     }
 
-    public function test_otomatis_tanpa_kanonis_subdomain_redirect_ke_custom(): void
+    public function test_custom_domain_tidak_pernah_redirect_otomatis(): void
     {
-        // Aturan 2: tanpa is_canonical, subdomain platform → custom domain
-        // ber-type sama, OTOMATIS (keputusan owner: bukan opt-in).
-        $this->buatTenantDuaDomain(kanonis: false);
-
-        $res = $this->jalankan('https://kanonis-test.pesantren.online/admin?x=1');
-
-        $this->assertSame(301, $res->getStatusCode());
-        $this->assertSame(
-            'https://pesantren.kanonis-test.com/admin?x=1',
-            $res->headers->get('Location'),
-        );
-    }
-
-    public function test_otomatis_custom_domain_tidak_pernah_redirect(): void
-    {
-        // Aturan 3: custom domain tidak di-redirect otomatis.
         $this->buatTenantDuaDomain(kanonis: false);
 
         $res = $this->jalankan('https://pesantren.kanonis-test.com/admin');
@@ -108,29 +92,29 @@ class DomainKanonisTest extends TestCase
         $this->assertSame('lolos', $res->getContent());
     }
 
-    public function test_otomatis_multi_custom_deterministik_is_primary_lalu_id_terkecil(): void
+    public function test_record_label_telanjang_ditandai_kanonis_tetap_ditolak_guard_host_valid(): void
     {
-        $tenant = $this->createRuntimeTenant('kanonis', 'Pesantren Kanonis');
+        // Jaring pengaman independen (insiden 2026-07-04): walau seharusnya
+        // owner tak akan menandai record label-telanjang (mis. 'albakids',
+        // artefak identifikasi subdomain stancl tanpa titik) sebagai domain
+        // utama via UI, guard host-valid tetap berlaku bila data domains
+        // tercemar record semacam itu — kelas kegagalan yang sama (redirect
+        // ke http://albakids/) harus mustahil terulang.
+        $tenant = $this->createRuntimeTenant('kanonis', 'Pesantren Label');
         $tenant->domains()->delete();
-        $tenant->domains()->create(['domain' => 'kanonis-multi.pesantren.online', 'type' => 'sistem', 'is_canonical' => false]);
-        $lama = $tenant->domains()->create(['domain' => 'lama.kanonis-test.com', 'type' => 'sistem', 'is_canonical' => false]);
-        $baru = $tenant->domains()->create(['domain' => 'baru.kanonis-test.com', 'type' => 'sistem', 'is_canonical' => false]);
+        $tenant->domains()->create(['domain' => 'label-telanjang', 'type' => 'subdomain', 'is_canonical' => true]);
+        $tenant->domains()->create(['domain' => 'label-telanjang.pesantren.online', 'type' => 'subdomain', 'is_canonical' => false]);
 
-        // Tanpa is_primary → ID terkecil (terdaftar paling lama) menang.
-        $res = $this->jalankan('https://kanonis-multi.pesantren.online/admin');
-        $this->assertSame(301, $res->getStatusCode());
-        $this->assertSame('https://lama.kanonis-test.com/admin', $res->headers->get('Location'));
+        $res = $this->jalankan('https://label-telanjang.pesantren.online/manifest.webmanifest');
 
-        // is_primary menang di atas urutan ID.
-        $baru->update(['is_primary' => true]);
-        $res = $this->jalankan('https://kanonis-multi.pesantren.online/admin');
-        $this->assertSame('https://baru.kanonis-test.com/admin', $res->headers->get('Location'));
+        $this->assertSame(200, $res->getStatusCode());
+        $this->assertSame('lolos', $res->getContent());
     }
 
     public function test_tenant_hanya_subdomain_platform_tidak_redirect_kasus_albakids(): void
     {
-        // Tenant seperti albakids/demo: HANYA subdomain platform, tanpa custom
-        // domain type=sistem → nol perubahan perilaku.
+        // Tenant seperti albakids/demo: HANYA subdomain platform, tanpa
+        // is_canonical diset → nol perubahan perilaku (default aman).
         $tenant = $this->createRuntimeTenant('kanonis', 'Alba Kids Like');
         $tenant->domains()->delete();
         $tenant->domains()->create(['domain' => 'albakids-like.pesantren.online', 'type' => 'sistem', 'is_canonical' => false]);
@@ -141,14 +125,14 @@ class DomainKanonisTest extends TestCase
         $this->assertSame('lolos', $res->getContent());
     }
 
-    public function test_otomatis_type_beda_tidak_dipakai_sebagai_target(): void
+    public function test_is_canonical_ber_type_beda_tidak_dipakai_sebagai_target(): void
     {
-        // Custom domain hanya ber-type 'website' → subdomain 'sistem' TIDAK
-        // dialihkan ke sana (konten beda).
+        // is_canonical=true pada domain ber-type 'website' tidak menjadi
+        // target redirect untuk request ber-type 'sistem' (konten beda).
         $tenant = $this->createRuntimeTenant('kanonis', 'Pesantren Kanonis');
         $tenant->domains()->delete();
         $tenant->domains()->create(['domain' => 'kanonis-web.pesantren.online', 'type' => 'sistem', 'is_canonical' => false]);
-        $tenant->domains()->create(['domain' => 'kanonis-web.com', 'type' => 'website', 'is_canonical' => false]);
+        $tenant->domains()->create(['domain' => 'kanonis-web.com', 'type' => 'website', 'is_canonical' => true]);
 
         $res = $this->jalankan('https://kanonis-web.pesantren.online/admin');
 
