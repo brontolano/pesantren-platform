@@ -69,8 +69,10 @@ class PanelThemeTest extends TestCase
         // Brisk = build CSS eksternal sendiri + font Kumbh Sans.
         $this->assertSame('resources/css/filament/pesantren/theme-brisk.css', PanelTheme::cssEntry());
         $this->assertSame('Kumbh Sans', PanelTheme::font());
-        // Brisk tanpa palet mengikat → primer ikut preset warna (default null).
-        $this->assertNull(PanelTheme::primaryHex());
+        // Brisk berpalet monokrom (demo Filafly) → primer near-black mengikat.
+        $this->assertSame('#18181b', PanelTheme::primaryHex());
+        $this->assertSame(['primary' => '#18181b', 'gray' => 'zinc'], PanelTheme::palette());
+        $this->assertFalse(PanelTheme::defaultDark());
         $this->assertNull(PanelTheme::bodyClass());
         $this->assertFalse(PanelTheme::topNavigation());
 
@@ -100,10 +102,15 @@ class PanelThemeTest extends TestCase
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'moonlight']]);
         $this->assertSame('resources/css/filament/pesantren/theme-moonlight.css', PanelTheme::cssEntry());
         $this->assertSame('#82aaff', PanelTheme::primaryHex());
+        // Moonlight = CSS .dark-only → WAJIB gelap-default agar terlihat.
+        $this->assertTrue(PanelTheme::defaultDark());
+        $this->assertTrue(PanelTheme::defaultDarkFor('moonlight'));
 
         Setting::updateOrCreate(['key' => PanelTheme::SETTING_THEME], ['value' => ['text' => 'neobrutalism']]);
         $this->assertSame('resources/css/filament/pesantren/theme-neobrutalism.css', PanelTheme::cssEntry());
-        $this->assertNull(PanelTheme::primaryHex());
+        // Neo-Brutalis: primer near-black kontras tinggi (identitas demo).
+        $this->assertSame('#111827', PanelTheme::primaryHex());
+        $this->assertFalse(PanelTheme::defaultDark());
 
         tenancy()->end();
     }

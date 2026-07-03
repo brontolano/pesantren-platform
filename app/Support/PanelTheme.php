@@ -64,6 +64,13 @@ class PanelTheme
             'bodyClass' => null,
             'cssEntry' => 'resources/css/filament/pesantren/theme-brisk.css',
             'font' => 'Kumbh Sans',
+            // Identitas Brisk (demo Filafly): monokrom zinc, primer near-black.
+            // Tanpa palet ini Brisk tampak "hijau standar" — nyaris tak beda.
+            'primary' => '#18181b',
+            'palette' => [
+                'primary' => '#18181b',
+                'gray' => 'zinc',
+            ],
             'category' => 'eksternal',
             'icon' => 'heroicon-o-sparkles',
             'thumbnail' => '/images/theme-thumbnails/brisk.svg',
@@ -80,6 +87,29 @@ class PanelTheme
             'bodyClass' => null,
             'cssEntry' => 'resources/css/filament/pesantren/theme-nord.css',
             'primary' => '#88c0d0',
+            // REPLIKA persis FilamentNordThemePlugin::register() ->colors():
+            // identitas Nord terutama datang dari palet ini (gray = polar night)
+            // — CSS vendornya sendiri kecil. Tanpa registrasi ini Nord nyaris
+            // tak terlihat.
+            'palette' => [
+                'danger' => '#bf616a',
+                'gray' => [
+                    50 => '#eceff4', 100 => '#e5e9f0', 200 => '#d8dee9',
+                    300 => '#a7b1c5', 400 => '#8c9ab3', 500 => '#71829b',
+                    600 => '#4c566a', 700 => '#434c5e', 800 => '#3b4252',
+                    900 => '#2e3440', 950 => '#232831',
+                ],
+                'info' => '#81a1c1',
+                'primary' => [
+                    50 => '#FAFCFD', 100 => '#F3F9FA', 200 => '#E3EFF2',
+                    300 => '#CFE6EC', 400 => '#ACD4DD', 500 => '#88C0D0',
+                    600 => '#7AADBB', 700 => '#66909B', 800 => '#52737D',
+                    900 => '#445E66', 950 => '#293A3D',
+                ],
+                'secondary' => '#5e81ac',
+                'success' => '#a3be8c',
+                'warning' => '#ebcb8b',
+            ],
             'category' => 'eksternal',
             'icon' => 'heroicon-o-cloud',
             'thumbnail' => '/images/theme-thumbnails/nord.svg',
@@ -91,17 +121,23 @@ class PanelTheme
         ],
         'moonlight' => [
             'label' => 'Moonlight (Gelap)',
-            'desc' => 'Tema eksternal gelap ala JetBrains Moonlight — biru malam dengan aksen pastel; efek penuh saat mode gelap dinyalakan.',
+            'desc' => 'Tema eksternal gelap ala JetBrains Moonlight — biru malam dengan aksen pastel; mode gelap otomatis aktif (bisa di-toggle).',
             'topNav' => false,
             'bodyClass' => null,
             'cssEntry' => 'resources/css/filament/pesantren/theme-moonlight.css',
             'primary' => '#82aaff',
+            // SELURUH CSS Moonlight di-scope `.dark` (tema gelap murni) —
+            // tanpa default dark halaman tetap terang & tema tak terlihat.
+            'defaultDark' => true,
+            'palette' => [
+                'primary' => '#82aaff',
+            ],
             'category' => 'eksternal',
             'icon' => 'heroicon-o-moon',
             'thumbnail' => '/images/theme-thumbnails/moonlight.svg',
             'thumb' => ['header' => '#1e2030', 'active' => '#2f334d', 'activeFg' => '#c8d3f5', 'primary' => '#82aaff'],
             'recommended_roles' => ['operator_divisi', 'admin_pesantren'],
-            'features' => ['Gelap ala JetBrains Moonlight', 'Aksen pastel lembut', 'Teduh untuk kerja malam', 'Aktif penuh di mode gelap'],
+            'features' => ['Gelap ala JetBrains Moonlight', 'Aksen pastel lembut', 'Teduh untuk kerja malam', 'Mode gelap otomatis aktif'],
             'efficiency' => 'normal',
             'typography' => 'Plus Jakarta Sans',
         ],
@@ -111,6 +147,12 @@ class PanelTheme
             'topNav' => false,
             'bodyClass' => null,
             'cssEntry' => 'resources/css/filament/pesantren/theme-neobrutalism.css',
+            // Identitas neo-brutalism: primer near-black kontras tinggi
+            // (aksen kuning datang dari CSS vendornya sendiri).
+            'primary' => '#111827',
+            'palette' => [
+                'primary' => '#111827',
+            ],
             'category' => 'eksternal',
             'icon' => 'heroicon-o-square-2-stack',
             'thumbnail' => '/images/theme-thumbnails/neobrutalism.svg',
@@ -243,6 +285,37 @@ class PanelTheme
     }
 
     /**
+     * Palet warna vendor tema aktif — REPLIKA efek `->plugin(XxxTheme::make())`
+     * vendor (yang me-register colors ke panel) tanpa mendaftarkan plugin
+     * global (tidak aman antar tenant di worker long-running). Nilai:
+     * hex string, nama palet Filament ('zinc' dll), atau array shade penuh.
+     * Kosong utk tema tanpa palet vendor. Diterapkan per-request oleh
+     * ApplyPanelTheme lewat FilamentColor::register().
+     *
+     * @return array<string, string|array<int, string>>
+     */
+    public static function palette(): array
+    {
+        return self::THEMES[self::theme()]['palette'] ?? [];
+    }
+
+    /**
+     * Tema aktif gelap-default? (mis. Moonlight: seluruh CSS-nya di-scope
+     * `.dark`). ApplyPanelTheme men-set default theme mode panel ke Dark —
+     * pengguna tetap bisa toggle terang/gelap.
+     */
+    public static function defaultDark(): bool
+    {
+        return (bool) (self::THEMES[self::theme()]['defaultDark'] ?? false);
+    }
+
+    /** Idem defaultDark() tetapi untuk key tema tertentu (dipakai UI apply). */
+    public static function defaultDarkFor(string $themeKey): bool
+    {
+        return (bool) (self::THEMES[$themeKey]['defaultDark'] ?? false);
+    }
+
+    /**
      * Font panel tema aktif (null = font bawaan platform). Diterapkan
      * per-request oleh ApplyPanelTheme lewat Panel::font() (provider
      * bawaan Bunny Fonts) — mis. Brisk memakai Kumbh Sans.
@@ -259,6 +332,13 @@ class PanelTheme
      */
     public static function cssVars(): string
     {
+        // Tema EKSTERNAL: JANGAN suntik var --tema-* preset warna — var itu
+        // hanya dipakai theme.css bawaan; menyuntiknya berisiko menimpa
+        // gaya vendor. Palet tema eksternal diikat lewat palette().
+        if ((self::THEMES[self::theme()]['category'] ?? null) === 'eksternal') {
+            return '';
+        }
+
         $vars = array_merge(
             self::COLORS[self::color()]['vars'],
             self::THEMES[self::theme()]['vars'] ?? [],
