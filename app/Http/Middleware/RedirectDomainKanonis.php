@@ -121,7 +121,11 @@ class RedirectDomainKanonis
             ->orderByDesc('is_primary')
             ->orderBy('id')
             ->get(['domain', 'is_primary'])
-            ->first(fn (Domain $d): bool => ! $this->adalahSubdomainPlatform($d->domain))
+            // Record label-telanjang tanpa titik (mis. 'albakids' — artefak
+            // identifikasi subdomain stancl/tenancy) BUKAN host valid dan tak
+            // boleh jadi target kanonis (regresi: 301 ke http://albakids/).
+            ->first(fn (Domain $d): bool => str_contains($d->domain, '.')
+                && ! $this->adalahSubdomainPlatform($d->domain))
             ?->domain;
     }
 

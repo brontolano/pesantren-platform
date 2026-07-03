@@ -52,6 +52,23 @@ class DomainKanonisTest extends TestCase
         return (new RedirectDomainKanonis)->handle($request, fn () => response('lolos'));
     }
 
+    public function test_record_label_telanjang_bukan_target_kanonis(): void
+    {
+        // REGRESI (F0): stancl/tenancy menyimpan record label-telanjang tanpa
+        // titik (mis. 'albakids') utk identifikasi subdomain. Record itu BUKAN
+        // host valid — tanpa guard, tenant subdomain platform di-301 ke
+        // http://albakids/ (host tak ada) dan seluruh PWA/panel mati.
+        $tenant = $this->createRuntimeTenant('kanonis', 'Pesantren Label');
+        $tenant->domains()->delete();
+        $tenant->domains()->create(['domain' => 'label-telanjang', 'type' => 'subdomain', 'is_canonical' => false]);
+        $tenant->domains()->create(['domain' => 'label-telanjang.pesantren.online', 'type' => 'subdomain', 'is_canonical' => false]);
+
+        $res = $this->jalankan('https://label-telanjang.pesantren.online/manifest.webmanifest');
+
+        $this->assertSame(200, $res->getStatusCode());
+        $this->assertSame('lolos', $res->getContent());
+    }
+
     public function test_subdomain_kembar_redirect_301_ke_kanonis_dengan_path_dan_query(): void
     {
         $this->buatTenantDuaDomain();
