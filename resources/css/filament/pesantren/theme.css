@@ -370,651 +370,681 @@
 /* ===================================================================
    TEMA LAYOUT (App\Support\PanelTheme) — kelas body `tema-…` disuntik
    via render hook BODY_START. Tema 'bawaan' tanpa kelas = blok ini
-   tidak aktif sama sekali.
+   tidak aktif sama sekali. 7 tema bergaya Aura UI.
    =================================================================== */
-
-/* Tema "Navigasi Atas": topbar mengambil warna header sidebar agar
-   identitas tema tetap terasa walau sidebar tidak tampil. */
-body.tema-navigasi-atas .fi-topbar {
-    background: var(--tema-sidebar-header, #008069) !important;
-    border-bottom: 1px solid var(--tema-sidebar-header-border, #007259) !important;
-}
-body.tema-navigasi-atas .fi-topbar .fi-topbar-item-label,
-body.tema-navigasi-atas .fi-topbar .fi-icon,
-body.tema-navigasi-atas .fi-topbar .fi-logo,
-body.tema-navigasi-atas .fi-topbar .fi-icon-btn {
-    color: #ffffff !important;
-}
-body.tema-navigasi-atas .fi-topbar .fi-topbar-item-btn:hover {
-    background-color: rgba(255, 255, 255, 0.12) !important;
-}
-body.tema-navigasi-atas .fi-topbar-item.fi-active .fi-topbar-item-btn {
-    background-color: rgba(255, 255, 255, 0.18) !important;
-}
-.dark body.tema-navigasi-atas .fi-topbar,
-body.tema-navigasi-atas.dark .fi-topbar {
-    background: var(--tema-sidebar-header-dark, #161823) !important;
-    border-bottom: 1px solid var(--tema-sidebar-header-border-dark, #2A2A35) !important;
-}
 
 /* ===================================================================
-   Tema "Pixio" (Emerald SaaS) — selaras TEMPLATE Design System (templates/
-   tenant-admin + platform-admin): kanvas slate dingin #f1f5f9, sidebar PUTIH
-   penuh (header putih, teks gelap), hairline dingin #e7ecf3, item aktif tint
-   emerald #ecfdf5 + teks emerald (tanpa garis inset), kartu putih radius 14px
-   + bayang halus. Mode gelap = navy DS #0a1018. Konsol desktop bersih.
+   Tema "Slate Pro" (Emerald) — kanvas slate dingin #f8fafc, sidebar PUTIH
+   penuh (header putih, teks gelap), hairline dingin #e7ecf3, item aktif
+   tint emerald #ecfdf5 + teks emerald, kartu putih radius 14px + bayang
+   halus. Mode gelap = navy #0a0f1a / sidebar #0f172a. Konsol desktop bersih.
    =================================================================== */
-body.tema-pixio .fi-body {
-    background-color: #f1f5f9;
+body.tema-slate-pro .fi-body {
+    background-color: #f8fafc;
 }
-body.tema-pixio .fi-sidebar {
+body.tema-slate-pro .fi-sidebar {
     background: #ffffff !important;
     border-inline-end: 1px solid #e7ecf3 !important;
 }
-/* Sidebar header PUTIH (DS): batalkan teks-putih bawaan tema WA → teks gelap. */
-body.tema-pixio .fi-sidebar-header,
-body.tema-pixio .fi-sidebar-header * {
+body.tema-slate-pro .fi-sidebar-header,
+body.tema-slate-pro .fi-sidebar-header * {
     color: #0f172a !important;
 }
-body.tema-pixio .fi-sidebar-header .fi-logo [class*="bg-primary"],
-body.tema-pixio .fi-sidebar-header .fi-logo span:first-child {
+body.tema-slate-pro .fi-sidebar-header .fi-logo [class*="bg-primary"],
+body.tema-slate-pro .fi-sidebar-header .fi-logo span:first-child {
     background-color: #ecfdf5 !important;
     box-shadow: inset 0 0 0 1px #d1fae5 !important;
 }
-/* Label grup: faint dingin */
-body.tema-pixio .fi-sidebar-group-label {
+body.tema-slate-pro .fi-sidebar-group-label {
     color: #94a3b8 !important;
 }
-/* Item normal: slate-700 */
-body.tema-pixio .fi-sidebar-item-btn > .fi-sidebar-item-label,
-body.tema-pixio .fi-sidebar-item-label {
+body.tema-slate-pro .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-slate-pro .fi-sidebar-item-label {
     color: #334155 !important;
 }
-body.tema-pixio .fi-sidebar-item-btn > .fi-icon,
-body.tema-pixio .fi-sidebar-item-btn .fi-sidebar-item-icon,
-body.tema-pixio .fi-sidebar-item-btn .fi-icon {
+body.tema-slate-pro .fi-sidebar-item-btn > .fi-icon,
+body.tema-slate-pro .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-slate-pro .fi-sidebar-item-btn .fi-icon {
     color: #64748b !important;
 }
-/* Hover: wash slate dingin */
-body.tema-pixio .fi-sidebar-item-btn:hover {
-    background-color: #f8fafc !important;
+body.tema-slate-pro .fi-sidebar-item-btn:hover {
+    background-color: #f1f5f9 !important;
 }
-body.tema-pixio .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
-body.tema-pixio .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
+body.tema-slate-pro .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
+body.tema-slate-pro .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
     color: #0f172a !important;
 }
-body.tema-pixio .fi-sidebar-item-btn:hover > .fi-icon,
-body.tema-pixio .fi-sidebar-item-btn:hover .fi-icon {
+body.tema-slate-pro .fi-sidebar-item-btn:hover > .fi-icon,
+body.tema-slate-pro .fi-sidebar-item-btn:hover .fi-icon {
     color: #047857 !important;
 }
-/* Aktif: tint emerald + teks emerald (DS — tanpa garis inset) */
-body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+body.tema-slate-pro .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background: #ecfdf5 !important;
 }
-body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
-body.tema-pixio .fi-sidebar-item.fi-active .fi-sidebar-item-label {
+body.tema-slate-pro .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-slate-pro .fi-sidebar-item.fi-active .fi-sidebar-item-label {
     color: #047857 !important;
 }
-body.tema-pixio .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
-body.tema-pixio .fi-sidebar-item.fi-active .fi-icon {
+body.tema-slate-pro .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+body.tema-slate-pro .fi-sidebar-item.fi-active .fi-icon {
     color: #059669 !important;
 }
-/* Topbar: putih + hairline dingin (tanpa ornamen emas) */
-body.tema-pixio .fi-topbar {
+body.tema-slate-pro .fi-topbar {
     background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(6px);
     border-bottom: 1px solid #e7ecf3 !important;
 }
-/* Kartu/section: cream Pixio + border dingin + radius 14px + bayang halus (DS) */
-body.tema-pixio .fi-section,
-body.tema-pixio .fi-wi-stats-overview-stat,
-body.tema-pixio .fi-ta-ctn {
+body.tema-slate-pro .fi-section,
+body.tema-slate-pro .fi-wi-stats-overview-stat,
+body.tema-slate-pro .fi-ta-ctn {
     border-radius: 14px !important;
     border: 1px solid #e7ecf3 !important;
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
-    background-color: #fffaf3;
-}
-/* ---- Pixio SaaS MODE GELAP: navy DS #0a1018 (bukan emerald-ink) ---- */
-.dark body.tema-pixio .fi-body,
-body.tema-pixio.dark .fi-body {
-    background-color: #0a1018 !important;
-}
-.dark body.tema-pixio .fi-sidebar,
-body.tema-pixio.dark .fi-sidebar {
-    background: #111a26 !important;
-    border-inline-end: 1px solid #1e2a3a !important;
-}
-/* Header gelap: navy + teks terang (var --tema-sidebar-header putih hanya utk terang). */
-.dark body.tema-pixio .fi-sidebar-header,
-body.tema-pixio.dark .fi-sidebar-header {
-    background: #111a26 !important;
-    border-bottom: 1px solid #1e2a3a !important;
-}
-.dark body.tema-pixio .fi-sidebar-header,
-.dark body.tema-pixio .fi-sidebar-header *,
-body.tema-pixio.dark .fi-sidebar-header,
-body.tema-pixio.dark .fi-sidebar-header * {
-    color: #f1f5f9 !important;
-}
-.dark body.tema-pixio .fi-topbar,
-.dark body.tema-pixio .fi-header,
-body.tema-pixio.dark .fi-topbar,
-body.tema-pixio.dark .fi-header {
-    background: #111a26 !important;
-    border-bottom: 1px solid #1e2a3a !important;
-}
-.dark body.tema-pixio .fi-section,
-.dark body.tema-pixio .fi-wi-stats-overview-stat,
-.dark body.tema-pixio .fi-ta-ctn,
-body.tema-pixio.dark .fi-section,
-body.tema-pixio.dark .fi-wi-stats-overview-stat,
-body.tema-pixio.dark .fi-ta-ctn {
-    border: 1px solid #1e2a3a !important;
-    background-color: #111a26 !important;
-}
-/* Widget dasbor ikut Pixio saat tema-pixio aktif (tema WA default & AlbaKids TIDAK kena). */
-body.tema-pixio .tema-greeting {
-    background-image: linear-gradient(to right, #0b8f63, #059669, #047857) !important;
-}
-.dark body.tema-pixio .tema-greeting,
-body.tema-pixio.dark .tema-greeting {
-    background-image: linear-gradient(to right, #064e3b, #065f46, #047857) !important;
-}
-.dark body.tema-pixio .tema-quick,
-body.tema-pixio.dark .tema-quick {
-    background-color: #111a26 !important;
-}
-/* Font display: Jost untuk heading di tema-pixio (sesuai Pixio DS) */
-body.tema-pixio .fi-header-heading,
-body.tema-pixio .fi-section-header-heading,
-body.tema-pixio .fi-wi-stats-overview-stat-label,
-body.tema-pixio .fi-modal-heading,
-body.tema-pixio .fi-sidebar-header .fi-logo {
-    font-family: 'Jost', 'Plus Jakarta Sans', system-ui, sans-serif !important;
-    font-weight: 600;
-}
-
-/* Tema "Baitul Maal" (desain pesantren-online-admin / PRD Keuangan Digital):
-   sidebar gradien hijau hutan #06351F→#04281A, aksen emas #D4AF37, item
-   aktif bergaris emas kiri, latar konten krim #FDFBF7. */
-body.tema-baitul-maal .fi-body {
-    background-color: #FDFBF7;
-}
-body.tema-baitul-maal .fi-sidebar {
-    background: linear-gradient(180deg, #06351F 0%, #04281A 100%) !important;
-    border-inline-end: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-body.tema-baitul-maal .fi-sidebar-group-label {
-    color: rgba(238, 220, 154, 0.75) !important;
-}
-body.tema-baitul-maal .fi-sidebar-item-btn > .fi-sidebar-item-label,
-body.tema-baitul-maal .fi-sidebar-item-label {
-    color: rgba(255, 255, 255, 0.75) !important;
-}
-body.tema-baitul-maal .fi-sidebar-item-btn > .fi-icon,
-body.tema-baitul-maal .fi-sidebar-item-btn .fi-sidebar-item-icon,
-body.tema-baitul-maal .fi-sidebar-item-btn .fi-icon {
-    color: #9CB9A9 !important;
-}
-body.tema-baitul-maal .fi-sidebar-item-btn:hover {
-    background-color: rgba(255, 255, 255, 0.07) !important;
-}
-body.tema-baitul-maal .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
-body.tema-baitul-maal .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
-    color: #ffffff !important;
-}
-body.tema-baitul-maal .fi-sidebar-item-btn:hover > .fi-icon,
-body.tema-baitul-maal .fi-sidebar-item-btn:hover .fi-icon {
-    color: rgba(255, 255, 255, 0.85) !important;
-}
-/* Aktif: tint emas + garis emas inset kiri (signature desain Baitul Maal) */
-body.tema-baitul-maal .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background: rgba(238, 220, 154, 0.15) !important;
-    box-shadow: inset 3px 0 0 #D4AF37 !important;
-}
-body.tema-baitul-maal .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
-body.tema-baitul-maal .fi-sidebar-item.fi-active .fi-sidebar-item-label {
-    color: #ffffff !important;
-}
-body.tema-baitul-maal .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
-body.tema-baitul-maal .fi-sidebar-item.fi-active .fi-icon {
-    color: #EEDC9A !important;
-}
-/* Tombol kecil sidebar (collapse grup, notifikasi) di atas hijau gelap */
-body.tema-baitul-maal .fi-sidebar-group-btn,
-body.tema-baitul-maal .fi-sidebar-group-collapse-btn,
-body.tema-baitul-maal .fi-sidebar .fi-icon-btn {
-    color: rgba(255, 255, 255, 0.5) !important;
-}
-body.tema-baitul-maal .fi-sidebar .fi-icon-btn:hover {
-    color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.1) !important;
-}
-/* ---- Baitul Maal MODE GELAP: varian dark milik tema sendiri ----------
-   Dark bawaan Filament (hitam TikTok #121212/#1C1C24) TIDAK boleh ikut —
-   identitas hijau hutan + emas dipertahankan dengan permukaan hijau pekat. */
-.dark body.tema-baitul-maal .fi-body,
-body.tema-baitul-maal.dark .fi-body {
-    background-color: #0A1410 !important; /* hijau-hitam pekat, bukan #121212 */
-}
-.dark body.tema-baitul-maal .fi-topbar,
-.dark body.tema-baitul-maal .fi-header,
-body.tema-baitul-maal.dark .fi-topbar,
-body.tema-baitul-maal.dark .fi-header {
-    background: #0E1A15 !important;
-    border-bottom: 1px solid #23392E !important;
-}
-.dark body.tema-baitul-maal .fi-section,
-.dark body.tema-baitul-maal .fi-wi-stats-overview-stat,
-.dark body.tema-baitul-maal .fi-ta-ctn,
-.dark body.tema-baitul-maal [class*="fi-card"],
-.dark body.tema-baitul-maal .fi-widget-container > div,
-body.tema-baitul-maal.dark .fi-section,
-body.tema-baitul-maal.dark .fi-wi-stats-overview-stat,
-body.tema-baitul-maal.dark .fi-ta-ctn {
-    background-color: #11201A !important;
-    border-color: #23392E !important;
-}
-/* Sidebar dark: gradien diperdalam + garis pemisah hijau */
-.dark body.tema-baitul-maal .fi-sidebar,
-body.tema-baitul-maal.dark .fi-sidebar {
-    background: linear-gradient(180deg, #04281A 0%, #031B12 100%) !important;
-    border-inline-end: 1px solid #1E3329 !important;
-}
-.dark body.tema-baitul-maal .fi-sidebar-header,
-body.tema-baitul-maal.dark .fi-sidebar-header {
-    background: #04281A !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
-/* ---- Baitul Maal LAYOUT (bukan hanya warna) ------------------------- */
-
-/* Tipografi: Plus Jakarta Sans utk teks, Marcellus (serif) utk judul */
-body.tema-baitul-maal,
-body.tema-baitul-maal .fi-body {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-}
-body.tema-baitul-maal .fi-header-heading,
-body.tema-baitul-maal .fi-section-header-heading,
-body.tema-baitul-maal .fi-wi-stats-overview-stat-label,
-body.tema-baitul-maal .fi-modal-heading,
-body.tema-baitul-maal .fi-sidebar-header .fi-logo {
-    font-family: 'Marcellus', serif !important;
-    letter-spacing: 0.02em;
-}
-
-/* Topbar: putih semi-transparan + blur, garis krem + hairline emas */
-body.tema-baitul-maal .fi-topbar {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(6px);
-    border-bottom: 1px solid #E8E3D4 !important;
-    box-shadow: 0 1px 0 rgba(212, 175, 55, 0.35) !important;
-}
-.dark body.tema-baitul-maal .fi-topbar,
-body.tema-baitul-maal.dark .fi-topbar {
-    background: #0E1A15 !important; /* dark milik tema (hijau pekat) */
-    border-bottom: 1px solid #23392E !important;
-    box-shadow: 0 1px 0 rgba(212, 175, 55, 0.25) !important;
-}
-
-/* Kartu/section: radius 1.125rem + border krem + bayangan hijau lembut */
-body.tema-baitul-maal .fi-section,
-body.tema-baitul-maal .fi-wi-stats-overview-stat,
-body.tema-baitul-maal .fi-ta-ctn {
-    border-radius: 1.125rem !important;
-    border: 1px solid #E8E3D4 !important;
-    box-shadow: 0 4px 14px rgba(8, 55, 44, 0.06) !important;
     background-color: #ffffff;
 }
-.dark body.tema-baitul-maal .fi-section,
-.dark body.tema-baitul-maal .fi-wi-stats-overview-stat,
-.dark body.tema-baitul-maal .fi-ta-ctn,
-body.tema-baitul-maal.dark .fi-section,
-body.tema-baitul-maal.dark .fi-wi-stats-overview-stat,
-body.tema-baitul-maal.dark .fi-ta-ctn {
-    /* Dark milik tema: permukaan hijau pekat (selaras blok varian dark) */
-    border: 1px solid #23392E !important;
-    background-color: #11201A !important;
+/* Slate Pro MODE GELAP: navy #0a0f1a / sidebar #0f172a */
+.dark body.tema-slate-pro .fi-body,
+body.tema-slate-pro.dark .fi-body {
+    background-color: #0a0f1a !important;
 }
-
-/* Konten: lebar maksimum 1480px terpusat (main shell desain) */
-body.tema-baitul-maal .fi-page > section,
-body.tema-baitul-maal .fi-page-content {
-    max-width: 1480px;
-    margin-inline: auto;
-    width: 100%;
+.dark body.tema-slate-pro .fi-sidebar,
+body.tema-slate-pro.dark .fi-sidebar {
+    background: #0f172a !important;
+    border-inline-end: 1px solid #1e293b !important;
 }
-
-/* Badge periode Hijriah·Masehi di topbar (pil emas) */
-body.tema-baitul-maal .tema-bm-periode {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    border: 1px solid rgba(229, 200, 104, 0.6);
-    background: #FBF6E4;
-    color: #9C7A1E;
-    border-radius: 9999px;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.72rem;
-    font-weight: 600;
-    white-space: nowrap;
+.dark body.tema-slate-pro .fi-sidebar-header,
+body.tema-slate-pro.dark .fi-sidebar-header {
+    background: #0f172a !important;
+    border-bottom: 1px solid #1e293b !important;
 }
-.dark body.tema-baitul-maal .tema-bm-periode,
-body.tema-baitul-maal.dark .tema-bm-periode {
-    background: rgba(212, 175, 55, 0.12);
-    border-color: rgba(212, 175, 55, 0.35);
-    color: #E5C868;
+.dark body.tema-slate-pro .fi-sidebar-header,
+.dark body.tema-slate-pro .fi-sidebar-header *,
+body.tema-slate-pro.dark .fi-sidebar-header,
+body.tema-slate-pro.dark .fi-sidebar-header * {
+    color: #f1f5f9 !important;
 }
-.tema-bm-periode { display: none; } /* sembunyikan di tema lain (guard ganda) */
-
-/* Kartu "Pesantren aktif" di kaki sidebar */
-body.tema-baitul-maal .tema-bm-tenant {
-    margin: 0.5rem 0.75rem 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 0.5rem;
-    padding: 0.45rem 0.65rem;
-    font-size: 0.66rem;
-    color: rgba(255, 255, 255, 0.7);
+.dark body.tema-slate-pro .fi-topbar,
+.dark body.tema-slate-pro .fi-header,
+body.tema-slate-pro.dark .fi-topbar,
+body.tema-slate-pro.dark .fi-header {
+    background: #0f172a !important;
+    border-bottom: 1px solid #1e293b !important;
 }
-body.tema-baitul-maal .tema-bm-tenant b {
-    color: #EEDC9A;
-    font-weight: 700;
+.dark body.tema-slate-pro .fi-section,
+.dark body.tema-slate-pro .fi-wi-stats-overview-stat,
+.dark body.tema-slate-pro .fi-ta-ctn,
+body.tema-slate-pro.dark .fi-section,
+body.tema-slate-pro.dark .fi-wi-stats-overview-stat,
+body.tema-slate-pro.dark .fi-ta-ctn {
+    border: 1px solid #1e293b !important;
+    background-color: #0f172a !important;
 }
-.tema-bm-tenant { display: none; }
-
-/* Footer khidmah */
-body.tema-baitul-maal .tema-bm-footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    border-top: 1px solid #E8E3D4;
-    background: #ffffff;
-    padding: 0.7rem 1.5rem;
-    font-size: 0.72rem;
-    color: #67786F;
-}
-body.tema-baitul-maal .tema-bm-footer b { color: #0A5C36; }
-body.tema-baitul-maal .tema-bm-footer-gold { color: #9C7A1E; font-weight: 500; }
-.dark body.tema-baitul-maal .tema-bm-footer,
-body.tema-baitul-maal.dark .tema-bm-footer {
-    background: #0E1A15;
-    border-top: 1px solid #23392E;
-    color: rgba(255, 255, 255, 0.55);
-}
-.dark body.tema-baitul-maal .tema-bm-footer b,
-body.tema-baitul-maal.dark .tema-bm-footer b { color: #83C2A0; }
-.tema-bm-footer { display: none; }
 
 /* ===================================================================
-   Tema "Pimpinan Biru" (referensi Dashboard Pimpinan navy):
-   navigasi atas putih bersih, header halaman band navy, kartu putih.
+   Tema "Kaca (Glass)" — glassmorphism: kartu putih semi-transparan +
+   backdrop-blur + border tipis, kanvas gradasi slate/indigo halus,
+   primer indigo #6366f1. Dark navy kaca #0b1020. Fallback solid untuk
+   peramban tanpa backdrop-filter (via @supports).
    =================================================================== */
-body.tema-pimpinan-biru .fi-body {
-    background-color: #f1f5f9; /* slate-100 */
+body.tema-glass .fi-body {
+    background-color: #eef2f8;
+    background-image: linear-gradient(135deg, #f1f5f9 0%, #eef2ff 50%, #f5f3ff 100%);
+    background-attachment: fixed;
 }
-body.tema-pimpinan-biru .fi-topbar {
-    background: #ffffff !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-    box-shadow: 0 1px 2px rgba(15, 42, 74, 0.06) !important;
+body.tema-glass .fi-sidebar {
+    background: rgba(255, 255, 255, 0.72) !important;
+    border-inline-end: 1px solid rgba(99, 102, 241, 0.14) !important;
+    backdrop-filter: blur(14px);
 }
-/* Header halaman: band navy gradien ala hero referensi */
-body.tema-pimpinan-biru .fi-header {
-    background: linear-gradient(135deg, #0f2a4a 0%, #163d6b 100%);
+body.tema-glass .fi-sidebar-header,
+body.tema-glass .fi-sidebar-header * {
+    color: #1e1b4b !important;
+}
+body.tema-glass .fi-sidebar-header .fi-logo [class*="bg-primary"],
+body.tema-glass .fi-sidebar-header .fi-logo span:first-child {
+    background-color: #eef2ff !important;
+    box-shadow: inset 0 0 0 1px #e0e7ff !important;
+}
+body.tema-glass .fi-sidebar-group-label {
+    color: #818cf8 !important;
+}
+body.tema-glass .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-glass .fi-sidebar-item-label {
+    color: #3730a3 !important;
+}
+body.tema-glass .fi-sidebar-item-btn > .fi-icon,
+body.tema-glass .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-glass .fi-sidebar-item-btn .fi-icon {
+    color: #6366f1 !important;
+}
+body.tema-glass .fi-sidebar-item-btn:hover {
+    background-color: rgba(99, 102, 241, 0.08) !important;
+}
+body.tema-glass .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: rgba(238, 242, 255, 0.9) !important;
+    box-shadow: inset 3px 0 0 #6366f1 !important;
+}
+body.tema-glass .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-glass .fi-sidebar-item.fi-active .fi-sidebar-item-label {
+    color: #4338ca !important;
+}
+body.tema-glass .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
+body.tema-glass .fi-sidebar-item.fi-active .fi-icon {
+    color: #4338ca !important;
+}
+body.tema-glass .fi-topbar {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(99, 102, 241, 0.12) !important;
+}
+body.tema-glass .fi-section,
+body.tema-glass .fi-wi-stats-overview-stat,
+body.tema-glass .fi-ta-ctn {
+    border-radius: 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px -12px rgba(79, 70, 229, 0.18) !important;
+}
+/* Fallback solid bila backdrop-filter tak didukung */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    body.tema-glass .fi-sidebar { background: #ffffff !important; }
+    body.tema-glass .fi-topbar { background: #ffffff !important; }
+    body.tema-glass .fi-section,
+    body.tema-glass .fi-wi-stats-overview-stat,
+    body.tema-glass .fi-ta-ctn { background-color: #ffffff !important; }
+}
+/* Glass MODE GELAP: navy kaca #0b1020 */
+.dark body.tema-glass .fi-body,
+body.tema-glass.dark .fi-body {
+    background-color: #0b1020 !important;
+    background-image: linear-gradient(135deg, #0b1020 0%, #131a33 55%, #1a1233 100%) !important;
+}
+.dark body.tema-glass .fi-sidebar,
+body.tema-glass.dark .fi-sidebar {
+    background: rgba(19, 26, 51, 0.72) !important;
+    border-inline-end: 1px solid rgba(129, 140, 248, 0.18) !important;
+}
+.dark body.tema-glass .fi-sidebar-header,
+body.tema-glass.dark .fi-sidebar-header {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(129, 140, 248, 0.18) !important;
+}
+.dark body.tema-glass .fi-sidebar-header,
+.dark body.tema-glass .fi-sidebar-header *,
+body.tema-glass.dark .fi-sidebar-header,
+body.tema-glass.dark .fi-sidebar-header * {
+    color: #e0e7ff !important;
+}
+.dark body.tema-glass .fi-topbar,
+.dark body.tema-glass .fi-header,
+body.tema-glass.dark .fi-topbar,
+body.tema-glass.dark .fi-header {
+    background: rgba(19, 26, 51, 0.7) !important;
+    border-bottom: 1px solid rgba(129, 140, 248, 0.18) !important;
+}
+.dark body.tema-glass .fi-section,
+.dark body.tema-glass .fi-wi-stats-overview-stat,
+.dark body.tema-glass .fi-ta-ctn,
+body.tema-glass.dark .fi-section,
+body.tema-glass.dark .fi-wi-stats-overview-stat,
+body.tema-glass.dark .fi-ta-ctn {
+    border: 1px solid rgba(129, 140, 248, 0.16) !important;
+    background-color: rgba(19, 26, 51, 0.7) !important;
+}
+
+/* ===================================================================
+   Tema "Korporat" (Navigasi Atas): netral slate/abu, primer biru #2563eb,
+   band header navy #1e293b; dark slate-900 #0f172a. Executive; memakai
+   mega-menu topnav (lihat LAPISAN BERSAMA NAVIGASI ATAS di bawah).
+   =================================================================== */
+body.tema-corporate .fi-body {
+    background-color: #f1f5f9;
+}
+body.tema-corporate .fi-topbar {
+    background: #1e293b !important;
+    border-bottom: 1px solid #0f172a !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12) !important;
+}
+body.tema-corporate .fi-topbar .fi-topbar-item-label,
+body.tema-corporate .fi-topbar .fi-icon,
+body.tema-corporate .fi-topbar .fi-logo,
+body.tema-corporate .fi-topbar .fi-icon-btn {
+    color: #e2e8f0 !important;
+}
+body.tema-corporate .fi-header {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     border-radius: 1rem;
     padding: 1.25rem 1.5rem !important;
     margin-bottom: 0.5rem;
 }
-body.tema-pimpinan-biru .fi-header-heading,
-body.tema-pimpinan-biru .fi-header .fi-breadcrumbs-item-label,
-body.tema-pimpinan-biru .fi-header * {
+body.tema-corporate .fi-header-heading,
+body.tema-corporate .fi-header .fi-breadcrumbs-item-label,
+body.tema-corporate .fi-header * {
     color: #ffffff !important;
 }
-body.tema-pimpinan-biru .fi-section,
-body.tema-pimpinan-biru .fi-wi-stats-overview-stat,
-body.tema-pimpinan-biru .fi-ta-ctn {
+body.tema-corporate .fi-section,
+body.tema-corporate .fi-wi-stats-overview-stat,
+body.tema-corporate .fi-ta-ctn {
     border-radius: 1rem !important;
     border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 6px 18px -12px rgba(15, 42, 74, 0.25) !important;
+    box-shadow: 0 6px 18px -12px rgba(15, 23, 42, 0.25) !important;
 }
-/* Dark: navy pekat, bukan hitam TikTok */
-.dark body.tema-pimpinan-biru .fi-body,
-body.tema-pimpinan-biru.dark .fi-body {
-    background-color: #0a1626 !important;
+.dark body.tema-corporate .fi-body,
+body.tema-corporate.dark .fi-body {
+    background-color: #0f172a !important;
 }
-.dark body.tema-pimpinan-biru .fi-topbar,
-body.tema-pimpinan-biru.dark .fi-topbar {
-    background: #0f2a4a !important;
-    border-bottom: 1px solid #1e3a5f !important;
+.dark body.tema-corporate .fi-topbar,
+body.tema-corporate.dark .fi-topbar {
+    background: #0f172a !important;
+    border-bottom: 1px solid #1e293b !important;
 }
-.dark body.tema-pimpinan-biru .fi-section,
-.dark body.tema-pimpinan-biru .fi-wi-stats-overview-stat,
-.dark body.tema-pimpinan-biru .fi-ta-ctn,
-body.tema-pimpinan-biru.dark .fi-section,
-body.tema-pimpinan-biru.dark .fi-wi-stats-overview-stat,
-body.tema-pimpinan-biru.dark .fi-ta-ctn {
-    background-color: #102036 !important;
-    border-color: #1e3a5f !important;
-}
-
-/* ===================================================================
-   Tema "Merah Putih" (referensi white-label merah):
-   sidebar merah marun gelap, konten putih hangat, aksen merah.
-   =================================================================== */
-body.tema-merah-putih .fi-body {
-    background-color: #faf7f5;
-}
-body.tema-merah-putih .fi-sidebar {
-    background: linear-gradient(180deg, #7f1d1d 0%, #450a0a 100%) !important;
-    border-inline-end: none !important;
-}
-body.tema-merah-putih .fi-sidebar-group-label {
-    color: rgba(254, 202, 202, 0.75) !important;
-}
-body.tema-merah-putih .fi-sidebar-item-btn > .fi-sidebar-item-label,
-body.tema-merah-putih .fi-sidebar-item-label {
-    color: rgba(255, 255, 255, 0.78) !important;
-}
-body.tema-merah-putih .fi-sidebar-item-btn > .fi-icon,
-body.tema-merah-putih .fi-sidebar-item-btn .fi-icon {
-    color: rgba(254, 202, 202, 0.7) !important;
-}
-body.tema-merah-putih .fi-sidebar-item-btn:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-}
-body.tema-merah-putih .fi-sidebar-item-btn:hover .fi-sidebar-item-label,
-body.tema-merah-putih .fi-sidebar-item-btn:hover .fi-icon {
-    color: #ffffff !important;
-}
-body.tema-merah-putih .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background: rgba(255, 255, 255, 0.14) !important;
-    box-shadow: inset 3px 0 0 #ffffff !important;
-}
-body.tema-merah-putih .fi-sidebar-item.fi-active .fi-sidebar-item-label,
-body.tema-merah-putih .fi-sidebar-item.fi-active .fi-icon {
-    color: #ffffff !important;
-}
-body.tema-merah-putih .fi-sidebar-group-btn,
-body.tema-merah-putih .fi-sidebar-group-collapse-btn,
-body.tema-merah-putih .fi-sidebar .fi-icon-btn {
-    color: rgba(254, 202, 202, 0.6) !important;
-}
-/* Kartu: garis aksen merah tipis di atas (ala kartu KPI referensi) */
-body.tema-merah-putih .fi-wi-stats-overview-stat {
-    border-top: 3px solid #dc2626 !important;
-}
-/* Dark: merah-hitam pekat */
-.dark body.tema-merah-putih .fi-body,
-body.tema-merah-putih.dark .fi-body {
-    background-color: #190b0b !important;
-}
-.dark body.tema-merah-putih .fi-topbar,
-body.tema-merah-putih.dark .fi-topbar {
-    background: #2a1212 !important;
-    border-bottom: 1px solid #451a1a !important;
-}
-.dark body.tema-merah-putih .fi-section,
-.dark body.tema-merah-putih .fi-wi-stats-overview-stat,
-.dark body.tema-merah-putih .fi-ta-ctn,
-body.tema-merah-putih.dark .fi-section,
-body.tema-merah-putih.dark .fi-wi-stats-overview-stat,
-body.tema-merah-putih.dark .fi-ta-ctn {
-    background-color: #241010 !important;
-    border-color: #451a1a !important;
-}
-.dark body.tema-merah-putih .fi-sidebar,
-body.tema-merah-putih.dark .fi-sidebar {
-    background: linear-gradient(180deg, #450a0a 0%, #2a0707 100%) !important;
+.dark body.tema-corporate .fi-section,
+.dark body.tema-corporate .fi-wi-stats-overview-stat,
+.dark body.tema-corporate .fi-ta-ctn,
+body.tema-corporate.dark .fi-section,
+body.tema-corporate.dark .fi-wi-stats-overview-stat,
+body.tema-corporate.dark .fi-ta-ctn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
 }
 
 /* ===================================================================
-   Tema "Hijau Malam (Emas)" (referensi dark luxury hijau-emas):
-   navigasi atas hijau pekat beraksen emas; light = krim + topbar hijau.
+   Tema "Tengah Malam" (Indigo) — dark-first: kanvas nyaris hitam #0b0b12,
+   sidebar #12121c, aksen indigo/violet #818cf8. Varian terang tetap teduh
+   (kanvas slate lembut, sidebar gelap indigo). Identitas selalu gelap.
    =================================================================== */
-body.tema-hijau-malam .fi-body {
-    background-color: #f6f7f4;
+body.tema-midnight .fi-body {
+    background-color: #eef0f6;
 }
-body.tema-hijau-malam .fi-topbar {
-    background: #0f2419 !important;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.25) !important;
+body.tema-midnight .fi-sidebar {
+    background: #12121c !important;
+    border-inline-end: 1px solid #232338 !important;
 }
-body.tema-hijau-malam .fi-topbar .fi-topbar-item-label,
-body.tema-hijau-malam .fi-topbar .fi-icon,
-body.tema-hijau-malam .fi-topbar .fi-logo,
-body.tema-hijau-malam .fi-topbar .fi-icon-btn {
-    color: rgba(255, 255, 255, 0.85) !important;
+body.tema-midnight .fi-sidebar-header,
+body.tema-midnight .fi-sidebar-header * {
+    color: #e0e7ff !important;
 }
-body.tema-hijau-malam .fi-topbar-item.fi-active .fi-topbar-item-btn {
-    background-color: rgba(212, 175, 55, 0.16) !important;
+body.tema-midnight .fi-sidebar-group-label {
+    color: rgba(199, 210, 254, 0.55) !important;
 }
-body.tema-hijau-malam .fi-topbar-item.fi-active .fi-topbar-item-label {
-    color: #e5c868 !important;
+body.tema-midnight .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-midnight .fi-sidebar-item-label {
+    color: rgba(226, 232, 255, 0.78) !important;
 }
-body.tema-hijau-malam .fi-topbar .fi-topbar-item-btn:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important;
+body.tema-midnight .fi-sidebar-item-btn > .fi-icon,
+body.tema-midnight .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-midnight .fi-sidebar-item-btn .fi-icon {
+    color: rgba(165, 180, 252, 0.7) !important;
 }
-body.tema-hijau-malam .fi-section,
-body.tema-hijau-malam .fi-wi-stats-overview-stat,
-body.tema-hijau-malam .fi-ta-ctn {
+body.tema-midnight .fi-sidebar-item-btn:hover {
+    background-color: rgba(129, 140, 248, 0.12) !important;
+}
+body.tema-midnight .fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+body.tema-midnight .fi-sidebar-item-btn:hover .fi-icon {
+    color: #ffffff !important;
+}
+body.tema-midnight .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%) !important;
+    box-shadow: 0 4px 14px -4px rgba(99, 102, 241, 0.5) !important;
+}
+body.tema-midnight .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+body.tema-midnight .fi-sidebar-item.fi-active .fi-icon {
+    color: #ffffff !important;
+}
+body.tema-midnight .fi-section,
+body.tema-midnight .fi-wi-stats-overview-stat,
+body.tema-midnight .fi-ta-ctn {
     border-radius: 1rem !important;
-    border: 1px solid #dde3da !important;
+    border: 1px solid #e2e5ef !important;
 }
-/* Dark (identitas utama tema ini): hijau malam + emas */
-.dark body.tema-hijau-malam .fi-body,
-body.tema-hijau-malam.dark .fi-body {
-    background-color: #0c1510 !important;
+/* Midnight MODE GELAP (identitas utama): nyaris hitam #0b0b12 */
+.dark body.tema-midnight .fi-body,
+body.tema-midnight.dark .fi-body {
+    background-color: #0b0b12 !important;
 }
-.dark body.tema-hijau-malam .fi-topbar,
-body.tema-hijau-malam.dark .fi-topbar {
-    background: #0f1d15 !important;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.3) !important;
+.dark body.tema-midnight .fi-sidebar,
+body.tema-midnight.dark .fi-sidebar {
+    background: #12121c !important;
+    border-inline-end: 1px solid #232338 !important;
 }
-.dark body.tema-hijau-malam .fi-section,
-.dark body.tema-hijau-malam .fi-wi-stats-overview-stat,
-.dark body.tema-hijau-malam .fi-ta-ctn,
-body.tema-hijau-malam.dark .fi-section,
-body.tema-hijau-malam.dark .fi-wi-stats-overview-stat,
-body.tema-hijau-malam.dark .fi-ta-ctn {
-    background-color: #111f17 !important;
+.dark body.tema-midnight .fi-topbar,
+.dark body.tema-midnight .fi-header,
+body.tema-midnight.dark .fi-topbar,
+body.tema-midnight.dark .fi-header {
+    background: #12121c !important;
+    border-bottom: 1px solid #232338 !important;
+}
+.dark body.tema-midnight .fi-section,
+.dark body.tema-midnight .fi-wi-stats-overview-stat,
+.dark body.tema-midnight .fi-ta-ctn,
+body.tema-midnight.dark .fi-section,
+body.tema-midnight.dark .fi-wi-stats-overview-stat,
+body.tema-midnight.dark .fi-ta-ctn {
+    background-color: #15151f !important;
+    border-color: #232338 !important;
+}
+
+/* ===================================================================
+   Tema "Hangat" (Amber) — kanvas krem #fdf6ec, sidebar warm-white, primer
+   amber #d97706, item aktif amber-50 #fffbeb. Dark cokelat-hitam #1a1410.
+   =================================================================== */
+body.tema-warm .fi-body {
+    background-color: #fdf6ec;
+}
+body.tema-warm .fi-sidebar {
+    background: #fffaf3 !important;
+    border-inline-end: 1px solid #efe4d3 !important;
+}
+body.tema-warm .fi-sidebar-header,
+body.tema-warm .fi-sidebar-header * {
+    color: #451a03 !important;
+}
+body.tema-warm .fi-sidebar-header .fi-logo [class*="bg-primary"],
+body.tema-warm .fi-sidebar-header .fi-logo span:first-child {
+    background-color: #fffbeb !important;
+    box-shadow: inset 0 0 0 1px #fde68a !important;
+}
+body.tema-warm .fi-sidebar-group-label {
+    color: #b08968 !important;
+}
+body.tema-warm .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-warm .fi-sidebar-item-label {
+    color: #57493a !important;
+}
+body.tema-warm .fi-sidebar-item-btn > .fi-icon,
+body.tema-warm .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-warm .fi-sidebar-item-btn .fi-icon {
+    color: #a1743c !important;
+}
+body.tema-warm .fi-sidebar-item-btn:hover {
+    background-color: #f7eeddff !important;
+}
+body.tema-warm .fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+body.tema-warm .fi-sidebar-item-btn:hover .fi-icon {
+    color: #78350f !important;
+}
+body.tema-warm .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: #fffbeb !important;
+    box-shadow: inset 3px 0 0 #d97706 !important;
+}
+body.tema-warm .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+body.tema-warm .fi-sidebar-item.fi-active .fi-icon {
+    color: #b45309 !important;
+}
+body.tema-warm .fi-topbar {
+    background: rgba(255, 250, 243, 0.95) !important;
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #efe4d3 !important;
+}
+body.tema-warm .fi-section,
+body.tema-warm .fi-wi-stats-overview-stat,
+body.tema-warm .fi-ta-ctn {
+    border-radius: 1rem !important;
+    border: 1px solid #efe4d3 !important;
+    background-color: #ffffff;
+    box-shadow: 0 4px 14px rgba(120, 53, 15, 0.05) !important;
+}
+/* Warm MODE GELAP: cokelat-hitam #1a1410 */
+.dark body.tema-warm .fi-body,
+body.tema-warm.dark .fi-body {
+    background-color: #1a1410 !important;
+}
+.dark body.tema-warm .fi-sidebar,
+body.tema-warm.dark .fi-sidebar {
+    background: #221a12 !important;
+    border-inline-end: 1px solid #3a2c1c !important;
+}
+.dark body.tema-warm .fi-sidebar-header,
+body.tema-warm.dark .fi-sidebar-header {
+    background: #221a12 !important;
+    border-bottom: 1px solid #3a2c1c !important;
+}
+.dark body.tema-warm .fi-sidebar-header,
+.dark body.tema-warm .fi-sidebar-header *,
+body.tema-warm.dark .fi-sidebar-header,
+body.tema-warm.dark .fi-sidebar-header * {
+    color: #fef3c7 !important;
+}
+.dark body.tema-warm .fi-topbar,
+.dark body.tema-warm .fi-header,
+body.tema-warm.dark .fi-topbar,
+body.tema-warm.dark .fi-header {
+    background: #221a12 !important;
+    border-bottom: 1px solid #3a2c1c !important;
+}
+.dark body.tema-warm .fi-section,
+.dark body.tema-warm .fi-wi-stats-overview-stat,
+.dark body.tema-warm .fi-ta-ctn,
+body.tema-warm.dark .fi-section,
+body.tema-warm.dark .fi-wi-stats-overview-stat,
+body.tema-warm.dark .fi-ta-ctn {
+    background-color: #241b12 !important;
+    border-color: #3a2c1c !important;
+}
+
+/* ===================================================================
+   Tema "Aurora" (Violet) — kanvas terang lapang + aksen gradasi ungu→
+   merah muda→biru, primer violet #8b5cf6. Dark aurora pekat #0d0a1a.
+   =================================================================== */
+body.tema-aurora .fi-body {
+    background-color: #faf7ff;
+    background-image: radial-gradient(1200px 400px at 100% 0%, rgba(236, 72, 153, 0.08), transparent),
+                      radial-gradient(1000px 400px at 0% 100%, rgba(59, 130, 246, 0.08), transparent);
+    background-attachment: fixed;
+}
+body.tema-aurora .fi-sidebar {
+    background: #ffffff !important;
+    border-inline-end: 1px solid rgba(139, 92, 246, 0.16) !important;
+}
+body.tema-aurora .fi-sidebar-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2) !important;
+}
+body.tema-aurora .fi-sidebar-header,
+body.tema-aurora .fi-sidebar-header * {
+    color: #ffffff !important;
+}
+body.tema-aurora .fi-sidebar-group-label {
+    color: #a78bfa !important;
+}
+body.tema-aurora .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-aurora .fi-sidebar-item-label {
+    color: #4c1d95 !important;
+}
+body.tema-aurora .fi-sidebar-item-btn > .fi-icon,
+body.tema-aurora .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-aurora .fi-sidebar-item-btn .fi-icon {
+    color: #8b5cf6 !important;
+}
+body.tema-aurora .fi-sidebar-item-btn:hover {
+    background-color: #f5f3ff !important;
+}
+body.tema-aurora .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: #f5f3ff !important;
+    box-shadow: inset 3px 0 0 #8b5cf6 !important;
+}
+body.tema-aurora .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+body.tema-aurora .fi-sidebar-item.fi-active .fi-icon {
+    color: #7c3aed !important;
+}
+body.tema-aurora .fi-topbar {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.14) !important;
+}
+body.tema-aurora .fi-section,
+body.tema-aurora .fi-wi-stats-overview-stat,
+body.tema-aurora .fi-ta-ctn {
+    border-radius: 1rem !important;
+    border: 1px solid rgba(139, 92, 246, 0.14) !important;
+    background-color: #ffffff;
+    box-shadow: 0 8px 24px -14px rgba(124, 58, 237, 0.2) !important;
+}
+/* Aurora MODE GELAP: aurora pekat #0d0a1a */
+.dark body.tema-aurora .fi-body,
+body.tema-aurora.dark .fi-body {
+    background-color: #0d0a1a !important;
+    background-image: radial-gradient(1200px 400px at 100% 0%, rgba(236, 72, 153, 0.14), transparent),
+                      radial-gradient(1000px 400px at 0% 100%, rgba(59, 130, 246, 0.14), transparent) !important;
+    background-attachment: fixed !important;
+}
+.dark body.tema-aurora .fi-sidebar,
+body.tema-aurora.dark .fi-sidebar {
+    background: #14102a !important;
+    border-inline-end: 1px solid #2a2150 !important;
+}
+.dark body.tema-aurora .fi-sidebar-header,
+body.tema-aurora.dark .fi-sidebar-header {
+    background: linear-gradient(135deg, #6d28d9 0%, #be185d 100%) !important;
+    border-bottom: 1px solid #2a2150 !important;
+}
+.dark body.tema-aurora .fi-sidebar-item-btn .fi-sidebar-item-label,
+body.tema-aurora.dark .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: rgba(233, 226, 255, 0.8) !important;
+}
+.dark body.tema-aurora .fi-topbar,
+.dark body.tema-aurora .fi-header,
+body.tema-aurora.dark .fi-topbar,
+body.tema-aurora.dark .fi-header {
+    background: #14102a !important;
+    border-bottom: 1px solid #2a2150 !important;
+}
+.dark body.tema-aurora .fi-section,
+.dark body.tema-aurora .fi-wi-stats-overview-stat,
+.dark body.tema-aurora .fi-ta-ctn,
+body.tema-aurora.dark .fi-section,
+body.tema-aurora.dark .fi-wi-stats-overview-stat,
+body.tema-aurora.dark .fi-ta-ctn {
+    background-color: #17122e !important;
+    border-color: #2a2150 !important;
+}
+
+/* ===================================================================
+   Tema "Alam" (Forest) — earthy: kanvas sage #f5f7f0, sidebar putih
+   kehijauan #fbfdf7, primer forest #15803d, aksen olive/cokelat. Dark
+   forest-night #0c150e.
+   =================================================================== */
+body.tema-nature .fi-body {
+    background-color: #f5f7f0;
+}
+body.tema-nature .fi-sidebar {
+    background: #fbfdf7 !important;
+    border-inline-end: 1px solid #e2ead9 !important;
+}
+body.tema-nature .fi-sidebar-header,
+body.tema-nature .fi-sidebar-header * {
+    color: #14532d !important;
+}
+body.tema-nature .fi-sidebar-header .fi-logo [class*="bg-primary"],
+body.tema-nature .fi-sidebar-header .fi-logo span:first-child {
+    background-color: #ecfdf3 !important;
+    box-shadow: inset 0 0 0 1px #bbf7d0 !important;
+}
+body.tema-nature .fi-sidebar-group-label {
+    color: #8a9a6e !important;
+}
+body.tema-nature .fi-sidebar-item-btn > .fi-sidebar-item-label,
+body.tema-nature .fi-sidebar-item-label {
+    color: #44503a !important;
+}
+body.tema-nature .fi-sidebar-item-btn > .fi-icon,
+body.tema-nature .fi-sidebar-item-btn .fi-sidebar-item-icon,
+body.tema-nature .fi-sidebar-item-btn .fi-icon {
+    color: #6b7d55 !important;
+}
+body.tema-nature .fi-sidebar-item-btn:hover {
+    background-color: #eef2e6 !important;
+}
+body.tema-nature .fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+body.tema-nature .fi-sidebar-item-btn:hover .fi-icon {
+    color: #166534 !important;
+}
+body.tema-nature .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: #ecfdf3 !important;
+    box-shadow: inset 3px 0 0 #15803d !important;
+}
+body.tema-nature .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+body.tema-nature .fi-sidebar-item.fi-active .fi-icon {
+    color: #166534 !important;
+}
+body.tema-nature .fi-topbar {
+    background: rgba(251, 253, 247, 0.95) !important;
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid #e2ead9 !important;
+}
+body.tema-nature .fi-section,
+body.tema-nature .fi-wi-stats-overview-stat,
+body.tema-nature .fi-ta-ctn {
+    border-radius: 1rem !important;
+    border: 1px solid #e2ead9 !important;
+    background-color: #ffffff;
+    box-shadow: 0 4px 14px rgba(20, 83, 45, 0.05) !important;
+}
+/* Nature MODE GELAP: forest-night #0c150e */
+.dark body.tema-nature .fi-body,
+body.tema-nature.dark .fi-body {
+    background-color: #0c150e !important;
+}
+.dark body.tema-nature .fi-sidebar,
+body.tema-nature.dark .fi-sidebar {
+    background: #101c13 !important;
+    border-inline-end: 1px solid #1f3327 !important;
+}
+.dark body.tema-nature .fi-sidebar-header,
+body.tema-nature.dark .fi-sidebar-header {
+    background: #101c13 !important;
+    border-bottom: 1px solid #1f3327 !important;
+}
+.dark body.tema-nature .fi-sidebar-header,
+.dark body.tema-nature .fi-sidebar-header *,
+body.tema-nature.dark .fi-sidebar-header,
+body.tema-nature.dark .fi-sidebar-header * {
+    color: #dcfce7 !important;
+}
+.dark body.tema-nature .fi-topbar,
+.dark body.tema-nature .fi-header,
+body.tema-nature.dark .fi-topbar,
+body.tema-nature.dark .fi-header {
+    background: #101c13 !important;
+    border-bottom: 1px solid #1f3327 !important;
+}
+.dark body.tema-nature .fi-section,
+.dark body.tema-nature .fi-wi-stats-overview-stat,
+.dark body.tema-nature .fi-ta-ctn,
+body.tema-nature.dark .fi-section,
+body.tema-nature.dark .fi-wi-stats-overview-stat,
+body.tema-nature.dark .fi-ta-ctn {
+    background-color: #111f16 !important;
     border-color: #1f3327 !important;
 }
 
-/* Tema "Kompak": kerapatan lebih tinggi — muat lebih banyak data per layar. */
-body.tema-kompak .fi-sidebar-item-btn {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-}
-body.tema-kompak .fi-sidebar-item-label {
-    font-size: 0.8125rem !important;
-}
-body.tema-kompak .fi-ta-cell,
-body.tema-kompak .fi-ta-header-cell {
-    padding-top: 0.3125rem !important;
-    padding-bottom: 0.3125rem !important;
-}
-body.tema-kompak .fi-section-content-ctn,
-body.tema-kompak .fi-section-content {
-    padding: 0.75rem !important;
-}
-body.tema-kompak .fi-wi-stats-overview-stat {
-    padding: 0.625rem 0.875rem !important;
-}
-body.tema-kompak .fi-btn {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-}
-
-/* Varian GELAP eksplisit tema Kompak: sebelumnya hanya mewarisi aturan
-   spacing di atas, sehingga di mode gelap kerapatan bisa terasa tak
-   konsisten (garis pemisah baris tabel tipis hilang di latar gelap).
-   Pertegas spacing kompak + hairline pemisah agar tetap rapat & terbaca. */
-.dark body.tema-kompak .fi-sidebar-item-btn {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-}
-.dark body.tema-kompak .fi-ta-cell,
-.dark body.tema-kompak .fi-ta-header-cell {
-    padding-top: 0.3125rem !important;
-    padding-bottom: 0.3125rem !important;
-    border-bottom: 1px solid #2A2A35 !important; /* pemisah baris tetap tampak di gelap */
-}
-.dark body.tema-kompak .fi-section-content-ctn,
-.dark body.tema-kompak .fi-section-content {
-    padding: 0.75rem !important;
-}
-.dark body.tema-kompak .fi-wi-stats-overview-stat {
-    padding: 0.625rem 0.875rem !important;
-}
-.dark body.tema-kompak .fi-btn {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-}
-
 /* ===================================================================
-   LAPISAN BERSAMA NAVIGASI ATAS — struktur/spasi/tipografi saja
-   (warna tetap milik blok per-tema di atas). Berlaku utk semua tema
-   topNav: tema-navigasi-atas, tema-pimpinan-biru, tema-hijau-malam.
-   Kelas DOM diverifikasi dari vendor (livewire/topbar.blade.php +
-   components/topbar/item.blade.php).
+   LAPISAN BERSAMA NAVIGASI ATAS — struktur/spasi/tipografi + warna item
+   untuk tema topNav (kini: tema-corporate). Kelas DOM diverifikasi dari
+   vendor (livewire/topbar.blade.php + components/topbar/item.blade.php).
    =================================================================== */
 
-/* Topbar: tinggi/irama tetap + konten rata dengan max-width 1400px.
-   Trik padding-inline: background tetap full-width, isi terpusat. */
-body.tema-navigasi-atas .fi-topbar,
-body.tema-pimpinan-biru .fi-topbar,
-body.tema-hijau-malam .fi-topbar {
+/* Topbar: tinggi/irama tetap + konten rata dengan max-width 1400px. */
+body.tema-corporate .fi-topbar {
     min-height: 3.5rem !important;
     padding-block: 0 !important;
     padding-inline: max(1rem, calc((100% - 1400px) / 2)) !important;
     gap: 0.75rem !important;
     align-items: center !important;
-    flex-wrap: nowrap !important; /* topbar satu baris, jangan pecah */
+    flex-wrap: nowrap !important;
 }
 
-/* Zona kiri (logo) & kanan (search/notif/user): jangan menyusut,
-   biar deretan menu yang mengalah saat sempit. */
-body.tema-navigasi-atas .fi-topbar-start,
-body.tema-pimpinan-biru .fi-topbar-start,
-body.tema-hijau-malam .fi-topbar-start,
-body.tema-navigasi-atas .fi-topbar-end,
-body.tema-pimpinan-biru .fi-topbar-end,
-body.tema-hijau-malam .fi-topbar-end {
+body.tema-corporate .fi-topbar-start,
+body.tema-corporate .fi-topbar-end {
     flex-shrink: 0 !important;
     display: flex !important;
     align-items: center !important;
     gap: 0.5rem !important;
 }
 
-/* Deretan menu: jarak rapi + scroll horizontal halus bila item
-   lebih banyak dari lebar layar (tanpa wrap dua baris). */
-body.tema-navigasi-atas .fi-topbar-nav-groups,
-body.tema-pimpinan-biru .fi-topbar-nav-groups,
-body.tema-hijau-malam .fi-topbar-nav-groups {
+body.tema-corporate .fi-topbar-nav-groups {
     display: flex !important;
-    /* Vendor memberi lg:flex-wrap → menu pecah 4-5 baris. Paksa satu
-       baris + scroll horizontal halus. */
     flex-wrap: nowrap !important;
     align-items: stretch !important;
     gap: 0.125rem !important;
@@ -1025,25 +1055,17 @@ body.tema-hijau-malam .fi-topbar-nav-groups {
     overflow-y: hidden !important;
     scrollbar-width: none !important;
 }
-body.tema-navigasi-atas .fi-topbar-nav-groups::-webkit-scrollbar,
-body.tema-pimpinan-biru .fi-topbar-nav-groups::-webkit-scrollbar,
-body.tema-hijau-malam .fi-topbar-nav-groups::-webkit-scrollbar {
+body.tema-corporate .fi-topbar-nav-groups::-webkit-scrollbar {
     display: none;
 }
 
-body.tema-navigasi-atas .fi-topbar-item,
-body.tema-pimpinan-biru .fi-topbar-item,
-body.tema-hijau-malam .fi-topbar-item {
+body.tema-corporate .fi-topbar-item {
     display: flex !important;
     align-items: stretch !important;
     position: relative !important;
 }
 
-/* Tombol item: pill rapi, label tak terpotong aneh, transisi halus.
-   Warna hover/active TIDAK di-set di sini (milik blok per-tema). */
-body.tema-navigasi-atas .fi-topbar-item-btn,
-body.tema-pimpinan-biru .fi-topbar-item-btn,
-body.tema-hijau-malam .fi-topbar-item-btn {
+body.tema-corporate .fi-topbar-item-btn {
     display: inline-flex !important;
     align-items: center !important;
     gap: 0.375rem !important;
@@ -1057,123 +1079,75 @@ body.tema-hijau-malam .fi-topbar-item-btn {
     transition: background-color 120ms ease, color 120ms ease !important;
 }
 
-/* Label panjang: potong dengan elipsis, jangan dorong topbar. */
-body.tema-navigasi-atas .fi-topbar-item-label,
-body.tema-pimpinan-biru .fi-topbar-item-label,
-body.tema-hijau-malam .fi-topbar-item-label {
+body.tema-corporate .fi-topbar-item-label {
     max-width: 11rem !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-body.tema-navigasi-atas .fi-topbar-item-icon,
-body.tema-pimpinan-biru .fi-topbar-item-icon,
-body.tema-hijau-malam .fi-topbar-item-icon {
+body.tema-corporate .fi-topbar-item-icon {
     width: 1.125rem !important;
     height: 1.125rem !important;
     flex-shrink: 0 !important;
 }
 
-body.tema-navigasi-atas .fi-topbar-group-toggle-icon,
-body.tema-pimpinan-biru .fi-topbar-group-toggle-icon,
-body.tema-hijau-malam .fi-topbar-group-toggle-icon {
+body.tema-corporate .fi-topbar-group-toggle-icon {
     width: 0.875rem !important;
     height: 0.875rem !important;
     opacity: 0.7;
     flex-shrink: 0 !important;
 }
 
-/* Penanda aktif: garis bawah halus memakai warna teks item aktif
-   (currentColor otomatis ikut palet tiap tema, light & dark). */
-body.tema-navigasi-atas .fi-topbar-item.fi-active .fi-topbar-item-btn,
-body.tema-pimpinan-biru .fi-topbar-item.fi-active .fi-topbar-item-btn,
-body.tema-hijau-malam .fi-topbar-item.fi-active .fi-topbar-item-btn {
+/* Penanda aktif: garis bawah halus (currentColor ikut palet). */
+body.tema-corporate .fi-topbar-item.fi-active .fi-topbar-item-btn {
     font-weight: 600 !important;
     box-shadow: inset 0 -2px 0 0 currentColor !important;
     border-bottom-left-radius: 0.25rem !important;
     border-bottom-right-radius: 0.25rem !important;
 }
 
-/* Pimpinan Biru: topbar putih perlu warna item netral slate yang
-   serasi (tema topnav lain sudah atur warna sendiri). */
-body.tema-pimpinan-biru .fi-topbar-item-label,
-body.tema-pimpinan-biru .fi-topbar-item-icon,
-body.tema-pimpinan-biru .fi-topbar-group-toggle-icon {
-    color: #334155 !important; /* slate-700 */
+/* Korporat: topbar navy → item terang, hover/aktif glass putih. */
+body.tema-corporate .fi-topbar-item-label,
+body.tema-corporate .fi-topbar-item-icon,
+body.tema-corporate .fi-topbar-group-toggle-icon {
+    color: #e2e8f0 !important;
 }
-body.tema-pimpinan-biru .fi-topbar-item-btn:hover {
-    background-color: #f1f5f9 !important;
+body.tema-corporate .fi-topbar-item-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
 }
-body.tema-pimpinan-biru .fi-topbar-item.fi-active .fi-topbar-item-btn,
-body.tema-pimpinan-biru .fi-topbar-item.fi-active .fi-topbar-item-label,
-body.tema-pimpinan-biru .fi-topbar-item.fi-active .fi-topbar-item-icon {
-    color: #0f2a4a !important;
+body.tema-corporate .fi-topbar-item.fi-active .fi-topbar-item-btn {
+    background-color: rgba(255, 255, 255, 0.16) !important;
 }
-body.tema-pimpinan-biru .fi-topbar-item.fi-active .fi-topbar-item-btn {
-    background-color: #e8eef6 !important;
-}
-.dark body.tema-pimpinan-biru .fi-topbar-item-label,
-.dark body.tema-pimpinan-biru .fi-topbar-item-icon,
-body.tema-pimpinan-biru.dark .fi-topbar-item-label,
-body.tema-pimpinan-biru.dark .fi-topbar-item-icon {
-    color: rgba(255, 255, 255, 0.78) !important;
-}
-.dark body.tema-pimpinan-biru .fi-topbar-item-btn:hover,
-body.tema-pimpinan-biru.dark .fi-topbar-item-btn:hover {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-}
-.dark body.tema-pimpinan-biru .fi-topbar-item.fi-active .fi-topbar-item-btn,
-body.tema-pimpinan-biru.dark .fi-topbar-item.fi-active .fi-topbar-item-btn {
-    background-color: rgba(255, 255, 255, 0.14) !important;
-}
-.dark body.tema-pimpinan-biru .fi-topbar-item.fi-active .fi-topbar-item-label,
-.dark body.tema-pimpinan-biru .fi-topbar-item.fi-active .fi-topbar-item-icon,
-body.tema-pimpinan-biru.dark .fi-topbar-item.fi-active .fi-topbar-item-label,
-body.tema-pimpinan-biru.dark .fi-topbar-item.fi-active .fi-topbar-item-icon {
+body.tema-corporate .fi-topbar-item.fi-active .fi-topbar-item-label,
+body.tema-corporate .fi-topbar-item.fi-active .fi-topbar-item-icon {
     color: #ffffff !important;
 }
 
-/* Panel dropdown grup: panel di-teleport ke <body> oleh Filament,
-   maka scope HARUS dari body.tema-x, BUKAN dari .fi-topbar.
-   Struktur saja — warna ikut bawaan light/dark Filament. */
-body.tema-navigasi-atas .fi-dropdown-panel,
-body.tema-pimpinan-biru .fi-dropdown-panel,
-body.tema-hijau-malam .fi-dropdown-panel {
+/* Panel dropdown grup: di-teleport ke <body> → scope dari body.tema-x. */
+body.tema-corporate .fi-dropdown-panel {
     border-radius: 0.75rem !important;
     min-width: 13rem !important;
     box-shadow:
         0 4px 6px -2px rgba(16, 24, 40, 0.05),
         0 12px 24px -6px rgba(16, 24, 40, 0.18) !important;
 }
-body.tema-navigasi-atas .fi-dropdown-list,
-body.tema-pimpinan-biru .fi-dropdown-list,
-body.tema-hijau-malam .fi-dropdown-list {
+body.tema-corporate .fi-dropdown-list {
     padding: 0.375rem !important;
 }
-body.tema-navigasi-atas .fi-dropdown-list-item,
-body.tema-pimpinan-biru .fi-dropdown-list-item,
-body.tema-hijau-malam .fi-dropdown-list-item {
+body.tema-corporate .fi-dropdown-list-item {
     border-radius: 0.5rem !important;
     padding: 0.4375rem 0.625rem !important;
 }
-body.tema-navigasi-atas .fi-dropdown-list-item-label,
-body.tema-pimpinan-biru .fi-dropdown-list-item-label,
-body.tema-hijau-malam .fi-dropdown-list-item-label {
+body.tema-corporate .fi-dropdown-list-item-label {
     font-size: 0.875rem !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
 
-/* Keseimbangan zona kanan: search tidak melar tak terkendali,
-   avatar user-menu punya area klik nyaman. */
-body.tema-navigasi-atas .fi-topbar .fi-global-search,
-body.tema-pimpinan-biru .fi-topbar .fi-global-search,
-body.tema-hijau-malam .fi-topbar .fi-global-search {
+body.tema-corporate .fi-topbar .fi-global-search {
     max-width: 16rem !important;
 }
-body.tema-navigasi-atas .fi-topbar .fi-user-menu-trigger,
-body.tema-pimpinan-biru .fi-topbar .fi-user-menu-trigger,
-body.tema-hijau-malam .fi-topbar .fi-user-menu-trigger {
+body.tema-corporate .fi-topbar .fi-user-menu-trigger {
     padding: 0.25rem !important;
     border-radius: 9999px !important;
 }
@@ -1181,25 +1155,19 @@ body.tema-hijau-malam .fi-topbar .fi-user-menu-trigger {
 /* ===================================================================
    NAV HIBRIDA TOPNAV: bar prioritas + waffle "Semua Menu" (mega-panel).
    Deretan grup bawaan Filament DISEMBUNYIKAN utk tema topNav — diganti
-   ul.tema-nav-utama dari render hook TOPBAR_LOGO_AFTER (semua menu
-   tetap terjangkau: prioritas 1-klik, sisanya di mega-panel grid).
+   ul.tema-nav-utama dari render hook TOPBAR_LOGO_AFTER.
    =================================================================== */
-body.tema-navigasi-atas .fi-topbar-nav-groups,
-body.tema-pimpinan-biru .fi-topbar-nav-groups,
-body.tema-hijau-malam .fi-topbar-nav-groups {
+body.tema-corporate .fi-topbar-nav-groups {
     display: none !important;
 }
 
-/* Zona start memuat logo + nav kita: biarkan tumbuh mengisi tengah. */
-body.tema-navigasi-atas .fi-topbar-start,
-body.tema-pimpinan-biru .fi-topbar-start,
-body.tema-hijau-malam .fi-topbar-start {
+body.tema-corporate .fi-topbar-start {
     flex: 1 1 auto !important;
     min-width: 0 !important;
 }
 
 .tema-nav-utama {
-    display: none; /* tampil hanya di tema topnav (di bawah) + desktop */
+    display: none; /* tampil hanya di tema topnav + desktop */
     list-style: none;
     margin: 0 0 0 1rem;
     padding: 0;
@@ -1208,9 +1176,7 @@ body.tema-hijau-malam .fi-topbar-start {
     min-width: 0;
 }
 @media (min-width: 1024px) {
-    body.tema-navigasi-atas .tema-nav-utama,
-    body.tema-pimpinan-biru .tema-nav-utama,
-    body.tema-hijau-malam .tema-nav-utama {
+    body.tema-corporate .tema-nav-utama {
         display: flex;
     }
 }
@@ -1262,8 +1228,8 @@ body.tema-hijau-malam .fi-topbar-start {
 }
 .tema-nav-dd-item.aktif {
     font-weight: 600;
-    color: var(--tema-active-fg, #008069);
-    background: var(--tema-active-bg, #E7F7EE);
+    color: var(--tema-active-fg, #1d4ed8);
+    background: var(--tema-active-bg, #dbeafe);
 }
 .dark .tema-nav-dd-item { color: rgba(255, 255, 255, 0.75); }
 .dark .tema-nav-dd-item:hover { background: rgba(255, 255, 255, 0.07); color: #ffffff; }
@@ -1320,30 +1286,21 @@ body.tema-hijau-malam .fi-topbar-start {
 
 [x-cloak] { display: none !important; }
 
-/* <1024px: topNavigation kembali memakai sidebar mobile (hamburger).
-   Pastikan target sentuh >=44px. */
+/* <1024px: topNavigation kembali memakai sidebar mobile (hamburger). */
 @media (max-width: 1024px) {
-    body.tema-navigasi-atas .fi-topbar,
-    body.tema-pimpinan-biru .fi-topbar,
-    body.tema-hijau-malam .fi-topbar {
+    body.tema-corporate .fi-topbar {
         min-height: 3.25rem !important;
         padding-inline: 0.75rem !important;
     }
-    body.tema-navigasi-atas .fi-topbar-item-btn,
-    body.tema-pimpinan-biru .fi-topbar-item-btn,
-    body.tema-hijau-malam .fi-topbar-item-btn {
-        min-height: 2.75rem !important; /* 44px sentuh */
+    body.tema-corporate .fi-topbar-item-btn {
+        min-height: 2.75rem !important;
         margin-block: 0.25rem !important;
     }
-    body.tema-navigasi-atas .fi-topbar .fi-icon-btn,
-    body.tema-pimpinan-biru .fi-topbar .fi-icon-btn,
-    body.tema-hijau-malam .fi-topbar .fi-icon-btn {
+    body.tema-corporate .fi-topbar .fi-icon-btn {
         min-width: 2.75rem !important;
         min-height: 2.75rem !important;
     }
-    body.tema-navigasi-atas .fi-topbar .fi-global-search,
-    body.tema-pimpinan-biru .fi-topbar .fi-global-search,
-    body.tema-hijau-malam .fi-topbar .fi-global-search {
+    body.tema-corporate .fi-topbar .fi-global-search {
         max-width: 11rem !important;
     }
 }

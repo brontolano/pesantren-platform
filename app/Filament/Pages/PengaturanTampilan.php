@@ -415,21 +415,9 @@ class PengaturanTampilan extends Page
             border-top: 1px solid #e5e7eb;
         }
 
-        /* === Tema KOMPAK: spasi lebih rapat (data-dense) === */
-        body.tema-kompak .content { padding: 16px; }
-        body.tema-kompak .sidebar { padding: 8px; }
-        body.tema-kompak .sidebar-item { padding: 5px 10px; margin: 2px 0; font-size: 12px; }
-        body.tema-kompak .card { padding: 12px; margin: 8px 0; }
-        body.tema-kompak .header { margin-bottom: 12px; }
-        body.tema-kompak .header h1 { font-size: 20px; }
-
-        /* === Tema NAVIGASI ATAS / top-nav: menu pindah ke bilah atas === */
-        body.tema-navigasi-atas .container,
-        body.tema-pimpinan-biru .container,
-        body.tema-hijau-malam .container { flex-direction: column; }
-        body.tema-navigasi-atas .sidebar,
-        body.tema-pimpinan-biru .sidebar,
-        body.tema-hijau-malam .sidebar {
+        /* === Tema top-nav (Korporat): menu pindah ke bilah atas === */
+        body.tema-corporate .container { flex-direction: column; }
+        body.tema-corporate .sidebar {
             display: flex;
             align-items: center;
             gap: 6px;
@@ -438,12 +426,8 @@ class PengaturanTampilan extends Page
             border-right: none;
             border-bottom: 1px solid var(--tema-sidebar-header-border, #e5e7eb);
         }
-        body.tema-navigasi-atas .sidebar-logo,
-        body.tema-pimpinan-biru .sidebar-logo,
-        body.tema-hijau-malam .sidebar-logo { margin-bottom: 0; margin-right: 16px; }
-        body.tema-navigasi-atas .sidebar-item,
-        body.tema-pimpinan-biru .sidebar-item,
-        body.tema-hijau-malam .sidebar-item { margin: 0; }
+        body.tema-corporate .sidebar-logo { margin-bottom: 0; margin-right: 16px; }
+        body.tema-corporate .sidebar-item { margin: 0; }
 
         /* === Dark mode (toggle preview) === */
         html.dark body { background: #0f172a; color: #e2e8f0; }
