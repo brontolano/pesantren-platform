@@ -13,6 +13,7 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -206,21 +207,23 @@ class TenantResource extends Resource
                     ->button()
                     ->visible(fn (Tenant $record): bool => static::customDomains($record) !== []),
 
-                // === Domain kanonis (opt-in): hapus dualitas panel admin — 301
-                // GET/HEAD dari domain kembar (type sama) ke domain utama. ===
+                // === Domain kanonis (OVERRIDE manual): tanpa pilihan pun,
+                // subdomain platform sudah OTOMATIS di-redirect 301 ke custom
+                // domain ber-type sama (bila ada). Aksi ini utk memaksa target
+                // lain atau kembali ke perilaku otomatis. ===
                 Action::make('domain_kanonis')
                     ->label('Domain Utama')
                     ->icon('heroicon-o-arrow-uturn-right')
                     ->color('gray')
                     ->visible(fn (Tenant $record): bool => $record->domains->count() > 1)
                     ->form(fn (Tenant $record): array => [
-                        \Filament\Forms\Components\Select::make('canonical_domain')
+                        Select::make('canonical_domain')
                             ->label('Jadikan Domain Utama (kanonis)')
-                            ->helperText('Semua kunjungan GET ke domain lain ber-type sama milik tenant ini akan dialihkan permanen (301) ke domain ini. Pilih "(tanpa kanonis)" untuk mematikan pengalihan.')
+                            ->helperText('OVERRIDE manual. Default sudah OTOMATIS: subdomain platform dialihkan 301 ke custom domain ber-type sama (bila ada). Pilih di sini untuk memaksa target tertentu; pilih "(tanpa kanonis)" untuk kembali ke perilaku otomatis.')
                             ->options(
                                 $record->domains
                                     ->mapWithKeys(fn ($d) => [$d->domain => "{$d->domain} ({$d->type})"])
-                                    ->prepend('(tanpa kanonis — tanpa pengalihan)', '')
+                                    ->prepend('(tanpa kanonis — pakai otomatis: subdomain → custom domain)', '')
                                     ->all()
                             )
                             ->default((string) $record->domains->firstWhere('is_canonical', true)?->domain),
@@ -237,7 +240,7 @@ class TenantResource extends Resource
                         Notification::make()
                             ->title($pilihan !== ''
                                 ? "Domain utama tenant {$record->id}: {$pilihan}"
-                                : "Domain kanonis tenant {$record->id} dimatikan — tanpa pengalihan.")
+                                : "Override kanonis tenant {$record->id} dihapus — kembali ke otomatis (subdomain platform → custom domain bila ada).")
                             ->body($pilihan !== ''
                                 ? 'Domain lain ber-type sama akan dialihkan 301 ke domain ini (hanya GET; POST/API/livewire/signed-URL tidak disentuh).'
                                 : null)

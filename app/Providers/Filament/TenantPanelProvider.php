@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Alkoumi\FilamentN8nChat\FilamentN8nChatPlugin;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\CadanganPemulihan;
 use App\Filament\Pages\CadanganWebsite;
@@ -25,12 +26,13 @@ use App\Filament\Widgets\KeuanganAreaChart;
 use App\Filament\Widgets\KontrakAkanHabisWidget;
 use App\Filament\Widgets\OnboardingChecklist;
 use App\Filament\Widgets\PondokOverviewWidget;
-use App\Filament\Widgets\QuickAccessWidget;
 use App\Filament\Widgets\StatsPesantren;
 use App\Filament\Widgets\TransaksiTerbaru;
 use App\Http\Middleware\ApplyPanelTheme;
 use App\Http\Middleware\RedirectCentralToPlatform;
+use App\Http\Middleware\RedirectDomainKanonis;
 use App\Models\Setting;
+use App\Services\ModuleService;
 use App\Support\TenantBranding;
 use App\Support\TenantCustomizationRegistry;
 use Filament\Http\Middleware\Authenticate;
@@ -52,8 +54,6 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Alkoumi\FilamentN8nChat\FilamentN8nChatPlugin;
-use App\Services\ModuleService;
 use Leek\FilamentRightClick\FilamentRightClickPlugin;
 use Modules\Akademik\Filament\Pages\GridNilai;
 use Modules\Akademik\Filament\Pages\RekapJurnalKbm;
@@ -211,7 +211,9 @@ class TenantPanelProvider extends PanelProvider
 
                 // === LAYER 2: Key Metrics ===
                 StatsPesantren::class,           // sort=-8: 5 KPI cards (santri, pengurus, kas, tagihan)
-                QuickAccessWidget::class,        // sort=-7: grid pintasan menu tersering (gerbang modul+izin)
+                // QuickAccessWidget SENGAJA TIDAK didaftarkan (keputusan owner
+                // 2026-07-03): pintasan muncul lagi seperti versi lama dan super
+                // admin melihat semuanya. Kelas + blade dibiarkan ada (tak dihapus).
                 PondokOverviewWidget::class,     // sort=0: indikator per pondok (Banin/Banat) — bila multi-pondok
 
                 // === LAYER 4: Financial Dashboard (for bendahara/tata usaha) ===
@@ -427,7 +429,7 @@ class TenantPanelProvider extends PanelProvider
                 // Kanonisasi domain (opt-in) PALING AWAL: panel Filament punya stack
                 // middleware sendiri (tidak lewat grup 'web' global), jadi harus
                 // didaftarkan juga di sini agar /admin di domain kembar ikut 301.
-                \App\Http\Middleware\RedirectDomainKanonis::class,
+                RedirectDomainKanonis::class,
                 // Tenancy HARUS diinisialisasi sebelum session & auth agar sesi/user
                 // di-resolve dari database tenant (bukan central). Mencegah redirect loop.
                 RedirectCentralToPlatform::class,
