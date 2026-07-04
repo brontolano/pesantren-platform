@@ -8,7 +8,6 @@ use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\CetakController;
-use App\Http\Controllers\DemoApps\KeamananDemoController;
 use App\Http\Controllers\DemoApps\PengasuhanDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
@@ -16,6 +15,7 @@ use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\EmisExportController;
 use App\Http\Controllers\HumasController;
 use App\Http\Controllers\Jemaah\JemaahAuthController;
+use App\Http\Controllers\KeamananController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
@@ -237,12 +237,18 @@ Route::middleware([
         // PosKantinController untuk rincian scope.
     });
 
-    Route::middleware('auth')->prefix('keamanan')->name('tenant.keamanan.')->group(function () {
-        Route::get('/', [KeamananDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/gerbang', [KeamananDemoController::class, 'gerbang'])->name('gerbang');
-        Route::get('/tamu', [KeamananDemoController::class, 'tamu'])->name('tamu');
-        Route::get('/log', [KeamananDemoController::class, 'log'])->name('log');
-        Route::get('/ronda', [KeamananDemoController::class, 'ronda'])->name('ronda');
+    Route::middleware(['auth', 'can:view_kegiatan'])->prefix('keamanan')->name('tenant.keamanan.')->group(function () {
+        Route::get('/', [KeamananController::class, 'beranda'])->name('beranda');
+        Route::get('/gerbang', [KeamananController::class, 'gerbang'])->name('gerbang');
+        Route::post('/gerbang/catat', [KeamananController::class, 'catatGerbang'])->name('gerbang.catat');
+        Route::get('/tamu', [KeamananController::class, 'tamu'])->name('tamu');
+        Route::post('/tamu/{pengajuan}/hadir', [KeamananController::class, 'jengukHadir'])->name('tamu.hadir');
+        Route::post('/tamu/walk-in', [KeamananController::class, 'jengukWalkIn'])->name('tamu.walk-in');
+        Route::get('/log', [KeamananController::class, 'log'])->name('log');
+        // Catatan: layar "Ronda Malam" (checklist titik patroli) demo lama
+        // sengaja TIDAK diportal — tak ada model/tabel patroli/ronda apa pun
+        // di sistem ini. Memaksakan akan jadi data palsu. Lihat docblock
+        // KeamananController untuk rincian scope.
     });
 
     Route::middleware('auth')->prefix('pengasuhan')->name('tenant.pengasuhan.')->group(function () {

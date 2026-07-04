@@ -91,6 +91,20 @@ final class AppLauncher
             'icon' => '<path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>',
         ],
         [
+            // F4 — petugas keamanan/satpam. TIDAK ada permission "keamanan"
+            // khusus di RolesAndPermissionsSeeder — `view_kegiatan` dipakai
+            // apa adanya, permission yang SAMA dgn gerbang LogGerbangPanel &
+            // KunjunganWaliResource::canAccess() di panel admin (data gerbang/
+            // tamu ada di modul Kegiatan). Dibagi role lain (admin_pesantren/
+            // tu/kepala) → tetap muncul di hub-nya masing2, konsisten dgn
+            // tile UKS/TU/PPDB lain.
+            'permission' => 'view_kegiatan',
+            'route' => 'tenant.keamanan.beranda',
+            'path' => '/keamanan',
+            'label' => 'Pos Keamanan',
+            'icon' => '<path d="M9 12.75 11.25 15 15 9.75M21 12c0 4.556-3.86 8.25-8.625 8.25S3.75 16.556 3.75 12 7.61 3.75 12.375 3.75 21 7.444 21 12Z"/>',
+        ],
+        [
             // F4 — petugas payroll/kepegawaian. Permission `run_payroll` sama dgn
             // gerbang EmployeeResource/CutiResource/PresensiStafResource/
             // SlipGajiResource::canAccess() di panel admin (Modules/Payroll).
@@ -175,7 +189,7 @@ final class AppLauncher
             'akses_pimpinan', 'akses_pwa_guru', 'close_period', 'operate_pos',
             'manage_keuangan', 'manage_santri', 'manage_users', 'manage_akademik',
             'manage_modules', 'manage_roles', 'kelola_approval',
-            'view_kesehatan', 'manage_kesehatan', 'manage_ppdb', 'run_payroll',
+            'view_kesehatan', 'manage_kesehatan', 'manage_ppdb', 'view_kegiatan', 'run_payroll',
         ]);
 
     }
