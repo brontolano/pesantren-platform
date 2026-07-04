@@ -22,6 +22,7 @@ use App\Http\Controllers\KepegawaianController;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\KeuanganPwaController;
+use App\Http\Controllers\KonselorController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
@@ -67,6 +68,7 @@ use App\Http\Controllers\PpdbPanitiaController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\SantriExportController;
+use App\Http\Controllers\SarprasController;
 use App\Http\Controllers\TahfidzExportController;
 use App\Http\Controllers\TuController;
 use App\Http\Controllers\UksController;
@@ -267,6 +269,21 @@ Route::middleware([
         Route::get('/presensi', [PengabdianController::class, 'presensi'])->name('presensi');
         Route::get('/laporan', [PengabdianController::class, 'laporan'])->name('laporan');
         Route::get('/profil', [PengabdianController::class, 'profil'])->name('profil');
+    });
+
+    Route::middleware(['auth', 'can:view_konseling'])->prefix('konselor')->name('tenant.konselor.')->group(function () {
+        Route::get('/', [KonselorController::class, 'beranda'])->name('beranda');
+        Route::get('/sesi', [KonselorController::class, 'sesi'])->name('sesi');
+        Route::get('/catat', [KonselorController::class, 'catat'])->name('catat');
+        Route::post('/catat', [KonselorController::class, 'simpan'])->name('catat.store');
+    });
+
+    Route::middleware(['auth', 'can:manage_sarpras'])->prefix('sarpras')->name('tenant.sarpras.')->group(function () {
+        Route::get('/', [SarprasController::class, 'beranda'])->name('beranda');
+        Route::get('/kerusakan', [SarprasController::class, 'kerusakan'])->name('kerusakan');
+        Route::post('/kerusakan/{laporan}/status', [SarprasController::class, 'ubahStatus'])->name('kerusakan.status');
+        Route::get('/piket', [SarprasController::class, 'piket'])->name('piket');
+        Route::post('/piket/scan', [SarprasController::class, 'scanPiket'])->name('piket.scan');
     });
 
     Route::middleware('auth')->prefix('santri-app')->name('tenant.santri-app.')->group(function () {
