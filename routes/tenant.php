@@ -10,7 +10,6 @@ use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\CetakController;
 use App\Http\Controllers\DemoApps\HumasDemoController;
 use App\Http\Controllers\DemoApps\KeamananDemoController;
-use App\Http\Controllers\DemoApps\KepegawaianDemoController;
 use App\Http\Controllers\DemoApps\PengabdianDemoController;
 use App\Http\Controllers\DemoApps\PengasuhanDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
@@ -21,6 +20,7 @@ use App\Http\Controllers\Jemaah\JemaahAuthController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
+use App\Http\Controllers\KepegawaianController;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\KeuanganPwaController;
@@ -193,13 +193,13 @@ Route::middleware([
         Route::get('/agenda', [HumasDemoController::class, 'agenda'])->name('agenda');
     });
 
-    Route::middleware('auth')->prefix('kepegawaian')->name('tenant.kepegawaian.')->group(function () {
-        Route::get('/', [KepegawaianDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/pegawai', [KepegawaianDemoController::class, 'pegawai'])->name('pegawai');
-        Route::get('/pegawai/{id}', [KepegawaianDemoController::class, 'detailPegawai'])->name('detail-pegawai');
-        Route::get('/absensi', [KepegawaianDemoController::class, 'absensi'])->name('absensi');
-        Route::get('/slip', [KepegawaianDemoController::class, 'slip'])->name('slip');
-        Route::get('/cuti', [KepegawaianDemoController::class, 'cuti'])->name('cuti');
+    Route::middleware(['auth', 'can:run_payroll'])->prefix('kepegawaian')->name('tenant.kepegawaian.')->group(function () {
+        Route::get('/', [KepegawaianController::class, 'beranda'])->name('beranda');
+        Route::get('/pegawai', [KepegawaianController::class, 'pegawai'])->name('pegawai');
+        Route::get('/pegawai/{id}', [KepegawaianController::class, 'detailPegawai'])->name('detail-pegawai');
+        Route::get('/absensi', [KepegawaianController::class, 'absensi'])->name('absensi');
+        Route::get('/slip', [KepegawaianController::class, 'slip'])->name('slip');
+        Route::get('/cuti', [KepegawaianController::class, 'cuti'])->name('cuti');
     });
 
     Route::middleware(['auth', 'can:manage_ppdb'])->prefix('ppdb-panitia')->name('tenant.ppdb-panitia.')->group(function () {
