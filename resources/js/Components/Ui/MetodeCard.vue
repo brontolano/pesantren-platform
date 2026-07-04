@@ -39,7 +39,7 @@ async function copyValue(value) {
 </script>
 
 <template>
-    <article class="overflow-hidden rounded-3xl bg-white ring-1 ring-slate-100 shadow-soft transition-all duration-200">
+    <article class="overflow-hidden rounded-3xl bg-white ring-1 ring-slate-100 shadow-lift">
         <button
             type="button"
             class="flex w-full items-center gap-3 px-4 py-4 text-left transition-all duration-200 hover:bg-slate-50/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--wali-primary,#059669)]"
