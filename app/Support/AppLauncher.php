@@ -148,6 +148,7 @@ final class AppLauncher
             'manage_modules', 'manage_roles', 'kelola_approval',
             'view_kesehatan', 'manage_kesehatan',
         ]);
+
     }
 
     /**
