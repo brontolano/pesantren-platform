@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AkademikExportController;
+use App\Http\Controllers\AkunController;
 use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeu
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\KeuanganPwaController;
+use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
 use App\Http\Controllers\PengadaanExportController;
@@ -342,6 +344,14 @@ Route::middleware([
     Route::post('/artikel/{slug}/komentar', [CommentController::class, 'store'])
         ->middleware(['auth', 'can:komentar', 'throttle:komentar'])
         ->name('tenant.cms.comments.store');
+
+    // F4 — Akun & Notifikasi lintas-peran (/akun, /notifikasi): tersedia untuk
+    // SIAPA PUN user tenant yang login, tanpa gerbang permission tambahan.
+    Route::middleware('auth')->group(function () {
+        Route::get('/akun', [AkunController::class, 'profil'])->name('tenant.akun.profil');
+        Route::post('/akun/password', [AkunController::class, 'updatePassword'])->name('tenant.akun.password');
+        Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('tenant.notifikasi.index');
+    });
 
     // Switch mode tampilan panel (simple <-> advanced) — preferensi per user.
     Route::post('/ui-mode/toggle', function () {
