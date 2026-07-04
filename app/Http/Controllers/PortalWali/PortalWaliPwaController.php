@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\PortalWali;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use App\Services\PortalWali\PortalWaliBrandingService;
+use App\Support\Pwa\SelfDestructSw;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -187,6 +189,18 @@ SVG;
 
     public function serviceWorker(): Response
     {
+        // F5 (sunset instalasi lama): flag ON → SW /wali serve self-destruct
+        // (sama seperti kill-switch F0 root) sebagai bagian migrasi ke aplikasi
+        // 1-pintu. Flag default OFF di semua tenant — dormant sampai owner
+        // mengaktifkan setelah F1 stabil di produksi (lihat plan F5).
+        if ((bool) Setting::getTenantValue('pwa.legacy_sw_selfdestruct', false)) {
+            return response(
+                SelfDestructSw::script('wali-shell-'),
+                200,
+                SelfDestructSw::headers('/wali/'),
+            );
+        }
+
         $branding = $this->brandingService->resolve();
         $versionSeed = implode('|', [
             $branding['tenantId'],

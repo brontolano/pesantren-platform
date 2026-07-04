@@ -3,6 +3,7 @@ import { Head } from '@inertiajs/vue3'
 import FlashToast from '@/Components/Ui/FlashToast.vue'
 import UiIcon from '@/Components/Ui/UiIcon.vue'
 import BottomNav from './BottomNav.vue'
+import LegacyPwaSunsetBanner from './LegacyPwaSunsetBanner.vue'
 import { useOnline } from './useOnline.js'
 
 /**
@@ -48,6 +49,8 @@ const { online } = useOnline()
 
         <div class="mx-auto flex min-h-screen w-full max-w-md flex-col">
             <header class="relative z-20">
+                <LegacyPwaSunsetBanner />
+
                 <div
                     v-if="!online"
                     class="mx-6 mb-2 mt-[calc(env(safe-area-inset-top)+0.5rem)] flex items-start gap-2.5 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 ring-1 ring-inset ring-amber-200"
