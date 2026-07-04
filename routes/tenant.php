@@ -16,7 +16,6 @@ use App\Http\Controllers\DemoApps\PengasuhanDemoController;
 use App\Http\Controllers\DemoApps\PosKantinDemoController;
 use App\Http\Controllers\DemoApps\PpdbPanitiaDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
-use App\Http\Controllers\DemoApps\TuDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
 use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\EmisExportController;
@@ -69,6 +68,7 @@ use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\SantriExportController;
 use App\Http\Controllers\TahfidzExportController;
+use App\Http\Controllers\TuController;
 use App\Http\Controllers\UksController;
 use App\Support\TenantBranding;
 use App\Support\UiMode;
@@ -175,13 +175,14 @@ Route::middleware([
         Route::get('/riwayat', [UksController::class, 'riwayat'])->name('riwayat');
     });
 
-    Route::middleware('auth')->prefix('tu')->name('tenant.tu.')->group(function () {
-        Route::get('/', [TuDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/santri', [TuDemoController::class, 'santri'])->name('santri');
-        Route::get('/santri/detail', [TuDemoController::class, 'detailSantri'])->name('detail-santri');
-        Route::get('/surat', [TuDemoController::class, 'surat'])->name('surat');
-        Route::get('/catat-surat', [TuDemoController::class, 'catatSurat'])->name('catat-surat');
-        Route::get('/arsip', [TuDemoController::class, 'arsip'])->name('arsip');
+    Route::middleware(['auth', 'can:manage_santri'])->prefix('tu')->name('tenant.tu.')->group(function () {
+        Route::get('/', [TuController::class, 'beranda'])->name('beranda');
+        Route::get('/santri', [TuController::class, 'santri'])->name('santri');
+        Route::get('/santri/detail', [TuController::class, 'detailSantri'])->name('detail-santri');
+        Route::get('/surat', [TuController::class, 'surat'])->name('surat');
+        Route::get('/catat-surat', [TuController::class, 'catatSurat'])->name('catat-surat');
+        Route::post('/catat-surat', [TuController::class, 'simpanSurat'])->name('catat-surat.store');
+        Route::get('/arsip', [TuController::class, 'arsip'])->name('arsip');
     });
 
     Route::middleware('auth')->prefix('humas')->name('tenant.humas.')->group(function () {
