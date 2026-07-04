@@ -31,7 +31,7 @@ const initial = computed(() =>
 
 <template>
     <div
-        class="relative overflow-hidden rounded-b-[30px] bg-brand-grad-hero px-6 pb-6 pt-[calc(env(safe-area-inset-top)+1.25rem)] text-white shadow-soft"
+        class="relative overflow-hidden rounded-b-[30px] bg-brand-grad-hero px-6 pb-6 pt-[calc(env(safe-area-inset-top)+1.25rem)] text-white shadow-soft-lg"
     >
         <IslamicPattern color="#ffffff" :opacity="0.06" :size="46" />
 
@@ -39,7 +39,7 @@ const initial = computed(() =>
             <div class="flex items-center justify-between gap-3">
                 <div class="flex min-w-0 items-center gap-3">
                     <span
-                        class="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-full bg-white/20 text-[17px] font-bold text-white ring-1 ring-inset ring-white/30"
+                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/20 text-[17px] font-bold text-white ring-1 ring-inset ring-white/35 shadow-[0_2px_8px_rgba(0,0,0,0.12)]"
                     >
                         {{ initial }}
                     </span>
