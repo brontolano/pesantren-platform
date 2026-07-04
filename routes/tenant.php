@@ -8,24 +8,24 @@ use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\CetakController;
-use App\Http\Controllers\DemoApps\HumasDemoController;
-use App\Http\Controllers\DemoApps\KeamananDemoController;
-use App\Http\Controllers\DemoApps\KepegawaianDemoController;
-use App\Http\Controllers\DemoApps\PengabdianDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
 use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\EmisExportController;
+use App\Http\Controllers\HumasController;
 use App\Http\Controllers\Jemaah\JemaahAuthController;
+use App\Http\Controllers\KeamananController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
+use App\Http\Controllers\KepegawaianController;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\KeuanganPwaController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
+use App\Http\Controllers\PengabdianController;
 use App\Http\Controllers\PengadaanExportController;
 use App\Http\Controllers\PengasuhanController;
 use App\Http\Controllers\PimpinanPwaController;
@@ -185,21 +185,31 @@ Route::middleware([
         Route::get('/arsip', [TuController::class, 'arsip'])->name('arsip');
     });
 
-    Route::middleware('auth')->prefix('humas')->name('tenant.humas.')->group(function () {
-        Route::get('/', [HumasDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/berita', [HumasDemoController::class, 'berita'])->name('berita');
-        Route::get('/berita/{artikel}', [HumasDemoController::class, 'detailArtikel'])->name('detail-artikel');
-        Route::get('/galeri', [HumasDemoController::class, 'galeri'])->name('galeri');
-        Route::get('/agenda', [HumasDemoController::class, 'agenda'])->name('agenda');
+    /*
+     * ── App PWA "Humas" (data nyata) ──
+     * Menggantikan HumasDemoController: query nyata ke Modules\CMS\Article
+     * (berita/pengumuman/prestasi via kolom category) + Gallery/GalleryImage
+     * (album foto) — model yang sama dipakai ArticleResource/GalleryResource
+     * di panel admin (grup "Website & Konten"). Gate permission `manage_santri`
+     * — permission pertama dari canAny(['manage_santri','manage_tenant_settings'])
+     * yang dipakai ArticleResource::canAccess()/GalleryResource::canAccess();
+     * tak ada role/permission "humas" khusus di RolesAndPermissionsSeeder.
+     * Layar "Agenda" demo lama TIDAK diportal (tak ada model agenda nyata).
+     */
+    Route::middleware(['auth', 'can:manage_santri'])->prefix('humas')->name('tenant.humas.')->group(function () {
+        Route::get('/', [HumasController::class, 'beranda'])->name('beranda');
+        Route::get('/berita', [HumasController::class, 'berita'])->name('berita');
+        Route::get('/berita/{artikel}', [HumasController::class, 'detailArtikel'])->name('detail-artikel');
+        Route::get('/galeri', [HumasController::class, 'galeri'])->name('galeri');
     });
 
-    Route::middleware('auth')->prefix('kepegawaian')->name('tenant.kepegawaian.')->group(function () {
-        Route::get('/', [KepegawaianDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/pegawai', [KepegawaianDemoController::class, 'pegawai'])->name('pegawai');
-        Route::get('/pegawai/{id}', [KepegawaianDemoController::class, 'detailPegawai'])->name('detail-pegawai');
-        Route::get('/absensi', [KepegawaianDemoController::class, 'absensi'])->name('absensi');
-        Route::get('/slip', [KepegawaianDemoController::class, 'slip'])->name('slip');
-        Route::get('/cuti', [KepegawaianDemoController::class, 'cuti'])->name('cuti');
+    Route::middleware(['auth', 'can:run_payroll'])->prefix('kepegawaian')->name('tenant.kepegawaian.')->group(function () {
+        Route::get('/', [KepegawaianController::class, 'beranda'])->name('beranda');
+        Route::get('/pegawai', [KepegawaianController::class, 'pegawai'])->name('pegawai');
+        Route::get('/pegawai/{id}', [KepegawaianController::class, 'detailPegawai'])->name('detail-pegawai');
+        Route::get('/absensi', [KepegawaianController::class, 'absensi'])->name('absensi');
+        Route::get('/slip', [KepegawaianController::class, 'slip'])->name('slip');
+        Route::get('/cuti', [KepegawaianController::class, 'cuti'])->name('cuti');
     });
 
     Route::middleware(['auth', 'can:manage_ppdb'])->prefix('ppdb-panitia')->name('tenant.ppdb-panitia.')->group(function () {
@@ -227,12 +237,18 @@ Route::middleware([
         // PosKantinController untuk rincian scope.
     });
 
-    Route::middleware('auth')->prefix('keamanan')->name('tenant.keamanan.')->group(function () {
-        Route::get('/', [KeamananDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/gerbang', [KeamananDemoController::class, 'gerbang'])->name('gerbang');
-        Route::get('/tamu', [KeamananDemoController::class, 'tamu'])->name('tamu');
-        Route::get('/log', [KeamananDemoController::class, 'log'])->name('log');
-        Route::get('/ronda', [KeamananDemoController::class, 'ronda'])->name('ronda');
+    Route::middleware(['auth', 'can:view_kegiatan'])->prefix('keamanan')->name('tenant.keamanan.')->group(function () {
+        Route::get('/', [KeamananController::class, 'beranda'])->name('beranda');
+        Route::get('/gerbang', [KeamananController::class, 'gerbang'])->name('gerbang');
+        Route::post('/gerbang/catat', [KeamananController::class, 'catatGerbang'])->name('gerbang.catat');
+        Route::get('/tamu', [KeamananController::class, 'tamu'])->name('tamu');
+        Route::post('/tamu/{pengajuan}/hadir', [KeamananController::class, 'jengukHadir'])->name('tamu.hadir');
+        Route::post('/tamu/walk-in', [KeamananController::class, 'jengukWalkIn'])->name('tamu.walk-in');
+        Route::get('/log', [KeamananController::class, 'log'])->name('log');
+        // Catatan: layar "Ronda Malam" (checklist titik patroli) demo lama
+        // sengaja TIDAK diportal — tak ada model/tabel patroli/ronda apa pun
+        // di sistem ini. Memaksakan akan jadi data palsu. Lihat docblock
+        // KeamananController untuk rincian scope.
     });
 
     Route::middleware(['auth', 'can:manage_asrama'])->prefix('pengasuhan')->name('tenant.pengasuhan.')->group(function () {
@@ -246,11 +262,11 @@ Route::middleware([
     });
 
     Route::middleware('auth')->prefix('pengabdian')->name('tenant.pengabdian.')->group(function () {
-        Route::get('/', [PengabdianDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/jadwal', [PengabdianDemoController::class, 'jadwal'])->name('jadwal');
-        Route::get('/presensi', [PengabdianDemoController::class, 'presensi'])->name('presensi');
-        Route::get('/laporan', [PengabdianDemoController::class, 'laporan'])->name('laporan');
-        Route::get('/profil', [PengabdianDemoController::class, 'profil'])->name('profil');
+        Route::get('/', [PengabdianController::class, 'beranda'])->name('beranda');
+        Route::get('/jadwal', [PengabdianController::class, 'jadwal'])->name('jadwal');
+        Route::get('/presensi', [PengabdianController::class, 'presensi'])->name('presensi');
+        Route::get('/laporan', [PengabdianController::class, 'laporan'])->name('laporan');
+        Route::get('/profil', [PengabdianController::class, 'profil'])->name('profil');
     });
 
     Route::middleware('auth')->prefix('santri-app')->name('tenant.santri-app.')->group(function () {
