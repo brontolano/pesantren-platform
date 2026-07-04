@@ -1,6 +1,6 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
-import { reactive, ref, computed } from 'vue'
+import { Head, useForm } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
 import { AppShell, PageHeader, UiField, UiInput, UiButton, SegmentedControl, BottomSheet } from '@/Shared'
 
 const props = defineProps({
@@ -9,8 +9,8 @@ const props = defineProps({
     santriOptions: { type: Array, default: () => [] },
 })
 
-const form = reactive({
-    santri: '',
+const form = useForm({
+    santri_id: '',
     keluhan: '',
     tindakan: '',
     status: 'pulang',
@@ -25,30 +25,31 @@ const statusOptions = [
 const selectClass = 'w-full rounded-2xl bg-white px-4 min-h-[48px] py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]'
 
 const sheetOpen = ref(false)
-const tersimpan = ref(false)
 
 const santriLabel = computed(
-    () => props.santriOptions.find((s) => s.value === form.santri)?.label ?? '-',
+    () => props.santriOptions.find((s) => s.value === form.santri_id)?.label ?? '-',
 )
 const statusLabel = computed(
     () => statusOptions.find((s) => s.value === form.status)?.label ?? '-',
 )
-const bisaSimpan = computed(() => form.santri && form.keluhan.trim())
+const bisaSimpan = computed(() => form.santri_id && form.keluhan.trim())
 
 function konfirmasi() {
     if (!bisaSimpan.value) return
     sheetOpen.value = true
 }
 
-// Optimistic: tutup sheet & tampilkan sukses, tanpa POST ke server.
 function simpan() {
-    sheetOpen.value = false
-    tersimpan.value = true
-    setTimeout(() => (tersimpan.value = false), 3000)
-    form.santri = ''
-    form.keluhan = ''
-    form.tindakan = ''
-    form.status = 'pulang'
+    form.post('/uks/kunjungan/catat', {
+        preserveScroll: true,
+        onSuccess: () => {
+            sheetOpen.value = false
+            form.reset()
+        },
+        onError: () => {
+            sheetOpen.value = false
+        },
+    })
 }
 </script>
 
@@ -61,7 +62,7 @@ function simpan() {
 
             <UiField label="Santri" required>
                 <template #default="{ fieldId }">
-                    <select :id="fieldId" v-model="form.santri" :class="selectClass" required>
+                    <select :id="fieldId" v-model="form.santri_id" :class="selectClass" required>
                         <option value="">— Pilih Santri —</option>
                         <option v-for="s in santriOptions" :key="s.value" :value="s.value">{{ s.label }}</option>
                     </select>
@@ -84,19 +85,15 @@ function simpan() {
                 <SegmentedControl v-model="form.status" :options="statusOptions" />
             </UiField>
 
-            <UiButton type="submit" variant="primary" block icon-left="check" :disabled="!bisaSimpan">
+            <UiButton type="submit" variant="primary" block icon-left="check" :disabled="!bisaSimpan || form.processing">
                 Simpan Kunjungan
             </UiButton>
 
             <p
-                v-if="tersimpan"
+                v-if="form.recentlySuccessful"
                 class="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 ring-1 ring-inset ring-emerald-100"
             >
                 Kunjungan berhasil dicatat.
-            </p>
-
-            <p class="px-1 text-xs leading-5 text-slate-400">
-                Mode peragaan — data tidak benar-benar disimpan ke server.
             </p>
         </form>
 
@@ -110,7 +107,7 @@ function simpan() {
             <template #footer>
                 <div class="flex gap-3">
                     <UiButton variant="secondary" block @click="sheetOpen = false">Batal</UiButton>
-                    <UiButton variant="primary" block icon-left="check" @click="simpan">Ya, Simpan</UiButton>
+                    <UiButton variant="primary" block icon-left="check" :disabled="form.processing" @click="simpan">Ya, Simpan</UiButton>
                 </div>
             </template>
         </BottomSheet>
