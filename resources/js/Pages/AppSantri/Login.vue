@@ -1,6 +1,7 @@
 <script setup>
 import { useForm } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, ref } from 'vue';
+import { UiField, UiInput, UiButton } from '@/Shared';
 
 const props = defineProps({
     metodeLogin: { type: Array, default: () => [{ key: 'nis_pin' }] },
@@ -88,39 +89,37 @@ const metodePerangkat = computed(() => props.metodeLogin.filter((m) => m.siap ==
 
             <!-- Scan QR (bila diaktifkan pesantren) -->
             <div v-if="aktif('qr')" class="mt-5">
-                <button
+                <UiButton
                     v-if="!scanning"
                     type="button"
-                    class="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50 py-3 text-sm font-semibold text-emerald-700"
+                    variant="secondary"
+                    block
+                    icon-left="camera"
                     @click="mulaiScan"
                 >
-                    📷 Scan Kartu Santri (QR)
-                </button>
+                    Scan Kartu Santri (QR)
+                </UiButton>
                 <div v-else class="overflow-hidden rounded-xl border border-emerald-300">
                     <video ref="videoEl" class="h-44 w-full bg-black object-cover" playsinline muted></video>
-                    <button type="button" class="w-full bg-stone-100 py-2 text-sm font-medium text-stone-600" @click="hentikanScan">
+                    <UiButton type="button" variant="ghost" block @click="hentikanScan">
                         Tutup kamera
-                    </button>
+                    </UiButton>
                 </div>
                 <p v-if="scanPesan" class="mt-1 text-center text-xs text-emerald-700">{{ scanPesan }}</p>
             </div>
 
             <form class="mt-5 space-y-4" @submit.prevent="submit">
-                <div>
-                    <label class="text-xs font-semibold text-stone-600">NIS</label>
-                    <input v-model="form.nis" type="text" inputmode="numeric" autocomplete="username"
-                        class="mt-1 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm" placeholder="Nomor Induk Santri">
-                </div>
-                <div>
-                    <label class="text-xs font-semibold text-stone-600">PIN</label>
-                    <input v-model="form.password" type="password" inputmode="numeric" autocomplete="current-password"
-                        class="mt-1 w-full rounded-xl border border-stone-300 px-4 py-3 text-center text-lg tracking-[0.3em]" placeholder="••••••">
-                </div>
+                <UiField label="NIS">
+                    <UiInput v-model="form.nis" type="text" inputmode="numeric" autocomplete="username" placeholder="Nomor Induk Santri" />
+                </UiField>
+                <UiField label="PIN">
+                    <UiInput v-model="form.password" type="password" inputmode="numeric" autocomplete="current-password"
+                        class="text-center text-lg tracking-[0.3em]" placeholder="••••••" />
+                </UiField>
                 <p v-if="form.errors.nis" class="text-sm text-red-600">{{ form.errors.nis }}</p>
-                <button type="submit" :disabled="form.processing"
-                    class="w-full rounded-full bg-emerald-600 py-3 text-sm font-semibold text-white disabled:opacity-60">
+                <UiButton type="submit" :loading="form.processing" block>
                     Masuk
-                </button>
+                </UiButton>
                 <p class="text-center text-xs text-stone-400">Lupa PIN? Minta orang tua atur ulang di aplikasi wali, atau hubungi admin.</p>
             </form>
 

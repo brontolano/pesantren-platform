@@ -1,5 +1,6 @@
 <script setup>
 import { Link, useForm } from '@inertiajs/vue3';
+import { HeroHeader, SectionCard, UiField, UiInput, UiButton } from '@/Shared';
 
 defineProps({
     qisms: Array,
@@ -24,53 +25,59 @@ function submit() {
 
 <template>
     <div class="min-h-screen bg-[#fffaf3] pb-10">
-        <header class="bg-gradient-to-b from-amber-700 to-amber-500 px-5 pb-10 pt-8 text-white">
-            <div class="mx-auto max-w-md">
-                <Link href="/app/pengurus" class="text-xs text-amber-100">← Mode Pengurus</Link>
-                <h1 class="mt-1 text-xl font-bold">Catat Pelanggaran</h1>
-            </div>
-        </header>
+        <HeroHeader name="Catat Pelanggaran" greeting="Mode Pengurus">
+            <template #action>
+                <Link href="/app/pengurus" class="text-xs text-white/80">← Kembali</Link>
+            </template>
+        </HeroHeader>
 
-        <main class="mx-auto -mt-6 max-w-md px-5">
-            <form class="space-y-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm" @submit.prevent="submit">
-                <p v-if="$page.props.flash?.sukses" class="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
-                    {{ $page.props.flash.sukses }}
-                </p>
+        <main class="mx-auto -mt-7 max-w-md space-y-4 px-5">
+            <SectionCard>
+                <form class="space-y-4" @submit.prevent="submit">
+                    <p v-if="$page.props.flash?.sukses" class="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
+                        {{ $page.props.flash.sukses }}
+                    </p>
 
-                <div>
-                    <label class="text-xs font-semibold text-stone-600">Santri</label>
-                    <select v-model="form.santri_id" required class="mt-1 w-full rounded-lg border-stone-300 text-sm">
-                        <option value="" disabled>Pilih santri…</option>
-                        <option v-for="s in santriList" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
-                    </select>
-                </div>
+                    <UiField label="Santri" required>
+                        <template #default="{ fieldId, describedby }">
+                            <select :id="fieldId" :aria-describedby="describedby" v-model="form.santri_id" required
+                                class="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]">
+                                <option value="" disabled>Pilih santri…</option>
+                                <option v-for="s in santriList" :key="s.id" :value="s.id">{{ s.nama }} ({{ s.nis }})</option>
+                            </select>
+                        </template>
+                    </UiField>
 
-                <div>
-                    <label class="text-xs font-semibold text-stone-600">Jenis pelanggaran</label>
-                    <select v-model="form.jenis_pelanggaran_id" required class="mt-1 w-full rounded-lg border-stone-300 text-sm">
-                        <option value="" disabled>Pilih jenis…</option>
-                        <option v-for="j in jenisList" :key="j.id" :value="j.id">{{ j.nama }} ({{ j.poin }} poin)</option>
-                    </select>
-                </div>
+                    <UiField label="Jenis pelanggaran" required>
+                        <template #default="{ fieldId, describedby }">
+                            <select :id="fieldId" :aria-describedby="describedby" v-model="form.jenis_pelanggaran_id" required
+                                class="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]">
+                                <option value="" disabled>Pilih jenis…</option>
+                                <option v-for="j in jenisList" :key="j.id" :value="j.id">{{ j.nama }} ({{ j.poin }} poin)</option>
+                            </select>
+                        </template>
+                    </UiField>
 
-                <div>
-                    <label class="text-xs font-semibold text-stone-600">Kronologi</label>
-                    <textarea v-model="form.kronologi" required rows="3" class="mt-1 w-full rounded-lg border-stone-300 text-sm" />
-                </div>
+                    <UiField label="Kronologi" required>
+                        <template #default="{ fieldId, describedby }">
+                            <UiInput :id="fieldId" :aria-describedby="describedby" v-model="form.kronologi" type="textarea" :rows="3" />
+                        </template>
+                    </UiField>
 
-                <div>
-                    <label class="text-xs font-semibold text-stone-600">Lokasi (opsional)</label>
-                    <input v-model="form.lokasi" type="text" class="mt-1 w-full rounded-lg border-stone-300 text-sm" />
-                </div>
+                    <UiField label="Lokasi (opsional)">
+                        <template #default="{ fieldId, describedby }">
+                            <UiInput :id="fieldId" :aria-describedby="describedby" v-model="form.lokasi" type="text" />
+                        </template>
+                    </UiField>
 
-                <button type="submit" :disabled="form.processing"
-                    class="w-full rounded-xl bg-amber-600 py-3 text-sm font-bold text-white disabled:opacity-50">
-                    Kirim Laporan
-                </button>
-                <p class="text-center text-[11px] text-stone-400">
-                    Laporan akan diperiksa & diverifikasi ustadz sebelum poin berlaku.
-                </p>
-            </form>
+                    <UiButton type="submit" variant="primary" size="lg" block :loading="form.processing" :disabled="form.processing">
+                        Kirim Laporan
+                    </UiButton>
+                    <p class="text-center text-[11px] text-stone-400">
+                        Laporan akan diperiksa & diverifikasi ustadz sebelum poin berlaku.
+                    </p>
+                </form>
+            </SectionCard>
         </main>
     </div>
 </template>
