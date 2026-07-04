@@ -75,4 +75,27 @@ class DemoPickerTest extends TestCase
         $resp->assertRedirect("http://{$host}/admin");
         $this->assertAuthenticated();
     }
+
+    /**
+     * Regresi: role demo utk tu/ppdb-panitia/keamanan/pengasuhan sebelumnya
+     * memetakan ke role yang TIDAK PUNYA permission gate route-nya (mis.
+     * 'tata_usaha' yang tak ada di RolesAndPermissionsSeeder, atau 'guru'
+     * yang tak punya manage_asrama/view_kegiatan) — hasilnya 403 walau
+     * sudah login. Pastikan tiap persona benar2 bisa GET halaman beranda-nya
+     * (bukan 403) setelah demo-masuk.
+     */
+    public function test_demo_masuk_persona_pwa_tidak_403(): void
+    {
+        [, $host] = $this->bootDemo(autologin: true);
+
+        foreach (['tu' => '/tu', 'ppdb-panitia' => '/ppdb-panitia', 'keamanan' => '/keamanan', 'pengasuhan' => '/pengasuhan'] as $peran => $path) {
+            $this->get("http://{$host}/demo-masuk/{$peran}", $this->headers($host));
+
+            $resp = $this->get("http://{$host}{$path}", $this->headers($host));
+
+            $resp->assertOk("Persona demo '{$peran}' seharusnya bisa akses {$path} tanpa 403.");
+
+            auth()->logout();
+        }
+    }
 }

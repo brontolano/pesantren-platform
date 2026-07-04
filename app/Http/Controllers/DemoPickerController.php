@@ -31,6 +31,7 @@ class DemoPickerController extends Controller
                 ['peran' => 'tu', 'label' => 'Tata Usaha', 'desc' => 'Administrasi & surat', 'ikon' => '🗂️'],
                 ['peran' => 'humas', 'label' => 'Humas', 'desc' => 'Website & informasi', 'ikon' => '📣'],
                 ['peran' => 'ppdb-panitia', 'label' => 'Panitia PPDB', 'desc' => 'Penerimaan santri baru', 'ikon' => '📝'],
+                ['peran' => 'kepegawaian', 'label' => 'Kepegawaian', 'desc' => 'Pegawai, absensi, slip, cuti', 'ikon' => '🧑‍💼'],
             ],
         ],
         [
@@ -40,6 +41,8 @@ class DemoPickerController extends Controller
                 ['peran' => 'pengasuhan', 'label' => 'Musyrif / Pengasuhan', 'desc' => 'Pembinaan & perizinan', 'ikon' => '🤲'],
                 ['peran' => 'uks', 'label' => 'Petugas UKS', 'desc' => 'Kesehatan santri', 'ikon' => '🏥'],
                 ['peran' => 'keamanan', 'label' => 'Keamanan', 'desc' => 'Gerbang & ketertiban', 'ikon' => '🛡️'],
+                ['peran' => 'konselor', 'label' => 'Konselor', 'desc' => 'Sesi konseling santri', 'ikon' => '💬'],
+                ['peran' => 'sarpras', 'label' => 'Sarpras', 'desc' => 'Kerusakan & ceklis piket', 'ikon' => '🔧'],
             ],
         ],
         [
