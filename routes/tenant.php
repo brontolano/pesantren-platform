@@ -13,7 +13,6 @@ use App\Http\Controllers\DemoApps\KeamananDemoController;
 use App\Http\Controllers\DemoApps\KepegawaianDemoController;
 use App\Http\Controllers\DemoApps\PengabdianDemoController;
 use App\Http\Controllers\DemoApps\PengasuhanDemoController;
-use App\Http\Controllers\DemoApps\PosKantinDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
 use App\Http\Controllers\DemoPickerController;
@@ -63,6 +62,7 @@ use App\Http\Controllers\PortalWali\PortalWaliRaporDownloadController;
 use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
+use App\Http\Controllers\PosKantinController;
 use App\Http\Controllers\PpdbPanitiaController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\RootPwaController;
@@ -213,12 +213,18 @@ Route::middleware([
         Route::get('/hasil', [PpdbPanitiaController::class, 'hasil'])->name('hasil');
     });
 
-    Route::middleware('auth')->prefix('pos-kantin')->name('tenant.pos-kantin.')->group(function () {
-        Route::get('/', [PosKantinDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/kasir', [PosKantinDemoController::class, 'kasir'])->name('kasir');
-        Route::get('/tabungan', [PosKantinDemoController::class, 'tabungan'])->name('tabungan');
-        Route::get('/stok', [PosKantinDemoController::class, 'stok'])->name('stok');
-        Route::get('/riwayat', [PosKantinDemoController::class, 'riwayat'])->name('riwayat');
+    Route::middleware(['auth', 'can:operate_pos'])->prefix('pos-kantin')->name('tenant.pos-kantin.')->group(function () {
+        Route::get('/', [PosKantinController::class, 'beranda'])->name('beranda');
+        Route::get('/kasir', [PosKantinController::class, 'kasir'])->name('kasir');
+        Route::get('/kasir/cari', [PosKantinController::class, 'cariSantri'])->name('kasir.cari');
+        Route::post('/kasir/belanja', [PosKantinController::class, 'belanja'])->name('kasir.belanja');
+        Route::get('/tabungan', [PosKantinController::class, 'tabungan'])->name('tabungan');
+        Route::get('/riwayat', [PosKantinController::class, 'riwayat'])->name('riwayat');
+        // Catatan: layar "Stok" (katalog produk + inventaris) demo lama
+        // sengaja TIDAK diportal — tak ada model produk/stok kantin nyata di
+        // sistem ini (KasirKantin admin pun nominal-only, bukan keranjang
+        // per-item). Memaksakan akan jadi data palsu. Lihat docblock
+        // PosKantinController untuk rincian scope.
     });
 
     Route::middleware('auth')->prefix('keamanan')->name('tenant.keamanan.')->group(function () {
