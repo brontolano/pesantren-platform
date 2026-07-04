@@ -70,6 +70,17 @@ final class AppLauncher
             'label' => 'Kesehatan UKS',
             'icon' => '<path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>',
         ],
+        [
+            // F4 — staf Tata Usaha. Permission `manage_santri` sama dgn gerbang
+            // SuratResource::canAccess() di panel admin — dipakai apa adanya,
+            // bukan permission baru. Dibagi role lain (mis. admin_pesantren) →
+            // itu tetap muncul di hub-nya, konsisten dgn tile UKS/keuangan lain.
+            'permission' => 'manage_santri',
+            'route' => 'tenant.tu.beranda',
+            'path' => '/tu',
+            'label' => 'Tata Usaha',
+            'icon' => '<path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>',
+        ],
     ];
 
     /**
