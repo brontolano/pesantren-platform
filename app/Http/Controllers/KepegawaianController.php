@@ -194,6 +194,9 @@ class KepegawaianController extends Controller
 
         return Inertia::render('Kepegawaian/Slip', [
             'navigation' => $this->nav(),
+            // 'proses_payroll' menandai tersedianya tombol Proses Payroll (POST
+            // /keuangan/api/payroll/proses — permission sama, run_payroll).
+            'can' => ['proses_payroll' => (bool) Auth::user()?->can('run_payroll')],
             'periode' => $periode,
             'slip' => $slip,
         ]);

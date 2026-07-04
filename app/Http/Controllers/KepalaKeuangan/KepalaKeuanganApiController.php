@@ -33,6 +33,7 @@ use Modules\Pajak\Services\LaporanPsak109Service;
 use Modules\Pajak\Services\SisaLebihService;
 use Modules\Pajak\Services\SptBadanService;
 use Modules\Pajak\Services\SptMasaService;
+use Modules\Payroll\Models\Employee;
 use Modules\Payroll\Models\SlipGaji;
 use Modules\Payroll\Services\PayrollService;
 
@@ -550,13 +551,59 @@ class KepalaKeuanganApiController extends Controller
         return response()->json(['data' => $slips, 'ringkasan' => $ringkasan]);
     }
 
+    /**
+     * Proses payroll massal 1 periode: buat slip (idempoten, skip yang sudah
+     * ada) utk semua pegawai aktif, terapkan potongan (PPh21/BPJS/cuti/
+     * kasbon — PayrollService::terapkanPotongan), lalu finalisasi (posting
+     * jurnal). Sebelumnya method ini stub (validasi saja, tak memanggil
+     * PayrollService sama sekali) — admin panel pun cuma bisa buat slip
+     * 1-per-1 (CreateSlipGaji). Ini implementasi nyata pertama utk "proses
+     * payroll massal", reuse method PayrollService yang sudah ada & teruji
+     * (buatSlipUntukEmployee/terapkanPotongan/finalisasi) — tak ada math baru.
+     * Kegagalan PER PEGAWAI (mis. belum tertaut akun, cuti basi, COA belum
+     * di-seed) dikumpulkan di 'gagal' — tak menghentikan pegawai lain.
+     */
     public function payrollProses(Request $request, PayrollService $payroll): JsonResponse
     {
         abort_unless(Auth::user()?->can('run_payroll') ?? false, 403);
 
-        $request->validate(['periode_id' => 'required|string']);
+        $data = $request->validate([
+            'periode_id' => ['required', 'string', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'],
+        ]);
+        $periode = $data['periode_id'];
 
-        return response()->json(['message' => 'Payroll diproses. Slip gaji diterbitkan.']);
+        $employees = Employee::where('aktif', true)->orderBy('nama')->get();
+
+        $dibuat = 0;
+        $sudahAda = 0;
+        $final = 0;
+        $gagal = [];
+
+        foreach ($employees as $employee) {
+            try {
+                $slip = $payroll->buatSlipUntukEmployee($employee, $periode, ['created_by' => Auth::id()]);
+                $slip->wasRecentlyCreated ? $dibuat++ : $sudahAda++;
+
+                if ($slip->status !== 'final') {
+                    $payroll->terapkanPotongan($slip, $employee);
+                    $payroll->finalisasi($slip->fresh(), Auth::id());
+                }
+                $final++;
+            } catch (\Throwable $e) {
+                $gagal[] = ['pegawai' => $employee->nama, 'error' => $e->getMessage()];
+            }
+        }
+
+        return response()->json([
+            'message' => "Payroll periode {$periode} diproses: {$final} slip final, ".count($gagal).' gagal.',
+            'ringkasan' => [
+                'total_pegawai' => $employees->count(),
+                'slip_dibuat_baru' => $dibuat,
+                'slip_sudah_ada' => $sudahAda,
+                'slip_final' => $final,
+                'gagal' => $gagal,
+            ],
+        ]);
     }
 
     // ── Pajak & Standar Akuntansi ───────────────────────────────
