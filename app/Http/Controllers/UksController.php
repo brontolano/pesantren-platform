@@ -139,6 +139,7 @@ class UksController extends Controller
                 'tindakan' => $k->tindakan ?? '-',
                 'status' => $k->status,
                 'jam' => optional($k->jam_masuk)->format('H:i') ?? '-',
+                'ditutup' => $k->jam_keluar !== null,
             ]);
 
         return Inertia::render('Uks/Kunjungan', [
@@ -151,6 +152,16 @@ class UksController extends Controller
                 'total' => $kunjungan->total(),
             ],
         ]);
+    }
+
+    public function tutupKunjungan(int $kunjungan): RedirectResponse
+    {
+        $tenantId = tenant('id');
+        $model = KunjunganUks::where('tenant_id', $tenantId)->findOrFail($kunjungan);
+
+        $this->kesehatan->tutupKunjungan($model);
+
+        return back()->with('success', 'Kunjungan ditutup.');
     }
 
     public function catatKunjunganForm(Request $request): Response

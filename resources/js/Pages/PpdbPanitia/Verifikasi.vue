@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import {
     AppShell, PageHeader, SectionCard, ListRow, StatusBadge, UiCard,
@@ -19,14 +19,11 @@ const navIcons = {
     hasil: 'document',
 }
 
-// Salinan lokal — aksi bersifat OPTIMISTIC (tidak POST ke server).
-const list = ref(props.dokumen.map((d) => ({ ...d })))
-
 const sheetOpen = ref(false)
 const aksi = ref('verifikasi') // 'verifikasi' | 'tolak'
 const aktif = ref(null)
 const catatan = ref('')
-const toast = ref('')
+const mengirim = ref(false)
 
 function buka(dok, mode) {
     aktif.value = dok
@@ -36,13 +33,18 @@ function buka(dok, mode) {
 }
 
 function konfirmasi() {
-    if (aktif.value) {
-        const target = list.value.find((d) => d.id === aktif.value.id)
-        if (target) target.status = aksi.value === 'verifikasi' ? 'terverifikasi' : 'ditolak'
-    }
-    toast.value = aksi.value === 'verifikasi' ? 'Dokumen ditandai terverifikasi (demo).' : 'Dokumen ditolak (demo).'
-    sheetOpen.value = false
-    window.setTimeout(() => (toast.value = ''), 2200)
+    if (!aktif.value) return
+    mengirim.value = true
+    router.post(`/ppdb-panitia/verifikasi/dokumen/${aktif.value.id}`, {
+        status: aksi.value === 'verifikasi' ? 'verified' : 'rejected',
+        catatan_verifikasi: catatan.value || null,
+    }, {
+        preserveScroll: true,
+        onFinish: () => {
+            mengirim.value = false
+            sheetOpen.value = false
+        },
+    })
 }
 </script>
 
@@ -64,7 +66,7 @@ function konfirmasi() {
 
             <SectionCard title="Dokumen" flush>
                 <div class="divide-y divide-slate-100">
-                    <ListRow v-for="d in list" :key="d.id" :title="d.nama" :subtitle="d.berkas">
+                    <ListRow v-for="d in dokumen" :key="d.id" :title="d.nama" :subtitle="d.berkas">
                         <template #leading>
                             <span class="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-50 text-slate-500">
                                 <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
@@ -85,19 +87,6 @@ function konfirmasi() {
                 </div>
             </SectionCard>
         </div>
-
-        <!-- Toast optimistic -->
-        <Transition name="toast">
-            <div
-                v-if="toast"
-                class="fixed inset-x-0 bottom-28 z-40 mx-auto w-full max-w-md px-6"
-            >
-                <div class="flex items-center gap-2.5 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-lg">
-                    <IconCircle icon="check" tone="emerald" size="sm" variant="glass" />
-                    {{ toast }}
-                </div>
-            </div>
-        </Transition>
 
         <!-- BottomSheet konfirmasi -->
         <BottomSheet
@@ -137,6 +126,7 @@ function konfirmasi() {
                     block
                     :variant="aksi === 'verifikasi' ? 'primary' : 'danger'"
                     :icon-left="aksi === 'verifikasi' ? 'check' : 'x-circle'"
+                    :disabled="mengirim"
                     @click="konfirmasi"
                 >
                     {{ aksi === 'verifikasi' ? 'Tandai Terverifikasi' : 'Tolak Dokumen' }}

@@ -1,11 +1,12 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { ref, reactive, computed } from 'vue'
 import { AppShell, PageHeader, SectionCard, ListRow, IconCircle, SegmentedControl, UiButton } from '@/Shared'
 
 const props = defineProps({
     navigation: { type: Array, default: () => [] },
     userName: { type: String, default: '' },
+    kamarId: { type: [Number, String], default: null },
     kamar: { type: String, default: '' },
     slotOptions: { type: Array, default: () => [] },
     santri: { type: Array, default: () => [] },
@@ -43,15 +44,37 @@ const ringkasan = computed(() => {
 
 const saving = ref(false)
 const tersimpan = ref(false)
+const errorPesan = ref('')
 
-// Optimistic — tidak POST ke server, hanya tampilkan konfirmasi sementara.
 function simpan() {
+    if (!props.kamarId) {
+        errorPesan.value = 'Belum ada kamar aktif untuk disimpan.'
+        return
+    }
+
     saving.value = true
-    setTimeout(() => {
-        saving.value = false
-        tersimpan.value = true
-        setTimeout(() => (tersimpan.value = false), 2600)
-    }, 500)
+    errorPesan.value = ''
+    router.post(
+        '/pengasuhan/presensi',
+        {
+            kamar_id: props.kamarId,
+            slot: slot.value,
+            santri: Object.entries(presensi).map(([santri_id, status]) => ({ santri_id, status })),
+        },
+        {
+            preserveScroll: true,
+            onSuccess: () => {
+                tersimpan.value = true
+                setTimeout(() => (tersimpan.value = false), 2600)
+            },
+            onError: (errors) => {
+                errorPesan.value = Object.values(errors)[0] ?? 'Gagal menyimpan presensi, coba lagi.'
+            },
+            onFinish: () => {
+                saving.value = false
+            },
+        },
+    )
 }
 </script>
 
@@ -98,6 +121,9 @@ function simpan() {
 
             <p v-if="tersimpan" class="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 ring-1 ring-inset ring-emerald-100">
                 Presensi {{ slot }} tersimpan. {{ ringkasan.hadir }} hadir dari {{ santri.length }} santri.
+            </p>
+            <p v-if="errorPesan" class="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800 ring-1 ring-inset ring-rose-100">
+                {{ errorPesan }}
             </p>
         </div>
     </AppShell>

@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import { AppShell, PageHeader, SectionCard, ListRow, StatusBadge, IconCircle, UiButton, BottomSheet, EmptyState } from '@/Shared'
 
@@ -11,11 +11,8 @@ const props = defineProps({
 
 const statusLabel = { pulang: 'Pulang', istirahat: 'Istirahat', rujuk: 'Dirujuk' }
 
-// Optimistic-only: tandai kunjungan yang sudah "ditutup" di sisi klien (tanpa POST).
-const ditutup = ref(new Set())
 const sheetOpen = ref(false)
 const aktif = ref(null)
-const toast = ref('')
 
 function konfirmasiTutup(k) {
     aktif.value = k
@@ -23,12 +20,11 @@ function konfirmasiTutup(k) {
 }
 
 function tutup() {
-    if (aktif.value) {
-        ditutup.value = new Set([...ditutup.value, aktif.value.id])
-        toast.value = `Kunjungan ${aktif.value.nama} ditutup.`
-        setTimeout(() => (toast.value = ''), 2500)
-    }
-    sheetOpen.value = false
+    if (!aktif.value) return
+    router.post(`/uks/kunjungan/${aktif.value.id}/tutup`, {}, {
+        preserveScroll: true,
+        onFinish: () => { sheetOpen.value = false },
+    })
 }
 </script>
 
@@ -66,12 +62,12 @@ function tutup() {
 
                         <div class="flex items-center justify-between gap-3">
                             <StatusBadge
-                                :status="ditutup.has(k.id) ? 'lunas' : k.status"
-                                :label="ditutup.has(k.id) ? 'Selesai' : statusLabel[k.status]"
+                                :status="k.ditutup ? 'lunas' : k.status"
+                                :label="k.ditutup ? 'Selesai' : statusLabel[k.status]"
                                 size="sm"
                             />
                             <UiButton
-                                v-if="!ditutup.has(k.id)"
+                                v-if="!k.ditutup"
                                 variant="ghost"
                                 size="sm"
                                 icon-left="check"

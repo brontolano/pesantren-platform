@@ -21,6 +21,8 @@ const selectClass =
 
 const konfirmasi = ref(false)
 const tersimpan = ref(false)
+const menyimpan = ref(false)
+const errorPesan = ref('')
 
 const namaSantri = () =>
     props.santriOptions.find((s) => String(s.id) === String(form.santri_id))?.nama ?? '—'
@@ -32,13 +34,32 @@ function tinjau() {
     konfirmasi.value = true
 }
 
-// Optimistic — tutup sheet, tampilkan toast, lalu kembali ke daftar disiplin.
 function simpan() {
-    konfirmasi.value = false
-    tersimpan.value = true
-    setTimeout(() => {
-        router.visit('/pengasuhan/disiplin')
-    }, 1200)
+    menyimpan.value = true
+    errorPesan.value = ''
+    router.post(
+        '/pengasuhan/disiplin/catat',
+        {
+            santri_id: form.santri_id,
+            jenis_pelanggaran_id: form.jenis,
+            kronologi: form.kronologi,
+        },
+        {
+            onSuccess: () => {
+                konfirmasi.value = false
+                tersimpan.value = true
+                setTimeout(() => {
+                    router.visit('/pengasuhan/disiplin')
+                }, 1200)
+            },
+            onError: (errors) => {
+                errorPesan.value = Object.values(errors)[0] ?? 'Gagal menyimpan, coba lagi.'
+            },
+            onFinish: () => {
+                menyimpan.value = false
+            },
+        },
+    )
 }
 </script>
 
@@ -75,9 +96,11 @@ function simpan() {
             <p v-if="tersimpan" class="rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 ring-1 ring-inset ring-emerald-100">
                 Pelanggaran tercatat. Mengarahkan ke rekap disiplin...
             </p>
+            <p v-if="errorPesan" class="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800 ring-1 ring-inset ring-rose-100">
+                {{ errorPesan }}
+            </p>
         </form>
 
-        <!-- Konfirmasi optimistic (tanpa POST ke server) -->
         <BottomSheet v-model="konfirmasi" title="Konfirmasi Pencatatan">
             <div class="space-y-3 text-sm">
                 <div class="flex justify-between gap-4">
@@ -96,7 +119,7 @@ function simpan() {
             <template #footer>
                 <div class="flex gap-3">
                     <UiButton type="button" variant="secondary" block @click="konfirmasi = false">Batal</UiButton>
-                    <UiButton type="button" variant="primary" block icon-left="check" @click="simpan">Simpan</UiButton>
+                    <UiButton type="button" variant="primary" block icon-left="check" :loading="menyimpan" @click="simpan">Simpan</UiButton>
                 </div>
             </template>
         </BottomSheet>

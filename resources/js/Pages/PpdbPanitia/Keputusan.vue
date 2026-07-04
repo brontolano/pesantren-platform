@@ -1,5 +1,5 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import {
     AppShell, PageHeader, SectionCard, ListRow, StatCard, StatusBadge,
@@ -22,8 +22,7 @@ const navIcons = {
 const sheetOpen = ref(false)
 const pilihan = ref(null)
 const catatan = ref('')
-const diputus = ref(null) // status final optimistic
-const toast = ref('')
+const mengirim = ref(false)
 
 const pilihanMeta = computed(() =>
     props.opsiKeputusan.find((o) => o.value === pilihan.value) ?? null,
@@ -36,18 +35,25 @@ function buka(opsi) {
 }
 
 function konfirmasi() {
-    diputus.value = pilihan.value
-    const label = pilihanMeta.value?.label ?? 'Keputusan'
-    toast.value = `Keputusan "${label}" tersimpan (demo).`
-    sheetOpen.value = false
-    window.setTimeout(() => (toast.value = ''), 2400)
+    mengirim.value = true
+    router.post(`/ppdb-panitia/keputusan/${props.calon.id}`, {
+        status_pendaftaran: pilihan.value,
+        catatan_keputusan: catatan.value || null,
+    }, {
+        preserveScroll: true,
+        onFinish: () => {
+            mengirim.value = false
+            sheetOpen.value = false
+        },
+    })
 }
 
-// Petakan value keputusan -> status badge yang dikenal StatusBadge.
+// Petakan value keputusan -> status badge yang dikenal StatusBadge (berdasarkan
+// status FINAL server, bukan status lokal-optimistic).
 const badgeStatus = computed(() => {
-    if (diputus.value === 'lulus') return 'terverifikasi'
-    if (diputus.value === 'cadangan') return 'menunggu'
-    if (diputus.value === 'ditolak') return 'ditolak'
+    if (props.calon.statusSaatIni === 'lulus') return 'terverifikasi'
+    if (props.calon.statusSaatIni === 'cadangan') return 'menunggu'
+    if (props.calon.statusSaatIni === 'ditolak') return 'ditolak'
     return null
 })
 </script>
@@ -102,7 +108,7 @@ const badgeStatus = computed(() => {
                         :key="o.value"
                         type="button"
                         class="flex flex-col items-center gap-2 rounded-2xl bg-white p-4 text-center ring-1 ring-slate-100 shadow-soft transition-all duration-200 active:scale-[.97]"
-                        :class="diputus === o.value ? 'ring-2 ring-emerald-500' : ''"
+                        :class="calon.statusSaatIni === o.value ? 'ring-2 ring-emerald-500' : ''"
                         @click="buka(o)"
                     >
                         <IconCircle
@@ -115,16 +121,6 @@ const badgeStatus = computed(() => {
                 </div>
             </SectionCard>
         </div>
-
-        <!-- Toast -->
-        <Transition name="toast">
-            <div v-if="toast" class="fixed inset-x-0 bottom-28 z-40 mx-auto w-full max-w-md px-6">
-                <div class="flex items-center gap-2.5 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-lg">
-                    <IconCircle icon="check" tone="emerald" size="sm" variant="glass" />
-                    {{ toast }}
-                </div>
-            </div>
-        </Transition>
 
         <!-- BottomSheet konfirmasi keputusan -->
         <BottomSheet v-model="sheetOpen" :title="`Tetapkan: ${pilihanMeta?.label ?? ''}`">
@@ -160,6 +156,7 @@ const badgeStatus = computed(() => {
                     block
                     :variant="pilihan === 'ditolak' ? 'danger' : 'primary'"
                     :icon-left="pilihan === 'ditolak' ? 'x-circle' : 'check'"
+                    :disabled="mengirim"
                     @click="konfirmasi"
                 >
                     Simpan Keputusan
