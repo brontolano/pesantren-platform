@@ -104,6 +104,26 @@ final class AppLauncher
             'label' => 'Pos Keamanan',
             'icon' => '<path d="M9 12.75 11.25 15 15 9.75M21 12c0 4.556-3.86 8.25-8.625 8.25S3.75 16.556 3.75 12 7.61 3.75 12.375 3.75 21 7.444 21 12Z"/>',
         ],
+        [
+            // F4 — petugas payroll/kepegawaian. Permission `run_payroll` sama dgn
+            // gerbang EmployeeResource/CutiResource/PresensiStafResource/
+            // SlipGajiResource::canAccess() di panel admin (Modules/Payroll).
+            // Sebelumnya `petugas_payroll` TIDAK match tile mana pun di daftar
+            // ini (tidak ada dead-code lama yang tergantikan).
+            'permission' => 'run_payroll',
+            'route' => 'tenant.kepegawaian.beranda',
+            'path' => '/kepegawaian',
+            'label' => 'Kepegawaian',
+            'icon' => '<path d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>',
+        ],
+        // Catatan: Humas TIDAK didaftarkan di STAFF_APPS. Tak ada role/
+        // permission "humas" khusus di RolesAndPermissionsSeeder — gerbangnya
+        // memakai `manage_santri`, permission yang sama dgn tile Tata Usaha di
+        // atas. STAFF_APPS bersifat first-match-only (lihat pwaHome()), jadi
+        // menambah entry kedua dgn permission yang sama akan selalu kalah
+        // dari tile TU dan jadi dead code murni — sama seperti keputusan utk
+        // POS Kantin (PR#413). Halaman /humas tetap dapat diakses langsung
+        // via URL bagi staf yang memegang `manage_santri`.
     ];
 
     /**
@@ -169,7 +189,7 @@ final class AppLauncher
             'akses_pimpinan', 'akses_pwa_guru', 'close_period', 'operate_pos',
             'manage_keuangan', 'manage_santri', 'manage_users', 'manage_akademik',
             'manage_modules', 'manage_roles', 'kelola_approval',
-            'view_kesehatan', 'manage_kesehatan', 'manage_ppdb', 'view_kegiatan',
+            'view_kesehatan', 'manage_kesehatan', 'manage_ppdb', 'view_kegiatan', 'run_payroll',
         ]);
 
     }
