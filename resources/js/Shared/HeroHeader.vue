@@ -45,7 +45,7 @@ const initial = computed(() =>
                     </span>
                     <div class="min-w-0">
                         <p class="text-[12.5px] text-white/75">{{ greeting }}</p>
-                        <p class="truncate font-jost text-base font-semibold text-white">
+                        <p class="truncate font-jost text-xl font-extrabold tracking-tight text-white">
                             {{ name || '—' }}
                         </p>
                         <div v-if="$slots.subtitle" class="mt-1">

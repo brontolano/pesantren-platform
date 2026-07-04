@@ -26,10 +26,12 @@ const TINTS = {
     slate: 'bg-slate-100 text-slate-500 ring-slate-200',
 }
 
+// Bulat penuh (rounded-full) — bahasa bentuk "tombol ikon lingkaran" ala
+// referensi Shoppe, diadopsi lintas Pixio (warna tetap emerald/tint brand).
 const SIZES = {
-    sm: { box: 'h-9 w-9 rounded-xl', icon: 'h-4.5 w-4.5' },
-    md: { box: 'h-11 w-11 rounded-2xl', icon: 'h-5 w-5' },
-    lg: { box: 'h-14 w-14 rounded-2xl', icon: 'h-7 w-7' },
+    sm: { box: 'h-9 w-9 rounded-full', icon: 'h-4.5 w-4.5' },
+    md: { box: 'h-11 w-11 rounded-full', icon: 'h-5 w-5' },
+    lg: { box: 'h-14 w-14 rounded-full', icon: 'h-7 w-7' },
 }
 
 const sizeMeta = computed(() => SIZES[props.size] ?? SIZES.md)
