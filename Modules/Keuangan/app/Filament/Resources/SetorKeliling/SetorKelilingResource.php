@@ -3,9 +3,9 @@
 namespace Modules\Keuangan\Filament\Resources\SetorKeliling;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -17,7 +17,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\CreateSetorKeliling;
 use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\EditSetorKeliling;
 use Modules\Keuangan\Filament\Resources\SetorKeliling\Pages\ListSetorKeliling;
@@ -74,10 +73,8 @@ class SetorKelilingResource extends Resource
                     ->label('')
                     ->disabled(fn (?SetorKelilingSesi $record): bool => $record !== null && $record->status !== 'draf')
                     ->schema([
-                        Select::make('santri_id')->label('Santri')
-                            ->options(fn () => Santri::query()->where('status', 'aktif')
-                                ->orderBy('nama')->limit(500)->pluck('nama', 'id'))
-                            ->searchable()->required(),
+                        SantriSelect::make('santri_id', fn (Builder $q) => $q->where('status', 'aktif'))
+                            ->required(),
                         TextInput::make('nominal')->label('Nominal')->numeric()
                             ->minValue(1)->required()->prefix('Rp'),
                         TextInput::make('catatan')->label('Catatan')->maxLength(120),

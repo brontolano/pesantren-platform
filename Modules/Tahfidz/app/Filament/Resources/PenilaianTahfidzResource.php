@@ -3,6 +3,7 @@
 namespace Modules\Tahfidz\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use App\Support\UiMode;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
@@ -15,7 +16,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\CreatePenilaianTahfidz;
 use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\EditPenilaianTahfidz;
 use Modules\Tahfidz\Filament\Resources\PenilaianTahfidzResource\Pages\ListPenilaianTahfidz;
@@ -74,9 +74,7 @@ class PenilaianTahfidzResource extends Resource
         return $schema
             ->schema([
                 Section::make()->schema([
-                    Select::make('santri_id')
-                        ->label('Santri')
-                        ->options(Santri::query()->pluck('nama', 'id'))
+                    SantriSelect::make('santri_id')
                         ->required(),
                     Select::make('hafalan_id')
                         ->label('Hafalan')
