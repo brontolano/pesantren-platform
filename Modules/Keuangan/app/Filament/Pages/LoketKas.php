@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -20,7 +21,6 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Models\PosKategori;
 use Modules\Keuangan\Models\PosSesi;
 use Modules\Keuangan\Models\Tagihan;
@@ -66,7 +66,7 @@ class LoketKas extends Page implements HasActions, HasForms
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'tenant'
-            && static::moduleVisible('koperasi')
+            && static::moduleVisible('keuangan')
             && (Auth::user()?->can('operate_pos') ?? false);
     }
 
@@ -134,11 +134,7 @@ class LoketKas extends Page implements HasActions, HasForms
                             ->required()
                             ->minValue(1)
                             ->prefix('Rp'),
-                        Select::make('santri_id')
-                            ->label('Santri')
-                            ->options(fn (): array => Santri::query()->orderBy('nama')->limit(500)->get()
-                                ->mapWithKeys(fn (Santri $s): array => [$s->id => trim(($s->nis ? $s->nis.' — ' : '').$s->nama)])->all())
-                            ->searchable()
+                        SantriSelect::make('santri_id')
                             ->visible(fn (Get $get): bool => $this->kategoriButuhSantri($get('kategori_id')))
                             ->required(fn (Get $get): bool => $this->kategoriButuhSantri($get('kategori_id'))),
                         Select::make('tagihan_id')

@@ -3,6 +3,7 @@
 namespace Modules\Akademik\Filament\Resources\Rubrik;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -23,7 +24,6 @@ use Modules\Akademik\Filament\Resources\Rubrik\Pages\ListRubrikKriteria;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\RubrikKriteria;
 use Modules\Akademik\Services\RubrikService;
-use Modules\Kesantrian\Models\Santri;
 
 class RubrikKriteriaResource extends Resource
 {
@@ -85,9 +85,7 @@ class RubrikKriteriaResource extends Resource
                     ->color('success')
                     ->visible(fn (): bool => auth()->user()?->can('manage_akademik') ?? false)
                     ->schema([
-                        Select::make('santri_id')->label('Santri')->required()->searchable()
-                            ->options(fn (): array => Santri::query()->orderBy('nama')->limit(200)
-                                ->get()->mapWithKeys(fn (Santri $s): array => [$s->id => $s->nama])->all()),
+                        SantriSelect::make('santri_id')->required(),
                         TextInput::make('skor')->label('Skor (0-100)')->numeric()->required()->minValue(0)->maxValue(100),
                     ])
                     ->action(function (array $data, RubrikKriteria $record): void {

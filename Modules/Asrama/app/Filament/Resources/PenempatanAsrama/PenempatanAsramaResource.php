@@ -3,6 +3,7 @@
 namespace Modules\Asrama\Filament\Resources\PenempatanAsrama;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use App\Support\UiMode;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -22,7 +23,6 @@ use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\EditPenempatanAsram
 use Modules\Asrama\Filament\Resources\PenempatanAsrama\Pages\ListPenempatanAsrama;
 use Modules\Asrama\Models\KamarAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;
-use Modules\Kesantrian\Models\Santri;
 
 class PenempatanAsramaResource extends Resource
 {
@@ -61,11 +61,8 @@ class PenempatanAsramaResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('santri_id')
-                ->label('Santri')
-                ->options(fn () => Santri::query()->orderBy('nama')->pluck('nama', 'id'))
-                ->required()
-                ->searchable(),
+            SantriSelect::make('santri_id')
+                ->required(),
             Select::make('kamar_id')
                 ->label('Kamar')
                 ->options(fn () => KamarAsrama::query()

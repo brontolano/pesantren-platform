@@ -3,6 +3,7 @@
 namespace Modules\Akademik\Filament\Resources\Nilai;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -24,7 +25,6 @@ use Modules\Akademik\Models\Nilai;
 use Modules\Akademik\Models\Pelajaran;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Kesantrian\Models\Kelas;
-use Modules\Kesantrian\Models\Santri;
 
 class NilaiResource extends Resource
 {
@@ -84,10 +84,7 @@ class NilaiResource extends Resource
                     ->options(fn () => static::pelajaranOptions())
                     ->searchable()
                     ->required(),
-                Select::make('santri_id')
-                    ->label('Santri')
-                    ->options(fn () => Santri::query()->orderBy('nama')->pluck('nama', 'id'))
-                    ->searchable()
+                SantriSelect::make('santri_id')
                     ->required(),
                 TextInput::make('nilai_harian')->numeric()->minValue(0)->maxValue(100),
                 TextInput::make('nilai_uts')->numeric()->minValue(0)->maxValue(100),

@@ -3,6 +3,7 @@
 namespace Modules\Kegiatan\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -37,10 +38,8 @@ class IzinSantriResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Select::make('santri_id')
-                ->label('Santri')
-                ->relationship('santri', 'nama')
-                ->searchable()->preload()->required(),
+            SantriSelect::make('santri_id')
+                ->required(),
             Select::make('jenis_izin')
                 ->label('Jenis Izin')
                 ->options(['pulang' => 'Pulang', 'sakit' => 'Sakit', 'keluar_kota' => 'Keluar Kota', 'kunjungan' => 'Kunjungan'])

@@ -32,9 +32,6 @@ class Santri extends Model
         'agama',
         'nik',
         'nisn',
-        // Kependudukan wajib EMIS 4.0 (Refs #327)
-        'no_kk',
-        'no_akta_lahir',
         'nama_panggilan',
         'cita_cita',
         'anak_ke',
@@ -112,7 +109,6 @@ class Santri extends Model
         'photo_url',
         'wali_user_id',
         'user_id',
-        'custom_fields',
     ];
 
     protected $casts = [
@@ -122,12 +118,35 @@ class Santri extends Model
         'jumlah_saudara' => 'integer',
         'tinggi_badan' => 'integer',
         'berat_badan' => 'integer',
-        'custom_fields' => 'array',
     ];
 
     public function kelas(): BelongsTo
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    /**
+     * Label tunggal untuk memilih/menampilkan santri di seluruh sistem
+     * (dropdown form, tabel, dsb). Format: "Nama (Kelas) — NIS" agar santri
+     * bernama mirip tidak tertukar. Kelas & NIS disertakan hanya bila ada.
+     * Sumber kelas: kelas_id langsung, lalu fallback ke penempatan kelas aktif.
+     * Pakai relasi yang SUDAH di-eager-load agar tak memicu N+1 (helper
+     * App\Filament\Forms\SantriSelect meng-eager-load 'kelas' & 'penempatanAktif.kelas').
+     */
+    public function getLabelPilihAttribute(): string
+    {
+        $kelas = $this->kelas?->nama_kelas
+            ?? $this->penempatanAktif?->kelas?->nama_kelas;
+
+        $label = trim($this->nama ?? '') ?: 'Santri';
+        if (! empty($kelas)) {
+            $label .= ' ('.$kelas.')';
+        }
+        if (! empty($this->nis)) {
+            $label .= ' — '.$this->nis;
+        }
+
+        return $label;
     }
 
     /**
@@ -164,21 +183,6 @@ class Santri extends Model
 
         return 'https://ui-avatars.com/api/?background='.$warna.'&color=fff&bold=true&name='
             .urlencode($this->nama ?? 'Santri');
-    }
-
-    /**
-     * URL foto yang AMAN ditampilkan ke pengguna saat ini:
-     * foto asli (via /_tenant-storage) bila boleh dilihat & ada,
-     * selain itu avatar inisial. Dipakai permukaan non-Filament
-     * (portal guru gerbang, loket pendaftaran, dsb).
-     */
-    public function urlFotoAman(): string
-    {
-        if ($this->photo_url && $this->fotoDapatDilihat()) {
-            return url('/_tenant-storage/'.ltrim($this->photo_url, '/'));
-        }
-
-        return $this->avatarInisialUrl();
     }
 
     public function enrollments(): HasMany
@@ -233,24 +237,6 @@ class Santri extends Model
     public function biayaAsrama(): HasMany
     {
         return $this->hasMany(BiayaAsrama::class, 'santri_id');
-    }
-
-    /** #338: jenjang formal kesetaraan (ula/wustha/ulya) diturunkan dari kelas aktif. */
-    public function getJenjangKesetaraanAttribute(): ?string
-    {
-        return $this->kelas?->jenjang_kesetaraan;
-    }
-
-    /** #338: tingkat kesetaraan (Ula 1-6, Wustha 1-3, Ulya 1-3) dari kelas aktif. */
-    public function getTingkatKesetaraanAttribute(): ?int
-    {
-        return $this->kelas?->tingkat_kesetaraan;
-    }
-
-    /** #338: label ringkas jenjang formal, mis. "Ula 3"; null bila belum terpetakan. */
-    public function getLabelKesetaraanAttribute(): ?string
-    {
-        return $this->kelas?->label_kesetaraan;
     }
 
     public function penempatanAktif(): HasOne

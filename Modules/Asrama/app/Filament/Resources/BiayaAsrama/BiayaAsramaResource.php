@@ -3,6 +3,7 @@
 namespace Modules\Asrama\Filament\Resources\BiayaAsrama;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -20,7 +21,6 @@ use Modules\Asrama\Filament\Resources\BiayaAsrama\Pages\EditBiayaAsrama;
 use Modules\Asrama\Filament\Resources\BiayaAsrama\Pages\ListBiayaAsrama;
 use Modules\Asrama\Models\BiayaAsrama;
 use Modules\Asrama\Models\KamarAsrama;
-use Modules\Kesantrian\Models\Santri;
 
 class BiayaAsramaResource extends Resource
 {
@@ -59,11 +59,8 @@ class BiayaAsramaResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('santri_id')
-                ->label('Santri')
-                ->options(fn () => Santri::query()->orderBy('nama')->pluck('nama', 'id'))
-                ->required()
-                ->searchable(),
+            SantriSelect::make('santri_id')
+                ->required(),
             Select::make('kamar_id')
                 ->label('Kamar')
                 ->options(fn () => KamarAsrama::query()

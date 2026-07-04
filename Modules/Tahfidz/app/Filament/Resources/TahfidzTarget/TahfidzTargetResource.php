@@ -3,6 +3,7 @@
 namespace Modules\Tahfidz\Filament\Resources\TahfidzTarget;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -13,7 +14,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\CreateTahfidzTarget;
 use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\EditTahfidzTarget;
 use Modules\Tahfidz\Filament\Resources\TahfidzTarget\Pages\ListTahfidzTarget;
@@ -52,9 +52,7 @@ class TahfidzTargetResource extends Resource
     {
         return $schema->components([
             Section::make('Target Hafalan (KPI)')->schema([
-                Select::make('santri_id')->label('Santri')->required()->searchable()
-                    ->options(fn (): array => Santri::query()->orderBy('nama')->limit(200)
-                        ->get()->mapWithKeys(fn (Santri $s): array => [$s->id => $s->nama])->all()),
+                SantriSelect::make('santri_id')->required(),
                 TextInput::make('periode')->label('Periode')->maxLength(20)->placeholder('2026 / 2026-S1'),
                 TextInput::make('target_surah')->label('Target (jumlah surah/hafalan)')->numeric()->required()->minValue(0),
                 TextInput::make('keterangan')->label('Keterangan')->maxLength(255),
