@@ -81,6 +81,15 @@ final class AppLauncher
             'label' => 'Tata Usaha',
             'icon' => '<path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>',
         ],
+        [
+            // F4 — panitia PPDB. Permission `manage_ppdb` sama dgn gerbang
+            // CalonSantriResource::canAccess() di panel admin.
+            'permission' => 'manage_ppdb',
+            'route' => 'tenant.ppdb-panitia.beranda',
+            'path' => '/ppdb-panitia',
+            'label' => 'PPDB Panitia',
+            'icon' => '<path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>',
+        ],
     ];
 
     /**
@@ -146,7 +155,7 @@ final class AppLauncher
             'akses_pimpinan', 'akses_pwa_guru', 'close_period', 'operate_pos',
             'manage_keuangan', 'manage_santri', 'manage_users', 'manage_akademik',
             'manage_modules', 'manage_roles', 'kelola_approval',
-            'view_kesehatan', 'manage_kesehatan',
+            'view_kesehatan', 'manage_kesehatan', 'manage_ppdb',
         ]);
 
     }
