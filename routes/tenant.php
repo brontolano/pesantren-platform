@@ -751,7 +751,15 @@ Route::middleware([
         Route::post('/approval/{approval}/setujui', [KepalaKeuanganApiController::class, 'approvalSetujui'])->name('approval.setujui');
         Route::post('/approval/{approval}/tolak', [KepalaKeuanganApiController::class, 'approvalTolak'])->name('approval.tolak');
 
-        // Payroll
+    });
+
+    // API Payroll (JSON) — digerbang 'run_payroll' terpisah dari grup di atas
+    // ('manage_keuangan'). BUG: petugas_payroll (role dgn HANYA run_payroll,
+    // TANPA manage_keuangan) sebelumnya 403 di sini — padahal method-nya
+    // sendiri sudah cek run_payroll (abort_unless), gerbang route lebih ketat
+    // dari yg dibutuhkan. Dipindah ke grup sendiri agar role payroll-only
+    // bisa proses gajinya sendiri tanpa perlu manage_keuangan.
+    Route::middleware(['auth', 'can:run_payroll'])->prefix('keuangan/api')->name('tenant.kepala-keuangan.api.')->group(function () {
         Route::get('/payroll/periode', [KepalaKeuanganApiController::class, 'payrollPeriode'])->name('payroll.periode');
         Route::get('/payroll/slip', [KepalaKeuanganApiController::class, 'payrollSlip'])->name('payroll.slip');
         Route::post('/payroll/proses', [KepalaKeuanganApiController::class, 'payrollProses'])->name('payroll.proses');

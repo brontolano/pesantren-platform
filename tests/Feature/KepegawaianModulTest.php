@@ -183,4 +183,46 @@ class KepegawaianModulTest extends TestCase
             ->where('pengajuan.0.status', 'diajukan')
         );
     }
+
+    /**
+     * Regresi: /keuangan/api/payroll/* sebelumnya digerbang 'manage_keuangan'
+     * (grup yang sama dgn endpoint kepala-keuangan lain) — petugas_payroll
+     * (yang HANYA punya run_payroll, bukan manage_keuangan) selalu 403 di
+     * endpoint milik fungsinya sendiri. Dipindah ke grup can:run_payroll
+     * terpisah (routes/tenant.php).
+     */
+    public function test_petugas_payroll_bisa_akses_api_payroll_tanpa_manage_keuangan(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Petugas Payroll API', 'email' => 'payroll-api@f4.test', 'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('petugas_payroll');
+
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $this->actingAs($user)->get("http://{$host}/keuangan/api/payroll/periode", $this->headers($host))
+            ->assertStatus(200);
+
+        $this->actingAs($user)->get("http://{$host}/keuangan/api/payroll/slip?periode_id=2026-06", $this->headers($host))
+            ->assertStatus(200);
+    }
+
+    public function test_role_lain_tanpa_run_payroll_tetap_403_di_api_payroll(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Guru Non Payroll API', 'email' => 'guru-nonpayroll-api@f4.test', 'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('guru');
+
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $this->actingAs($user)->get("http://{$host}/keuangan/api/payroll/periode", $this->headers($host))
+            ->assertStatus(403);
+    }
 }
