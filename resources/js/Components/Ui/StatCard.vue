@@ -35,7 +35,7 @@ const valueTone = computed(() => VALUE_TONES[props.tone] ?? VALUE_TONES.slate)
 
 <template>
     <div
-        class="flex flex-col rounded-3xl bg-white ring-1 ring-slate-100 shadow-soft transition-all duration-200"
+        class="flex flex-col rounded-3xl bg-white ring-1 ring-slate-100 shadow-lift"
         :class="compact ? 'p-4' : 'p-5'"
     >
         <div class="flex items-center justify-between gap-2">

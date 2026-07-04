@@ -245,6 +245,14 @@
     --shadow-soft-lg: 0 16px 44px -24px rgba(17, 17, 17, 0.22);
     --shadow-brand:   0 8px 20px -12px rgba(5, 150, 105, 0.45);  /* angkat CTA emerald */
     --shadow-pop:     0 16px 44px -24px rgba(17, 17, 17, 0.40);  /* nav melayang / sheet */
+    /* Refresh (evolusi Pixio): shadow berlapis (ambient + contact) — lebih
+       dimensional dari --shadow-soft datar, tetap "sangat lembut" bukan glow
+       berat. Dipakai kartu yang ingin sedikit lebih "terangkat" (StatCard,
+       hero) tanpa mengubah kartu lain yang sudah memakai --shadow-soft. */
+    --shadow-lift:    0 2px 4px -2px rgba(17, 17, 17, 0.06),
+                       0 12px 28px -14px rgba(17, 17, 17, 0.16);
+    --shadow-lift-hover: 0 4px 8px -2px rgba(17, 17, 17, 0.08),
+                       0 20px 36px -16px rgba(17, 17, 17, 0.20);
 
     /* Hairline ring (dipakai SEBAGAI ganti border pada kartu). */
     --ring-card: inset 0 0 0 1px var(--border-card);
@@ -263,6 +271,11 @@
     /* Gradient tanda-tangan (cukup gelap agar teks putih terbaca). */
     --brand-grad:      linear-gradient(135deg, #10b981 0%, #059669 100%);
     --brand-grad-hero: linear-gradient(160deg, #0b8f63 0%, #059669 45%, #047857 100%);
+    /* Refresh: hero + radial highlight halus di pojok kanan-atas (kedalaman
+       tanpa mengubah warna dasar) — tetap terbaca utk teks putih. */
+    --brand-grad-hero-refined:
+        radial-gradient(120% 140% at 88% -10%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 55%),
+        linear-gradient(160deg, #0b8f63 0%, #059669 45%, #047857 100%);
     --gold-hairline:   linear-gradient(90deg, transparent 0%, rgba(201, 162, 74, 0) 8%,
                           var(--pst-gold) 50%, rgba(201, 162, 74, 0) 92%, transparent 100%);
 }
@@ -290,7 +303,7 @@ html {
     background-image: var(--brand-grad);
 }
 .bg-brand-grad-hero {
-    background-image: var(--brand-grad-hero);
+    background-image: var(--brand-grad-hero-refined);
 }
 .shadow-soft {
     box-shadow: var(--shadow-soft);
@@ -300,6 +313,14 @@ html {
 }
 .shadow-brand {
     box-shadow: var(--shadow-brand);
+}
+.shadow-lift {
+    box-shadow: var(--shadow-lift);
+    transition: box-shadow var(--dur-base) var(--ease-standard), transform var(--dur-base) var(--ease-standard);
+}
+.shadow-lift:hover {
+    box-shadow: var(--shadow-lift-hover);
+    transform: translateY(-1px);
 }
 .shadow-pop {
     box-shadow: var(--shadow-pop);
