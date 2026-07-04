@@ -13,9 +13,7 @@ use App\Http\Controllers\DemoApps\KeamananDemoController;
 use App\Http\Controllers\DemoApps\KepegawaianDemoController;
 use App\Http\Controllers\DemoApps\PengabdianDemoController;
 use App\Http\Controllers\DemoApps\PengasuhanDemoController;
-use App\Http\Controllers\DemoApps\PpdbPanitiaDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
-use App\Http\Controllers\DemoApps\TuDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
 use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\EmisExportController;
@@ -65,10 +63,12 @@ use App\Http\Controllers\PortalWali\PortalWaliSantriAkunController;
 use App\Http\Controllers\PortalWali\PortalWaliTabunganController;
 use App\Http\Controllers\PortalWali\PortalWaliTopupController;
 use App\Http\Controllers\PosKantinController;
+use App\Http\Controllers\PpdbPanitiaController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\SantriExportController;
 use App\Http\Controllers\TahfidzExportController;
+use App\Http\Controllers\TuController;
 use App\Http\Controllers\UksController;
 use App\Support\TenantBranding;
 use App\Support\UiMode;
@@ -175,13 +175,14 @@ Route::middleware([
         Route::get('/riwayat', [UksController::class, 'riwayat'])->name('riwayat');
     });
 
-    Route::middleware('auth')->prefix('tu')->name('tenant.tu.')->group(function () {
-        Route::get('/', [TuDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/santri', [TuDemoController::class, 'santri'])->name('santri');
-        Route::get('/santri/detail', [TuDemoController::class, 'detailSantri'])->name('detail-santri');
-        Route::get('/surat', [TuDemoController::class, 'surat'])->name('surat');
-        Route::get('/catat-surat', [TuDemoController::class, 'catatSurat'])->name('catat-surat');
-        Route::get('/arsip', [TuDemoController::class, 'arsip'])->name('arsip');
+    Route::middleware(['auth', 'can:manage_santri'])->prefix('tu')->name('tenant.tu.')->group(function () {
+        Route::get('/', [TuController::class, 'beranda'])->name('beranda');
+        Route::get('/santri', [TuController::class, 'santri'])->name('santri');
+        Route::get('/santri/detail', [TuController::class, 'detailSantri'])->name('detail-santri');
+        Route::get('/surat', [TuController::class, 'surat'])->name('surat');
+        Route::get('/catat-surat', [TuController::class, 'catatSurat'])->name('catat-surat');
+        Route::post('/catat-surat', [TuController::class, 'simpanSurat'])->name('catat-surat.store');
+        Route::get('/arsip', [TuController::class, 'arsip'])->name('arsip');
     });
 
     Route::middleware('auth')->prefix('humas')->name('tenant.humas.')->group(function () {
@@ -201,13 +202,15 @@ Route::middleware([
         Route::get('/cuti', [KepegawaianDemoController::class, 'cuti'])->name('cuti');
     });
 
-    Route::middleware('auth')->prefix('ppdb-panitia')->name('tenant.ppdb-panitia.')->group(function () {
-        Route::get('/', [PpdbPanitiaDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/pendaftar', [PpdbPanitiaDemoController::class, 'pendaftar'])->name('pendaftar');
-        Route::get('/detail', [PpdbPanitiaDemoController::class, 'detail'])->name('detail');
-        Route::get('/verifikasi', [PpdbPanitiaDemoController::class, 'verifikasi'])->name('verifikasi');
-        Route::get('/keputusan', [PpdbPanitiaDemoController::class, 'keputusan'])->name('keputusan');
-        Route::get('/hasil', [PpdbPanitiaDemoController::class, 'hasil'])->name('hasil');
+    Route::middleware(['auth', 'can:manage_ppdb'])->prefix('ppdb-panitia')->name('tenant.ppdb-panitia.')->group(function () {
+        Route::get('/', [PpdbPanitiaController::class, 'beranda'])->name('beranda');
+        Route::get('/pendaftar', [PpdbPanitiaController::class, 'pendaftar'])->name('pendaftar');
+        Route::get('/detail/{calonSantri}', [PpdbPanitiaController::class, 'detail'])->name('detail');
+        Route::get('/verifikasi/{calonSantri}', [PpdbPanitiaController::class, 'verifikasi'])->name('verifikasi');
+        Route::post('/verifikasi/dokumen/{dokumen}', [PpdbPanitiaController::class, 'verifikasiDokumen'])->name('verifikasi.dokumen');
+        Route::get('/keputusan/{calonSantri}', [PpdbPanitiaController::class, 'keputusan'])->name('keputusan');
+        Route::post('/keputusan/{calonSantri}', [PpdbPanitiaController::class, 'simpanKeputusan'])->name('keputusan.store');
+        Route::get('/hasil', [PpdbPanitiaController::class, 'hasil'])->name('hasil');
     });
 
     Route::middleware(['auth', 'can:operate_pos'])->prefix('pos-kantin')->name('tenant.pos-kantin.')->group(function () {
