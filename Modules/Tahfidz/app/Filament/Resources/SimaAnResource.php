@@ -3,6 +3,7 @@
 namespace Modules\Tahfidz\Filament\Resources;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -15,7 +16,6 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Tahfidz\Filament\Resources\SimaAnResource\Pages\CreateSimaAn;
 use Modules\Tahfidz\Filament\Resources\SimaAnResource\Pages\EditSimaAn;
 use Modules\Tahfidz\Filament\Resources\SimaAnResource\Pages\ListSimaAn;
@@ -85,10 +85,7 @@ class SimaAnResource extends Resource
     {
         return $schema->schema([
             Section::make()->schema([
-                Select::make('santri_id')
-                    ->label('Santri')
-                    ->options(Santri::query()->pluck('nama', 'id'))
-                    ->searchable()
+                SantriSelect::make('santri_id')
                     ->required(),
                 DatePicker::make('tanggal')
                     ->label('Tanggal')
