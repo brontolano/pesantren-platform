@@ -121,17 +121,29 @@ class AppLauncherTest extends TestCase
         $this->assertStringContainsString('/admin/keuangan/pwa', AppLauncher::pwaHome($u)['url']);
     }
 
+    public function test_pengelola_uks_hub_dengan_pwa_uks(): void
+    {
+        $this->boot();
+        $u = $this->user(['pengelola_uks']);
+        // view_kesehatan → tile "Kesehatan UKS" (/uks) di STAFF_APPS.
+        $this->assertStringContainsString('/uks', AppLauncher::pwaHome($u)['url']);
+        $this->assertSame('hub', AppLauncher::primaryDestination($u)['kind']);
+    }
+
     public function test_admin_pesantren_langsung_ke_admin_panel(): void
     {
         $this->boot();
         $u = $this->user(['admin_pesantren']);
-        // Staf admin tanpa aplikasi PWA khusus → auto-redirect ke Beranda Staf
-        // /staf (bukan hub) — /staf sendiri redirect ke /admin utk request
-        // desktop, tapi primaryDestination hanya menentukan tujuan awal.
+        // admin_pesantren juga punya view_kesehatan/manage_kesehatan (permission
+        // yang sama dipakai gerbang tile UKS di STAFF_APPS — beda dgn
+        // close_period/operate_pos/akses_pwa_guru/akses_pimpinan yang sengaja
+        // TAK dimiliki admin_pesantren) → pwaHome() cocok, primaryDestination
+        // jadi 'hub' (bukan redirect paksa ke /staf). Bukan regresi: admin_pesantren
+        // tetap punya akses admin panel penuh via tile "Panel Lengkap" di hub.
         $dest = AppLauncher::primaryDestination($u);
-        $this->assertSame('redirect', $dest['kind']);
-        $this->assertStringContainsString('/staf', $dest['url']);
-        $this->assertNull(AppLauncher::pwaHome($u));
+        $this->assertSame('hub', $dest['kind']);
+        $this->assertNotNull(AppLauncher::adminPanelUrl($u));
+        $this->assertNotNull(AppLauncher::pwaHome($u));
         $this->assertNotNull(AppLauncher::adminPanelUrl($u));
     }
 
