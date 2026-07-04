@@ -2,6 +2,7 @@
 
 namespace Modules\Kesantrian\Filament\Resources\PenempatanKelas;
 
+use App\Filament\Forms\SantriSelect;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -17,7 +18,6 @@ use Modules\Kesantrian\Filament\Resources\PenempatanKelas\Pages\CreatePenempatan
 use Modules\Kesantrian\Filament\Resources\PenempatanKelas\Pages\ListPenempatanKelas;
 use Modules\Kesantrian\Models\Kelas;
 use Modules\Kesantrian\Models\PenempatanKelas;
-use Modules\Kesantrian\Models\Santri;
 
 class PenempatanKelasResource extends Resource
 {
@@ -48,10 +48,7 @@ class PenempatanKelasResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('santri_id')
-                ->label('Santri')
-                ->options(fn () => Santri::where('status', 'aktif')->pluck('nama', 'id'))
-                ->searchable()
+            SantriSelect::make('santri_id', fn (Builder $q) => $q->where('status', 'aktif'))
                 ->required(),
             Select::make('kelas_id')
                 ->label('Kelas Tujuan')

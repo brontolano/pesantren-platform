@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Filament\Resources\BaitulMaal;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -15,8 +16,8 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\CreateBeasiswa;
 use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\EditBeasiswa;
 use Modules\Keuangan\Filament\Resources\BaitulMaal\Pages\ListBeasiswa;
@@ -69,8 +70,7 @@ class BeasiswaResource extends Resource
     {
         return $schema->components([
             Section::make('Beasiswa')->schema([
-                Select::make('santri_id')->label('Santri')->required()->searchable()
-                    ->options(fn () => Santri::query()->where('status', 'aktif')->orderBy('nama')->pluck('nama', 'id')),
+                SantriSelect::make('santri_id', fn (Builder $q) => $q->where('status', 'aktif'))->required(),
                 Select::make('sumber_dana_id')->label('Sumber Dana Penanggung')->required()->searchable()
                     ->options(fn () => SumberDana::query()->orderBy('kode_dana')->pluck('nama_sumber', 'id')),
                 TextInput::make('nominal_per_bulan')->label('Potongan per Bulan (Rp)')->numeric()->required()->prefix('Rp'),

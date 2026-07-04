@@ -3,6 +3,7 @@
 namespace Modules\Akademik\Filament\Resources\PresensiSantri;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -18,7 +19,6 @@ use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\CreatePresensiSantr
 use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\EditPresensiSantri;
 use Modules\Akademik\Filament\Resources\PresensiSantri\Pages\ListPresensiSantri;
 use Modules\Akademik\Models\PresensiSantri;
-use Modules\Kesantrian\Models\Santri;
 
 class PresensiSantriResource extends Resource
 {
@@ -52,9 +52,7 @@ class PresensiSantriResource extends Resource
     {
         return $schema->components([
             Section::make('Presensi Kelas Harian')->schema([
-                Select::make('santri_id')->label('Santri')->required()->searchable()
-                    ->options(fn (): array => Santri::query()->orderBy('nama')->limit(200)
-                        ->get()->mapWithKeys(fn (Santri $s): array => [$s->id => $s->nama])->all()),
+                SantriSelect::make('santri_id')->required(),
                 DatePicker::make('tanggal')->label('Tanggal')->required()->default(now()),
                 Select::make('status')->label('Status')->native(false)->required()
                     ->options(array_combine(PresensiSantri::STATUS, ['Hadir', 'Izin', 'Sakit', 'Alpa']))->default('hadir'),

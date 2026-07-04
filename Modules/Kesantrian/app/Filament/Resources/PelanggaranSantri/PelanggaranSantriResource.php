@@ -2,6 +2,7 @@
 
 namespace Modules\Kesantrian\Filament\Resources\PelanggaranSantri;
 
+use App\Filament\Forms\SantriSelect;
 use App\Services\StorageQuotaService;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -28,7 +29,6 @@ use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages\ListPelanggara
 use Modules\Kesantrian\Filament\Resources\PelanggaranSantri\Pages\ViewPelanggaranSantri;
 use Modules\Kesantrian\Models\JenisPelanggaran;
 use Modules\Kesantrian\Models\PelanggaranSantri;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Kesantrian\Services\DisiplinService;
 use Throwable;
 use UnitEnum;
@@ -101,14 +101,7 @@ class PelanggaranSantriResource extends Resource
     {
         return $schema->components([
             Section::make('Catat Kejadian')->schema([
-                Select::make('santri_id')
-                    ->label('Santri')
-                    ->options(fn () => Santri::query()->where('status', 'aktif')->orderBy('nama')->limit(500)->pluck('nama', 'id'))
-                    ->getSearchResultsUsing(fn (string $search) => Santri::query()
-                        ->where('nama', 'ilike', "%{$search}%")
-                        ->orWhere('nis', 'ilike', "%{$search}%")
-                        ->limit(50)->pluck('nama', 'id'))
-                    ->searchable()
+                SantriSelect::make('santri_id', fn (Builder $q) => $q->where('status', 'aktif'))
                     ->required(),
                 Select::make('jenis_pelanggaran_id')
                     ->label('Jenis')
@@ -195,27 +188,9 @@ class PelanggaranSantriResource extends Resource
                     ->label('Jenis')
                     ->options(fn () => JenisPelanggaran::query()->pluck('nama', 'id')),
             ])
-            ->actions(static::rowActions())
-            // A5 — menu klik-kanan (leek/filament-right-click): MEMAKAI ULANG
-            // action baris yang SAMA (Lihat/Verifikasi/Catat Sanksi/Selesai/
-            // Batalkan) — nol logika/izin baru; ->visible() (status + permission
-            // manage_kedisiplinan) tetap berlaku di menu klik-kanan.
-            ->contextMenuActions(static::rowActions());
-    }
-
-    /**
-     * Action baris tabel Pelanggaran/Ta'zir — SATU sumber dipakai ulang oleh
-     * ->actions() DAN ->contextMenuActions() (menu klik-kanan A5). Ekstraksi
-     * verbatim dari blok actions lama; nol logika baru; ->visible()/otorisasi
-     * (siklus status + manage_kedisiplinan) tetap berlaku.
-     *
-     * @return array<int, \Filament\Actions\Action>
-     */
-    protected static function rowActions(): array
-    {
-        return [
-            ViewAction::make(),
-            Action::make('verifikasi')
+            ->actions([
+                ViewAction::make(),
+                Action::make('verifikasi')
                     ->label('Verifikasi')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
@@ -292,7 +267,7 @@ class PelanggaranSantriResource extends Resource
                             Notification::make()->danger()->title('Gagal membatalkan')->body($e->getMessage())->send();
                         }
                     }),
-        ];
+            ]);
     }
 
     public static function statusColor(string $state): string

@@ -2,6 +2,7 @@
 
 namespace Modules\Tahfidz\Filament\Resources\Halaqah\RelationManagers;
 
+use App\Filament\Forms\SantriSelect;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -30,11 +31,7 @@ class KeanggotaanRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Select::make('santri_id')
-                ->label('Santri')
-                ->relationship('santri', 'nama')
-                ->searchable()
-                ->preload()
+            SantriSelect::make('santri_id')
                 ->required(),
             DatePicker::make('joined_at')
                 ->label('Tanggal Masuk')

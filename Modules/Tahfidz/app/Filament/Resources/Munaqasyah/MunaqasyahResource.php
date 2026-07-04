@@ -3,6 +3,7 @@
 namespace Modules\Tahfidz\Filament\Resources\Munaqasyah;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use App\Models\User;
 use BackedEnum;
 use Filament\Forms\Components\DatePicker;
@@ -16,9 +17,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
 use Modules\Akademik\Models\PeriodeAkademik;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\CreateMunaqasyah;
 use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\EditMunaqasyah;
 use Modules\Tahfidz\Filament\Resources\Munaqasyah\Pages\ListMunaqasyah;
@@ -51,38 +50,11 @@ class MunaqasyahResource extends Resource
         return static::moduleVisible('tahfidz') && (auth()->user()?->canAny(['view_tahfidz', 'manage_tahfidz']) ?? false);
     }
 
-    /**
-     * Gerbang mutasi (audit RBAC 2026-07 P0-1): `view_*` = baca-saja;
-     * create/edit/delete WAJIB permission `manage_tahfidz`.
-     */
-    public static function canCreate(): bool
-    {
-        return static::canAccess() && (auth()->user()?->can('manage_tahfidz') ?? false);
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return static::canCreate();
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return static::canCreate();
-    }
-
-    public static function canDeleteAny(): bool
-    {
-        return static::canCreate();
-    }
-
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Section::make()->schema([
-                Select::make('santri_id')
-                    ->label('Santri')
-                    ->options(Santri::query()->orderBy('nama')->pluck('nama', 'id'))
-                    ->searchable()
+                SantriSelect::make('santri_id')
                     ->required(),
                 TextInput::make('juz_diuji')
                     ->label('Juz Diuji')

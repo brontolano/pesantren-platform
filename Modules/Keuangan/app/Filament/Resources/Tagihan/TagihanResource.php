@@ -3,6 +3,7 @@
 namespace Modules\Keuangan\Filament\Resources\Tagihan;
 
 use App\Filament\Concerns\ModuleGate;
+use App\Filament\Forms\SantriSelect;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -16,7 +17,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Kesantrian\Models\Santri;
 use Modules\Keuangan\Filament\Resources\Tagihan\Pages\CreateTagihan;
 use Modules\Keuangan\Filament\Resources\Tagihan\Pages\EditTagihan;
 use Modules\Keuangan\Filament\Resources\Tagihan\Pages\ListTagihan;
@@ -118,10 +118,7 @@ class TagihanResource extends Resource
     {
         return $schema->components([
             Section::make('Data Tagihan')->schema([
-                Select::make('santri_id')
-                    ->label('Santri')
-                    ->options(fn () => Santri::where('status', 'aktif')->pluck('nama', 'id'))
-                    ->searchable()
+                SantriSelect::make('santri_id', fn (Builder $q) => $q->where('status', 'aktif'))
                     ->required(),
                 Select::make('jenis_tagihan')
                     ->label('Jenis Tagihan')
@@ -237,25 +234,10 @@ class TagihanResource extends Resource
                         'lainnya' => 'Lainnya',
                     ]),
             ])
-            ->actions(static::rowActions())
-            // A5 — menu klik-kanan (leek/filament-right-click): MEMAKAI ULANG
-            // action baris yang SAMA (Edit/Hapus) — nol logika/izin baru;
-            // otorisasi Filament (canEdit/canDelete) tetap berlaku.
-            ->contextMenuActions(static::rowActions());
-    }
-
-    /**
-     * Action baris tabel Tagihan — SATU sumber dipakai ulang oleh ->actions()
-     * DAN ->contextMenuActions() (menu klik-kanan A5). Nol logika baru.
-     *
-     * @return array<int, \Filament\Actions\Action>
-     */
-    protected static function rowActions(): array
-    {
-        return [
-            EditAction::make(),
-            DeleteAction::make(),
-        ];
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ]);
     }
 
     public static function getEloquentQuery(): Builder
