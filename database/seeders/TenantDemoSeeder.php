@@ -36,7 +36,8 @@ class TenantDemoSeeder extends Seeder
         $users = [
             ['name' => 'Admin Demo', 'email' => 'admin@demo.pesantren.online', 'role' => 'super_admin'],
             ['name' => 'KH. Ahmad Fauzi', 'email' => 'kepala@demo.pesantren.online', 'role' => 'kepala'],
-            ['name' => 'Siti Aisyah', 'email' => 'tu@demo.pesantren.online', 'role' => 'tata_usaha'],
+            // FIX: 'tata_usaha' tak ada di RolesAndPermissionsSeeder (nama asli 'tu').
+            ['name' => 'Siti Aisyah', 'email' => 'tu@demo.pesantren.online', 'role' => 'tu'],
             ['name' => 'Hj. Nurjanah', 'email' => 'bendahara@demo.pesantren.online', 'role' => 'bendahara'],
         ];
         foreach ($users as $u) {
