@@ -11,7 +11,6 @@ use App\Http\Controllers\CetakController;
 use App\Http\Controllers\DemoApps\HumasDemoController;
 use App\Http\Controllers\DemoApps\KeamananDemoController;
 use App\Http\Controllers\DemoApps\KepegawaianDemoController;
-use App\Http\Controllers\DemoApps\PengabdianDemoController;
 use App\Http\Controllers\DemoApps\PengasuhanDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
@@ -27,6 +26,7 @@ use App\Http\Controllers\KeuanganPwaController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
+use App\Http\Controllers\PengabdianController;
 use App\Http\Controllers\PengadaanExportController;
 use App\Http\Controllers\PimpinanPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
@@ -244,11 +244,11 @@ Route::middleware([
     });
 
     Route::middleware('auth')->prefix('pengabdian')->name('tenant.pengabdian.')->group(function () {
-        Route::get('/', [PengabdianDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/jadwal', [PengabdianDemoController::class, 'jadwal'])->name('jadwal');
-        Route::get('/presensi', [PengabdianDemoController::class, 'presensi'])->name('presensi');
-        Route::get('/laporan', [PengabdianDemoController::class, 'laporan'])->name('laporan');
-        Route::get('/profil', [PengabdianDemoController::class, 'profil'])->name('profil');
+        Route::get('/', [PengabdianController::class, 'beranda'])->name('beranda');
+        Route::get('/jadwal', [PengabdianController::class, 'jadwal'])->name('jadwal');
+        Route::get('/presensi', [PengabdianController::class, 'presensi'])->name('presensi');
+        Route::get('/laporan', [PengabdianController::class, 'laporan'])->name('laporan');
+        Route::get('/profil', [PengabdianController::class, 'profil'])->name('profil');
     });
 
     Route::middleware('auth')->prefix('santri-app')->name('tenant.santri-app.')->group(function () {
