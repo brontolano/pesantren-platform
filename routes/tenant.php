@@ -9,8 +9,6 @@ use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\CetakController;
 use App\Http\Controllers\DemoApps\KeamananDemoController;
-use App\Http\Controllers\DemoApps\KepegawaianDemoController;
-use App\Http\Controllers\DemoApps\PengabdianDemoController;
 use App\Http\Controllers\DemoApps\PengasuhanDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
@@ -21,12 +19,14 @@ use App\Http\Controllers\Jemaah\JemaahAuthController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
+use App\Http\Controllers\KepegawaianController;
 use App\Http\Controllers\KeuanganApiController;
 use App\Http\Controllers\KeuanganExportController;
 use App\Http\Controllers\KeuanganPwaController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
+use App\Http\Controllers\PengabdianController;
 use App\Http\Controllers\PengadaanExportController;
 use App\Http\Controllers\PimpinanPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
@@ -203,13 +203,13 @@ Route::middleware([
         Route::get('/galeri', [HumasController::class, 'galeri'])->name('galeri');
     });
 
-    Route::middleware('auth')->prefix('kepegawaian')->name('tenant.kepegawaian.')->group(function () {
-        Route::get('/', [KepegawaianDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/pegawai', [KepegawaianDemoController::class, 'pegawai'])->name('pegawai');
-        Route::get('/pegawai/{id}', [KepegawaianDemoController::class, 'detailPegawai'])->name('detail-pegawai');
-        Route::get('/absensi', [KepegawaianDemoController::class, 'absensi'])->name('absensi');
-        Route::get('/slip', [KepegawaianDemoController::class, 'slip'])->name('slip');
-        Route::get('/cuti', [KepegawaianDemoController::class, 'cuti'])->name('cuti');
+    Route::middleware(['auth', 'can:run_payroll'])->prefix('kepegawaian')->name('tenant.kepegawaian.')->group(function () {
+        Route::get('/', [KepegawaianController::class, 'beranda'])->name('beranda');
+        Route::get('/pegawai', [KepegawaianController::class, 'pegawai'])->name('pegawai');
+        Route::get('/pegawai/{id}', [KepegawaianController::class, 'detailPegawai'])->name('detail-pegawai');
+        Route::get('/absensi', [KepegawaianController::class, 'absensi'])->name('absensi');
+        Route::get('/slip', [KepegawaianController::class, 'slip'])->name('slip');
+        Route::get('/cuti', [KepegawaianController::class, 'cuti'])->name('cuti');
     });
 
     Route::middleware(['auth', 'can:manage_ppdb'])->prefix('ppdb-panitia')->name('tenant.ppdb-panitia.')->group(function () {
@@ -254,11 +254,11 @@ Route::middleware([
     });
 
     Route::middleware('auth')->prefix('pengabdian')->name('tenant.pengabdian.')->group(function () {
-        Route::get('/', [PengabdianDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/jadwal', [PengabdianDemoController::class, 'jadwal'])->name('jadwal');
-        Route::get('/presensi', [PengabdianDemoController::class, 'presensi'])->name('presensi');
-        Route::get('/laporan', [PengabdianDemoController::class, 'laporan'])->name('laporan');
-        Route::get('/profil', [PengabdianDemoController::class, 'profil'])->name('profil');
+        Route::get('/', [PengabdianController::class, 'beranda'])->name('beranda');
+        Route::get('/jadwal', [PengabdianController::class, 'jadwal'])->name('jadwal');
+        Route::get('/presensi', [PengabdianController::class, 'presensi'])->name('presensi');
+        Route::get('/laporan', [PengabdianController::class, 'laporan'])->name('laporan');
+        Route::get('/profil', [PengabdianController::class, 'profil'])->name('profil');
     });
 
     Route::middleware('auth')->prefix('santri-app')->name('tenant.santri-app.')->group(function () {
