@@ -11,12 +11,13 @@ use App\Http\Controllers\Auth\StaffLoginController;
 use App\Http\Controllers\DonasiPublikController;
 use App\Http\Controllers\HapusAkunController;
 use App\Http\Controllers\LauncherController;
+use App\Http\Controllers\PanelMasukController;
 use App\Http\Controllers\TenantWebsiteController;
 use App\Support\KebijakanPrivasiSistem;
 use App\Support\TenantBranding;
 use Illuminate\Support\Facades\Route;
-use Modules\CMS\Http\Controllers\EmbedWidgetController;
 use Modules\CMS\Http\Controllers\AppShellController;
+use Modules\CMS\Http\Controllers\EmbedWidgetController;
 use Modules\CMS\Http\Controllers\TenantLandingPageController;
 use Modules\PPDB\Http\Controllers\LandingRegistrationController;
 use Modules\PPDB\Http\Controllers\PpdbFileController;
@@ -134,6 +135,15 @@ Route::get('/embed/data.json', [EmbedWidgetController::class, 'data'])->name('te
 Route::get('/beranda', AppShellController::class)->name('tenant.app-shell');
 Route::get('/beranda/manifest.webmanifest', [AppShellController::class, 'manifest'])->name('tenant.app-shell.manifest');
 
+// ── Beranda Staf (PWA) — "panel admin dirapikan jadi PWA" ──
+// App-shell mobile untuk staf yang BELUM punya PWA khusus (keamanan, UKS, TU,
+// konselor, asrama, PPDB, akuntan, payroll). Menampilkan ikon menu TERFILTER
+// IZIN; tiap ikon membuka halaman panel /admin yang sudah responsif. AppLauncher
+// mengarahkan staf panel-only ke sini (bukan langsung /admin).
+Route::get('/staf', [AppShellController::class, 'stafHome'])
+    ->middleware('auth')
+    ->name('tenant.staf-shell');
+
 Route::get('/masuk', [StaffLoginController::class, 'show'])->name('tenant.masuk.show');
 Route::post('/masuk', [StaffLoginController::class, 'store'])
     ->middleware('throttle:20,1')
@@ -178,17 +188,6 @@ Route::get('/disclaimer', fn () => view('legal.disclaimer'))->name('legal.discla
 Route::get('/cookie-policy', fn () => view('legal.cookie-policy'))->name('legal.cookies');
 Route::get('/kontak', fn () => view('legal.contact'))->name('legal.contact');
 
-// Halaman pemasaran "bahasa kiai" (issue #334) — manfaat platform dijelaskan
-// tanpa jargon teknis untuk pengasuh/pengurus pesantren. Hanya relevan di
-// central domain; di domain tenant diarahkan ke situs pusat.
-Route::get('/untuk-pesantren', function () {
-    if (! in_array(request()->getHost(), config('tenancy.central_domains', []), true)) {
-        return redirect('https://pesantren.online/untuk-pesantren');
-    }
-
-    return view('untuk-pesantren');
-})->name('landing.untuk-pesantren');
-
 // ── API publik konten CMS untuk website tenant (mis. api.asy-syifaa.com) ──
 // Tenant di-resolve dari domain oleh middleware tenancy web. CORS: config/cors.php.
 // Kontrak: docs/SPEC-API-WEBSITE-ASY-SYIFAA.md
@@ -221,7 +220,7 @@ Route::middleware(['auth:sanctum', 'throttle:public-api'])->group(function () {
 });
 
 // Auto-login panel web dari tautan signed (dibuka WebView native). Sekali-pakai, TTL pendek.
-Route::get('/auth/panel-masuk', \App\Http\Controllers\PanelMasukController::class)
+Route::get('/auth/panel-masuk', PanelMasukController::class)
     ->middleware('signed')
     ->name('auth.panel-masuk');
 
