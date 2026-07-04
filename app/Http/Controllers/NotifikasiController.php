@@ -52,6 +52,9 @@ class NotifikasiController extends Controller
                 'sentCount' => $notifications->where('status', 'sent')->count(),
                 'failedCount' => $notifications->where('status', 'failed')->count(),
             ],
+            // F6 — Web Push opt-in: kunci publik VAPID (kosong = tombol
+            // disembunyikan, sama seperti pola PortalWaliNotificationController).
+            'vapidPublicKey' => (string) config('services.webpush.public_key'),
         ]);
     }
 }

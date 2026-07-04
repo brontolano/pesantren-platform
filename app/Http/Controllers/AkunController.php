@@ -29,6 +29,9 @@ class AkunController extends Controller
                 'phone' => $user->phone ?? null,
             ],
             'from' => $request->query('from'),
+            // F6 — Web Push opt-in: kunci publik VAPID (kosong = tombol
+            // disembunyikan, sama seperti pola PortalWaliNotificationController).
+            'vapidPublicKey' => (string) config('services.webpush.public_key'),
         ]);
     }
 
