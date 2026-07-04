@@ -6,7 +6,7 @@ const props = defineProps({
     navigation: { type: Array, default: () => [] },
     can: { type: Object, default: () => ({}) },
     userName: { type: String, default: 'Santri Pengabdian' },
-    penugasan: { type: Object, default: () => ({}) },
+    penugasan: { type: Object, default: null },
     stats: { type: Array, default: () => [] },
     tugasTerdekat: { type: Array, default: () => [] },
 })
@@ -20,7 +20,7 @@ const props = defineProps({
             <HeroHeader :name="userName" greeting="Assalamu'alaikum,">
                 <template #subtitle>
                     <Chip :active="true" tone="soft" size="sm" icon="heart">
-                        {{ penugasan.unit || 'Khidmah' }}
+                        {{ penugasan?.unit || 'Khidmah' }}
                     </Chip>
                 </template>
 
@@ -38,16 +38,17 @@ const props = defineProps({
         </template>
 
         <div class="space-y-5">
-            <SectionCard kicker="Penugasan Aktif" :title="penugasan.unit || 'Khidmah'" :subtitle="penugasan.periode">
-                <div class="space-y-2.5">
+            <SectionCard kicker="Penugasan Aktif" :title="penugasan?.unit || 'Khidmah'" :subtitle="penugasan?.periode">
+                <div v-if="penugasan" class="space-y-2.5">
                     <div class="flex items-center gap-3">
                         <IconCircle icon="user" tone="emerald" size="sm" />
                         <div class="min-w-0">
                             <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Pembimbing</p>
-                            <p class="truncate text-sm font-semibold text-slate-800">{{ penugasan.pembimbing || '—' }}</p>
+                            <p class="truncate text-sm font-semibold text-slate-800">{{ penugasan?.pembimbing || '—' }}</p>
                         </div>
                     </div>
                 </div>
+                <p v-else class="text-sm text-slate-400">Belum ada data santri terhubung ke akun ini.</p>
             </SectionCard>
 
             <div class="grid grid-cols-3 gap-3">

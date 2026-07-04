@@ -253,6 +253,11 @@ class RolesAndPermissionsSeeder extends Seeder
             // pencairan, tutup buku, payroll, pembiayaan).
             'bendahara_pusat' => [
                 'view_dashboard', 'view_santri',
+                // manage_keuangan — gerbang PWA Kepala Keuangan (tenant.kepala-keuangan.*,
+                // routes/tenant.php). Sempat hilang saat breakdown granular 2026-06-28
+                // sehingga TIDAK ADA role staf keuangan (kecuali admin_pesantren) yang bisa
+                // buka PWA-nya sendiri — 403 nyata, bukan cuma demo. Lihat kepala_keuangan.
+                'manage_keuangan',
                 'view_tagihan', 'manage_tagihan', 'view_tabungan', 'manage_tabungan',
                 'setor_tabungan', 'operate_pos', 'view_donasi', 'manage_donasi',
                 'view_laporan_keuangan', 'view_ledger', 'manage_ledger', 'close_period',
@@ -263,6 +268,8 @@ class RolesAndPermissionsSeeder extends Seeder
             // kasir harian; fokus approval, pembukuan, laporan, mutu).
             'kepala_keuangan' => [
                 'view_dashboard', 'view_santri',
+                // manage_keuangan — lihat catatan di bendahara_pusat di atas.
+                'manage_keuangan',
                 'view_tagihan', 'manage_tagihan', 'view_tabungan', 'manage_tabungan',
                 'view_donasi', 'manage_donasi', 'view_laporan_keuangan',
                 'view_ledger', 'manage_ledger', 'close_period', 'manage_dana_kebajikan',

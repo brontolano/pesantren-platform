@@ -83,12 +83,35 @@ class DemoPickerTest extends TestCase
      * yang tak punya manage_asrama/view_kegiatan) — hasilnya 403 walau
      * sudah login. Pastikan tiap persona benar2 bisa GET halaman beranda-nya
      * (bukan 403) setelah demo-masuk.
+     *
+     * Daftar diperluas 2026-07-05 mencakup SELURUH persona staf PWA (bukan
+     * cuma 4) setelah ditemukan 'keuangan' (role kepala_keuangan) 403 nyata
+     * karena kehilangan permission manage_keuangan saat breakdown granular
+     * 2026-06-28 — insiden yang lolos karena cakupan test sebelumnya sempit.
+     * Multi-peran krusial: setiap persona baru WAJIB ditambah di sini.
      */
     public function test_demo_masuk_persona_pwa_tidak_403(): void
     {
         [, $host] = $this->bootDemo(autologin: true);
 
-        foreach (['tu' => '/tu', 'ppdb-panitia' => '/ppdb-panitia', 'keamanan' => '/keamanan', 'pengasuhan' => '/pengasuhan'] as $peran => $path) {
+        $personaKePath = [
+            'tu' => '/tu',
+            'ppdb-panitia' => '/ppdb-panitia',
+            'keamanan' => '/keamanan',
+            'pengasuhan' => '/pengasuhan',
+            'uks' => '/uks',
+            'humas' => '/humas',
+            'kepegawaian' => '/kepegawaian',
+            'pos-kantin' => '/pos-kantin',
+            'keuangan' => '/keuangan',
+            'keuangan-lapangan' => '/admin/keuangan/pwa',
+            'pengabdian' => '/pengabdian',
+            'konselor' => '/konselor',
+            'sarpras' => '/sarpras',
+            'pimpinan' => '/pimpinan',
+        ];
+
+        foreach ($personaKePath as $peran => $path) {
             $this->get("http://{$host}/demo-masuk/{$peran}", $this->headers($host));
 
             $resp = $this->get("http://{$host}{$path}", $this->headers($host));
