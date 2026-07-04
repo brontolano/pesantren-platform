@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesehatan\Models\KunjunganUks;
 use Modules\Kesehatan\Models\Obat;
 use Modules\Kesehatan\Services\KesehatanService;
+use Modules\Kesehatan\Services\ObatService;
 
 /**
  * Portal PWA "Kesehatan UKS" (Vue/Inertia) — persona pengelola_uks, DATA NYATA.
@@ -25,7 +27,10 @@ use Modules\Kesehatan\Services\KesehatanService;
  */
 class UksController extends Controller
 {
-    public function __construct(private readonly KesehatanService $kesehatan) {}
+    public function __construct(
+        private readonly KesehatanService $kesehatan,
+        private readonly ObatService $obatService,
+    ) {}
 
     /** Kontrak nav bottom-bar, identik dgn UksDemoController. */
     private function nav(): array
@@ -245,6 +250,34 @@ class UksController extends Controller
         ]);
     }
 
+    /**
+     * Catat pemakaian obat (stok keluar) — lewat ObatService::keluar() yang
+     * sudah lockForUpdate + tolak stok minus. Dipakai saat menangani santri
+     * sakit (mis. beri obat saat kunjungan), tanpa harus lewat panel admin.
+     */
+    public function obatPakaiStore(Request $request, Obat $obat): RedirectResponse
+    {
+        if ($obat->tenant_id !== tenant('id')) {
+            abort(404);
+        }
+
+        $data = $request->validate([
+            'jumlah' => ['required', 'integer', 'min:1'],
+            'keterangan' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            $this->obatService->keluar($obat, $data['jumlah'], null, [
+                'keterangan' => $data['keterangan'] ?? null,
+                'user_id' => Auth::id(),
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            throw ValidationException::withMessages(['jumlah' => $e->getMessage()]);
+        }
+
+        return back()->with('success', "Pemakaian {$obat->nama} dicatat.");
+    }
+
     public function rujukan(): Response
     {
         $tenantId = tenant('id');
@@ -270,6 +303,26 @@ class UksController extends Controller
             'can' => $this->can(),
             'rujukan' => $rujukan,
         ]);
+    }
+
+    /**
+     * Isi/perbarui tujuan & estimasi biaya rujukan. Menutup rujukan (jam
+     * keluar) sudah difasilitasi endpoint kunjungan.tutup yang ada.
+     */
+    public function rujukanUpdateStore(Request $request, KunjunganUks $kunjungan): RedirectResponse
+    {
+        if ($kunjungan->tenant_id !== tenant('id') || $kunjungan->status !== 'rujuk') {
+            abort(404);
+        }
+
+        $data = $request->validate([
+            'rujukan_ke' => ['required', 'string', 'max:255'],
+            'rujukan_biaya' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $kunjungan->update($data);
+
+        return back()->with('success', 'Detail rujukan diperbarui.');
     }
 
     public function riwayat(): Response
