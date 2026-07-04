@@ -55,6 +55,30 @@ final class AppLauncher
             'icon' => '<path d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V18Zm2.498-6.75h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V13.5Zm0 2.25h.007v.008h-.007v-.008Zm0 2.25h.007v.008h-.007V18Zm2.504-6.75h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V13.5Zm2.498-4.5h.008v.008h-.008V9Zm0 2.25h.008v.008h-.008v-.008ZM8.25 6h7.5v2.25h-7.5V6ZM12 2.25c-1.892 0-3.758.11-5.593.322C5.307 2.7 4.5 3.65 4.5 4.757V19.5a2.25 2.25 0 0 0 2.25 2.25h10.5a2.25 2.25 0 0 0 2.25-2.25V4.757c0-1.108-.806-2.057-1.907-2.185A48.507 48.507 0 0 0 12 2.25Z"/>',
         ],
         [
+            // operator_divisi = "input belanja unitnya" (RolesAndPermissionsSeeder).
+            // Shell KeuanganPwaController SUDAH adaptif per-izin (nav
+            // menampilkan tab "Belanja" hanya jika input_belanja) — dipakai
+            // apa adanya, bukan halaman baru. Sebelumnya operator_divisi
+            // tak match tile mana pun → jatuh ke /staf generik walau app
+            // yang tepat (dan endpoint tulisnya) sudah ada & teruji.
+            'permission' => 'input_belanja',
+            'route' => 'tenant.keuangan.pwa.beranda',
+            'path' => '/admin/keuangan/pwa',
+            'label' => 'Keuangan Lapangan',
+            'icon' => '<path d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"/>',
+        ],
+        [
+            // dewan_pembina = pengawasan (view-only): view_laporan_pimpinan
+            // SAJA, tanpa input_belanja/close_period apa pun (RolesAndPermissionsSeeder
+            // — peran ini sengaja tak bisa mencatat transaksi). Shell yang sama
+            // (KeuanganPwaController) menampilkan tab "Dasbor" saja untuknya.
+            'permission' => 'view_laporan_pimpinan',
+            'route' => 'tenant.keuangan.pwa.beranda',
+            'path' => '/admin/keuangan/pwa',
+            'label' => 'Dasbor Keuangan',
+            'icon' => '<path d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"/>',
+        ],
+        [
             'permission' => 'akses_pwa_guru',
             'route' => 'tenant.portal-guru.beranda',
             'path' => '/guru',
@@ -225,9 +249,8 @@ final class AppLauncher
             'manage_keuangan', 'manage_santri', 'manage_users', 'manage_akademik',
             'manage_modules', 'manage_roles', 'kelola_approval',
             'view_kesehatan', 'manage_kesehatan', 'manage_ppdb', 'manage_asrama', 'view_kegiatan', 'run_payroll',
-            'view_konseling', 'manage_sarpras',
+            'view_konseling', 'manage_sarpras', 'input_belanja', 'view_laporan_pimpinan',
         ]);
-
     }
 
     /**

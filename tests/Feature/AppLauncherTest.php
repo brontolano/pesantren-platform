@@ -130,6 +130,25 @@ class AppLauncherTest extends TestCase
         $this->assertSame('hub', AppLauncher::primaryDestination($u)['kind']);
     }
 
+    public function test_operator_divisi_hub_dengan_pwa_keuangan_lapangan(): void
+    {
+        $this->boot();
+        $u = $this->user(['operator_divisi']);
+        // input_belanja → tile "Keuangan Lapangan" (/admin/keuangan/pwa) di STAFF_APPS.
+        $this->assertStringContainsString('/admin/keuangan/pwa', AppLauncher::pwaHome($u)['url']);
+        $this->assertSame('hub', AppLauncher::primaryDestination($u)['kind']);
+    }
+
+    public function test_dewan_pembina_hub_dengan_pwa_keuangan_lapangan(): void
+    {
+        $this->boot();
+        $u = $this->user(['dewan_pembina']);
+        // view_laporan_pimpinan → tile "Dasbor Keuangan" (/admin/keuangan/pwa)
+        // (shell sama dgn operator_divisi, nav-nya sendiri yg adaptif per-izin).
+        $this->assertStringContainsString('/admin/keuangan/pwa', AppLauncher::pwaHome($u)['url']);
+        $this->assertSame('hub', AppLauncher::primaryDestination($u)['kind']);
+    }
+
     public function test_admin_pesantren_langsung_ke_admin_panel(): void
     {
         $this->boot();
