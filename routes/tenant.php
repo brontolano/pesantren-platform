@@ -8,13 +8,13 @@ use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\CetakController;
-use App\Http\Controllers\DemoApps\HumasDemoController;
 use App\Http\Controllers\DemoApps\KeamananDemoController;
 use App\Http\Controllers\DemoApps\PengasuhanDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
 use App\Http\Controllers\DemoPickerController;
 use App\Http\Controllers\EmisExportController;
+use App\Http\Controllers\HumasController;
 use App\Http\Controllers\Jemaah\JemaahAuthController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
@@ -185,12 +185,22 @@ Route::middleware([
         Route::get('/arsip', [TuController::class, 'arsip'])->name('arsip');
     });
 
-    Route::middleware('auth')->prefix('humas')->name('tenant.humas.')->group(function () {
-        Route::get('/', [HumasDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/berita', [HumasDemoController::class, 'berita'])->name('berita');
-        Route::get('/berita/{artikel}', [HumasDemoController::class, 'detailArtikel'])->name('detail-artikel');
-        Route::get('/galeri', [HumasDemoController::class, 'galeri'])->name('galeri');
-        Route::get('/agenda', [HumasDemoController::class, 'agenda'])->name('agenda');
+    /*
+     * ── App PWA "Humas" (data nyata) ──
+     * Menggantikan HumasDemoController: query nyata ke Modules\CMS\Article
+     * (berita/pengumuman/prestasi via kolom category) + Gallery/GalleryImage
+     * (album foto) — model yang sama dipakai ArticleResource/GalleryResource
+     * di panel admin (grup "Website & Konten"). Gate permission `manage_santri`
+     * — permission pertama dari canAny(['manage_santri','manage_tenant_settings'])
+     * yang dipakai ArticleResource::canAccess()/GalleryResource::canAccess();
+     * tak ada role/permission "humas" khusus di RolesAndPermissionsSeeder.
+     * Layar "Agenda" demo lama TIDAK diportal (tak ada model agenda nyata).
+     */
+    Route::middleware(['auth', 'can:manage_santri'])->prefix('humas')->name('tenant.humas.')->group(function () {
+        Route::get('/', [HumasController::class, 'beranda'])->name('beranda');
+        Route::get('/berita', [HumasController::class, 'berita'])->name('berita');
+        Route::get('/berita/{artikel}', [HumasController::class, 'detailArtikel'])->name('detail-artikel');
+        Route::get('/galeri', [HumasController::class, 'galeri'])->name('galeri');
     });
 
     Route::middleware(['auth', 'can:run_payroll'])->prefix('kepegawaian')->name('tenant.kepegawaian.')->group(function () {
