@@ -74,7 +74,9 @@ class DemoAutoLoginController extends Controller
         'tu' => [
             'email' => 'tu.demo@demo.pesantren.online',
             'name' => 'Staf TU Demo',
-            'role' => 'tata_usaha',
+            // FIX: role 'tata_usaha' tidak ada di RolesAndPermissionsSeeder
+            // (nama sebenarnya 'tu') — sebelumnya bikin 403 di /tu.
+            'role' => 'tu',
             'route' => 'tenant.tu.beranda',
         ],
         'humas' => [
@@ -92,7 +94,9 @@ class DemoAutoLoginController extends Controller
         'ppdb-panitia' => [
             'email' => 'ppdb.demo@demo.pesantren.online',
             'name' => 'Panitia PPDB Demo',
-            'role' => 'tata_usaha',
+            // FIX: role 'tata_usaha' tidak ada — perlu 'panitia_ppdb' (gate
+            // manage_ppdb) supaya tidak 403 di /ppdb-panitia.
+            'role' => 'panitia_ppdb',
             'route' => 'tenant.ppdb-panitia.beranda',
         ],
         'pos-kantin' => [
@@ -104,13 +108,18 @@ class DemoAutoLoginController extends Controller
         'keamanan' => [
             'email' => 'keamanan.demo@demo.pesantren.online',
             'name' => 'Petugas Keamanan Demo',
-            'role' => 'guru',
+            // FIX: 'guru' tak punya view_kegiatan → 403 di /keamanan. Tak ada
+            // role "keamanan" khusus (lihat KeamananController) — 'tu' punya
+            // manage_kegiatan (mencakup view_kegiatan), gerbang paling dekat.
+            'role' => 'tu',
             'route' => 'tenant.keamanan.beranda',
         ],
         'pengasuhan' => [
             'email' => 'pengasuhan.demo@demo.pesantren.online',
             'name' => 'Musyrif Demo',
-            'role' => 'guru',
+            // FIX: 'guru' tak punya manage_asrama → 403 di /pengasuhan. Role
+            // asli utk permission ini adalah pengelola_asrama.
+            'role' => 'pengelola_asrama',
             'route' => 'tenant.pengasuhan.beranda',
         ],
         'pengabdian' => [
@@ -118,6 +127,18 @@ class DemoAutoLoginController extends Controller
             'name' => 'Santri Pengabdian Demo',
             'role' => 'santri',
             'route' => 'tenant.pengabdian.beranda',
+        ],
+        'konselor' => [
+            'email' => 'konselor.demo@demo.pesantren.online',
+            'name' => 'Konselor Demo',
+            'role' => 'konselor',
+            'route' => 'tenant.konselor.beranda',
+        ],
+        'sarpras' => [
+            'email' => 'sarpras.demo@demo.pesantren.online',
+            'name' => 'Petugas Sarpras Demo',
+            'role' => 'pengelola_sarpras',
+            'route' => 'tenant.sarpras.beranda',
         ],
         'santri' => [
             'email' => 'santri.demo@demo.pesantren.online',
