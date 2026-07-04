@@ -125,10 +125,12 @@ class AppLauncherTest extends TestCase
     {
         $this->boot();
         $u = $this->user(['admin_pesantren']);
-        // Staf admin tanpa aplikasi PWA khusus → auto-redirect ke /admin (bukan hub).
+        // Staf admin tanpa aplikasi PWA khusus → auto-redirect ke Beranda Staf
+        // /staf (bukan hub) — /staf sendiri redirect ke /admin utk request
+        // desktop, tapi primaryDestination hanya menentukan tujuan awal.
         $dest = AppLauncher::primaryDestination($u);
         $this->assertSame('redirect', $dest['kind']);
-        $this->assertStringContainsString('/admin', $dest['url']);
+        $this->assertStringContainsString('/staf', $dest['url']);
         $this->assertNull(AppLauncher::pwaHome($u));
         $this->assertNotNull(AppLauncher::adminPanelUrl($u));
     }

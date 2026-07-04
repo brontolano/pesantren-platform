@@ -61,15 +61,6 @@ final class AppLauncher
             'label' => 'Aplikasi Guru',
             'icon' => '<path d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5"/>',
         ],
-        [
-            // F4 — petugas UKS/kesehatan. Permission `view_kesehatan` sudah
-            // dimiliki role pengelola_uks (RolesAndPermissionsSeeder).
-            'permission' => 'view_kesehatan',
-            'route' => 'tenant.uks.beranda',
-            'path' => '/uks',
-            'label' => 'Kesehatan UKS',
-            'icon' => '<path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>',
-        ],
     ];
 
     /**
@@ -99,11 +90,10 @@ final class AppLauncher
         if ($user->hasRole('jemaah')) {
             return ['kind' => 'redirect', 'url' => url('/')];
         }
-        // Santri MURNI (tanpa kapasitas staf) → aplikasi santri. Sejak audit
-        // RBAC 2026-07 (P1-1) role santri juga DIKECUALIKAN dari isTenantStaff,
-        // sehingga /admin tertutup; redirect ke /app dicek sebelum "hub".
+        // Santri MURNI (tanpa kapasitas staf) → aplikasi santri. Dicek sebelum
+        // "hub" karena canAccessPanel tidak mengecualikan role santri.
         if ($user->hasRole('santri') && ! self::hasStaffCapability($user)) {
-            return ['kind' => 'redirect', 'url' => self::routeOr('tenant.app-santri.home', '/app')];
+            return ['kind' => 'redirect', 'url' => self::routeOr('tenant.santri-app.beranda', '/santri-app')];
         }
 
         $adminUrl = self::adminPanelUrl($user);
@@ -115,13 +105,14 @@ final class AppLauncher
             return ['kind' => 'redirect', 'url' => $adminUrl];
         }
 
-        // Staf admin tanpa aplikasi PWA khusus (mis. admin_pesantren) → langsung
-        // ke panel administrasi /admin. Hub-nya hanya akan berisi satu tile panel,
-        // jadi mampir hub cuma menambah satu klik. Staf yang PUNYA aplikasi PWA
-        // (guru/keuangan/pimpinan/kasir) tetap melihat hub agar bisa memilih
-        // aplikasi vs panel.
+        // Staf admin tanpa aplikasi PWA khusus (mis. keamanan, uks, tu, konselor,
+        // asrama, ppdb, akuntan, payroll) → Beranda Staf (PWA) `/staf`: app-shell
+        // mobile berisi ikon menu terfilter izin yang membuka halaman panel
+        // responsif. Di sana ada tile "Panel Lengkap" → /admin untuk akses penuh.
+        // Staf yang PUNYA aplikasi PWA khusus (guru/keuangan/pimpinan/kasir) tetap
+        // melihat hub agar bisa memilih aplikasi vs panel.
         if ($adminUrl !== null && self::pwaHome($user) === null) {
-            return ['kind' => 'redirect', 'url' => $adminUrl];
+            return ['kind' => 'redirect', 'url' => self::routeOr('tenant.staf-shell', '/staf')];
         }
 
         // Staf dengan aplikasi PWA (dan fallback authenticated-tanpa-app) → hub.
@@ -134,7 +125,7 @@ final class AppLauncher
         return $user->canAny([
             'akses_pimpinan', 'akses_pwa_guru', 'close_period', 'operate_pos',
             'manage_keuangan', 'manage_santri', 'manage_users', 'manage_akademik',
-            'manage_modules', 'manage_roles', 'kelola_approval', 'view_kesehatan',
+            'manage_modules', 'manage_roles', 'kelola_approval',
         ]);
     }
 

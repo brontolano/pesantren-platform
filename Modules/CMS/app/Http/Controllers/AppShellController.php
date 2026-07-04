@@ -7,9 +7,10 @@ use App\Models\Setting;
 use App\Services\PrayerTimesService;
 use App\Services\QiblaService;
 use App\Support\TenantBranding;
-use App\Support\TenantCustomizationRegistry;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Services\TenantWebsiteService;
 
@@ -25,11 +26,21 @@ use Modules\CMS\Services\TenantWebsiteService;
  */
 class AppShellController extends Controller
 {
-    /*
-     * Default tautan konten (bila admin belum mengisi Setting) kini dari
-     * registry: TenantCustomizationRegistry::appContentLinks() — satu sumber
-     * dengan PengaturanBranding (tahap 4 #343, dulu konstanta DEFAULTS duplikat).
-     */
+    /** Default tautan konten (dipakai bila admin belum mengisi Setting). */
+    private const DEFAULTS = [
+        'app_profil_pondok_url' => 'https://asy-syifaa.com/profil-pondok-pesantren',
+        'app_profil_abuya_url' => 'https://asy-syifaa.com/profil-abuya',
+        'app_profil_guru_url' => 'https://asy-syifaa.com/profil-guru',
+        'app_struktur_url' => 'https://asy-syifaa.com/struktur-organisasi',
+        'app_instagram_url' => 'https://www.instagram.com/ponpes.asysyifaa',
+        'app_instagram2_url' => 'https://www.instagram.com/asysyifaapusat/',
+        'app_instagram3_url' => 'https://www.instagram.com/syifaalawiyyahofficial/',
+        'app_youtube_url' => 'https://www.youtube.com/@AsySyifaaTVOfficial/videos',
+        'app_facebook_url' => 'https://www.facebook.com/AsySyifaaTV/live_videos',
+        'app_jadwal_kajian_url' => '',
+        'app_donasi_url' => '/donasi',
+        'app_zakat_wakaf_url' => '',
+    ];
 
     public function __invoke(TenantWebsiteService $websiteService): View
     {
@@ -57,6 +68,96 @@ class AppShellController extends Controller
             'cfg' => $this->appConfig(),
             'artikel' => $this->artikelTerbaru(),
             'masukUrl' => '/masuk',
+        ]);
+    }
+
+    /**
+     * Beranda Staf (PWA) — "panel admin dirapikan jadi PWA". Menampilkan ikon
+     * menu HANYA yang sesuai izin peran pengguna; tiap ikon membuka halaman
+     * panel (/admin/...) yang sudah responsif. Untuk staf yang belum punya PWA
+     * khusus (keamanan, UKS, TU, konselor, dll).
+     */
+    public function stafHome(Request $request): View|RedirectResponse
+    {
+        $u = auth()->user();
+        if (! $u) {
+            return redirect('/masuk');
+        }
+
+        // Desktop browser → panel Filament langsung (lebih nyaman di layar besar).
+        // Mobile / PWA → tetap di halaman ini (ikon launcher native feel).
+        if (! $this->isMobileRequest($request)) {
+            return redirect('/admin');
+        }
+
+        // Katalog menu: [label, ikon, izin[], url]. Tampil bila user canAny(izin).
+        $katalog = [
+            'Kesantrian' => [
+                ['Data Santri', 'users', ['view_santri', 'manage_santri'], '/admin/santri/santris'],
+                ['Kelas', 'grid', ['view_akademik', 'manage_akademik', 'manage_santri'], '/admin/kelas'],
+                ['Alumni', 'user', ['view_alumni', 'manage_alumni'], '/admin/alumni/alumnis'],
+            ],
+            'Perizinan & Keamanan' => [
+                ['Izin Santri', 'doc', ['view_kegiatan', 'manage_kegiatan'], '/admin/izin-santris'],
+                ['Kunjungan Wali', 'users', ['view_kegiatan', 'manage_kegiatan'], '/admin/kunjungan-walis'],
+                ['Pengajuan Jenguk', 'bell', ['view_kegiatan', 'manage_kegiatan'], '/admin/pengajuan-jenguk'],
+                ['Log Gerbang', 'shield', ['view_kegiatan', 'manage_kegiatan'], '/admin/log-gerbang'],
+                ['Kegiatan', 'cal', ['view_kegiatan', 'manage_kegiatan'], '/admin/kegiatans'],
+                ['Pelanggaran / Ta\'zir', 'shield', ['view_kedisiplinan', 'manage_kedisiplinan'], '/admin/pelanggaran-santri/pelanggaran-santris'],
+            ],
+            'Asrama & Pengasuhan' => [
+                ['Blok Asrama', 'home', ['view_asrama', 'manage_asrama'], '/admin/blok-asrama/blok-asramas'],
+                ['Kamar', 'home', ['view_asrama', 'manage_asrama'], '/admin/kamar-asrama/kamar-asramas'],
+                ['Penempatan Asrama', 'home', ['view_asrama', 'manage_asrama'], '/admin/penempatan-asrama/penempatan-asramas'],
+                ['Presensi Asrama', 'check', ['view_asrama', 'manage_asrama'], '/admin/kepengasuhan/presensi-asrama/presensi-asramas'],
+            ],
+            'Kesehatan & Konseling' => [
+                ['Kunjungan UKS', 'heart', ['view_kesehatan', 'manage_kesehatan'], '/admin/kesehatan/kunjungan-uks'],
+                ['Riwayat Kesehatan', 'heart', ['view_kesehatan', 'manage_kesehatan'], '/admin/riwayat-kesehatans'],
+                ['Obat', 'heart', ['view_kesehatan', 'manage_kesehatan'], '/admin/kesehatan/obat'],
+                ['Konseling', 'chat', ['view_konseling', 'manage_konseling'], '/admin/sesi-konselings'],
+            ],
+            'Akademik' => [
+                ['Presensi Santri', 'check', ['view_akademik', 'manage_akademik'], '/admin/presensi-santri/presensi-santris'],
+                ['Presensi Pengajar', 'check', ['run_payroll', 'view_akademik'], '/admin/presensi-staf/presensi-stafs'],
+                ['Rekap Jurnal KBM', 'book', ['view_akademik', 'manage_akademik'], '/admin/rekap-jurnal-kbm'],
+            ],
+            'PPDB' => [
+                ['Calon Santri', 'user', ['view_ppdb', 'manage_ppdb'], '/admin/ppdb/calon-santri'],
+                ['Hasil Ujian', 'doc', ['view_ppdb', 'manage_ppdb'], '/admin/ppdb/hasil-ujian'],
+            ],
+            'Keuangan' => [
+                ['Pembayaran', 'wallet', ['view_tagihan', 'manage_tagihan'], '/admin/pembayaran/pembayarans'],
+                ['Laporan Keuangan', 'chart', ['view_laporan_keuangan'], '/admin/laporan-keuangan'],
+                ['Jurnal', 'book', ['view_ledger', 'manage_ledger'], '/admin/jurnals'],
+                ['Slip Gaji', 'wallet', ['run_payroll'], '/admin/payroll/slip'],
+            ],
+            'Website & Pengaturan' => [
+                ['Broadcast WA', 'bell', ['manage_notifikasi'], '/admin/broadcast-wa/broadcast-was'],
+                ['Pengguna', 'users', ['manage_users'], '/admin/users'],
+                ['Settings & Branding', 'cog', ['manage_tenant_settings'], '/admin/settings'],
+            ],
+        ];
+
+        $groups = [];
+        foreach ($katalog as $judul => $items) {
+            $vis = array_values(array_filter($items, fn ($it) => $u->canAny($it[2])));
+            if ($vis !== []) {
+                $groups[$judul] = $vis;
+            }
+        }
+
+        $jam = (int) now()->format('H');
+        $sapa = $jam < 11 ? 'Selamat pagi' : ($jam < 15 ? 'Selamat siang' : ($jam < 18 ? 'Selamat sore' : 'Selamat malam'));
+
+        return view('staf-home', [
+            'namaPesantren' => TenantBranding::name(),
+            'logoUrl' => TenantBranding::logoUrl(),
+            'user' => $u,
+            'peran' => $u->getRoleNames()->map(fn ($r) => str()->headline($r))->implode(' · '),
+            'sapa' => $sapa,
+            'groups' => $groups,
+            'adminUrl' => '/admin',
         ]);
     }
 
@@ -90,11 +191,28 @@ class AppShellController extends Controller
         ])->header('Content-Type', 'application/manifest+json');
     }
 
+    /** Deteksi apakah request dari perangkat mobile / PWA (bukan desktop). */
+    private function isMobileRequest(Request $request): bool
+    {
+        // Jika sudah dalam mode standalone PWA, selalu anggap mobile.
+        if ($request->header('Sec-Fetch-Dest') === 'document'
+            && str_contains((string) $request->header('Referer', ''), 'android')) {
+            return true;
+        }
+
+        $ua = strtolower((string) $request->header('User-Agent', ''));
+
+        return (bool) preg_match(
+            '/mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini|webos|windows phone/i',
+            $ua
+        );
+    }
+
     /** Konfigurasi konten app (Setting → fallback default asy-syifaa). */
     private function appConfig(): array
     {
         $cfg = [];
-        foreach (TenantCustomizationRegistry::appContentLinks() as $key => $default) {
+        foreach (self::DEFAULTS as $key => $default) {
             try {
                 $val = Setting::getTenantStringValue($key, null);
             } catch (\Throwable) {

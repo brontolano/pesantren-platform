@@ -188,6 +188,16 @@
         </div>
       @endif
 
+      {{-- Banner SPMB --}}
+      <a href="/spmb" style="display:flex;align-items:center;gap:14px;margin:14px 16px 4px;background:linear-gradient(135deg,#0a4e31,#0e5c3a);border-radius:16px;padding:16px 18px;color:#fff;text-decoration:none;box-shadow:0 4px 14px rgba(10,78,49,.3)">
+        <span style="font-size:28px;flex:0 0 auto">📋</span>
+        <span style="flex:1">
+          <span style="display:block;font-size:14px;font-weight:800;line-height:1.2">Daftar Santri Baru</span>
+          <span style="display:block;font-size:12px;opacity:.8;margin-top:2px">Pendaftaran PPDB online — klik di sini</span>
+        </span>
+        <span style="opacity:.7">{!! $svg('chev',20) !!}</span>
+      </a>
+
       {{-- Grid menu profil --}}
       <div class="sectitle">Tentang Pesantren</div>
       <div class="grid">
