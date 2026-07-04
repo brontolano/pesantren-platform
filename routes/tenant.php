@@ -8,7 +8,6 @@ use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
 use App\Http\Controllers\CetakController;
-use App\Http\Controllers\DemoApps\PengasuhanDemoController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
 use App\Http\Controllers\DemoPickerController;
@@ -28,6 +27,7 @@ use App\Http\Controllers\PayrollExportController;
 use App\Http\Controllers\PembiayaanExportController;
 use App\Http\Controllers\PengabdianController;
 use App\Http\Controllers\PengadaanExportController;
+use App\Http\Controllers\PengasuhanController;
 use App\Http\Controllers\PimpinanPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
@@ -251,12 +251,14 @@ Route::middleware([
         // KeamananController untuk rincian scope.
     });
 
-    Route::middleware('auth')->prefix('pengasuhan')->name('tenant.pengasuhan.')->group(function () {
-        Route::get('/', [PengasuhanDemoController::class, 'beranda'])->name('beranda');
-        Route::get('/presensi', [PengasuhanDemoController::class, 'presensiAsrama'])->name('presensi');
-        Route::get('/disiplin', [PengasuhanDemoController::class, 'disiplin'])->name('disiplin');
-        Route::get('/disiplin/catat', [PengasuhanDemoController::class, 'catatPelanggaran'])->name('catat');
-        Route::get('/izin', [PengasuhanDemoController::class, 'izin'])->name('izin');
+    Route::middleware(['auth', 'can:manage_asrama'])->prefix('pengasuhan')->name('tenant.pengasuhan.')->group(function () {
+        Route::get('/', [PengasuhanController::class, 'beranda'])->name('beranda');
+        Route::get('/presensi', [PengasuhanController::class, 'presensiAsrama'])->name('presensi');
+        Route::post('/presensi', [PengasuhanController::class, 'simpanPresensi'])->name('presensi.store');
+        Route::get('/disiplin', [PengasuhanController::class, 'disiplin'])->name('disiplin');
+        Route::get('/disiplin/catat', [PengasuhanController::class, 'catatPelanggaranForm'])->name('catat');
+        Route::post('/disiplin/catat', [PengasuhanController::class, 'catatPelanggaranStore'])->name('catat.store');
+        Route::get('/izin', [PengasuhanController::class, 'izin'])->name('izin');
     });
 
     Route::middleware('auth')->prefix('pengabdian')->name('tenant.pengabdian.')->group(function () {

@@ -91,6 +91,19 @@ final class AppLauncher
             'icon' => '<path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>',
         ],
         [
+            // F4 — musyrif/pengelola asrama. Permission `manage_asrama` sama dgn
+            // gerbang KamarAsramaResource/PenempatanAsramaResource::canCreate()
+            // di panel admin (view_asrama dipakai utk canAccess baca-saja;
+            // manage_asrama dipilih di sini krn musyrif JUGA mencatat presensi/
+            // disiplin, bukan cuma melihat) — role pengelola_asrama sudah
+            // memilikinya (RolesAndPermissionsSeeder).
+            'permission' => 'manage_asrama',
+            'route' => 'tenant.pengasuhan.beranda',
+            'path' => '/pengasuhan',
+            'label' => 'Pengasuhan/Asrama',
+            'icon' => '<path d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>',
+        ],
+        [
             // F4 — petugas keamanan/satpam. TIDAK ada permission "keamanan"
             // khusus di RolesAndPermissionsSeeder — `view_kegiatan` dipakai
             // apa adanya, permission yang SAMA dgn gerbang LogGerbangPanel &
@@ -189,7 +202,7 @@ final class AppLauncher
             'akses_pimpinan', 'akses_pwa_guru', 'close_period', 'operate_pos',
             'manage_keuangan', 'manage_santri', 'manage_users', 'manage_akademik',
             'manage_modules', 'manage_roles', 'kelola_approval',
-            'view_kesehatan', 'manage_kesehatan', 'manage_ppdb', 'view_kegiatan', 'run_payroll',
+            'view_kesehatan', 'manage_kesehatan', 'manage_ppdb', 'manage_asrama', 'view_kegiatan', 'run_payroll',
         ]);
 
     }
