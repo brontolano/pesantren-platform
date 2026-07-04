@@ -8,12 +8,16 @@ use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\InitializeTenancyForWebRequests;
 use App\Http\Middleware\RedirectDomainKanonis;
 use App\Http\Middleware\SecurityHeaders;
+use Filament\Notifications\Notification;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,6 +30,21 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Caddy (reverse proxy) mengirim X-Forwarded-Proto=https dari luar,
+        // tapi FrankenPHP di dalam container menerima koneksi plain HTTP dari
+        // Caddy — TANPA ini, Laravel tak percaya header itu & asset()/url()
+        // generate http:// (bukan https://), diblokir browser sebagai
+        // mixed-content → semua halaman Inertia/@vite blank. Proxy sesungguhnya
+        // hanya bisa dijangkau via jaringan Docker internal (bukan IP publik
+        // sembarang), jadi trust '*' aman di sini.
+        $middleware->trustProxies(
+            at: '*',
+            headers: SymfonyRequest::HEADER_X_FORWARDED_FOR
+                | SymfonyRequest::HEADER_X_FORWARDED_HOST
+                | SymfonyRequest::HEADER_X_FORWARDED_PORT
+                | SymfonyRequest::HEADER_X_FORWARDED_PROTO,
+        );
+
         $middleware->web(
             prepend: [
                 // Kanonisasi domain tenant (opt-in) SEBELUM tenancy init —
@@ -97,7 +116,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // 403 di luar panel / tamu / JSON / halaman home (cegah loop) → render
         // halaman branded resources/views/errors/403.blade.php (fallback).
         $exceptions->render(function (
-            \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e,
+            HttpExceptionInterface $e,
             Request $request,
         ) {
             if ($e->getStatusCode() !== 403) {
@@ -111,7 +130,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 // redirect gagal → fallback ke halaman 403 branded (return null →
                 // Laravel render resources/views/errors/403.blade.php).
                 try {
-                    \Filament\Notifications\Notification::make()
+                    Notification::make()
                         ->title('Akses ditolak')
                         ->body('Halaman tersebut di luar kewenangan akun Anda. Anda dialihkan kembali ke Dasbor.')
                         ->danger()
@@ -124,8 +143,8 @@ return Application::configure(basePath: dirname(__DIR__))
                     // saat response melewati middleware CSRF (PreventRequestForgery) →
                     // "Undefined property ...Redirector::$headers" → 500. RedirectResponse
                     // murni Symfony punya ->headers, jadi aman di Livewire & non-Livewire.
-                    return new \Illuminate\Http\RedirectResponse(url('admin'), 302);
-                } catch (\Throwable) {
+                    return new RedirectResponse(url('admin'), 302);
+                } catch (Throwable) {
                     return null;
                 }
             }
