@@ -90,23 +90,14 @@ final class AppLauncher
             'label' => 'PPDB Panitia',
             'icon' => '<path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>',
         ],
-        [
-            // Humas — TIDAK ADA role/permission "humas" khusus di
-            // RolesAndPermissionsSeeder (operator_divisi pun tak relevan:
-            // hanya view_dashboard/view_santri/input_belanja/view_ledger).
-            // Permission `manage_santri` dipakai apa adanya — sama dgn gerbang
-            // ArticleResource::canAccess()/GalleryResource::canAccess() di
-            // panel admin (grup "Website & Konten"). Diletakkan SETELAH tile
-            // Tata Usaha (permission sama, prioritas tile pertama menang) agar
-            // staf TU tetap ke /tu; tile ini praktis tak pernah jadi beranda
-            // utama karena sama permission-nya dgn TU — didaftarkan untuk
-            // konsistensi pola/dokumentasi, bukan untuk mengubah prioritas.
-            'permission' => 'manage_santri',
-            'route' => 'tenant.humas.beranda',
-            'path' => '/humas',
-            'label' => 'Humas',
-            'icon' => '<path d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>',
-        ],
+        // Catatan: Humas TIDAK didaftarkan di STAFF_APPS. Tak ada role/
+        // permission "humas" khusus di RolesAndPermissionsSeeder — gerbangnya
+        // memakai `manage_santri`, permission yang sama dgn tile Tata Usaha di
+        // atas. STAFF_APPS bersifat first-match-only (lihat pwaHome()), jadi
+        // menambah entry kedua dgn permission yang sama akan selalu kalah
+        // dari tile TU dan jadi dead code murni — sama seperti keputusan utk
+        // POS Kantin (PR#413). Halaman /humas tetap dapat diakses langsung
+        // via URL bagi staf yang memegang `manage_santri`.
     ];
 
     /**
