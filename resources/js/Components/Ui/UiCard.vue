@@ -37,7 +37,7 @@ const paddings = {
 const shadowClass = computed(() => {
     if (props.flat) return ''
     if (isHero.value) return 'shadow-soft-lg'
-    return 'shadow-soft'
+    return 'shadow-lift'
 })
 
 const rootClass = computed(() => [
