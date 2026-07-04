@@ -27,6 +27,9 @@ class PortalWaliNotificationController extends Controller
             ],
             'children' => $dashboard['children'],
             'navigation' => $this->navigationItems($dashboard['children']),
+            // F6 — Web Push opt-in: kunci publik VAPID (kosong = tombol
+            // disembunyikan sisi client, fitur belum dikonfigurasi).
+            'vapidPublicKey' => (string) config('services.webpush.public_key'),
             ...$portalWaliService->getNotificationPayload($wali),
         ]);
     }

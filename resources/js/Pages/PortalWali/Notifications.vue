@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
 import UiIcon from '@/Components/Ui/UiIcon.vue'
 
@@ -10,12 +11,58 @@ const props = defineProps({
     children: { type: Array, default: () => [] },
     notifications: { type: Array, default: () => [] },
     summary: { type: Object, required: true },
+    vapidPublicKey: { type: String, default: '' },
 })
 
 const initials = (name) => String(name || '?').charAt(0).toUpperCase()
 
 function logout() {
     router.post('/wali/logout')
+}
+
+// F6 — Web Push (VAPID) opt-in. Kanal PELENGKAP: WA tetap kanal utama.
+// Degradasi anggun: tombol disembunyikan bila browser tak mendukung
+// PushManager (mis. iOS belum di-install) atau kunci VAPID belum diset.
+const pushSupported = typeof window !== 'undefined'
+    && 'serviceWorker' in navigator
+    && 'PushManager' in window
+    && !!props.vapidPublicKey
+const pushStatus = ref('idle') // idle | loading | active | error | denied
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+    const rawData = window.atob(base64)
+    return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)))
+}
+
+async function aktifkanPush() {
+    if (!pushSupported) return
+    pushStatus.value = 'loading'
+
+    try {
+        const permission = await Notification.requestPermission()
+        if (permission !== 'granted') {
+            pushStatus.value = 'denied'
+            return
+        }
+
+        const registration = await navigator.serviceWorker.ready
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(props.vapidPublicKey),
+        })
+
+        await fetch('/push/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(subscription.toJSON()),
+        })
+
+        pushStatus.value = 'active'
+    } catch (error) {
+        pushStatus.value = 'error'
+    }
 }
 </script>
 
@@ -61,6 +108,30 @@ function logout() {
         <div class="space-y-[9px]">
             <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Pengaturan</p>
             <div class="rounded-[22px] bg-white px-[17px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
+                <!-- F6 — Web Push opt-in (pelengkap; WA tetap kanal utama) -->
+                <button
+                    v-if="pushSupported && pushStatus !== 'active'"
+                    type="button"
+                    class="flex w-full items-center gap-3 border-b border-[#f6f0e6] py-3 text-left"
+                    :disabled="pushStatus === 'loading'"
+                    @click="aktifkanPush"
+                >
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                        <UiIcon name="bell" class="h-[18px] w-[18px]" />
+                    </span>
+                    <span class="flex-1 text-[13.5px] font-semibold text-slate-800">
+                        {{ pushStatus === 'loading' ? 'Mengaktifkan…' : 'Aktifkan Notifikasi Push' }}
+                    </span>
+                </button>
+                <p v-if="pushStatus === 'active'" class="border-b border-[#f6f0e6] py-3 text-[13px] text-emerald-700">
+                    Notifikasi push aktif di perangkat ini.
+                </p>
+                <p v-else-if="pushStatus === 'denied'" class="border-b border-[#f6f0e6] py-3 text-[13px] text-slate-500">
+                    Izin notifikasi ditolak browser. Aktifkan lewat pengaturan browser bila ingin mencoba lagi.
+                </p>
+                <p v-else-if="pushStatus === 'error'" class="border-b border-[#f6f0e6] py-3 text-[13px] text-rose-600">
+                    Gagal mengaktifkan notifikasi push. Coba lagi nanti.
+                </p>
                 <Link href="/wali/notifikasi" class="flex items-center gap-3 border-b border-[#f6f0e6] py-3">
                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
                         <UiIcon name="bell" class="h-[18px] w-[18px]" />
