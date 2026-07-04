@@ -175,7 +175,11 @@ Route::middleware([
         Route::post('/kunjungan/{kunjungan}/tutup', [UksController::class, 'tutupKunjungan'])
             ->middleware('can:manage_kesehatan')->name('kunjungan.tutup');
         Route::get('/obat', [UksController::class, 'obat'])->name('obat');
+        Route::post('/obat/{obat}/pakai', [UksController::class, 'obatPakaiStore'])
+            ->middleware('can:manage_kesehatan')->name('obat.pakai');
         Route::get('/rujukan', [UksController::class, 'rujukan'])->name('rujukan');
+        Route::post('/rujukan/{kunjungan}', [UksController::class, 'rujukanUpdateStore'])
+            ->middleware('can:manage_kesehatan')->name('rujukan.update');
         Route::get('/riwayat', [UksController::class, 'riwayat'])->name('riwayat');
     });
 

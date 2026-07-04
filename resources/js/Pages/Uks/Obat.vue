@@ -1,7 +1,7 @@
 <script setup>
-import { Head } from '@inertiajs/vue3'
-import { computed } from 'vue'
-import { AppShell, PageHeader, StatCard, SectionCard, ListRow, StatusBadge, Chip, IconCircle } from '@/Shared'
+import { Head, router } from '@inertiajs/vue3'
+import { computed, ref } from 'vue'
+import { AppShell, PageHeader, StatCard, SectionCard, ListRow, StatusBadge, Chip, IconCircle, UiButton, UiField, UiInput, BottomSheet } from '@/Shared'
 
 const props = defineProps({
     navigation: { type: Array, default: () => [] },
@@ -9,10 +9,38 @@ const props = defineProps({
     obat: { type: Array, default: () => [] },
 })
 
-const menipis = (stok) => stok <= 5
+const menipis = (o) => o.stok <= o.ambang_menipis
 
 const totalItem = computed(() => props.obat.length)
-const jumlahMenipis = computed(() => props.obat.filter((o) => menipis(o.stok)).length)
+const jumlahMenipis = computed(() => props.obat.filter(menipis).length)
+
+const sheetOpen = ref(false)
+const obatDipilih = ref(null)
+const jumlah = ref(1)
+const keterangan = ref('')
+const mengirim = ref(false)
+
+function bukaForm(o) {
+    obatDipilih.value = o
+    jumlah.value = 1
+    keterangan.value = ''
+    sheetOpen.value = true
+}
+
+function simpanPakai() {
+    if (!obatDipilih.value) return
+    mengirim.value = true
+    router.post(`/uks/obat/${obatDipilih.value.id}/pakai`, {
+        jumlah: jumlah.value,
+        keterangan: keterangan.value,
+    }, {
+        preserveScroll: true,
+        onFinish: () => {
+            mengirim.value = false
+            sheetOpen.value = false
+        },
+    })
+}
 </script>
 
 <template>
@@ -45,7 +73,10 @@ const jumlahMenipis = computed(() => props.obat.filter((o) => menipis(o.stok)).l
                         <template #trailing>
                             <div class="flex flex-col items-end gap-1.5">
                                 <span class="text-lg font-extrabold tabular-nums text-slate-900">{{ o.stok }}</span>
-                                <StatusBadge v-if="menipis(o.stok)" status="info" label="Menipis" size="sm" />
+                                <StatusBadge v-if="menipis(o)" status="info" label="Menipis" size="sm" />
+                                <UiButton v-if="can.kelola_obat" variant="ghost" size="sm" @click="bukaForm(o)">
+                                    Catat Pakai
+                                </UiButton>
                             </div>
                         </template>
                     </ListRow>
@@ -53,8 +84,45 @@ const jumlahMenipis = computed(() => props.obat.filter((o) => menipis(o.stok)).l
             </SectionCard>
 
             <p class="px-1 text-xs leading-5 text-slate-400">
-                Obat dengan stok 5 atau kurang ditandai "Menipis" — segera ajukan pembelian ke bendahara.
+                Obat ditandai "Menipis" saat stok sudah di ambang batas — segera ajukan pembelian ke bendahara.
             </p>
         </div>
+
+        <BottomSheet v-model="sheetOpen" :title="`Catat Pakai: ${obatDipilih?.nama ?? ''}`">
+            <div v-if="obatDipilih" class="space-y-3">
+                <p class="text-sm text-slate-500">Sisa stok saat ini: <strong>{{ obatDipilih.stok }} {{ obatDipilih.satuan }}</strong></p>
+                <UiField label="Jumlah dipakai">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model.number="jumlah"
+                            type="number"
+                            min="1"
+                            :max="obatDipilih.stok"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
+                <UiField label="Keterangan (opsional)">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput
+                            :id="fieldId"
+                            v-model="keterangan"
+                            type="text"
+                            placeholder="mis. untuk santri demam di kunjungan hari ini"
+                            :aria-describedby="describedby"
+                        />
+                    </template>
+                </UiField>
+            </div>
+            <template #footer>
+                <div class="flex gap-2">
+                    <UiButton variant="ghost" block :disabled="mengirim" @click="sheetOpen = false">Batal</UiButton>
+                    <UiButton variant="primary" icon-left="check" block :disabled="mengirim || jumlah < 1" @click="simpanPakai">
+                        Simpan
+                    </UiButton>
+                </div>
+            </template>
+        </BottomSheet>
     </AppShell>
 </template>

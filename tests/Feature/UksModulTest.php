@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Modules\Kesantrian\Models\Santri;
 use Modules\Kesehatan\Models\KunjunganUks;
+use Modules\Kesehatan\Models\Obat;
+use Modules\Kesehatan\Models\ObatMutasi;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -30,7 +32,7 @@ class UksModulTest extends TestCase
         $this->withoutVite();
         $this->ensurePpdbTestingSchemaReady([
             'tenants', 'domains', 'users', 'roles', 'permissions', 'model_has_roles', 'model_has_permissions',
-            'santri', 'kunjungan_uks', 'obat',
+            'santri', 'kunjungan_uks', 'obat', 'obat_mutasi',
         ]);
         $this->truncatePpdbTables(['domains', 'tenants']);
 
@@ -127,6 +129,127 @@ class UksModulTest extends TestCase
         $this->assertSame('Demam sejak semalam', $kunjungan->keluhan);
         $this->assertSame('pulang', $kunjungan->status);
         $this->assertSame($user->id, $kunjungan->pencatat_id);
+
+        tenancy()->end();
+    }
+
+    public function test_post_obat_pakai_mengurangi_stok_dan_mencatat_mutasi(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Petugas UKS Obat',
+            'email' => 'petugas-obat@f4.test',
+            'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('pengelola_uks');
+
+        $obat = Obat::create([
+            'tenant_id' => $this->tenant->id,
+            'nama' => 'Paracetamol',
+            'satuan' => 'tablet',
+            'stok' => 20,
+            'ambang_menipis' => 5,
+            'aktif' => true,
+        ]);
+
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->post("http://{$host}/uks/obat/{$obat->id}/pakai", [
+            'jumlah' => 3,
+            'keterangan' => 'Untuk santri demam',
+        ], ['HTTP_HOST' => $host, 'SERVER_NAME' => $host]);
+
+        tenancy()->initialize($this->tenant);
+        $response->assertRedirect();
+
+        $obat->refresh();
+        $this->assertSame(17, $obat->stok);
+        $this->assertSame(1, ObatMutasi::count());
+        $mutasi = ObatMutasi::first();
+        $this->assertSame('keluar', $mutasi->jenis);
+        $this->assertSame(3, $mutasi->jumlah);
+        $this->assertSame($user->id, $mutasi->user_id);
+
+        tenancy()->end();
+    }
+
+    public function test_post_obat_pakai_tolak_jika_stok_tidak_cukup(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Petugas UKS Obat Tolak',
+            'email' => 'petugas-obat-tolak@f4.test',
+            'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('pengelola_uks');
+
+        $obat = Obat::create([
+            'tenant_id' => $this->tenant->id,
+            'nama' => 'Betadine',
+            'satuan' => 'botol',
+            'stok' => 2,
+            'ambang_menipis' => 1,
+            'aktif' => true,
+        ]);
+
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->post("http://{$host}/uks/obat/{$obat->id}/pakai", [
+            'jumlah' => 5,
+        ], ['HTTP_HOST' => $host, 'SERVER_NAME' => $host]);
+
+        $response->assertSessionHasErrors('jumlah');
+
+        tenancy()->initialize($this->tenant);
+        $obat->refresh();
+        $this->assertSame(2, $obat->stok);
+        $this->assertSame(0, ObatMutasi::count());
+
+        tenancy()->end();
+    }
+
+    public function test_post_rujukan_update_menyimpan_tujuan_dan_biaya(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id,
+            'name' => 'Petugas UKS Rujukan',
+            'email' => 'petugas-rujukan@f4.test',
+            'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('pengelola_uks');
+
+        $kunjungan = KunjunganUks::create([
+            'tenant_id' => $this->tenant->id,
+            'santri_id' => $this->santri->id,
+            'tanggal' => now()->toDateString(),
+            'jam_masuk' => now()->format('H:i:s'),
+            'keluhan' => 'Cedera kaki saat olahraga',
+            'status' => 'rujuk',
+            'pencatat_id' => $user->id,
+        ]);
+
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->post("http://{$host}/uks/rujukan/{$kunjungan->id}", [
+            'rujukan_ke' => 'Puskesmas Cileunyi',
+            'rujukan_biaya' => 150000,
+        ], ['HTTP_HOST' => $host, 'SERVER_NAME' => $host]);
+
+        tenancy()->initialize($this->tenant);
+        $response->assertRedirect();
+
+        $kunjungan->refresh();
+        $this->assertSame('Puskesmas Cileunyi', $kunjungan->rujukan_ke);
+        $this->assertSame('150000.00', (string) $kunjungan->rujukan_biaya);
 
         tenancy()->end();
     }
