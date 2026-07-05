@@ -47,6 +47,17 @@
     --pst-teal-500:    #14b8a6;
     --pst-teal-200:    #99f6e4;
 
+    /* ---- Violet — PRIMARY baru (2026-07 refresh "fresh"), ganti emerald ---- */
+    --pst-violet-50:  #f5f3ff;
+    --pst-violet-100: #ede9fe;
+    --pst-violet-200: #ddd6fe;
+    --pst-violet-400: #a78bfa;
+    --pst-violet-500: #8b5cf6;
+    --pst-violet-600: #7c3aed;   /* PRIMARY — CTA, aktif, tautan */
+    --pst-violet-700: #6d28d9;   /* strong — hover/active & teks aksen */
+    --pst-violet-800: #5b21b6;
+    --pst-violet-900: #4c1d95;
+
     /* ---- Cream & permukaan hangat (ground yang tenang & premium) ---- */
     --pst-cream:       #fffaf3;   /* page background — cream hangat */
     --pst-cream-2:     #fdfbf7;   /* cream Baitul Maal */
@@ -96,9 +107,9 @@
     /* ========================================================================
        HOOK WHITE-LABEL — tenant menimpa HANYA ini; komponen membaca alias.
        ====================================================================== */
-    --brand-primary:        var(--pst-emerald-600);
-    --brand-primary-strong: var(--pst-emerald-700);
-    --brand-primary-tint:   var(--pst-emerald-50);
+    --brand-primary:        var(--pst-violet-600);
+    --brand-primary-strong: var(--pst-violet-700);
+    --brand-primary-tint:   var(--pst-violet-50);
     --brand-gold:           var(--pst-gold);
 
     /* ---- Alias permukaan + teks semantik (PAKAI ini di komponen baru) ---- */
@@ -113,7 +124,7 @@
     --text-muted:      var(--pst-slate-500);
     --text-faint:      var(--pst-slate-400);
     --text-onbrand:    #ffffff;
-    --text-accent:     var(--pst-emerald-700);
+    --text-accent:     var(--pst-violet-700);
 
     --border-card:     var(--pst-border-warm);
     --border-gold:     var(--pst-border-gold);
@@ -243,7 +254,7 @@
     /* Shadow SANGAT lembut (minimalis, bukan glow berat). */
     --shadow-soft:    0 6px 24px -16px rgba(17, 17, 17, 0.18);
     --shadow-soft-lg: 0 16px 44px -24px rgba(17, 17, 17, 0.22);
-    --shadow-brand:   0 8px 20px -12px rgba(5, 150, 105, 0.45);  /* angkat CTA emerald */
+    --shadow-brand:   0 8px 20px -12px rgba(124, 58, 237, 0.45);  /* angkat CTA violet (refresh 2026-07) */
     --shadow-pop:     0 16px 44px -24px rgba(17, 17, 17, 0.40);  /* nav melayang / sheet */
     /* Refresh (evolusi Pixio): shadow berlapis (ambient + contact) — lebih
        dimensional dari --shadow-soft datar, tetap "sangat lembut" bukan glow
@@ -268,14 +279,16 @@
     --dur-slow:   300ms;
     --press-scale: 0.97;
 
-    /* Gradient tanda-tangan (cukup gelap agar teks putih terbaca). */
-    --brand-grad:      linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --brand-grad-hero: linear-gradient(160deg, #0b8f63 0%, #059669 45%, #047857 100%);
+    /* Gradient tanda-tangan (cukup gelap agar teks putih terbaca).
+       Refresh 2026-07: emerald -> violet (primary baru, "fresh"), gold ornamen
+       ditinggalkan sebagai aksen ornamental terpisah (tak berubah). */
+    --brand-grad:      linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    --brand-grad-hero: linear-gradient(160deg, #9061f9 0%, #7c3aed 45%, #6524c7 100%);
     /* Refresh: hero + radial highlight halus di pojok kanan-atas (kedalaman
        tanpa mengubah warna dasar) — tetap terbaca utk teks putih. */
     --brand-grad-hero-refined:
-        radial-gradient(120% 140% at 88% -10%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 55%),
-        linear-gradient(160deg, #0b8f63 0%, #059669 45%, #047857 100%);
+        radial-gradient(120% 140% at 88% -10%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 55%),
+        linear-gradient(160deg, #9061f9 0%, #7c3aed 45%, #6524c7 100%);
     --gold-hairline:   linear-gradient(90deg, transparent 0%, rgba(201, 162, 74, 0) 8%,
                           var(--pst-gold) 50%, rgba(201, 162, 74, 0) 92%, transparent 100%);
 }
