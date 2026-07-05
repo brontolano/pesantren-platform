@@ -217,4 +217,69 @@ class PengasuhanModulTest extends TestCase
         $this->assertSame('dicatat', $pelanggaran->status);
         tenancy()->end();
     }
+
+    public function test_post_penempatan_menempatkan_santri_ke_kamar_dan_memindah_penempatan_lama(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $blok = BlokAsrama::create([
+            'tenant_id' => $this->tenant->id, 'nama_blok' => 'Blok Penempatan', 'gender' => 'putra',
+        ]);
+        $kamarLama = KamarAsrama::create([
+            'tenant_id' => $this->tenant->id, 'blok_id' => $blok->id, 'nomor_kamar' => '301',
+            'kapasitas' => 10, 'tipe' => 'regular', 'biaya_per_bulan' => 0, 'is_active' => true,
+        ]);
+        $kamarBaru = KamarAsrama::create([
+            'tenant_id' => $this->tenant->id, 'blok_id' => $blok->id, 'nomor_kamar' => '302',
+            'kapasitas' => 10, 'tipe' => 'regular', 'biaya_per_bulan' => 0, 'is_active' => true,
+        ]);
+        $santri = Santri::create([
+            'tenant_id' => $this->tenant->id, 'nis' => '2026401', 'nama' => 'Santri Pindah Kamar',
+            'tanggal_lahir' => '2011-01-01', 'jenis_kelamin' => 'L', 'status' => 'aktif',
+        ]);
+        $penempatanLama = PenempatanAsrama::create([
+            'tenant_id' => $this->tenant->id, 'santri_id' => $santri->id, 'kamar_id' => $kamarLama->id,
+            'tanggal_masuk' => now()->subMonth()->toDateString(), 'status' => 'aktif', 'is_current' => true,
+        ]);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Musyrif Penempatan', 'email' => 'musyrif-penempatan@f4.test', 'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('pengelola_asrama');
+
+        $host = $this->tenant->id.'.localhost';
+        $santriId = $santri->id;
+        $kamarBaruId = $kamarBaru->id;
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->post("http://{$host}/pengasuhan/penempatan", [
+            'santri_id' => $santriId, 'kamar_id' => $kamarBaruId,
+        ], $this->headers($host));
+        $response->assertRedirect(route('tenant.pengasuhan.penempatan'));
+
+        tenancy()->initialize($this->tenant);
+        $this->assertSame(2, PenempatanAsrama::count());
+        $this->assertFalse($penempatanLama->fresh()->is_current);
+        $baru = PenempatanAsrama::where('santri_id', $santriId)->where('is_current', true)->first();
+        $this->assertSame($kamarBaruId, $baru->kamar_id);
+        tenancy()->end();
+    }
+
+    public function test_halaman_penempatan_200_dengan_role_pengelola_asrama(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Musyrif Lihat Penempatan', 'email' => 'musyrif-lp@f4.test', 'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('pengelola_asrama');
+
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->get("http://{$host}/pengasuhan/penempatan", $this->headers($host));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page->component('Pengasuhan/Penempatan'));
+    }
 }

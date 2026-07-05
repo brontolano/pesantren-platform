@@ -268,6 +268,8 @@ Route::middleware([
         Route::get('/', [PengasuhanController::class, 'beranda'])->name('beranda');
         Route::get('/presensi', [PengasuhanController::class, 'presensiAsrama'])->name('presensi');
         Route::post('/presensi', [PengasuhanController::class, 'simpanPresensi'])->name('presensi.store');
+        Route::get('/penempatan', [PengasuhanController::class, 'penempatan'])->name('penempatan');
+        Route::post('/penempatan', [PengasuhanController::class, 'penempatanStore'])->name('penempatan.store');
         Route::get('/disiplin', [PengasuhanController::class, 'disiplin'])->name('disiplin');
         Route::get('/disiplin/catat', [PengasuhanController::class, 'catatPelanggaranForm'])->name('catat');
         Route::post('/disiplin/catat', [PengasuhanController::class, 'catatPelanggaranStore'])->name('catat.store');
