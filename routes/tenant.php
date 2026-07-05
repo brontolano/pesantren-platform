@@ -230,6 +230,9 @@ Route::middleware([
         Route::post('/verifikasi/dokumen/{dokumen}', [PpdbPanitiaController::class, 'verifikasiDokumen'])->name('verifikasi.dokumen');
         Route::get('/keputusan/{calonSantri}', [PpdbPanitiaController::class, 'keputusan'])->name('keputusan');
         Route::post('/keputusan/{calonSantri}', [PpdbPanitiaController::class, 'simpanKeputusan'])->name('keputusan.store');
+        Route::post('/nilai-ujian/{calonSantri}', [PpdbPanitiaController::class, 'nilaiUjianStore'])->name('nilai-ujian.store');
+        Route::get('/jadwal-ujian', [PpdbPanitiaController::class, 'jadwalUjian'])->name('jadwal-ujian');
+        Route::post('/jadwal-ujian', [PpdbPanitiaController::class, 'jadwalUjianStore'])->name('jadwal-ujian.store');
         Route::get('/hasil', [PpdbPanitiaController::class, 'hasil'])->name('hasil');
     });
 

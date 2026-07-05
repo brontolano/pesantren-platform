@@ -11,6 +11,8 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\CalonSantriDokumen;
+use Modules\PPDB\Models\HasilUjian;
+use Modules\PPDB\Models\JadwalUjian;
 use Modules\PPDB\Services\PpdbAdmissionDecisionService;
 
 /**
@@ -36,6 +38,7 @@ class PpdbPanitiaController extends Controller
         $items = [
             ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/ppdb-panitia', 'route' => 'beranda'],
             ['key' => 'pendaftar', 'label' => 'Pendaftar', 'href' => '/ppdb-panitia/pendaftar', 'route' => 'pendaftar'],
+            ['key' => 'jadwal', 'label' => 'Jadwal Ujian', 'href' => '/ppdb-panitia/jadwal-ujian', 'route' => 'jadwal-ujian'],
             ['key' => 'hasil', 'label' => 'Hasil', 'href' => '/ppdb-panitia/hasil', 'route' => 'hasil'],
         ];
 
@@ -136,6 +139,28 @@ class PpdbPanitiaController extends Controller
         ]);
     }
 
+    /**
+     * Catat nilai ujian calon santri — sebelumnya tak ada layar tulis di PWA
+     * sama sekali (panitia harus buka HasilUjianResource di admin). Model
+     * sederhana/flat, tak ada service khusus (kategori_ujian teks bebas,
+     * sama seperti admin) — idempoten per (calon_santri_id, kategori_ujian).
+     */
+    public function nilaiUjianStore(Request $request, CalonSantri $calonSantri): RedirectResponse
+    {
+        $data = $request->validate([
+            'kategori_ujian' => ['required', 'string', 'max:100'],
+            'nilai' => ['required', 'numeric', 'min:0', 'max:100'],
+            'catatan' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        HasilUjian::updateOrCreate(
+            ['calon_santri_id' => $calonSantri->id, 'kategori_ujian' => $data['kategori_ujian']],
+            ['nilai' => $data['nilai'], 'catatan' => $data['catatan'] ?? null],
+        );
+
+        return redirect()->route('tenant.ppdb-panitia.detail', $calonSantri)->with('success', 'Nilai ujian tersimpan.');
+    }
+
     public function verifikasi(CalonSantri $calonSantri): Response
     {
         $calonSantri->load('dokumen');
@@ -227,6 +252,46 @@ class PpdbPanitiaController extends Controller
         }
 
         return redirect()->route('tenant.ppdb-panitia.hasil')->with('success', 'Keputusan tersimpan.');
+    }
+
+    /**
+     * Jadwal ujian PPDB — sebelumnya tak ada layar PWA sama sekali (panitia
+     * harus buka JadwalUjianResource di admin). Model flat sederhana, tak
+     * ada service khusus.
+     */
+    public function jadwalUjian(): Response
+    {
+        $jadwal = JadwalUjian::orderBy('tanggal')->orderBy('waktu_mulai')->get()
+            ->map(fn (JadwalUjian $j): array => [
+                'id' => $j->id,
+                'kategori_ujian' => $j->kategori_ujian,
+                'tanggal' => optional($j->tanggal)->translatedFormat('d M Y'),
+                'waktu_mulai' => $j->waktu_mulai,
+                'waktu_selesai' => $j->waktu_selesai,
+                'ruang' => $j->ruang,
+                'keterangan' => $j->keterangan,
+            ]);
+
+        return Inertia::render('PpdbPanitia/JadwalUjian', [
+            'jadwal' => $jadwal,
+            'navigation' => $this->nav(),
+        ]);
+    }
+
+    public function jadwalUjianStore(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'kategori_ujian' => ['required', 'string', 'max:100'],
+            'tanggal' => ['required', 'date'],
+            'waktu_mulai' => ['required'],
+            'waktu_selesai' => ['nullable'],
+            'ruang' => ['nullable', 'string', 'max:100'],
+            'keterangan' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        JadwalUjian::create($data);
+
+        return back()->with('success', 'Jadwal ujian dibuat.');
     }
 
     public function hasil(): Response

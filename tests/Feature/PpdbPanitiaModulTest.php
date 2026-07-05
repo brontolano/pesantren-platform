@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 use Modules\PPDB\Models\CalonSantri;
 use Modules\PPDB\Models\CalonSantriDokumen;
 use Modules\PPDB\Models\HasilUjian;
+use Modules\PPDB\Models\JadwalUjian;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -32,7 +33,7 @@ class PpdbPanitiaModulTest extends TestCase
         $this->withoutVite();
         $this->ensurePpdbTestingSchemaReady([
             'tenants', 'domains', 'users', 'roles', 'permissions', 'model_has_roles', 'model_has_permissions',
-            'calon_santri', 'calon_santri_dokumen', 'hasil_ujian',
+            'calon_santri', 'calon_santri_dokumen', 'hasil_ujian', 'jadwal_ujian',
         ]);
         $this->truncatePpdbTables(['domains', 'tenants']);
 
@@ -182,5 +183,74 @@ class PpdbPanitiaModulTest extends TestCase
         $this->assertSame('lulus', $fresh->status_pendaftaran);
         $this->assertNotNull($fresh->tanggal_keputusan);
         tenancy()->end();
+    }
+
+    public function test_catat_nilai_ujian_tersimpan_dan_idempoten_per_kategori(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Panitia Nilai', 'email' => 'panitia-nilai@f4.test', 'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('panitia_ppdb');
+
+        $host = $this->tenant->id.'.localhost';
+        $calonId = $this->calon->id;
+        tenancy()->end();
+
+        $this->actingAs($user)->post("http://{$host}/ppdb-panitia/nilai-ujian/{$calonId}", [
+            'kategori_ujian' => 'Wawancara', 'nilai' => 90,
+        ], $this->headers($host))->assertRedirect();
+
+        // Kirim ulang kategori sama dengan nilai berbeda — harus update, bukan duplikat.
+        $this->actingAs($user)->post("http://{$host}/ppdb-panitia/nilai-ujian/{$calonId}", [
+            'kategori_ujian' => 'Wawancara', 'nilai' => 95,
+        ], $this->headers($host))->assertRedirect();
+
+        tenancy()->initialize($this->tenant);
+        $this->assertSame(1, HasilUjian::where('calon_santri_id', $calonId)->where('kategori_ujian', 'Wawancara')->count());
+        $this->assertEquals(95, HasilUjian::where('calon_santri_id', $calonId)->where('kategori_ujian', 'Wawancara')->first()->nilai);
+        tenancy()->end();
+    }
+
+    public function test_buat_jadwal_ujian_tersimpan(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Panitia Jadwal', 'email' => 'panitia-jadwal@f4.test', 'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('panitia_ppdb');
+
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->post("http://{$host}/ppdb-panitia/jadwal-ujian", [
+            'kategori_ujian' => 'Tes Baca Quran', 'tanggal' => now()->addDays(7)->toDateString(),
+            'waktu_mulai' => '08:00', 'ruang' => 'Aula',
+        ], $this->headers($host));
+        $response->assertRedirect();
+
+        tenancy()->initialize($this->tenant);
+        $this->assertSame(1, JadwalUjian::where('kategori_ujian', 'Tes Baca Quran')->count());
+        tenancy()->end();
+    }
+
+    public function test_halaman_jadwal_ujian_200_dengan_role_panitia(): void
+    {
+        tenancy()->initialize($this->tenant);
+
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Panitia Lihat Jadwal', 'email' => 'panitia-lj@f4.test', 'password' => bcrypt('password'),
+        ]);
+        $user->assignRole('panitia_ppdb');
+
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->get("http://{$host}/ppdb-panitia/jadwal-ujian", $this->headers($host));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn ($page) => $page->component('PpdbPanitia/JadwalUjian'));
     }
 }

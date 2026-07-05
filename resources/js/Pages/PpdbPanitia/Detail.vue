@@ -1,11 +1,12 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3'
+import { Head, Link, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 import {
     AppShell, PageHeader, SectionCard, ListRow, StatCard, StatusBadge,
-    UiButton, UiCard,
+    UiButton, UiCard, BottomSheet, UiField, UiInput,
 } from '@/Shared'
 
-defineProps({
+const props = defineProps({
     calon: { type: Object, default: () => ({}) },
     navigation: { type: Array, default: () => [] },
 })
@@ -15,6 +16,23 @@ const navIcons = {
     pendaftar: 'user',
     verifikasi: 'check-circle',
     hasil: 'document',
+}
+
+const sheetOpen = ref(false)
+const form = ref({ kategori_ujian: '', nilai: 0, catatan: '' })
+const menyimpan = ref(false)
+
+function bukaFormNilai() {
+    form.value = { kategori_ujian: '', nilai: 0, catatan: '' }
+    sheetOpen.value = true
+}
+
+function simpanNilai() {
+    menyimpan.value = true
+    router.post(`/ppdb-panitia/nilai-ujian/${props.calon.id}`, form.value, {
+        preserveScroll: true,
+        onFinish: () => { menyimpan.value = false; sheetOpen.value = false },
+    })
 }
 </script>
 
@@ -78,6 +96,9 @@ const navIcons = {
                         </template>
                     </StatCard>
                 </div>
+                <UiButton variant="secondary" size="sm" class="mt-3" icon-left="add" @click="bukaFormNilai">
+                    Catat Nilai
+                </UiButton>
             </SectionCard>
 
             <!-- Dokumen -->
@@ -105,5 +126,33 @@ const navIcons = {
                 </UiButton>
             </div>
         </div>
+
+        <BottomSheet v-model="sheetOpen" title="Catat Nilai Ujian">
+            <div class="space-y-3">
+                <UiField label="Kategori Ujian">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput :id="fieldId" v-model="form.kategori_ujian" type="text" placeholder="mis. Baca Al-Qur'an" :aria-describedby="describedby" />
+                    </template>
+                </UiField>
+                <UiField label="Nilai (0-100)">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput :id="fieldId" v-model.number="form.nilai" type="number" min="0" max="100" :aria-describedby="describedby" />
+                    </template>
+                </UiField>
+                <UiField label="Catatan (opsional)">
+                    <template #default="{ fieldId, describedby }">
+                        <UiInput :id="fieldId" v-model="form.catatan" type="text" :aria-describedby="describedby" />
+                    </template>
+                </UiField>
+            </div>
+            <template #footer>
+                <div class="flex gap-2">
+                    <UiButton variant="ghost" block :disabled="menyimpan" @click="sheetOpen = false">Batal</UiButton>
+                    <UiButton variant="primary" icon-left="check" block :disabled="menyimpan || !form.kategori_ujian" @click="simpanNilai">
+                        Simpan
+                    </UiButton>
+                </div>
+            </template>
+        </BottomSheet>
     </AppShell>
 </template>
