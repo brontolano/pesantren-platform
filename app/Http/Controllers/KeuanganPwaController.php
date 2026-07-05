@@ -58,6 +58,8 @@ class KeuanganPwaController extends Controller
     {
         $can = $this->can();
 
+        abort_unless(in_array(true, $can, true), 403);
+
         return Inertia::render('KeuanganPwa/Beranda', [
             'can' => $can,
             'navigation' => $this->nav($can),
@@ -67,6 +69,8 @@ class KeuanganPwaController extends Controller
 
     public function catatBelanja()
     {
+        abort_unless(Auth::user()?->can('input_belanja') ?? false, 403);
+
         return Inertia::render('KeuanganPwa/CatatBelanja', [
             'navigation' => $this->nav($this->can()),
             'sumberDana' => SumberDana::orderBy('kode_dana')->get(['id', 'kode_dana', 'nama_sumber']),
@@ -78,6 +82,8 @@ class KeuanganPwaController extends Controller
 
     public function catatPemasukan()
     {
+        abort_unless(Auth::user()?->can('input_belanja') ?? false, 403);
+
         return Inertia::render('KeuanganPwa/CatatPemasukan', [
             'navigation' => $this->nav($this->can()),
         ]);
@@ -85,6 +91,8 @@ class KeuanganPwaController extends Controller
 
     public function dasbor()
     {
+        abort_unless(Auth::user()?->can('view_laporan_pimpinan') ?? false, 403);
+
         return Inertia::render('KeuanganPwa/DasborPimpinan', [
             'navigation' => $this->nav($this->can()),
         ]);
@@ -92,6 +100,8 @@ class KeuanganPwaController extends Controller
 
     public function slipSaya()
     {
+        abort_unless(Auth::user()?->can('view_slip_sendiri') ?? false, 403);
+
         return Inertia::render('KeuanganPwa/SlipSaya', [
             'navigation' => $this->nav($this->can()),
         ]);
