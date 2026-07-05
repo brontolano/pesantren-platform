@@ -3,6 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
 import UiIcon from '@/Components/Ui/UiIcon.vue'
+import { UiSelect, UiInput, UiButton } from '@/Shared'
 
 defineOptions({ layout: PortalWaliLayout })
 
@@ -58,7 +59,7 @@ const allSubmissions = [...(props.submissions || []).map(s => ({ ...s, tipe: 'iz
         <!-- Two-card hub -->
         <div class="flex gap-[11px]">
             <button
-                class="flex flex-1 flex-col rounded-[24px] bg-gradient-to-br from-[#0b8f63] to-emerald-700 p-[18px] text-left text-white shadow-[0_16px_44px_-24px_rgba(17,17,17,0.4)]"
+                class="flex flex-1 flex-col rounded-[24px] bg-gradient-to-br from-[#6d28d9] to-violet-700 p-[18px] text-left text-white shadow-[0_16px_44px_-24px_rgba(17,17,17,0.4)]"
                 @click="showForm = !showForm"
             >
                 <span class="flex h-[42px] w-[42px] items-center justify-center rounded-[14px] bg-white/16 ring-1 ring-inset ring-white/25">
@@ -99,43 +100,44 @@ const allSubmissions = [...(props.submissions || []).map(s => ({ ...s, tipe: 'iz
 
             <label class="grid gap-1.5 text-sm font-semibold text-slate-700">
                 Pilih santri
-                <select v-model="form.santri_id" class="rounded-2xl border border-[#efe7da] bg-[#fffaf3] px-4 py-3 text-sm">
+                <UiSelect v-model="form.santri_id">
                     <option v-for="child in children" :key="child.id" :value="child.id">{{ child.nama }}</option>
-                </select>
+                </UiSelect>
             </label>
 
             <label class="grid gap-1.5 text-sm font-semibold text-slate-700">
                 Jenis izin
-                <select v-model="form.jenis_izin" class="rounded-2xl border border-[#efe7da] bg-[#fffaf3] px-4 py-3 text-sm">
+                <UiSelect v-model="form.jenis_izin">
                     <option value="sakit">Sakit</option>
                     <option value="pulang">Pulang</option>
                     <option value="khusus">Khusus</option>
-                </select>
+                </UiSelect>
             </label>
 
             <div class="grid grid-cols-2 gap-3">
                 <label class="grid gap-1.5 text-sm font-semibold text-slate-700">
                     Tanggal mulai
-                    <input v-model="form.tanggal_mulai" type="date" class="rounded-2xl border border-[#efe7da] bg-[#fffaf3] px-4 py-3 text-sm">
+                    <UiInput v-model="form.tanggal_mulai" type="date" />
                 </label>
                 <label class="grid gap-1.5 text-sm font-semibold text-slate-700">
                     Tanggal selesai
-                    <input v-model="form.tanggal_selesai" type="date" class="rounded-2xl border border-[#efe7da] bg-[#fffaf3] px-4 py-3 text-sm">
+                    <UiInput v-model="form.tanggal_selesai" type="date" />
                 </label>
             </div>
 
             <label class="grid gap-1.5 text-sm font-semibold text-slate-700">
                 Alasan
-                <textarea v-model="form.alasan" rows="3" class="rounded-2xl border border-[#efe7da] bg-[#fffaf3] px-4 py-3 text-sm" />
+                <UiInput v-model="form.alasan" type="textarea" :rows="3" />
             </label>
 
-            <button
+            <UiButton
                 type="submit"
-                class="w-full rounded-full bg-emerald-600 py-[14px] font-jost text-[15px] font-semibold text-white shadow-[0_8px_20px_-12px_rgba(5,150,105,0.45)]"
+                variant="primary"
+                block
                 :disabled="form.processing"
             >
                 Kirim Pengajuan
-            </button>
+            </UiButton>
         </form>
 
         <!-- Riwayat pengajuan -->

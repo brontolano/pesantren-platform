@@ -72,7 +72,7 @@ async function aktifkanPush() {
 
         <!-- Profile header -->
         <div class="flex flex-col items-center gap-[10px] pt-2 text-center">
-            <div class="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-emerald-50 font-jost text-[28px] font-bold text-emerald-700 shadow-[inset_0_0_0_1px_#efe7da]">
+            <div class="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-violet-50 font-jost text-[28px] font-bold text-violet-700 shadow-[inset_0_0_0_1px_#efe7da]">
                 {{ initials(wali.name) }}
             </div>
             <div>
@@ -93,7 +93,7 @@ async function aktifkanPush() {
                 :href="`/wali/santri/${child.id}`"
                 class="flex items-center gap-3 rounded-[20px] bg-white px-4 py-[13px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)] transition active:scale-[.99]"
             >
-                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 font-jost text-base font-bold text-emerald-700">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-50 font-jost text-base font-bold text-violet-700">
                     {{ initials(child.nama) }}
                 </span>
                 <div class="min-w-0 flex-1">
@@ -116,7 +116,7 @@ async function aktifkanPush() {
                     :disabled="pushStatus === 'loading'"
                     @click="aktifkanPush"
                 >
-                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700">
                         <UiIcon name="bell" class="h-[18px] w-[18px]" />
                     </span>
                     <span class="flex-1 text-[13.5px] font-semibold text-slate-800">

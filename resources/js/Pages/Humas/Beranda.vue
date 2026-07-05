@@ -13,7 +13,7 @@ const props = defineProps({
 const navItems = props.navigation
 
 const COVER = {
-    emerald: 'bg-emerald-100 text-emerald-700',
+    emerald: 'bg-violet-100 text-violet-700',
     teal: 'bg-teal-100 text-teal-700',
     amber: 'bg-amber-100 text-amber-700',
     blue: 'bg-blue-100 text-blue-700',

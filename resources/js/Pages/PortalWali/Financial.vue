@@ -51,7 +51,7 @@ function statusBadge(status) {
                 :key="tab"
                 class="rounded-full px-4 py-2 font-jost text-[13px] font-semibold transition"
                 :class="activeTab === tab
-                    ? 'bg-emerald-600 text-white'
+                    ? 'bg-violet-600 text-white'
                     : 'bg-white text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]'"
                 @click="activeTab = tab"
             >
@@ -70,7 +70,7 @@ function statusBadge(status) {
                 <Link
                     v-if="unpaidBills.length"
                     :href="`/wali/santri/${child.id}/tagihan/${unpaidBills[0].id}/bayar`"
-                    class="rounded-full bg-emerald-600 px-[18px] py-2.5 font-jost text-[13px] font-semibold text-white shadow-[0_8px_20px_-12px_rgba(5,150,105,0.45)]"
+                    class="rounded-full bg-violet-600 px-[18px] py-2.5 font-jost text-[13px] font-semibold text-white shadow-[0_8px_20px_-12px_rgba(124,58,237,0.45)]"
                 >
                     Bayar semua
                 </Link>
@@ -105,7 +105,7 @@ function statusBadge(status) {
                             >
                                 <span class="truncate">
                                     {{ k.nama }}
-                                    <span v-if="k.masukTabungan" class="ml-1 rounded-full bg-emerald-50 px-1.5 py-px text-[9.5px] font-semibold text-emerald-700">→ Tabungan</span>
+                                    <span v-if="k.masukTabungan" class="ml-1 rounded-full bg-violet-50 px-1.5 py-px text-[9.5px] font-semibold text-violet-700">→ Tabungan</span>
                                 </span>
                                 <span class="shrink-0 tabular-nums">{{ fmt(k.nominal) }}</span>
                             </li>
@@ -128,7 +128,7 @@ function statusBadge(status) {
 
             <!-- Empty state -->
             <div v-if="!bills.length" class="rounded-[22px] bg-white px-5 py-6 text-center shadow-[inset_0_0_0_1px_#efe7da]">
-                <UiIcon name="check-circle" class="mx-auto h-8 w-8 text-emerald-500" />
+                <UiIcon name="check-circle" class="mx-auto h-8 w-8 text-violet-500" />
                 <p class="mt-2 text-sm font-semibold text-slate-700">Tidak ada tagihan</p>
                 <p class="mt-1 text-xs text-slate-500">Semua tagihan anak sudah lunas.</p>
             </div>
@@ -136,7 +136,7 @@ function statusBadge(status) {
             <!-- Tabungan card (bottom, always visible in tagihan tab) -->
             <Link
                 :href="`/wali/santri/${child.id}/tabungan`"
-                class="flex items-center gap-[13px] rounded-[22px] bg-gradient-to-br from-emerald-600 to-emerald-800 px-[18px] py-[15px] text-white shadow-[0_16px_44px_-24px_rgba(17,17,17,0.4)] transition active:scale-[.99]"
+                class="flex items-center gap-[13px] rounded-[22px] bg-gradient-to-br from-violet-600 to-violet-800 px-[18px] py-[15px] text-white shadow-[0_16px_44px_-24px_rgba(17,17,17,0.4)] transition active:scale-[.99]"
             >
                 <span class="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-[14px] bg-white/16 ring-1 ring-inset ring-white/25">
                     <UiIcon name="wallet" class="h-5 w-5" />
@@ -145,7 +145,7 @@ function statusBadge(status) {
                     <p class="font-jost text-[10.5px] font-semibold uppercase tracking-[0.14em] text-[#e7d3a1]">Tabungan {{ child.nama }}</p>
                     <p class="mt-0.5 font-jost text-lg font-bold tabular-nums">{{ fmt(savings.saldo) }}</p>
                 </div>
-                <span class="shrink-0 rounded-full bg-white px-4 py-2 font-jost text-[12.5px] font-semibold text-emerald-700">
+                <span class="shrink-0 rounded-full bg-white px-4 py-2 font-jost text-[12.5px] font-semibold text-violet-700">
                     Setor saldo
                 </span>
             </Link>
@@ -153,13 +153,13 @@ function statusBadge(status) {
 
         <!-- ==================== TAB: TABUNGAN ==================== -->
         <template v-if="activeTab === 'tabungan'">
-            <div class="rounded-[22px] bg-gradient-to-br from-emerald-600 to-emerald-800 px-5 py-5 text-white">
+            <div class="rounded-[22px] bg-gradient-to-br from-violet-600 to-violet-800 px-5 py-5 text-white">
                 <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.14em] text-[#e7d3a1]">Saldo Tabungan</p>
                 <p class="mt-1 font-jost text-3xl font-bold tabular-nums">{{ fmt(savings.saldo) }}</p>
                 <div class="mt-4 flex gap-2">
                     <Link
                         :href="`/wali/santri/${child.id}/topup`"
-                        class="rounded-full bg-white px-5 py-2.5 font-jost text-[13px] font-semibold text-emerald-700"
+                        class="rounded-full bg-white px-5 py-2.5 font-jost text-[13px] font-semibold text-violet-700"
                     >
                         Setor Saldo
                     </Link>
@@ -193,14 +193,14 @@ function statusBadge(status) {
             <div v-if="payments.length" class="rounded-[22px] bg-white shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
                 <div class="divide-y divide-[#f6f0e6] px-[18px]">
                     <div v-for="payment in payments" :key="payment.id" class="flex items-center gap-[13px] py-3">
-                        <span class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[13px] bg-emerald-50 text-emerald-700">
+                        <span class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[13px] bg-violet-50 text-violet-700">
                             <UiIcon name="check-circle" class="h-[19px] w-[19px]" />
                         </span>
                         <div class="min-w-0 flex-1">
                             <p class="text-[13.5px] font-semibold text-slate-800">{{ payment.tagihan || 'Pembayaran' }}</p>
                             <p class="text-xs text-slate-500">{{ payment.tanggalPembayaran || '-' }} · {{ payment.metode || '-' }}</p>
                         </div>
-                        <p class="shrink-0 font-jost text-sm font-bold tabular-nums text-emerald-700">{{ fmt(payment.nominal) }}</p>
+                        <p class="shrink-0 font-jost text-sm font-bold tabular-nums text-violet-700">{{ fmt(payment.nominal) }}</p>
                     </div>
                 </div>
             </div>

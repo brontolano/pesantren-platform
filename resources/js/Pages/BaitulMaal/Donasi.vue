@@ -95,7 +95,7 @@ function tolak() {
                     :href="selected.bukti_url"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 underline"
+                    class="inline-flex items-center gap-1.5 text-sm font-semibold text-violet-700 underline"
                 >
                     Lihat bukti transfer
                 </a>

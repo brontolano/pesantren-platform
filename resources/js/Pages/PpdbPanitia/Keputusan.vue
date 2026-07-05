@@ -108,7 +108,7 @@ const badgeStatus = computed(() => {
                         :key="o.value"
                         type="button"
                         class="flex flex-col items-center gap-2 rounded-2xl bg-white p-4 text-center ring-1 ring-slate-100 shadow-soft transition-all duration-200 active:scale-[.97]"
-                        :class="calon.statusSaatIni === o.value ? 'ring-2 ring-emerald-500' : ''"
+                        :class="calon.statusSaatIni === o.value ? 'ring-2 ring-violet-500' : ''"
                         @click="buka(o)"
                     >
                         <IconCircle

@@ -83,7 +83,7 @@ function tarikNilai(item) {
                         <template v-else>
                             <select
                                 v-model="komponenDipilih"
-                                class="rounded-xl border-slate-300 py-2 text-xs font-medium text-slate-700 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                                class="rounded-xl border-slate-300 py-2 text-xs font-medium text-slate-700 shadow-sm focus:border-violet-500 focus:ring-violet-500"
                             >
                                 <option :value="null" disabled>Pilih komponen…</option>
                                 <option v-for="k in item.komponen" :key="k.id" :value="k.id">{{ k.nama }}</option>

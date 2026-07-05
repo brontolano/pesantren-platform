@@ -156,7 +156,7 @@ onMounted(() => {
             <!-- WP-30: registrasi tamu penjengukan -->
             <div class="mt-5 border-t border-slate-100 pt-4">
                 <h3 class="flex items-center gap-2 text-sm font-bold tracking-tight text-slate-700">
-                    <UiIcon name="user" class="h-4 w-4 text-emerald-600" />
+                    <UiIcon name="user" class="h-4 w-4 text-violet-600" />
                     Penjengukan Hari Ini
                 </h3>
 

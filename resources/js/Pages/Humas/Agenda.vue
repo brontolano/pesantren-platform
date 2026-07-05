@@ -44,8 +44,8 @@ const JENIS_TONE = {
                 <SectionCard v-for="g in grup" :key="g.tanggal" flush>
                     <template #header>
                         <div class="flex items-center gap-2 px-1">
-                            <span class="h-1.5 w-1.5 rounded-full bg-[var(--wali-primary,#059669)]" />
-                            <p class="font-jost text-[13px] font-bold uppercase tracking-wider text-emerald-700">
+                            <span class="h-1.5 w-1.5 rounded-full bg-[var(--wali-primary,#7c3aed)]" />
+                            <p class="font-jost text-[13px] font-bold uppercase tracking-wider text-violet-700">
                                 {{ g.tanggal }}
                             </p>
                         </div>

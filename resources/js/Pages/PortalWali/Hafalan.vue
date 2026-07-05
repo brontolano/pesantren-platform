@@ -22,7 +22,7 @@ function nilaiColor(nilai) {
 function jenisIconBg(jenis) {
     const j = String(jenis || '').toLowerCase()
     if (j.includes('muraja')) return 'bg-[#f7efdc] text-[#a07c2c]'
-    return 'bg-emerald-50 text-emerald-700'
+    return 'bg-violet-50 text-violet-700'
 }
 
 const formatDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }) : '-'
@@ -39,13 +39,13 @@ const formatDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', { weekday:
 
         <!-- Tab pills -->
         <div class="flex gap-2">
-            <span class="rounded-full bg-emerald-600 px-4 py-2 font-jost text-[13px] font-semibold text-white">Tahfidz</span>
+            <span class="rounded-full bg-violet-600 px-4 py-2 font-jost text-[13px] font-semibold text-white">Tahfidz</span>
             <Link :href="`/wali/santri/${santri.id}/akademik`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Rapor</Link>
             <Link :href="`/wali/santri/${santri.id}/kesehatan`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Kesehatan</Link>
         </div>
 
         <!-- Progress card -->
-        <div class="rounded-[26px] bg-gradient-to-br from-[#0b8f63] via-emerald-600 to-emerald-700 p-5 text-white shadow-[0_16px_44px_-24px_rgba(17,17,17,0.4)]">
+        <div class="rounded-[26px] bg-gradient-to-br from-[#6d28d9] via-violet-600 to-violet-700 p-5 text-white shadow-[0_16px_44px_-24px_rgba(17,17,17,0.4)]">
             <p class="font-jost text-[11px] font-semibold uppercase tracking-[0.16em] text-[#e7d3a1]">Hafalan saat ini</p>
             <p class="mt-[7px] font-jost text-[21px] font-bold">{{ ringkasan.posisiTerakhir || 'Belum ada data' }}</p>
             <div v-if="ringkasan.persentase" class="mt-[14px]">
@@ -62,7 +62,7 @@ const formatDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', { weekday:
         <!-- Stats -->
         <div class="grid grid-cols-2 gap-[11px]">
             <div class="rounded-[20px] bg-white px-4 py-[14px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
-                <p class="font-jost text-[21px] font-bold tabular-nums text-emerald-700">{{ ringkasan.ziyadahPekan ?? 0 }} hal</p>
+                <p class="font-jost text-[21px] font-bold tabular-nums text-violet-700">{{ ringkasan.ziyadahPekan ?? 0 }} hal</p>
                 <p class="mt-0.5 text-xs text-slate-500">Ziyadah pekan ini</p>
             </div>
             <div class="rounded-[20px] bg-white px-4 py-[14px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">

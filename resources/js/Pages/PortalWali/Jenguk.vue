@@ -74,7 +74,7 @@ const warnaStatus = {
                 <textarea v-model="form.catatan" rows="2" class="rounded-xl border border-slate-300 px-3 py-2 font-normal" placeholder="Misal: datang 4 orang"></textarea>
             </label>
 
-            <button type="submit" :disabled="form.processing" class="w-full rounded-2xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow disabled:opacity-50">
+            <button type="submit" :disabled="form.processing" class="w-full rounded-2xl bg-violet-600 px-4 py-3 font-semibold text-white shadow disabled:opacity-50">
                 Ajukan Jenguk
             </button>
         </form>

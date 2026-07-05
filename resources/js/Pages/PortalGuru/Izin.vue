@@ -1,7 +1,7 @@
 <script setup>
 import { Head, useForm, router } from '@inertiajs/vue3'
 import PortalGuruLayout from '../../Layouts/PortalGuruLayout.vue'
-import { PageHeader, SectionCard, ListRow, StatusBadge, UiField, UiInput, UiButton, EmptyState, IconCircle } from '@/Shared'
+import { PageHeader, SectionCard, ListRow, StatusBadge, UiField, UiInput, UiSelect, UiButton, EmptyState, IconCircle } from '@/Shared'
 
 defineOptions({
     layout: PortalGuruLayout,
@@ -88,14 +88,13 @@ const warnaStatus = {
             <form class="space-y-3" @submit.prevent="ajukan">
                 <UiField label="Jenis Izin">
                     <template #default="{ fieldId, describedby }">
-                        <select
+                        <UiSelect
                             :id="fieldId"
                             v-model="form.jenis"
                             :aria-describedby="describedby"
-                            class="min-h-[48px] w-full rounded-2xl bg-white px-4 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]"
                         >
                             <option v-for="j in jenisIzin" :key="j.value" :value="j.value">{{ j.label }}</option>
-                        </select>
+                        </UiSelect>
                     </template>
                 </UiField>
                 <div class="grid grid-cols-2 gap-3">

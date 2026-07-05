@@ -44,7 +44,7 @@ const mutasiUrl = computed(() => `/wali/santri/${props.child.id}/tabungan`)
             <div class="flex flex-col items-center">
                 <!-- Badge sukses gradient -->
                 <span class="relative flex h-20 w-20 items-center justify-center">
-                    <span aria-hidden="true" class="absolute inset-0 rounded-full bg-emerald-100/70 blur-xl" />
+                    <span aria-hidden="true" class="absolute inset-0 rounded-full bg-violet-100/70 blur-xl" />
                     <span class="relative flex h-20 w-20 items-center justify-center rounded-full bg-brand-grad text-white shadow-brand ring-4 ring-white success-pop">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-9 w-9">
                             <path d="m4.5 12.75 6 6 9-13.5" class="check-draw" />
@@ -60,8 +60,8 @@ const mutasiUrl = computed(() => `/wali/santri/${props.child.id}/tabungan`)
                 </p>
 
                 <!-- Nominal top up -->
-                <div class="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 ring-1 ring-inset ring-emerald-100">
-                    <span class="text-[11px] font-bold uppercase tracking-wide text-emerald-700">Nominal</span>
+                <div class="mt-5 inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-2 ring-1 ring-inset ring-violet-100">
+                    <span class="text-[11px] font-bold uppercase tracking-wide text-violet-700">Nominal</span>
                     <MoneyText :amount="topup.nominal" size="md" tone="emerald" sign="plus" />
                 </div>
             </div>
@@ -74,7 +74,7 @@ const mutasiUrl = computed(() => `/wali/santri/${props.child.id}/tabungan`)
             </p>
             <MoneyText :amount="saldoBaru" size="2xl" tone="inherit" class="mt-2 block text-white" />
             <p class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-white/85 ring-1 ring-inset ring-white/15">
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-200" />
+                <span class="h-1.5 w-1.5 rounded-full bg-violet-200" />
                 Saldo siap dipakai · {{ topup.metodeName }}
             </p>
         </UiCard>

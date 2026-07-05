@@ -166,8 +166,8 @@ function submit() {
         <!-- KATALOG METODE -->
         <section class="space-y-4">
             <div class="px-0.5">
-                <p class="inline-flex items-center gap-1.5 font-jost text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
-                    <span class="h-1.5 w-1.5 rounded-full bg-[var(--wali-primary,#059669)]" />
+                <p class="inline-flex items-center gap-1.5 font-jost text-[11px] font-semibold uppercase tracking-wider text-violet-700">
+                    <span class="h-1.5 w-1.5 rounded-full bg-[var(--wali-primary,#7c3aed)]" />
                     Langkah 2
                 </p>
                 <h3 class="mt-1 font-jost text-lg font-bold leading-tight tracking-tight text-slate-900">
@@ -187,9 +187,9 @@ function submit() {
                         v-for="method in group.methods"
                         :key="method.code"
                         type="button"
-                        class="flex w-full items-center gap-3 rounded-3xl bg-white px-4 py-3.5 text-left shadow-soft ring-1 transition-all duration-200 active:scale-[.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--wali-primary,#059669)]"
+                        class="flex w-full items-center gap-3 rounded-3xl bg-white px-4 py-3.5 text-left shadow-soft ring-1 transition-all duration-200 active:scale-[.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--wali-primary,#7c3aed)]"
                         :class="form.metode === method.code
-                            ? 'ring-2 ring-[var(--wali-primary,#059669)]'
+                            ? 'ring-2 ring-[var(--wali-primary,#7c3aed)]'
                             : 'ring-[var(--wali-border,#efe7da)] hover:ring-slate-300'"
                         :aria-pressed="form.metode === method.code"
                         @click="pickMethod(method.code)"
@@ -197,7 +197,7 @@ function submit() {
                         <!-- Badge inisial berwarna dari method.color (tanpa aset eksternal) -->
                         <span
                             class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-[11px] font-extrabold tracking-tight text-white"
-                            :style="{ backgroundColor: method.color || '#059669' }"
+                            :style="{ backgroundColor: method.color || '#7c3aed' }"
                         >
                             {{ methodInitials(method) }}
                         </span>
@@ -223,7 +223,7 @@ function submit() {
                         <span
                             class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors"
                             :class="form.metode === method.code
-                                ? 'border-[var(--wali-primary,#059669)] bg-[var(--wali-primary,#059669)]'
+                                ? 'border-[var(--wali-primary,#7c3aed)] bg-[var(--wali-primary,#7c3aed)]'
                                 : 'border-slate-300 bg-white'"
                             aria-hidden="true"
                         >

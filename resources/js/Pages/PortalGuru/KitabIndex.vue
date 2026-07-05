@@ -42,7 +42,7 @@ defineProps({
                     chevron
                 >
                     <template #trailing>
-                        <span class="inline-flex shrink-0 items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700 ring-1 ring-inset ring-emerald-100">
+                        <span class="inline-flex shrink-0 items-center rounded-full bg-violet-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-violet-700 ring-1 ring-inset ring-violet-100">
                             {{ k.metode }}
                         </span>
                     </template>

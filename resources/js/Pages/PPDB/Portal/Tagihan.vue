@@ -122,7 +122,7 @@ const labelStatus = (s) => (s || '').replace(/_/g, ' ').replace(/\b\w/g, (c) => 
                             <span v-if="uploadingId === item.id">Mengunggah…</span>
                             <span v-else>{{ item.buktiAda ? 'Ganti bukti' : 'Unggah bukti transfer' }}</span>
                         </label>
-                        <span v-if="item.buktiAda" class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600">✓ bukti terkirim</span>
+                        <span v-if="item.buktiAda" class="inline-flex items-center gap-1 text-[11px] font-semibold text-violet-600">✓ bukti terkirim</span>
                     </div>
                 </MdCard>
             </div>

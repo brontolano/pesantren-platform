@@ -11,8 +11,8 @@ const props = defineProps({
 const navItems = props.navigation
 
 const COVER = {
-    emerald: 'from-emerald-400 to-teal-500',
-    teal: 'from-teal-400 to-emerald-500',
+    emerald: 'from-violet-400 to-teal-500',
+    teal: 'from-teal-400 to-violet-500',
     amber: 'from-amber-400 to-orange-500',
     blue: 'from-blue-400 to-indigo-500',
     rose: 'from-rose-400 to-pink-500',

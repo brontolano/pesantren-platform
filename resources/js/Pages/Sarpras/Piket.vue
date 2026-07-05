@@ -64,7 +64,7 @@ function simpan() {
             </form>
 
             <section>
-                <p class="mb-3 font-jost text-[11px] font-semibold uppercase tracking-wider text-emerald-700">
+                <p class="mb-3 font-jost text-[11px] font-semibold uppercase tracking-wider text-violet-700">
                     Ceklis Hari Ini
                 </p>
                 <SectionCard flush>

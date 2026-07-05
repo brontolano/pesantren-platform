@@ -117,7 +117,7 @@ function submit() {
                     >
                         <span class="truncate">
                             {{ k.nama }}
-                            <span v-if="k.masukTabungan" class="ml-1 rounded-full bg-white/15 px-1.5 py-px text-[9.5px] font-semibold text-emerald-200">→ Tabungan</span>
+                            <span v-if="k.masukTabungan" class="ml-1 rounded-full bg-white/15 px-1.5 py-px text-[9.5px] font-semibold text-violet-200">→ Tabungan</span>
                         </span>
                         <MoneyText :amount="k.nominal" size="sm" tone="inherit" class="shrink-0" />
                     </li>
@@ -165,7 +165,7 @@ function submit() {
                                 :aria-describedby="describedby"
                                 :aria-invalid="invalid || undefined"
                                 class="min-h-[48px] w-full appearance-none rounded-2xl bg-white py-3 pl-4 pr-11 text-sm font-medium text-slate-900 ring-1 ring-inset transition-all duration-200 focus:outline-none focus:ring-2"
-                                :class="invalid ? 'ring-rose-300 focus:ring-rose-500' : 'ring-slate-200 hover:ring-slate-300 focus:ring-[var(--wali-primary,#059669)]'"
+                                :class="invalid ? 'ring-rose-300 focus:ring-rose-500' : 'ring-slate-200 hover:ring-slate-300 focus:ring-[var(--wali-primary,#7c3aed)]'"
                             >
                                 <option
                                     v-for="metode in metodePembayaran"
@@ -211,7 +211,7 @@ function submit() {
                 <UiField label="Foto bukti transfer" :error="form.errors.bukti_pembayaran">
                     <template #default="{ describedby }">
                         <label
-                            class="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-4 py-8 text-center transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-50/40 focus-within:border-emerald-300 focus-within:ring-2 focus-within:ring-[var(--wali-primary,#059669)]"
+                            class="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 px-4 py-8 text-center transition-all duration-200 hover:border-violet-300 hover:bg-violet-50/40 focus-within:border-violet-300 focus-within:ring-2 focus-within:ring-[var(--wali-primary,#7c3aed)]"
                         >
                             <input
                                 type="file"
@@ -234,14 +234,14 @@ function submit() {
                                     size="lg"
                                     class="transition-transform duration-200 group-hover:scale-105"
                                 />
-                                <span class="mt-3 text-sm font-bold text-emerald-700">Pilih foto</span>
+                                <span class="mt-3 text-sm font-bold text-violet-700">Pilih foto</span>
                                 <span class="mt-1 text-xs font-normal text-slate-500">
                                     Ambil dari galeri atau kamera (maks. 2 MB)
                                 </span>
                             </template>
                         </label>
                         <p v-if="previewUrl" class="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                            <UiIcon name="upload" class="h-3.5 w-3.5 text-emerald-600" />
+                            <UiIcon name="upload" class="h-3.5 w-3.5 text-violet-600" />
                             Ketuk gambar untuk mengganti foto.
                         </p>
                     </template>

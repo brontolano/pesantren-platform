@@ -57,7 +57,7 @@ const quickLinks = [
 
             <!-- CTA Daftar Ulang (peserta LULUS) -->
             <Link v-if="bolehDaftarUlang" href="/spmb/daftar-ulang" class="block">
-                <div class="flex items-center justify-between rounded-2xl bg-emerald-600 px-4 py-3.5 text-white shadow-sm active:brightness-95">
+                <div class="flex items-center justify-between rounded-2xl bg-violet-600 px-4 py-3.5 text-white shadow-sm active:brightness-95">
                     <span class="text-[15px] font-semibold">🎉 Anda LULUS — Daftar Ulang</span>
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6" /></svg>
                 </div>
@@ -146,7 +146,7 @@ const quickLinks = [
                 <h2 class="mb-3 text-[15px] font-bold text-stone-900">Riwayat aktivitas</h2>
                 <ol class="space-y-2.5">
                     <li v-for="(item, idx) in timeline" :key="idx" class="flex items-start gap-3">
-                        <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full" :class="idx === 0 ? 'bg-emerald-500' : 'bg-stone-300'" />
+                        <span class="mt-1 h-2.5 w-2.5 shrink-0 rounded-full" :class="idx === 0 ? 'bg-violet-500' : 'bg-stone-300'" />
                         <div>
                             <div class="text-[13px] font-semibold text-stone-900">{{ item.label }}</div>
                             <div class="text-[11px] text-stone-500">{{ item.tanggal }}</div>
