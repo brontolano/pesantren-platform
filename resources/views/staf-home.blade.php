@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b6e4f">
+<script>try{if(localStorage.getItem('nur-theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
 <title>{{ $namaPesantren }} — Staf</title>
 <link rel="manifest" href="/beranda/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,7 +19,14 @@
 html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 :root{--nur:#0b6e4f;--nur-strong:#085840;--nur-tint:#ecfdf6;--nur-100:#d1faea;--terra:#c14f2a;--terra-tint:#fef3ee;--gold:#c9a24a;--gold-soft:#e7d3a1;--goldb:#fef9c3;--goldink:#7a5e1e;--ink:#111;--sub:#64748b;--faint:#94a3b8;--line:#efe7da;--card:#fff;--bg:#fffaf3;--grad:linear-gradient(160deg,#17a179 0%,#0b6e4f 48%,#062a20 100%);--r:16px;--r2:20px;--rs:12px;--fd:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;--fb:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;--sh:inset 0 0 0 1px var(--line),0 2px 4px -2px rgba(17,17,17,.06),0 12px 28px -16px rgba(17,17,17,.18)}
 html,body{height:100%;font-family:var(--fb);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none}
-a{text-decoration:none;color:inherit}button{font-family:inherit}a,button,input{touch-action:manipulation}
+a{text-decoration:none;color:inherit}button{font-family:inherit;color:inherit}a,button,input{touch-action:manipulation}
+/* Dark Mode "Nur" — aktif bila <html class="dark"> (di-set toggle, persist localStorage). */
+html.dark{--nur:#2fbf85;--nur-strong:#26a874;--nur-tint:#12271f;--nur-100:#1c3a2e;--terra-tint:#33180f;--goldb:#2a230f;--goldink:#e7c877;--ink:#eef2f0;--sub:#9fb0a8;--faint:#6b7a73;--line:#26312c;--card:#161e1a;--bg:#0d1411;--sh:inset 0 0 0 1px var(--line),0 10px 26px -18px rgba(0,0,0,.7)}
+html.dark body{background:var(--bg)}
+html.dark .c-nur{background:#12271f;color:#5fe0a8}html.dark .c-gold{background:#2a230f;color:#e7c877}html.dark .c-violet{background:#241c3a;color:#c4b5fd}html.dark .c-sky{background:#12293a;color:#7dd3fc}html.dark .c-rose{background:#3a1420;color:#fda4c0}html.dark .c-terra{background:#33180f;color:#f0a084}html.dark .c-slate{background:#1e2630;color:#b0c0d0}
+html.dark .tile[data-c="gold"] .tile-icon,html.dark .menu-item[data-c="gold"] .menu-icon{background:#2a230f;color:#e7c877}html.dark .tile[data-c="sky"] .tile-icon,html.dark .menu-item[data-c="sky"] .menu-icon{background:#12293a;color:#7dd3fc}html.dark .tile[data-c="rose"] .tile-icon,html.dark .menu-item[data-c="rose"] .menu-icon{background:#3a1420;color:#fda4c0}html.dark .tile[data-c="violet"] .tile-icon,html.dark .menu-item[data-c="violet"] .menu-icon{background:#241c3a;color:#c4b5fd}html.dark .tile[data-c="terra"] .tile-icon,html.dark .menu-item[data-c="terra"] .menu-icon{background:#33180f;color:#f0a084}html.dark .tile[data-c="slate"] .tile-icon,html.dark .menu-item[data-c="slate"] .menu-icon{background:#1e2630;color:#b0c0d0}
+html.dark .nav{background:rgba(18,24,21,.96)}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 .app{max-width:540px;margin:0 auto;min-height:100%;position:relative}
 .scroll-area{overflow-y:auto;height:100vh;padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .tab{display:none}.tab.on{display:block;animation:fade .25s ease}
@@ -151,6 +159,7 @@ $featArt=$pengumuman->first();
     <div class="hero-top">
       <div class="avatar">@if($logoUrl)<img src="{{ $logoUrl }}" alt="">@else{{ $inisial }}@endif</div>
       <div class="hero-info"><div class="hero-greeting">{{ $sapa }},</div><div class="hero-name">{{ $user->name }}</div></div>
+      <button class="hero-bell" id="btnTema" aria-label="Ganti tema gelap/terang" style="margin-right:8px">{!! $svg('moon',20) !!}</button>
       <button class="hero-bell" data-go="aktivitas">{!! $svg('bell',20) !!}</button>
     </div>
     <div class="datestrip"><span>{!! $svg('moon',13) !!} &nbsp;<b>{{ $tanggal['masehi'] ?? '' }}</b></span>@if(!empty($tanggal['hijriah']))<span class="cd">{{ $tanggal['hijriah'] }}</span>@endif</div>
@@ -267,6 +276,8 @@ $featArt=$pengumuman->first();
   function go(n){tabs.forEach(t=>t.classList.toggle('on',t.id==='tab-'+n));navs.forEach(b=>b.classList.toggle('on',b.dataset.tab===n));scroller.scrollTop=0;}
   navs.forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
   document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.go)));
+  const btnTema=document.getElementById('btnTema');
+  if(btnTema)btnTema.addEventListener('click',function(){const d=document.documentElement.classList.toggle('dark');try{localStorage.setItem('nur-theme',d?'dark':'light');}catch(e){}});
   const gridView=document.getElementById('grid-view');
   if(gridView){
     const detail=document.getElementById('detail'),results=document.getElementById('results'),noRes=document.getElementById('no-result'),inp=document.getElementById('search'),panes=[...document.querySelectorAll('.detail-pane')];
