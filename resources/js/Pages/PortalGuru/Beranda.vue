@@ -16,7 +16,7 @@ defineProps({
 })
 
 const menu = [
-    { href: '/guru/nilai', icon: 'book', tone: 'emerald', label: 'Nilai', hint: 'Grid massal' },
+    { href: '/guru/nilai', icon: 'book', tone: 'violet', label: 'Nilai', hint: 'Grid massal' },
     { href: '/guru/kitab', icon: 'document', tone: 'amber', label: 'Kitab', hint: 'Capaian kajian' },
     { href: '/guru/wali-kelas', icon: 'user', tone: 'teal', label: 'Wali Kelas', hint: 'Rekap binaan' },
 ]
