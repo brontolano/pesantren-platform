@@ -114,7 +114,7 @@ onBeforeUnmount(() => {
         <link rel="apple-touch-icon" :href="branding.icon192Url || faviconUrl">
     </Head>
 
-    <div class="font-jost min-h-screen bg-[var(--wali-bg,#fffaf3)] text-[#111] antialiased">
+    <div class="font-jost min-h-screen bg-[var(--wali-bg,#fffaf3)] text-[var(--wali-ink,#111)] antialiased">
         <FlashToast />
 
         <div class="mx-auto flex min-h-screen w-full max-w-md flex-col">

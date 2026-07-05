@@ -399,64 +399,6 @@ button { color: inherit; }
     }
 }
 
-/* Dark Mode "Nur": override HANYA token semantik → seluruh alias (--wali-*/--app-*)
-   & komponen yang membaca token ikut berubah (var() resolve lazy). Nilai = spec dark. */
-html.dark {
-    /* permukaan & ink */
-    --pst-cream:       #0d1411;
-    --pst-cream-2:     #0d1411;
-    --pst-cream-muted: #12271f;
-    --pst-parchment:   #241d10;
-    --pst-white:       #161e1a;
-    --pst-ink:         #eef2f0;
-
-    /* ramp slate (dipakai teks & border komponen) — dibalik terang/gelap */
-    --pst-slate-900:   #eef2f0;
-    --pst-slate-800:   #dbe5e0;
-    --pst-slate-700:   #c3d0ca;
-    --pst-slate-600:   #a9b8b1;
-    --pst-slate-500:   #9fb0a8;
-    --pst-slate-400:   #6b7a73;
-    --pst-slate-300:   #3a463f;
-    --pst-slate-200:   #26312c;
-    --pst-slate-100:   #1c2521;
-    --pst-slate-50:    #161e1a;
-
-    --pst-border-warm: #26312c;
-    --pst-border-gold: #3a2f18;
-
-    /* brand hijau lebih terang agar kontras di gelap */
-    --pst-nur-600:     #2fbf85;
-    --pst-nur-700:     #26a874;
-    --pst-nur-50:      #12271f;
-
-    /* alias semantik langsung (aman walau sudah cascade dari var di atas) */
-    --surface-page:  #0d1411;
-    --surface-card:  #161e1a;
-    --surface-muted: #12271f;
-    --surface-gold:  #241d10;
-    --text-strong:   #eef2f0;
-    --text-body:     #dbe5e0;
-    --text-muted:    #9fb0a8;
-    --text-faint:    #6b7a73;
-    --text-accent:   #5fe0a8;
-    --border-card:   #26312c;
-    --border-cool:   #26312c;
-    --border-gold:   #3a2f18;
-    --brand-primary:        #2fbf85;
-    --brand-primary-strong: #26a874;
-    --brand-primary-tint:   #12271f;
-
-    color-scheme: dark;
-    background: var(--surface-page);
-}
-
-/* PAGAR AlbaKids: tenant custom tetap TERANG walau .dark ter-set (jaga identitas
-   playful kids). Balikkan token inti ke nilai terang untuk body.tenant-albakids. */
-html.dark body.tenant-albakids {
-    --pst-cream: #fffaf3; --pst-white: #ffffff; --pst-ink: #111111;
-    --surface-page: #fffaf3; --surface-card: #ffffff;
-    --text-strong: #111111; --text-body: #1e293b; --text-muted: #64748b;
-    --border-card: #efe7da;
-    color-scheme: light;
-}
+/* CATATAN BUILD: blok Dark Mode dipindah ke style INLINE di app.blade.php dan
+   staf-home.blade karena lightningcss (Tailwind v4) menghapus rule selektor
+   dark dari app.css. Jangan taruh rule dark di sini. */
