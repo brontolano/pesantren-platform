@@ -45,13 +45,13 @@ const visible = computed(() => flagOn.value && isStandalone.value && isLegacySco
 <template>
     <div
         v-if="visible"
-        class="mx-4 mb-3 flex items-center justify-between gap-3 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900 ring-1 ring-inset ring-emerald-200"
+        class="mx-4 mb-3 flex items-center justify-between gap-3 rounded-2xl bg-violet-50 px-4 py-3 text-sm text-violet-900 ring-1 ring-inset ring-violet-200"
         role="status"
     >
         <span>Ada aplikasi baru yang lebih lengkap.</span>
         <a
             href="/"
-            class="shrink-0 rounded-full bg-emerald-600 px-3 py-1.5 font-semibold text-white"
+            class="shrink-0 rounded-full bg-violet-600 px-3 py-1.5 font-semibold text-white"
         >Pasang aplikasi baru</a>
     </div>
 </template>

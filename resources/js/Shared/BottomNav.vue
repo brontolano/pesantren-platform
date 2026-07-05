@@ -48,14 +48,14 @@ function iconFor(item) {
                 v-for="item in navItems"
                 :key="item.key || item.label"
                 :href="item.href"
-                class="group relative flex flex-col items-center gap-1 rounded-full px-1 py-1.5 transition-all duration-200 active:scale-[.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
-                :class="item.active ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'"
+                class="group relative flex flex-col items-center gap-1 rounded-full px-1 py-1.5 transition-all duration-200 active:scale-[.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500"
+                :class="item.active ? 'text-violet-700' : 'text-slate-400 hover:text-slate-600'"
                 :aria-current="item.active ? 'page' : undefined"
             >
                 <span
                     class="relative flex h-[34px] w-[34px] items-center justify-center rounded-full transition-all duration-200"
                     :class="item.active
-                        ? 'bg-emerald-50 text-emerald-700'
+                        ? 'bg-violet-50 text-violet-700'
                         : 'bg-transparent text-slate-400 group-hover:bg-slate-900/[0.04]'"
                 >
                     <UiIcon :name="iconFor(item)" class="h-[19px] w-[19px]" />
@@ -69,7 +69,7 @@ function iconFor(item) {
                 </span>
                 <span
                     class="font-jost text-[9.5px] leading-none tracking-tight transition-all duration-200"
-                    :class="item.active ? 'font-semibold text-emerald-700' : 'font-medium'"
+                    :class="item.active ? 'font-semibold text-violet-700' : 'font-medium'"
                 >
                     {{ item.label }}
                 </span>
