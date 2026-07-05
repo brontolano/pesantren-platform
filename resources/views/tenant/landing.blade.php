@@ -13,9 +13,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $namaPesantren }} — Pondok Pesantren</title>
-    <meta name="description" content="{{ $namaPesantren }} — {{ $tagline }}. Penerimaan Peserta Didik Baru (PPDB) telah dibuka.">
+    <meta name="description" content="{{ $namaPesantren }} — {{ $tagline }}. Tempat harapan Ayah Bunda dirawat, ilmu dan akhlak tumbuh bersama. Pendaftaran santri baru kini dibuka.">
     <meta property="og:title" content="{{ $namaPesantren }}">
-    <meta property="og:description" content="{{ $tagline }}">
+    <meta property="og:description" content="{{ $tagline }} — tempat harapan Ayah Bunda dirawat dengan sabar dan penuh cinta.">
     <meta property="og:type" content="website">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&family=amiri:400,700" rel="stylesheet">
@@ -145,13 +145,13 @@
 <section class="hero">
     <div class="hero-inner">
         <div class="bismillah arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-        <div class="hero-badge">🟢 PPDB Tahun Ajaran 2026/2027 Telah Dibuka</div>
+        <div class="hero-badge">🟢 Pintu Pendaftaran Tahun Ajaran 2026/2027 Terbuka</div>
         <h1>{{ $namaPesantren }}</h1>
         <p class="tagline">{{ $tagline }}</p>
-        <p class="desc">Lembaga pendidikan Islam yang memadukan ilmu agama dan ilmu umum, membentuk santri berakhlak mulia, mandiri, dan siap menghadapi tantangan zaman.</p>
+        <p class="desc">Setiap Ayah Bunda menitipkan harapan yang sama: putra-putrinya tumbuh menjadi pribadi yang berilmu, berakhlak, dan mandiri. Di sinilah harapan itu kami rawat — dengan bimbingan yang hangat, lingkungan yang aman, dan hati yang sabar mendampingi setiap langkah.</p>
         <div class="hero-actions">
-            <a href="{{ route('tenant.ppdb.form') }}" class="btn btn-primary btn-lg">Daftar Sekarang</a>
-            <a href="#program" class="btn btn-outline btn-lg">Lihat Program</a>
+            <a href="{{ route('tenant.ppdb.form') }}" class="btn btn-primary btn-lg">Titipkan Putra-Putri Anda</a>
+            <a href="#program" class="btn btn-outline btn-lg">Kenali Perjalanannya</a>
         </div>
 
         @if($tenant->id === 'demo')
@@ -169,49 +169,49 @@
 </section>
 
 <div class="stats">
-    <div class="stat"><div class="stat-num">{{ $stats['santri'] }}+</div><div class="stat-label">Santri Aktif</div></div>
-    <div class="stat"><div class="stat-num">{{ $stats['kelas'] }}</div><div class="stat-label">Rombongan Belajar</div></div>
-    <div class="stat"><div class="stat-num">{{ $stats['pelajaran'] }}</div><div class="stat-label">Mata Pelajaran</div></div>
-    <div class="stat"><div class="stat-num">24</div><div class="stat-label">Jam Pengasuhan</div></div>
+    <div class="stat"><div class="stat-num">{{ $stats['santri'] }}+</div><div class="stat-label">Keluarga yang Mempercayakan Putra-Putrinya</div></div>
+    <div class="stat"><div class="stat-num">{{ $stats['kelas'] }}</div><div class="stat-label">Kelas Penuh Kebersamaan</div></div>
+    <div class="stat"><div class="stat-num">{{ $stats['pelajaran'] }}</div><div class="stat-label">Ilmu yang Dipelajari</div></div>
+    <div class="stat"><div class="stat-num">24</div><div class="stat-label">Jam Pendampingan Tanpa Henti</div></div>
 </div>
 
 <section class="section" id="program">
     <div class="section-inner">
         <div class="section-header">
-            <div class="eyebrow">Program Pendidikan</div>
-            <h2>Pilihan Program Unggulan</h2>
-            <p>Setiap santri dibimbing sesuai minat dan potensinya melalui program yang terstruktur.</p>
+            <div class="eyebrow">Perjalanan yang Kami Tempuh Bersama</div>
+            <h2>Setiap Anak Punya Cerita, Kami Membimbingnya dengan Sabar</h2>
+            <p>Bukan sekadar kurikulum di atas kertas — ini adalah perjalanan menemukan jati diri, dituntun langkah demi langkah oleh mereka yang tulus mendampingi.</p>
         </div>
         <div class="programs">
             <div class="program-card">
                 <div class="program-icon">📖</div>
                 <h3>Tahfidzul Quran</h3>
-                <p>Program menghafal Al-Quran 30 juz dengan metode mutqin, bimbingan ustadz hafidz, dan target hafalan terukur per semester.</p>
+                <p>Menjaga Al-Quran di dada bukan perlombaan angka juz, melainkan cinta yang ditanam pelan-pelan bersama ustadz hafidz yang sabar mendampingi setiap ayat.</p>
             </div>
             <div class="program-card">
                 <div class="program-icon">📚</div>
                 <h3>Kajian Kitab Kuning</h3>
-                <p>Pendalaman kitab turats klasik — nahwu, shorof, fiqih, dan aqidah — dengan sanad keilmuan yang jelas.</p>
+                <p>Mewarisi ilmu para ulama lewat sanad yang bersambung — nahwu, shorof, fiqih, dan aqidah dipelajari dengan penuh penghayatan, bukan sekadar hafalan.</p>
             </div>
             <div class="program-card">
                 <div class="program-icon">🎓</div>
                 <h3>Pendidikan Formal</h3>
-                <p>Kurikulum nasional terakreditasi yang dipadukan dengan kurikulum pesantren, lulusan siap melanjutkan ke jenjang lebih tinggi.</p>
+                <p>Ijazah negara tetap di tangan, masa depan akademik tetap terbuka — kurikulum nasional terakreditasi berjalan seiring dengan nilai-nilai pesantren.</p>
             </div>
             <div class="program-card">
                 <div class="program-icon">🗣️</div>
                 <h3>Bahasa Arab & Inggris</h3>
-                <p>Penguasaan dua bahasa internasional sebagai bekal santri berkomunikasi dan menimba ilmu lintas negara.</p>
+                <p>Membuka pintu dunia bagi santri — agar kelak mereka mampu berbicara, berdakwah, dan menimba ilmu tanpa batas bahasa.</p>
             </div>
             <div class="program-card">
                 <div class="program-icon">🤝</div>
                 <h3>Pembinaan Akhlak</h3>
-                <p>Penanaman adab dan akhlak mulia melalui keteladanan, pembiasaan ibadah, dan pengasuhan 24 jam.</p>
+                <p>Adab didahulukan sebelum ilmu. Diteladankan lewat keseharian, bukan sekadar diajarkan — karena akhlak tumbuh dari apa yang dilihat dan dirasakan.</p>
             </div>
             <div class="program-card">
                 <div class="program-icon">⚽</div>
                 <h3>Ekstrakurikuler</h3>
-                <p>Pengembangan bakat santri: olahraga, kaligrafi, jurnalistik, kepramukaan, dan keterampilan hidup.</p>
+                <p>Ruang bagi santri menemukan bakatnya — berolahraga, berkarya, dan tumbuh percaya diri di luar bangku kelas.</p>
             </div>
         </div>
     </div>
@@ -220,23 +220,23 @@
 <section class="section why" id="keunggulan">
     <div class="section-inner">
         <div class="section-header">
-            <div class="eyebrow">Mengapa Kami</div>
-            <h2>Keunggulan {{ $namaPesantren }}</h2>
+            <div class="eyebrow">Mengapa Ayah Bunda Mempercayakan Kami</div>
+            <h2>Karena Ketenangan Hati Anda Adalah Prioritas Kami</h2>
         </div>
         <div class="why-grid">
-            <div class="why-item"><div class="why-icon">🕌</div><h3>Lingkungan Islami</h3><p>Suasana kondusif untuk tumbuh dalam nilai-nilai keislaman setiap hari.</p></div>
-            <div class="why-item"><div class="why-icon">👨‍🏫</div><h3>Pengajar Berkompeten</h3><p>Dibimbing asatidz lulusan pesantren ternama dan perguruan tinggi Islam.</p></div>
-            <div class="why-item"><div class="why-icon">🏠</div><h3>Asrama Nyaman</h3><p>Fasilitas asrama bersih dan aman dengan pengasuhan penuh selama 24 jam.</p></div>
-            <div class="why-item"><div class="why-icon">📈</div><h3>Prestasi Terukur</h3><p>Perkembangan santri dipantau transparan dan dilaporkan rutin kepada wali.</p></div>
+            <div class="why-item"><div class="why-icon">🕌</div><h3>Lingkungan yang Menenangkan</h3><p>Setiap sudut pesantren dirancang agar nilai-nilai keislaman terasa hidup, bukan sekadar diajarkan, dalam keseharian santri.</p></div>
+            <div class="why-item"><div class="why-icon">👨‍🏫</div><h3>Dibimbing dengan Ketulusan</h3><p>Asatidz kami bukan hanya berilmu — mereka hadir sebagai orang tua kedua yang mendampingi dengan sabar dan penuh kasih.</p></div>
+            <div class="why-item"><div class="why-icon">🏠</div><h3>Rumah Kedua yang Aman</h3><p>Asrama yang bersih dan terjaga, tempat santri merasa nyaman meski jauh dari pelukan keluarga.</p></div>
+            <div class="why-item"><div class="why-icon">📈</div><h3>Anda Selalu Tahu Perkembangannya</h3><p>Tak perlu menunggu lama untuk tahu kabar ananda — perkembangan mereka dilaporkan rutin dan transparan kepada Anda.</p></div>
         </div>
     </div>
 </section>
 
 <section class="cta-ppdb">
-    <div class="badge-open">PENDAFTARAN DIBUKA</div>
-    <h2>Bergabung Bersama Kami</h2>
-    <p>Daftarkan putra-putri Anda menjadi bagian dari keluarga besar {{ $namaPesantren }}. Proses pendaftaran mudah dan online.</p>
-    <a href="{{ route('tenant.ppdb.form') }}" class="btn btn-gold btn-lg">Formulir Pendaftaran PPDB</a>
+    <div class="badge-open">PINTU KAMI TERBUKA UNTUK KELUARGA ANDA</div>
+    <h2>Mari Rawat Harapan Itu Bersama Kami</h2>
+    <p>Jadikan putra-putri Anda bagian dari keluarga besar {{ $namaPesantren }} — tempat ilmu, adab, dan cinta tumbuh bersama. Langkah pertama itu kini semudah mengisi satu formulir.</p>
+    <a href="{{ route('tenant.ppdb.form') }}" class="btn btn-gold btn-lg">Mulai Langkah Pertama</a>
 </section>
 
 <section class="section contact" id="kontak">
