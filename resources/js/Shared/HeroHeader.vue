@@ -70,7 +70,7 @@ const initial = computed(() =>
                         <UiIcon name="bell" class="h-[19px] w-[19px] text-white" />
                         <span
                             v-if="hasNotif"
-                            class="absolute right-[9px] top-2 h-2 w-2 rounded-full bg-amber-400 ring-2 ring-violet-600"
+                            class="absolute right-[9px] top-2 h-2 w-2 rounded-full bg-amber-400 ring-2 ring-[color:var(--brand-primary-strong)]"
                         />
                     </Link>
                 </slot>

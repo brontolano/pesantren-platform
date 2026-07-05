@@ -23,9 +23,9 @@ defineEmits(['update:modelValue'])
             v-for="opt in options"
             :key="String(opt.value)"
             type="button"
-            class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-4 py-2 font-jost text-[13px] font-semibold tracking-tight transition-all duration-200 active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500"
+            class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-4 py-2 font-jost text-[13px] font-semibold tracking-tight transition-all duration-200 active:scale-[.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand-primary)]"
             :class="opt.value === modelValue
-                ? 'bg-violet-600 text-white shadow-brand'
+                ? 'bg-[var(--brand-primary)] text-white shadow-brand'
                 : 'text-slate-600 hover:text-slate-900'"
             :aria-pressed="opt.value === modelValue"
             @click="$emit('update:modelValue', opt.value)"
