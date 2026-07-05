@@ -109,6 +109,7 @@ class DemoPickerTest extends TestCase
             'konselor' => '/konselor',
             'sarpras' => '/sarpras',
             'pimpinan' => '/pimpinan',
+            'akuntan' => '/akuntan',
         ];
 
         foreach ($personaKePath as $peran => $path) {

@@ -51,6 +51,7 @@ class DemoPickerController extends Controller
                 ['peran' => 'keuangan', 'label' => 'Bendahara', 'desc' => 'Buku besar, tagihan, laporan', 'ikon' => '💰'],
                 ['peran' => 'keuangan-lapangan', 'label' => 'Kasir Lapangan', 'desc' => 'Setor tabungan keliling', 'ikon' => '🧾'],
                 ['peran' => 'pos-kantin', 'label' => 'Kasir Kantin', 'desc' => 'POS koperasi/kantin', 'ikon' => '🏪'],
+                ['peran' => 'akuntan', 'label' => 'Akuntan', 'desc' => 'Jurnal, COA, neraca saldo', 'ikon' => '📊'],
             ],
         ],
         [
