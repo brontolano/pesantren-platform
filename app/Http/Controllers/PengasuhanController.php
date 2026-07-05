@@ -7,10 +7,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Asrama\Models\KamarAsrama;
 use Modules\Asrama\Models\PenempatanAsrama;
+use Modules\Asrama\Services\PenempatanAsramaService;
 use Modules\Kegiatan\Models\IzinSantri;
 use Modules\Kesantrian\Models\JenisPelanggaran;
 use Modules\Kesantrian\Models\PelanggaranSantri;
@@ -44,6 +46,7 @@ class PengasuhanController extends Controller
     public function __construct(
         private readonly PresensiAsramaService $presensiService,
         private readonly DisiplinService $disiplinService,
+        private readonly PenempatanAsramaService $penempatanService,
     ) {}
 
     private function nav(): array
@@ -53,6 +56,7 @@ class PengasuhanController extends Controller
         $items = [
             ['key' => 'hariini', 'label' => 'Hari Ini', 'icon' => 'calendar', 'href' => $base, 'route' => 'beranda'],
             ['key' => 'presensi', 'label' => 'Presensi', 'icon' => 'check-circle', 'href' => "{$base}/presensi", 'route' => 'presensi'],
+            ['key' => 'penempatan', 'label' => 'Penempatan', 'icon' => 'home', 'href' => "{$base}/penempatan", 'route' => 'penempatan'],
             ['key' => 'disiplin', 'label' => 'Disiplin', 'icon' => 'chart', 'href' => "{$base}/disiplin", 'route' => 'disiplin'],
             ['key' => 'izin', 'label' => 'Izin', 'icon' => 'document', 'href' => "{$base}/izin", 'route' => 'izin'],
         ];
@@ -207,6 +211,81 @@ class PengasuhanController extends Controller
 
         return redirect()->route('tenant.pengasuhan.presensi', ['kamar_id' => $kamar->id, 'slot' => $data['slot']])
             ->with('success', 'Presensi tersimpan.');
+    }
+
+    /**
+     * Penempatan santri ke kamar — sebelumnya tak ada layar tulis di PWA
+     * sama sekali (musyrif harus buka PenempatanAsramaResource di admin).
+     * Reuse PenempatanAsramaService::tempatkan (idempoten — santri lama
+     * otomatis dipindah 'is_current=false', kapasitas kamar dijaga).
+     */
+    public function penempatan(Request $request): Response
+    {
+        $tenantId = tenant('id');
+        $search = trim((string) $request->query('q', ''));
+
+        $penempatan = PenempatanAsrama::where('tenant_id', $tenantId)
+            ->where('is_current', true)
+            ->with(['santri.kelas', 'kamar.blok'])
+            ->orderByDesc('tanggal_masuk')
+            ->limit(100)
+            ->get()
+            ->map(fn (PenempatanAsrama $p): array => [
+                'id' => $p->id,
+                'santri' => $p->santri?->nama ?? '-',
+                'kelas' => $p->santri?->kelas?->nama_kelas ?? '-',
+                'kamar' => $p->kamar ? "Kamar {$p->kamar->nomor_kamar} — {$p->kamar->blok?->nama_blok}" : '-',
+                'tanggal_masuk' => optional($p->tanggal_masuk)->translatedFormat('d M Y'),
+            ]);
+
+        $query = Santri::where('tenant_id', $tenantId)->where('status', 'aktif')->with('kelas');
+        if ($search !== '') {
+            $term = '%'.mb_strtolower($search).'%';
+            $query->where(fn ($w) => $w->whereRaw('LOWER(nama) LIKE ?', [$term])->orWhereRaw('LOWER(nis) LIKE ?', [$term]));
+        }
+        $santriOptions = $query->orderBy('nama')->limit(50)->get()
+            ->map(fn (Santri $s): array => ['value' => (string) $s->id, 'label' => trim($s->nama.' ('.($s->kelas?->nama_kelas ?? '-').')')])
+            ->all();
+
+        $kamarOptions = KamarAsrama::where('tenant_id', $tenantId)
+            ->where('is_active', true)
+            ->withCount(['penempatanAktif as terisi'])
+            ->with('blok')
+            ->orderBy('nomor_kamar')
+            ->get()
+            ->map(fn (KamarAsrama $k): array => [
+                'value' => (string) $k->id,
+                'label' => "Kamar {$k->nomor_kamar} — {$k->blok?->nama_blok} ({$k->terisi}/{$k->kapasitas})",
+            ])
+            ->all();
+
+        return Inertia::render('Pengasuhan/Penempatan', [
+            'navigation' => $this->nav(),
+            'userName' => $this->userName(),
+            'penempatan' => $penempatan,
+            'santriOptions' => $santriOptions,
+            'kamarOptions' => $kamarOptions,
+            'occupancy' => $this->penempatanService->occupancySummary(),
+        ]);
+    }
+
+    public function penempatanStore(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'santri_id' => ['required', 'integer', 'exists:santri,id'],
+            'kamar_id' => ['required', 'integer'],
+            'keterangan' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        try {
+            $this->penempatanService->tempatkan($data['santri_id'], $data['kamar_id'], [
+                'keterangan' => $data['keterangan'] ?? null,
+            ]);
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors());
+        }
+
+        return redirect()->route('tenant.pengasuhan.penempatan')->with('success', 'Santri ditempatkan.');
     }
 
     public function disiplin(): Response
