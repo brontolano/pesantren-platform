@@ -60,6 +60,7 @@ const sectionAnchor = (type) => ({
 const brandStyle = {
     '--brand-primary': branding.primaryColor || '#059669',
     '--brand-secondary': branding.secondaryColor || '#0f766e',
+    '--brand-gold': '#d97706',
     fontFamily: "'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif",
 }
 const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
@@ -151,7 +152,8 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
                     <div class="relative mx-auto max-w-3xl px-5 sm:px-8">
                         <span
                             v-if="heroSection?.config?.eyebrow"
-                            class="inline-block rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-white ring-1 ring-inset ring-white/20"
+                            class="inline-block rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-white shadow-sm"
+                            :style="{ backgroundColor: 'var(--brand-gold)' }"
                         >
                             {{ heroSection.config.eyebrow }}
                         </span>
@@ -196,7 +198,8 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
                     <div
                         v-for="stat in heroStats"
                         :key="stat.label"
-                        class="min-w-[9rem] flex-1 rounded-2xl border border-slate-100 bg-white px-5 py-5 text-center shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
+                        class="min-w-[9rem] flex-1 rounded-2xl border-t-4 border-slate-100 bg-white px-5 py-5 text-center shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
+                        :style="{ borderTopColor: 'var(--brand-gold)' }"
                     >
                         <div class="text-2xl font-extrabold sm:text-3xl" :style="{ color: 'var(--brand-primary)' }">{{ stat.value }}</div>
                         <div class="mt-1 text-sm text-slate-500">{{ stat.label }}</div>
@@ -410,8 +413,9 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
                 <!-- PPDB CTA -->
                 <section v-else-if="section.type === 'ppdb_cta'" class="bg-[#fafbfc]">
                     <div class="mx-auto max-w-6xl px-5 sm:px-8">
-                        <div class="overflow-hidden rounded-3xl px-6 py-14 text-center sm:px-12" :style="{ background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' }">
-                            <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">{{ renderSectionTitle(section) }}</h2>
+                        <div class="relative overflow-hidden rounded-3xl px-6 py-14 text-center sm:px-12" :style="{ background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-gold))' }">
+                            <IslamicPattern color="#ffffff" :opacity="0.1" :size="56" />
+                            <h2 class="relative text-3xl font-extrabold tracking-tight text-white sm:text-4xl">{{ renderSectionTitle(section) }}</h2>
                             <p class="mx-auto mt-3 max-w-xl text-base leading-relaxed text-white/85">{{ section.config.body }}</p>
                             <p v-if="section.config.helperText" class="mx-auto mt-2 max-w-xl text-sm text-white/70">{{ section.config.helperText }}</p>
                             <a
