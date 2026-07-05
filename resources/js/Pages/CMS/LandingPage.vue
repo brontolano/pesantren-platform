@@ -1,5 +1,6 @@
 <script setup>
 import { Head } from '@inertiajs/vue3'
+import IslamicPattern from '@/Components/Ui/IslamicPattern.vue'
 
 const props = defineProps({
     tenant: {
@@ -141,46 +142,67 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
             </nav>
 
             <!-- HERO -->
-            <header id="top" class="relative overflow-hidden">
-                <div class="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[linear-gradient(180deg,#ffffff_0%,#fafbfc_100%)]"></div>
-                <div class="relative mx-auto max-w-3xl px-5 pb-12 pt-32 text-center sm:px-8 sm:pt-36">
-                    <span
-                        v-if="heroSection?.config?.eyebrow"
-                        class="inline-block rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide"
-                        :style="{ color: 'var(--brand-primary)', backgroundColor: softTint }"
-                    >
-                        {{ heroSection.config.eyebrow }}
-                    </span>
-                    <h1 class="mt-5 text-4xl font-extrabold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">
-                        {{ heroSection?.config?.title || branding.name }}
-                    </h1>
-                    <p class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-slate-500">
-                        {{ heroSection?.config?.description || branding.tagline }}
-                    </p>
-                    <div class="mt-8 flex flex-wrap justify-center gap-3">
-                        <a
-                            :href="heroSection?.config?.primaryCtaHref || '/ppdb'"
-                            class="inline-flex items-center rounded-lg px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:opacity-95"
-                            :style="{ backgroundColor: 'var(--brand-primary)' }"
+            <header id="top" class="relative overflow-hidden pt-16">
+                <div
+                    class="relative overflow-hidden pb-16 pt-20 text-center sm:pt-24"
+                    :style="{ background: `linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))` }"
+                >
+                    <IslamicPattern color="#ffffff" :opacity="0.08" :size="64" />
+                    <div class="relative mx-auto max-w-3xl px-5 sm:px-8">
+                        <span
+                            v-if="heroSection?.config?.eyebrow"
+                            class="inline-block rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-white ring-1 ring-inset ring-white/20"
                         >
-                            {{ heroSection?.config?.primaryCtaLabel || 'Daftar PPDB' }}
-                        </a>
-                        <a
-                            :href="heroSection?.config?.secondaryCtaHref || '#kontak'"
-                            class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-300"
-                        >
-                            {{ heroSection?.config?.secondaryCtaLabel || 'Hubungi Kami' }}
-                        </a>
+                            {{ heroSection.config.eyebrow }}
+                        </span>
+                        <h1 class="mt-5 text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-5xl">
+                            {{ heroSection?.config?.title || branding.name }}
+                        </h1>
+                        <p class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/85">
+                            {{ heroSection?.config?.description || branding.tagline }}
+                        </p>
+                        <div class="mt-8 flex flex-wrap justify-center gap-3">
+                            <a
+                                :href="heroSection?.config?.primaryCtaHref || '/ppdb'"
+                                class="inline-flex items-center rounded-lg bg-white px-6 py-3 text-sm font-semibold shadow-sm transition hover:-translate-y-0.5 hover:opacity-95"
+                                :style="{ color: 'var(--brand-primary)' }"
+                            >
+                                {{ heroSection?.config?.primaryCtaLabel || 'Daftar PPDB' }}
+                            </a>
+                            <a
+                                :href="heroSection?.config?.secondaryCtaHref || '#kontak'"
+                                class="inline-flex items-center rounded-lg border border-white/30 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/20"
+                            >
+                                {{ heroSection?.config?.secondaryCtaLabel || 'Hubungi Kami' }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Foto hero (opsional, dari CMS) — bingkai lengkung + aksen islami -->
+                    <div v-if="heroSection?.config?.imageUrl" class="relative mx-auto mt-10 max-w-2xl px-5 sm:px-8">
+                        <div class="overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.25)] ring-4 ring-white/20">
+                            <img
+                                :src="heroSection.config.imageUrl"
+                                :alt="heroSection.config.imageAlt || branding.name"
+                                class="aspect-[16/9] w-full object-cover"
+                                loading="eager"
+                            >
+                        </div>
                     </div>
                 </div>
 
                 <!-- STATS -->
-                <div v-if="heroStats.length" class="relative mx-auto mb-4 flex max-w-3xl flex-wrap justify-center gap-x-14 gap-y-6 px-5 pb-10 sm:px-8">
-                    <div v-for="stat in heroStats" :key="stat.label" class="text-center">
-                        <div class="text-3xl font-extrabold" :style="{ color: 'var(--brand-primary)' }">{{ stat.value }}</div>
+                <div v-if="heroStats.length" class="relative mx-auto -mt-6 flex max-w-4xl flex-wrap justify-center gap-4 px-5 sm:px-8">
+                    <div
+                        v-for="stat in heroStats"
+                        :key="stat.label"
+                        class="min-w-[9rem] flex-1 rounded-2xl border border-slate-100 bg-white px-5 py-5 text-center shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
+                    >
+                        <div class="text-2xl font-extrabold sm:text-3xl" :style="{ color: 'var(--brand-primary)' }">{{ stat.value }}</div>
                         <div class="mt-1 text-sm text-slate-500">{{ stat.label }}</div>
                     </div>
                 </div>
+                <div class="h-10 sm:h-14"></div>
             </header>
 
             <!-- IBADAH: jadwal sholat + arah kiblat + donasi (Beranda publik, 1-aplikasi) -->
