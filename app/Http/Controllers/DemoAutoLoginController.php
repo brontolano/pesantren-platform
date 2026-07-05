@@ -140,6 +140,14 @@ class DemoAutoLoginController extends Controller
             'role' => 'pengelola_sarpras',
             'route' => 'tenant.sarpras.beranda',
         ],
+        // F4 — akuntan (PWA baru, PR#430). Role `akuntan` sebelumnya tak
+        // punya persona demo apa pun (0% PWA saat itu).
+        'akuntan' => [
+            'email' => 'akuntan.demo@demo.pesantren.online',
+            'name' => 'Akuntan Demo',
+            'role' => 'akuntan',
+            'route' => 'tenant.akuntan.beranda',
+        ],
         'santri' => [
             'email' => 'santri.demo@demo.pesantren.online',
             'name' => 'Santri Demo',
