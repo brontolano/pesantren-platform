@@ -1,0 +1,123 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Isi Presensi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--nur:#0b6e4f;--nur-strong:#085840;--nur-tint:#ecfdf6;--nur-100:#d1faea;--terra:#c14f2a;--gold:#c9a24a;--gold-soft:#e7d3a1;--ink:#111;--sub:#64748b;--faint:#94a3b8;--line:#efe7da;--card:#fff;--bg:#fffaf3;--grad:linear-gradient(160deg,#17a179 0%,#0b6e4f 48%,#062a20 100%);--r:14px;--f:'Plus Jakarta Sans',system-ui,sans-serif;--sh:inset 0 0 0 1px var(--line),0 2px 4px -2px rgba(17,17,17,.06),0 12px 28px -16px rgba(17,17,17,.18)}
+html.dark{--bg:#0d1411;--card:#161e1a;--nur:#2fbf85;--nur-strong:#26a874;--nur-tint:#12271f;--nur-100:#1c3a2e;--ink:#eef2f0;--sub:#9fb0a8;--faint:#6b7a73;--line:#26312c;--sh:inset 0 0 0 1px var(--line),0 10px 26px -18px rgba(0,0,0,.7)}
+html,body{height:100%;font-family:var(--f);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;color:inherit;cursor:pointer}a{text-decoration:none;color:inherit}
+.app{max-width:540px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+.scroll{flex:1;overflow-y:auto;padding-bottom:96px}
+/* topbar */
+.top{background:var(--grad);color:#fff;padding:calc(16px + env(safe-area-inset-top)) 14px 16px;position:relative;overflow:hidden;border-bottom-left-radius:22px;border-bottom-right-radius:22px}
+.top-pat{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22 viewBox=%220 0 44 44%22%3E%3Cg fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%221%22 opacity=%220.5%22%3E%3Crect x=%2213%22 y=%2213%22 width=%2218%22 height=%2218%22/%3E%3Crect x=%2213%22 y=%2213%22 width=%2218%22 height=%2218%22 transform=%22rotate(45 22 22)%22/%3E%3C/g%3E%3C/svg%3E");background-size:44px 44px;opacity:.10}
+.top-row{display:flex;align-items:center;gap:12px;position:relative}
+.iconbtn{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.14);border:none;color:#fff;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.top-ttl{flex:1;min-width:0}.top-ttl .t{font-size:18px;font-weight:800;line-height:1.15}.top-ttl .s{font-size:11.5px;color:#c9f2e2;margin-top:2px;font-weight:500}
+/* role switcher */
+.switch{display:flex;gap:8px;padding:14px 14px 0;overflow-x:auto;scrollbar-width:none}.switch::-webkit-scrollbar{display:none}
+.switch a{flex:0 0 auto;font-size:12px;font-weight:700;padding:8px 14px;border-radius:99px;background:var(--card);box-shadow:var(--sh);color:var(--sub);white-space:nowrap}
+.switch a.on{background:var(--nur);color:#fff;box-shadow:0 8px 18px -10px rgba(11,110,79,.6)}
+/* form */
+.sec{padding:16px 14px 0}
+.sec-h{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--sub);padding:0 4px 9px;display:flex;align-items:center;gap:7px}
+.grp{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.fld{padding:13px 15px;border-bottom:1px solid var(--line)}.fld:last-child{border-bottom:none}
+.fld label{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin-bottom:7px}
+.req{color:var(--terra)}
+.inp,.sel,.ta{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:11px;padding:12px 13px;font-size:15px;font-family:inherit;color:var(--ink);outline:none;transition:border-color .15s,box-shadow .15s}
+.inp:focus,.sel:focus,.ta:focus{border-color:var(--nur);box-shadow:0 0 0 3px rgba(11,110,79,.12)}
+.selwrap{position:relative}.selwrap>svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--faint);pointer-events:none}
+.sel{appearance:none;-webkit-appearance:none;padding-right:38px}
+.ta{min-height:82px;resize:none;line-height:1.5}
+.inpic{position:relative}.inpic>svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--faint);pointer-events:none}.inpic .inp{padding-left:40px}
+.hint{font-size:11px;color:var(--faint);margin-top:6px}
+/* photo upload */
+.photo{display:flex;align-items:center;gap:14px}
+.ph-prev{width:70px;height:70px;border-radius:16px;background:var(--nur-tint);color:var(--nur);display:flex;align-items:center;justify-content:center;flex:0 0 auto;border:2px dashed var(--nur-100)}
+.ph-btn{font-size:13px;font-weight:700;color:var(--nur)}.ph-sub{font-size:11px;color:var(--faint);margin-top:2px}
+/* segmented (jenis kelamin/status) */
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:11px;border-radius:11px;border:1.5px solid var(--line);background:var(--bg);font-size:13.5px;font-weight:700;color:var(--sub)}
+.seg button.on{border-color:var(--nur);background:var(--nur-tint);color:var(--nur)}
+/* presensi bulk */
+.quickall{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--nur);padding:11px 15px;border-bottom:1px solid var(--line)}
+.pres-row{display:flex;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--line)}.pres-row:last-child{border-bottom:none}
+.pres-av{width:34px;height:34px;border-radius:50%;background:var(--nur);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:0 0 auto}
+.pres-nm{flex:1;font-size:13.5px;font-weight:700;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pres-seg{display:flex;gap:4px;flex:0 0 auto}
+.pres-seg button{width:30px;height:30px;border-radius:9px;border:1.5px solid var(--line);background:var(--bg);font-size:12px;font-weight:800;color:var(--faint)}
+.pres-seg button.h.on{border-color:var(--nur);background:var(--nur-tint);color:var(--nur)}
+.pres-seg button.i.on{border-color:#b8891f;background:#fef9c3;color:#7a5e1e}
+.pres-seg button.s.on{border-color:#075985;background:#e0f2fe;color:#075985}
+.pres-seg button.a.on{border-color:var(--terra);background:#fef3ee;color:var(--terra)}
+.pres-sum{display:flex;gap:10px;padding:12px 15px;font-size:12px;font-weight:700}
+.pres-sum span{display:flex;align-items:center;gap:5px;color:var(--sub)}.pres-sum b{color:var(--ink)}
+/* toggle */
+.tgl-row{display:flex;align-items:center;gap:12px}.tgl-row .tt{flex:1}.tgl-row .tt .n{font-size:14px;font-weight:700}.tgl-row .tt .d{font-size:11.5px;color:var(--sub);margin-top:1px}
+.tgl{width:46px;height:27px;border-radius:99px;background:var(--nur);position:relative;flex:0 0 auto;border:none}
+.tgl::after{content:"";position:absolute;top:3px;right:3px;width:21px;height:21px;border-radius:50%;background:#fff;transition:.2s}
+.tgl.off{background:var(--line)}.tgl.off::after{right:22px}
+/* money big */
+.money{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px 14px}
+.money .cur{font-size:15px;font-weight:800;color:var(--sub)}.money input{border:none;background:none;outline:none;font-size:22px;font-weight:800;font-family:inherit;color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
+/* action bar */
+.bar{position:fixed;bottom:0;left:0;right:0;max-width:540px;margin:0 auto;background:var(--card);border-top:1px solid var(--line);display:flex;gap:10px;padding:12px 14px calc(14px + env(safe-area-inset-bottom));z-index:20;box-shadow:0 -8px 24px -18px rgba(17,17,17,.3)}
+.btn{flex:1;border-radius:99px;padding:14px;font-size:15px;font-weight:800;border:none;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn.ghost{flex:0 0 auto;padding:14px 22px;background:var(--bg);color:var(--sub);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn.primary{background:linear-gradient(135deg,#17a179,#0b6e4f);color:#fff;box-shadow:0 10px 22px -12px rgba(11,110,79,.7)}
+html.dark .btn.primary{background:linear-gradient(135deg,#2fbf85,#0b6e4f)}
+.theme{margin-left:auto}
+</style></head><body>
+<div class="app"><div class="scroll">
+  <div class="top">
+    <div class="top-pat"></div>
+    <div class="top-row">
+      <button class="iconbtn" aria-label="Kembali"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="top-ttl"><div class="t">Isi Presensi</div><div class="s">Guru · Pembelajaran</div></div>
+      <button class="iconbtn theme" aria-label="Tema" onclick="document.documentElement.classList.toggle('dark')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+    </div>
+  </div>
+
+  <div class="switch">
+    <a href="?f=santri" class="">Buat Santri</a><a href="?f=presensi" class="on">Isi Presensi</a><a href="?f=bayar" class="">Catat Pembayaran</a><a href="?f=izin" class="">Input Izin Santri</a><a href="?f=uks" class="">Kunjungan UKS</a><a href="?f=tabungan" class="">Setor Tabungan</a>  </div>
+
+      <div class="sec"><div class="sec-h"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg> Kelas & Tanggal</div>
+      <div class="grp">
+        <div class="fld"><label>Kelas <span class="req">*</span></label><div class="selwrap"><select class="sel"><option>1 Tsanawiyah A (28 santri)</option><option>2 Tsanawiyah B</option></select><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div></div>
+        <div class="fld"><label>Tanggal · Sesi</label><input class="inp" type="date"></div>
+      </div>
+    </div>
+    <div class="sec"><div class="sec-h"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Daftar Santri · H / I / S / A</div>
+      <div class="grp">
+        <div class="quickall"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tandai semua Hadir</div>
+                <div class="pres-row"><span class="pres-av">AH</span><span class="pres-nm">Abdil Hadi</span>
+          <div class="pres-seg"><button class="h on">H</button><button class="i ">I</button><button class="s ">S</button><button class="a ">A</button></div>
+        </div>
+                <div class="pres-row"><span class="pres-av">AY</span><span class="pres-nm">Abdulloh Ibrahim</span>
+          <div class="pres-seg"><button class="h on">H</button><button class="i ">I</button><button class="s ">S</button><button class="a ">A</button></div>
+        </div>
+                <div class="pres-row"><span class="pres-av">AS</span><span class="pres-nm">Abdulloh Syakir</span>
+          <div class="pres-seg"><button class="h ">H</button><button class="i on">I</button><button class="s ">S</button><button class="a ">A</button></div>
+        </div>
+                <div class="pres-row"><span class="pres-av">AQ</span><span class="pres-nm">Abdul Muhyi Al Qorni</span>
+          <div class="pres-seg"><button class="h on">H</button><button class="i ">I</button><button class="s ">S</button><button class="a ">A</button></div>
+        </div>
+                <div class="pres-row"><span class="pres-av">AF</span><span class="pres-nm">Abdurrohman Fauzan</span>
+          <div class="pres-seg"><button class="h ">H</button><button class="i ">I</button><button class="s ">S</button><button class="a on">A</button></div>
+        </div>
+                <div class="pres-sum"><span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Hadir <b>3</b></span><span>Izin <b>1</b></span><span>Sakit <b>0</b></span><span>Alpa <b>1</b></span></div>
+      </div>
+    </div>
+    <div style="height:10px"></div>
+</div>
+<div class="bar">
+  <button class="btn ghost">Batal</button>
+  <button class="btn primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Simpan</button>
+</div>
+</div>
+<script>document.querySelectorAll('.seg button, .pres-seg button').forEach(b=>b.addEventListener('click',function(){[...this.parentNode.children].forEach(x=>x.classList.remove('on'));this.classList.add('on');}));document.querySelectorAll('.tgl').forEach(t=>t.addEventListener('click',()=>t.classList.toggle('off')));</script>
+</body></html>

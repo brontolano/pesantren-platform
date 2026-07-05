@@ -76,6 +76,12 @@ Radius kartu 16px, tile 16px, pill 9999px. Shadow lembut berlapis `--sh` (light)
 Total: **~25 role, ~18 aplikasi, 6 layout Vue + 174 halaman Vue + 3 blade + 1 panel Filament.**
 Router peran: `App\Support\AppLauncher::primaryDestination()`.
 
+## 4b. KEPUTUSAN TERKUNCI — Mobile = PWA native (2026-07-06)
+- **Desktop = Panel Filament** (`/admin`). Filament TIDAK dipaksa meniru kartu-mobile; cukup token F1 (dark/font/hijau). Desktop pakai komponen native Filament.
+- **Mobile/HP = PWA native "Nur"** untuk SEMUA (list + form + dark mode). Staf generik yg tadinya tap menu → Filament di HP, DIGANTI form Nur native (keputusan owner opsi-b).
+- **Dark mode = standar** di semua layar PWA (toggle .dark; auto prefers-color-scheme).
+- Pola form terdokumentasi di mockup `form-*.html`: single-form, **bulk presensi (H/I/S/A)**, uang, medis, tabungan, izin. Field: text ber-ikon, select, textarea, segmented, toggle, money, date/datetime, upload foto, bulk-list. Action bar Batal/Simpan sticky.
+
 ## 5. Roadmap Upgrade PWA Lama → Nur
 
 **Kunci strategi:** semua Vue app membaca CSS token bersama (`--brand-*`, `--app-*`, `--wali-*`) dari `resources/css/app.css`. Upgrade tingkat-TOKEN + shell Layout → 174 halaman ikut berubah dengan usaha minimal per-halaman.

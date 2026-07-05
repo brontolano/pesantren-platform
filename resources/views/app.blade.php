@@ -3,6 +3,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{-- Dark Mode "Nur" — terapkan SEBELUM CSS/Vue mount (anti-flash).
+         OPT-IN dulu: hanya aktif bila pengguna sudah menyetel via toggle
+         (localStorage 'nur-theme' === 'dark'). Auto-ikut-sistem (prefers-color-
+         scheme) DITUNDA sampai dark tiap app terverifikasi rapi — agar user
+         ber-HP gelap tak mendapat layar dark yang belum dipoles. --}}
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('nur-theme') === 'dark') {
+                    document.documentElement.classList.add('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     {{-- 1-aplikasi (Fase 4 fondasi) — PWA scope root: installable dari Beranda + dasar TWA.
          Hanya di konteks tenant; di domain central endpoint ini 404 (diabaikan browser).
          F1: DIKECUALIKAN di path portal yang punya manifest sendiri (guru/wali/spmb/
