@@ -39,6 +39,10 @@ Route::get('/caddy/ssl-check', function () {
     return response('ok');
 })->name('caddy.ssl-check');
 
+if (app()->environment('local')) {
+    Route::get('/dev/design-system-nur', fn () => view('design-system-nur-demo'));
+}
+
 // Root: central landing (pesantren.online) atau PINTU SISTEM tenant (domain sistem).
 // Domain sistem tenant (mis. pesantren.asy-syifaa.com) = satu pintu terkunci login:
 // guest → login bermerek dirender langsung di '/'; setelah login → diarahkan per

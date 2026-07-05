@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Pesantren Asy-Syifaa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--nur:#0b6e4f;--nur-strong:#085840;--nur-tint:#ecfdf6;--nur-100:#d1faea;--terra:#c14f2a;--terra-tint:#fef3ee;--gold:#c9a24a;--gold-soft:#e7d3a1;--goldb:#fef9c3;--goldink:#7a5e1e;--ink:#111;--sub:#64748b;--faint:#94a3b8;--line:#efe7da;--card:#fff;--bg:#fffaf3;--grad:linear-gradient(160deg,#17a179 0%,#0b6e4f 48%,#062a20 100%);--r:16px;--r2:20px;--rs:12px;--f:'Plus Jakarta Sans',system-ui,sans-serif;--sh:inset 0 0 0 1px var(--line),0 2px 4px -2px rgba(17,17,17,.06),0 12px 28px -16px rgba(17,17,17,.18)}
+html,body{height:100%;font-family:var(--f);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}button{font-family:inherit}
+.app{max-width:540px;margin:0 auto;min-height:100%;position:relative}
+.scroll-area{overflow-y:auto;height:100vh;padding-bottom:96px}
+.tab{display:none}.tab.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.c-nur{background:var(--nur-tint);color:var(--nur)}.c-gold{background:var(--goldb);color:var(--goldink)}.c-violet{background:#ede9fe;color:#5b21b6}.c-sky{background:#e0f2fe;color:#075985}.c-terra{background:var(--terra-tint);color:var(--terra)}
+.hero{background:var(--grad);color:#fff;padding:22px 18px 20px;position:relative;overflow:hidden;border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:0 12px 30px -18px rgba(6,42,32,.7)}
+.hero.sm{padding-bottom:18px}
+.hero-pat{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22 viewBox=%220 0 44 44%22%3E%3Cg fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%221%22 opacity=%220.5%22%3E%3Crect x=%2213%22 y=%2213%22 width=%2218%22 height=%2218%22/%3E%3Crect x=%2213%22 y=%2213%22 width=%2218%22 height=%2218%22 transform=%22rotate(45 22 22)%22/%3E%3C/g%3E%3C/svg%3E");background-size:44px 44px;opacity:.10}
+.hero-glow{position:absolute;right:-46px;top:-46px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(231,211,161,.22),transparent 66%)}
+.hero-top{display:flex;align-items:center;gap:12px;position:relative}
+.logo{width:50px;height:50px;border-radius:15px;background:rgba(255,255,255,.16);border:1px solid rgba(231,211,161,.35);display:flex;align-items:center;justify-content:center;font-size:26px;flex:0 0 auto}
+.hero-info{flex:1;min-width:0}.hero-name{font-size:18px;font-weight:800;line-height:1.15}.hero-tag{font-size:11.5px;color:#c9f2e2;margin-top:2px;font-weight:500}
+.hero-h1{font-size:20px;font-weight:800;position:relative}.hero-h2{font-size:12px;color:#c9f2e2;position:relative;margin-top:3px;font-weight:500}
+.masuk{display:flex;align-items:center;gap:6px;background:var(--gold-soft);color:#5a4415;border:none;border-radius:99px;padding:8px 14px;font-size:12.5px;font-weight:800;cursor:pointer}
+.masuk svg{width:15px;height:15px}
+.datestrip{display:flex;align-items:center;justify-content:space-between;margin-top:14px;position:relative;font-size:11.5px;color:#c9f2e2;font-weight:600}
+.datestrip b{color:#fff;font-weight:800}.datestrip .cd{background:rgba(255,255,255,.1);border-radius:99px;padding:3px 10px}
+.hairline{height:1px;margin:14px 0 0;background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);opacity:.55;position:relative}
+.prayer{display:flex;gap:6px;margin-top:14px;position:relative}
+.pcell{flex:1;text-align:center;padding:9px 2px;border-radius:13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)}
+.pcell.next{background:rgba(231,211,161,.16);border:1px solid rgba(231,211,161,.5)}
+.pcell .pn{font-size:10px;font-weight:700;color:#c9f2e2}.pcell.next .pn{color:#fff}
+.pcell .pt{font-size:13px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+.pcell .pnext{font-size:8.5px;font-weight:800;color:#0b6e4f;background:var(--gold-soft);border-radius:99px;padding:1px 6px;margin-top:4px;display:inline-block}
+.sec{padding:20px 16px 0}.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px}.sec-title::before{content:"";width:4px;height:15px;border-radius:99px;background:var(--nur)}
+.sec-link{font-size:12px;font-weight:800;color:var(--nur);background:none;border:none;display:flex;align-items:center;gap:1px}
+.about{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.ab{background:var(--card);border-radius:var(--r);padding:14px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:var(--sh);text-align:center}
+.ab-ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.ab-lbl{font-size:10.5px;font-weight:700;line-height:1.15}
+.spmb{margin:0 16px;border-radius:var(--r2);overflow:hidden;position:relative;background:linear-gradient(120deg,#c9a24a,#a67c1e);box-shadow:var(--sh)}
+.spmb-pat{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22 viewBox=%220 0 44 44%22%3E%3Cg fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%221%22 opacity=%220.5%22%3E%3Crect x=%2213%22 y=%2213%22 width=%2218%22 height=%2218%22/%3E%3Crect x=%2213%22 y=%2213%22 width=%2218%22 height=%2218%22 transform=%22rotate(45 22 22)%22/%3E%3C/g%3E%3C/svg%3E");background-size:44px 44px;opacity:.16}
+.spmb-in{position:relative;padding:18px;color:#fff;display:flex;align-items:center;gap:14px}
+.spmb-in .t{font-size:16px;font-weight:800;line-height:1.2}.spmb-in .s{font-size:11.5px;color:#fff6e2;margin-top:3px}
+.spmb-btn{margin-left:auto;background:#fff;color:#8a6516;border-radius:99px;padding:9px 15px;font-size:12.5px;font-weight:800;white-space:nowrap}
+.gal{display:flex;gap:9px;overflow-x:auto;padding:0 16px 2px;scrollbar-width:none}.gal::-webkit-scrollbar{display:none}
+.gal .ph{width:112px;height:112px;border-radius:var(--r);flex:0 0 auto;box-shadow:var(--sh);background:linear-gradient(135deg,#d1faea,#e0f2fe);display:flex;align-items:center;justify-content:center;color:var(--nur)}
+.tv{margin:0 16px;border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,#0b6e4f,#17a179);display:flex;align-items:center;justify-content:center;color:#fff}
+.tv .live{position:absolute;top:12px;left:12px;background:var(--terra);color:#fff;font-size:10px;font-weight:800;border-radius:99px;padding:3px 9px;display:flex;align-items:center;gap:5px}
+.tv .live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff}
+.clist{display:flex;flex-direction:column;gap:9px}
+.crow{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:var(--r);padding:13px 14px;box-shadow:var(--sh)}
+.crow-ic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.crow-body{flex:1;min-width:0}.crow-t{font-size:13.5px;font-weight:700;line-height:1.25}.crow-s{font-size:11.5px;color:var(--sub);margin-top:2px}
+.donasi{margin:20px 16px 0;border-radius:var(--r2);background:var(--nur-tint);border:1px solid var(--nur-100);padding:18px;display:flex;align-items:center;gap:14px}
+.donasi-ic{width:46px;height:46px;border-radius:14px;background:#fff;color:var(--nur);display:flex;align-items:center;justify-content:center;flex:0 0 auto;box-shadow:var(--sh)}
+.donasi .t{font-size:14.5px;font-weight:800}.donasi .s{font-size:11.5px;color:var(--sub);margin-top:2px}
+.donasi-btn{margin-left:auto;background:var(--nur);color:#fff;border-radius:99px;padding:10px 16px;font-size:12.5px;font-weight:800;white-space:nowrap}
+/* ibadah */
+.prayer-list{margin:0 16px;background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.pli{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)}
+.pli:last-child{border-bottom:none}.pli.now{background:var(--nur-tint)}
+.pli .pic{width:34px;height:34px;border-radius:10px;background:var(--nur-tint);color:var(--nur);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.pli.now .pic{background:var(--nur);color:#fff}
+.pli .pnm{flex:1;font-weight:700;font-size:14px}.pli .ptm{font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
+.pli .badge{font-size:9.5px;font-weight:800;color:#fff;background:var(--nur);border-radius:99px;padding:2px 8px;margin-left:8px}
+.kompas{margin:0 16px;background:var(--card);border-radius:var(--r2);box-shadow:var(--sh);padding:22px;text-align:center}
+.kompas .lbl{font-size:12px;color:var(--sub);font-weight:600}.kompas .lbl b{color:var(--nur)}
+.dial{width:210px;height:210px;margin:16px auto 8px;border-radius:50%;position:relative;background:radial-gradient(circle at 50% 42%,#fff,#f6f0e6);box-shadow:inset 0 0 0 2px var(--line),inset 0 0 30px -10px rgba(11,110,79,.15)}
+.dial .tick{position:absolute;inset:0}.dial .card-pt{position:absolute;font-size:12px;font-weight:800;color:var(--faint)}
+.dial .n{top:10px;left:50%;transform:translateX(-50%);color:var(--terra)}.dial .s{bottom:10px;left:50%;transform:translateX(-50%)}.dial .e{right:12px;top:50%;transform:translateY(-50%)}.dial .w{left:12px;top:50%;transform:translateY(-50%)}
+.qibla-arm{position:absolute;left:50%;top:50%;width:0;height:0;transform:rotate(295deg)}
+.qibla-arm .needle{position:absolute;left:-2.5px;top:-86px;width:5px;height:86px;background:linear-gradient(var(--nur),rgba(11,110,79,.12));border-radius:5px}
+.qibla-arm .kaaba{position:absolute;left:-17px;top:-104px;width:34px;height:34px;border-radius:10px;background:#1a1a1a;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 8px 16px -6px rgba(0,0,0,.5);transform:rotate(-295deg)}
+.dial .center{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:50%;background:var(--nur);transform:translate(-50%,-50%);box-shadow:0 0 0 4px #fff}
+.kompas .hint{font-size:11px;color:var(--faint);margin-top:6px;line-height:1.4}
+.sbtn{display:flex;align-items:center;gap:12px;padding:14px 15px;border-bottom:1px solid var(--line)}
+.sbtn:last-child{border-bottom:none}
+.sbtn .sic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.sbtn .snm{font-weight:700;font-size:14px}.sbtn .ssub{font-size:11.5px;color:var(--sub);margin-top:1px}
+.svc{margin:0 16px;background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+/* kabar */
+.art{display:flex;gap:13px;background:var(--card);border-radius:var(--r);box-shadow:var(--sh);padding:12px;margin-bottom:10px}
+.art .thumb{width:88px;height:72px;border-radius:12px;flex:0 0 auto;background:linear-gradient(135deg,#d1faea,#e0f2fe);display:flex;align-items:center;justify-content:center;color:var(--nur)}
+.art .at{font-weight:800;font-size:13.5px;line-height:1.25}.art .ax{font-size:11.5px;color:var(--sub);margin-top:3px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.art .ad{font-size:10.5px;color:var(--faint);font-weight:700;margin-top:5px}
+.nav{position:fixed;bottom:0;left:0;right:0;max-width:540px;margin:0 auto;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;padding:9px 8px 12px;z-index:30;box-shadow:0 -8px 24px -18px rgba(17,17,17,.3)}
+.nav button,.nav a{flex:1;border:none;background:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--faint)}
+.nav button.on{color:var(--nur)}
+.nav .ic{width:52px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:99px;transition:background .2s}
+.nav button.on .ic{background:var(--nur-tint)}
+</style></head><body>
+<div class="app"><div class="scroll-area">
+
+<!-- BERANDA -->
+<div class="tab on" id="tab-beranda">
+  <div class="hero">
+    <div class="hero-pat"></div><div class="hero-glow"></div>
+    <div class="hero-top">
+      <div class="logo">🕌</div>
+      <div class="hero-info"><div class="hero-name">Pesantren Asy-Syifaa</div><div class="hero-tag">Pendidikan adab, ilmu & layanan santri</div></div>
+      <button class="masuk" onclick="location.href='login-preview.php'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><path d="M15 12H3"/></svg> Masuk</button>
+    </div>
+    <div class="datestrip"><span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> &nbsp;<b>Ahad, 6 Juli 2026</b></span><span class="cd">10 Muharram 1448 H</span></div>
+    <div class="hairline"></div>
+    <div class="prayer"><div class="pcell "><div class="pn">Subuh</div><div class="pt">04:41</div></div><div class="pcell "><div class="pn">Dzuhur</div><div class="pt">11:54</div></div><div class="pcell next"><div class="pn">Ashar</div><div class="pt">15:18</div><div class="pnext">1j 20m</div></div><div class="pcell "><div class="pn">Maghrib</div><div class="pt">17:52</div></div><div class="pcell "><div class="pn">Isya</div><div class="pt">19:05</div></div></div>
+  </div>
+  <div class="sec"><div class="sec-head"><div class="sec-title">Tentang Pesantren</div></div>
+    <div class="about"><a class="ab" href="#"><span class="ab-ic c-nur"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span><span class="ab-lbl">Profil Pondok</span></a><a class="ab" href="#"><span class="ab-ic c-gold"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/></svg></span><span class="ab-lbl">Profil Abuya</span></a><a class="ab" href="#"><span class="ab-ic c-violet"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="ab-lbl">Dewan Guru</span></a><a class="ab" href="#"><span class="ab-ic c-sky"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg></span><span class="ab-lbl">Struktur</span></a></div></div>
+  <div class="sec"><div class="spmb"><div class="spmb-pat"></div><div class="spmb-in"><div><div class="t">Penerimaan Santri Baru</div><div class="s">Gelombang 1 dibuka — daftar online</div></div><span class="spmb-btn">Daftar</span></div></div></div>
+  <div class="sec"><div class="sec-head"><div class="sec-title">Galeri Foto</div><button class="sec-link">Instagram <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button></div>
+    <div class="gal"><div class="ph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></div><div class="ph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></div><div class="ph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></div><div class="ph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></div><div class="ph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></div></div></div>
+  <div class="sec"><div class="sec-head"><div class="sec-title">Asy-Syifaa TV</div><button class="sec-link">YouTube <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button></div>
+    <div class="tv"><span class="live">LIVE</span><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div></div>
+  <div class="sec"><div class="sec-head"><div class="sec-title">Kabar Terbaru</div><button class="sec-link" onclick="tab('kabar')">Semua <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button></div>
+    <div class="clist"><a class="crow" href="#"><span class="crow-ic c-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg></span><div class="crow-body"><div class="crow-t">Peringatan Tahun Baru Hijriah 1448 H</div><div class="crow-s">2 hari lalu</div></div><span style="color:#cbd5e1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span></a><a class="crow" href="#"><span class="crow-ic c-gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg></span><div class="crow-body"><div class="crow-t">Pendaftaran Santri Baru Dibuka</div><div class="crow-s">5 hari lalu</div></div><span style="color:#cbd5e1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span></a></div></div>
+  <div class="donasi"><span class="donasi-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.5 4.04 3 5.5l7 7Z"/></svg></span><div><div class="t">Infak & Donasi</div><div class="s">Dukung pendidikan santri</div></div><span class="donasi-btn">Salurkan</span></div>
+  <div style="height:12px"></div>
+</div>
+
+<!-- IBADAH -->
+<div class="tab" id="tab-ibadah">
+  <div class="hero sm">
+    <div class="hero-pat"></div><div class="hero-glow"></div>
+    <div class="hero-h1" style="position:relative">Ibadah</div><div class="hero-h2">Jadwal sholat, arah kiblat & layanan</div>
+    <div class="datestrip"><span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg> &nbsp;<b>Ahad, 6 Juli 2026</b></span><span class="cd">10 Muharram 1448 H</span></div>
+  </div>
+  <div class="sec"><div class="sec-head"><div class="sec-title">Jadwal Sholat</div></div></div>
+  <div class="prayer-list"><div class="pli "><span class="pic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V11l8-6 8 6v11"/><path d="M8 22v-5a4 4 0 0 1 8 0v5"/><path d="M2 22h20"/></svg></span><span class="pnm">Subuh</span><span class="ptm">04:41</span></div><div class="pli "><span class="pic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V11l8-6 8 6v11"/><path d="M8 22v-5a4 4 0 0 1 8 0v5"/><path d="M2 22h20"/></svg></span><span class="pnm">Dzuhur</span><span class="ptm">11:54</span></div><div class="pli now"><span class="pic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V11l8-6 8 6v11"/><path d="M8 22v-5a4 4 0 0 1 8 0v5"/><path d="M2 22h20"/></svg></span><span class="pnm">Ashar</span><span class="badge">berikutnya</span><span class="ptm">15:18</span></div><div class="pli "><span class="pic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V11l8-6 8 6v11"/><path d="M8 22v-5a4 4 0 0 1 8 0v5"/><path d="M2 22h20"/></svg></span><span class="pnm">Maghrib</span><span class="ptm">17:52</span></div><div class="pli "><span class="pic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V11l8-6 8 6v11"/><path d="M8 22v-5a4 4 0 0 1 8 0v5"/><path d="M2 22h20"/></svg></span><span class="pnm">Isya</span><span class="ptm">19:05</span></div></div>
+  <div class="sec"><div class="sec-head"><div class="sec-title">Arah Kiblat</div></div></div>
+  <div class="kompas">
+    <div class="lbl">Arah Kiblat · <b>295° dari utara</b></div>
+    <div class="dial">
+      <span class="card-pt n">U</span><span class="card-pt s">S</span><span class="card-pt e">T</span><span class="card-pt w">B</span>
+      <div class="qibla-arm"><div class="needle"></div><div class="kaaba">🕋</div></div><div class="center"></div>
+    </div>
+    <div class="hint">Arahkan HP mengikuti jarum hijau menuju 🕋 — itulah arah kiblat. Putar HP perlahan untuk mengkalibrasi.</div>
+  </div>
+  <div class="sec"><div class="sec-head"><div class="sec-title">Layanan Ibadah</div></div></div>
+  <div class="svc"><a class="sbtn" href="#"><span class="sic c-nur"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span style="flex:1"><span class="snm">Jadwal Kajian</span><div class="ssub">Majelis & pengajian</div></span><span style="color:#cbd5e1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span></a><a class="sbtn" href="#"><span class="sic c-terra"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.5 4.04 3 5.5l7 7Z"/></svg></span><span style="flex:1"><span class="snm">Donasi / Infaq</span><div class="ssub">Salurkan kebaikan</div></span><span style="color:#cbd5e1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span></a><a class="sbtn" href="#"><span class="sic c-gold"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg></span><span style="flex:1"><span class="snm">Zakat & Wakaf</span><div class="ssub">Tunaikan zakat & wakaf</div></span><span style="color:#cbd5e1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span></a></div>
+  <div style="height:16px"></div>
+</div>
+
+<!-- KABAR -->
+<div class="tab" id="tab-kabar">
+  <div class="hero sm">
+    <div class="hero-pat"></div><div class="hero-glow"></div>
+    <div class="hero-h1" style="position:relative">Kabar</div><div class="hero-h2">Berita & pengumuman pesantren</div>
+  </div>
+  <div class="sec">
+    <a class="art" href="#"><span class="thumb"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></span><div style="min-width:0"><div class="at">Peringatan Tahun Baru Hijriah 1448 H</div><div class="ax">Peringatan 1 Muharram digelar khidmat bersama seluruh santri dan asatidz…</div><div class="ad">2 hari lalu</div></div></a><a class="art" href="#"><span class="thumb"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></span><div style="min-width:0"><div class="at">Pendaftaran Santri Baru Dibuka</div><div class="ax">Gelombang 1 penerimaan santri baru resmi dibuka, kuota terbatas…</div><div class="ad">5 hari lalu</div></div></a><a class="art" href="#"><span class="thumb"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></svg></span><div style="min-width:0"><div class="at">Khataman Akbar Bulan Muharram</div><div class="ax">Rangkaian khataman Al-Qur'an akbar diikuti ratusan santri tahfidz…</div><div class="ad">1 pekan lalu</div></div></a>  </div>
+  <div style="height:16px"></div>
+</div>
+
+</div>
+<nav class="nav">
+  <button class="on" data-tab="beranda" onclick="tab('beranda')"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span>Beranda</button>
+  <button data-tab="ibadah" onclick="tab('ibadah')"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V11l8-6 8 6v11"/><path d="M8 22v-5a4 4 0 0 1 8 0v5"/><path d="M2 22h20"/></svg></span>Ibadah</button>
+  <button data-tab="kabar" onclick="tab('kabar')"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8Z"/></svg></span>Kabar</button>
+  <a href="login-preview.php"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><path d="M15 12H3"/></svg></span>Masuk</a>
+</nav>
+</div>
+<script>
+function tab(n){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id==='tab-'+n));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===n));document.querySelector('.scroll-area').scrollTop=0;}
+(function(){var p=new URLSearchParams(location.search).get('tab');if(p&&document.getElementById('tab-'+p))tab(p);})();
+</script>
+</body></html>

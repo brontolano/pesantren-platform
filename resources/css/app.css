@@ -1,15 +1,15 @@
-/* Tipografi Portal Wali — Plus Jakarta Sans (default global, dipakai SPMB/landing)
-   + Jost (geometric sans, gaya "Pixio" untuk display & UI chrome)
-   + Marcellus (serif display, tema Keuangan "Baitul Maal").
+/* Tipografi "Nur" (2026-07 rebuild, gaya kartu-e-commerce Shoppe direkolorasi Islami)
+   — Raleway (display/heading tegas) + Nunito Sans (body ramah-baca)
+   + Marcellus (serif display, tema Keuangan "Baitul Maal", tak berubah).
    Harus mendahului semua aturan lain (selain @charset/@layer) agar tidak di-drop. */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Jost:wght@400;500;600;700&family=Marcellus&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Marcellus&family=Amiri&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    /* Default sans = Plus Jakarta Sans (premium), fallback Instrument Sans/system. */
+    /* Default sans = Plus Jakarta Sans (mockup "Nur"), fallback Instrument Sans/system. */
     --font-sans: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
@@ -47,16 +47,39 @@
     --pst-teal-500:    #14b8a6;
     --pst-teal-200:    #99f6e4;
 
-    /* ---- Violet — PRIMARY baru (2026-07 refresh "fresh"), ganti emerald ---- */
+    /* ---- Violet (2026-07 refresh "fresh") — DIPENSIUNKAN oleh "Nur" di bawah,
+       nilai dibiarkan agar komponen lama yang masih rujuk literal tak pecah. ---- */
     --pst-violet-50:  #f5f3ff;
     --pst-violet-100: #ede9fe;
     --pst-violet-200: #ddd6fe;
     --pst-violet-400: #a78bfa;
     --pst-violet-500: #8b5cf6;
-    --pst-violet-600: #7c3aed;   /* PRIMARY — CTA, aktif, tautan */
-    --pst-violet-700: #6d28d9;   /* strong — hover/active & teks aksen */
+    --pst-violet-600: #7c3aed;
+    --pst-violet-700: #6d28d9;
     --pst-violet-800: #5b21b6;
     --pst-violet-900: #4c1d95;
+
+    /* ---- Hijau "Nur" — PRIMARY final pesantren.online (2026-07 rebuild), tone
+       Islami (hijau masjid dalam, bukan hijau korporat) menggantikan violet
+       di atas sebagai sumber --brand-primary. Struktur kartu/badge/tombol
+       ala Shoppe dipertahankan, warnanya direkolorasi ke sini. ---- */
+    --pst-nur-50:  #ecfdf6;
+    --pst-nur-100: #d1faea;
+    --pst-nur-200: #a3f3d6;
+    --pst-nur-400: #34ba85;
+    --pst-nur-500: #14956b;
+    --pst-nur-600: #0b6e4f;   /* PRIMARY — CTA, aktif, tautan, tombol utama */
+    --pst-nur-700: #085840;   /* strong — hover/active & teks aksen */
+    --pst-nur-800: #0a4534;
+    --pst-nur-900: #073226;
+
+    /* ---- Terracotta hangat — pengganti pink Shoppe untuk badge diskon/live/
+       flash-sale, direkolorasi lebih hangat & islami (bukan pink cerah). ---- */
+    --pst-terracotta-50:  #fef3ee;
+    --pst-terracotta-100: #fde3d7;
+    --pst-terracotta-500: #d9663f;
+    --pst-terracotta-600: #c14f2a;   /* badge diskon/live, rating star tetap emas */
+    --pst-terracotta-700: #9c3e20;
 
     /* ---- Cream & permukaan hangat (ground yang tenang & premium) ---- */
     --pst-cream:       #fffaf3;   /* page background — cream hangat */
@@ -107,10 +130,12 @@
     /* ========================================================================
        HOOK WHITE-LABEL — tenant menimpa HANYA ini; komponen membaca alias.
        ====================================================================== */
-    --brand-primary:        var(--pst-violet-600);
-    --brand-primary-strong: var(--pst-violet-700);
-    --brand-primary-tint:   var(--pst-violet-50);
+    --brand-primary:        var(--pst-nur-600);
+    --brand-primary-strong: var(--pst-nur-700);
+    --brand-primary-tint:   var(--pst-nur-50);
     --brand-gold:           var(--pst-gold);
+    --brand-accent:         var(--pst-terracotta-600);  /* badge diskon/live/promo */
+    --brand-accent-tint:    var(--pst-terracotta-50);
 
     /* ---- Alias permukaan + teks semantik (PAKAI ini di komponen baru) ---- */
     --surface-page:    var(--pst-cream);
@@ -185,7 +210,7 @@
        TIPOGRAFI — dua keluarga bekerja: Jost (display/chrome) + Plus Jakarta Sans
        (body). Marcellus (serif) khusus tema keuangan. Uang selalu tabular-nums.
        ====================================================================== */
-    --font-display: 'Jost', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
     --font-body:    'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
     --font-serif:   'Marcellus', Georgia, 'Times New Roman', serif;
     --font-native:  system-ui, 'Roboto', -apple-system, 'Segoe UI', sans-serif; /* shell SPMB Android-native */
@@ -254,7 +279,7 @@
     /* Shadow SANGAT lembut (minimalis, bukan glow berat). */
     --shadow-soft:    0 6px 24px -16px rgba(17, 17, 17, 0.18);
     --shadow-soft-lg: 0 16px 44px -24px rgba(17, 17, 17, 0.22);
-    --shadow-brand:   0 8px 20px -12px rgba(124, 58, 237, 0.45);  /* angkat CTA violet (refresh 2026-07) */
+    --shadow-brand:   0 8px 20px -12px rgba(11, 110, 79, 0.45);  /* angkat CTA hijau "Nur" (rebuild 2026-07) */
     --shadow-pop:     0 16px 44px -24px rgba(17, 17, 17, 0.40);  /* nav melayang / sheet */
     /* Refresh (evolusi Pixio): shadow berlapis (ambient + contact) — lebih
        dimensional dari --shadow-soft datar, tetap "sangat lembut" bukan glow
@@ -280,15 +305,15 @@
     --press-scale: 0.97;
 
     /* Gradient tanda-tangan (cukup gelap agar teks putih terbaca).
-       Refresh 2026-07: emerald -> violet (primary baru, "fresh"), gold ornamen
-       ditinggalkan sebagai aksen ornamental terpisah (tak berubah). */
-    --brand-grad:      linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    --brand-grad-hero: linear-gradient(160deg, #9061f9 0%, #7c3aed 45%, #6524c7 100%);
-    /* Refresh: hero + radial highlight halus di pojok kanan-atas (kedalaman
+       "Nur" (2026-07 rebuild): violet -> hijau masjid dalam (islami, tenang),
+       gold ornamen dipertahankan sebagai aksen ornamental terpisah (tak berubah). */
+    --brand-grad:      linear-gradient(135deg, #14956b 0%, #0b6e4f 100%);
+    --brand-grad-hero: linear-gradient(160deg, #17a179 0%, #0b6e4f 45%, #073226 100%);
+    /* Hero + radial highlight halus di pojok kanan-atas (kedalaman
        tanpa mengubah warna dasar) — tetap terbaca utk teks putih. */
     --brand-grad-hero-refined:
         radial-gradient(120% 140% at 88% -10%, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 55%),
-        linear-gradient(160deg, #9061f9 0%, #7c3aed 45%, #6524c7 100%);
+        linear-gradient(160deg, #17a179 0%, #0b6e4f 45%, #073226 100%);
     --gold-hairline:   linear-gradient(90deg, transparent 0%, rgba(201, 162, 74, 0) 8%,
                           var(--pst-gold) 50%, rgba(201, 162, 74, 0) 92%, transparent 100%);
 }
@@ -354,4 +379,84 @@ html {
 /* Hairline emas islami — garis tipis gradient emas (fade di tepi), aksen ornamen. */
 .bg-gold-hairline {
     background-image: var(--gold-hairline);
+}
+
+/* ============================================================================
+   A11Y & DARK MODE — mockup "Nur" terkunci 2026-07-06 (docs/mockup-nur/).
+   Additif: tampilan LIGHT tidak berubah. Dark aktif hanya bila <html class="dark">.
+   ========================================================================== */
+
+/* WAJIB: teks di dalam <button> tidak mewarisi warna body (default UA hitam) →
+   di dark mode jadi tak terlihat. Paksa mewarisi. (Jebakan .tile-label mockup.) */
+button { color: inherit; }
+
+/* Hormati preferensi kurangi-gerak (WCAG 2.2 / tren a11y 2026). */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+/* Dark Mode "Nur": override HANYA token semantik → seluruh alias (--wali-*/--app-*)
+   & komponen yang membaca token ikut berubah (var() resolve lazy). Nilai = spec dark. */
+html.dark {
+    /* permukaan & ink */
+    --pst-cream:       #0d1411;
+    --pst-cream-2:     #0d1411;
+    --pst-cream-muted: #12271f;
+    --pst-parchment:   #241d10;
+    --pst-white:       #161e1a;
+    --pst-ink:         #eef2f0;
+
+    /* ramp slate (dipakai teks & border komponen) — dibalik terang/gelap */
+    --pst-slate-900:   #eef2f0;
+    --pst-slate-800:   #dbe5e0;
+    --pst-slate-700:   #c3d0ca;
+    --pst-slate-600:   #a9b8b1;
+    --pst-slate-500:   #9fb0a8;
+    --pst-slate-400:   #6b7a73;
+    --pst-slate-300:   #3a463f;
+    --pst-slate-200:   #26312c;
+    --pst-slate-100:   #1c2521;
+    --pst-slate-50:    #161e1a;
+
+    --pst-border-warm: #26312c;
+    --pst-border-gold: #3a2f18;
+
+    /* brand hijau lebih terang agar kontras di gelap */
+    --pst-nur-600:     #2fbf85;
+    --pst-nur-700:     #26a874;
+    --pst-nur-50:      #12271f;
+
+    /* alias semantik langsung (aman walau sudah cascade dari var di atas) */
+    --surface-page:  #0d1411;
+    --surface-card:  #161e1a;
+    --surface-muted: #12271f;
+    --surface-gold:  #241d10;
+    --text-strong:   #eef2f0;
+    --text-body:     #dbe5e0;
+    --text-muted:    #9fb0a8;
+    --text-faint:    #6b7a73;
+    --text-accent:   #5fe0a8;
+    --border-card:   #26312c;
+    --border-cool:   #26312c;
+    --border-gold:   #3a2f18;
+    --brand-primary:        #2fbf85;
+    --brand-primary-strong: #26a874;
+    --brand-primary-tint:   #12271f;
+
+    color-scheme: dark;
+    background: var(--surface-page);
+}
+
+/* PAGAR AlbaKids: tenant custom tetap TERANG walau .dark ter-set (jaga identitas
+   playful kids). Balikkan token inti ke nilai terang untuk body.tenant-albakids. */
+html.dark body.tenant-albakids {
+    --pst-cream: #fffaf3; --pst-white: #ffffff; --pst-ink: #111111;
+    --surface-page: #fffaf3; --surface-card: #ffffff;
+    --text-strong: #111111; --text-body: #1e293b; --text-muted: #64748b;
+    --border-card: #efe7da;
+    color-scheme: light;
 }

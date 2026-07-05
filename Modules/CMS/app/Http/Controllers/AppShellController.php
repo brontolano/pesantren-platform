@@ -91,18 +91,28 @@ class AppShellController extends Controller
         }
 
         // Katalog menu: [label, ikon, izin[], url]. Tampil bila user canAny(izin).
+        // Nama grup DISAMAKAN PERSIS dengan navigationGroups([...]) panel admin
+        // (TenantPanelProvider::navigationGroups) — "logic seperti panel admin":
+        // staf melihat pengelompokan yang sama persis dengan yang admin lihat,
+        // bedanya hanya diringkas jadi kartu PWA per izin yang ia miliki.
         $katalog = [
-            'Kesantrian' => [
+            'Santri' => [
                 ['Data Santri', 'users', ['view_santri', 'manage_santri'], '/admin/santri/santris'],
-                ['Kelas', 'grid', ['view_akademik', 'manage_akademik', 'manage_santri'], '/admin/kelas'],
                 ['Alumni', 'user', ['view_alumni', 'manage_alumni'], '/admin/alumni/alumnis'],
             ],
-            'Perizinan & Keamanan' => [
+            'Master Akademik' => [
+                ['Kelas', 'grid', ['view_akademik', 'manage_akademik', 'manage_santri'], '/admin/kelas'],
+            ],
+            'Perizinan & Kunjungan' => [
                 ['Izin Santri', 'doc', ['view_kegiatan', 'manage_kegiatan'], '/admin/izin-santris'],
                 ['Kunjungan Wali', 'users', ['view_kegiatan', 'manage_kegiatan'], '/admin/kunjungan-walis'],
                 ['Pengajuan Jenguk', 'bell', ['view_kegiatan', 'manage_kegiatan'], '/admin/pengajuan-jenguk'],
+            ],
+            'Kegiatan' => [
                 ['Log Gerbang', 'shield', ['view_kegiatan', 'manage_kegiatan'], '/admin/log-gerbang'],
                 ['Kegiatan', 'cal', ['view_kegiatan', 'manage_kegiatan'], '/admin/kegiatans'],
+            ],
+            'Kedisiplinan' => [
                 ['Pelanggaran / Ta\'zir', 'shield', ['view_kedisiplinan', 'manage_kedisiplinan'], '/admin/pelanggaran-santri/pelanggaran-santris'],
             ],
             'Asrama & Pengasuhan' => [
@@ -111,29 +121,39 @@ class AppShellController extends Controller
                 ['Penempatan Asrama', 'home', ['view_asrama', 'manage_asrama'], '/admin/penempatan-asrama/penempatan-asramas'],
                 ['Presensi Asrama', 'check', ['view_asrama', 'manage_asrama'], '/admin/kepengasuhan/presensi-asrama/presensi-asramas'],
             ],
-            'Kesehatan & Konseling' => [
+            'Kesehatan' => [
                 ['Kunjungan UKS', 'heart', ['view_kesehatan', 'manage_kesehatan'], '/admin/kesehatan/kunjungan-uks'],
                 ['Riwayat Kesehatan', 'heart', ['view_kesehatan', 'manage_kesehatan'], '/admin/riwayat-kesehatans'],
                 ['Obat', 'heart', ['view_kesehatan', 'manage_kesehatan'], '/admin/kesehatan/obat'],
+            ],
+            'Konseling' => [
                 ['Konseling', 'chat', ['view_konseling', 'manage_konseling'], '/admin/sesi-konselings'],
             ],
-            'Akademik' => [
+            'Pembelajaran' => [
                 ['Presensi Santri', 'check', ['view_akademik', 'manage_akademik'], '/admin/presensi-santri/presensi-santris'],
                 ['Presensi Pengajar', 'check', ['run_payroll', 'view_akademik'], '/admin/presensi-staf/presensi-stafs'],
                 ['Rekap Jurnal KBM', 'book', ['view_akademik', 'manage_akademik'], '/admin/rekap-jurnal-kbm'],
             ],
-            'PPDB' => [
+            'Pendaftaran' => [
                 ['Calon Santri', 'user', ['view_ppdb', 'manage_ppdb'], '/admin/ppdb/calon-santri'],
                 ['Hasil Ujian', 'doc', ['view_ppdb', 'manage_ppdb'], '/admin/ppdb/hasil-ujian'],
             ],
-            'Keuangan' => [
+            'Tagihan Santri' => [
                 ['Pembayaran', 'wallet', ['view_tagihan', 'manage_tagihan'], '/admin/pembayaran/pembayarans'],
+            ],
+            'Laporan Keuangan' => [
                 ['Laporan Keuangan', 'chart', ['view_laporan_keuangan'], '/admin/laporan-keuangan'],
+            ],
+            'Buku Besar' => [
                 ['Jurnal', 'book', ['view_ledger', 'manage_ledger'], '/admin/jurnals'],
+            ],
+            'Penggajian' => [
                 ['Slip Gaji', 'wallet', ['run_payroll'], '/admin/payroll/slip'],
             ],
-            'Website & Pengaturan' => [
+            'Komunikasi' => [
                 ['Broadcast WA', 'bell', ['manage_notifikasi'], '/admin/broadcast-wa/broadcast-was'],
+            ],
+            'Pengaturan Sistem' => [
                 ['Pengguna', 'users', ['manage_users'], '/admin/users'],
                 ['Settings & Branding', 'cog', ['manage_tenant_settings'], '/admin/settings'],
             ],
@@ -150,6 +170,40 @@ class AppShellController extends Controller
         $jam = (int) now()->format('H');
         $sapa = $jam < 11 ? 'Selamat pagi' : ($jam < 15 ? 'Selamat siang' : ($jam < 18 ? 'Selamat sore' : 'Selamat malam'));
 
+        // Pintasan Cepat — item pertama dari maksimal 4 grup pertama yg terlihat
+        // untuk peran (bukan menu palsu; benar2 tautan yg user berhak akses).
+        $pintasan = [];
+        foreach (array_slice($groups, 0, 4, true) as $items) {
+            if (isset($items[0])) {
+                $pintasan[] = $items[0]; // [label, ikon, izin[], url]
+            }
+        }
+
+        // Jadwal 5 waktu sholat + tandai yg berikutnya (real, helper yg sudah ada).
+        $ibadah = $this->ibadahPayload();
+        $sholat = [];
+        try {
+            $jadwal = $ibadah['jadwal'] ?? [];
+            if ($jadwal !== []) {
+                $nextKey = app(PrayerTimesService::class)->nextPrayerKey($jadwal);
+                foreach ($jadwal as $p) {
+                    $sholat[] = [
+                        'label' => $p['label'] ?? '',
+                        'time' => $p['time'] ?? '',
+                        'next' => (($p['key'] ?? null) === $nextKey),
+                    ];
+                }
+            }
+        } catch (\Throwable) {
+            $sholat = [];
+        }
+
+        // Jumlah fitur (menu) yg boleh diakses peran — untuk kartu profil.
+        $totalFitur = 0;
+        foreach ($groups as $items) {
+            $totalFitur += count($items);
+        }
+
         return view('staf-home', [
             'namaPesantren' => TenantBranding::name(),
             'logoUrl' => TenantBranding::logoUrl(),
@@ -157,6 +211,11 @@ class AppShellController extends Controller
             'peran' => $u->getRoleNames()->map(fn ($r) => str()->headline($r))->implode(' · '),
             'sapa' => $sapa,
             'groups' => $groups,
+            'pintasan' => $pintasan,
+            'tanggal' => $this->tanggalIbadah(),
+            'sholat' => $sholat,
+            'totalFitur' => $totalFitur,
+            'pengumuman' => $this->artikelTerbaru(),
             'adminUrl' => '/admin',
         ]);
     }
