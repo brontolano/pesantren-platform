@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\AkunController;
+use App\Http\Controllers\AkuntanController;
 use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
@@ -290,6 +291,17 @@ Route::middleware([
         Route::post('/kerusakan/{laporan}/status', [SarprasController::class, 'ubahStatus'])->name('kerusakan.status');
         Route::get('/piket', [SarprasController::class, 'piket'])->name('piket');
         Route::post('/piket/scan', [SarprasController::class, 'scanPiket'])->name('piket.scan');
+    });
+
+    // Portal PWA Akuntan — role `akuntan` sebelumnya 0% PWA (harus buka
+    // admin utk segala hal). Gate view_ledger (baca); balik jurnal digerbang
+    // manage_ledger terpisah di dalam (sama dgn JurnalResource admin).
+    Route::middleware(['auth', 'can:view_ledger'])->prefix('akuntan')->name('tenant.akuntan.')->group(function () {
+        Route::get('/', [AkuntanController::class, 'beranda'])->name('beranda');
+        Route::get('/jurnal', [AkuntanController::class, 'jurnal'])->name('jurnal');
+        Route::post('/jurnal/{jurnal}/balik', [AkuntanController::class, 'balikJurnal'])
+            ->middleware('can:manage_ledger')->name('jurnal.balik');
+        Route::get('/akun', [AkuntanController::class, 'akun'])->name('akun');
     });
 
     Route::middleware('auth')->prefix('santri-app')->name('tenant.santri-app.')->group(function () {
