@@ -37,6 +37,12 @@
         html.dark .text-gray-900,html.dark .text-gray-800,html.dark .text-slate-900,html.dark .text-slate-800,html.dark .text-black{color:#eef2f0!important}
         html.dark .text-gray-600,html.dark .text-gray-500,html.dark .text-slate-600,html.dark .text-slate-500{color:#9fb0a8!important}
         html.dark .border-gray-100,html.dark .border-gray-200,html.dark .border-slate-100,html.dark .border-slate-200,html.dark .ring-gray-200{border-color:#26312c!important}
+        /* Tint pastel-50 (chip/kartu status) -> tint gelap agar tak menyilaukan. */
+        html.dark .bg-amber-50,html.dark .bg-yellow-50{background-color:#2a230f!important}
+        html.dark .bg-emerald-50,html.dark .bg-green-50,html.dark .bg-teal-50{background-color:#12271f!important}
+        html.dark .bg-blue-50,html.dark .bg-sky-50,html.dark .bg-indigo-50{background-color:#12293a!important}
+        html.dark .bg-violet-50,html.dark .bg-purple-50{background-color:#241c3a!important}
+        html.dark .bg-rose-50,html.dark .bg-red-50,html.dark .bg-orange-50,html.dark .bg-pink-50{background-color:#33180f!important}
         /* Pagar AlbaKids: tetap terang. */
         html.dark body.tenant-albakids{--pst-cream:#fffaf3;--pst-white:#fff;--pst-ink:#111;--surface-page:#fffaf3;--surface-card:#fff;--text-strong:#111;--text-body:#1e293b;--text-muted:#64748b;--border-card:#efe7da;--wali-bg:#fffaf3;--wali-surface:#fff;--wali-ink:#111;color-scheme:light;background:#fffaf3}
     </style>
