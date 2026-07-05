@@ -174,11 +174,11 @@ class TenantWebsiteService
                 'type' => 'hero',
                 'order' => 1,
                 'config' => [
-                    'eyebrow' => 'Tempat harapan Ayah Bunda dirawat',
+                    'eyebrow' => '✨ Pesantren Digital — Adab, Ilmu, dan Teknologi dalam Satu Rumah',
                     'title' => $brandingName,
                     'description' => $brandingTagline,
-                    'imageUrl' => 'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&fit=crop&w=1200&q=80',
-                    'imageAlt' => 'Mushaf Al-Quran, simbol ilmu yang dijaga di pesantren',
+                    'imageUrl' => 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1200&q=80',
+                    'imageAlt' => 'Masjid biru bermandikan cahaya keemasan senja',
                     'primaryCtaLabel' => 'Titipkan Putra-Putri Anda',
                     'primaryCtaHref' => '/ppdb',
                     'secondaryCtaLabel' => 'Kenali Perjalanannya',
@@ -186,7 +186,8 @@ class TenantWebsiteService
                     'stats' => [
                         ['label' => 'Keluarga yang Percaya', 'value' => 'Ratusan Wali Santri'],
                         ['label' => 'Pendampingan', 'value' => '24 Jam Penuh'],
-                        ['label' => 'Kabar Ananda', 'value' => 'Selalu Sampai ke Anda'],
+                        ['label' => 'Kabar Ananda', 'value' => 'Real-time via Aplikasi'],
+                        ['label' => 'Pendaftaran', 'value' => '100% Online, Tanpa Antre'],
                     ],
                 ],
             ],
@@ -204,9 +205,10 @@ class TenantWebsiteService
                     ],
                     'contact' => [],
                     'highlights' => [
-                        'Setiap perkembangan santri dilaporkan, bukan disembunyikan',
-                        'Identitas pesantren hadir di setiap sudut, bukan sekadar formalitas',
-                        'Langkah pertama menuju pesantren kini semudah mengisi satu formulir',
+                        '📱 Pantau presensi, nilai, dan tabungan santri langsung dari genggaman — kapan saja, di mana saja',
+                        '🕌 Adab dan ibadah tetap jadi napas utama, teknologi hanya mempermudah, bukan menggantikan',
+                        '💬 Wali santri terhubung setiap saat lewat notifikasi otomatis — tak ada kabar yang terlewat',
+                        '📝 Pendaftaran, pembayaran, hingga konsultasi — semua selesai online tanpa perlu bolak-balik',
                     ],
                 ]),
             ],
@@ -237,7 +239,15 @@ class TenantWebsiteService
                         ],
                         [
                             'question' => 'Kalau saya rindu atau ingin tahu kabar anak, bagaimana caranya?',
-                            'answer' => 'Anda tidak perlu menunggu lama. Hubungi kontak pesantren di bagian bawah halaman ini — kami senang mendengar dan menjawab kerinduan Anda.',
+                            'answer' => 'Anda tidak perlu menunggu lama. Aplikasi wali santri kami mengabarkan presensi, nilai, hingga aktivitas harian ananda secara real-time — dan tim pesantren selalu siap dihubungi lewat kontak di bagian bawah halaman ini.',
+                        ],
+                        [
+                            'question' => 'Apakah biaya dan tabungan santri transparan?',
+                            'answer' => 'Insyaallah. Setiap tagihan, pembayaran, dan saldo tabungan santri tercatat rapi dan bisa Anda pantau kapan saja lewat aplikasi — tanpa perlu bertanya-tanya.',
+                        ],
+                        [
+                            'question' => 'Bagaimana jika saya gaptek atau tidak terbiasa pakai aplikasi?',
+                            'answer' => 'Tenang, tampilannya sederhana dan tim kami siap membimbing Anda langkah demi langkah lewat WhatsApp — teknologi ini dibuat untuk memudahkan, bukan merepotkan.',
                         ],
                     ],
                 ]),
@@ -254,7 +264,7 @@ class TenantWebsiteService
                     'highlights' => [
                         'Adab ditanamkan lewat keteladanan, bukan sekadar aturan',
                         'Ilmu, akhlak, dan kepercayaan diri tumbuh bersamaan',
-                        'Anda tak pernah sendirian menunggu kabar ananda',
+                        'Teknologi menjaga Anda tetap dekat, walau jarak memisahkan',
                     ],
                 ]),
             ],
@@ -369,7 +379,7 @@ class TenantWebsiteService
             ->where('is_published', true)
             ->whereNotNull('published_at')
             ->orderByDesc('published_at')
-            ->limit((int) ($config['limit'] ?? 3))
+            ->limit((int) ($config['limit'] ?? 6))
             ->get()
             ->map(fn (Article $article): array => [
                 'title' => $article->title,
@@ -398,7 +408,7 @@ class TenantWebsiteService
             ->where('is_published', true)
             ->whereNotNull('published_at')
             ->orderByDesc('published_at')
-            ->limit((int) ($config['limit'] ?? 3))
+            ->limit((int) ($config['limit'] ?? 6))
             ->get()
             ->map(function (Gallery $gallery): array {
                 $images = $gallery->images
