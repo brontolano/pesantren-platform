@@ -8,6 +8,7 @@ use App\Http\Controllers\AkuntanController;
 use App\Http\Controllers\AppSantri\AppSantriController;
 use App\Http\Controllers\AppSantri\AppSantriPengurusController;
 use App\Http\Controllers\AppSantri\AppSantriUjianController;
+use App\Http\Controllers\BaitulMaalController;
 use App\Http\Controllers\CetakController;
 use App\Http\Controllers\DemoApps\SantriDemoController;
 use App\Http\Controllers\DemoAutoLoginController;
@@ -302,6 +303,28 @@ Route::middleware([
         Route::post('/jurnal/{jurnal}/balik', [AkuntanController::class, 'balikJurnal'])
             ->middleware('can:manage_ledger')->name('jurnal.balik');
         Route::get('/akun', [AkuntanController::class, 'akun'])->name('akun');
+    });
+
+    // Portal PWA Baitul Maal — Donasi/Program Donasi/Beasiswa sebelumnya
+    // tidak ada layar PWA sama sekali. Gate view_donasi (baca); tulis
+    // digerbang manage_donasi terpisah di dalam (sama dgn *Resource admin).
+    Route::middleware(['auth', 'can:view_donasi'])->prefix('baitul-maal')->name('tenant.baitul-maal.')->group(function () {
+        Route::get('/', [BaitulMaalController::class, 'beranda'])->name('beranda');
+        Route::get('/donasi', [BaitulMaalController::class, 'donasi'])->name('donasi');
+        Route::post('/donasi/{donasi}/konfirmasi', [BaitulMaalController::class, 'donasiKonfirmasi'])
+            ->middleware('can:manage_donasi')->name('donasi.konfirmasi');
+        Route::post('/donasi/{donasi}/tolak', [BaitulMaalController::class, 'donasiTolak'])
+            ->middleware('can:manage_donasi')->name('donasi.tolak');
+        Route::get('/program', [BaitulMaalController::class, 'program'])->name('program');
+        Route::post('/program', [BaitulMaalController::class, 'programStore'])
+            ->middleware('can:manage_donasi')->name('program.store');
+        Route::post('/program/{program}', [BaitulMaalController::class, 'programUpdate'])
+            ->middleware('can:manage_donasi')->name('program.update');
+        Route::get('/beasiswa', [BaitulMaalController::class, 'beasiswa'])->name('beasiswa');
+        Route::post('/beasiswa', [BaitulMaalController::class, 'beasiswaStore'])
+            ->middleware('can:manage_donasi')->name('beasiswa.store');
+        Route::post('/beasiswa/{beasiswa}', [BaitulMaalController::class, 'beasiswaUpdate'])
+            ->middleware('can:manage_donasi')->name('beasiswa.update');
     });
 
     Route::middleware('auth')->prefix('santri-app')->name('tenant.santri-app.')->group(function () {
