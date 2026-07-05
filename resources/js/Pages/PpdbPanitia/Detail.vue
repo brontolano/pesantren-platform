@@ -52,7 +52,7 @@ function simpanNilai() {
             <!-- Identitas calon -->
             <UiCard>
                 <div class="flex items-start gap-3">
-                    <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-lg font-bold text-emerald-600">
+                    <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-violet-50 text-lg font-bold text-violet-600">
                         {{ (calon.nama || '?').charAt(0) }}
                     </span>
                     <div class="min-w-0 flex-1">

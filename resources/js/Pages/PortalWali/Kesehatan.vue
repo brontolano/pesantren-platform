@@ -27,12 +27,12 @@ const formatDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', { day: 'nu
         <div class="flex gap-2">
             <Link :href="`/wali/santri/${santri.id}/hafalan`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Tahfidz</Link>
             <Link :href="`/wali/santri/${santri.id}/akademik`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Rapor</Link>
-            <span class="rounded-full bg-emerald-600 px-4 py-2 font-jost text-[13px] font-semibold text-white">Kesehatan</span>
+            <span class="rounded-full bg-violet-600 px-4 py-2 font-jost text-[13px] font-semibold text-white">Kesehatan</span>
         </div>
 
         <!-- Status card -->
         <div class="flex items-center gap-[14px] rounded-[24px] bg-white px-5 py-[18px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
-            <span class="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[18px] bg-emerald-50 text-emerald-700">
+            <span class="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[18px] bg-violet-50 text-violet-700">
                 <UiIcon name="heart" class="h-[26px] w-[26px]" />
             </span>
             <div class="min-w-0 flex-1">

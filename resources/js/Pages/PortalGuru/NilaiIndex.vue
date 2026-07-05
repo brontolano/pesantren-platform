@@ -42,10 +42,10 @@ defineProps({
                     chevron
                 >
                     <template #leading>
-                        <IconCircle icon="book" tone="emerald" variant="tint" size="sm" />
+                        <IconCircle icon="book" tone="violet" variant="tint" size="sm" />
                     </template>
                     <template #trailing>
-                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-700">Isi Nilai</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-violet-700">Isi Nilai</span>
                     </template>
                 </ListRow>
             </div>

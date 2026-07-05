@@ -37,14 +37,14 @@ function scoreColor(nilai) {
         <!-- Tab pills -->
         <div class="flex gap-2">
             <Link :href="`/wali/santri/${child.id}/hafalan`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Tahfidz</Link>
-            <span class="rounded-full bg-emerald-600 px-4 py-2 font-jost text-[13px] font-semibold text-white">Rapor</span>
+            <span class="rounded-full bg-violet-600 px-4 py-2 font-jost text-[13px] font-semibold text-white">Rapor</span>
             <Link :href="`/wali/santri/${child.id}/kesehatan`" class="rounded-full bg-white px-4 py-2 font-jost text-[13px] font-medium text-slate-600 shadow-[inset_0_0_0_1px_#efe7da]">Kesehatan</Link>
         </div>
 
         <!-- Stats -->
         <div class="grid grid-cols-2 gap-[11px]">
             <div class="rounded-[20px] bg-white px-4 py-[14px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
-                <p class="font-jost text-[24px] font-bold tabular-nums text-emerald-700">{{ latestRapor?.ipk ?? '-' }}</p>
+                <p class="font-jost text-[24px] font-bold tabular-nums text-violet-700">{{ latestRapor?.ipk ?? '-' }}</p>
                 <p class="mt-0.5 text-xs text-slate-500">Rata-rata nilai</p>
             </div>
             <div class="rounded-[20px] bg-white px-4 py-[14px] shadow-[inset_0_0_0_1px_#efe7da,0_6px_24px_-16px_rgba(17,17,17,0.18)]">
@@ -83,14 +83,14 @@ function scoreColor(nilai) {
             <Link
                 v-if="latestRapor"
                 :href="`/wali/santri/${child.id}/rapor/${latestRapor.id}/download`"
-                class="block rounded-full bg-white py-[14px] text-center font-jost text-[14.5px] font-semibold text-emerald-700 shadow-[inset_0_0_0_1px_#efe7da]"
+                class="block rounded-full bg-white py-[14px] text-center font-jost text-[14.5px] font-semibold text-violet-700 shadow-[inset_0_0_0_1px_#efe7da]"
             >
                 Unduh rapor (PDF)
             </Link>
             <Link
                 v-if="raporDiniyah"
                 :href="`/wali/santri/${child.id}/rapor-diniyah/${raporDiniyah.id}/download`"
-                class="block rounded-full bg-white py-[14px] text-center font-jost text-[14.5px] font-semibold text-emerald-700 shadow-[inset_0_0_0_1px_#efe7da]"
+                class="block rounded-full bg-white py-[14px] text-center font-jost text-[14.5px] font-semibold text-violet-700 shadow-[inset_0_0_0_1px_#efe7da]"
             >
                 Unduh rapor diniyah (PDF)
             </Link>

@@ -56,7 +56,7 @@ function kumpulkan() {
 
 <template>
     <div class="min-h-screen bg-[#fffaf3] pb-24">
-        <header class="sticky top-0 z-10 bg-emerald-700 px-5 py-3 text-white shadow">
+        <header class="sticky top-0 z-10 bg-violet-700 px-5 py-3 text-white shadow">
             <div class="mx-auto flex max-w-md items-center justify-between">
                 <p class="truncate text-sm font-bold">{{ sesi.nama }}</p>
                 <p class="rounded-lg bg-white/15 px-3 py-1 font-mono text-sm font-bold" :class="{ 'animate-pulse text-amber-300': sisaDetik < 300 }">
@@ -75,11 +75,11 @@ function kumpulkan() {
                         v-for="(teks, huruf) in s.pilihan"
                         :key="huruf"
                         class="flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm"
-                        :class="jawaban[s.id] === huruf ? 'border-emerald-600 bg-emerald-50 font-semibold text-emerald-800' : 'border-stone-200'"
+                        :class="jawaban[s.id] === huruf ? 'border-violet-600 bg-violet-50 font-semibold text-violet-800' : 'border-stone-200'"
                     >
                         <input
                             v-model="jawaban[s.id]"
-                            type="radio" :name="`soal-${s.id}`" :value="huruf" class="text-emerald-600"
+                            type="radio" :name="`soal-${s.id}`" :value="huruf" class="text-violet-600"
                             @change="simpanJawaban(s.id)"
                         >
                         <span><b>{{ huruf }}.</b> {{ teks }}</span>
@@ -107,7 +107,7 @@ function kumpulkan() {
 
         <footer class="fixed inset-x-0 bottom-0 bg-white/95 px-5 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.06)]">
             <div class="mx-auto max-w-md">
-                <button type="button" class="w-full rounded-xl bg-emerald-700 py-3 text-sm font-bold text-white" @click="kumpulkan">
+                <button type="button" class="w-full rounded-xl bg-violet-700 py-3 text-sm font-bold text-white" @click="kumpulkan">
                     Kumpulkan Ujian
                 </button>
             </div>

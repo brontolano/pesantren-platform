@@ -26,6 +26,15 @@ export { default as BottomNav } from './BottomNav.vue'
 export { default as SegmentedControl } from './SegmentedControl.vue'
 export { default as LoadingState } from './LoadingState.vue'
 
+// Form-kit refresh 2026-07 (pasca palet violet #440) — radius lebih besar,
+// shadow berlapis (--shadow-lift), focus ring violet. Menimpa (override)
+// UiInput/UiButton dari wildcard di atas secara sengaja: import dari
+// `@/Shared` dapat versi baru; halaman yang butuh versi lama Portal Wali
+// tetap bisa `import UiInput from '@/Components/Ui/UiInput.vue'` langsung.
+export { default as UiInput } from './UiInput.vue'
+export { default as UiSelect } from './UiSelect.vue'
+export { default as UiButton } from './UiButton.vue'
+
 // Helper & composable bersama.
 export * from './format.js'
 export { useOnline } from './useOnline.js'

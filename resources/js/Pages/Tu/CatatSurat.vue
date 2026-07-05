@@ -73,7 +73,7 @@ function selesai() {
                 <div class="space-y-4">
                     <div class="flex items-center justify-between rounded-2xl bg-slate-50/70 px-4 py-3 ring-1 ring-slate-100">
                         <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">No. Agenda</span>
-                        <span class="font-jost text-sm font-bold tabular-nums text-emerald-700">{{ nomorBerikutnya }}</span>
+                        <span class="font-jost text-sm font-bold tabular-nums text-violet-700">{{ nomorBerikutnya }}</span>
                     </div>
 
                     <UiField label="Tujuan / Penerima" :error="errors.tujuan" required>
@@ -133,7 +133,7 @@ function selesai() {
                     <IconCircle icon="document" tone="emerald" variant="gradient" size="lg" />
                     <div>
                         <p class="text-sm font-bold text-slate-900">Surat akan dicatat</p>
-                        <p class="text-xs text-slate-500">Nomor agenda otomatis: <span class="font-semibold text-emerald-700">{{ nomorBerikutnya }}</span></p>
+                        <p class="text-xs text-slate-500">Nomor agenda otomatis: <span class="font-semibold text-violet-700">{{ nomorBerikutnya }}</span></p>
                     </div>
                 </div>
                 <dl class="divide-y divide-slate-100 rounded-2xl bg-slate-50/60 px-4 ring-1 ring-slate-100">

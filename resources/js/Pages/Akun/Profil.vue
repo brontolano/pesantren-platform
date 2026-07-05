@@ -170,7 +170,7 @@ async function aktifkanPush() {
                 <button
                     v-if="pushSupported && pushStatus !== 'active'"
                     type="button"
-                    class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
+                    class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
                     :disabled="pushStatus === 'loading'"
                     @click="aktifkanPush"
                 >

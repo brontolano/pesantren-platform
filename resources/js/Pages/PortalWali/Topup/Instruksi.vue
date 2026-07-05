@@ -354,7 +354,7 @@ const checkoutUrl = computed(() => `/wali/santri/${props.child.id}/topup`)
                         :key="i"
                         class="flex items-start gap-3"
                     >
-                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-xs font-extrabold text-emerald-700 ring-1 ring-inset ring-emerald-100">
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-50 text-xs font-extrabold text-violet-700 ring-1 ring-inset ring-violet-100">
                             {{ i + 1 }}
                         </span>
                         <span class="pt-0.5 text-sm leading-6 text-slate-700">{{ step }}</span>

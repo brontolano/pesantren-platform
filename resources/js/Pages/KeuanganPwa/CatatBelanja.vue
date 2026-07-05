@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/vue3'
 import { reactive, ref, computed } from 'vue'
 import { enqueue, flush, uuid } from '@/keuangan-pwa/offline-sync.js'
 import { ambilLokasi } from '@/keuangan-pwa/camera-gps.js'
-import { AppShell, PageHeader, UiField, UiInput, UiButton, SegmentedControl, UiIcon } from '@/Shared'
+import { AppShell, PageHeader, UiField, UiInput, UiSelect, UiButton, SegmentedControl, UiIcon } from '@/Shared'
 
 const props = defineProps({
     navigation: { type: Array, default: () => [] },
@@ -27,8 +27,6 @@ const jenisOptions = [
     { value: 'jasa', label: 'Jasa' },
     { value: 'sewa', label: 'Sewa' },
 ]
-
-const selectClass = 'w-full rounded-2xl bg-white px-4 min-h-[48px] py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]'
 
 const statusClass = computed(() => ({
     success: 'bg-emerald-50 text-emerald-800 ring-emerald-100',
@@ -107,42 +105,42 @@ window.addEventListener('online', () => flush())
 
             <UiField label="Sumber Dana" required>
                 <template #default="{ fieldId }">
-                    <select :id="fieldId" v-model="form.sumber_dana_id" :class="selectClass" required>
+                    <UiSelect :id="fieldId" v-model="form.sumber_dana_id" required>
                         <option value="">— Pilih Sumber Dana —</option>
                         <option v-for="s in sumberDana" :key="s.id" :value="s.id">{{ s.kode_dana }} — {{ s.nama_sumber }}</option>
-                    </select>
+                    </UiSelect>
                 </template>
             </UiField>
 
             <UiField label="Divisi / Unit" hint="Opsional — pembebanan per unit">
                 <template #default="{ fieldId }">
-                    <select :id="fieldId" v-model="form.divisi_id" :class="selectClass">
+                    <UiSelect :id="fieldId" v-model="form.divisi_id">
                         <option value="">— Semua / Umum —</option>
                         <option v-for="d in divisi" :key="d.id" :value="d.id">{{ d.nama_divisi }}</option>
-                    </select>
+                    </UiSelect>
                 </template>
             </UiField>
 
             <UiField label="Akun Beban">
                 <template #default="{ fieldId }">
-                    <select :id="fieldId" v-model="form.akun_beban_id" :class="selectClass">
+                    <UiSelect :id="fieldId" v-model="form.akun_beban_id">
                         <option value="">— Akun Beban —</option>
                         <option v-for="a in akunBeban" :key="a.id" :value="a.id">{{ a.kode }} — {{ a.nama }}</option>
-                    </select>
+                    </UiSelect>
                 </template>
             </UiField>
 
             <UiField label="Akun Kas">
                 <template #default="{ fieldId }">
-                    <select :id="fieldId" v-model="form.akun_kas_id" :class="selectClass">
+                    <UiSelect :id="fieldId" v-model="form.akun_kas_id">
                         <option value="">— Akun Kas —</option>
                         <option v-for="a in akunKas" :key="a.id" :value="a.id">{{ a.kode }} — {{ a.nama }}</option>
-                    </select>
+                    </UiSelect>
                 </template>
             </UiField>
 
             <label class="flex items-center gap-2.5 rounded-2xl bg-white px-4 py-3 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-200">
-                <input v-model="form.vendor_npwp" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                <input v-model="form.vendor_npwp" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500" />
                 Vendor ber-NPWP
             </label>
 

@@ -89,7 +89,7 @@ onMounted(fetchPeriodes)
             <!-- Ringkasan -->
             <div
                 v-if="ringkasan"
-                class="rounded-3xl bg-gradient-to-br from-[var(--wali-primary,#059669)] to-emerald-900 p-5 text-white shadow-soft ring-1 ring-[var(--wali-accent,#C9A24A)]/30"
+                class="rounded-3xl bg-gradient-to-br from-[var(--wali-primary,#059669)] to-violet-900 p-5 text-white shadow-soft ring-1 ring-[var(--wali-accent,#C9A24A)]/30"
             >
                 <div class="grid grid-cols-2 gap-4">
                     <div>

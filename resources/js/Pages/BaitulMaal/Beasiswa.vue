@@ -1,9 +1,7 @@
 <script setup>
 import { Head, router } from '@inertiajs/vue3'
 import { ref } from 'vue'
-import { AppShell, PageHeader, SectionCard, ListRow, StatusBadge, MoneyText, IconCircle, BottomSheet, UiButton, UiField, UiInput, EmptyState } from '@/Shared'
-
-const selectClass = 'w-full rounded-2xl bg-white px-4 min-h-[48px] py-3 text-sm font-medium text-slate-900 ring-1 ring-inset ring-slate-200 transition-all duration-200 hover:ring-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--wali-primary,#059669)]'
+import { AppShell, PageHeader, SectionCard, ListRow, StatusBadge, MoneyText, IconCircle, BottomSheet, UiButton, UiField, UiInput, UiSelect, EmptyState } from '@/Shared'
 
 const props = defineProps({
     navigation: { type: Array, default: () => [] },
@@ -74,18 +72,18 @@ function nonaktifkan(b) {
             <div class="space-y-3">
                 <UiField label="Santri">
                     <template #default="{ fieldId }">
-                        <select :id="fieldId" v-model="form.santri_id" :class="selectClass" required>
+                        <UiSelect :id="fieldId" v-model="form.santri_id" required>
                             <option value="" disabled>Pilih santri…</option>
                             <option v-for="s in santriOptions" :key="s.value" :value="s.value">{{ s.label }}</option>
-                        </select>
+                        </UiSelect>
                     </template>
                 </UiField>
                 <UiField label="Sumber Dana">
                     <template #default="{ fieldId }">
-                        <select :id="fieldId" v-model="form.sumber_dana_id" :class="selectClass" required>
+                        <UiSelect :id="fieldId" v-model="form.sumber_dana_id" required>
                             <option value="" disabled>Pilih sumber dana…</option>
                             <option v-for="s in sumberDana" :key="s.id" :value="s.id">{{ s.kode_dana }} — {{ s.nama_sumber }}</option>
-                        </select>
+                        </UiSelect>
                     </template>
                 </UiField>
                 <UiField label="Nominal per Bulan (Rp)">

@@ -79,10 +79,10 @@ const metodePerangkat = computed(() => props.metodeLogin.filter((m) => m.siap ==
 </script>
 
 <template>
-    <div class="flex min-h-screen items-center justify-center bg-gradient-to-b from-emerald-900 to-emerald-700 px-4 py-8">
+    <div class="flex min-h-screen items-center justify-center bg-gradient-to-b from-violet-900 to-violet-700 px-4 py-8">
         <div class="w-full max-w-sm rounded-3xl bg-white p-7 shadow-xl">
             <div class="text-center">
-                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-2xl text-white">🎓</div>
+                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-violet-600 text-2xl text-white">🎓</div>
                 <h1 class="mt-4 text-xl font-bold text-stone-900">App Santri</h1>
                 <p class="mt-1 text-sm text-stone-500">Masuk dengan NIS dan PIN kamu.</p>
             </div>
@@ -99,13 +99,13 @@ const metodePerangkat = computed(() => props.metodeLogin.filter((m) => m.siap ==
                 >
                     Scan Kartu Santri (QR)
                 </UiButton>
-                <div v-else class="overflow-hidden rounded-xl border border-emerald-300">
+                <div v-else class="overflow-hidden rounded-xl border border-violet-300">
                     <video ref="videoEl" class="h-44 w-full bg-black object-cover" playsinline muted></video>
                     <UiButton type="button" variant="ghost" block @click="hentikanScan">
                         Tutup kamera
                     </UiButton>
                 </div>
-                <p v-if="scanPesan" class="mt-1 text-center text-xs text-emerald-700">{{ scanPesan }}</p>
+                <p v-if="scanPesan" class="mt-1 text-center text-xs text-violet-700">{{ scanPesan }}</p>
             </div>
 
             <form class="mt-5 space-y-4" @submit.prevent="submit">

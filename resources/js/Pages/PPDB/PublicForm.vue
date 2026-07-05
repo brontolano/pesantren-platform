@@ -22,7 +22,7 @@ const form = useForm({
     setuju_kebijakan: false,
 });
 
-const inputClass = 'w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-[15px] outline-none transition focus:border-emerald-500 focus:bg-white';
+const inputClass = 'w-full rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-[15px] outline-none transition focus:border-violet-500 focus:bg-white';
 
 const submit = () => form.post('/ppdb', { preserveState: true });
 </script>
@@ -35,7 +35,7 @@ const submit = () => form.post('/ppdb', { preserveState: true });
             <!-- Panel info -->
             <section class="lg:w-[40%]">
                 <div class="space-y-5 lg:sticky lg:top-8">
-                    <span class="inline-flex items-center rounded-full border border-emerald-800/10 bg-white/70 px-4 py-2 text-sm font-medium text-emerald-900 shadow-sm backdrop-blur">
+                    <span class="inline-flex items-center rounded-full border border-violet-800/10 bg-white/70 px-4 py-2 text-sm font-medium text-violet-900 shadow-sm backdrop-blur">
                         Pendaftaran Santri Baru • {{ tenant.name }}
                     </span>
                     <h1 class="text-3xl font-semibold tracking-tight text-stone-950 lg:text-4xl">
@@ -49,7 +49,7 @@ const submit = () => form.post('/ppdb', { preserveState: true });
                         <h2 class="text-base font-semibold">Langkahnya</h2>
                         <ul class="mt-3 space-y-2.5 text-sm leading-6 text-stone-300">
                             <li v-for="item in registrationChecklist" :key="item" class="flex gap-3">
-                                <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
+                                <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-violet-400" />
                                 <span>{{ item }}</span>
                             </li>
                         </ul>
@@ -61,7 +61,7 @@ const submit = () => form.post('/ppdb', { preserveState: true });
             <section class="lg:flex-1">
                 <div class="rounded-3xl bg-white/90 p-5 shadow-2xl ring-1 ring-black/5 backdrop-blur sm:p-7">
                     <div class="mb-6 border-b border-stone-200 pb-4">
-                        <div class="text-xs font-medium uppercase tracking-[0.18em] text-emerald-800">Data awal calon santri</div>
+                        <div class="text-xs font-medium uppercase tracking-[0.18em] text-violet-800">Data awal calon santri</div>
                         <p class="mt-2 text-sm leading-6 text-stone-600">Pastikan nomor WhatsApp wali aktif — kode aktivasi dikirim ke sana.</p>
                     </div>
 
@@ -129,7 +129,7 @@ const submit = () => form.post('/ppdb', { preserveState: true });
                                 <input v-model="form.setuju_kebijakan" type="checkbox" required class="mt-1 h-4 w-4 rounded border-stone-300">
                                 <span>
                                     Saya (orang tua/wali) menyetujui
-                                    <a href="/kebijakan-privasi" target="_blank" rel="noopener" class="font-semibold text-emerald-700 underline">Kebijakan Privasi Sistem</a>
+                                    <a href="/kebijakan-privasi" target="_blank" rel="noopener" class="font-semibold text-violet-700 underline">Kebijakan Privasi Sistem</a>
                                     — termasuk penggunaan data, foto, dan contoh tulisan anak untuk keperluan pendidikan internal pesantren. *
                                 </span>
                             </label>

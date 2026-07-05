@@ -132,7 +132,7 @@ const tabs = [
                         </template>
                         <template #subtitle>MAP {{ data.bagian_b?.kode_map }} / KJS {{ data.bagian_b?.kode_kjs }}</template>
                         <template #trailing>
-                            <MoneyText :amount="data.bagian_b?.pph21_disetor ?? 0" size="md" tone="emerald" />
+                            <MoneyText :amount="data.bagian_b?.pph21_disetor ?? 0" size="md" tone="violet" />
                         </template>
                     </ListRow>
                 </div>
@@ -144,7 +144,7 @@ const tabs = [
                         <template #trailing>
                             <div class="space-y-0.5 text-right">
                                 <MoneyText :amount="r.bruto" size="sm" tone="default" />
-                                <div class="text-xs font-semibold text-emerald-700">PPh {{ formatRupiahFull(r.pph21) }}</div>
+                                <div class="text-xs font-semibold text-violet-700">PPh {{ formatRupiahFull(r.pph21) }}</div>
                             </div>
                         </template>
                     </ListRow>
@@ -189,7 +189,7 @@ const tabs = [
                         <template #trailing>
                             <div class="space-y-0.5 text-right text-xs">
                                 <div class="tabular-nums text-slate-500">Bruto {{ formatRupiahFull(r.bruto) }}</div>
-                                <div class="font-semibold text-emerald-700">PPh {{ formatRupiahFull(r.pph21_dipotong) }}</div>
+                                <div class="font-semibold text-violet-700">PPh {{ formatRupiahFull(r.pph21_dipotong) }}</div>
                             </div>
                         </template>
                     </ListRow>

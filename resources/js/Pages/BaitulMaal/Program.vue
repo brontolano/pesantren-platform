@@ -73,7 +73,7 @@ function progres(p) {
                         </ListRow>
                         <div class="mt-2 px-1">
                             <div class="h-2 overflow-hidden rounded-full bg-slate-100">
-                                <div class="h-full rounded-full bg-emerald-500" :style="{ width: progres(p) + '%' }" />
+                                <div class="h-full rounded-full bg-violet-500" :style="{ width: progres(p) + '%' }" />
                             </div>
                             <div class="mt-1 flex items-center justify-between text-xs text-slate-500">
                                 <MoneyText :amount="p.terkumpul" size="sm" tone="emerald" />

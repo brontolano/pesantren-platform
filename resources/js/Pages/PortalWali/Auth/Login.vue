@@ -35,7 +35,7 @@ const submit = () => {
                     <label for="identifier" class="font-['Jost',sans-serif] text-[13px] font-semibold text-[#1e293b]">
                         Nomor WhatsApp
                     </label>
-                    <div class="flex items-center gap-2.5 rounded-[14px] bg-white px-4 py-3.5 shadow-[inset_0_0_0_1px_#efe7da] transition focus-within:shadow-[inset_0_0_0_2px_#059669]">
+                    <div class="flex items-center gap-2.5 rounded-[14px] bg-white px-4 py-3.5 shadow-[inset_0_0_0_1px_#efe7da] transition focus-within:shadow-[inset_0_0_0_2px_#7c3aed]">
                         <svg class="h-5 w-5 shrink-0 text-[#94a3b8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>
                         <input
                             id="identifier"
@@ -57,7 +57,7 @@ const submit = () => {
                     <label for="password" class="font-['Jost',sans-serif] text-[13px] font-semibold text-[#1e293b]">
                         Kata sandi
                     </label>
-                    <div class="flex items-center justify-between rounded-[14px] bg-white px-4 py-3.5 shadow-[inset_0_0_0_1px_#efe7da] transition focus-within:shadow-[inset_0_0_0_2px_#059669]">
+                    <div class="flex items-center justify-between rounded-[14px] bg-white px-4 py-3.5 shadow-[inset_0_0_0_1px_#efe7da] transition focus-within:shadow-[inset_0_0_0_2px_#7c3aed]">
                         <input
                             id="password"
                             v-model="form.password"
@@ -70,7 +70,7 @@ const submit = () => {
                         >
                         <button
                             type="button"
-                            class="ml-3 shrink-0 font-['Jost',sans-serif] text-xs font-semibold text-emerald-700"
+                            class="ml-3 shrink-0 font-['Jost',sans-serif] text-xs font-semibold text-violet-700"
                             @click="showPassword = !showPassword"
                         >
                             {{ showPassword ? 'Sembunyikan' : 'Tampilkan' }}
@@ -82,7 +82,7 @@ const submit = () => {
                 </div>
 
                 <div class="text-right">
-                    <Link href="/wali/lupa-password" class="font-['Jost',sans-serif] text-[13px] font-semibold text-emerald-700">
+                    <Link href="/wali/lupa-password" class="font-['Jost',sans-serif] text-[13px] font-semibold text-violet-700">
                         Lupa kata sandi?
                     </Link>
                 </div>
@@ -91,7 +91,7 @@ const submit = () => {
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="block w-full rounded-full bg-emerald-600 px-4 py-4 text-center font-['Jost',sans-serif] text-base font-semibold text-white shadow-[0_8px_20px_-12px_rgba(5,150,105,0.45)] transition active:scale-[0.99] disabled:opacity-60"
+                        class="block w-full rounded-full bg-violet-600 px-4 py-4 text-center font-['Jost',sans-serif] text-base font-semibold text-white shadow-[0_8px_20px_-12px_rgba(124,58,237,0.45)] transition active:scale-[0.99] disabled:opacity-60"
                     >
                         {{ form.processing ? 'Memproses…' : 'Masuk' }}
                     </button>
@@ -104,7 +104,7 @@ const submit = () => {
 
                     <Link
                         href="/wali/aktivasi"
-                        class="block w-full rounded-full bg-white px-4 py-[15px] text-center font-['Jost',sans-serif] text-[15px] font-semibold text-emerald-700 shadow-[inset_0_0_0_1px_#efe7da] transition active:scale-[0.99]"
+                        class="block w-full rounded-full bg-white px-4 py-[15px] text-center font-['Jost',sans-serif] text-[15px] font-semibold text-violet-700 shadow-[inset_0_0_0_1px_#efe7da] transition active:scale-[0.99]"
                     >
                         Aktifkan dengan kode dari pesantren
                     </Link>

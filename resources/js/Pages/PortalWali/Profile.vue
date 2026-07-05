@@ -64,12 +64,12 @@ function simpanPin() {
             </div>
         </section>
 
-        <section class="rounded-[1.75rem] border border-emerald-200 bg-emerald-50/60 px-4 py-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+        <section class="rounded-[1.75rem] border border-violet-200 bg-violet-50/60 px-4 py-4">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-violet-700">
                 Login Aplikasi Santri
             </p>
-            <h3 class="mt-2 font-jost text-lg text-emerald-950">Atur PIN anak</h3>
-            <p class="mt-1 text-sm leading-6 text-emerald-900/70">
+            <h3 class="mt-2 font-jost text-lg text-violet-950">Atur PIN anak</h3>
+            <p class="mt-1 text-sm leading-6 text-violet-900/70">
                 Santri masuk App Santri dengan <b>NIS {{ child.nis }}</b> + PIN 6 angka.
                 Buat PIN yang mudah diingat anak.
             </p>
@@ -87,14 +87,14 @@ function simpanPin() {
                         maxlength="6"
                         pattern="\d{6}"
                         placeholder="6 angka"
-                        class="w-32 rounded-xl border border-emerald-300 px-4 py-3 text-center text-lg tracking-[0.4em] tabular-nums"
+                        class="w-32 rounded-xl border border-violet-300 px-4 py-3 text-center text-lg tracking-[0.4em] tabular-nums"
                     >
                     <p v-if="pinForm.errors.pin" class="mt-1 text-xs text-red-600">{{ pinForm.errors.pin }}</p>
                 </div>
                 <button
                     type="submit"
                     :disabled="pinForm.processing || !/^\d{6}$/.test(pinForm.pin)"
-                    class="rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                    class="rounded-full bg-violet-600 px-6 py-3 text-sm font-semibold text-white disabled:opacity-50"
                 >
                     Simpan PIN
                 </button>
@@ -139,7 +139,7 @@ function simpanPin() {
 
         <Link
             :href="`/wali/santri/${child.id}/akademik`"
-            class="block rounded-[1.5rem] bg-emerald-50 px-4 py-4 text-center text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700"
+            class="block rounded-[1.5rem] bg-violet-50 px-4 py-4 text-center text-sm font-semibold uppercase tracking-[0.18em] text-violet-700"
         >
             Lanjut ke akademik
         </Link>

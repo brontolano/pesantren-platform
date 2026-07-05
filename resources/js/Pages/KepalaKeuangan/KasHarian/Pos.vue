@@ -122,7 +122,7 @@ onMounted(fetchData)
                 <div class="grid grid-cols-2 gap-3">
                     <StatCard icon="clock" tone="emerald" label="Sesi Aktif">
                         <template #value>
-                            <span class="text-2xl font-extrabold tabular-nums tracking-tight text-emerald-700">{{ ringkasan.sesiAktif ?? 0 }}</span>
+                            <span class="text-2xl font-extrabold tabular-nums tracking-tight text-violet-700">{{ ringkasan.sesiAktif ?? 0 }}</span>
                         </template>
                     </StatCard>
                     <StatCard
@@ -171,7 +171,7 @@ onMounted(fetchData)
             <div class="grid grid-cols-3 gap-2">
                 <button v-for="p in produkFiltered" :key="p.id"
                         type="button"
-                        class="flex flex-col items-center rounded-2xl bg-white p-2.5 text-center shadow-soft ring-1 ring-slate-100 transition-all duration-200 hover:ring-emerald-200 active:scale-[.97]"
+                        class="flex flex-col items-center rounded-2xl bg-white p-2.5 text-center shadow-soft ring-1 ring-slate-100 transition-all duration-200 hover:ring-violet-200 active:scale-[.97]"
                         @click="tambahKeKeranjang(p)">
                     <div class="mb-1 text-xs font-semibold leading-tight tracking-tight text-slate-900">{{ p.nama }}</div>
                     <MoneyText :amount="p.harga" size="sm" tone="emerald" />

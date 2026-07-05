@@ -133,7 +133,7 @@ onMounted(muat)
                 <div class="rounded-3xl bg-white p-4 ring-1 ring-slate-100 shadow-soft">
                     <div class="mb-1.5 flex justify-between text-xs">
                         <span class="text-slate-500">Kolektibilitas</span>
-                        <span class="font-bold tabular-nums text-emerald-700">{{ data.persentase_terkumpul }}%</span>
+                        <span class="font-bold tabular-nums text-violet-700">{{ data.persentase_terkumpul }}%</span>
                     </div>
                     <div class="h-2.5 overflow-hidden rounded-full bg-slate-100">
                         <div class="h-full rounded-full bg-gradient-to-r from-[var(--wali-primary,#0A5C36)] to-[var(--wali-accent,#C9A24A)]"
