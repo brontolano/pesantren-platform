@@ -4,6 +4,7 @@ namespace Modules\CMS\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\User;
 use App\Services\PrayerTimesService;
 use App\Services\QiblaService;
 use App\Support\AppLauncher;
@@ -188,7 +189,7 @@ class AppShellController extends Controller
         // (canAccess) PERSIS panel, "main hidden/active" seperti panel (owner
         // 2026-07-06). Bila gagal (mis. konteks panel tak tersedia), JATUH ke
         // katalog tangan di atas agar /staf tak pernah kosong.
-        $groups = $this->katalogDariPanel();
+        $groups = $this->katalogDariPanel($u);
         if ($groups === null) {
             $groups = [];
             foreach ($katalog as $judul => $items) {
@@ -196,7 +197,7 @@ class AppShellController extends Controller
                 if ($vis !== []) {
                     // Remap ke halaman PWA native juga di jalur fallback.
                     $groups[$judul] = array_map(
-                        fn ($it) => [$it[0], $it[1], $it[2], self::urlPwaNative(url($it[3]))],
+                        fn ($it) => [$it[0], $it[1], $it[2], self::urlPwaNative(url($it[3]), $u)],
                         $vis,
                     );
                 }
@@ -297,7 +298,7 @@ class AppShellController extends Controller
      *
      * @return array<string, array<int, array{0:string,1:string,2:array,3:string}>>|null
      */
-    private function katalogDariPanel(): ?array
+    private function katalogDariPanel(User $u): ?array
     {
         try {
             $panel = Filament::getPanel('tenant');
@@ -332,9 +333,20 @@ class AppShellController extends Controller
                     $item->getLabel(),
                     self::heroiconKeMobile(is_string($icon) ? $icon : ''),
                     [],
-                    self::urlPwaNative($url),
+                    self::urlPwaNative($url, $u),
                 ];
             }
+        }
+
+        // ITEM NATIVE-ONLY — fitur PWA yang TAK punya padanan halaman panel
+        // sehingga tak pernah muncul dari getNavigation(), padahal alat inti
+        // lapangan. Disisipkan ke grup terkait, tetap ter-gate izin.
+        // Pos Gerbang (scan NIS keluar/masuk) — alat utama petugas keamanan.
+        if ($u->can('view_kegiatan')) {
+            $out['Kegiatan'] = array_merge(
+                [['Pos Gerbang (Scan)', 'qr', [], url('/keamanan/gerbang')]],
+                $out['Kegiatan'] ?? [],
+            );
         }
 
         return $out !== [] ? $out : null;
@@ -347,8 +359,13 @@ class AppShellController extends Controller
      * halaman panel responsif sampai versi native-nya dibangun bertahap.
      * Kunci = path panel; gerbang izin native ≈ izin canAccess item panelnya.
      */
-    private static function urlPwaNative(string $url): string
+    private static function urlPwaNative(string $url, ?User $u = null): string
     {
+        // PENTING: remap hanya bila USER LOLOS gerbang route tujuannya —
+        // item panel bisa tampil utk izin A tapi route native ber-gate izin B
+        // (mis. "Izin Santri" tampil utk manage_kegiatan, tapi /pengasuhan/*
+        // ber-gate manage_asrama → petugas keamanan akan 403 = alur putus).
+        // Kunci ber-syarat dicek terpisah di bawah.
         static $peta = [
             // Santri & TU
             '/admin/santri/santris' => '/tu/santri',
@@ -356,18 +373,11 @@ class AppShellController extends Controller
             // Master Akademik & Pembelajaran
             '/admin/kelas' => '/akademik-app/kelas',
             '/admin/presensi-santri/presensi-santris' => '/akademik-app/presensi',
-            // Asrama & Pengasuhan
-            '/admin/penempatan-asrama/penempatan-asramas' => '/pengasuhan/penempatan',
-            '/admin/kepengasuhan/presensi-asrama/presensi-asramas' => '/pengasuhan/presensi',
-            // Kedisiplinan
-            '/admin/pelanggaran-santri/pelanggaran-santris' => '/pengasuhan/disiplin',
             // Kegiatan / gerbang / tamu
             '/admin/kegiatans' => '/kegiatan-app',
             '/admin/log-gerbang' => '/keamanan/log',
             '/admin/kunjungan-walis' => '/keamanan/tamu',
             '/admin/pengajuan-jenguk' => '/keamanan/tamu',
-            // Perizinan
-            '/admin/izin-santris' => '/pengasuhan/izin',
             // Kesehatan (UKS)
             '/admin/kesehatan/kunjungan-uks' => '/uks/kunjungan',
             '/admin/riwayat-kesehatans' => '/uks/riwayat',
@@ -384,9 +394,25 @@ class AppShellController extends Controller
             '/admin/jurnals' => '/akuntan/jurnal',
         ];
 
+        // Tujuan native ber-gate manage_asrama (/pengasuhan/*) — remap HANYA
+        // bila user memang lolos gerbangnya; selain itu biarkan ke panel.
+        static $petaAsrama = [
+            '/admin/penempatan-asrama/penempatan-asramas' => '/pengasuhan/penempatan',
+            '/admin/kepengasuhan/presensi-asrama/presensi-asramas' => '/pengasuhan/presensi',
+            '/admin/pelanggaran-santri/pelanggaran-santris' => '/pengasuhan/disiplin',
+            '/admin/izin-santris' => '/pengasuhan/izin',
+        ];
+
         $path = rtrim((string) (parse_url($url, PHP_URL_PATH) ?: ''), '/');
 
-        return isset($peta[$path]) ? url($peta[$path]) : $url;
+        if (isset($peta[$path])) {
+            return url($peta[$path]);
+        }
+        if (isset($petaAsrama[$path]) && $u !== null && $u->can('manage_asrama')) {
+            return url($petaAsrama[$path]);
+        }
+
+        return $url;
     }
 
     /** Petakan nama Heroicon panel → kunci ikon set mobile ($svg); default 'grid'. */

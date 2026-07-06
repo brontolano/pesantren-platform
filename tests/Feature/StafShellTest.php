@@ -83,6 +83,32 @@ class StafShellTest extends TestCase
         $response->assertDontSee('Jurnal');
     }
 
+    public function test_persona_keamanan_scan_gerbang_dan_tanpa_403(): void
+    {
+        tenancy()->initialize($this->tenant);
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Satpam', 'email' => 'satpam@stafshell.test', 'password' => bcrypt('password'),
+        ]);
+        // Persona keamanan: izin kegiatan TANPA manage_asrama.
+        $user->givePermissionTo(['view_kegiatan', 'manage_kegiatan']);
+        DB::connection('pgsql')->table('tenant_modules')->updateOrInsert(
+            ['tenant_id' => $this->tenant->id, 'module_name' => 'kegiatan'],
+            ['is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        );
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->get("http://{$host}/staf", $this->headers($host, mobile: true));
+
+        $response->assertOk();
+        // Alat inti keamanan tersedia dari menu (item native-only).
+        $response->assertSee('Pos Gerbang (Scan)');
+        $response->assertSee('/keamanan/gerbang');
+        // Izin Santri TIDAK di-remap ke /pengasuhan/izin (gate manage_asrama
+        // yang TAK dimiliki persona ini → akan 403 = alur putus).
+        $response->assertDontSee('/pengasuhan/izin');
+    }
+
     public function test_tanpa_login_ditolak_akses(): void
     {
         $host = $this->tenant->id.'.localhost';
