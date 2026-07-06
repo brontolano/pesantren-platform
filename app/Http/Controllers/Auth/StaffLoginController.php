@@ -38,7 +38,13 @@ class StaffLoginController extends Controller
             return redirect()->to($dest['kind'] === 'redirect' ? $dest['url'] : '/');
         }
 
-        return view('tenant.login', [
+        // AlbaKids (tenant custom playful) tetap pakai login lama; tenant lain
+        // dapat login "Nur" (mockup terkunci). Form/action/field identik di keduanya.
+        $viewLogin = str_contains(\App\Support\TenantCustomizationRegistry::bodyClass(), 'tenant-albakids')
+            ? 'tenant.login'
+            : 'tenant.login-nur';
+
+        return view($viewLogin, [
             'pesantren' => TenantBranding::name(tenant()?->name ?? 'Portal Pesantren'),
             'logoUrl' => TenantBranding::logoUrl(),
             'heroImageUrl' => TenantBranding::heroImageUrl(),
