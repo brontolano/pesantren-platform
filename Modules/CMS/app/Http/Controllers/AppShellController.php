@@ -367,13 +367,7 @@ class AppShellController extends Controller
         // ber-gate manage_asrama → petugas keamanan akan 403 = alur putus).
         // Kunci ber-syarat dicek terpisah di bawah.
         static $peta = [
-            // Santri & TU
-            '/admin/santri/santris' => '/tu/santri',
-            '/admin/alumni/alumnis' => '/akademik-app/alumni',
-            // Master Akademik & Pembelajaran
-            '/admin/kelas' => '/akademik-app/kelas',
-            '/admin/presensi-santri/presensi-santris' => '/akademik-app/presensi',
-            // Kegiatan / gerbang / tamu
+            // Kegiatan / gerbang / tamu (item & route sama-sama view_kegiatan)
             '/admin/kegiatans' => '/kegiatan-app',
             '/admin/log-gerbang' => '/keamanan/log',
             '/admin/kunjungan-walis' => '/keamanan/tamu',
@@ -387,20 +381,32 @@ class AppShellController extends Controller
             // Kepegawaian & Penggajian
             '/admin/presensi-staf/presensi-stafs' => '/kepegawaian/absensi',
             '/admin/payroll/slip' => '/kepegawaian/slip',
-            // Pendaftaran (panitia PPDB)
-            '/admin/ppdb/calon-santri' => '/ppdb-panitia/pendaftar',
-            '/admin/ppdb/hasil-ujian' => '/ppdb-panitia/hasil',
-            // Buku Besar
+            // Buku Besar (item view_ledger||manage_ledger; gate view_ledger — semua
+            // pemegang manage_ledger di seeder juga punya view_ledger)
             '/admin/jurnals' => '/akuntan/jurnal',
         ];
 
-        // Tujuan native ber-gate manage_asrama (/pengasuhan/*) — remap HANYA
-        // bila user memang lolos gerbangnya; selain itu biarkan ke panel.
-        static $petaAsrama = [
-            '/admin/penempatan-asrama/penempatan-asramas' => '/pengasuhan/penempatan',
-            '/admin/kepengasuhan/presensi-asrama/presensi-asramas' => '/pengasuhan/presensi',
-            '/admin/pelanggaran-santri/pelanggaran-santris' => '/pengasuhan/disiplin',
-            '/admin/izin-santris' => '/pengasuhan/izin',
+        // Tujuan native yang gate route-nya LEBIH KETAT dari canAccess item
+        // panel — remap HANYA bila user lolos izin route tujuannya; selain itu
+        // biarkan ke panel (akses tak diblok, tanpa 403). Format:
+        // path panel => [path native, izin gate route native].
+        static $petaSyarat = [
+            // Item tampil utk view_santri||manage_santri; /tu/* gate manage_santri.
+            '/admin/santri/santris' => ['/tu/santri', 'manage_santri'],
+            // Item tampil utk view_alumni||manage_alumni; route gate view_alumni.
+            '/admin/alumni/alumnis' => ['/akademik-app/alumni', 'view_alumni'],
+            // Item tampil utk view/manage_akademik||manage_santri; gate view_akademik.
+            '/admin/kelas' => ['/akademik-app/kelas', 'view_akademik'],
+            '/admin/presensi-santri/presensi-santris' => ['/akademik-app/presensi', 'view_akademik'],
+            // /pengasuhan/* gate manage_asrama (item bisa tampil dari izin lain).
+            '/admin/penempatan-asrama/penempatan-asramas' => ['/pengasuhan/penempatan', 'manage_asrama'],
+            '/admin/kepengasuhan/presensi-asrama/presensi-asramas' => ['/pengasuhan/presensi', 'manage_asrama'],
+            '/admin/pelanggaran-santri/pelanggaran-santris' => ['/pengasuhan/disiplin', 'manage_asrama'],
+            '/admin/izin-santris' => ['/pengasuhan/izin', 'manage_asrama'],
+            // Item tampil utk view_ppdb||manage_ppdb; /ppdb-panitia gate manage_ppdb
+            // (kepala hanya view_ppdb → tanpa syarat ini akan 403).
+            '/admin/ppdb/calon-santri' => ['/ppdb-panitia/pendaftar', 'manage_ppdb'],
+            '/admin/ppdb/hasil-ujian' => ['/ppdb-panitia/hasil', 'manage_ppdb'],
         ];
 
         $path = rtrim((string) (parse_url($url, PHP_URL_PATH) ?: ''), '/');
@@ -408,8 +414,8 @@ class AppShellController extends Controller
         if (isset($peta[$path])) {
             return url($peta[$path]);
         }
-        if (isset($petaAsrama[$path]) && $u !== null && $u->can('manage_asrama')) {
-            return url($petaAsrama[$path]);
+        if (isset($petaSyarat[$path]) && $u !== null && $u->can($petaSyarat[$path][1])) {
+            return url($petaSyarat[$path][0]);
         }
 
         return $url;

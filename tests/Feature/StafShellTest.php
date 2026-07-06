@@ -109,6 +109,27 @@ class StafShellTest extends TestCase
         $response->assertDontSee('/pengasuhan/izin');
     }
 
+    public function test_persona_guru_item_santri_tidak_403(): void
+    {
+        tenancy()->initialize($this->tenant);
+        $user = User::withoutGlobalScopes()->create([
+            'tenant_id' => $this->tenant->id, 'name' => 'Ust Guru', 'email' => 'guru@stafshell.test', 'password' => bcrypt('password'),
+        ]);
+        // guru: view_santri + view_akademik TANPA manage_santri.
+        $user->assignRole('guru');
+        $host = $this->tenant->id.'.localhost';
+        tenancy()->end();
+
+        $response = $this->actingAs($user)->get("http://{$host}/staf", $this->headers($host, mobile: true));
+
+        $response->assertOk();
+        // Item Santri TIDAK di-remap ke /tu/santri (gate manage_santri yang
+        // TAK dimiliki guru → akan 403 = alur putus); tetap ke panel.
+        $response->assertDontSee('/tu/santri');
+        // Kelas boleh di-remap: guru punya view_akademik = gate /akademik-app.
+        $response->assertSee('/akademik-app/kelas');
+    }
+
     public function test_tanpa_login_ditolak_akses(): void
     {
         $host = $this->tenant->id.'.localhost';
