@@ -105,7 +105,7 @@ a{text-decoration:none;color:inherit}button{font-family:inherit;color:inherit}
 html.dark .nav{background:rgba(18,24,21,.96)}
 /* TWA/aplikasi terpasang (standalone): env(safe-area-inset-bottom) sering over-report
    di perangkat tombol-3 → ruang kosong besar di bawah ikon. Batasi agar nav rapat. */
-@media(display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){.nav{padding-bottom:min(max(8px,env(safe-area-inset-bottom)),16px)}}
+@media(display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){.nav{padding-bottom:10px}.scroll-area{padding-bottom:84px}}
 .nav button,.nav a{flex:1;border:none;background:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--faint)}
 .nav button.on{color:var(--nur)}
 .nav .ic{width:52px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:99px;transition:background .2s}
