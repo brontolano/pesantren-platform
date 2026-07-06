@@ -245,14 +245,15 @@ final class AppLauncher
             return ['kind' => 'redirect', 'url' => $adminUrl];
         }
 
-        // Staf admin tanpa aplikasi PWA khusus (mis. keamanan, uks, tu, konselor,
-        // asrama, ppdb, akuntan, payroll) → Beranda Staf (PWA) `/staf`: app-shell
-        // mobile berisi ikon menu terfilter izin yang membuka halaman panel
-        // responsif. Di sana ada tile "Panel Lengkap" → /admin untuk akses penuh.
-        // Staf yang PUNYA aplikasi PWA khusus (guru/keuangan/pimpinan/kasir) tetap
-        // melihat hub agar bisa memilih aplikasi vs panel.
+        // Staf berkapasitas admin TANPA aplikasi PWA operasional khusus — dalam
+        // praktik HANYA role `IT` (sysadmin: manage_users/roles/modules/settings/
+        // audit; tak ada izin di STAFF_APPS). Fungsinya sepenuhnya hidup di panel
+        // Filament `/admin`, jadi arahkan LANGSUNG ke `/admin` seperti super_admin
+        // (owner 2026-07-06). Ke-22 role operasional tak pernah sampai sini —
+        // semuanya match tile PWA khusus di STAFF_APPS. Fallback `/staf` lama
+        // (katalog yang menautkan ke halaman /admin responsif) ditinggalkan.
         if ($adminUrl !== null && self::pwaHome($user) === null) {
-            return ['kind' => 'redirect', 'url' => self::routeOr('tenant.staf-shell', '/staf')];
+            return ['kind' => 'redirect', 'url' => $adminUrl];
         }
 
         // Staf dengan aplikasi PWA (dan fallback authenticated-tanpa-app) → hub.
