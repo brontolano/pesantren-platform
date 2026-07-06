@@ -93,7 +93,7 @@ async function aktifkanPush() {
                 &larr; Kembali
             </a>
 
-            <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
+            <section class="rounded-[2rem] bg-brand-grad-hero px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
                 <div class="flex items-center gap-4">
                     <div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/10 font-jost text-2xl font-bold">
                         {{ initials(user.name) }}

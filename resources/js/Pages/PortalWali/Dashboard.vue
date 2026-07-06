@@ -22,8 +22,8 @@ const shortcuts = computed(() => {
     const childId = activeChild.value?.id
     if (!childId) return []
     return [
-        { key: 'tagihan', label: 'Tagihan', icon: 'receipt', bg: 'bg-violet-100', color: 'text-violet-700', href: `/wali/santri/${childId}/keuangan?section=tagihan#tagihan` },
-        { key: 'tabungan', label: 'Tabungan', icon: 'wallet', bg: 'bg-violet-100', color: 'text-violet-700', href: `/wali/santri/${childId}/tabungan` },
+        { key: 'tagihan', label: 'Tagihan', icon: 'receipt', bg: 'bg-emerald-100', color: 'text-emerald-700', href: `/wali/santri/${childId}/keuangan?section=tagihan#tagihan` },
+        { key: 'tabungan', label: 'Tabungan', icon: 'wallet', bg: 'bg-emerald-100', color: 'text-emerald-700', href: `/wali/santri/${childId}/tabungan` },
         { key: 'izin', label: 'Izin', icon: 'document', bg: 'bg-amber-100', color: 'text-amber-700', href: '/wali/izin', badge: props.summary.pendingIzin > 0 },
         { key: 'jenguk', label: 'Jenguk', icon: 'calendar', bg: 'bg-orange-100', color: 'text-orange-700', href: '/wali/jenguk' },
         { key: 'tahfidz', label: 'Tahfidz', icon: 'book', bg: 'bg-teal-100', color: 'text-teal-700', href: `/wali/santri/${childId}/hafalan` },
@@ -104,7 +104,7 @@ function activityIcon(type) {
         <div class="space-y-2.5">
             <div class="flex items-center justify-between">
                 <h3 class="font-jost text-base font-semibold text-[#111]">Terbaru dari pondok</h3>
-                <Link href="/wali/notifikasi" class="font-jost text-[13px] font-semibold text-violet-700">Semua</Link>
+                <Link href="/wali/notifikasi" class="font-jost text-[13px] font-semibold text-emerald-700">Semua</Link>
             </div>
 
             <div v-if="recentActivities.length" class="rounded-[22px] bg-white px-[18px] shadow-lift">
@@ -114,7 +114,7 @@ function activityIcon(type) {
                     class="flex items-center gap-[13px] py-3"
                     :class="i < recentActivities.length - 1 && i < 4 ? 'border-b border-[#f6f0e6]' : ''"
                 >
-                    <span class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700">
+                    <span class="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
                         <UiIcon :name="activityIcon(activity.type)" class="h-[19px] w-[19px]" />
                     </span>
                     <div class="min-w-0 flex-1">

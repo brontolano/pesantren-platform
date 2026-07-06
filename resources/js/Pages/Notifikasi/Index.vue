@@ -34,7 +34,7 @@ const statusTone = (status) => {
                 &larr; Kembali
             </a>
 
-            <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
+            <section class="rounded-[2rem] bg-brand-grad-hero px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
                 <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
                     Riwayat Notifikasi
                 </p>
