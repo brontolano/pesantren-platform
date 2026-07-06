@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="{{ $namaPesantren }}">
 @if($logoUrl)<link rel="apple-touch-icon" href="{{ $logoUrl }}"><link rel="icon" href="{{ $logoUrl }}">@endif
-<script>try{if(localStorage.getItem('nur-theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
+<script>try{if(localStorage.getItem('nur-theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}try{if(/PesantrenApp/i.test(navigator.userAgent))document.documentElement.classList.add('inapp');}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri&display=swap" rel="stylesheet">
 <style>
@@ -106,6 +106,9 @@ html.dark .nav{background:rgba(18,24,21,.96)}
 /* TWA/aplikasi terpasang (standalone): env(safe-area-inset-bottom) sering over-report
    di perangkat tombol-3 → ruang kosong besar di bawah ikon. Batasi agar nav rapat. */
 @media(display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){.nav{padding-bottom:10px}.scroll-area{padding-bottom:84px}}
+/* WebView app (userAgent 'PesantrenApp') tak melapor display-mode:standalone → deteksi via JS class .inapp */
+html.inapp .nav{padding-bottom:10px}
+html.inapp .scroll-area{padding-bottom:84px}
 .nav button,.nav a{flex:1;border:none;background:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--faint)}
 .nav button.on{color:var(--nur)}
 .nav .ic{width:52px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:99px;transition:background .2s}

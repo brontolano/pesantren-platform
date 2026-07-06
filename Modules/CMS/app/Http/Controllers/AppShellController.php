@@ -48,7 +48,7 @@ class AppShellController extends Controller
      * cache: countdown dihitung JS jadi tetap jalan walau HTML lama). Ditampilkan
      * kecil di footer Beranda.
      */
-    private const APP_SHELL_BUILD = '2026.07.06-4';
+    private const APP_SHELL_BUILD = '2026.07.06-5';
 
     public function __invoke(TenantWebsiteService $websiteService): \Illuminate\Http\Response
     {
