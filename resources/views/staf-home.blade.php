@@ -177,18 +177,6 @@ $featArt=$pengumuman->first();
   </div>
 
   @if(count($pintasan) > 0)
-  {{-- Aplikasi PERAN khusus (guru/keamanan/uks/…): kartu unggulan — landing HP
-       kini selalu shell ini (bentuk mockup staf-app-preview), app peran satu ketukan. --}}
-  @if(!empty($appPeran))
-  <div class="sec">
-    <a href="{{ $appPeran['url'] }}" style="display:flex;align-items:center;gap:13px;background:var(--grad);border-radius:var(--r2);padding:15px 16px;color:#fff;box-shadow:var(--sh);position:relative;overflow:hidden">
-      <span style="width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.14);border:1px solid rgba(231,211,161,.35);display:flex;align-items:center;justify-content:center;flex:0 0 auto"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{!! $appPeran['icon'] !!}</svg></span>
-      <span style="flex:1;min-width:0"><span style="display:block;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#c9f2e2;text-transform:uppercase">Aplikasi Saya</span><span style="display:block;font-size:15px;font-weight:800;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ $appPeran['label'] }}</span></span>
-      <span style="background:var(--gold-soft);color:#5a4415;border-radius:99px;padding:8px 14px;font-size:12px;font-weight:800;white-space:nowrap">Buka</span>
-    </a>
-  </div>
-  @endif
-
   <div class="sec">
     <div class="sec-head"><div class="sec-title">Pintasan Cepat</div><button class="sec-link" data-go="menu">Semua {!! $svg('chevron',14) !!}</button></div>
     <div class="quick">

@@ -194,7 +194,11 @@ class AppShellController extends Controller
             foreach ($katalog as $judul => $items) {
                 $vis = array_values(array_filter($items, fn ($it) => $u->canAny($it[2])));
                 if ($vis !== []) {
-                    $groups[$judul] = $vis;
+                    // Remap ke halaman PWA native juga di jalur fallback.
+                    $groups[$judul] = array_map(
+                        fn ($it) => [$it[0], $it[1], $it[2], self::urlPwaNative(url($it[3]))],
+                        $vis,
+                    );
                 }
             }
         }
@@ -236,16 +240,9 @@ class AppShellController extends Controller
             $totalFitur += count($items);
         }
 
-        // Aplikasi PERAN khusus (guru/keamanan/uks/…) sebagai kartu unggulan
-        // "Aplikasi Saya" — landing HP kini selalu shell ini (bentuk mockup),
-        // app peran tetap satu ketukan. super_admin dilewati (pwaHome tak andal
-        // untuknya: Gate::before membuat can() selalu true → tile pertama palsu).
-        $appPeran = $u->hasRole('super_admin') ? null : AppLauncher::pwaHome($u);
-
         return view('staf-home', [
             'namaPesantren' => TenantBranding::name(),
             'logoUrl' => TenantBranding::logoUrl(),
-            'appPeran' => $appPeran,
             'user' => $u,
             'peran' => $u->getRoleNames()->map(fn ($r) => str()->headline($r))->implode(' · '),
             'sapa' => $sapa,
@@ -335,12 +332,56 @@ class AppShellController extends Controller
                     $item->getLabel(),
                     self::heroiconKeMobile(is_string($icon) ? $icon : ''),
                     [],
-                    $url,
+                    self::urlPwaNative($url),
                 ];
             }
         }
 
         return $out !== [] ? $out : null;
+    }
+
+    /**
+     * Menu HP membuka halaman PWA NATIVE (list + form input), BUKAN panel admin
+     * (owner 2026-07-06). Item panel yang sudah punya padanan halaman native
+     * di-remap ke sana; sisanya (belum ada versi native) sementara tetap ke
+     * halaman panel responsif sampai versi native-nya dibangun bertahap.
+     * Kunci = path panel; gerbang izin native ≈ izin canAccess item panelnya.
+     */
+    private static function urlPwaNative(string $url): string
+    {
+        static $peta = [
+            // Santri & TU
+            '/admin/santri/santris' => '/tu/santri',
+            // Asrama & Pengasuhan
+            '/admin/penempatan-asrama/penempatan-asramas' => '/pengasuhan/penempatan',
+            '/admin/kepengasuhan/presensi-asrama/presensi-asramas' => '/pengasuhan/presensi',
+            // Kedisiplinan
+            '/admin/pelanggaran-santri/pelanggaran-santris' => '/pengasuhan/disiplin',
+            // Kegiatan / gerbang / tamu
+            '/admin/log-gerbang' => '/keamanan/log',
+            '/admin/kunjungan-walis' => '/keamanan/tamu',
+            '/admin/pengajuan-jenguk' => '/keamanan/tamu',
+            // Perizinan
+            '/admin/izin-santris' => '/pengasuhan/izin',
+            // Kesehatan (UKS)
+            '/admin/kesehatan/kunjungan-uks' => '/uks/kunjungan',
+            '/admin/riwayat-kesehatans' => '/uks/riwayat',
+            '/admin/kesehatan/obat' => '/uks/obat',
+            // Konseling
+            '/admin/sesi-konselings' => '/konselor/sesi',
+            // Kepegawaian & Penggajian
+            '/admin/presensi-staf/presensi-stafs' => '/kepegawaian/absensi',
+            '/admin/payroll/slip' => '/kepegawaian/slip',
+            // Pendaftaran (panitia PPDB)
+            '/admin/ppdb/calon-santri' => '/ppdb-panitia/pendaftar',
+            '/admin/ppdb/hasil-ujian' => '/ppdb-panitia/hasil',
+            // Buku Besar
+            '/admin/jurnals' => '/akuntan/jurnal',
+        ];
+
+        $path = rtrim((string) (parse_url($url, PHP_URL_PATH) ?: ''), '/');
+
+        return isset($peta[$path]) ? url($peta[$path]) : $url;
     }
 
     /** Petakan nama Heroicon panel → kunci ikon set mobile ($svg); default 'grid'. */
