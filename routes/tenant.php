@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AkademikAppController;
 use App\Http\Controllers\AkademikExportController;
 use App\Http\Controllers\AkunController;
 use App\Http\Controllers\AkuntanController;
@@ -263,6 +264,14 @@ Route::middleware([
         // sengaja TIDAK diportal — tak ada model/tabel patroli/ronda apa pun
         // di sistem ini. Memaksakan akan jadi data palsu. Lihat docblock
         // KeamananController untuk rincian scope.
+    });
+
+    // PWA native Akademik — Kelas (view+isi) & Rekap Presensi (view). Gate =
+    // view_akademik, sama gerbang KelasResource/PresensiSantriResource panel.
+    Route::middleware(['auth', 'can:view_akademik'])->prefix('akademik-app')->name('tenant.akademik-app.')->group(function () {
+        Route::get('/kelas', [AkademikAppController::class, 'kelas'])->name('kelas');
+        Route::get('/kelas/{kelas}', [AkademikAppController::class, 'kelasDetail'])->name('kelas.detail');
+        Route::get('/presensi', [AkademikAppController::class, 'presensi'])->name('presensi');
     });
 
     // PWA native Kegiatan — alur linear menu staf HP: list + form input (owner

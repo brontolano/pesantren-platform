@@ -352,6 +352,9 @@ class AppShellController extends Controller
         static $peta = [
             // Santri & TU
             '/admin/santri/santris' => '/tu/santri',
+            // Master Akademik & Pembelajaran
+            '/admin/kelas' => '/akademik-app/kelas',
+            '/admin/presensi-santri/presensi-santris' => '/akademik-app/presensi',
             // Asrama & Pengasuhan
             '/admin/penempatan-asrama/penempatan-asramas' => '/pengasuhan/penempatan',
             '/admin/kepengasuhan/presensi-asrama/presensi-asramas' => '/pengasuhan/presensi',
