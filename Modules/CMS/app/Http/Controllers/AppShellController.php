@@ -110,31 +110,34 @@ class AppShellController extends Controller
         // (TenantPanelProvider::navigationGroups) — "logic seperti panel admin":
         // staf melihat pengelompokan yang sama persis dengan yang admin lihat,
         // bedanya hanya diringkas jadi kartu PWA per izin yang ia miliki.
+        // URUTAN grup DISAMAKAN PERSIS dengan navigationGroups([...]) panel admin
+        // (TenantPanelProvider) — bukan hanya nama, tapi juga URUTAN: Santri →
+        // Asrama & Pengasuhan → Kedisiplinan → Kegiatan → Perizinan & Kunjungan →
+        // Kesehatan → Konseling → Pembelajaran → Master Akademik → Pendaftaran →
+        // Tagihan Santri → Buku Besar → Laporan Keuangan → Penggajian →
+        // Komunikasi → Pengaturan Sistem. Filter per-izin via canAny.
         $katalog = [
             'Santri' => [
                 ['Data Santri', 'users', ['view_santri', 'manage_santri'], '/admin/santri/santris'],
                 ['Alumni', 'user', ['view_alumni', 'manage_alumni'], '/admin/alumni/alumnis'],
-            ],
-            'Master Akademik' => [
-                ['Kelas', 'grid', ['view_akademik', 'manage_akademik', 'manage_santri'], '/admin/kelas'],
-            ],
-            'Perizinan & Kunjungan' => [
-                ['Izin Santri', 'doc', ['view_kegiatan', 'manage_kegiatan'], '/admin/izin-santris'],
-                ['Kunjungan Wali', 'users', ['view_kegiatan', 'manage_kegiatan'], '/admin/kunjungan-walis'],
-                ['Pengajuan Jenguk', 'bell', ['view_kegiatan', 'manage_kegiatan'], '/admin/pengajuan-jenguk'],
-            ],
-            'Kegiatan' => [
-                ['Log Gerbang', 'shield', ['view_kegiatan', 'manage_kegiatan'], '/admin/log-gerbang'],
-                ['Kegiatan', 'cal', ['view_kegiatan', 'manage_kegiatan'], '/admin/kegiatans'],
-            ],
-            'Kedisiplinan' => [
-                ['Pelanggaran / Ta\'zir', 'shield', ['view_kedisiplinan', 'manage_kedisiplinan'], '/admin/pelanggaran-santri/pelanggaran-santris'],
             ],
             'Asrama & Pengasuhan' => [
                 ['Blok Asrama', 'home', ['view_asrama', 'manage_asrama'], '/admin/blok-asrama/blok-asramas'],
                 ['Kamar', 'home', ['view_asrama', 'manage_asrama'], '/admin/kamar-asrama/kamar-asramas'],
                 ['Penempatan Asrama', 'home', ['view_asrama', 'manage_asrama'], '/admin/penempatan-asrama/penempatan-asramas'],
                 ['Presensi Asrama', 'check', ['view_asrama', 'manage_asrama'], '/admin/kepengasuhan/presensi-asrama/presensi-asramas'],
+            ],
+            'Kedisiplinan' => [
+                ['Pelanggaran / Ta\'zir', 'shield', ['view_kedisiplinan', 'manage_kedisiplinan'], '/admin/pelanggaran-santri/pelanggaran-santris'],
+            ],
+            'Kegiatan' => [
+                ['Log Gerbang', 'shield', ['view_kegiatan', 'manage_kegiatan'], '/admin/log-gerbang'],
+                ['Kegiatan', 'cal', ['view_kegiatan', 'manage_kegiatan'], '/admin/kegiatans'],
+            ],
+            'Perizinan & Kunjungan' => [
+                ['Izin Santri', 'doc', ['view_kegiatan', 'manage_kegiatan'], '/admin/izin-santris'],
+                ['Kunjungan Wali', 'users', ['view_kegiatan', 'manage_kegiatan'], '/admin/kunjungan-walis'],
+                ['Pengajuan Jenguk', 'bell', ['view_kegiatan', 'manage_kegiatan'], '/admin/pengajuan-jenguk'],
             ],
             'Kesehatan' => [
                 ['Kunjungan UKS', 'heart', ['view_kesehatan', 'manage_kesehatan'], '/admin/kesehatan/kunjungan-uks'],
@@ -149,6 +152,9 @@ class AppShellController extends Controller
                 ['Presensi Pengajar', 'check', ['run_payroll', 'view_akademik'], '/admin/presensi-staf/presensi-stafs'],
                 ['Rekap Jurnal KBM', 'book', ['view_akademik', 'manage_akademik'], '/admin/rekap-jurnal-kbm'],
             ],
+            'Master Akademik' => [
+                ['Kelas', 'grid', ['view_akademik', 'manage_akademik', 'manage_santri'], '/admin/kelas'],
+            ],
             'Pendaftaran' => [
                 ['Calon Santri', 'user', ['view_ppdb', 'manage_ppdb'], '/admin/ppdb/calon-santri'],
                 ['Hasil Ujian', 'doc', ['view_ppdb', 'manage_ppdb'], '/admin/ppdb/hasil-ujian'],
@@ -156,11 +162,11 @@ class AppShellController extends Controller
             'Tagihan Santri' => [
                 ['Pembayaran', 'wallet', ['view_tagihan', 'manage_tagihan'], '/admin/pembayaran/pembayarans'],
             ],
-            'Laporan Keuangan' => [
-                ['Laporan Keuangan', 'chart', ['view_laporan_keuangan'], '/admin/laporan-keuangan'],
-            ],
             'Buku Besar' => [
                 ['Jurnal', 'book', ['view_ledger', 'manage_ledger'], '/admin/jurnals'],
+            ],
+            'Laporan Keuangan' => [
+                ['Laporan Keuangan', 'chart', ['view_laporan_keuangan'], '/admin/laporan-keuangan'],
             ],
             'Penggajian' => [
                 ['Slip Gaji', 'wallet', ['run_payroll'], '/admin/payroll/slip'],
