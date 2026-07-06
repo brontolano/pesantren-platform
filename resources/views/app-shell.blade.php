@@ -89,6 +89,9 @@ a{text-decoration:none;color:inherit}button{font-family:inherit;color:inherit}
 .dial .center{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:50%;background:var(--nur);transform:translate(-50%,-50%);box-shadow:0 0 0 4px var(--card)}
 .kompas .hint{font-size:11px;color:var(--faint);margin-top:6px;line-height:1.4}
 .kompas .kbtn{margin-top:12px;background:var(--nur-tint);color:var(--nur);border:none;border-radius:99px;padding:9px 16px;font-size:12.5px;font-weight:800;cursor:pointer}
+.gpsbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 32px);margin:16px 16px 0;background:var(--nur);color:#fff;border:none;border-radius:14px;padding:13px;font-size:13.5px;font-weight:800;cursor:pointer}
+.gpsbtn:disabled{opacity:.6}
+.gpsnote{margin:8px 16px 0;font-size:11.5px;font-weight:600;color:var(--faint);text-align:center;line-height:1.4}
 .svc{margin:0 16px;background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
 .sbtn{display:flex;align-items:center;gap:12px;padding:14px 15px;border-bottom:1px solid var(--line)}.sbtn:last-child{border-bottom:none}
 .sbtn .sic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
@@ -209,28 +212,33 @@ $prJson = $jadwal->map(fn($s)=>['n'=>$s['label']??'','t'=>$s['time']??''])->valu
     <div class="hero-h1">Ibadah</div><div class="hero-h2">Jadwal sholat, arah kiblat & layanan</div>
     <div class="datestrip"><span class="l">{!! $svg('cal',13) !!} <b>{{ $tanggal['masehi'] ?? '' }}</b></span>@if(!empty($tanggal['hijriah']))<span class="cd">{{ $tanggal['hijriah'] }}</span>@endif</div>
   </div>
-  @if($jadwal->isNotEmpty())
-    <div class="sec"><div class="sec-head"><div class="sec-title">Jadwal Sholat</div></div></div>
-    <div class="prayer-list">
-      @foreach($jadwal as $s)
-        <div class="pli {{ ($s['label']??'')===$nextKey ? 'now' : '' }}"><span class="pic">{!! $svg('mosque',18) !!}</span><span class="pnm">{{ $s['label']??'' }}</span>@if(($s['label']??'')===$nextKey)<span class="badge">berikutnya</span>@endif<span class="ptm">{{ $s['time']??'' }}</span></div>
-      @endforeach
+  @php $adaKiblat = ($ibadah['kiblat'] ?? null) !== null; @endphp
+  {{-- Tombol GPS: hitung jadwal & kiblat dari lokasi PERANGKAT (jalan walau admin belum set lokasi) --}}
+  <button class="gpsbtn" id="btnGps" type="button">{!! $svg('mosque',17) !!} Pakai lokasi saya (GPS)</button>
+  <div class="gpsnote" id="gpsNote"></div>
+
+  {{-- Jadwal Sholat (server-render bila lokasi pesantren ada; kalau tidak, diisi GPS) --}}
+  <div class="sec" id="secPrayer" @if($jadwal->isEmpty())style="display:none"@endif><div class="sec-head"><div class="sec-title">Jadwal Sholat</div></div></div>
+  <div class="prayer-list" id="prayerList" @if($jadwal->isEmpty())style="display:none"@endif>
+    @foreach($jadwal as $s)
+      <div class="pli {{ ($s['label']??'')===$nextKey ? 'now' : '' }}"><span class="pic">{!! $svg('mosque',18) !!}</span><span class="pnm">{{ $s['label']??'' }}</span>@if(($s['label']??'')===$nextKey)<span class="badge">berikutnya</span>@endif<span class="ptm">{{ $s['time']??'' }}</span></div>
+    @endforeach
+  </div>
+
+  {{-- Arah Kiblat --}}
+  <div class="sec" id="secQibla" @unless($adaKiblat)style="display:none"@endunless><div class="sec-head"><div class="sec-title">Arah Kiblat</div></div></div>
+  <div class="kompas" id="kiblatCard" data-qibla="{{ $ibadah['kiblat'] ?? '' }}" @unless($adaKiblat)style="display:none"@endunless>
+    <div class="lbl">Arah Kiblat · <b id="qiblaDeg">{{ $adaKiblat ? $ibadah['kiblat'].'° dari utara' : '—' }}</b></div>
+    <div class="dial">
+      <span class="card-pt n">U</span><span class="card-pt s">S</span><span class="card-pt e">T</span><span class="card-pt w">B</span>
+      <div class="qibla-arm" id="qiblaArm" style="transform:rotate({{ $ibadah['kiblat'] ?? 0 }}deg)"><div class="needle"></div><div class="kaaba">🕋</div></div><div class="center"></div>
     </div>
-    @if(($ibadah['kiblat'] ?? null) !== null)
-      <div class="sec"><div class="sec-head"><div class="sec-title">Arah Kiblat</div></div></div>
-      <div class="kompas" id="kiblatCard" data-qibla="{{ $ibadah['kiblat'] }}">
-        <div class="lbl">Arah Kiblat · <b>{{ $ibadah['kiblat'] }}° dari utara</b></div>
-        <div class="dial">
-          <span class="card-pt n">U</span><span class="card-pt s">S</span><span class="card-pt e">T</span><span class="card-pt w">B</span>
-          <div class="qibla-arm" id="qiblaArm" style="transform:rotate({{ $ibadah['kiblat'] }}deg)"><div class="needle"></div><div class="kaaba">🕋</div></div><div class="center"></div>
-        </div>
-        <div class="hint" id="kompasHint">Arahkan HP mengikuti jarum hijau menuju 🕋 — itulah arah kiblat.</div>
-        <button class="kbtn" id="btnKompas" style="display:none">Aktifkan Kompas</button>
-      </div>
-    @endif
-  @else
-    <div class="empty">Jadwal sholat belum tersedia (lokasi pesantren belum diatur admin).</div>
-  @endif
+    <div class="hint" id="kompasHint">Arahkan HP mengikuti jarum hijau menuju 🕋 — itulah arah kiblat.</div>
+    <button class="kbtn" id="btnKompas" style="display:none">Aktifkan Kompas</button>
+  </div>
+
+  {{-- Empty hanya bila TAK ada data server (GPS akan mengisinya) --}}
+  <div class="empty" id="ibadahEmpty" @if($jadwal->isNotEmpty())style="display:none"@endif>Jadwal belum diatur admin — ketuk <b>Pakai lokasi saya</b> untuk memakai GPS perangkat.</div>
 
   @php $adaLayanan = !empty($cfg['app_jadwal_kajian_url']) || !empty($cfg['app_donasi_url']) || !empty($cfg['app_zakat_wakaf_url']); @endphp
   @if($adaLayanan)
@@ -275,7 +283,18 @@ function tab(n){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle(
 // hitung mundur sholat berikutnya (.pnext)
 (function(){var PR=@json($prJson);var cd=document.getElementById('cd');if(!cd||!PR.length)return;function pad(n){return String(n).padStart(2,'0');}function tick(){var now=new Date(),target=null;for(var i=0;i<PR.length;i++){var a=(PR[i].t||'').match(/(\d{1,2}):(\d{2})/);if(!a)continue;var t=new Date(now);t.setHours(+a[1],+a[2],0,0);if(t>now){target=t;break;}}if(!target){var a2=(PR[0].t||'').match(/(\d{1,2}):(\d{2})/);target=new Date(now);target.setDate(target.getDate()+1);if(a2)target.setHours(+a2[1],+a2[2],0,0);}var d=Math.max(0,target-now),hh=Math.floor(d/3.6e6),mm=Math.floor(d%3.6e6/6e4);cd.textContent=(hh>0?hh+'j ':'')+mm+'m';}tick();setInterval(tick,30000);})();
 // kompas kiblat (DeviceOrientation) — arm menunjuk arah kiblat relatif heading HP
-(function(){var card=document.getElementById('kiblatCard');if(!card)return;var qibla=parseFloat(card.dataset.qibla)||0;var arm=document.getElementById('qiblaArm'),hint=document.getElementById('kompasHint'),btn=document.getElementById('btnKompas');var norm=function(a){return((a%360)+360)%360;};var smooth=null,got=false,absSeen=false;function screenAngle(){return(screen.orientation&&screen.orientation.angle)||window.orientation||0;}function apply(h){h=norm(h+screenAngle());if(smooth==null)smooth=h;else{var d=((h-smooth+540)%360)-180;smooth=norm(smooth+d*0.18);}var rel=norm(qibla-smooth);arm.style.transform='rotate('+rel+'deg)';var selisih=Math.abs(((rel+540)%360)-180);hint.textContent=selisih<=6?'✓ Tepat menghadap kiblat.':'Putar HP perlahan hingga jarum 🕋 lurus ke atas.';hint.style.color=selisih<=6?'var(--nur)':'';}function handle(e){var h=null;if(e.webkitCompassHeading!=null)h=e.webkitCompassHeading;else if(e.alpha!=null){if(e.absolute){absSeen=true;}else if(absSeen){return;}h=360-e.alpha;}if(h==null)return;got=true;apply(h);}function start(){window.addEventListener('deviceorientationabsolute',function(e){absSeen=true;handle(e);},true);window.addEventListener('deviceorientation',handle,true);setTimeout(function(){if(!got){hint.textContent='Kompas tak tersedia — arah kiblat '+Math.round(qibla)+'° dari utara, gunakan kompas terpisah.';}},2000);}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){btn.style.display='';btn.onclick=function(){DeviceOrientationEvent.requestPermission().then(function(s){if(s==='granted'){btn.style.display='none';start();}}).catch(function(){});};}else{start();}})();
+(function(){var card=document.getElementById('kiblatCard');if(!card)return;var qibla=function(){return parseFloat(card.dataset.qibla)||0;};var arm=document.getElementById('qiblaArm'),hint=document.getElementById('kompasHint'),btn=document.getElementById('btnKompas');var norm=function(a){return((a%360)+360)%360;};var smooth=null,got=false,absSeen=false;function screenAngle(){return(screen.orientation&&screen.orientation.angle)||window.orientation||0;}function apply(h){h=norm(h+screenAngle());if(smooth==null)smooth=h;else{var d=((h-smooth+540)%360)-180;smooth=norm(smooth+d*0.18);}var rel=norm(qibla()-smooth);arm.style.transform='rotate('+rel+'deg)';var selisih=Math.abs(((rel+540)%360)-180);hint.textContent=selisih<=6?'✓ Tepat menghadap kiblat.':'Putar HP perlahan hingga jarum 🕋 lurus ke atas.';hint.style.color=selisih<=6?'var(--nur)':'';}function handle(e){var h=null;if(e.webkitCompassHeading!=null)h=e.webkitCompassHeading;else if(e.alpha!=null){if(e.absolute){absSeen=true;}else if(absSeen){return;}h=360-e.alpha;}if(h==null)return;got=true;apply(h);}function start(){window.addEventListener('deviceorientationabsolute',function(e){absSeen=true;handle(e);},true);window.addEventListener('deviceorientation',handle,true);setTimeout(function(){if(!got){hint.textContent='Kompas tak tersedia — arah kiblat '+Math.round(qibla())+'° dari utara, gunakan kompas terpisah.';}},2000);}if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){btn.style.display='';btn.onclick=function(){DeviceOrientationEvent.requestPermission().then(function(s){if(s==='granted'){btn.style.display='none';start();}}).catch(function(){});};}else{start();}})();
+// GPS — jadwal sholat & arah kiblat dari lokasi PERANGKAT (opsional; jalan walau admin belum set lokasi tenant)
+(function(){var btn=document.getElementById('btnGps'),note=document.getElementById('gpsNote');if(!btn)return;var MOSQUE={!! json_encode($svg('mosque',18)) !!};
+function tzHours(){return -(new Date().getTimezoneOffset())/60;}
+function fill(d){var arr=d.jadwalSholat||[];var pl=document.getElementById('prayerList'),sec=document.getElementById('secPrayer'),emp=document.getElementById('ibadahEmpty');
+if(arr.length){var now=new Date(),hm=now.getHours()*60+now.getMinutes(),ni=-1;for(var i=0;i<arr.length;i++){var t=(arr[i].time||'').split(':');if(t.length===2){var mm=(+t[0])*60+(+t[1]);if(mm>=hm){ni=i;break;}}}var h='';for(var j=0;j<arr.length;j++){var on=j===ni;h+='<div class="pli'+(on?' now':'')+'"><span class="pic">'+MOSQUE+'</span><span class="pnm">'+arr[j].label+'</span>'+(on?'<span class="badge">berikutnya</span>':'')+'<span class="ptm">'+arr[j].time+'</span></div>';}pl.innerHTML=h;pl.style.display='';if(sec)sec.style.display='';if(emp)emp.style.display='none';}
+if(d.arahKiblat!=null){var card=document.getElementById('kiblatCard'),secQ=document.getElementById('secQibla'),deg=document.getElementById('qiblaDeg'),arm=document.getElementById('qiblaArm');card.dataset.qibla=d.arahKiblat;card.style.display='';if(secQ)secQ.style.display='';if(deg)deg.textContent=Math.round(d.arahKiblat)+'° dari utara';if(arm)arm.style.transform='rotate('+d.arahKiblat+'deg)';}
+note.textContent=d.dariGps?'✓ Memakai lokasi GPS perangkat Anda.':'GPS tak terpakai — memakai lokasi pesantren.';note.style.color=d.dariGps?'var(--nur)':'var(--faint)';}
+function load(la,lo){note.textContent='Menghitung untuk lokasi Anda…';note.style.color='var(--sub)';fetch('/api/v1/jadwal-sholat?lat='+encodeURIComponent(la)+'&lng='+encodeURIComponent(lo)+'&tz='+encodeURIComponent(tzHours()),{headers:{'Accept':'application/json'}}).then(function(r){return r.json();}).then(function(j){if(j&&j.ok){fill(j.data);}else{note.textContent='Gagal memuat jadwal.';}}).catch(function(){note.textContent='Gagal memuat jadwal untuk lokasi Anda.';});}
+btn.onclick=function(){if(!navigator.geolocation){note.textContent='Perangkat tak mendukung GPS.';return;}btn.disabled=true;note.textContent='Meminta izin lokasi…';note.style.color='var(--sub)';navigator.geolocation.getCurrentPosition(function(p){btn.disabled=false;var la=p.coords.latitude,lo=p.coords.longitude;try{localStorage.setItem('nur-geo',JSON.stringify({la:la,lo:lo}));}catch(e){}load(la,lo);},function(err){btn.disabled=false;note.textContent=err&&err.code===1?'Izin lokasi ditolak. Aktifkan izin lokasi di pengaturan browser.':'Tak bisa mendapatkan lokasi GPS.';note.style.color='var(--terra)';},{enableHighAccuracy:true,timeout:10000,maximumAge:300000});};
+try{var g=JSON.parse(localStorage.getItem('nur-geo')||'null');if(g&&g.la!=null)load(g.la,g.lo);}catch(e){}
+})();
 </script>
 </body>
 </html>
