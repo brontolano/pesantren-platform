@@ -274,6 +274,9 @@ Route::middleware([
         Route::get('/presensi', [AkademikAppController::class, 'presensi'])->name('presensi');
     });
 
+    // PWA native Alumni (view) — gate view_alumni (sama AlumniResource).
+    Route::middleware(['auth', 'can:view_alumni'])->get('/akademik-app/alumni', [AkademikAppController::class, 'alumni'])->name('tenant.akademik-app.alumni');
+
     // PWA native Kegiatan — alur linear menu staf HP: list + form input (owner
     // 2026-07-06). Gate baca = view_kegiatan (sama KegiatanResource); tulis
     // dicek manage_kegiatan di controller.

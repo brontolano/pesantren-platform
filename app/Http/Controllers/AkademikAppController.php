@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Akademik\Models\PresensiSantri;
+use Modules\Kesantrian\Models\Alumni;
 use Modules\Kesantrian\Models\Kelas;
 
 /**
@@ -54,6 +55,29 @@ class AkademikAppController extends Controller
                 ->map(fn ($s) => ['id' => $s->id, 'nis' => $s->nis, 'nama' => $s->nama, 'status' => $s->status])
                 ->values()->all(),
         ]);
+    }
+
+    /** Alumni (view) — gate route terpisah can:view_alumni (sama AlumniResource). */
+    public function alumni(Request $request): Response
+    {
+        $q = trim((string) $request->query('q', ''));
+
+        $daftar = Alumni::query()
+            ->with(['santri:id,nis,nama', 'lembaga:id,nama'])
+            ->when($q !== '', fn ($b) => $b->whereHas('santri', fn ($s) => $s->where('nama', 'ilike', "%{$q}%")))
+            ->orderByDesc('tahun_lulus')
+            ->limit(100)
+            ->get()
+            ->map(fn ($a): array => [
+                'id' => $a->id,
+                'nama' => $a->santri?->nama,
+                'nis' => $a->santri?->nis,
+                'tahun' => $a->tahun_lulus,
+                'lembaga' => $a->lembaga?->nama,
+                'lanjutan' => $a->status_lanjutan,
+            ])->values()->all();
+
+        return Inertia::render('AkademikApp/Alumni', ['daftar' => $daftar, 'q' => $q]);
     }
 
     /** Rekap presensi santri per tanggal (default hari ini). */
