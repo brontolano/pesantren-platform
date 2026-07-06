@@ -29,7 +29,7 @@ class KonselorController extends Controller
         $base = '/konselor';
 
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => $base, 'route' => 'beranda', 'icon' => 'home'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
             ['key' => 'sesi', 'label' => 'Sesi', 'href' => "{$base}/sesi", 'route' => 'sesi', 'icon' => 'chat'],
             ['key' => 'catat', 'label' => 'Catat', 'href' => "{$base}/catat", 'route' => 'catat', 'icon' => 'plus'],
         ];

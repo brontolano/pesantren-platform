@@ -39,7 +39,7 @@ class AkuntanController extends Controller
     {
         $base = '/akuntan';
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => $base, 'route' => 'beranda', 'icon' => 'home'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
             ['key' => 'jurnal', 'label' => 'Jurnal', 'href' => "{$base}/jurnal", 'route' => 'jurnal', 'icon' => 'book-open'],
             ['key' => 'akun', 'label' => 'Akun', 'href' => "{$base}/akun", 'route' => 'akun', 'icon' => 'bank'],
         ];

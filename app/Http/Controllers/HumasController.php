@@ -52,7 +52,7 @@ class HumasController extends Controller
     private function nav(): array
     {
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/humas', 'icon' => 'home', 'route' => 'tenant.humas.beranda'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'icon' => 'home', 'route' => 'tenant.humas.beranda'],
             ['key' => 'berita', 'label' => 'Berita', 'href' => '/humas/berita', 'icon' => 'document', 'route' => 'tenant.humas.berita'],
             ['key' => 'galeri', 'label' => 'Galeri', 'href' => '/humas/galeri', 'icon' => 'camera', 'route' => 'tenant.humas.galeri'],
         ];

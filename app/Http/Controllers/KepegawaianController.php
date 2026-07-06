@@ -46,7 +46,7 @@ class KepegawaianController extends Controller
         $base = '/kepegawaian';
 
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => $base, 'route' => 'beranda', 'icon' => 'home'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
             ['key' => 'pegawai', 'label' => 'Pegawai', 'href' => "{$base}/pegawai", 'route' => 'pegawai', 'icon' => 'user'],
             ['key' => 'absensi', 'label' => 'Absensi', 'href' => "{$base}/absensi", 'route' => 'absensi', 'icon' => 'check-circle'],
             ['key' => 'slip', 'label' => 'Slip', 'href' => "{$base}/slip", 'route' => 'slip', 'icon' => 'receipt'],

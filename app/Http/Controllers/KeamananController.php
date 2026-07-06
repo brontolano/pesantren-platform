@@ -54,7 +54,7 @@ class KeamananController extends Controller
     private function nav(): array
     {
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/keamanan', 'route' => 'beranda'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda'],
             ['key' => 'gerbang', 'label' => 'Gerbang', 'href' => '/keamanan/gerbang', 'route' => 'gerbang'],
             ['key' => 'tamu', 'label' => 'Tamu', 'href' => '/keamanan/tamu', 'route' => 'tamu'],
             ['key' => 'log', 'label' => 'Log', 'href' => '/keamanan/log', 'route' => 'log'],

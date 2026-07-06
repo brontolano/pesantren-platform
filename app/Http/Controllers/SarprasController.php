@@ -43,7 +43,7 @@ class SarprasController extends Controller
         $base = '/sarpras';
 
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => $base, 'route' => 'beranda', 'icon' => 'home'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
             ['key' => 'kerusakan', 'label' => 'Kerusakan', 'href' => "{$base}/kerusakan", 'route' => 'kerusakan', 'icon' => 'wrench'],
             ['key' => 'piket', 'label' => 'Piket', 'href' => "{$base}/piket", 'route' => 'piket', 'icon' => 'check-circle'],
         ];

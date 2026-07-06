@@ -39,7 +39,7 @@ class BaitulMaalController extends Controller
     {
         $base = '/baitul-maal';
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => $base, 'route' => 'beranda', 'icon' => 'home'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
             ['key' => 'donasi', 'label' => 'Donasi', 'href' => "{$base}/donasi", 'route' => 'donasi', 'icon' => 'heart'],
             ['key' => 'program', 'label' => 'Program', 'href' => "{$base}/program", 'route' => 'program', 'icon' => 'inbox'],
             ['key' => 'beasiswa', 'label' => 'Beasiswa', 'href' => "{$base}/beasiswa", 'route' => 'beasiswa', 'icon' => 'user'],

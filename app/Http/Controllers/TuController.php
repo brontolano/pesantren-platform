@@ -31,7 +31,7 @@ class TuController extends Controller
     private function nav(): array
     {
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'icon' => 'home', 'href' => '/tu', 'route' => 'beranda'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'icon' => 'home', 'href' => '/staf', 'route' => 'beranda'],
             ['key' => 'santri', 'label' => 'Santri', 'icon' => 'book', 'href' => '/tu/santri', 'route' => 'santri'],
             ['key' => 'surat', 'label' => 'Surat', 'icon' => 'document', 'href' => '/tu/surat', 'route' => 'surat'],
             ['key' => 'arsip', 'label' => 'Arsip', 'icon' => 'inbox', 'href' => '/tu/arsip', 'route' => 'arsip'],

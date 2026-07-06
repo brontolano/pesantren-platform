@@ -42,7 +42,7 @@ class PosKantinController extends Controller
     private function nav(): array
     {
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/pos-kantin', 'icon' => 'home', 'route' => 'beranda'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'icon' => 'home', 'route' => 'beranda'],
             ['key' => 'kasir', 'label' => 'Kasir', 'href' => '/pos-kantin/kasir', 'icon' => 'cash', 'route' => 'kasir'],
             ['key' => 'tabungan', 'label' => 'Tabungan', 'href' => '/pos-kantin/tabungan', 'icon' => 'wallet', 'route' => 'tabungan'],
             ['key' => 'riwayat', 'label' => 'Riwayat', 'href' => '/pos-kantin/riwayat', 'icon' => 'receipt', 'route' => 'riwayat'],

@@ -35,7 +35,7 @@ class KeuanganPwaController extends Controller
     {
         $base = '/admin/keuangan/pwa';
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => $base, 'route' => 'beranda', 'show' => true],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'show' => true],
             ['key' => 'catat', 'label' => 'Belanja', 'href' => "{$base}/catat-belanja", 'route' => 'belanja', 'show' => $can['input_belanja']],
             ['key' => 'setor', 'label' => 'Setor', 'href' => "{$base}/setor-keliling", 'route' => 'setor-keliling', 'show' => $can['setor_tabungan']],
             ['key' => 'dasbor', 'label' => 'Dasbor', 'href' => "{$base}/dasbor", 'route' => 'dasbor', 'show' => $can['view_laporan_pimpinan']],

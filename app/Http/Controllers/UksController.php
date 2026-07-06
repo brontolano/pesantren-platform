@@ -37,7 +37,7 @@ class UksController extends Controller
     {
         $base = '/uks';
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => $base, 'route' => 'beranda', 'icon' => 'home'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
             ['key' => 'kunjungan', 'label' => 'Kunjungan', 'href' => "{$base}/kunjungan", 'route' => 'kunjungan', 'icon' => 'check-circle'],
             ['key' => 'obat', 'label' => 'Obat', 'href' => "{$base}/obat", 'route' => 'obat', 'icon' => 'receipt'],
             ['key' => 'rujukan', 'label' => 'Rujukan', 'href' => "{$base}/rujukan", 'route' => 'rujukan', 'icon' => 'inbox'],

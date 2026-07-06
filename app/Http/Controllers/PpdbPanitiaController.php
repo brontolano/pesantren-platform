@@ -36,7 +36,7 @@ class PpdbPanitiaController extends Controller
     private function nav(): array
     {
         $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/ppdb-panitia', 'route' => 'beranda'],
+            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda'],
             ['key' => 'pendaftar', 'label' => 'Pendaftar', 'href' => '/ppdb-panitia/pendaftar', 'route' => 'pendaftar'],
             ['key' => 'jadwal', 'label' => 'Jadwal Ujian', 'href' => '/ppdb-panitia/jadwal-ujian', 'route' => 'jadwal-ujian'],
             ['key' => 'hasil', 'label' => 'Hasil', 'href' => '/ppdb-panitia/hasil', 'route' => 'hasil'],
