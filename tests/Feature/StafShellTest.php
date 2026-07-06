@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
 
@@ -68,7 +69,7 @@ class StafShellTest extends TestCase
         // modul (persis panel). Aktifkan modul kesehatan agar grup UKS tampil
         // (tenant baru default minimal). Ini juga menegaskan perilaku benar:
         // modul non-aktif → tersembunyi di mobile SAMA seperti panel.
-        \Illuminate\Support\Facades\DB::connection('pgsql')->table('tenant_modules')->updateOrInsert(
+        DB::connection('pgsql')->table('tenant_modules')->updateOrInsert(
             ['tenant_id' => $this->tenant->id, 'module_name' => 'kesehatan'],
             ['is_active' => true, 'created_at' => now(), 'updated_at' => now()],
         );

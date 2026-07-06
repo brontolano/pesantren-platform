@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Services\PrayerTimesService;
 use App\Services\QiblaService;
+use App\Support\AppLauncher;
 use App\Support\TenantBranding;
+use Filament\Facades\Filament;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Modules\CMS\Models\Article;
 use Modules\CMS\Services\TenantWebsiteService;
 
@@ -50,7 +53,7 @@ class AppShellController extends Controller
      */
     private const APP_SHELL_BUILD = '2026.07.06-6';
 
-    public function __invoke(TenantWebsiteService $websiteService): \Illuminate\Http\Response
+    public function __invoke(TenantWebsiteService $websiteService): Response
     {
         $web = [];
         try {
@@ -293,8 +296,8 @@ class AppShellController extends Controller
     private function katalogDariPanel(): ?array
     {
         try {
-            $panel = \Filament\Facades\Filament::getPanel('tenant');
-            \Filament\Facades\Filament::setCurrentPanel($panel);
+            $panel = Filament::getPanel('tenant');
+            Filament::setCurrentPanel($panel);
             $nav = $panel->getNavigation();
         } catch (\Throwable) {
             return null;
@@ -366,7 +369,7 @@ class AppShellController extends Controller
     {
         // Satu sumber kebenaran deteksi device (sesi 'device_mobile' dari sinyal
         // klien saat login → fallback UA/Sec-Fetch). Lihat AppLauncher.
-        return \App\Support\AppLauncher::isMobileRequest($request);
+        return AppLauncher::isMobileRequest($request);
     }
 
     /** Konfigurasi konten app (Setting → fallback default asy-syifaa). */

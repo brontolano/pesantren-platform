@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Support\AppLauncher;
 use App\Support\TenantBranding;
+use App\Support\TenantCustomizationRegistry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +41,7 @@ class StaffLoginController extends Controller
 
         // AlbaKids (tenant custom playful) tetap pakai login lama; tenant lain
         // dapat login "Nur" (mockup terkunci). Form/action/field identik di keduanya.
-        $viewLogin = str_contains(\App\Support\TenantCustomizationRegistry::bodyClass(), 'tenant-albakids')
+        $viewLogin = str_contains(TenantCustomizationRegistry::bodyClass(), 'tenant-albakids')
             ? 'tenant.login'
             : 'tenant.login-nur';
 

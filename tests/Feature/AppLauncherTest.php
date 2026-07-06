@@ -7,9 +7,11 @@ use App\Models\User;
 use App\Support\AppLauncher;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Inertia\Response;
+use Modules\CMS\Http\Controllers\AppShellController;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\InteractsWithPpdbTestDatabase;
 use Tests\TestCase;
@@ -229,10 +231,10 @@ class AppLauncherTest extends TestCase
         $this->boot();
         $u = $this->user(['admin_pesantren']);
         Auth::login($u);
-        $req = \Illuminate\Http\Request::create(
+        $req = Request::create(
             'http://x/staf', 'GET', server: ['HTTP_USER_AGENT' => 'Mozilla/5.0 (Linux; Android 13; Mobile)'],
         );
-        $resp = app(\Modules\CMS\Http\Controllers\AppShellController::class)->stafHome($req);
+        $resp = app(AppShellController::class)->stafHome($req);
         $this->assertInstanceOf(View::class, $resp);
         $labels = array_keys($resp->getData()['groups']);
         // Grup ini ADA di panel tapi TIDAK di katalog tangan lama → bukti menu
