@@ -96,6 +96,11 @@ $icSun='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M
       @if ($errors->any())<div class="err">{{ $errors->first() }}</div>@endif
       <form method="POST" action="{{ route('tenant.masuk.store') }}">
         @csrf
+        {{-- Sinyal device NYATA (viewport/pointer) → server memutuskan tujuan
+             pasca-login: desktop = panel admin, HP = PWA. Lebih akurat dari
+             User-Agent (mis. iPad baru lapor UA desktop). Fallback ke UA bila
+             JS mati (field kosong). --}}
+        <input type="hidden" name="dv" id="dv" value="">
         <div class="field"><label for="email">Email</label>
           <div class="inputwrap"><span class="lead">{!! $sv($icMail) !!}</span><input id="email" name="email" type="email" autocomplete="username" required autofocus value="{{ old('email') }}" placeholder="nama@pesantren.id"></div>
         </div>
@@ -119,6 +124,9 @@ $icSun='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M
 </nav>
 <script>
 (function(){var f=document.getElementById('fabTema');if(!f)return;var moon='{!! $sv($icMoon,18) !!}',sun='{!! $sv($icSun,18) !!}';function s(){f.innerHTML=document.documentElement.classList.contains('dark')?sun:moon;}s();f.addEventListener('click',function(){var d=document.documentElement.classList.toggle('dark');try{localStorage.setItem('nur-theme',d?'dark':'light');}catch(e){}s();});})();
+// Deteksi device NYATA saat login: pointer kasar (sentuh) ATAU viewport sempit
+// = HP → PWA; selain itu desktop → panel. Diset saat muat & tiap submit.
+(function(){var dv=document.getElementById('dv');if(!dv)return;function set(){var m=(window.matchMedia&&window.matchMedia('(pointer: coarse)').matches)||window.innerWidth<768;dv.value=m?'m':'d';}set();if(dv.form)dv.form.addEventListener('submit',set);})();
 </script>
 </body>
 </html>

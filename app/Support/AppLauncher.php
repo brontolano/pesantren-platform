@@ -347,6 +347,13 @@ final class AppLauncher
      */
     public static function isMobileRequest(Request $request): bool
     {
+        // Sinyal device NYATA yang ditangkap saat login (viewport/pointer klien)
+        // disimpan di sesi — DIUTAMAKAN agar keputusan desktop/HP konsisten di
+        // seluruh request sesi, tak bergantung UA yang bisa keliru.
+        if ($request->hasSession() && $request->session()->has('device_mobile')) {
+            return (bool) $request->session()->get('device_mobile');
+        }
+
         if ($request->header('Sec-Fetch-Dest') === 'document'
             && str_contains((string) $request->header('Referer', ''), 'android')) {
             return true;

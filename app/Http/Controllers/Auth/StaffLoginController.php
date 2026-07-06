@@ -92,7 +92,16 @@ class StaffLoginController extends Controller
         // BUKAN selalu '/', sebab pada tenant subdomain '/' = website publik
         // (bukan launcher), sehingga staf akan nyangkut di website. intended()
         // tetap dihormati untuk deep-link yang memicu login.
-        $dest = AppLauncher::primaryDestination(Auth::user(), AppLauncher::isMobileRequest($request));
+        // Device NYATA dari sinyal klien 'dv' (viewport/pointer, diset JS di form
+        // login) DIUTAMAKAN atas User-Agent — UA bisa keliru (mis. iPad baru
+        // lapor UA desktop). Disimpan di sesi agar request berikut (launcher '/',
+        // /staf) konsisten memakai keputusan yang sama. Fallback UA bila 'dv'
+        // kosong (JS mati).
+        $dv = (string) $request->input('dv');
+        $isMobile = $dv === 'm' ? true : ($dv === 'd' ? false : AppLauncher::isMobileRequest($request));
+        $request->session()->put('device_mobile', $isMobile);
+
+        $dest = AppLauncher::primaryDestination(Auth::user(), $isMobile);
         $tujuan = $dest['kind'] === 'redirect' ? $dest['url'] : '/';
 
         return redirect()->intended($tujuan);

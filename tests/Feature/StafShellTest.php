@@ -64,6 +64,14 @@ class StafShellTest extends TestCase
             'tenant_id' => $this->tenant->id, 'name' => 'Petugas UKS', 'email' => 'uks2@stafshell.test', 'password' => bcrypt('password'),
         ]);
         $user->assignRole('pengelola_uks');
+        // Menu /staf kini diturunkan dari navigasi panel yang HORMATI gerbang
+        // modul (persis panel). Aktifkan modul kesehatan agar grup UKS tampil
+        // (tenant baru default minimal). Ini juga menegaskan perilaku benar:
+        // modul non-aktif → tersembunyi di mobile SAMA seperti panel.
+        \Illuminate\Support\Facades\DB::connection('pgsql')->table('tenant_modules')->updateOrInsert(
+            ['tenant_id' => $this->tenant->id, 'module_name' => 'kesehatan'],
+            ['is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        );
         $host = $this->tenant->id.'.localhost';
         tenancy()->end();
 

@@ -364,18 +364,9 @@ class AppShellController extends Controller
 
     private function isMobileRequest(Request $request): bool
     {
-        // Jika sudah dalam mode standalone PWA, selalu anggap mobile.
-        if ($request->header('Sec-Fetch-Dest') === 'document'
-            && str_contains((string) $request->header('Referer', ''), 'android')) {
-            return true;
-        }
-
-        $ua = strtolower((string) $request->header('User-Agent', ''));
-
-        return (bool) preg_match(
-            '/mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini|webos|windows phone/i',
-            $ua
-        );
+        // Satu sumber kebenaran deteksi device (sesi 'device_mobile' dari sinyal
+        // klien saat login → fallback UA/Sec-Fetch). Lihat AppLauncher.
+        return \App\Support\AppLauncher::isMobileRequest($request);
     }
 
     /** Konfigurasi konten app (Setting → fallback default asy-syifaa). */
