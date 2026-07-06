@@ -161,7 +161,7 @@ $prJson = $jadwal->map(fn($s)=>['n'=>$s['label']??'','t'=>$s['time']??''])->valu
       <div class="hero-info"><div class="hero-name">{{ $namaPesantren }}</div><div class="hero-tag">{{ $tagline }}</div></div>
       <a class="masuk" href="{{ $masukUrl }}">{!! $svg('login',15) !!} Masuk</a>
     </div>
-    <div class="datestrip"><span class="l">{!! $svg('cal',13) !!} <b>{{ $tanggal['masehi'] ?? '' }}</b></span>@if(!empty($tanggal['hijriah']))<span class="cd">{{ $tanggal['hijriah'] }}</span>@endif</div>
+    <div class="datestrip"><span class="l">{!! $svg('moon',13) !!} <b>{{ $tanggal['masehi'] ?? '' }}</b></span>@if(!empty($tanggal['hijriah']))<span class="cd">{{ $tanggal['hijriah'] }}</span>@endif</div>
     @if($jadwal->isNotEmpty())
       <div class="hairline"></div>
       <div class="prayer">
@@ -217,7 +217,7 @@ $prJson = $jadwal->map(fn($s)=>['n'=>$s['label']??'','t'=>$s['time']??''])->valu
   <div class="hero sm">
     <div class="hero-pat"></div><div class="hero-glow"></div>
     <div class="hero-h1">Ibadah</div><div class="hero-h2">Jadwal sholat, arah kiblat & layanan</div>
-    <div class="datestrip"><span class="l">{!! $svg('cal',13) !!} <b>{{ $tanggal['masehi'] ?? '' }}</b></span>@if(!empty($tanggal['hijriah']))<span class="cd">{{ $tanggal['hijriah'] }}</span>@endif</div>
+    <div class="datestrip"><span class="l">{!! $svg('moon',13) !!} <b>{{ $tanggal['masehi'] ?? '' }}</b></span>@if(!empty($tanggal['hijriah']))<span class="cd">{{ $tanggal['hijriah'] }}</span>@endif</div>
   </div>
   @php $adaKiblat = ($ibadah['kiblat'] ?? null) !== null; @endphp
   {{-- Tombol GPS: hitung jadwal & kiblat dari lokasi PERANGKAT (jalan walau admin belum set lokasi) --}}
