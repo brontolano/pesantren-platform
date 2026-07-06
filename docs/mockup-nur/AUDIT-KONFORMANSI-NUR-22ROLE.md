@@ -14,8 +14,23 @@ PortalGuru(23), PosKantin, PpdbPanitia, SantriApp, Sarpras, Tu, Uks.
 Total: **~155/184 (84%) sudah Nur.**
 
 ## Daftar gap — diklasifikasi
-### A. DIKECUALIKAN by-design (jangan diubah)
+### A. DIKECUALIKAN by-design (jangan diubah) — DIKONFIRMASI baca-kode
 - `CMS/AlbaKidsLanding.vue`, `CMS/AlbaKidsLandingV2.vue` — AlbaKids dipagari (tema playful sendiri).
+- **Portal PPDB/SPMB (14 file)** — BUKAN gap. Aplikasi guest terpisah gaya Android-native untuk TWA:
+  `SpmbLayout` (AppBar + BottomNav fixed, safe-area), pustaka komponen sendiri `@/spmb/components`
+  (MdCard/MdButton, Material Design), manifest/PWA `/spmb` sendiri, white-label via `--spmb-primary`
+  (default #059669 hijau sekeluarga Nur). Tak impor `@/Shared` KARENA punya design system sendiri,
+  bukan karena usang. Mengubah ke komponen app Nur = merusak. BIARKAN.
+- `CMS/ArticleDetail.vue` — halaman artikel PUBLIK ber-branding per-tenant (serif, layout baca,
+  `website.branding.primaryColor`), bukan app-shell. BIARKAN.
+
+### KESIMPULAN TERKOREKSI
+Setelah baca-kode, mayoritas "gap" audit mekanik = false-positive (sistem terpisah by-design).
+Halaman KONTEN in-app yang benar-benar perlu port SUDAH SELESAI (batch-1/2, LIVE 3935f6d):
+PortalWali {Jenguk,Kegiatan,Profile} + AppSantri/Pengurus/PresensiKegiatan.
+Sisa nyata HANYA layar auth/login portal (Wali/Jemaah/PPDB Auth) + ujian full-screen —
+prioritas rendah, risiko lockout tinggi; login platform utama /masuk sudah Nur. Jangan diutak-atik
+tanpa permintaan eksplisit + verifikasi.
 
 ### B. Layar khusus (auth/ujian full-screen — prioritas rendah)
 - Auth: `PPDB/Portal/{Login,LupaPassword,Aktivasi}`, `PortalWali/Auth/{Login,LupaPassword,Aktivasi}`,
