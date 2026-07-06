@@ -123,9 +123,11 @@ class StafShellTest extends TestCase
         $response = $this->actingAs($user)->get("http://{$host}/staf", $this->headers($host, mobile: true));
 
         $response->assertOk();
-        // Item Santri TIDAK di-remap ke /tu/santri (gate manage_santri yang
-        // TAK dimiliki guru → akan 403 = alur putus); tetap ke panel.
+        // Item Santri TIDAK ke /tu/santri (gate manage_santri, guru tak punya)
+        // → jatuh ke kandidat berikut: /santri-info (baca-saja, view_santri).
+        // TIDAK ada yang ke panel.
         $response->assertDontSee('/tu/santri');
+        $response->assertSee('/santri-info');
         // Kelas boleh di-remap: guru punya view_akademik = gate /akademik-app.
         $response->assertSee('/akademik-app/kelas');
     }

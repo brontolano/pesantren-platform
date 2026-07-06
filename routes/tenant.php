@@ -18,6 +18,7 @@ use App\Http\Controllers\EmisExportController;
 use App\Http\Controllers\HumasController;
 use App\Http\Controllers\Jemaah\JemaahAuthController;
 use App\Http\Controllers\KeamananController;
+use App\Http\Controllers\KedisiplinanAppController;
 use App\Http\Controllers\KegiatanAppController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\PembiayaanExportController;
 use App\Http\Controllers\PengabdianController;
 use App\Http\Controllers\PengadaanExportController;
 use App\Http\Controllers\PengasuhanController;
+use App\Http\Controllers\PerizinanAppController;
 use App\Http\Controllers\PimpinanPwaController;
 use App\Http\Controllers\PortalGuru\PortalGuruBerandaController;
 use App\Http\Controllers\PortalGuru\PortalGuruDisiplinController;
@@ -72,6 +74,7 @@ use App\Http\Controllers\PpdbPanitiaController;
 use App\Http\Controllers\PushSubscriptionController;
 use App\Http\Controllers\RootPwaController;
 use App\Http\Controllers\SantriExportController;
+use App\Http\Controllers\SantriInfoController;
 use App\Http\Controllers\SarprasController;
 use App\Http\Controllers\TahfidzExportController;
 use App\Http\Controllers\TuController;
@@ -273,6 +276,22 @@ Route::middleware([
         Route::get('/kelas/{kelas}', [AkademikAppController::class, 'kelasDetail'])->name('kelas.detail');
         Route::get('/presensi', [AkademikAppController::class, 'presensi'])->name('presensi');
     });
+
+    // PWA native Izin Santri — gate view_kegiatan; tulis manage_kegiatan (controller).
+    Route::middleware(['auth', 'can:view_kegiatan'])->prefix('perizinan-app')->name('tenant.perizinan-app.')->group(function () {
+        Route::get('/', [PerizinanAppController::class, 'index'])->name('index');
+        Route::post('/', [PerizinanAppController::class, 'store'])->name('store');
+        Route::post('/{izin}/kembali', [PerizinanAppController::class, 'kembali'])->name('kembali');
+    });
+
+    // PWA native Jenis Ta'zir — gate view_kedisiplinan; tulis manage_kedisiplinan.
+    Route::middleware(['auth', 'can:view_kedisiplinan'])->prefix('kedisiplinan-app')->name('tenant.kedisiplinan-app.')->group(function () {
+        Route::get('/jenis-tazir', [KedisiplinanAppController::class, 'jenisTazir'])->name('jenis-tazir');
+        Route::post('/jenis-tazir', [KedisiplinanAppController::class, 'store'])->name('jenis-tazir.store');
+    });
+
+    // PWA native Data Santri BACA-SAJA — gate view_santri (pemegang manage_santri → /tu/santri).
+    Route::middleware(['auth', 'can:view_santri'])->get('/santri-info', [SantriInfoController::class, 'index'])->name('tenant.santri-info');
 
     // PWA native Alumni (view) — gate view_alumni (sama AlumniResource).
     Route::middleware(['auth', 'can:view_alumni'])->get('/akademik-app/alumni', [AkademikAppController::class, 'alumni'])->name('tenant.akademik-app.alumni');

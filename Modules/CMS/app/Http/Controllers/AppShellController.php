@@ -367,11 +367,14 @@ class AppShellController extends Controller
         // ber-gate manage_asrama → petugas keamanan akan 403 = alur putus).
         // Kunci ber-syarat dicek terpisah di bawah.
         static $peta = [
-            // Kegiatan / gerbang / tamu (item & route sama-sama view_kegiatan)
+            // Kegiatan / gerbang / tamu / izin (item & route serumpun view_kegiatan)
             '/admin/kegiatans' => '/kegiatan-app',
             '/admin/log-gerbang' => '/keamanan/log',
             '/admin/kunjungan-walis' => '/keamanan/tamu',
             '/admin/pengajuan-jenguk' => '/keamanan/tamu',
+            '/admin/izin-santris' => '/perizinan-app',
+            // Kedisiplinan master (item & route serumpun view_kedisiplinan)
+            '/admin/jenis-pelanggarans' => '/kedisiplinan-app/jenis-tazir',
             // Kesehatan (UKS)
             '/admin/kesehatan/kunjungan-uks' => '/uks/kunjungan',
             '/admin/riwayat-kesehatans' => '/uks/riwayat',
@@ -387,26 +390,26 @@ class AppShellController extends Controller
         ];
 
         // Tujuan native yang gate route-nya LEBIH KETAT dari canAccess item
-        // panel — remap HANYA bila user lolos izin route tujuannya; selain itu
-        // biarkan ke panel (akses tak diblok, tanpa 403). Format:
-        // path panel => [path native, izin gate route native].
+        // panel — daftar KANDIDAT [path native, izin] dicoba berurutan; dipakai
+        // kandidat pertama yang izinnya dimiliki user. Tak ada yang lolos →
+        // tetap panel (akses tak diblok, tanpa 403). Contoh Santri: pemegang
+        // manage_santri → /tu/santri (CRUD); hanya view_santri → /santri-info
+        // (baca-saja) — dua-duanya native, TIDAK ada yang jatuh ke panel.
         static $petaSyarat = [
-            // Item tampil utk view_santri||manage_santri; /tu/* gate manage_santri.
-            '/admin/santri/santris' => ['/tu/santri', 'manage_santri'],
-            // Item tampil utk view_alumni||manage_alumni; route gate view_alumni.
-            '/admin/alumni/alumnis' => ['/akademik-app/alumni', 'view_alumni'],
-            // Item tampil utk view/manage_akademik||manage_santri; gate view_akademik.
-            '/admin/kelas' => ['/akademik-app/kelas', 'view_akademik'],
-            '/admin/presensi-santri/presensi-santris' => ['/akademik-app/presensi', 'view_akademik'],
+            '/admin/santri/santris' => [
+                ['/tu/santri', 'manage_santri'],
+                ['/santri-info', 'view_santri'],
+            ],
+            '/admin/alumni/alumnis' => [['/akademik-app/alumni', 'view_alumni']],
+            '/admin/kelas' => [['/akademik-app/kelas', 'view_akademik']],
+            '/admin/presensi-santri/presensi-santris' => [['/akademik-app/presensi', 'view_akademik']],
             // /pengasuhan/* gate manage_asrama (item bisa tampil dari izin lain).
-            '/admin/penempatan-asrama/penempatan-asramas' => ['/pengasuhan/penempatan', 'manage_asrama'],
-            '/admin/kepengasuhan/presensi-asrama/presensi-asramas' => ['/pengasuhan/presensi', 'manage_asrama'],
-            '/admin/pelanggaran-santri/pelanggaran-santris' => ['/pengasuhan/disiplin', 'manage_asrama'],
-            '/admin/izin-santris' => ['/pengasuhan/izin', 'manage_asrama'],
-            // Item tampil utk view_ppdb||manage_ppdb; /ppdb-panitia gate manage_ppdb
-            // (kepala hanya view_ppdb → tanpa syarat ini akan 403).
-            '/admin/ppdb/calon-santri' => ['/ppdb-panitia/pendaftar', 'manage_ppdb'],
-            '/admin/ppdb/hasil-ujian' => ['/ppdb-panitia/hasil', 'manage_ppdb'],
+            '/admin/penempatan-asrama/penempatan-asramas' => [['/pengasuhan/penempatan', 'manage_asrama']],
+            '/admin/kepengasuhan/presensi-asrama/presensi-asramas' => [['/pengasuhan/presensi', 'manage_asrama']],
+            '/admin/pelanggaran-santri/pelanggaran-santris' => [['/pengasuhan/disiplin', 'manage_asrama']],
+            // /ppdb-panitia gate manage_ppdb (kepala hanya view_ppdb → tanpa syarat 403).
+            '/admin/ppdb/calon-santri' => [['/ppdb-panitia/pendaftar', 'manage_ppdb']],
+            '/admin/ppdb/hasil-ujian' => [['/ppdb-panitia/hasil', 'manage_ppdb']],
         ];
 
         $path = rtrim((string) (parse_url($url, PHP_URL_PATH) ?: ''), '/');
@@ -414,8 +417,12 @@ class AppShellController extends Controller
         if (isset($peta[$path])) {
             return url($peta[$path]);
         }
-        if (isset($petaSyarat[$path]) && $u !== null && $u->can($petaSyarat[$path][1])) {
-            return url($petaSyarat[$path][0]);
+        if (isset($petaSyarat[$path]) && $u !== null) {
+            foreach ($petaSyarat[$path] as [$native, $izin]) {
+                if ($u->can($izin)) {
+                    return url($native);
+                }
+            }
         }
 
         return $url;
