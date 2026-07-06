@@ -103,6 +103,9 @@ a{text-decoration:none;color:inherit}button{font-family:inherit;color:inherit}
 .empty{text-align:center;padding:40px 24px;color:var(--sub);font-size:13.5px}
 .nav{position:fixed;bottom:0;left:0;right:0;max-width:540px;margin:0 auto;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;padding:7px 8px max(8px,env(safe-area-inset-bottom));z-index:30;box-shadow:0 -8px 24px -18px rgba(17,17,17,.3)}
 html.dark .nav{background:rgba(18,24,21,.96)}
+/* TWA/aplikasi terpasang (standalone): env(safe-area-inset-bottom) sering over-report
+   di perangkat tombol-3 → ruang kosong besar di bawah ikon. Batasi agar nav rapat. */
+@media(display-mode:standalone),(display-mode:fullscreen),(display-mode:minimal-ui){.nav{padding-bottom:min(max(8px,env(safe-area-inset-bottom)),16px)}}
 .nav button,.nav a{flex:1;border:none;background:none;cursor:pointer;padding:0;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--faint)}
 .nav button.on{color:var(--nur)}
 .nav .ic{width:52px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:99px;transition:background .2s}
@@ -202,6 +205,7 @@ $prJson = $jadwal->map(fn($s)=>['n'=>$s['label']??'','t'=>$s['time']??''])->valu
   @if(!empty($cfg['app_donasi_url']))
   <a class="donasi" href="{{ $cfg['app_donasi_url'] }}"><span class="donasi-ic">{!! $svg('heart',22) !!}</span><div><div class="t">Infak & Donasi</div><div class="s">Dukung pendidikan santri</div></div><span class="donasi-btn">Salurkan</span></a>
   @endif
+  <div style="text-align:center;font-size:9px;color:var(--faint);padding:10px 0 2px;letter-spacing:.04em">Versi {{ $appBuild ?? '-' }}</div>
   <div style="height:12px"></div>
 </div>
 

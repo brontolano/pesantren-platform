@@ -42,7 +42,15 @@ class AppShellController extends Controller
         'app_zakat_wakaf_url' => '',
     ];
 
-    public function __invoke(TenantWebsiteService $websiteService): View
+    /**
+     * Versi build app-shell. Dinaikkan manual saat mengubah tampilan agar
+     * pengguna bisa memastikan sudah menerima versi baru (mengatasi kebingungan
+     * cache: countdown dihitung JS jadi tetap jalan walau HTML lama). Ditampilkan
+     * kecil di footer Beranda.
+     */
+    private const APP_SHELL_BUILD = '2026.07.06-2';
+
+    public function __invoke(TenantWebsiteService $websiteService): \Illuminate\Http\Response
     {
         $web = [];
         try {
@@ -54,7 +62,7 @@ class AppShellController extends Controller
         $branding = $web['branding'] ?? [];
         $contact = $web['contact'] ?? [];
 
-        return view('app-shell', [
+        $view = view('app-shell', [
             'namaPesantren' => $branding['name'] ?? TenantBranding::name(),
             'tagline' => $branding['tagline'] ?? 'Pendidikan adab, ilmu, dan layanan santri',
             'logoUrl' => $branding['logo'] ?? TenantBranding::logoUrl(),
@@ -68,7 +76,14 @@ class AppShellController extends Controller
             'cfg' => $this->appConfig(),
             'artikel' => $this->artikelTerbaru(),
             'masukUrl' => '/masuk',
+            'appBuild' => self::APP_SHELL_BUILD,
         ]);
+
+        // Paksa selalu ambil-ulang: app-shell = HTML+CSS inline yang sering
+        // diubah; no-store mencegah browser/TWA menyajikan salinan basi.
+        return response($view)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache');
     }
 
     /**
