@@ -30,6 +30,20 @@ const DEFAULT_ICONS = {
     santri: 'book', akademik: 'book', nilai: 'book', tahfidz: 'book',
     presensi: 'check-circle', kepengasuhan: 'heart', gerbang: 'qr',
     akun: 'user', profil: 'user', notifikasi: 'bell', mutu: 'chart',
+    // Nav peran lain (dulu jatuh ke 'home' generik). Hanya ikon yang ada di UiIcon.
+    tamu: 'user', log: 'clock', riwayat: 'clock',
+    sesi: 'heart', konselor: 'heart', konseling: 'heart', catatan: 'document',
+    kerusakan: 'info', piket: 'calendar', sarpras: 'home', aset: 'home',
+    pendaftar: 'user', pendaftaran: 'user', ppdb: 'user', jadwal: 'calendar', hasil: 'chart',
+    berita: 'document', artikel: 'document', galeri: 'camera', humas: 'bell',
+    donasi: 'heart', program: 'book', beasiswa: 'book', baitulmaal: 'heart',
+    kasir: 'card', pos: 'card', pembayaran: 'wallet', bayar: 'wallet', tagihan: 'receipt',
+    jurnal: 'book', bukubesar: 'book', akuntan: 'chart',
+    pegawai: 'user', absensi: 'check-circle', cuti: 'calendar', kepegawaian: 'user',
+    kegiatan: 'calendar', kedisiplinan: 'info', disiplin: 'info', pelanggaran: 'info',
+    kelas: 'book', kbm: 'book', jurnalkbm: 'book', walikelas: 'user', kitab: 'book',
+    uks: 'heart', kesehatan: 'heart', obat: 'heart', pengasuhan: 'heart', asrama: 'home',
+    tu: 'document', surat: 'document', alumni: 'user', pimpinan: 'chart',
 }
 
 function iconFor(item) {
