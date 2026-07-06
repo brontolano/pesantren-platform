@@ -33,7 +33,7 @@ class StaffLoginController extends Controller
     public function show(): View|RedirectResponse
     {
         if (Auth::check()) {
-            $dest = AppLauncher::primaryDestination(Auth::user());
+            $dest = AppLauncher::primaryDestination(Auth::user(), AppLauncher::isMobileRequest(request()));
 
             return redirect()->to($dest['kind'] === 'redirect' ? $dest['url'] : '/');
         }
@@ -92,7 +92,7 @@ class StaffLoginController extends Controller
         // BUKAN selalu '/', sebab pada tenant subdomain '/' = website publik
         // (bukan launcher), sehingga staf akan nyangkut di website. intended()
         // tetap dihormati untuk deep-link yang memicu login.
-        $dest = AppLauncher::primaryDestination(Auth::user());
+        $dest = AppLauncher::primaryDestination(Auth::user(), AppLauncher::isMobileRequest($request));
         $tujuan = $dest['kind'] === 'redirect' ? $dest['url'] : '/';
 
         return redirect()->intended($tujuan);

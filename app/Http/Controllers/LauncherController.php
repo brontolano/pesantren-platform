@@ -67,7 +67,7 @@ class LauncherController extends Controller
             }
         }
 
-        $dest = AppLauncher::primaryDestination($user);
+        $dest = AppLauncher::primaryDestination($user, AppLauncher::isMobileRequest(request()));
 
         if ($dest['kind'] === 'redirect') {
             return redirect()->to($dest['url']);

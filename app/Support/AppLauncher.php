@@ -6,6 +6,7 @@ namespace App\Support;
 
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -208,7 +209,7 @@ final class AppLauncher
      *
      * @return array{kind:'hub'|'redirect', url?:string}
      */
-    public static function primaryDestination(User $user): array
+    public static function primaryDestination(User $user, bool $isMobile = false): array
     {
         // Akun keluarga/eksternal = satu tujuan, lewati hub staf.
         // PENTING: cek BERBASIS ROLE, bukan can('view_own_children'). super_admin
@@ -238,26 +239,34 @@ final class AppLauncher
 
         $adminUrl = self::adminPanelUrl($user);
 
-        // super_admin = admin penuh tenant (dibuat TenantProvisioner) → langsung
-        // /admin. TIDAK bisa memakai pwaHome() sebagai pembeda untuknya karena can()
-        // di-bypass Gate::before → pwaHome palsu non-null (seolah punya app pimpinan).
-        if ($adminUrl !== null && $user->hasRole('super_admin')) {
+        // Bukan staf berkapasitas panel (dan bukan peran keluarga di atas) → hub
+        // fallback ramah (jarang terjadi).
+        if ($adminUrl === null) {
+            return ['kind' => 'hub'];
+        }
+
+        // ========================================================================
+        // ATURAN DEVICE (ditegaskan owner 2026-07-06): "desktop = panel admin,
+        // HP = TWA/PWA". Tujuan staf ditentukan PERANGKAT, bukan peran:
+        //   - Desktop  → panel Filament `/admin` (layar besar, fitur penuh).
+        //   - HP/mobile → PWA Nur: aplikasi peran KHUSUS bila ada (guru/keuangan/
+        //     uks/konselor/…), selain itu shell staf mobile `/staf`.
+        // Ini menghapus "hub pemilih" (dulu ambigu) — device yang memutuskan.
+        // ========================================================================
+        if (! $isMobile) {
             return ['kind' => 'redirect', 'url' => $adminUrl];
         }
 
-        // Staf berkapasitas admin TANPA aplikasi PWA operasional khusus — dalam
-        // praktik HANYA role `IT` (sysadmin: manage_users/roles/modules/settings/
-        // audit; tak ada izin di STAFF_APPS). Fungsinya sepenuhnya hidup di panel
-        // Filament `/admin`, jadi arahkan LANGSUNG ke `/admin` seperti super_admin
-        // (owner 2026-07-06). Ke-22 role operasional tak pernah sampai sini —
-        // semuanya match tile PWA khusus di STAFF_APPS. Fallback `/staf` lama
-        // (katalog yang menautkan ke halaman /admin responsif) ditinggalkan.
-        if ($adminUrl !== null && self::pwaHome($user) === null) {
-            return ['kind' => 'redirect', 'url' => $adminUrl];
+        // super_admin: pwaHome() TAK ANDAL (Gate::before → can() selalu true →
+        // tile pertama palsu). Beri shell staf mobile penuh `/staf` (punya semua menu).
+        if (! $user->hasRole('super_admin')) {
+            $pwa = self::pwaHome($user);
+            if ($pwa !== null) {
+                return ['kind' => 'redirect', 'url' => $pwa['url']];
+            }
         }
 
-        // Staf dengan aplikasi PWA (dan fallback authenticated-tanpa-app) → hub.
-        return ['kind' => 'hub'];
+        return ['kind' => 'redirect', 'url' => self::routeOr('tenant.staf-shell', '/staf')];
     }
 
     /** Kapasitas operasional staf — memilah santri murni dari santri-yang-juga-staf. */
@@ -329,6 +338,26 @@ final class AppLauncher
         }
 
         return null;
+    }
+
+    /**
+     * Deteksi HP/mobile untuk aturan device (desktop→panel, HP→PWA). PWA/TWA
+     * Android standalone (Sec-Fetch-Dest document + Referer android) DAN WebView
+     * app (userAgent 'PesantrenApp') selalu dianggap mobile.
+     */
+    public static function isMobileRequest(Request $request): bool
+    {
+        if ($request->header('Sec-Fetch-Dest') === 'document'
+            && str_contains((string) $request->header('Referer', ''), 'android')) {
+            return true;
+        }
+
+        $ua = strtolower((string) $request->header('User-Agent', ''));
+
+        return (bool) preg_match(
+            '/mobile|android|iphone|ipad|ipod|blackberry|iemobile|opera mini|webos|windows phone|pesantrenapp/i',
+            $ua
+        );
     }
 
     private static function routeOr(string $name, string $fallback): string
