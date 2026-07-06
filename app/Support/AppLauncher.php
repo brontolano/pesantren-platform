@@ -248,24 +248,17 @@ final class AppLauncher
         }
 
         // ========================================================================
-        // ATURAN DEVICE (ditegaskan owner 2026-07-06): "desktop = panel admin,
-        // HP = TWA/PWA". Tujuan staf ditentukan PERANGKAT, bukan peran:
+        // ATURAN DEVICE (owner 2026-07-06): "desktop = panel admin, HP = TWA/PWA".
         //   - Desktop  → panel Filament `/admin` (layar besar, fitur penuh).
-        //   - HP/mobile → PWA Nur: aplikasi peran KHUSUS bila ada (guru/keuangan/
-        //     uks/konselor/…), selain itu shell staf mobile `/staf`.
-        // Ini menghapus "hub pemilih" (dulu ambigu) — device yang memutuskan.
+        //   - HP/mobile → shell staf `/staf` untuk SEMUA staf — bentuk aplikasi
+        //     mengikuti mockup terkunci staf-app-preview (4 tab Beranda/Menu/
+        //     Aktivitas/Akun). Aplikasi peran KHUSUS (guru/keamanan/uks/…) tak
+        //     hilang: tampil sebagai kartu unggulan "Aplikasi Saya" di dalam
+        //     shell (satu ketukan) — lihat AppShellController::stafHome.
+        // Hub pemilih lama dihapus — device yang memutuskan.
         // ========================================================================
         if (! $isMobile) {
             return ['kind' => 'redirect', 'url' => $adminUrl];
-        }
-
-        // super_admin: pwaHome() TAK ANDAL (Gate::before → can() selalu true →
-        // tile pertama palsu). Beri shell staf mobile penuh `/staf` (punya semua menu).
-        if (! $user->hasRole('super_admin')) {
-            $pwa = self::pwaHome($user);
-            if ($pwa !== null) {
-                return ['kind' => 'redirect', 'url' => $pwa['url']];
-            }
         }
 
         return ['kind' => 'redirect', 'url' => self::routeOr('tenant.staf-shell', '/staf')];

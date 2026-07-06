@@ -100,7 +100,7 @@ class AppLauncherTest extends TestCase
         $u = $this->user(['guru']);
         // Device-based: desktop → panel; HP → PWA guru.
         $this->assertStringContainsString('/admin', AppLauncher::primaryDestination($u, false)['url']);
-        $this->assertStringContainsString('/guru', AppLauncher::primaryDestination($u, true)['url']);
+        $this->assertStringContainsString('/staf', AppLauncher::primaryDestination($u, true)['url']); // HP: shell mockup, app peran = tile unggulan
         $this->assertStringContainsString('/guru', AppLauncher::pwaHome($u)['url']);
         $this->assertNotNull(AppLauncher::adminPanelUrl($u));
     }
@@ -135,7 +135,7 @@ class AppLauncherTest extends TestCase
         $this->assertStringContainsString('/uks', AppLauncher::pwaHome($u)['url']);
         // Device-based: desktop → panel; HP → PWA UKS.
         $this->assertStringContainsString('/admin', AppLauncher::primaryDestination($u, false)['url']);
-        $this->assertStringContainsString('/uks', AppLauncher::primaryDestination($u, true)['url']);
+        $this->assertStringContainsString('/staf', AppLauncher::primaryDestination($u, true)['url']);
     }
 
     public function test_operator_divisi_hub_dengan_pwa_keuangan_lapangan(): void
@@ -146,7 +146,7 @@ class AppLauncherTest extends TestCase
         $this->assertStringContainsString('/admin/keuangan/pwa', AppLauncher::pwaHome($u)['url']);
         // Device-based: desktop → panel; HP → PWA keuangan lapangan.
         $this->assertStringContainsString('/admin', AppLauncher::primaryDestination($u, false)['url']);
-        $this->assertStringContainsString('/admin/keuangan/pwa', AppLauncher::primaryDestination($u, true)['url']);
+        $this->assertStringContainsString('/staf', AppLauncher::primaryDestination($u, true)['url']);
     }
 
     public function test_dewan_pembina_hub_dengan_pwa_keuangan_lapangan(): void
@@ -158,7 +158,7 @@ class AppLauncherTest extends TestCase
         $this->assertStringContainsString('/admin/keuangan/pwa', AppLauncher::pwaHome($u)['url']);
         // Device-based: desktop → panel; HP → PWA keuangan lapangan.
         $this->assertStringContainsString('/admin', AppLauncher::primaryDestination($u, false)['url']);
-        $this->assertStringContainsString('/admin/keuangan/pwa', AppLauncher::primaryDestination($u, true)['url']);
+        $this->assertStringContainsString('/staf', AppLauncher::primaryDestination($u, true)['url']);
     }
 
     public function test_admin_pesantren_langsung_ke_admin_panel(): void

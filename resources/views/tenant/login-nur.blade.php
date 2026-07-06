@@ -59,6 +59,14 @@ footer{text-align:center;font-size:.72rem;color:var(--faint);margin-top:22px;fon
 footer a{color:var(--nur);font-weight:700}
 .nav{position:fixed;bottom:0;left:0;right:0;max-width:480px;margin:0 auto;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;padding:9px 8px calc(12px + env(safe-area-inset-bottom));z-index:30;box-shadow:0 -8px 24px -18px rgba(17,17,17,.3)}
 html.dark .nav{background:rgba(18,24,21,.96)}
+/* KUNCI IDENTIFIKASI DEVICE di halaman login (owner 2026-07-06):
+   desktop (pointer halus & layar lebar) = tampilan login DESKTOP — TANPA
+   bottom-nav ala app HP, kartu di tengah layar. HP tetap bentuk app. */
+@media(min-width:900px) and (pointer:fine){
+  .nav{display:none}
+  .wrap{max-width:520px;min-height:auto;margin:40px auto;justify-content:flex-start}
+  .hero{border-radius:32px}
+}
 .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--faint)}
 .nav a.on{color:var(--nur)}
 .nav .ic{width:52px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:99px}

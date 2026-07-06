@@ -236,9 +236,16 @@ class AppShellController extends Controller
             $totalFitur += count($items);
         }
 
+        // Aplikasi PERAN khusus (guru/keamanan/uks/…) sebagai kartu unggulan
+        // "Aplikasi Saya" — landing HP kini selalu shell ini (bentuk mockup),
+        // app peran tetap satu ketukan. super_admin dilewati (pwaHome tak andal
+        // untuknya: Gate::before membuat can() selalu true → tile pertama palsu).
+        $appPeran = $u->hasRole('super_admin') ? null : AppLauncher::pwaHome($u);
+
         return view('staf-home', [
             'namaPesantren' => TenantBranding::name(),
             'logoUrl' => TenantBranding::logoUrl(),
+            'appPeran' => $appPeran,
             'user' => $u,
             'peran' => $u->getRoleNames()->map(fn ($r) => str()->headline($r))->implode(' · '),
             'sapa' => $sapa,
