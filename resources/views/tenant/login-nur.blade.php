@@ -61,11 +61,35 @@ footer a{color:var(--nur);font-weight:700}
 html.dark .nav{background:rgba(18,24,21,.96)}
 /* KUNCI IDENTIFIKASI DEVICE di halaman login (owner 2026-07-06):
    desktop (pointer halus & layar lebar) = tampilan login DESKTOP — TANPA
-   bottom-nav ala app HP, kartu di tengah layar. HP tetap bentuk app. */
+   bottom-nav ala app HP. HP tetap bentuk app.
+   Refresh 2026-07-06: sebelumnya kartu HP cuma disempitkan & ditengahkan
+   di kanvas kosong — sekarang split-screen sungguhan (branding kiri,
+   form kanan) mengisi seluruh viewport, bukan kartu mengambang. */
 @media(min-width:900px) and (pointer:fine){
   .nav{display:none}
-  .wrap{max-width:520px;min-height:auto;margin:40px auto;justify-content:flex-start}
-  .hero{border-radius:32px}
+  body{overflow:hidden}
+  .wrap{max-width:none;min-height:100dvh;margin:0;flex-direction:row}
+  .hero{
+    flex:1 1 46%;max-width:640px;min-height:100dvh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;border-radius:0;padding:48px;
+  }
+  .hero-glow{top:auto;bottom:-80px}
+  .brandmark{width:104px;height:104px;font-size:52px;margin-bottom:22px}
+  .bismillah{font-size:2.1rem}
+  .hero h1{font-size:2rem;max-width:22ch;text-wrap:balance}
+  .hero .sub{font-size:1rem;margin-top:8px}
+  .sheet{
+    flex:1 1 54%;margin-top:0;border-radius:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:48px;overflow-y:auto;
+  }
+  .sheet>*{width:100%;max-width:400px}
+  .card{padding:32px 30px}
+  .card-t{font-size:1.3rem}
+  .card-s{font-size:.88rem}
+}
+@media(min-width:1180px) and (pointer:fine){
+  .hero{flex-basis:50%}
+  .sheet{flex-basis:50%}
 }
 .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--faint)}
 .nav a.on{color:var(--nur)}
