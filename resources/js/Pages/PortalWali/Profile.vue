@@ -2,6 +2,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import PortalWaliLayout from '../../Layouts/PortalWaliLayout.vue'
+import { UiCard, UiButton, EmptyState } from '@/Components/Ui'
 
 defineOptions({
     layout: PortalWaliLayout,
@@ -27,6 +28,21 @@ function simpanPin() {
         onSuccess: () => pinForm.reset('pin'),
     })
 }
+
+const detail = computed(() => [
+    ['Status', props.child.status],
+    ['Tanggal lahir', props.child.tanggalLahir],
+    ['Tempat lahir', props.child.tempatLahir],
+    ['Jenis kelamin', props.child.jenisKelamin],
+    ['Agama', props.child.agama],
+    ['Asal sekolah', props.child.asalSekolah],
+    ['Alamat', props.child.alamat],
+    ['Angkatan', props.child.tahunAngkatan],
+    ['Ayah', props.child.namaAyah],
+    ['Ibu', props.child.namaIbu],
+    ['No HP wali', props.child.noHpWali],
+    ['Email wali', props.child.emailWali],
+])
 </script>
 
 <template>
@@ -35,41 +51,34 @@ function simpanPin() {
             <title>Profil Santri</title>
         </Head>
 
-        <section class="rounded-[2rem] bg-slate-950 px-5 py-5 text-white shadow-[0_24px_60px_-40px_rgba(15,23,42,0.8)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
-                Profil Santri
-            </p>
-            <h2 class="mt-3 font-jost text-3xl leading-tight">
-                {{ child.nama }}
-            </h2>
-            <p class="mt-2 text-sm leading-6 text-white/75">
+        <!-- HERO -->
+        <UiCard variant="hero-dark" padding="lg">
+            <p class="text-[11px] font-bold uppercase tracking-wide text-white/70">Profil Santri</p>
+            <h2 class="mt-1 text-2xl font-extrabold leading-tight tracking-tight">{{ child.nama }}</h2>
+            <p class="mt-2 text-sm leading-6 text-white/80">
                 NIS {{ child.nis }} · {{ child.kelas?.nama || 'Belum ada kelas' }}
             </p>
-        </section>
+        </UiCard>
 
-        <section class="rounded-[1.75rem] border border-black/5 bg-white px-4 py-4 shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]">
-            <div class="grid gap-3 text-sm text-slate-600">
-                <p><span class="font-semibold text-slate-900">Status:</span> {{ child.status }}</p>
-                <p><span class="font-semibold text-slate-900">Tanggal lahir:</span> {{ child.tanggalLahir || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Tempat lahir:</span> {{ child.tempatLahir || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Jenis kelamin:</span> {{ child.jenisKelamin || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Agama:</span> {{ child.agama || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Asal sekolah:</span> {{ child.asalSekolah || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Alamat:</span> {{ child.alamat || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Angkatan:</span> {{ child.tahunAngkatan || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Ayah:</span> {{ child.namaAyah || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Ibu:</span> {{ child.namaIbu || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">No HP wali:</span> {{ child.noHpWali || '-' }}</p>
-                <p><span class="font-semibold text-slate-900">Email wali:</span> {{ child.emailWali || '-' }}</p>
+        <!-- DETAIL -->
+        <UiCard padding="none">
+            <div class="flex items-center gap-2.5 px-5 pt-5">
+                <span class="h-1.5 w-1.5 rounded-full bg-brand-grad" />
+                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Data Santri</p>
             </div>
-        </section>
+            <dl class="mt-2 divide-y divide-slate-100">
+                <div v-for="[label, value] in detail" :key="label" class="flex items-start justify-between gap-3 px-5 py-3">
+                    <dt class="text-sm text-slate-500">{{ label }}</dt>
+                    <dd class="max-w-[60%] text-right text-sm font-semibold text-slate-900">{{ value || '-' }}</dd>
+                </div>
+            </dl>
+        </UiCard>
 
-        <section class="rounded-[1.75rem] border border-emerald-200 bg-emerald-50/60 px-4 py-4">
-            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
-                Login Aplikasi Santri
-            </p>
-            <h3 class="mt-2 font-jost text-lg text-emerald-950">Atur PIN anak</h3>
-            <p class="mt-1 text-sm leading-6 text-emerald-900/70">
+        <!-- ATUR PIN -->
+        <UiCard padding="md" class="ring-emerald-200/70">
+            <p class="text-[11px] font-bold uppercase tracking-wide text-emerald-700">Login Aplikasi Santri</p>
+            <h3 class="mt-1 text-lg font-extrabold tracking-tight text-emerald-950">Atur PIN anak</h3>
+            <p class="mt-1 text-sm leading-6 text-slate-600">
                 Santri masuk App Santri dengan <b>NIS {{ child.nis }}</b> + PIN 6 angka.
                 Buat PIN yang mudah diingat anak.
             </p>
@@ -87,61 +96,52 @@ function simpanPin() {
                         maxlength="6"
                         pattern="\d{6}"
                         placeholder="6 angka"
-                        class="w-32 rounded-xl border border-emerald-300 px-4 py-3 text-center text-lg tracking-[0.4em] tabular-nums"
+                        class="w-32 rounded-2xl border border-emerald-300 px-4 py-3 text-center text-lg tracking-[0.4em] tabular-nums outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                     >
-                    <p v-if="pinForm.errors.pin" class="mt-1 text-xs text-red-600">{{ pinForm.errors.pin }}</p>
+                    <p v-if="pinForm.errors.pin" class="mt-1 text-xs font-medium text-rose-600">{{ pinForm.errors.pin }}</p>
                 </div>
-                <button
+                <UiButton
                     type="submit"
+                    variant="primary"
+                    size="lg"
                     :disabled="pinForm.processing || !/^\d{6}$/.test(pinForm.pin)"
-                    class="rounded-full bg-emerald-600 px-6 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                    :loading="pinForm.processing"
                 >
                     Simpan PIN
-                </button>
+                </UiButton>
             </form>
-        </section>
+        </UiCard>
 
+        <!-- RIWAYAT KELAS -->
         <section class="space-y-3">
-            <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
-                    Penempatan
-                </p>
-                <h3 class="mt-1 font-jost text-2xl text-slate-900">
-                    Riwayat Kelas
-                </h3>
+            <div class="flex items-center gap-2.5">
+                <span class="h-1.5 w-1.5 rounded-full bg-brand-grad" />
+                <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Riwayat Kelas</p>
             </div>
 
             <div v-if="placementHistory.length" class="grid gap-3">
-                <article
+                <UiCard
                     v-for="item in placementHistory"
                     :key="`${item.kelas}-${item.tanggalPenempatan}`"
-                    class="rounded-[1.5rem] border border-black/5 bg-white px-4 py-4 text-sm shadow-[0_20px_45px_-40px_rgba(15,23,42,0.7)]"
+                    padding="md"
                 >
-                    <p class="font-semibold text-slate-900">
-                        {{ item.kelas || 'Belum ada kelas' }}
-                    </p>
-                    <p class="mt-1 text-slate-500">
-                        {{ item.tahunAkademik || '-' }} · {{ item.semester || '-' }}
-                    </p>
-                    <p class="mt-1 text-slate-500">
-                        {{ item.tanggalPenempatan || '-' }}
-                    </p>
-                </article>
+                    <p class="font-bold text-slate-900">{{ item.kelas || 'Belum ada kelas' }}</p>
+                    <p class="mt-1 text-sm text-slate-500">{{ item.tahunAkademik || '-' }} · {{ item.semester || '-' }}</p>
+                    <p class="mt-0.5 text-sm text-slate-500">{{ item.tanggalPenempatan || '-' }}</p>
+                </UiCard>
             </div>
-
-            <div
-                v-else
-                class="rounded-[1.5rem] border border-dashed border-slate-300 bg-white px-4 py-6 text-sm text-slate-600"
-            >
-                Riwayat penempatan kelas belum tersedia.
-            </div>
+            <EmptyState v-else icon="calendar" title="Belum ada riwayat penempatan" message="Riwayat kelas santri akan tampil di sini." />
         </section>
 
-        <Link
+        <UiButton
+            variant="secondary"
+            size="lg"
+            block
+            as="link"
             :href="`/wali/santri/${child.id}/akademik`"
-            class="block rounded-[1.5rem] bg-emerald-50 px-4 py-4 text-center text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700"
+            icon-right="arrow-up-right"
         >
             Lanjut ke akademik
-        </Link>
+        </UiButton>
     </div>
 </template>
