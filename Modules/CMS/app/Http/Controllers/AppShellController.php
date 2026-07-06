@@ -358,6 +358,7 @@ class AppShellController extends Controller
             // Kedisiplinan
             '/admin/pelanggaran-santri/pelanggaran-santris' => '/pengasuhan/disiplin',
             // Kegiatan / gerbang / tamu
+            '/admin/kegiatans' => '/kegiatan-app',
             '/admin/log-gerbang' => '/keamanan/log',
             '/admin/kunjungan-walis' => '/keamanan/tamu',
             '/admin/pengajuan-jenguk' => '/keamanan/tamu',

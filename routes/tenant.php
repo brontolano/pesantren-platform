@@ -17,6 +17,7 @@ use App\Http\Controllers\EmisExportController;
 use App\Http\Controllers\HumasController;
 use App\Http\Controllers\Jemaah\JemaahAuthController;
 use App\Http\Controllers\KeamananController;
+use App\Http\Controllers\KegiatanAppController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganApiController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaBrandingController;
 use App\Http\Controllers\KepalaKeuangan\KepalaKeuanganPwaController as KepalaKeuanganCtrl;
@@ -262,6 +263,15 @@ Route::middleware([
         // sengaja TIDAK diportal — tak ada model/tabel patroli/ronda apa pun
         // di sistem ini. Memaksakan akan jadi data palsu. Lihat docblock
         // KeamananController untuk rincian scope.
+    });
+
+    // PWA native Kegiatan — alur linear menu staf HP: list + form input (owner
+    // 2026-07-06). Gate baca = view_kegiatan (sama KegiatanResource); tulis
+    // dicek manage_kegiatan di controller.
+    Route::middleware(['auth', 'can:view_kegiatan'])->prefix('kegiatan-app')->name('tenant.kegiatan-app.')->group(function () {
+        Route::get('/', [KegiatanAppController::class, 'index'])->name('index');
+        Route::post('/', [KegiatanAppController::class, 'store'])->name('store');
+        Route::post('/{kegiatan}/status', [KegiatanAppController::class, 'ubahStatus'])->name('status');
     });
 
     Route::middleware(['auth', 'can:manage_asrama'])->prefix('pengasuhan')->name('tenant.pengasuhan.')->group(function () {
