@@ -341,14 +341,9 @@ html {
     background-image: var(--brand-grad);
 }
 .bg-brand-grad-hero {
-    /* Ornamen geometris Islami (Rub el Hizb) di atas gradient — ciri khas mockup
-       "Nur". Diterapkan ke SEMUA hero yg pakai kelas ini (Wali/Keuangan/dll). */
-    background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.045' stroke-width='1'%3E%3Crect x='19' y='19' width='22' height='22'/%3E%3Crect x='19' y='19' width='22' height='22' transform='rotate(45 30 30)'/%3E%3C/g%3E%3C/svg%3E"),
-        var(--brand-grad-hero-refined);
-    background-size: 60px 60px, cover;
-    background-repeat: repeat, no-repeat;
-    background-position: center, center;
+    /* Hanya gradient. Ornamen Islami sudah disediakan komponen <IslamicPattern>
+       di HeroHeader (jangan tambah pola di sini — bikin DOBEL & berantakan). */
+    background-image: var(--brand-grad-hero-refined);
 }
 .shadow-soft {
     box-shadow: var(--shadow-soft);
