@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -53,21 +54,8 @@ class KeamananController extends Controller
 
     private function nav(): array
     {
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda'],
-            ['key' => 'gerbang', 'label' => 'Gerbang', 'href' => '/keamanan/gerbang', 'route' => 'gerbang'],
-            ['key' => 'tamu', 'label' => 'Tamu', 'href' => '/keamanan/tamu', 'route' => 'tamu'],
-            ['key' => 'log', 'label' => 'Log', 'href' => '/keamanan/log', 'route' => 'log'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'active' => request()->routeIs("tenant.keamanan.{$i['route']}"),
-            ])
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     private function can(): array

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -51,23 +52,8 @@ class PengasuhanController extends Controller
 
     private function nav(): array
     {
-        $base = '/pengasuhan';
-
-        $items = [
-            ['key' => 'hariini', 'label' => 'Hari Ini', 'icon' => 'calendar', 'href' => $base, 'route' => 'beranda'],
-            ['key' => 'presensi', 'label' => 'Presensi', 'icon' => 'check-circle', 'href' => "{$base}/presensi", 'route' => 'presensi'],
-            ['key' => 'penempatan', 'label' => 'Penempatan', 'icon' => 'home', 'href' => "{$base}/penempatan", 'route' => 'penempatan'],
-            ['key' => 'disiplin', 'label' => 'Disiplin', 'icon' => 'chart', 'href' => "{$base}/disiplin", 'route' => 'disiplin'],
-            ['key' => 'izin', 'label' => 'Izin', 'icon' => 'document', 'href' => "{$base}/izin", 'route' => 'izin'],
-        ];
-
-        return array_map(fn (array $i): array => [
-            'key' => $i['key'],
-            'label' => $i['label'],
-            'icon' => $i['icon'],
-            'href' => $i['href'],
-            'active' => request()->routeIs("tenant.pengasuhan.{$i['route']}"),
-        ], $items);
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     private function userName(): string

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,22 +38,8 @@ class AkuntanController extends Controller
 
     private function nav(): array
     {
-        $base = '/akuntan';
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
-            ['key' => 'jurnal', 'label' => 'Jurnal', 'href' => "{$base}/jurnal", 'route' => 'jurnal', 'icon' => 'book-open'],
-            ['key' => 'akun', 'label' => 'Akun', 'href' => "{$base}/akun", 'route' => 'akun', 'icon' => 'bank'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'icon' => $i['icon'],
-                'active' => request()->routeIs("tenant.akuntan.{$i['route']}"),
-            ])
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     private function can(): array

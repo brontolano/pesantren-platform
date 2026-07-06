@@ -1,17 +1,13 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
-import { AppShell, PageHeader, SectionCard, ListRow, EmptyState } from '@/Shared'
+import { AppShell, PageHeader, SectionCard, ListRow, EmptyState, STAF_NAV, KembaliBar } from '@/Shared'
 
 defineProps({
     kelas: { type: Object, required: true },
     santri: { type: Array, default: () => [] },
 })
 
-const nav = [
-    { key: 'beranda', label: 'Beranda', href: '/staf', active: false },
-    { key: 'kelas', label: 'Kelas', href: '/akademik-app/kelas', active: true },
-    { key: 'presensi', label: 'Presensi', href: '/akademik-app/presensi', active: false },
-]
+const nav = STAF_NAV
 
 const statusClass = {
     aktif: 'bg-emerald-100 text-emerald-700',
@@ -24,12 +20,8 @@ const statusClass = {
     <AppShell :nav-items="nav" brand-name="Akademik">
         <Head><title>{{ kelas.nama }}</title></Head>
         <div class="space-y-5">
-            <div class="flex items-center gap-3">
-                <Link href="/akademik-app/kelas" class="text-slate-400 transition hover:text-slate-700" aria-label="Kembali">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                </Link>
-                <PageHeader kicker="Isi Kelas" :title="kelas.nama" :subtitle="[kelas.tingkat ? `Tingkat ${kelas.tingkat}` : null, kelas.wali ? `Wali: ${kelas.wali}` : null].filter(Boolean).join(' · ')" class="flex-1" />
-            </div>
+            <KembaliBar />
+            <PageHeader kicker="Isi Kelas" :title="kelas.nama" :subtitle="[kelas.tingkat ? `Tingkat ${kelas.tingkat}` : null, kelas.wali ? `Wali: ${kelas.wali}` : null].filter(Boolean).join(' · ')" />
 
             <EmptyState v-if="santri.length === 0" icon="user" title="Belum ada santri" message="Santri yang ditempatkan di kelas ini akan tampil di sini." />
 

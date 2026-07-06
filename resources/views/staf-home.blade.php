@@ -278,6 +278,8 @@ $featArt=$pengumuman->first();
   const scroller=document.querySelector('.scroll-area'),tabs=[...document.querySelectorAll('.tab')],navs=[...document.querySelectorAll('.nav button')];
   function go(n){tabs.forEach(t=>t.classList.toggle('on',t.id==='tab-'+n));navs.forEach(b=>b.classList.toggle('on',b.dataset.tab===n));scroller.scrollTop=0;}
   navs.forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
+  // Deep-link tab dari halaman detail (bottom-nav standar): /staf?tab=menu|aktivitas|akun.
+  try{var tq=new URLSearchParams(location.search).get('tab');if(tq&&document.getElementById('tab-'+tq))go(tq);}catch(e){}
   document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.go)));
   const btnTema=document.getElementById('btnTema');
   if(btnTema)btnTema.addEventListener('click',function(){const d=document.documentElement.classList.toggle('dark');try{localStorage.setItem('nur-theme',d?'dark':'light');}catch(e){}});

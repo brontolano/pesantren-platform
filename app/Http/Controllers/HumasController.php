@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -51,22 +52,8 @@ class HumasController extends Controller
 {
     private function nav(): array
     {
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'icon' => 'home', 'route' => 'tenant.humas.beranda'],
-            ['key' => 'berita', 'label' => 'Berita', 'href' => '/humas/berita', 'icon' => 'document', 'route' => 'tenant.humas.berita'],
-            ['key' => 'galeri', 'label' => 'Galeri', 'href' => '/humas/galeri', 'icon' => 'camera', 'route' => 'tenant.humas.galeri'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'icon' => $i['icon'],
-                'active' => request()->routeIs($i['route'])
-                    || ($i['key'] === 'berita' && request()->routeIs('tenant.humas.detail-artikel')),
-            ])
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     private function mapArtikel(Article $a): array

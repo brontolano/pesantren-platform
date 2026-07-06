@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { Head, useForm } from '@inertiajs/vue3'
-import { AppShell, PageHeader, SectionCard, IconCircle, UiButton, EmptyState, BottomSheet } from '@/Shared'
+import { AppShell, PageHeader, SectionCard, IconCircle, UiButton, EmptyState, BottomSheet, STAF_NAV, KembaliBar } from '@/Shared'
 
 const props = defineProps({
     daftar: { type: Array, default: () => [] },
@@ -9,10 +9,7 @@ const props = defineProps({
     opsiKategori: { type: Array, default: () => [] },
 })
 
-const nav = [
-    { key: 'beranda', label: 'Beranda', href: '/staf', active: false },
-    { key: 'tazir', label: "Ta'zir", href: '/kedisiplinan-app/jenis-tazir', active: true },
-]
+const nav = STAF_NAV
 
 const buka = ref(false)
 const form = useForm({ nama: '', kategori: 'ringan', poin: 5, sanksi_default: '' })
@@ -33,6 +30,7 @@ const inputClass = 'w-full rounded-2xl border border-slate-200 bg-white px-3.5 p
     <AppShell :nav-items="nav" brand-name="Kedisiplinan">
         <Head><title>Jenis Ta'zir</title></Head>
         <div class="space-y-5">
+            <KembaliBar />
             <PageHeader kicker="Kedisiplinan" title="Jenis Ta'zir" subtitle="Master pelanggaran & prestasi (poin negatif)." />
 
             <UiButton v-if="bolehTulis" variant="primary" size="lg" block @click="buka = true">+ Tambah Jenis</UiButton>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Modules\Ledger\Models\Akun;
@@ -33,25 +34,8 @@ class KeuanganPwaController extends Controller
      */
     private function nav(array $can): array
     {
-        $base = '/admin/keuangan/pwa';
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'show' => true],
-            ['key' => 'catat', 'label' => 'Belanja', 'href' => "{$base}/catat-belanja", 'route' => 'belanja', 'show' => $can['input_belanja']],
-            ['key' => 'setor', 'label' => 'Setor', 'href' => "{$base}/setor-keliling", 'route' => 'setor-keliling', 'show' => $can['setor_tabungan']],
-            ['key' => 'dasbor', 'label' => 'Dasbor', 'href' => "{$base}/dasbor", 'route' => 'dasbor', 'show' => $can['view_laporan_pimpinan']],
-            ['key' => 'slip', 'label' => 'Slip', 'href' => "{$base}/slip-saya", 'route' => 'slip', 'show' => $can['view_slip_sendiri']],
-        ];
-
-        return collect($items)
-            ->filter(fn (array $i): bool => $i['show'])
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'active' => request()->routeIs("tenant.keuangan.pwa.{$i['route']}"),
-            ])
-            ->values()
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     public function beranda()

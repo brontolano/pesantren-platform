@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,24 +31,8 @@ class TuController extends Controller
 
     private function nav(): array
     {
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'icon' => 'home', 'href' => '/staf', 'route' => 'beranda'],
-            ['key' => 'santri', 'label' => 'Santri', 'icon' => 'book', 'href' => '/tu/santri', 'route' => 'santri'],
-            ['key' => 'surat', 'label' => 'Surat', 'icon' => 'document', 'href' => '/tu/surat', 'route' => 'surat'],
-            ['key' => 'arsip', 'label' => 'Arsip', 'icon' => 'inbox', 'href' => '/tu/arsip', 'route' => 'arsip'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'icon' => $i['icon'],
-                'href' => $i['href'],
-                'active' => request()->routeIs("tenant.tu.{$i['route']}")
-                    || ($i['key'] === 'santri' && request()->routeIs('tenant.tu.detail-santri'))
-                    || ($i['key'] === 'surat' && request()->routeIs('tenant.tu.catat-surat')),
-            ])
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     public function beranda(): Response

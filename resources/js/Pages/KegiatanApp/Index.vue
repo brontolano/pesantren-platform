@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { Head, router, useForm } from '@inertiajs/vue3'
-import { AppShell, PageHeader, SectionCard, IconCircle, UiButton, EmptyState, BottomSheet } from '@/Shared'
+import { AppShell, PageHeader, SectionCard, IconCircle, UiButton, EmptyState, BottomSheet, STAF_NAV, KembaliBar } from '@/Shared'
 
 const props = defineProps({
     daftar: { type: Array, default: () => [] },
@@ -12,11 +12,7 @@ const props = defineProps({
     pjOptions: { type: Array, default: () => [] },
 })
 
-// Nav minimal: kembali ke shell staf (satu aplikasi, peran = grup menu).
-const nav = [
-    { key: 'beranda', label: 'Beranda', href: '/staf', active: false },
-    { key: 'kegiatan', label: 'Kegiatan', href: '/kegiatan-app', active: true },
-]
+const nav = STAF_NAV
 
 const cari = ref(props.q)
 function submitCari() {
@@ -54,6 +50,7 @@ const inputClass = 'w-full rounded-2xl border border-slate-200 bg-white px-3.5 p
     <AppShell :nav-items="nav" brand-name="Kegiatan">
         <Head><title>Kegiatan</title></Head>
         <div class="space-y-5">
+            <KembaliBar />
             <PageHeader kicker="Kegiatan" title="Agenda Pesantren" subtitle="Kelola kegiatan: jadwal, status, penanggung jawab." />
 
             <form class="flex gap-2" @submit.prevent="submitCari">

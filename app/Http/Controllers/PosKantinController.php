@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,20 +42,8 @@ class PosKantinController extends Controller
 
     private function nav(): array
     {
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'icon' => 'home', 'route' => 'beranda'],
-            ['key' => 'kasir', 'label' => 'Kasir', 'href' => '/pos-kantin/kasir', 'icon' => 'cash', 'route' => 'kasir'],
-            ['key' => 'tabungan', 'label' => 'Tabungan', 'href' => '/pos-kantin/tabungan', 'icon' => 'wallet', 'route' => 'tabungan'],
-            ['key' => 'riwayat', 'label' => 'Riwayat', 'href' => '/pos-kantin/riwayat', 'icon' => 'receipt', 'route' => 'riwayat'],
-        ];
-
-        return array_map(static fn (array $i): array => [
-            'key' => $i['key'],
-            'label' => $i['label'],
-            'href' => $i['href'],
-            'icon' => $i['icon'],
-            'active' => request()->routeIs("tenant.pos-kantin.{$i['route']}"),
-        ], $items);
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     /** Transaksi belanja/refund kantin oleh kasir login, hari ini. */

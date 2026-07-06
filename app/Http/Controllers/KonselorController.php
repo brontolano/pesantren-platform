@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,24 +27,8 @@ class KonselorController extends Controller
 {
     private function nav(): array
     {
-        $base = '/konselor';
-
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
-            ['key' => 'sesi', 'label' => 'Sesi', 'href' => "{$base}/sesi", 'route' => 'sesi', 'icon' => 'chat'],
-            ['key' => 'catat', 'label' => 'Catat', 'href' => "{$base}/catat", 'route' => 'catat', 'icon' => 'plus'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'icon' => $i['icon'],
-                'active' => request()->routeIs("tenant.konselor.{$i['route']}"),
-            ])
-            ->values()
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     public function beranda(): Response

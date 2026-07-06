@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,24 +41,8 @@ class SarprasController extends Controller
 
     private function nav(): array
     {
-        $base = '/sarpras';
-
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
-            ['key' => 'kerusakan', 'label' => 'Kerusakan', 'href' => "{$base}/kerusakan", 'route' => 'kerusakan', 'icon' => 'wrench'],
-            ['key' => 'piket', 'label' => 'Piket', 'href' => "{$base}/piket", 'route' => 'piket', 'icon' => 'check-circle'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'icon' => $i['icon'],
-                'active' => request()->routeIs("tenant.sarpras.{$i['route']}"),
-            ])
-            ->values()
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     public function beranda(): Response

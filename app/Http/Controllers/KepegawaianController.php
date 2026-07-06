@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -43,26 +44,8 @@ class KepegawaianController extends Controller
 {
     private function nav(): array
     {
-        $base = '/kepegawaian';
-
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
-            ['key' => 'pegawai', 'label' => 'Pegawai', 'href' => "{$base}/pegawai", 'route' => 'pegawai', 'icon' => 'user'],
-            ['key' => 'absensi', 'label' => 'Absensi', 'href' => "{$base}/absensi", 'route' => 'absensi', 'icon' => 'check-circle'],
-            ['key' => 'slip', 'label' => 'Slip', 'href' => "{$base}/slip", 'route' => 'slip', 'icon' => 'receipt'],
-            ['key' => 'cuti', 'label' => 'Cuti', 'href' => "{$base}/cuti", 'route' => 'cuti', 'icon' => 'calendar'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'icon' => $i['icon'],
-                'active' => request()->routeIs("tenant.kepegawaian.{$i['route']}"),
-            ])
-            ->values()
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     public function beranda(): Response

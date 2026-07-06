@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,19 +36,8 @@ class PpdbPanitiaController extends Controller
 
     private function nav(): array
     {
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda'],
-            ['key' => 'pendaftar', 'label' => 'Pendaftar', 'href' => '/ppdb-panitia/pendaftar', 'route' => 'pendaftar'],
-            ['key' => 'jadwal', 'label' => 'Jadwal Ujian', 'href' => '/ppdb-panitia/jadwal-ujian', 'route' => 'jadwal-ujian'],
-            ['key' => 'hasil', 'label' => 'Hasil', 'href' => '/ppdb-panitia/hasil', 'route' => 'hasil'],
-        ];
-
-        return array_map(static fn (array $i): array => [
-            'key' => $i['key'],
-            'label' => $i['label'],
-            'href' => $i['href'],
-            'active' => request()->routeIs("tenant.ppdb-panitia.{$i['route']}"),
-        ], $items);
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     public function beranda(): Response

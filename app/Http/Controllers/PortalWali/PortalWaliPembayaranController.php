@@ -89,7 +89,7 @@ class PortalWaliPembayaranController extends Controller
             return $path;
         }
 
-        return url('/_tenant-storage/' . ltrim($path, '/'));
+        return url('/_tenant-storage/'.ltrim($path, '/'));
     }
 
     /**

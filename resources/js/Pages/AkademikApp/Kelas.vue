@@ -1,20 +1,17 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3'
-import { AppShell, PageHeader, SectionCard, IconCircle, EmptyState } from '@/Shared'
+import { AppShell, PageHeader, SectionCard, IconCircle, EmptyState, STAF_NAV, KembaliBar } from '@/Shared'
 
 defineProps({ daftar: { type: Array, default: () => [] } })
 
-const nav = [
-    { key: 'beranda', label: 'Beranda', href: '/staf', active: false },
-    { key: 'kelas', label: 'Kelas', href: '/akademik-app/kelas', active: true },
-    { key: 'presensi', label: 'Presensi', href: '/akademik-app/presensi', active: false },
-]
+const nav = STAF_NAV
 </script>
 
 <template>
     <AppShell :nav-items="nav" brand-name="Akademik">
         <Head><title>Kelas</title></Head>
         <div class="space-y-5">
+            <KembaliBar />
             <PageHeader kicker="Master Akademik" title="Daftar Kelas" subtitle="Ketuk kelas untuk melihat isi santrinya." />
 
             <EmptyState v-if="daftar.length === 0" icon="book" title="Belum ada kelas" message="Kelas yang dibuat akan tampil di sini." />

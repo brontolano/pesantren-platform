@@ -1,17 +1,14 @@
 <script setup>
 import { ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
-import { AppShell, PageHeader, SectionCard, ListRow, EmptyState, UiButton } from '@/Shared'
+import { AppShell, PageHeader, SectionCard, ListRow, EmptyState, UiButton, STAF_NAV, KembaliBar } from '@/Shared'
 
 const props = defineProps({
     daftar: { type: Array, default: () => [] },
     q: { type: String, default: '' },
 })
 
-const nav = [
-    { key: 'beranda', label: 'Beranda', href: '/staf', active: false },
-    { key: 'santri', label: 'Santri', href: '/santri-info', active: true },
-]
+const nav = STAF_NAV
 
 const cari = ref(props.q)
 function submitCari() {
@@ -23,6 +20,7 @@ function submitCari() {
     <AppShell :nav-items="nav" brand-name="Data Santri">
         <Head><title>Data Santri</title></Head>
         <div class="space-y-5">
+            <KembaliBar />
             <PageHeader kicker="Santri" title="Data Santri" subtitle="Rujukan santri aktif (baca-saja)." />
 
             <form class="flex gap-2" @submit.prevent="submitCari">

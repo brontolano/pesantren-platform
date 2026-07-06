@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,23 +38,8 @@ class BaitulMaalController extends Controller
 
     private function nav(): array
     {
-        $base = '/baitul-maal';
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
-            ['key' => 'donasi', 'label' => 'Donasi', 'href' => "{$base}/donasi", 'route' => 'donasi', 'icon' => 'heart'],
-            ['key' => 'program', 'label' => 'Program', 'href' => "{$base}/program", 'route' => 'program', 'icon' => 'inbox'],
-            ['key' => 'beasiswa', 'label' => 'Beasiswa', 'href' => "{$base}/beasiswa", 'route' => 'beasiswa', 'icon' => 'user'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'icon' => $i['icon'],
-                'active' => request()->routeIs("tenant.baitul-maal.{$i['route']}"),
-            ])
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     private function can(): array

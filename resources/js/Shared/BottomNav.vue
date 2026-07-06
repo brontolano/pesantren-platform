@@ -24,6 +24,7 @@ const navItems = computed(() =>
 // Peta default key->ikon, mencakup peran wali/guru/kasir/pimpinan.
 const DEFAULT_ICONS = {
     beranda: 'home', home: 'home', dashboard: 'home', hariini: 'calendar',
+    menu: 'grid', aktivitas: 'bell',
     keuangan: 'wallet', catat: 'receipt', belanja: 'receipt', pemasukan: 'cash',
     setor: 'cash', tabungan: 'wallet', slip: 'document', dasbor: 'chart',
     laporan: 'chart', approval: 'inbox', inbox: 'inbox', izin: 'document',

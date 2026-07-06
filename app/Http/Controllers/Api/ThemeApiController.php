@@ -26,7 +26,7 @@ class ThemeApiController extends Controller
      */
     public function listThemes(): JsonResponse
     {
-        if (!Auth::user()?->can('manage_tenant_settings')) {
+        if (! Auth::user()?->can('manage_tenant_settings')) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -52,12 +52,12 @@ class ThemeApiController extends Controller
      */
     public function getTheme(string $themeKey): JsonResponse
     {
-        if (!Auth::user()?->can('manage_tenant_settings')) {
+        if (! Auth::user()?->can('manage_tenant_settings')) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $theme = PanelTheme::themeWithMetadata($themeKey);
-        if (!$theme) {
+        if (! $theme) {
             return response()->json(['error' => 'Theme not found'], 404);
         }
 
@@ -79,18 +79,18 @@ class ThemeApiController extends Controller
      */
     public function updateThemeSettings(Request $request): JsonResponse
     {
-        if (!Auth::user()?->can('manage_tenant_settings')) {
+        if (! Auth::user()?->can('manage_tenant_settings')) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $validated = $request->validate([
-            'theme' => ['required', 'string', 'in:' . implode(',', array_keys(PanelTheme::THEMES))],
-            'color' => ['required', 'string', 'in:' . implode(',', array_keys(PanelTheme::COLORS))],
+            'theme' => ['required', 'string', 'in:'.implode(',', array_keys(PanelTheme::THEMES))],
+            'color' => ['required', 'string', 'in:'.implode(',', array_keys(PanelTheme::COLORS))],
         ]);
 
         // Validasi bahwa tema & warna combo valid
         $themeMeta = PanelTheme::THEMES[$validated['theme']] ?? null;
-        if (!$themeMeta) {
+        if (! $themeMeta) {
             return response()->json(['error' => 'Invalid theme'], 400);
         }
 
@@ -117,7 +117,7 @@ class ThemeApiController extends Controller
                 'css_vars' => $this->generateCssVars($validated['theme'], $validated['color']),
             ], 200);
         } catch (\Throwable $e) {
-            return response()->json(['error' => 'Failed to save theme: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Failed to save theme: '.$e->getMessage()], 500);
         }
     }
 

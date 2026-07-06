@@ -70,7 +70,7 @@ html.dark .nav{background:rgba(18,24,21,.96)}
   body{overflow:hidden}
   .wrap{max-width:none;min-height:100dvh;margin:0;flex-direction:row}
   .hero{
-    flex:1 1 46%;max-width:640px;min-height:100dvh;display:flex;flex-direction:column;
+    flex:1 1 auto;min-height:100dvh;display:flex;flex-direction:column;
     align-items:center;justify-content:center;border-radius:0;padding:48px;
   }
   .hero-glow{top:auto;bottom:-80px}
@@ -79,17 +79,16 @@ html.dark .nav{background:rgba(18,24,21,.96)}
   .hero h1{font-size:2rem;max-width:22ch;text-wrap:balance}
   .hero .sub{font-size:1rem;margin-top:8px}
   .sheet{
-    flex:1 1 54%;margin-top:0;border-radius:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;padding:48px;overflow-y:auto;
+    flex:0 0 460px;margin-top:0;border-radius:0;display:flex;flex-direction:column;
+    align-items:stretch;justify-content:center;padding:48px 44px;overflow-y:auto;
+    border-left:1px solid var(--line);box-shadow:-24px 0 48px -32px rgba(17,17,17,.12);
   }
-  .sheet>*{width:100%;max-width:400px}
   .card{padding:32px 30px}
   .card-t{font-size:1.3rem}
   .card-s{font-size:.88rem}
 }
-@media(min-width:1180px) and (pointer:fine){
-  .hero{flex-basis:50%}
-  .sheet{flex-basis:50%}
+@media(min-width:1280px) and (pointer:fine){
+  .sheet{flex-basis:520px}
 }
 .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10.5px;font-weight:800;color:var(--faint)}
 .nav a.on{color:var(--nur)}

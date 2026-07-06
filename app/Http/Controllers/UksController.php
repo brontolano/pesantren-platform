@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\StafNav;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,24 +36,8 @@ class UksController extends Controller
     /** Kontrak nav bottom-bar, identik dgn UksDemoController. */
     private function nav(): array
     {
-        $base = '/uks';
-        $items = [
-            ['key' => 'beranda', 'label' => 'Beranda', 'href' => '/staf', 'route' => 'beranda', 'icon' => 'home'],
-            ['key' => 'kunjungan', 'label' => 'Kunjungan', 'href' => "{$base}/kunjungan", 'route' => 'kunjungan', 'icon' => 'check-circle'],
-            ['key' => 'obat', 'label' => 'Obat', 'href' => "{$base}/obat", 'route' => 'obat', 'icon' => 'receipt'],
-            ['key' => 'rujukan', 'label' => 'Rujukan', 'href' => "{$base}/rujukan", 'route' => 'rujukan', 'icon' => 'inbox'],
-            ['key' => 'riwayat', 'label' => 'Riwayat', 'href' => "{$base}/riwayat", 'route' => 'riwayat', 'icon' => 'heart'],
-        ];
-
-        return collect($items)
-            ->map(fn (array $i): array => [
-                'key' => $i['key'],
-                'label' => $i['label'],
-                'href' => $i['href'],
-                'icon' => $i['icon'],
-                'active' => request()->routeIs("tenant.uks.{$i['route']}"),
-            ])
-            ->all();
+        // Bottom-nav STANDAR mockup (Beranda/Menu/Aktivitas/Akun) - owner 2026-07-06.
+        return StafNav::items();
     }
 
     private function can(): array

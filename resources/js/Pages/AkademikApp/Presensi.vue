@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
-import { AppShell, PageHeader, SectionCard, StatCard, ListRow, EmptyState } from '@/Shared'
+import { AppShell, PageHeader, SectionCard, StatCard, ListRow, EmptyState, STAF_NAV, KembaliBar } from '@/Shared'
 
 const props = defineProps({
     tanggal: { type: String, required: true },
@@ -9,11 +9,7 @@ const props = defineProps({
     rows: { type: Array, default: () => [] },
 })
 
-const nav = [
-    { key: 'beranda', label: 'Beranda', href: '/staf', active: false },
-    { key: 'kelas', label: 'Kelas', href: '/akademik-app/kelas', active: false },
-    { key: 'presensi', label: 'Presensi', href: '/akademik-app/presensi', active: true },
-]
+const nav = STAF_NAV
 
 const tgl = ref(props.tanggal)
 function muat() {
@@ -32,6 +28,7 @@ const statusClass = {
     <AppShell :nav-items="nav" brand-name="Akademik">
         <Head><title>Rekap Presensi</title></Head>
         <div class="space-y-5">
+            <KembaliBar />
             <PageHeader kicker="Pembelajaran" title="Rekap Presensi Santri" subtitle="Rekap per tanggal — input presensi dilakukan guru di Aplikasi Guru." />
 
             <input

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Modules\Akademik\Models\PeriodeAkademik;
 use Modules\Akademik\Models\Rapor;
@@ -88,8 +89,8 @@ class AkademikExportController extends Controller
             'alumni' => $alumni,
             'jenis' => $jenis,
             'jenjang' => $jenjang,
-            'tempatTerbit' => \App\Models\Setting::getTenantStringValue('akademik.tempat_terbit_ijazah'),
-            'namaPimpinan' => \App\Models\Setting::getTenantStringValue('akademik.nama_pimpinan_ijazah')
+            'tempatTerbit' => Setting::getTenantStringValue('akademik.tempat_terbit_ijazah'),
+            'namaPimpinan' => Setting::getTenantStringValue('akademik.nama_pimpinan_ijazah')
                 ?: $alumni->lembaga?->kepala?->name,
             'tanggalTerbit' => $alumni->tanggal_lulus ?? now(),
         ]);
