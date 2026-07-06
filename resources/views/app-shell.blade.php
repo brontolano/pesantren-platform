@@ -55,7 +55,7 @@ a{text-decoration:none;color:inherit}button{font-family:inherit;color:inherit}
 .about{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
 .ab{background:var(--card);border-radius:var(--r);padding:14px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:var(--sh);text-align:center}
 .ab-ic{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center}.ab-lbl{font-size:11px;font-weight:700;line-height:1.15}
-.spmb{margin:0 16px;border-radius:var(--r2);overflow:hidden;position:relative;background:linear-gradient(125deg,#8f6a1e,#5a3d0e);box-shadow:var(--sh)}
+.spmb{display:block;margin:0 16px;border-radius:var(--r2);overflow:hidden;position:relative;background:linear-gradient(125deg,#8f6a1e,#5a3d0e);box-shadow:var(--sh)}
 .spmb-pat{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2244%22 height=%2244%22 viewBox=%220 0 44 44%22%3E%3Cg fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%221%22 opacity=%220.5%22%3E%3Crect x=%2213%22 y=%2213%22 width=%2218%22 height=%2218%22/%3E%3Crect x=%2213%22 y=%2213%22 width=%2218%22 height=%2218%22 transform=%22rotate(45 22 22)%22/%3E%3C/g%3E%3C/svg%3E");background-size:44px 44px;opacity:.16}
 .spmb-in{position:relative;padding:18px;color:#fff;display:flex;align-items:center;gap:14px}
 .spmb-in .t{font-size:16px;font-weight:800;line-height:1.2}.spmb-in .s{font-size:11.5px;color:rgba(255,255,255,.9);margin-top:3px}
