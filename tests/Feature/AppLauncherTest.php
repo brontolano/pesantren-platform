@@ -224,6 +224,24 @@ class AppLauncherTest extends TestCase
         $this->assertStringContainsString('/wali', $resp->getTargetUrl());
     }
 
+    public function test_staf_shell_menu_diturunkan_dari_panel(): void
+    {
+        $this->boot();
+        $u = $this->user(['admin_pesantren']);
+        Auth::login($u);
+        $req = \Illuminate\Http\Request::create(
+            'http://x/staf', 'GET', server: ['HTTP_USER_AGENT' => 'Mozilla/5.0 (Linux; Android 13; Mobile)'],
+        );
+        $resp = app(\Modules\CMS\Http\Controllers\AppShellController::class)->stafHome($req);
+        $this->assertInstanceOf(View::class, $resp);
+        $labels = array_keys($resp->getData()['groups']);
+        // Grup ini ADA di panel tapi TIDAK di katalog tangan lama → bukti menu
+        // /staf kini DITURUNKAN dari navigasi panel (bukan daftar tangan).
+        $this->assertContains('Donasi', $labels);
+        $this->assertContains('Persetujuan', $labels);
+        $this->assertContains('Santri', $labels);
+    }
+
     public function test_controller_staf_desktop_ke_admin(): void
     {
         $this->boot();

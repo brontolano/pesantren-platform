@@ -180,11 +180,19 @@ class AppShellController extends Controller
             ],
         ];
 
-        $groups = [];
-        foreach ($katalog as $judul => $items) {
-            $vis = array_values(array_filter($items, fn ($it) => $u->canAny($it[2])));
-            if ($vis !== []) {
-                $groups[$judul] = $vis;
+        // SUMBER KEBENARAN TUNGGAL: turunkan menu dari navigasi panel admin
+        // (Filament getNavigation) — grup, URUTAN, & visibilitas per-peran
+        // (canAccess) PERSIS panel, "main hidden/active" seperti panel (owner
+        // 2026-07-06). Bila gagal (mis. konteks panel tak tersedia), JATUH ke
+        // katalog tangan di atas agar /staf tak pernah kosong.
+        $groups = $this->katalogDariPanel();
+        if ($groups === null) {
+            $groups = [];
+            foreach ($katalog as $judul => $items) {
+                $vis = array_values(array_filter($items, fn ($it) => $u->canAny($it[2])));
+                if ($vis !== []) {
+                    $groups[$judul] = $vis;
+                }
             }
         }
 
@@ -272,6 +280,88 @@ class AppShellController extends Controller
     }
 
     /** Deteksi apakah request dari perangkat mobile / PWA (bukan desktop). */
+    /**
+     * Katalog menu /staf DITURUNKAN dari navigasi panel admin (Filament
+     * getNavigation): grup + urutan + visibilitas per-peran (canAccess) PERSIS
+     * panel. Struktur output SAMA dgn katalog tangan ([judul => [[label, ikon,
+     * izin[], url], ...]]) sehingga view tak berubah; item sudah ter-filter
+     * canAccess (elemen izin[] dikosongkan, tak dipakai lagi). Ikon Heroicon
+     * dipetakan ke set ikon mobile. null bila navigasi tak terbaca (→ fallback).
+     *
+     * @return array<string, array<int, array{0:string,1:string,2:array,3:string}>>|null
+     */
+    private function katalogDariPanel(): ?array
+    {
+        try {
+            $panel = \Filament\Facades\Filament::getPanel('tenant');
+            \Filament\Facades\Filament::setCurrentPanel($panel);
+            $nav = $panel->getNavigation();
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($nav === []) {
+            return null;
+        }
+
+        $adminRoot = rtrim(url('/admin'), '/');
+        $out = [];
+
+        foreach ($nav as $group) {
+            $judul = $group->getLabel();
+            $judul = ($judul === null || trim($judul) === '') ? 'Umum' : $judul;
+
+            foreach ($group->getItems() as $item) {
+                $url = $item->getUrl();
+                if (! is_string($url) || $url === '') {
+                    continue;
+                }
+                // Lewati "Dasbor" (→ root panel /admin) — di HP kita PWA, bukan panel.
+                if (rtrim($url, '/') === $adminRoot) {
+                    continue;
+                }
+                $icon = $item->getIcon();
+                $out[$judul][] = [
+                    $item->getLabel(),
+                    self::heroiconKeMobile(is_string($icon) ? $icon : ''),
+                    [],
+                    $url,
+                ];
+            }
+        }
+
+        return $out !== [] ? $out : null;
+    }
+
+    /** Petakan nama Heroicon panel → kunci ikon set mobile ($svg); default 'grid'. */
+    private static function heroiconKeMobile(string $icon): string
+    {
+        static $map = [
+            'user-group' => 'users', 'users' => 'users', 'user' => 'user', 'user-circle' => 'user',
+            'identification' => 'user', 'academic-cap' => 'book', 'book-open' => 'book', 'book' => 'book',
+            'calendar' => 'cal', 'calendar-days' => 'cal', 'clock' => 'cal',
+            'shield-check' => 'shield', 'shield-exclamation' => 'shield', 'exclamation-triangle' => 'shield',
+            'home' => 'home', 'home-modern' => 'home', 'building-office' => 'home', 'building-office-2' => 'home',
+            'building-library' => 'home', 'heart' => 'heart', 'chat-bubble-left-right' => 'chat',
+            'chat-bubble-oval-left' => 'chat', 'chat-bubble-bottom-center-text' => 'chat',
+            'banknotes' => 'wallet', 'currency-dollar' => 'wallet', 'wallet' => 'wallet', 'credit-card' => 'wallet',
+            'receipt-percent' => 'wallet', 'chart-bar' => 'chart', 'chart-pie' => 'chart',
+            'presentation-chart-line' => 'chart', 'presentation-chart-bar' => 'chart',
+            'bell' => 'bell', 'bell-alert' => 'bell', 'megaphone' => 'bell', 'envelope' => 'bell',
+            'cog' => 'cog', 'cog-6-tooth' => 'cog', 'cog-8-tooth' => 'cog', 'adjustments-horizontal' => 'cog',
+            'wrench-screwdriver' => 'cog', 'wrench' => 'cog', 'document' => 'doc', 'document-text' => 'doc',
+            'document-check' => 'doc', 'document-duplicate' => 'doc', 'clipboard-document-list' => 'doc',
+            'clipboard-document-check' => 'doc', 'clipboard' => 'doc', 'folder' => 'doc',
+            'check' => 'check', 'check-circle' => 'check', 'check-badge' => 'check',
+            'squares-2x2' => 'grid', 'rectangle-group' => 'grid', 'table-cells' => 'grid', 'cube' => 'grid',
+            'archive-box' => 'grid', 'gift' => 'heart', 'sparkles' => 'grid', 'globe-alt' => 'grid',
+        ];
+
+        $name = preg_replace('/^heroicon-[a-z]+-/', '', $icon);
+
+        return $map[$name] ?? 'grid';
+    }
+
     private function isMobileRequest(Request $request): bool
     {
         // Jika sudah dalam mode standalone PWA, selalu anggap mobile.
