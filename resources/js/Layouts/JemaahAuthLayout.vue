@@ -23,13 +23,13 @@ const rootStyle = computed(() => ({
             <div class="mb-9 flex items-center gap-2.5">
                 <span
                     v-if="branding.logoUrl"
-                    class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-violet-600 to-violet-800"
+                    class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800"
                 >
                     <img :src="branding.logoUrl" :alt="branding.name ?? 'Logo'" class="h-full w-full object-contain p-1">
                 </span>
                 <span
                     v-else
-                    class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-violet-800"
+                    class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 to-emerald-800"
                 >
                     <span class="h-4 w-4 rounded-full bg-[#e7d3a1]" style="-webkit-mask:radial-gradient(circle at 68% 32%,transparent 52%,#000 53%);mask:radial-gradient(circle at 68% 32%,transparent 52%,#000 53%);" />
                 </span>

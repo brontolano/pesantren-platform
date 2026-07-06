@@ -147,7 +147,7 @@ onBeforeUnmount(() => {
                                 class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/16 ring-1 ring-inset ring-white/25"
                             >
                                 <UiIcon name="bell" class="h-[19px] w-[19px] text-white" />
-                                <span class="absolute right-[9px] top-2 h-2 w-2 rounded-full bg-amber-400 ring-2 ring-violet-600" />
+                                <span class="absolute right-[9px] top-2 h-2 w-2 rounded-full bg-amber-400 ring-2 ring-emerald-600" />
                             </Link>
                         </div>
 
@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
                                 :href="resolveChildHref(child.id)"
                                 class="shrink-0 rounded-full px-5 py-2 text-sm font-semibold tracking-tight transition-all duration-200 active:scale-[.97]"
                                 :class="child.id === activeChildId
-                                    ? 'bg-white text-violet-700 shadow-soft'
+                                    ? 'bg-white text-emerald-700 shadow-soft'
                                     : 'bg-transparent text-white/90 ring-1 ring-inset ring-white/40 hover:bg-white/10'"
                             >
                                 {{ child.nama }}
@@ -212,21 +212,21 @@ onBeforeUnmount(() => {
                         v-for="item in navigationItems"
                         :key="item.key || item.label"
                         :href="item.href"
-                        class="group relative flex flex-col items-center gap-1 rounded-full px-1 py-1.5 transition-all duration-200 active:scale-[.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-violet-500"
-                        :class="item.active ? 'text-violet-700' : 'text-slate-400 hover:text-slate-600'"
+                        class="group relative flex flex-col items-center gap-1 rounded-full px-1 py-1.5 transition-all duration-200 active:scale-[.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-500"
+                        :class="item.active ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'"
                         :aria-current="item.active ? 'page' : undefined"
                     >
                         <span
                             class="flex h-[34px] w-[34px] items-center justify-center rounded-full transition-all duration-200"
                             :class="item.active
-                                ? 'bg-violet-50 text-violet-700'
+                                ? 'bg-emerald-50 text-emerald-700'
                                 : 'bg-transparent text-slate-400 group-hover:bg-slate-900/[0.04]'"
                         >
                             <UiIcon :name="navIcons[item.key] || 'home'" class="h-[19px] w-[19px]" />
                         </span>
                         <span
                             class="font-jost text-[9.5px] leading-none tracking-tight transition-all duration-200"
-                            :class="item.active ? 'font-semibold text-violet-700' : 'font-medium'"
+                            :class="item.active ? 'font-semibold text-emerald-700' : 'font-medium'"
                         >
                             {{ item.label }}
                         </span>
