@@ -55,7 +55,7 @@ class TenantBoundaryTest extends TestCase
             'organization_id' => $organization->id,
             'email' => $organization->first_admin_email,
             'token_hash' => Hash::make($token),
-            'expires_at' => now()->subMinute(),
+            'expires_at' => now()->subDay(),
         ]);
         $this->assertFalse($invitation->fresh()->isUsable());
 

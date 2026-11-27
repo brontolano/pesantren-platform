@@ -13,7 +13,7 @@ class TenantAdminInvitationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public readonly Organization $organization, public readonly string $invitationUrl, public readonly \Illuminate\Support\Carbon $expiresAt) {}
+    public function __construct(public readonly Organization $organization, public readonly string $invitationUrl, public readonly \DateTimeInterface $expiresAt) {}
 
     public function envelope(): Envelope
     {
