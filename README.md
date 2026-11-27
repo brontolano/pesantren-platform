@@ -110,43 +110,28 @@ dan `LedgerAutoJurnalTest`.
 
 ### Gate CI hijau: Lint
 
-`/.github/workflows/lint.yml` menjalankan `vendor/bin/pint --test` tanpa
-DB — cepat dan selalu bisa hijau; jadikan ini required check. `test.yml`
-merah permanen di CI karena arsitektur DB-per-tenant — **bukan** gate.
+`lint.yml` menjalankan `vendor/bin/pint --test` tanpa basis data. Periksa hasil
+run terbaru sebelum menganggap suatu pemeriksaan sebagai syarat merge. Deploy
+cron VPS tidak menunggu status CI.
 
 ## CI/CD
 
 ### CI
 
-Workflow [`/.github/workflows/test.yml`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\.github\workflows\test.yml) berjalan pada `push` dan `pull_request` ke `main` dan memblokir deploy jika test gagal.
+Workflow [lint.yml](.github/workflows/lint.yml) dan [test.yml](.github/workflows/test.yml) berjalan pada `push` serta `pull_request` ke `main`. Pemeriksaan CI tidak otomatis menahan cron deploy VPS.
 
 ### CD
 
-Workflow [`/.github/workflows/deploy.yml`](C:\Users\maula\Downloads\ABDM\_Agent Manager\_PESANTREN\pesantren-platform\.github\workflows\deploy.yml) berjalan pada `push` ke `main`, namun job deploy hanya jalan setelah job test hijau.
+Produksi saat ini memakai pola VPS menarik perubahan dari GitHub. Cron di VPS memeriksa `origin/main` sekitar setiap lima menit lalu menjalankan `/opt/deploy.sh` hanya saat commit berubah. Detail dan batasnya ada di [docs/DEPLOY-VPS.md](docs/DEPLOY-VPS.md).
 
-Secret GitHub yang wajib diisi:
+Workflow [deploy.yml](.github/workflows/deploy.yml) hanya memiliki pemicu manual. Jangan menganggap push ke `main` memulai workflow deploy GitHub Actions.
 
-- `VPS_HOST`
-- `VPS_USER`
-- `VPS_PORT`
-- `VPS_SSH_KEY`
-- `VPS_PATH`
+## Mengembangkan dengan Codex
 
-Struktur target di VPS:
-
-- Repo diekstrak ke `${VPS_PATH}/current`
-- File `.env` production disimpan permanen di `${VPS_PATH}/shared/.env`
-- Direktori `storage` persisten disimpan di `${VPS_PATH}/shared/storage`
-
-Alur deploy:
-
-1. Runner membuat arsip source tanpa `.git`, `vendor`, dan `node_modules`.
-2. Arsip dikirim ke VPS via SCP.
-3. VPS mengekstrak source ke `${VPS_PATH}/current`.
-4. `.env` dan `storage` shared dipasang ulang.
-5. `docker compose up -d --build` dijalankan.
-6. Migrasi production dijalankan dengan `php artisan migrate --force`.
-7. Cache aplikasi di-refresh.
+Codex membaca [AGENTS.md](AGENTS.md) sebagai petunjuk proyek. Mulai dari satu
+alur pengguna, petakan ke ID di PRD baru, lalu implementasikan setelah rencana
+ditinjau. Lihat [panduan kerja Codex](docs/VIBE-CODING-PRD.md) untuk prompt
+yang bisa langsung dipakai.
 
 ## Monitoring
 
