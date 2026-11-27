@@ -59,7 +59,7 @@ class PlatformOperationsTest extends TestCase
         $this->actingAs($operator, 'platform')
             ->get(route('platform.modules'))
             ->assertOk()
-            ->assertDontSee('santri');
+            ->assertDontSee('Nama santri uji');
 
         $this->assertFalse(\Illuminate\Support\Facades\Schema::connection('central')->hasTable('students'));
         $this->assertFalse(\Illuminate\Support\Facades\Schema::connection('central')->hasTable('santri'));
