@@ -82,7 +82,10 @@ jobs:
 
       - name: Check formatting
         working-directory: apps/platform-v2
-        run: vendor/bin/pint --test
+        run: |
+          vendor/bin/pint
+          vendor/bin/pint --test
+          git -C ../.. diff --binary -- apps/platform-v2 > pint-fixes.patch
 
       - name: Prepare testing environment
         working-directory: apps/platform-v2
@@ -120,5 +123,6 @@ jobs:
           path: |
             apps/platform-v2/composer.lock
             apps/platform-v2/package-lock.json
+            apps/platform-v2/pint-fixes.patch
           if-no-files-found: ignore
           retention-days: 7
