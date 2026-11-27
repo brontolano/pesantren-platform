@@ -13,7 +13,7 @@ Operator platform membuat dan memantau organisasi untuk pesantren, yayasan, orga
 5. Jika langkah gagal, lanjutkan upaya untuk organisasi yang sama. Domain, basis data, dan admin tidak dibuat ulang.
 6. Periksa hasil teknis terpisah dari status layanan administratif dan tindak lanjut yang direkam.
 
-Ringkasan, wizard, navigasi, dan shell utama memakai Blade/Livewire serta design tokens v2 agar urutan dan hierarki konten dapat ditata bebas. Core UI dirancang di paket Laravel-compatible terpisah `packages/pesantren-design-system` (calon path/repo; belum dibuat); aplikasi memakai adapter untuk alur domain. Filament dapat dipakai sebagai alat admin pendukung untuk operasi internal yang cocok; ia bukan shell atau alur tabel utama. Desktop menggunakan sidebar kiri, judul/breadcrumb dan satu tindakan utama. Di ponsel, navigasi masuk drawer dan isi mengalir satu kolom.
+Ringkasan, wizard, navigasi, dan shell utama memakai Blade/Livewire serta design tokens v2 agar urutan dan hierarki konten dapat ditata bebas. Core UI tersedia sebagai paket Laravel di `packages/pesantren-design-system`, tanpa ketergantungan pada Filament; aplikasi menghubungkan paket dengan alur domain. Desktop menggunakan sidebar kiri, judul/breadcrumb dan satu tindakan utama. Di ponsel, navigasi masuk drawer dan isi mengalir satu kolom.
 
 ## Status yang berbeda makna
 

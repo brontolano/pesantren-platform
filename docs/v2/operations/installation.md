@@ -1,6 +1,6 @@
 # Instalasi dan konfigurasi lokal
 
-V2 berjalan terpisah dari aplikasi lama. Gunakan PHP 8.3, Composer 2, Node.js 24 LTS, sama dengan versi workflow, dan PostgreSQL 16. Composer harus memakai `composer.lock` yang dilacak Git; `composer install` memulihkan versi persis dari lock, bukan menyelesaikan ulang dependensi. Filament 5 memerlukan PHP 8.2+, Laravel 11.28+, dan Tailwind CSS 4.1+; Laravel 13 memerlukan PHP 8.3. Database lokal dapat berupa layanan PostgreSQL tersendiri atau container sekali pakai yang tidak menyentuh database produksi.
+V2 berjalan terpisah dari aplikasi lama. Gunakan PHP 8.3, Composer 2, Node.js 24 LTS, sama dengan versi workflow, dan PostgreSQL 16. `composer.lock` belum tersedia karena lingkungan authoring tidak memiliki PHP/Composer. Workflow CI menghasilkan lockfile melalui resolusi Composer; tinjau dan commit hasil tersebut agar instalasi selanjutnya memakai versi dependensi yang sudah ditetapkan. Database lokal dapat berupa layanan PostgreSQL tersendiri atau container sekali pakai yang tidak menyentuh database produksi.
 
 ## Windows PowerShell
 

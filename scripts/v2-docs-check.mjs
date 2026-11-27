@@ -28,11 +28,3 @@ assert.ok(!/^\s*workflow_dispatch:/m.test(workflow), 'workflow must run from bra
 assert.ok(!/deploy|production|ssh|rsync|scp|hosting_deploy|migrate --force.*https/i.test(workflow), 'quality workflow must not contain release/deployment behavior');
 
 console.log('v2 documentation verification passed');
-
-
-
-
-
-
-
-\n

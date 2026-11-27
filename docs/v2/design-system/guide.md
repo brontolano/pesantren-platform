@@ -2,7 +2,7 @@
 
 ## Tata letak
 
-Shell utama, navigasi, ringkasan, wizard, dan alur tabel dibangun dengan Blade/Livewire serta komponen dan design tokens v2. Ini memberi tim kendali pada hierarki, jarak, interaksi, dan tampilan tenant/operator. Filament adalah pilihan pendukung untuk alat admin internal yang cocok dengan resource standar; jangan jadikan Filament sebagai shell atau tabel utama.
+Shell utama, navigasi, ringkasan, wizard, dan tabel dibangun dengan Blade/Livewire serta komponen dan design tokens dari paket UI v2. Ini memberi tim kendali pada hierarki, jarak, interaksi, dan tampilan tenant/operator tanpa ketergantungan pada Filament.
 
 - Desktop: sidebar kiri yang dapat diciutkan; breadcrumb dan judul halaman; satu tombol utama di lokasi konsisten; konten ringkasan dan daftar mengikuti konteks/status.
 - Ponsel: drawer navigasi, kolom tunggal, jarak tekan cukup, form bertahap.
@@ -28,9 +28,7 @@ Warna status memakai latar dan teks dengan kontras yang cukup, ikon boleh memban
 
 ## Batas paket
 
-Sistem desain v2 dirancang sebagai paket Laravel-compatible yang terpisah dari aplikasi produk. Paket ini direncanakan memiliki token CSS, primitive Blade components, pola responsif, shell, dan komponen tabel berbentuk data responsif. Aplikasi memegang model bisnis, izin, data tenant, dan integrasi Livewire. Paket tidak memuat identitas/data organisasi, proses provisioning, atau runtime AI.
-
-Calon lokasi dalam monorepo adalah `packages/pesantren-design-system`, dengan target publikasi sebagai repo tersendiri setelah repository dibuat dan kontrak API paket ditinjau. Path dan repository tersebut belum ada; dokumen ini hanya mencatat batas desain yang diinginkan. CI aplikasi tetap menguji integrasi yang benar-benar tersedia, bukan menganggap paket telah dibuat.
+Paket Composer `brontolano/pesantren-online-design-system` tersedia di `packages/pesantren-design-system`. Paket menyediakan token CSS, komponen Blade, shell, dan tabel yang berubah menjadi kartu berlabel pada layar sempit. Aplikasi memegang model bisnis, izin, data tenant, dan integrasi Livewire. Paket tidak memuat identitas/data organisasi, proses provisioning, ketergantungan pada Filament, atau runtime AI. Repo GitHub tersendiri disiapkan agar paket dapat digunakan lintas aplikasi Laravel.
 
 ## Tipografi dan jarak
 

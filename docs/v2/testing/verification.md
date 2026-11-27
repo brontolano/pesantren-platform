@@ -31,8 +31,3 @@ Jalankan tes terhadap database lokal khusus disposable; jangan memakai `.env` pr
 ## Bukti dan pengukuran
 
 Bedakan hasil tes otomatis, tinjauan antarmuka lab, target desain, dan telemetri pengguna. Laporkan perintah/versi runtime, DB, hasil tes, viewport/perangkat, dan keterbatasan. LCP, INP, CLS, serta p95 daftar organisasi dihitung pada fixture sintetis dan lingkungan yang disebutkan. Jangan menyalin target ke kolom hasil, dan jangan menyebut data sintetis sebagai ukuran pengguna nyata.
-
-
-
-
-\n
