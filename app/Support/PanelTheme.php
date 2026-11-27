@@ -45,15 +45,15 @@ class PanelTheme
      */
     public const THEMES = [
         'bawaan' => [
-            'label' => 'Standar (Sidebar Putih)',
-            'desc' => 'Menu samping putih seperti WhatsApp, header hijau — tampilan standar & default.',
+            'label' => 'Standar (Ruang Kerja Modern)',
+            'desc' => 'Sidebar ringkas, permukaan terang yang bersih, dan status kerja yang mudah dibaca.',
             'topNav' => false,
             'bodyClass' => null,
             'category' => 'sidebar',
             'icon' => 'heroicon-o-rectangle-group',
             'thumbnail' => '/images/theme-thumbnails/bawaan.svg',
             'recommended_roles' => ['admin_pesantren', 'tu', 'operator_divisi'],
-            'features' => ['Familiar seperti WhatsApp', 'Cocok untuk entry-level', 'Tidak perlu adaptasi', 'Netral untuk semua peran'],
+            'features' => ['Tampilan modern dan tenang', 'Navigasi mudah dipindai', 'Nyaman di layar kecil', 'Netral untuk semua peran'],
             'efficiency' => 'normal',
             'typography' => 'Plus Jakarta Sans',
         ],
@@ -215,7 +215,7 @@ class PanelTheme
     /**
      * Key tema aktif tenant. Default per-tenant dari registry kustomisasi
      * ('panel_theme_default'):
-     * - SEMUA tenant → 'bawaan' (Standar Sidebar Putih) bila belum memilih;
+     * - SEMUA tenant → 'bawaan' (Ruang Kerja Modern) bila belum memilih;
      *   pilihan eksplisit tenant via Setting tetap dihormati. Nilai tersimpan
      *   yang tak dikenal (mis. tema lama yang sudah dihapus) → jatuh ke 'bawaan'.
      */

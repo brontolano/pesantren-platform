@@ -25,7 +25,13 @@ class BillingServiceTest extends TestCase
     {
         parent::setUp();
         $this->billing = new BillingService;
-        $this->tenant = Tenant::create(['id' => 'pesantren-a', 'name' => 'Pesantren A', 'is_active' => true]);
+        // BillingService only uses the central tenant row; suppress tenancy lifecycle
+        // events that try to CREATE DATABASE inside RefreshDatabase's SQL transaction.
+        $this->tenant = Tenant::withoutEvents(fn () => Tenant::create([
+            'id' => 'pesantren-a',
+            'name' => 'Pesantren A',
+            'is_active' => true,
+        ]));
         $this->plan = Plan::create([
             'name' => 'Paket Standar',
             'billing_type' => 'flat',
@@ -110,7 +116,11 @@ class BillingServiceTest extends TestCase
 
     public function test_mrr_dihitung_dari_subscription_aktif(): void
     {
-        $tenantB = Tenant::create(['id' => 'pesantren-b', 'name' => 'Pesantren B', 'is_active' => true]);
+        $tenantB = Tenant::withoutEvents(fn () => Tenant::create([
+            'id' => 'pesantren-b',
+            'name' => 'Pesantren B',
+            'is_active' => true,
+        ]));
 
         $this->billing->subscribe($this->tenant, $this->plan);
         $this->billing->subscribe($tenantB, $this->plan, ['price' => 400000]);

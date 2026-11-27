@@ -41,7 +41,7 @@ class DevTaskResource extends Resource
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'admin'
-            && (auth()->user()?->hasRole('super_admin') ?? false);
+            && (auth()->user()?->isPlatformSuperAdmin() ?? false);
     }
 
     public static function form(Schema $schema): Schema

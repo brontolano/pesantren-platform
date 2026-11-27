@@ -42,7 +42,7 @@ class KelolaKuotaPenyimpanan extends Page implements HasForms
     public static function canAccess(): bool
     {
         return Filament::getCurrentPanel()?->getId() === 'admin'
-            && (auth()->user()?->hasRole('super_admin') ?? false);
+            && (auth()->user()?->isPlatformSuperAdmin() ?? false);
     }
 
     public static function shouldRegisterNavigation(): bool

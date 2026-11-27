@@ -8,7 +8,9 @@ use App\Filament\Pages\CadanganPemulihan;
 use App\Filament\Pages\CadanganWebsite;
 use App\Filament\Pages\KebijakanPesantren;
 use App\Filament\Pages\KesiapanEmis;
+use App\Filament\Pages\PlatformInbox;
 use App\Filament\Pages\TenantDashboard;
+use App\Filament\Pages\TenantSupport;
 use App\Filament\Resources\Approval\ApprovalRequestResource;
 use App\Filament\Resources\Approval\ApprovalRuleResource;
 use App\Filament\Resources\Audit\AuditLogResource;
@@ -35,6 +37,7 @@ use App\Models\Setting;
 use App\Services\ModuleService;
 use App\Support\TenantBranding;
 use App\Support\TenantCustomizationRegistry;
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -198,7 +201,9 @@ class TenantPanelProvider extends PanelProvider
         // WP-13: PratinjauKhidmah didaftar EKSPLISIT (aturan WP uang) — aman
         // dobel dengan discoverPages karena getPages() = array_unique.
         // WP-07: SidangKenaikan didaftar eksplisit (pola layar kerja).
-        $pages = $ringkas ? [Dashboard::class] : [TenantDashboard::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class, GridNilai::class, RekapJurnalKbm::class, KesiapanEmis::class, LogGerbangPanel::class, PengajuanJengukPanel::class, ModerasiPesanWali::class, KebijakanPesantren::class, ProfilMutuSantri::class, MutuKelas::class, MutuLembaga::class, KasirKantin::class, RekonKantin::class, PiketHariIni::class, CadanganPemulihan::class, CadanganWebsite::class];
+        $pages = $ringkas
+            ? [Dashboard::class, PlatformInbox::class, TenantSupport::class]
+            : [TenantDashboard::class, PlatformInbox::class, TenantSupport::class, PratinjauKhidmah::class, SidangKenaikan::class, GenerateThr::class, GridNilai::class, RekapJurnalKbm::class, KesiapanEmis::class, LogGerbangPanel::class, PengajuanJengukPanel::class, ModerasiPesanWali::class, KebijakanPesantren::class, ProfilMutuSantri::class, MutuKelas::class, MutuLembaga::class, KasirKantin::class, RekonKantin::class, PiketHariIni::class, CadanganPemulihan::class, CadanganWebsite::class];
         $widgets = $ringkas
             ? [
                 GreetingBanner::class,
@@ -323,7 +328,8 @@ class TenantPanelProvider extends PanelProvider
                 NavigationGroup::make('Mutu')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Mutu')),
                 NavigationGroup::make('Laporan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Laporan')),
                 // ── Blok Pengaturan & Tata Kelola ──
-                NavigationGroup::make('Website & Konten')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Website & Konten')),
+                NavigationGroup::make('Website Pesantren')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Website Pesantren')),
+                NavigationGroup::make('Fitur Pesantren')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Fitur Pesantren')),
                 NavigationGroup::make('Pengaturan Sistem')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Pengaturan Sistem')),
                 NavigationGroup::make('Persetujuan')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Persetujuan')),
                 NavigationGroup::make('Audit & Arsip')->collapsible()->collapsed(fn (): bool => self::grupTerciutUntukPeran('Audit & Arsip')),
@@ -353,7 +359,9 @@ class TenantPanelProvider extends PanelProvider
             // (tema navigasi-atas tak punya sidebar). Grup TETAP tanpa ->icon()
             // (hindari 500-trap); saat menciut yang tampil ikon item.
             ->sidebarCollapsibleOnDesktop()
+            ->sidebarWidth('18rem')
             ->spa()
+            ->defaultThemeMode(ThemeMode::Light)
             ->viteTheme('resources/css/filament/pesantren/theme.css')
             ->brandLogo(fn () => view('filament.brand', [
                 'name' => static::resolveTenantBrandName(),

@@ -46,7 +46,7 @@ class ArticleResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Artikel';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Website & Konten';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website Pesantren';
 
     protected static ?int $navigationSort = 1;
 

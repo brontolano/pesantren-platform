@@ -55,6 +55,11 @@ class TenantPanelAuthedSmokeTest extends TestCase
             'tenant_id' => $tenant->id, 'name' => 'Admin Smoke',
             'email' => 'smoke@panel.test', 'password' => 'password123',
         ]);
+        // Mode default memang 'simple', dan ui_mode sengaja bukan mass-assignable.
+        // Sweep resource harus menguji panel mode lengkap agar menu modul terkait
+        // benar-benar dapat diakses oleh super_admin tenant.
+        $user->forceFill(['ui_mode' => 'advanced'])->save();
+        $this->assertSame('advanced', $user->fresh()->ui_mode, 'Fixture harus membuka mode lengkap untuk sweep resource.');
         if (Schema::connection('tenant')->hasTable('roles')
             && DB::connection('tenant')->table('roles')->where('name', 'super_admin')->exists()) {
             $user->assignRole('super_admin');

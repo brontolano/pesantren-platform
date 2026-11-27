@@ -175,6 +175,7 @@ class SetupPesantren extends Page implements HasForms
                         Select::make('preset')
                             ->label('Jenis pesantren (arketipe)')
                             ->options($presetOptions)
+                            ->visible(fn (): bool => ! $this->awam)
                             ->native(false)
                             ->placeholder('Lewati (pakai default sistem)')
                             ->helperText(fn (): string => $this->awam
@@ -214,6 +215,7 @@ class SetupPesantren extends Page implements HasForms
                 // 3) Modul aktif (READ-ONLY) ------------------------------------
                 Step::make('Modul Aktif')
                     ->icon('heroicon-o-squares-2x2')
+                    ->visible(fn (): bool => ! $this->awam)
                     ->schema([
                         Placeholder::make('modul_info')
                             ->hiddenLabel()
@@ -276,7 +278,7 @@ class SetupPesantren extends Page implements HasForms
                 // 6) Kurikulum & program studi (opsional, link-out) -------------
                 Step::make('Kurikulum')
                     ->icon('heroicon-o-book-open')
-                    ->visible(fn (): bool => $this->akademikAktif())
+                    ->visible(fn (): bool => ! $this->awam && $this->akademikAktif())
                     ->schema([
                         Placeholder::make('kurikulum_info')
                             ->hiddenLabel()
@@ -288,6 +290,7 @@ class SetupPesantren extends Page implements HasForms
                 // 7) Tinjau kebijakan -------------------------------------------
                 Step::make('Kebijakan')
                     ->icon('heroicon-o-adjustments-horizontal')
+                    ->visible(fn (): bool => ! $this->awam)
                     ->schema([
                         Placeholder::make('kebijakan_info')
                             ->hiddenLabel()
@@ -315,6 +318,7 @@ class SetupPesantren extends Page implements HasForms
                 // 8) Keuangan dasar (opsional) ----------------------------------
                 Step::make('Keuangan')
                     ->icon('heroicon-o-banknotes')
+                    ->visible(fn (): bool => ! $this->awam)
                     ->schema([
                         Placeholder::make('keuangan_info')
                             ->hiddenLabel()
@@ -519,12 +523,12 @@ class SetupPesantren extends Page implements HasForms
             $urutan = [
                 [true, filled(Setting::getTenantStringValue(UnitSetupRegistry::SETTING_SKENARIO))], // Mulai
                 [true, $ada('identitas')],            // Identitas
-                [true, $ada('identitas')],            // Modul Aktif (info)
+                [! $this->awam, $ada('identitas')],   // Modul Aktif (info, mode lanjutan)
                 [$akademik, $ada('lembaga')],         // Lembaga
                 [$akademik, $ada('periode')],         // Periode Akademik
-                [$akademik, $ada('periode')],         // Kurikulum (info)
-                [true, $ada('kebijakan')],            // Kebijakan
-                [true, $ada('keuangan')],             // Keuangan
+                [! $this->awam && $akademik, $ada('periode')], // Kurikulum (info, lanjutan)
+                [! $this->awam, $ada('kebijakan')],   // Kebijakan (mode lanjutan)
+                [! $this->awam, $ada('keuangan')],    // Keuangan (mode lanjutan)
                 [true, false],                        // Selesai (ringkasan)
             ];
 

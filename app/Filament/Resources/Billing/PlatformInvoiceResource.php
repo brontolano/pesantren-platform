@@ -13,6 +13,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -25,7 +26,7 @@ class PlatformInvoiceResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-currency-dollar';
 
-    protected static ?string $navigationLabel = 'Invoice Platform';
+    protected static ?string $navigationLabel = 'Tagihan Layanan';
 
     protected static UnitEnum|string|null $navigationGroup = 'Langganan & Billing';
 
@@ -33,34 +34,39 @@ class PlatformInvoiceResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
-            Select::make('tenant_id')
-                ->label('Tenant')
-                ->relationship('tenant', 'name')
-                ->searchable()
-                ->preload()
-                ->required(),
-            TextInput::make('period')
-                ->label('Periode (YYYY-MM)')
-                ->required()
-                ->placeholder('2026-06'),
-            TextInput::make('amount')
-                ->label('Jumlah (Rp)')
-                ->numeric()
-                ->prefix('Rp')
-                ->required(),
-            Select::make('status')
-                ->label('Status')
-                ->options(['unpaid' => 'Belum Dibayar', 'paid' => 'Lunas'])
-                ->required()
-                ->default('unpaid'),
-            FileUpload::make('payment_proof')
-                ->label('Bukti Pembayaran')
-                ->nullable()
-                ->directory('billing/proofs'),
-            DateTimePicker::make('paid_at')
-                ->label('Tanggal Bayar')
-                ->nullable(),
+        return $schema->components([
+            Section::make('Tagihan layanan')
+                ->description('Catatan ini untuk kewajiban layanan atau langganan. Donasi sukarela dicatat terpisah dan tidak memengaruhi status layanan.')
+                ->columns(2)
+                ->schema([
+                    Select::make('tenant_id')
+                        ->label('Tenant')
+                        ->relationship('tenant', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    TextInput::make('period')
+                        ->label('Periode (YYYY-MM)')
+                        ->required()
+                        ->placeholder('2026-06'),
+                    TextInput::make('amount')
+                        ->label('Jumlah (Rp)')
+                        ->numeric()
+                        ->prefix('Rp')
+                        ->required(),
+                    Select::make('status')
+                        ->label('Status')
+                        ->options(['unpaid' => 'Belum Dibayar', 'paid' => 'Lunas'])
+                        ->required()
+                        ->default('unpaid'),
+                    FileUpload::make('payment_proof')
+                        ->label('Bukti Pembayaran')
+                        ->nullable()
+                        ->directory('billing/proofs'),
+                    DateTimePicker::make('paid_at')
+                        ->label('Tanggal Bayar')
+                        ->nullable(),
+                ]),
         ]);
     }
 
@@ -93,6 +99,6 @@ class PlatformInvoiceResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasRole('super_admin') ?? false;
+        return auth()->user()?->isPlatformSuperAdmin() ?? false;
     }
 }

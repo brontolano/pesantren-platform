@@ -136,6 +136,25 @@ services:
     networks:
       - internal
 
+  # ── Laravel scheduler: menjalankan tugas terjadwal dan heartbeat platform ──
+  scheduler:
+    image: pesantren-platform-app:latest
+    container_name: pesantren-scheduler
+    restart: unless-stopped
+    command: php artisan schedule:work
+    env_file:
+      - .env
+    volumes:
+      - app_storage:/app/storage
+      - ./.env:/app/.env:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
   # ── LLM lokal (Ollama) untuk Modul AI "Khadim Digital" ──
   # TIDAK diekspos keluar VPS; satu-satunya pemanggil = AiGateway (Modules/AI).
   # mem_limit/cpus dipakai (bukan deploy.resources — tak dijamin di compose non-swarm)
