@@ -111,6 +111,7 @@ class TenantProvisioningService
                 'attempt_id' => $attempt->id,
                 'failure_code' => 'setup_step_failed',
                 'exception_class' => $exception::class,
+                'exception_origin' => basename($exception->getFile()).':'.$exception->getLine(),
             ]);
 
             return $organization->fresh();

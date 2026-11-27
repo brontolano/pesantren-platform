@@ -51,12 +51,13 @@ class TenantBoundaryTest extends TestCase
     {
         $organization = $this->readyOrganization('expired-pesantren.test', 'Pondok Kedaluwarsa Fiktif');
         $token = str_repeat('z', 64);
-        PlatformInvitation::query()->create([
+        $invitation = PlatformInvitation::query()->create([
             'organization_id' => $organization->id,
             'email' => $organization->first_admin_email,
             'token_hash' => Hash::make($token),
             'expires_at' => now()->subMinute(),
         ]);
+        $this->assertFalse($invitation->fresh()->isUsable());
 
         $this->get('http://'.$organization->canonical_domain.'/pondok/invitation/'.$token)
             ->assertStatus(410);
