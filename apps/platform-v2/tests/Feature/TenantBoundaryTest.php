@@ -25,7 +25,7 @@ class TenantBoundaryTest extends TestCase
             'expires_at' => now()->addMinutes(30),
         ]);
 
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->post('/pondok/invitation/'.$token, [
                 'name' => 'Admin Demo',
                 'password' => 'password-test-1234',
@@ -34,14 +34,14 @@ class TenantBoundaryTest extends TestCase
             ->assertRedirect('/pondok/beranda');
 
         $this->assertNotNull($invitation->fresh()->used_at);
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->get('/pondok/beranda')
             ->assertOk()
             ->assertSee('Pondok Demo Fiktif')
             ->assertSee('Admin Demo')
             ->assertDontSee('data santri');
 
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->post('/pondok/invitation/'.$token, [
                 'name' => 'Admin Kedua',
                 'password' => 'password-test-1234',
@@ -61,7 +61,7 @@ class TenantBoundaryTest extends TestCase
             'expires_at' => now()->subMinute(),
         ]);
 
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->get('/pondok/invitation/'.$token)
             ->assertStatus(410);
     }
@@ -73,11 +73,11 @@ class TenantBoundaryTest extends TestCase
         $this->createTenantAdmin($first, 'admin@first-pesantren.test', 'password-test-1234');
         $this->createTenantAdmin($second, 'admin@second-pesantren.test', 'password-test-1234');
 
-        $this->withHeaders(['Host' => $first->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $first->canonical_domain, 'SERVER_NAME' => $first->canonical_domain])
             ->post('/pondok/login', ['email' => 'admin@first-pesantren.test', 'password' => 'password-test-1234'])
             ->assertRedirect('/pondok/beranda');
 
-        $this->withHeaders(['Host' => $second->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $second->canonical_domain, 'SERVER_NAME' => $second->canonical_domain])
             ->get('/pondok/beranda')
             ->assertStatus(403);
     }
@@ -88,7 +88,7 @@ class TenantBoundaryTest extends TestCase
         $this->createTenantAdmin($organization, 'admin@inactive-pesantren.test', 'password-test-1234');
         \App\Models\TenantAdmin::query()->where('email', 'admin@inactive-pesantren.test')->update(['is_active' => false]);
 
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->post('/pondok/login', ['email' => 'admin@inactive-pesantren.test', 'password' => 'password-test-1234'])
             ->assertRedirect('/pondok/login')
             ->assertSessionHasErrors('email');
@@ -98,12 +98,12 @@ class TenantBoundaryTest extends TestCase
     {
         $organization = $this->readyOrganization('revoked-pesantren.test', 'Pondok Sesi Dicabut');
         $this->createTenantAdmin($organization, 'admin@revoked-pesantren.test', 'password-test-1234');
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->post('/pondok/login', ['email' => 'admin@revoked-pesantren.test', 'password' => 'password-test-1234'])
             ->assertRedirect('/pondok/beranda');
         \App\Models\TenantAdmin::query()->where('email', 'admin@revoked-pesantren.test')->update(['is_active' => false]);
 
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->get('/pondok/beranda')
             ->assertForbidden();
     }
@@ -114,10 +114,10 @@ class TenantBoundaryTest extends TestCase
         $this->createTenantAdmin($organization, 'admin@modules-pesantren.test', 'password-test-1234');
         \App\Models\ModuleCatalogItem::query()->create(['key' => 'ppdb', 'name' => 'PPDB', 'description' => 'Belum tersedia.', 'available' => false, 'implemented' => false]);
 
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->post('/pondok/login', ['email' => 'admin@modules-pesantren.test', 'password' => 'password-test-1234'])
             ->assertRedirect('/pondok/beranda');
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->get('/pondok/modul/ppdb')
             ->assertStatus(404);
     }
@@ -142,7 +142,7 @@ class TenantBoundaryTest extends TestCase
 
     private function createTenantAdmin(Organization $organization, string $email, string $password): void
     {
-        $this->withHeaders(['Host' => $organization->canonical_domain])
+        $this->withServerVariables(['HTTP_HOST' => $organization->canonical_domain, 'SERVER_NAME' => $organization->canonical_domain])
             ->get('/pondok/login')
             ->assertOk();
         \App\Models\TenantAdmin::query()->create(['name' => 'Admin Demo', 'email' => $email, 'password' => $password, 'is_active' => true]);

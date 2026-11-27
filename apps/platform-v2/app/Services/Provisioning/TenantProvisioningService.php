@@ -106,7 +106,12 @@ class TenantProvisioningService
             });
             $this->audit->record('organization.setup_failed', $organization->id, ['attempt_id' => $attempt->id, 'failure_code' => 'setup_step_failed'], Organization::class, $organization->id, $operator);
 
-            Log::warning('Tenant setup step failed.', ['organization_id' => $organization->id, 'attempt_id' => $attempt->id, 'failure_code' => 'setup_step_failed']);
+            Log::warning('Tenant setup step failed.', [
+                'organization_id' => $organization->id,
+                'attempt_id' => $attempt->id,
+                'failure_code' => 'setup_step_failed',
+                'exception_class' => $exception::class,
+            ]);
 
             return $organization->fresh();
         }
