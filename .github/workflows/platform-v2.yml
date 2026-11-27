@@ -45,7 +45,7 @@ jobs:
           --health-retries 10
     env:
       APP_ENV: testing
-      APP_KEY: base64:VjJfQ0lfT05MWV9LRVlfTk9UX0FfU0VDUkVU
+      APP_KEY: base64:cGVzYW50cmVuLXYyLWNpLXRlc3Qta2V5LTMyLWJ5dGU=
       DB_CONNECTION: central
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
