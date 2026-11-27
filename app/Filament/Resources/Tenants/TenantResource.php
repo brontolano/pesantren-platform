@@ -9,12 +9,14 @@ use App\Models\Tenant;
 use App\Models\User;
 use App\Services\DnsOtomasiService;
 use App\Services\TenantRecoveryService;
+use App\Services\TenantHealthCheck;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -120,6 +122,23 @@ class TenantResource extends Resource
                     ->label('Nama Pesantren')
                     ->required()
                     ->maxLength(255),
+                TextInput::make('contact_person')
+                    ->label('Kontak Penanggung Jawab (internal platform)')
+                    ->maxLength(150),
+                TextInput::make('contact_email')
+                    ->label('Email Utama (internal platform)')
+                    ->email()
+                    ->maxLength(150),
+                TextInput::make('contact_phone')
+                    ->label('Telepon / WhatsApp (internal platform)')
+                    ->tel()
+                    ->maxLength(40),
+                Textarea::make('address')
+                    ->label('Alamat Korespondensi (internal platform)')
+                    ->rows(3)
+                    ->maxLength(500)
+                    ->helperText('Terpisah dari alamat yang tampil di website publik pesantren.')
+                    ->columnSpanFull(),
                 Toggle::make('is_active')
                     ->label('Aktif')
                     ->default(true)
@@ -161,6 +180,32 @@ class TenantResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->actions([
                 EditAction::make(),
+                Action::make('technical_health')
+                    ->label('Cek kesehatan teknis')
+                    ->icon('heroicon-o-heart')
+                    ->color('gray')
+                    ->tooltip('Periksa koneksi database dan kesiapan dasar tenant sekarang.')
+                    ->action(function (Tenant $record): void {
+                        try {
+                            $checks = collect(app(TenantHealthCheck::class)->run($record, withRender: false));
+                            $failed = $checks->where('ok', false)->pluck('label')->take(6)->values();
+
+                            $notification = Notification::make()
+                                ->title($failed->isEmpty() ? 'Pemeriksaan teknis selesai' : 'Tenant perlu ditinjau')
+                                ->body($failed->isEmpty()
+                                    ? 'Semua pemeriksaan kesiapan dasar yang tersedia berhasil. Diperiksa '.now()->format('d M Y, H:i').'.'
+                                    : 'Perlu ditinjau: '.$failed->implode(', ').'. Diperiksa '.now()->format('d M Y, H:i').'.')
+                                ->duration(12000);
+
+                            ($failed->isEmpty() ? $notification->success() : $notification->warning())->send();
+                        } catch (\Throwable) {
+                            Notification::make()
+                                ->title('Pemeriksaan teknis gagal dijalankan')
+                                ->body('Coba lagi nanti atau periksa log teknis dengan akses yang sesuai.')
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 Action::make('suspend')
                     ->label('Suspend')
                     ->icon('heroicon-o-pause-circle')

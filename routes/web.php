@@ -48,6 +48,10 @@ if (app()->environment('local')) {
 // guest → login bermerek dirender langsung di '/'; setelah login → diarahkan per
 // peran (LauncherController + App\Support\AppLauncher). Website publik = domain
 // terpisah (type='website').
+Route::get('/preview-website/{tenantKey}', [TenantLandingPageController::class, 'preview'])
+    ->middleware(['signed:relative', 'cache.headers:no_store;private'])
+    ->name('tenant.website.preview');
+
 Route::get('/', function () {
     if (in_array(request()->getHost(), config('tenancy.central_domains', []), true)) {
         return view('landing');

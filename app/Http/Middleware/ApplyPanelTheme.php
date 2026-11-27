@@ -54,11 +54,11 @@ class ApplyPanelTheme
                 $panel->viteTheme(PanelTheme::cssEntry());
                 $panel->font(PanelTheme::font() ?? 'Plus Jakarta Sans');
 
-                // Tema gelap-default (Moonlight: seluruh CSS di-scope .dark)
-                // → default theme mode DARK; user tetap bisa toggle. SELALU
-                // di-set (System bila bukan) agar tak bocor antar request.
+                // Tema bawaan dimulai dalam mode terang yang konsisten; tema
+                // gelap seperti Moonlight meminta gelap. Preferensi toggle
+                // pengguna tetap dihormati oleh Filament.
                 $panel->defaultThemeMode(
-                    PanelTheme::defaultDark() ? ThemeMode::Dark : ThemeMode::System,
+                    PanelTheme::defaultDark() ? ThemeMode::Dark : ThemeMode::Light,
                 );
 
                 if (PanelTheme::topNavigation()) {

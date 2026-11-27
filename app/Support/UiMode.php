@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
  * pagar keras dan semua fungsi/route tetap jalan di kedua mode.
  *
  * Resolusi: preferensi user (users.ui_mode) → default 'simple'
- * (menu ringkas untuk semua; Mode Lengkap = opt-in via toggle topbar).
+ * bagi semua peran. Mode Lengkap tetap tersedia lewat toggle topbar.
  */
 class UiMode
 {
@@ -36,16 +36,8 @@ class UiMode
             return 'simple';
         }
 
-        // Belum memilih: super_admin default Mode Lengkap (lihat semuanya),
-        // user lain default Mode Sederhana.
-        try {
-            if ($user !== null && method_exists($user, 'hasRole') && $user->hasRole('super_admin')) {
-                return 'advanced';
-            }
-        } catch (\Throwable) {
-            // tabel roles belum siap → default simple
-        }
-
+        // Pengguna baru mulai dengan menu ringkas. Izin tetap dijaga oleh RBAC;
+        // pengguna yang membutuhkan semua fitur dapat memilih Mode Lengkap.
         return 'simple';
     }
 

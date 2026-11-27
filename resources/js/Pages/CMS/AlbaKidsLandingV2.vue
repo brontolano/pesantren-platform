@@ -18,6 +18,10 @@ const props = defineProps({
             hasPublishedArticles: false,
         }),
     },
+    previewMode: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 /* ------------------------------------------------------------------ *
@@ -273,6 +277,10 @@ const submitAdmission = () => {
             <meta head-key="twitter:description" name="twitter:description" :content="seoDescription">
             <meta head-key="twitter:image" name="twitter:image" :content="seoImage">
         </Head>
+
+        <div v-if="previewMode" role="status" aria-live="polite" class="sticky top-0 z-[100] border-b border-amber-300 bg-amber-100 px-4 py-3 text-center text-sm font-semibold text-amber-950 shadow-sm">
+            Pratinjau draf website. Ini belum terlihat oleh pengunjung dan tautan pratinjau akan kedaluwarsa dalam 10 menit.
+        </div>
 
         <div class="min-h-screen scroll-smooth bg-[#fffdf8] font-sans text-slate-800 antialiased">
             <!-- ============================== NAV ============================== -->

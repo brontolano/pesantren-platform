@@ -4,6 +4,12 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
+// Heartbeat satu menit sekali agar dasbor pusat dapat membedakan scheduler dan
+// worker hidup, diam, atau belum pernah mengirim sinyal.
+Schedule::command('platform:heartbeat')
+    ->everyMinute()
+    ->withoutOverlapping();
+
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');

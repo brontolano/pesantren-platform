@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Filament\Pages\AktivasiModulTenant;
+use App\Filament\Widgets\PlatformOverview;
 use App\Models\ModuleRegistry;
 use App\Models\User;
 use Database\Seeders\ModuleRegistrySeeder;
@@ -115,7 +116,8 @@ class PlatformPanelAuthedSmokeTest extends TestCase
             $widgetDicek++;
         }
 
-        $this->assertGreaterThanOrEqual(4, $widgetDicek, 'Widget dashboard platform terlalu sedikit — panel admin mungkin tak ter-boot.');
+        $this->assertContains(PlatformOverview::class, $panel->getWidgets(), 'Widget operasi superadmin tidak terdaftar pada panel platform.');
+        $this->assertGreaterThanOrEqual(1, $widgetDicek, 'Panel platform tidak memiliki widget yang dapat dirender.');
     }
 
     /**

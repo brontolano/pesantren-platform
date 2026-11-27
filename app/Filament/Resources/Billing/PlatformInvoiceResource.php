@@ -13,6 +13,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -25,7 +26,7 @@ class PlatformInvoiceResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-currency-dollar';
 
-    protected static ?string $navigationLabel = 'Invoice Platform';
+    protected static ?string $navigationLabel = 'Tagihan Layanan';
 
     protected static UnitEnum|string|null $navigationGroup = 'Langganan & Billing';
 
@@ -33,7 +34,11 @@ class PlatformInvoiceResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
+            Section::make('Tagihan layanan')
+                ->description('Catatan ini untuk kewajiban layanan atau langganan. Donasi sukarela dicatat terpisah dan tidak memengaruhi status layanan.')
+                ->columns(2)
+                ->schema([
             Select::make('tenant_id')
                 ->label('Tenant')
                 ->relationship('tenant', 'name')
@@ -61,6 +66,7 @@ class PlatformInvoiceResource extends Resource
             DateTimePicker::make('paid_at')
                 ->label('Tanggal Bayar')
                 ->nullable(),
+                ]),
         ]);
     }
 
@@ -93,6 +99,6 @@ class PlatformInvoiceResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->hasRole('super_admin') ?? false;
+        return auth()->user()?->isPlatformSuperAdmin() ?? false;
     }
 }

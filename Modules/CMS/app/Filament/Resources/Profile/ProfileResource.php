@@ -4,7 +4,6 @@ namespace Modules\CMS\Filament\Resources\Profile;
 
 use App\Filament\Concerns\BuiltInWebsiteGate;
 use App\Filament\Concerns\ModuleGate;
-use App\Support\UiMode;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Repeater;
@@ -37,13 +36,13 @@ class ProfileResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Profil Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Website & Konten';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website Pesantren';
 
     protected static ?int $navigationSort = 9;
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::moduleVisible('cms') && (static::canAccess());
+        return static::moduleVisible('cms') && static::canAccess();
     }
 
     public static function canAccess(): bool

@@ -3,7 +3,6 @@
 namespace Modules\CMS\Filament\Pages;
 
 use App\Filament\Concerns\ModuleGate;
-use App\Support\UiMode;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -26,11 +25,11 @@ class WebsiteIdentity extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-identification';
 
-    protected static ?string $navigationLabel = 'Identitas & Kontak';
+    protected static ?string $navigationLabel = 'Identitas Website';
 
-    protected static ?string $title = 'Identitas & Kontak Website';
+    protected static ?string $title = 'Identitas Website Pesantren';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Website & Konten';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website Pesantren';
 
     protected static ?int $navigationSort = 8;
 
@@ -45,7 +44,7 @@ class WebsiteIdentity extends Page implements HasForms
 
     public static function shouldRegisterNavigation(): bool
     {
-        return UiMode::advanced() && static::canAccess();
+        return static::canAccess();
     }
 
     public function mount(): void
@@ -68,7 +67,7 @@ class WebsiteIdentity extends Page implements HasForms
     {
         return $schema->statePath('data')->components([
             Section::make('Identitas')
-                ->description('Nama & tagline pesantren yang tampil di website.')
+                ->description('Nama dan tagline pesantren yang tampil di website. Perubahan tersimpan langsung terlihat oleh pengunjung.')
                 ->icon('heroicon-o-building-library')
                 ->columns(2)
                 ->schema([

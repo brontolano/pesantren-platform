@@ -1,546 +1,864 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
-/* Pindai kelas Tailwind yang dipakai di widget & view Filament custom */
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';
 @source '../../../../Modules/AI/resources/views/components';
 
-/*
- |--------------------------------------------------------------------------
- | Tema Pesantren v2 — WhatsApp Light · TikTok Dark
- |--------------------------------------------------------------------------
- | Mode terang  : inspirasi WhatsApp — sidebar putih + header hijau #008069,
- |                background #F0F2F5, active item tint #E7F7EE.
- | Mode gelap   : inspirasi TikTok — sidebar #161823, surface #1C1C24,
- |                border #2A2A35, high-contrast text.
- | Compact      : padding lebih rapat di sidebar, kartu, tabel, tombol.
- |
- | Referensi kelas Filament v5.6 (DOM aktual, bukan asumsi):
- |   .fi-sidebar-item-btn (BUKAN -button)
- |   .fi-sidebar-item-label, .fi-sidebar-item-icon, .fi-icon
- |   .fi-sidebar-item.fi-active
- |   Filament pakai :where() (spesifisitas 0) → !important selalu menang.
- */
-
 @theme {
-    --radius-xl: 0.875rem;
+    --radius-xl: 1rem;
 }
 
-/* ===================================================================
-   VARIABEL TEMA — nilai default aman (fallback CSS).
-   Preset warna per-tenant menimpa lewat --tema-* dari PanelTheme::cssVars()
-   (di theme-vars.blade.php). Jika tema tak menyetel varian gelap, blok
-   gelap memakai default #161823 (TikTok) di sini — TIDAK lagi hardcode
-   tersebar, jadi warna header/topbar gelap ikut tema saat disetel.
-   =================================================================== */
+/* Pesantren.online — a calm, modern workspace for daily operations. */
 :root {
-    --tema-sidebar-header-dark: #161823;
-    --tema-sidebar-header-border-dark: #2A2A35;
+    color-scheme: light;
+    --po-canvas: #f4f6f2;
+    --po-surface: #ffffff;
+    --po-surface-raised: #ffffff;
+    --po-border: #e1e7e1;
+    --po-border-strong: #c6d2c8;
+    --po-ink: #17251f;
+    --po-text: #34483e;
+    --po-muted: #596c60;
+    --po-brand: #176747;
+    --po-brand-strong: #0f5037;
+    --po-brand-soft: #e6f2e9;
+    --po-focus: #176747;
+    --po-sidebar: #16372c;
+    --po-sidebar-text: #e9f1ec;
+    --po-sidebar-muted: #acc0b5;
+    --tema-sidebar-header: #16372c;
+    --tema-sidebar-header-border: #16372c;
 }
 
-/* ===================================================================
-   LATAR UTAMA
-   =================================================================== */
+.dark {
+    color-scheme: dark;
+    --po-canvas: #101713;
+    --po-surface: #17211b;
+    --po-surface-raised: #1c2921;
+    --po-border: #2c3b31;
+    --po-border-strong: #405246;
+    --po-ink: #f2f6f3;
+    --po-text: #d7e1da;
+    --po-muted: #b5c4ba;
+    --po-brand: #40c995;
+    --po-brand-strong: #77dfb3;
+    --po-brand-soft: #203b2e;
+    --po-focus: #68ddb0;
+    --po-sidebar: #0d211a;
+    --po-sidebar-text: #e1ebe4;
+    --po-sidebar-muted: #a6bbae;
+    --tema-sidebar-header: #0d211a;
+    --tema-sidebar-header-border: #0d211a;
+}
 
-/* Light: WA signature background */
+/* Canvas and global type */
 .fi-body {
-    background-color: #F0F2F5;
+    background: var(--po-canvas);
+    color: var(--po-ink);
+    font-family: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Dark: TikTok deep black */
-.dark .fi-body {
-    background-color: #121212;
+.fi-main-ctn,
+.fi-main {
+    background: var(--po-canvas);
 }
 
-/* ===================================================================
-   SIDEBAR LIGHT — WhatsApp style
-   Sidebar putih + header gelap hijau WA + item subtle
-   =================================================================== */
+.fi-header {
+    padding-block: 0.5rem 1rem;
+}
 
+.fi-header-heading {
+    color: var(--po-ink);
+    font-size: clamp(1.35rem, 1.1rem + 0.8vw, 1.8rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.2;
+}
+
+.fi-breadcrumbs,
+.fi-breadcrumbs-item-label {
+    color: var(--po-muted);
+}
+
+/* Navigation: quiet surfaces, compact groups, clear current location */
 .fi-sidebar {
-    background: #FFFFFF !important;
-    border-inline-end: 1px solid #E9EDEF !important;
+    background: var(--po-sidebar);
+    border-inline-end: 1px solid var(--po-sidebar);
+    box-shadow: none;
 }
 
-/* Header brand: warna header WA (#008069) — bisa di-override preset warna
-   tema via --tema-* (lihat App\Support\PanelTheme; fallback = nilai lama). */
 .fi-sidebar-header {
-    background: var(--tema-sidebar-header, #008069) !important;
-    border-bottom: 1px solid var(--tema-sidebar-header-border, #007259) !important;
-    padding-top: 0.875rem !important;
-    padding-bottom: 0.875rem !important;
+    background: var(--po-sidebar);
+    border-bottom: 1px solid rgb(255 255 255 / 10%);
+    padding-block: 0.9rem;
 }
 
-/* Teks & ikon dalam header harus putih (di atas hijau gelap WA) */
 .fi-sidebar-header,
 .fi-sidebar-header * {
-    color: #ffffff !important;
+    color: var(--po-sidebar-text);
 }
 
-/* Icon mark brand: subtle glass di atas header hijau */
-.fi-sidebar-header .fi-logo [class*="bg-primary"],
+.fi-sidebar-header .fi-logo [class*='bg-primary'],
 .fi-sidebar-header .fi-logo span:first-child {
-    background-color: rgba(255, 255, 255, 0.18) !important;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--po-brand) 18%, transparent);
 }
 
-/* Nav wrapper */
 .fi-sidebar-nav {
-    background: transparent !important;
-    padding-top: 0.375rem !important;
-    gap: 0.0625rem !important;
+    gap: 0.125rem;
+    padding: 0.75rem 0.625rem 1rem;
 }
 
-/* Label grup: WA medium gray */
 .fi-sidebar-group-label {
-    color: #8696A0 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    font-size: 0.625rem;
+    color: var(--po-sidebar-muted);
+    font-size: 0.67rem;
     font-weight: 700;
-    padding-top: 0.75rem !important;
-    padding-bottom: 0.25rem !important;
-    padding-inline-start: 0.75rem !important;
+    letter-spacing: 0.075em;
+    padding: 0.9rem 0.65rem 0.35rem;
+    text-transform: uppercase;
 }
 
-/* Item btn: compact + soft radius */
 .fi-sidebar-item-btn {
-    border-radius: 0.5rem !important;
-    padding-top: 0.375rem !important;
-    padding-bottom: 0.375rem !important;
-    padding-inline-start: 0.625rem !important;
-    padding-inline-end: 0.625rem !important;
-    transition: background-color 120ms ease, color 120ms ease !important;
+    border-radius: 0.7rem;
+    min-height: 2.65rem;
+    padding: 0.55rem 0.7rem;
+    transition: background-color 150ms ease, color 150ms ease;
 }
 
-/* Label & ikon normal: WA secondary text (#41525D) */
-.fi-sidebar-item-btn > .fi-sidebar-item-label,
 .fi-sidebar-item-label {
-    color: #41525D !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
+    color: var(--po-sidebar-text);
+    font-size: 0.875rem;
+    font-weight: 500;
 }
 
-.fi-sidebar-item-btn > .fi-icon,
-.fi-sidebar-item-btn .fi-sidebar-item-icon,
-.fi-sidebar-item-btn .fi-icon {
-    color: #54656F !important;
-    width: 1.125rem !important;
-    height: 1.125rem !important;
+.fi-sidebar-item-btn .fi-icon,
+.fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: var(--po-sidebar-muted);
+    height: 1.125rem;
+    width: 1.125rem;
 }
 
-/* Hover: latar abu WA */
 .fi-sidebar-item-btn:hover {
-    background-color: #F5F6F6 !important;
-}
-.fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
-.fi-sidebar-item-btn:hover .fi-sidebar-item-label {
-    color: #111B21 !important;
-}
-.fi-sidebar-item-btn:hover > .fi-icon,
-.fi-sidebar-item-btn:hover .fi-sidebar-item-icon,
-.fi-sidebar-item-btn:hover .fi-icon {
-    color: #41525D !important;
+    background: rgb(255 255 255 / 8%);
 }
 
-/* ACTIVE: tint hijau lembut + teks WA dark green (override-able preset warna) */
+.fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+.fi-sidebar-item-btn:hover .fi-icon,
+.fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
+    color: #ffffff;
+}
+
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background: var(--tema-active-bg, #E7F7EE) !important;
-    box-shadow: none !important;
-}
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
-.fi-sidebar-item.fi-active .fi-sidebar-item-label {
-    color: var(--tema-active-fg, #008069) !important;
-    font-weight: 600 !important;
-}
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
-.fi-sidebar-item.fi-active .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-active .fi-icon {
-    color: var(--tema-active-fg, #008069) !important;
+    background: color-mix(in srgb, var(--po-brand) 30%, var(--po-sidebar));
 }
 
-/* Tombol sidebar misc (collapse grup, notifikasi) */
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active .fi-icon,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: #b9f1d1;
+    font-weight: 650;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: color-mix(in srgb, var(--tema-active-bg, var(--po-brand)) 35%, var(--po-sidebar));
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active .fi-icon,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon { color: #e8fff0; }
+
 .fi-sidebar-group-btn,
 .fi-sidebar-group-collapse-btn,
 .fi-sidebar .fi-icon-btn,
 .fi-sidebar .fi-sidebar-database-notifications-btn {
-    color: #54656F !important;
-}
-.fi-sidebar .fi-icon-btn:hover {
-    color: #111B21 !important;
-    background-color: #F5F6F6 !important;
+    color: var(--po-sidebar-muted);
 }
 
-/* ===================================================================
-   SIDEBAR DARK — TikTok style
-   Biru-hitam #161823, border subtle, active emerald pesantren
-   =================================================================== */
-
-.dark .fi-sidebar {
-    background: var(--tema-sidebar-header-dark, #161823) !important;
-    border-inline-end: 1px solid var(--tema-sidebar-header-border-dark, #2A2A35) !important;
-}
-
-.dark .fi-sidebar-header {
-    background: var(--tema-sidebar-header-dark, #161823) !important;
-    border-bottom: 1px solid var(--tema-sidebar-header-border-dark, #2A2A35) !important;
-}
-
-/* Logo dark: force putih, icon mark emerald glow */
-.dark .fi-sidebar-header,
-.dark .fi-sidebar-header * {
-    color: #ffffff !important;
-}
-.dark .fi-sidebar-header .fi-logo [class*="bg-primary"],
-.dark .fi-sidebar-header .fi-logo span:first-child {
-    background-color: rgba(16, 185, 129, 0.2) !important;
-    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.3) !important;
-}
-
-.dark .fi-sidebar-nav {
-    background: transparent !important;
-}
-
-.dark .fi-sidebar-group-label {
-    color: rgba(255, 255, 255, 0.35) !important;
-}
-
-/* Label & ikon normal: putih redup */
-.dark .fi-sidebar-item-btn > .fi-sidebar-item-label,
-.dark .fi-sidebar-item-label {
-    color: rgba(255, 255, 255, 0.72) !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-}
-.dark .fi-sidebar-item-btn > .fi-icon,
-.dark .fi-sidebar-item-btn .fi-sidebar-item-icon,
-.dark .fi-sidebar-item-btn .fi-icon {
-    color: rgba(255, 255, 255, 0.5) !important;
-    width: 1.125rem !important;
-    height: 1.125rem !important;
-}
-
-/* Hover TikTok: glass overlay */
-.dark .fi-sidebar-item-btn:hover {
-    background-color: rgba(255, 255, 255, 0.06) !important;
-}
-.dark .fi-sidebar-item-btn:hover > .fi-sidebar-item-label,
-.dark .fi-sidebar-item-btn:hover .fi-sidebar-item-label {
-    color: rgba(255, 255, 255, 0.95) !important;
-}
-.dark .fi-sidebar-item-btn:hover > .fi-icon,
-.dark .fi-sidebar-item-btn:hover .fi-sidebar-item-icon,
-.dark .fi-sidebar-item-btn:hover .fi-icon {
-    color: rgba(255, 255, 255, 0.85) !important;
-}
-
-/* ACTIVE dark: emerald gradient (identitas pesantren; override-able preset) */
-.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background: var(--tema-active-dark, linear-gradient(90deg, #059669 0%, #047857 100%)) !important;
-    box-shadow: 0 4px 14px -4px rgba(5, 150, 105, 0.45) !important;
-}
-.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-sidebar-item-label,
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-label {
-    color: #ffffff !important;
-    font-weight: 600 !important;
-}
-.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > .fi-icon,
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-icon,
-.dark .fi-sidebar-item.fi-active .fi-icon {
-    color: #ffffff !important;
-}
-
-/* Misc sidebar buttons dark */
-.dark .fi-sidebar-group-btn,
-.dark .fi-sidebar-group-collapse-btn,
-.dark .fi-sidebar .fi-icon-btn,
-.dark .fi-sidebar .fi-sidebar-database-notifications-btn {
-    color: rgba(255, 255, 255, 0.45) !important;
-}
-.dark .fi-sidebar .fi-icon-btn:hover {
-    color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.08) !important;
-}
-
-/* ===================================================================
-   KONTEN UTAMA DARK — TikTok surface colors
-   =================================================================== */
-
-/* TikTok topbar / header */
-.dark .fi-topbar,
-.dark .fi-header {
-    background-color: var(--tema-sidebar-header-dark, #161823) !important;
-    border-bottom-color: var(--tema-sidebar-header-border-dark, #2A2A35) !important;
-}
-
-/* TikTok card/section surface (#1C1C24) */
-.dark .fi-section,
-.dark .fi-wi-stats-overview-stat,
-.dark .fi-ta-ctn,
-.dark [class*="fi-card"],
-.dark .fi-widget-container > div {
-    background-color: #1C1C24 !important;
-    border-color: #2A2A35 !important;
-}
-
-/* ===================================================================
-   KARTU & SECTION — compact + rounded (KEDUA mode)
-   =================================================================== */
-
+/* Surfaces, tables, and dashboard statistics */
 .fi-section,
 .fi-wi-stats-overview-stat,
-.fi-ta-ctn {
-    border-radius: 0.875rem;
-    box-shadow:
-        0 1px 2px rgba(16, 24, 40, 0.04),
-        0 6px 18px -10px rgba(16, 24, 40, 0.12);
+.fi-ta-ctn,
+.fi-widget-container > div,
+[class*='fi-card'] {
+    background: var(--po-surface);
+    border: 1px solid var(--po-border);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px rgb(16 36 24 / 4%), 0 8px 24px -20px rgb(16 36 24 / 24%);
 }
 
-/* Light stat card: sedikit bayangan WA-style */
-.fi-wi-stats-overview-stat {
-    padding: 1rem 1.25rem !important;
-}
-
-/* Compact section header */
 .fi-section-header-ctn {
-    padding: 0.625rem 0.875rem !important;
-    min-height: 0 !important;
+    min-height: 0;
+    padding: 1rem 1.125rem 0.8rem;
 }
 
-/* ===================================================================
-   TOMBOL — compact + soft radius
-   =================================================================== */
-
-.fi-btn {
-    border-radius: 0.5rem !important;
-    padding-top: 0.375rem !important;
-    padding-bottom: 0.375rem !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
+.fi-section-content-ctn {
+    border-color: var(--po-border);
 }
 
-/* ===================================================================
-   TABEL — compact rows
-   =================================================================== */
+.fi-wi-stats-overview-stat {
+    padding: 1.1rem 1.2rem;
+}
 
-.fi-ta-cell {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
+.fi-ta-header {
+    background: color-mix(in srgb, var(--po-canvas) 72%, var(--po-surface));
 }
 
 .fi-ta-header-cell {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0.5rem !important;
-    font-size: 0.75rem !important;
+    color: var(--po-muted);
+    font-size: 0.75rem;
+    font-weight: 650;
+    letter-spacing: 0.025em;
+    padding-block: 0.75rem;
 }
 
-/* ===================================================================
-   KETERBACAAN — kontras teks redup (aksesibilitas AA) + target sentuh
-   HP (tanpa mengubah kerapatan desktop yang sudah compact).
-   =================================================================== */
+.fi-ta-cell {
+    color: var(--po-text);
+    padding-block: 0.75rem;
+}
 
-/* Teks redup default Filament (gray-400) kurang kontras di latar putih untuk
-   ustadz lansia / HP di bawah matahari. Naikkan ke gray-500/400 (AA). */
+.fi-ta-row:hover {
+    background: color-mix(in srgb, var(--po-brand-soft) 44%, var(--po-surface));
+}
+
+/* Inputs and actions keep familiar Filament behavior with clearer states. */
+.fi-input-wrp {
+    background: var(--po-surface);
+    border-color: var(--po-border-strong);
+    border-radius: 0.7rem;
+    box-shadow: none;
+    min-height: 2.7rem;
+}
+
+.fi-input-wrp:focus-within {
+    border-color: var(--po-focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--po-focus) 18%, transparent);
+}
+
+.fi-fo-field-wrp-label,
+.fi-fo-field-wrp-helper-text {
+    color: var(--po-text);
+}
+
+.fi-btn {
+    border-radius: 0.7rem;
+    font-weight: 600;
+    min-height: 2.55rem;
+    transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.fi-btn:not(.fi-color-gray) {
+    box-shadow: 0 1px 2px rgb(16 36 24 / 10%);
+}
+
+.fi-icon-btn {
+    min-height: 2.5rem;
+    min-width: 2.5rem;
+}
+
+.fi-badge {
+    border-radius: 999px;
+    font-weight: 600;
+}
+
 .fi-color-gray.fi-text-color-400,
 .fi-ta-text-item-label.fi-color-gray {
-    color: rgb(100 116 139) !important; /* slate-500 */
-}
-.dark .fi-color-gray.fi-text-color-400,
-.dark .fi-ta-text-item-label.fi-color-gray {
-    /* slate-400 (#94a3b8) di latar gelap ~2.5:1 = GAGAL AA. Naikkan ke
-       slate-300 (#cbd5e1) → ~4.8:1 di #1C1C24 = LULUS AA (≥4.5:1). */
-    color: rgb(203 213 225) !important; /* slate-300 di gelap */
+    color: var(--po-muted);
 }
 
-/* Di layar HP: target sentuh tombol & item menu minimal 44px (pedoman a11y),
-   serta teks tabel sedikit lebih besar agar terbaca. Desktop tak terpengaruh. */
+/* Consistent keyboard focus across links, actions, fields, and custom views. */
+:is(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--po-focus) 65%, transparent);
+    outline-offset: 2px;
+}
+
+/* Keep contrast and surface relationships intentional in dark mode. */
+.dark .fi-body,
+.dark .fi-main-ctn,
+.dark .fi-main {
+    background: var(--po-canvas);
+    color: var(--po-ink);
+}
+
+.dark .fi-sidebar,
+.dark .fi-sidebar-header,
+.dark .fi-topbar,
+.dark .fi-header,
+.dark .fi-section,
+.dark .fi-wi-stats-overview-stat,
+.dark .fi-ta-ctn,
+.dark .fi-widget-container > div,
+.dark [class*='fi-card'] {
+    background: var(--po-surface);
+    border-color: var(--po-border);
+}
+
+.dark .fi-sidebar-header,
+.dark .fi-sidebar-header *,
+.dark .fi-header-heading,
+.dark .fi-section-header-heading,
+.dark .fi-ta-cell {
+    color: var(--po-ink);
+}
+
+.dark .fi-sidebar-item-label,
+.dark .fi-sidebar-item-btn .fi-icon,
+.dark .fi-sidebar-item-btn .fi-sidebar-item-icon,
+.dark .fi-breadcrumbs,
+.dark .fi-breadcrumbs-item-label {
+    color: var(--po-muted);
+}
+
+.dark .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: color-mix(in srgb, var(--tema-active-fg, var(--po-brand)) 22%, var(--po-surface));
+}
+
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.dark .fi-sidebar-item.fi-active .fi-icon,
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: var(--po-brand-strong);
+}
+
+.dark .fi-ta-header,
+.dark .fi-ta-header-cell {
+    background: var(--po-surface-raised);
+    color: var(--po-muted);
+}
+
+.dark .fi-ta-row:hover {
+    background: color-mix(in srgb, var(--po-brand-soft) 68%, var(--po-surface));
+}
+
+.dark .fi-input-wrp {
+    background: var(--po-surface-raised);
+    border-color: var(--po-border-strong);
+}
+
+.dark .fi-fo-field-wrp-label,
+.dark .fi-fo-field-wrp-helper-text {
+    color: var(--po-text);
+}
+
+/* Small-screen navigation and data tables remain touch-friendly. */
 @media (max-width: 768px) {
-    .fi-btn {
-        min-height: 2.75rem; /* 44px */
-        font-size: 0.9375rem !important; /* 15px */
-    }
-    .fi-ta-cell,
-    .fi-ta-text-item-label {
-        font-size: 0.9375rem !important; /* 15px */
-    }
-    .fi-sidebar-item-button {
+    .fi-sidebar-item-btn,
+    .fi-btn,
+    .fi-icon-btn {
         min-height: 2.75rem;
     }
+
+    .fi-main {
+        padding-inline: 1rem;
+    }
+
+    .fi-section-header-ctn {
+        padding-inline: 1rem;
+    }
+
+    .fi-ta-ctn {
+        max-width: 100%;
+        overflow-x: auto;
+    }
 }
 
-/* ===================================================================
-   Tema EKSTERNAL (Brisk/Nord/Moonlight/Neo-Brutalis) TIDAK di file ini —
-   masing-masing punya build CSS Vite sendiri (theme-*.css) yang meng-
-   import CSS paket vendornya; dipilih per-tenant saat runtime lewat
-   ApplyPanelTheme → Panel::viteTheme(PanelTheme::cssEntry()).
-   Skin custom lama (slate-pro/glass/corporate/midnight/warm/aurora/
-   nature/neon) DIHAPUS BERSIH — lihat PR tema eksternal.
-   =================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
 
-/* ===================================================================
-   NAV HIBRIDA TOPNAV: bar prioritas + waffle "Semua Menu" (mega-panel).
-   Deretan grup bawaan Filament DISEMBUNYIKAN utk tema topNav — diganti
-   ul.tema-nav-utama dari render hook TOPBAR_LOGO_AFTER.
-   =================================================================== */
-body[class*="tema-"] .fi-topbar-nav-groups {
+/* Tenant dashboard widgets share the same restrained surfaces. */
+.tema-greeting {
+    background: #075d47 !important;
+}
+
+.dark .tema-greeting {
+    background: #1b4f3d !important;
+}
+
+.tema-quick {
+    background: var(--po-surface) !important;
+    --tw-ring-color: var(--po-border) !important;
+}
+
+.dark .tema-card {
+    background-color: var(--po-surface) !important;
+    --tw-ring-color: var(--po-border) !important;
+}
+
+/* Align the platform overview's Blade cards with the Filament dark palette. */
+.dark .fi-main [aria-labelledby='platform-overview-title'] > .rounded-2xl,
+.dark .fi-main [aria-labelledby='platform-health-title'],
+.dark .fi-main [aria-labelledby='platform-health-title'] .rounded-2xl {
+    background-color: var(--po-surface) !important;
+    --tw-ring-color: var(--po-border) !important;
+}
+
+/* A purpose-built operational canvas for the central superadmin dashboard. */
+.po-dashboard {
+    display: grid;
+    gap: 1.25rem;
+    margin-inline: auto;
+    max-width: 1600px;
+    padding: 0.25rem 0 2rem;
+}
+
+.po-dashboard-header,
+.po-panel-heading,
+.po-quick-heading {
+    align-items: flex-end;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-between;
+}
+
+.po-dashboard-header {
+    padding: 0.7rem 0 0.25rem;
+}
+
+.po-overline {
+    align-items: center;
+    color: var(--po-brand);
+    display: flex;
+    font-size: 0.68rem;
+    font-weight: 750;
+    gap: 0.5rem;
+    letter-spacing: 0.11em;
+    line-height: 1.4;
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+}
+
+.po-overline span[aria-hidden='true'] { color: var(--po-muted); }
+
+.po-dashboard-intro h1 {
+    color: var(--po-ink);
+    font-size: clamp(1.65rem, 1.1rem + 1.5vw, 2.35rem);
+    font-weight: 720;
+    letter-spacing: -0.045em;
+    line-height: 1.13;
+    margin: 0;
+}
+
+.po-dashboard-summary,
+.po-last-checked,
+.po-panel-description {
+    color: var(--po-muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.po-dashboard-summary { margin: 0.65rem 0 0; max-width: 42rem; }
+
+.po-dashboard-header-actions {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.po-last-checked { font-size: 0.76rem; margin: 0; }
+.po-last-checked time { color: var(--po-text); font-weight: 650; }
+
+.po-primary-action,
+.po-refresh-action,
+.po-text-action,
+.po-action-card,
+.po-developer-links a {
+    outline-offset: 3px;
+}
+
+.po-primary-action {
+    align-items: center;
+    background: var(--po-brand);
+    border: 1px solid var(--po-brand);
+    border-radius: 0.8rem;
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 0.875rem;
+    font-weight: 700;
+    gap: 0.55rem;
+    justify-content: center;
+    min-height: 2.9rem;
+    padding: 0.7rem 1rem;
+    transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+    white-space: nowrap;
+}
+
+.po-primary-action svg { height: 1.1rem; width: 1.1rem; }
+.po-primary-action:hover { background: var(--po-brand-strong); border-color: var(--po-brand-strong); transform: translateY(-1px); }
+.po-primary-action:focus-visible,
+.po-refresh-action:focus-visible,
+.po-text-action:focus-visible,
+.po-action-card:focus-visible,
+.po-developer-tools summary:focus-visible,
+.po-developer-links a:focus-visible { outline: 3px solid var(--po-focus); }
+
+.po-stat-grid {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.po-stat-card,
+.po-panel,
+.po-action-card {
+    background: var(--po-surface);
+    border: 1px solid var(--po-border);
+    border-radius: 1.15rem;
+}
+
+.po-stat-card {
+    min-width: 0;
+    padding: 1.05rem 1.15rem 1rem;
+}
+
+.po-stat-topline {
+    align-items: center;
+    display: flex;
+    gap: 0.8rem;
+    justify-content: space-between;
+}
+
+.po-stat-label { color: var(--po-muted); font-size: 0.8rem; font-weight: 650; margin: 0; }
+
+.po-stat-icon,
+.po-action-icon {
+    align-items: center;
+    background: var(--po-brand-soft);
+    border-radius: 0.75rem;
+    color: var(--po-brand);
+    display: inline-flex;
+    flex: 0 0 auto;
+    height: 2.35rem;
+    justify-content: center;
+    width: 2.35rem;
+}
+
+.po-stat-icon svg { height: 1.2rem; width: 1.2rem; }
+.po-stat-icon.is-green { background: #e9f5ee; color: #176747; }
+.po-stat-icon.is-amber { background: #fbf1dc; color: #855b0e; }
+.po-stat-icon.is-rose { background: #fae9e6; color: #a63d32; }
+
+.po-stat-value {
+    color: var(--po-ink);
+    font-size: clamp(1.65rem, 1.25rem + 0.7vw, 2.1rem);
+    font-variant-numeric: tabular-nums;
+    font-weight: 720;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin: 0.75rem 0 0.3rem;
+}
+
+.po-stat-note {
+    color: var(--po-muted);
+    font-size: 0.76rem;
+    line-height: 1.45;
+    margin: 0;
+    min-height: 1.1em;
+}
+
+.po-panel { min-width: 0; padding: 1.2rem; }
+
+.po-panel-heading { align-items: flex-start; }
+.po-panel-heading h2,
+.po-quick-heading h2 {
+    color: var(--po-ink);
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin: 0;
+}
+
+.po-panel-heading .po-overline,
+.po-quick-heading .po-overline { margin-bottom: 0.38rem; }
+.po-panel-heading .po-panel-description { margin: 0.35rem 0 0; max-width: 42rem; }
+.po-panel-heading.compact { align-items: flex-start; }
+
+.po-panel-heading-actions {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.65rem;
+}
+
+.po-attention-pill,
+.po-service-status {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.72rem;
+    font-weight: 700;
+    gap: 0.45rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.po-attention-pill { padding: 0.48rem 0.65rem; }
+.po-attention-pill.has-attention { background: #fbf1dc; color: #77510b; }
+.po-attention-pill.is-clear { background: var(--po-brand-soft); color: var(--po-brand-strong); }
+.po-indicator,.po-service-dot { background: currentColor; border-radius: 50%; display: inline-block; height: 0.45rem; width: 0.45rem; }
+
+.po-refresh-action {
+    align-items: center;
+    background: var(--po-surface);
+    border: 1px solid var(--po-border-strong);
+    border-radius: 0.7rem;
+    color: var(--po-text);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 650;
+    gap: 0.45rem;
+    justify-content: center;
+    min-height: 2.55rem;
+    padding: 0.5rem 0.7rem;
+    transition: background-color 140ms ease, border-color 140ms ease;
+    white-space: nowrap;
+}
+
+.po-refresh-action:hover { background: var(--po-canvas); border-color: var(--po-brand); }
+.po-refresh-action svg { height: 1rem; width: 1rem; }
+.po-spinner { animation: po-spin 850ms linear infinite; }
+@keyframes po-spin { to { transform: rotate(360deg); } }
+
+.po-service-grid {
+    display: grid;
+    gap: 0.7rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+    margin-top: 1rem;
+}
+
+.po-service-card {
+    background: color-mix(in srgb, var(--po-canvas) 65%, var(--po-surface));
+    border: 1px solid var(--po-border);
+    border-radius: 0.9rem;
+    min-width: 0;
+    padding: 0.85rem 0.9rem;
+}
+
+.po-service-heading { align-items: center; display: flex; gap: 0.55rem; min-width: 0; }
+.po-service-heading h3 { color: var(--po-ink); font-size: 0.83rem; font-weight: 700; margin: 0; overflow-wrap: anywhere; }
+.po-service-card p { color: var(--po-muted); font-size: 0.76rem; line-height: 1.45; margin: 0.5rem 0 0; }
+.po-service-status { margin-top: 0.55rem; }
+.po-service-card.is-good .po-service-dot,.po-service-card.is-good .po-service-status { color: #19704f; }
+.po-service-card.is-warning .po-service-dot,.po-service-card.is-warning .po-service-status { color: #855b0e; }
+.po-service-card.is-danger .po-service-dot,.po-service-card.is-danger .po-service-status { color: #a63d32; }
+.po-service-card.is-neutral .po-service-dot,.po-service-card.is-neutral .po-service-status { color: var(--po-muted); }
+
+.po-dashboard-columns {
+    display: grid;
+    gap: 0.85rem;
+    grid-template-columns: minmax(0, 1.35fr) minmax(18rem, 0.8fr);
+}
+
+.po-text-action {
+    align-items: center;
+    border-radius: 0.55rem;
+    color: var(--po-brand);
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 700;
+    gap: 0.35rem;
+    min-height: 2.4rem;
+    padding: 0.35rem 0.45rem;
+    white-space: nowrap;
+}
+
+.po-text-action:hover { background: var(--po-brand-soft); color: var(--po-brand-strong); }
+.po-tenant-bar { background: var(--po-border); border-radius: 999px; display: flex; height: 0.6rem; margin-top: 1.15rem; overflow: hidden; }
+.po-tenant-bar .is-active { background: #278560; min-width: 0; }
+.po-tenant-bar .is-inactive { background: #c9d2cb; min-width: 0; }
+
+.po-tenant-breakdown {
+    display: grid;
+    gap: 0.55rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 1rem 0 0;
+}
+
+.po-tenant-breakdown div { min-width: 0; }
+.po-tenant-breakdown dt { align-items: center; color: var(--po-muted); display: flex; font-size: 0.74rem; gap: 0.4rem; }
+.po-tenant-breakdown dd { color: var(--po-ink); font-size: 1.2rem; font-variant-numeric: tabular-nums; font-weight: 700; margin: 0.3rem 0 0 1rem; }
+.po-legend-dot { border-radius: 50%; display: inline-block; height: 0.5rem; width: 0.5rem; }
+.po-legend-dot.is-active { background: #278560; }
+.po-legend-dot.is-inactive { background: #9ca9a0; }
+
+.po-support-count { color: var(--po-ink); font-size: 1.55rem; font-variant-numeric: tabular-nums; font-weight: 720; letter-spacing: -0.035em; margin: 1rem 0 0.3rem; }
+.po-support-count span { color: var(--po-muted); font-size: 0.82rem; font-weight: 500; letter-spacing: 0; }
+.po-support-note { color: var(--po-muted); font-size: 0.77rem; margin: 0; }
+.po-empty-state { background: var(--po-canvas); border-radius: 0.75rem; color: var(--po-muted); font-size: 0.8rem; line-height: 1.5; margin-top: 1rem; padding: 0.85rem; }
+
+.po-quick-work { display: grid; gap: 0.9rem; }
+.po-quick-heading { align-items: flex-end; }
+.po-quick-heading .po-panel-description { margin: 0 0 0.08rem; }
+.po-action-grid { display: grid; gap: 0.7rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.po-action-card {
+    align-items: center;
+    color: var(--po-text);
+    display: flex;
+    gap: 0.75rem;
+    min-height: 4.4rem;
+    padding: 0.75rem 0.85rem;
+    transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.po-action-card:hover { background: color-mix(in srgb, var(--po-brand-soft) 35%, var(--po-surface)); border-color: color-mix(in srgb, var(--po-brand) 35%, var(--po-border)); transform: translateY(-1px); }
+.po-action-icon { height: 2.5rem; width: 2.5rem; }
+.po-action-icon svg { height: 1.25rem; width: 1.25rem; }
+.po-action-copy { display: grid; gap: 0.2rem; min-width: 0; }
+.po-action-copy strong { color: var(--po-ink); font-size: 0.82rem; font-weight: 700; line-height: 1.3; }
+.po-action-copy small { color: var(--po-muted); font-size: 0.73rem; line-height: 1.35; }
+.po-action-arrow { color: var(--po-brand); font-size: 1rem; margin-inline-start: auto; }
+
+.po-developer-tools { border-top: 1px solid var(--po-border); color: var(--po-text); padding-top: 0.25rem; }
+.po-developer-tools summary { align-items: center; border-radius: 0.65rem; cursor: pointer; display: flex; flex-wrap: wrap; font-size: 0.82rem; font-weight: 700; gap: 0.4rem 0.7rem; list-style: none; min-height: 2.8rem; padding: 0.45rem 0.5rem; }
+.po-developer-tools summary::-webkit-details-marker { display: none; }
+.po-developer-tools summary::after { color: var(--po-muted); content: '+'; font-size: 1rem; margin-inline-start: auto; }
+.po-developer-tools[open] summary::after { content: '−'; }
+.po-developer-tools summary:hover { background: var(--po-surface); }
+.po-developer-note { color: var(--po-muted); font-size: 0.74rem; font-weight: 450; }
+.po-developer-links { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.3rem 0.5rem 0.6rem; }
+.po-developer-links a { border-radius: 0.5rem; color: var(--po-brand); font-size: 0.78rem; font-weight: 650; padding: 0.45rem 0.55rem; }
+.po-developer-links a:hover { background: var(--po-brand-soft); }
+
+.dark .po-stat-card,
+.dark .po-panel,
+.dark .po-action-card { background: var(--po-surface); border-color: var(--po-border); }
+.dark .po-service-card { background: color-mix(in srgb, var(--po-surface-raised) 80%, var(--po-surface)); border-color: var(--po-border); }
+.dark .po-stat-icon.is-green { background: #203b2e; color: #8ce1b9; }
+.dark .po-stat-icon.is-amber { background: #3e321c; color: #f4d28a; }
+.dark .po-stat-icon.is-rose { background: #442823; color: #f1a69c; }
+.dark .po-attention-pill.has-attention { background: #3e321c; color: #f4d28a; }
+.dark .po-attention-pill.is-clear { background: #203b2e; color: #8ce1b9; }
+.dark .po-service-card.is-good .po-service-dot,.dark .po-service-card.is-good .po-service-status { color: #8ce1b9; }
+.dark .po-service-card.is-warning .po-service-dot,.dark .po-service-card.is-warning .po-service-status { color: #f4d28a; }
+.dark .po-service-card.is-danger .po-service-dot,.dark .po-service-card.is-danger .po-service-status { color: #f1a69c; }
+.dark .po-service-card.is-neutral .po-service-dot,.dark .po-service-card.is-neutral .po-service-status { color: var(--po-muted); }
+.dark .po-tenant-bar .is-inactive { background: #53645a; }
+.dark .po-empty-state { background: var(--po-surface-raised); }
+.dark .po-action-card:hover { background: var(--po-brand-soft); }
+
+@media (max-width: 1023px) {
+    .po-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .po-dashboard-columns { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); }
+}
+
+@media (max-width: 767px) {
+    .po-dashboard { gap: 0.9rem; padding-top: 0; }
+    .po-dashboard-header { align-items: stretch; flex-direction: column; gap: 1rem; }
+    .po-dashboard-header-actions { align-items: stretch; }
+    .po-last-checked { order: 2; }
+    .po-primary-action { min-height: 2.9rem; width: 100%; }
+    .po-panel { padding: 0.95rem; }
+    .po-panel-heading { flex-direction: column; gap: 0.8rem; }
+    .po-panel-heading-actions { flex-wrap: wrap; width: 100%; }
+    .po-dashboard-columns { grid-template-columns: minmax(0, 1fr); }
+    .po-action-grid { grid-template-columns: minmax(0, 1fr); }
+    .po-quick-heading { align-items: flex-start; flex-direction: column; gap: 0.25rem; }
+    .po-service-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 420px) {
+    .po-stat-grid { gap: 0.55rem; }
+    .po-stat-card { padding: 0.8rem; }
+    .po-stat-value { font-size: 1.55rem; }
+    .po-stat-note { font-size: 0.72rem; }
+    .po-tenant-breakdown { gap: 0.3rem; }
+}
+
+.dark .tema-card li {
+    border-color: var(--po-border) !important;
+}
+
+/* Retained for any tenant that enables the optional hybrid top navigation. */
+body[class*='tema-'] .fi-topbar-nav-groups {
     display: none !important;
 }
 
-body[class*="tema-"] .fi-topbar-start {
+body[class*='tema-'] .fi-topbar-start {
     flex: 1 1 auto !important;
     min-width: 0 !important;
 }
 
 .tema-nav-utama {
-    display: none; /* tampil hanya di tema topnav + desktop */
+    align-items: center;
+    display: none;
+    gap: 0.25rem;
     list-style: none;
     margin: 0 0 0 1rem;
-    padding: 0;
-    align-items: center;
-    gap: 0.125rem;
     min-width: 0;
+    padding: 0;
 }
+
 @media (min-width: 1024px) {
-    body[class*="tema-"] .tema-nav-utama {
+    body[class*='tema-'] .tema-nav-utama {
         display: flex;
     }
 }
-.tema-nav-utama .fi-topbar-item {
-    position: relative;
-}
-.tema-nav-utama .fi-topbar-item-btn {
-    cursor: pointer;
-    background: transparent;
-    border: 0;
+
+.tema-nav-utama .fi-topbar-item { position: relative; }
+.tema-nav-utama .fi-topbar-item-btn { background: transparent; border: 0; cursor: pointer; }
+
+.tema-nav-dropdown,
+.tema-nav-mega {
+    background: var(--po-surface);
+    border: 1px solid var(--po-border);
+    box-shadow: 0 18px 42px -24px rgb(16 36 24 / 36%);
 }
 
-/* Dropdown grup prioritas */
 .tema-nav-dropdown {
+    border-radius: 0.9rem;
+    inset-inline-start: 0;
+    max-height: 70vh;
+    min-width: 14rem;
+    overflow-y: auto;
+    padding: 0.4rem;
     position: absolute;
     top: calc(100% - 0.25rem);
-    inset-inline-start: 0;
     z-index: 50;
-    min-width: 14rem;
-    max-height: 70vh;
-    overflow-y: auto;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 6px -2px rgba(16, 24, 40, 0.05), 0 12px 24px -6px rgba(16, 24, 40, 0.18);
-    padding: 0.375rem;
-}
-.dark .tema-nav-dropdown {
-    background: #18181b;
-    border-color: #3f3f46;
 }
 
-/* Item di dropdown & mega-panel */
 .tema-nav-dd-item {
-    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4375rem 0.625rem;
-    border-radius: 0.5rem;
+    border-radius: 0.65rem;
+    color: var(--po-text);
+    display: flex;
     font-size: 0.875rem;
-    color: #374151;
-    white-space: nowrap;
+    gap: 0.5rem;
     overflow: hidden;
+    padding: 0.55rem 0.65rem;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
-.tema-nav-dd-item:hover {
-    background: #f3f4f6;
-    color: #111827;
-}
-.tema-nav-dd-item.aktif {
-    font-weight: 600;
-    color: var(--tema-active-fg, #1d4ed8);
-    background: var(--tema-active-bg, #dbeafe);
-}
-.dark .tema-nav-dd-item { color: rgba(255, 255, 255, 0.75); }
-.dark .tema-nav-dd-item:hover { background: rgba(255, 255, 255, 0.07); color: #ffffff; }
-.tema-nav-dd-icon { width: 1rem; height: 1rem; flex-shrink: 0; opacity: 0.75; }
 
-/* Mega-panel "Semua Menu": lebar penuh di bawah topbar */
+.tema-nav-dd-item:hover { background: var(--po-canvas); color: var(--po-ink); }
+.tema-nav-dd-item.aktif { background: var(--tema-active-bg, var(--po-brand-soft)); color: var(--tema-active-fg, var(--po-brand)); font-weight: 600; }
+.tema-nav-dd-icon { flex-shrink: 0; height: 1rem; opacity: 0.8; width: 1rem; }
+
 .tema-nav-mega {
-    position: fixed;
-    top: 3.5rem;
+    border-radius: 0 0 1rem 1rem;
+    border-top: 0;
     inset-inline: 0;
-    z-index: 50;
     max-height: calc(100vh - 4.5rem);
     overflow-y: auto;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 24px 48px -12px rgba(16, 24, 40, 0.25);
     padding: 1.25rem max(1.5rem, calc((100% - 1400px) / 2)) 1rem;
-}
-.dark .tema-nav-mega {
-    background: #18181b;
-    border-bottom-color: #3f3f46;
-}
-.tema-nav-mega-grid {
-    columns: 4 16rem;
-    column-gap: 1.5rem;
-}
-.tema-nav-mega-grup {
-    break-inside: avoid;
-    margin-bottom: 1rem;
-}
-.tema-nav-mega-judul {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #9ca3af;
-    padding: 0 0.625rem 0.25rem;
-    margin: 0;
-}
-.tema-nav-mega-hint {
-    margin: 0.5rem 0 0;
-    padding-top: 0.625rem;
-    border-top: 1px solid #f3f4f6;
-    font-size: 0.75rem;
-    color: #9ca3af;
-}
-.dark .tema-nav-mega-hint { border-top-color: #27272a; }
-.tema-nav-mega-hint kbd {
-    border: 1px solid #d1d5db;
-    border-radius: 0.25rem;
-    padding: 0 0.3rem;
-    font-size: 0.7rem;
+    position: fixed;
+    top: 3.5rem;
+    z-index: 50;
 }
 
-[x-cloak] { display: none !important; }
-[x-cloak] { display: none !important; }
+.tema-nav-mega-grid { column-gap: 1.5rem; columns: 4 16rem; }
+.tema-nav-mega-grup { break-inside: avoid; margin-bottom: 1rem; }
+.tema-nav-mega-judul { color: var(--po-muted); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.08em; margin: 0; padding: 0 0.625rem 0.25rem; text-transform: uppercase; }
+.tema-nav-mega-hint { border-top: 1px solid var(--po-border); color: var(--po-muted); font-size: 0.75rem; margin: 0.5rem 0 0; padding-top: 0.625rem; }
+.tema-nav-mega-hint kbd { border: 1px solid var(--po-border-strong); border-radius: 0.3rem; padding: 0 0.3rem; }
 
-/* ===================================================================
-   IDENTITAS WIDGET DASBOR — HANYA TEMA BAWAAN.
-   Blade widget kini theme-aware (token primary/gray netral); blok ini
-   memulihkan identitas visual bawaan persis seperti semula:
-   - Banner sambutan: gradient hijau WA (light) / TikTok deep (dark)
-   - Akses Cepat: kartu krem hangat (light) / gradasi #1C1C24 (dark)
-   - Kartu agenda/pengumuman: permukaan #1C1C24 + ring #2A2A35 (dark)
-   Build tema EKSTERNAL tidak memuat file ini → widget tampil netral
-   mengikuti palet tema (tidak "setengah bertema").
-   =================================================================== */
-.tema-greeting {
-    background: linear-gradient(to right, #0b8f63, #059669, #047857) !important;
-}
-.dark .tema-greeting {
-    background: linear-gradient(to right, #0f1c14, #161823, #1a243a) !important;
-}
-.tema-quick {
-    background: linear-gradient(to bottom, #fffaf3, #ffffff) !important;
-    --tw-ring-color: #efe7da !important;
-}
-.dark .tema-quick {
-    background: linear-gradient(to bottom, #1f2937, #1C1C24) !important;
-    --tw-ring-color: #374151 !important;
-}
-.dark .tema-card {
-    background-color: #1C1C24 !important;
-    --tw-ring-color: #2A2A35 !important;
-}
-.dark .tema-card li {
-    /* replika dark:divide-[#2A2A35] lama (divide-y memberi border-top) */
-    border-color: #2A2A35 !important;
-}
+[x-cloak] { display: none !important; }

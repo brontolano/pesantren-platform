@@ -34,6 +34,10 @@ const props = defineProps({
         type: [String, null],
         default: null,
     },
+    previewMode: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 const seo = props.website.seo ?? {}
@@ -94,6 +98,10 @@ const softTint = 'color-mix(in srgb, var(--brand-primary) 10%, #ffffff)'
                 v-text="schemaMarkup"
             />
         </Head>
+
+        <div v-if="previewMode" role="status" aria-live="polite" class="sticky top-0 z-[100] border-b border-amber-300 bg-amber-100 px-4 py-3 text-center text-sm font-semibold text-amber-950 shadow-sm">
+            Pratinjau draf website. Ini belum terlihat oleh pengunjung dan tautan pratinjau akan kedaluwarsa dalam 10 menit.
+        </div>
 
         <div class="min-h-screen bg-[#fffaf3] text-slate-800 antialiased" :style="brandStyle">
             <!-- NAV -->

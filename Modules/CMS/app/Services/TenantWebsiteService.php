@@ -12,7 +12,7 @@ use Modules\CMS\Models\WebsiteSetting;
 
 class TenantWebsiteService
 {
-    public function buildLandingPagePayload(): array
+    public function buildLandingPagePayload(?array $previewDraft = null): array
     {
         $tenant = tenant();
         $isAlbaKids = $this->isAlbaKidsTenant();
@@ -26,8 +26,12 @@ class TenantWebsiteService
         );
         $primaryColor = Setting::getTenantStringValue('branding_primary_color', $isAlbaKids ? '#ff8a3d' : '#14532d');
         $secondaryColor = Setting::getTenantStringValue('branding_secondary_color', $isAlbaKids ? '#1f9d8f' : '#c2410c');
-        $contact = WebsiteSetting::getTenantValue('contact', []);
-        $seo = WebsiteSetting::getTenantValue('seo', []);
+        $contact = is_array($previewDraft['contact'] ?? null)
+            ? $previewDraft['contact']
+            : WebsiteSetting::getTenantValue('contact', []);
+        $seo = is_array($previewDraft['seo'] ?? null)
+            ? $previewDraft['seo']
+            : WebsiteSetting::getTenantValue('seo', []);
         $canonicalUrl = url('/');
         $title = $this->resolveSeoTitle(
             $seo['meta_title'] ?? null,
@@ -91,7 +95,7 @@ class TenantWebsiteService
                 ], fn ($v) => $v !== null && $v !== '' && $v !== []),
             ],
             'admission' => $this->buildAdmissionPayload($isAlbaKids),
-            'sections' => $this->resolveSections($brandingName, $brandingTagline),
+            'sections' => $this->resolveSections($brandingName, $brandingTagline, $previewDraft['sections'] ?? null),
         ];
     }
 
@@ -151,8 +155,22 @@ class TenantWebsiteService
         ];
     }
 
-    protected function resolveSections(string $brandingName, string $brandingTagline): array
+    protected function resolveSections(string $brandingName, string $brandingTagline, ?array $previewSections = null): array
     {
+        if ($previewSections !== null) {
+            return collect($previewSections)
+                ->filter(fn (array $section): bool => (bool) ($section['is_active'] ?? true))
+                ->sortBy('sort_order')
+                ->map(fn (array $section) => $this->normalizeSection(new WebsiteSection([
+                    'section_type' => $section['section_type'],
+                    'sort_order' => $section['sort_order'] ?? 0,
+                    'is_active' => true,
+                    'config' => $section['config'] ?? [],
+                ])))
+                ->values()
+                ->all();
+        }
+
         if ($this->isAlbaKidsTenant() && ! WebsiteSection::query()->where('is_active', true)->exists()) {
             return $this->defaultAlbaKidsSections($brandingName, $brandingTagline);
         }

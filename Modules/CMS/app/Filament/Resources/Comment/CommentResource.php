@@ -32,7 +32,7 @@ class CommentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Komentar';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Website & Konten';
+    protected static string|\UnitEnum|null $navigationGroup = 'Website Pesantren';
 
     protected static ?int $navigationSort = 3;
 

@@ -5,7 +5,21 @@
          ============================================================ --}}
     <x-filament::section>
         <x-slot name="heading">Kelola Section Website</x-slot>
-        <x-slot name="description">Aktifkan/nonaktifkan section dan atur urutannya. Klik Simpan untuk menyimpan perubahan.</x-slot>
+        <x-slot name="description">Aktifkan/nonaktifkan bagian situs dan atur urutannya. Simpan sebagai draf, lihat pratinjau, lalu terbitkan jika hasilnya sudah sesuai.</x-slot>
+
+        @if ($hasDraft)
+            <div role="status" class="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-100">
+                @if ($hasUnsavedChanges)
+                    Ada perubahan yang belum disimpan ke draf. Simpan sebelum membuat pratinjau atau menerbitkannya.
+                @else
+                    Ada draf website yang belum diterbitkan. Pengunjung masih melihat versi yang sudah terbit.
+                @endif
+            </div>
+        @else
+            <div role="note" class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200">
+                Perubahan disimpan sebagai draf terlebih dahulu. Website publik tidak berubah sampai Anda memilih Terbitkan Perubahan.
+            </div>
+        @endif
 
         <div class="space-y-3">
             @foreach ($sections as $i => $section)
@@ -17,8 +31,10 @@
                     {{-- Toggle --}}
                     <div class="flex-shrink-0">
                         <button wire:click="toggleSection({{ $i }})" type="button"
+                            role="switch" aria-checked="{{ $section['is_active'] ? 'true' : 'false' }}"
+                            aria-label="{{ ($section['is_active'] ? 'Nonaktifkan bagian ' : 'Aktifkan bagian ') . $section['label'] }}"
                             @class([
-                                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none',
+                                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-2',
                                 'bg-primary-600' => $section['is_active'],
                                 'bg-gray-300 dark:bg-gray-600' => ! $section['is_active'],
                             ])>
@@ -47,13 +63,15 @@
                     {{-- Reorder buttons --}}
                     <div class="flex flex-col gap-0.5">
                         <button wire:click="moveSectionUp({{ $i }})" type="button"
+                            aria-label="Naikkan bagian {{ $section['label'] }}"
                             @disabled($i === 0)
-                            class="p-1 rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed">
+                            class="min-h-6 min-w-6 rounded p-1 text-gray-400 hover:text-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed">
                             <x-heroicon-s-chevron-up class="w-4 h-4"/>
                         </button>
                         <button wire:click="moveSectionDown({{ $i }})" type="button"
+                            aria-label="Turunkan bagian {{ $section['label'] }}"
                             @disabled($i === count($sections) - 1)
-                            class="p-1 rounded text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed">
+                            class="min-h-6 min-w-6 rounded p-1 text-gray-400 hover:text-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-600 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed">
                             <x-heroicon-s-chevron-down class="w-4 h-4"/>
                         </button>
                     </div>
@@ -244,8 +262,8 @@
         </div>
 
         <div class="mt-4 flex justify-end">
-            <x-filament::button wire:click="saveSections" icon="heroicon-o-check">
-                Simpan Urutan & Status Section
+            <x-filament::button wire:click="saveSections" icon="heroicon-o-check" wire:loading.attr="disabled" wire:target="saveSections">
+                Simpan Draf Website
             </x-filament::button>
         </div>
     </x-filament::section>
@@ -255,7 +273,7 @@
          ============================================================ --}}
     <x-filament::section class="mt-6">
         <x-slot name="heading">Kontak Pesantren</x-slot>
-        <x-slot name="description">Informasi kontak yang ditampilkan di website dan section profil.</x-slot>
+        <x-slot name="description">Informasi kontak publik. Perubahan disimpan sebagai draf dan terlihat pengunjung setelah diterbitkan.</x-slot>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -276,19 +294,21 @@
                     <input type="email" wire:model="contact.email"
                         class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="info@pesantren.sch.id">
+                    @error('contact.email')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
                 </div>
                 <div>
                     <label class="fi-fo-field-wrp-label block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Link Google Maps</label>
                     <input type="url" wire:model="contact.maps_url"
                         class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                         placeholder="https://maps.google.com/...">
+                    @error('contact.maps_url')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
                 </div>
             </div>
         </div>
 
         <div class="mt-4 flex justify-end">
-            <x-filament::button wire:click="saveContact" icon="heroicon-o-check">
-                Simpan Kontak
+            <x-filament::button wire:click="saveContact" icon="heroicon-o-check" wire:loading.attr="disabled" wire:target="saveContact">
+                Simpan Kontak ke Draf
             </x-filament::button>
         </div>
     </x-filament::section>
@@ -298,7 +318,7 @@
          ============================================================ --}}
     <x-filament::section class="mt-6">
         <x-slot name="heading">SEO & Meta Tags</x-slot>
-        <x-slot name="description">Pengaturan SEO halaman utama website pesantren.</x-slot>
+        <x-slot name="description">Metadata halaman utama website. Perubahan disimpan sebagai draf dan berlaku setelah diterbitkan.</x-slot>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -306,30 +326,34 @@
                 <input type="text" wire:model="seo.meta_title" maxlength="70"
                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Biarkan kosong untuk pakai nama pesantren">
+                @error('seo.meta_title')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="fi-fo-field-wrp-label block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Robots</label>
                 <input type="text" wire:model="seo.robots"
                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="index,follow">
+                @error('seo.robots')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
             </div>
             <div class="md:col-span-2">
                 <label class="fi-fo-field-wrp-label block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Meta Description <span class="text-gray-400 font-normal">(maks 160 karakter)</span></label>
                 <textarea wire:model="seo.meta_description" rows="2" maxlength="160"
                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Deskripsi singkat pesantren untuk mesin pencari."></textarea>
+                @error('seo.meta_description')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
             </div>
             <div class="md:col-span-2">
                 <label class="fi-fo-field-wrp-label block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">OG Image URL <span class="text-gray-400 font-normal">(untuk share sosmed)</span></label>
                 <input type="url" wire:model="seo.image_url"
                     class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="https://...">
+                @error('seo.image_url')<p class="mt-1 text-sm text-danger-600">{{ $message }}</p>@enderror
             </div>
         </div>
 
         <div class="mt-4 flex justify-end">
-            <x-filament::button wire:click="saveSeo" icon="heroicon-o-check">
-                Simpan SEO
+            <x-filament::button wire:click="saveSeo" icon="heroicon-o-check" wire:loading.attr="disabled" wire:target="saveSeo">
+                Simpan SEO ke Draf
             </x-filament::button>
         </div>
     </x-filament::section>

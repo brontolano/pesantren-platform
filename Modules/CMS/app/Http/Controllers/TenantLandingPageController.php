@@ -11,6 +11,7 @@ use App\Support\TenantCustomizationRegistry;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\CMS\Models\Article;
+use Modules\CMS\Models\WebsiteSetting;
 use Modules\CMS\Services\TenantWebsiteService;
 
 class TenantLandingPageController extends Controller
@@ -27,12 +28,31 @@ class TenantLandingPageController extends Controller
         return Inertia::render($component, $this->payload($websiteService));
     }
 
-    /** Props bersama landing (kontrak komponen: tenant, website, blog, ibadah). */
-    private function payload(TenantWebsiteService $websiteService): array
+    public function preview(string $tenantKey, TenantWebsiteService $websiteService): Response
     {
+        abort_unless((string) tenant()?->getTenantKey() === $tenantKey, 404);
+
+        $draft = WebsiteSetting::getTenantValue('website_builder_draft');
+        abort_unless(is_array($draft) && is_array($draft['sections'] ?? null), 404);
+
+        return Inertia::render(
+            TenantCustomizationRegistry::landingComponent(),
+            $this->payload($websiteService, $draft, previewMode: true)
+        );
+    }
+
+    /** Props bersama landing (kontrak komponen: tenant, website, blog, ibadah). */
+    private function payload(TenantWebsiteService $websiteService, ?array $draft = null, bool $previewMode = false): array
+    {
+        $website = $websiteService->buildLandingPagePayload($draft);
+        if ($previewMode) {
+            $website['seo']['robots'] = 'noindex,nofollow';
+        }
+
         return [
             'tenant' => tenant(),
-            'website' => $websiteService->buildLandingPagePayload(),
+            'website' => $website,
+            'previewMode' => $previewMode,
             'blog' => [
                 'indexUrl' => '/#blog',
                 'hasPublishedArticles' => Article::query()
