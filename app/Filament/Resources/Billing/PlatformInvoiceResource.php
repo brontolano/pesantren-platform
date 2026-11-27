@@ -39,33 +39,33 @@ class PlatformInvoiceResource extends Resource
                 ->description('Catatan ini untuk kewajiban layanan atau langganan. Donasi sukarela dicatat terpisah dan tidak memengaruhi status layanan.')
                 ->columns(2)
                 ->schema([
-            Select::make('tenant_id')
-                ->label('Tenant')
-                ->relationship('tenant', 'name')
-                ->searchable()
-                ->preload()
-                ->required(),
-            TextInput::make('period')
-                ->label('Periode (YYYY-MM)')
-                ->required()
-                ->placeholder('2026-06'),
-            TextInput::make('amount')
-                ->label('Jumlah (Rp)')
-                ->numeric()
-                ->prefix('Rp')
-                ->required(),
-            Select::make('status')
-                ->label('Status')
-                ->options(['unpaid' => 'Belum Dibayar', 'paid' => 'Lunas'])
-                ->required()
-                ->default('unpaid'),
-            FileUpload::make('payment_proof')
-                ->label('Bukti Pembayaran')
-                ->nullable()
-                ->directory('billing/proofs'),
-            DateTimePicker::make('paid_at')
-                ->label('Tanggal Bayar')
-                ->nullable(),
+                    Select::make('tenant_id')
+                        ->label('Tenant')
+                        ->relationship('tenant', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->required(),
+                    TextInput::make('period')
+                        ->label('Periode (YYYY-MM)')
+                        ->required()
+                        ->placeholder('2026-06'),
+                    TextInput::make('amount')
+                        ->label('Jumlah (Rp)')
+                        ->numeric()
+                        ->prefix('Rp')
+                        ->required(),
+                    Select::make('status')
+                        ->label('Status')
+                        ->options(['unpaid' => 'Belum Dibayar', 'paid' => 'Lunas'])
+                        ->required()
+                        ->default('unpaid'),
+                    FileUpload::make('payment_proof')
+                        ->label('Bukti Pembayaran')
+                        ->nullable()
+                        ->directory('billing/proofs'),
+                    DateTimePicker::make('paid_at')
+                        ->label('Tanggal Bayar')
+                        ->nullable(),
                 ]),
         ]);
     }

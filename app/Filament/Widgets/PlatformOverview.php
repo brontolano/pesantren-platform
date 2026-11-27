@@ -4,9 +4,9 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Pages\AktivasiModulTenant;
 use App\Filament\Pages\SupportDesk;
-use App\Filament\Resources\PlatformAnnouncements\PlatformAnnouncementResource;
 use App\Filament\Resources\DevProjects\DevProjectResource;
 use App\Filament\Resources\DevTasks\DevTaskResource;
+use App\Filament\Resources\PlatformAnnouncements\PlatformAnnouncementResource;
 use App\Filament\Resources\Tenants\TenantResource;
 use App\Services\PlatformOperationsSnapshot;
 use Filament\Widgets\Widget;

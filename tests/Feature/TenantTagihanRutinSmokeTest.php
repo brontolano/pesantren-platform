@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
