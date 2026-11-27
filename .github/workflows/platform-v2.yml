@@ -76,6 +76,8 @@ jobs:
 
       - name: Install Laravel Boost developer assistant
         working-directory: apps/platform-v2
+        env:
+          APP_ENV: local
         run: php artisan boost:install --no-interaction
 
       - name: Check formatting
