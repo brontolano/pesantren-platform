@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 2090)
-Total output lines: 172
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -46,7 +43,91 @@ return new class extends Migration
             $table->timestampsTz();
         });
 
-        Schema::connection('central')->create('tenant_domains', function (Blueprint $ta…1090 tokens truncated…
+        Schema::connection('central')->create('tenant_domains', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('organization_id')->constrained('organizations')->cascadeOnUpdate()->restrictOnDelete();
+            $table->string('domain')->unique();
+            $table->boolean('is_canonical')->default(false);
+            $table->timestampTz('verified_at')->nullable();
+            $table->timestampsTz();
+            $table->index(['organization_id', 'is_canonical']);
+        });
+
+        Schema::connection('central')->create('platform_invitations', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('organization_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->string('email');
+            $table->string('token_hash', 255);
+            $table->timestampTz('expires_at')->index();
+            $table->timestampTz('used_at')->nullable();
+            $table->timestampsTz();
+            $table->index(['organization_id', 'email', 'used_at']);
+        });
+
+        Schema::connection('central')->create('provisioning_attempts', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('organization_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->uuid('idempotency_key');
+            $table->string('state', 24);
+            $table->jsonb('steps')->default('{}');
+            $table->string('error_code')->nullable();
+            $table->timestampTz('started_at');
+            $table->timestampTz('finished_at')->nullable();
+            $table->timestampsTz();
+            $table->unique(['organization_id', 'idempotency_key']);
+        });
+
+        Schema::connection('central')->create('audit_events', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('organization_id')->nullable()->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->string('actor_type');
+            $table->unsignedBigInteger('actor_id')->nullable();
+            $table->string('event');
+            $table->string('subject_type')->nullable();
+            $table->string('subject_id')->nullable();
+            $table->jsonb('metadata')->default('{}');
+            $table->timestampTz('created_at')->useCurrent();
+            $table->index(['organization_id', 'created_at']);
+            $table->index(['actor_type', 'actor_id', 'created_at']);
+        });
+
+        Schema::connection('central')->create('module_catalog_items', function (Blueprint $table): void {
+            $table->id();
+            $table->string('key')->unique();
+            $table->string('name');
+            $table->text('description');
+            $table->boolean('available')->default(false);
+            $table->boolean('implemented')->default(false);
+            $table->timestampsTz();
+        });
+
+        Schema::connection('central')->create('tenant_module_entitlements', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('organization_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('module_catalog_item_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('enabled_by')->nullable()->constrained('platform_operators')->nullOnDelete();
+            $table->timestampTz('enabled_at')->nullable();
+            $table->timestampsTz();
+            $table->unique(['organization_id', 'module_catalog_item_id']);
+        });
+
+        Schema::connection('central')->create('technical_checks', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('organization_id')->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->string('check_key', 64);
+            $table->string('state', 24);
+            $table->timestampTz('checked_at');
+            $table->string('failure_code')->nullable();
+            $table->string('recovery_step')->nullable();
+            $table->timestampsTz();
+            $table->index(['organization_id', 'checked_at']);
+        });
+
+        Schema::connection('central')->create('sessions', function (Blueprint $table): void {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
