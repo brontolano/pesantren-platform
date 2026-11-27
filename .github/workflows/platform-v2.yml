@@ -89,9 +89,7 @@ jobs:
 
       - name: Prepare testing environment
         working-directory: apps/platform-v2
-        run: |
-          cp .env.example .env
-          php artisan key:generate --force
+        run: cp .env.example .env
 
       - name: Run migrations and feature tests
         working-directory: apps/platform-v2
