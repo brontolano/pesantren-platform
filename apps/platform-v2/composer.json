@@ -1,0 +1,56 @@
+{
+  "name": "pesantren-online/platform-v2",
+  "type": "project",
+  "description": "Fondasi platform multi-tenant Pesantren.online v2",
+  "license": "proprietary",
+  "require": {
+    "php": "^8.3",
+    "ext-ctype": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-openssl": "*",
+    "ext-pdo": "*",
+    "ext-pdo_pgsql": "*",
+    "laravel/framework": "^13.0",
+    "livewire/livewire": "^4.0",
+    "laravel/tinker": "^3.0",
+    "brontolano/pesantren-online-design-system": "@dev"
+  },
+  "repositories": [
+    {
+      "type": "path",
+      "url": "../../packages/pesantren-design-system",
+      "options": { "symlink": true }
+    }
+  ],
+  "require-dev": {
+    "fakerphp/faker": "^1.24",
+    "laravel/boost": "2.10.4",
+    "laravel/pint": "^1.24",
+    "mockery/mockery": "^1.6",
+    "nunomaduro/collision": "^8.8",
+    "phpunit/phpunit": "^12.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Database\\Factories\\": "database/factories/",
+      "Database\\Seeders\\": "database/seeders/",
+      "Tests\\": "tests/"
+    }
+  },
+  "autoload-dev": { "psr-4": { "Tests\\": "tests/" } },
+  "scripts": {
+    "test": "@php artisan test",
+    "lint": "@php vendor/bin/pint --test",
+    "post-autoload-dump": ["Illuminate\\Foundation\\ComposerScripts::postAutoloadDump", "@php artisan package:discover --ansi"]
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "allow-plugins": { "php-http/discovery": true }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

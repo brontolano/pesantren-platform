@@ -1,0 +1,25 @@
+{
+  "$schema": "https://getcomposer.org/schema.json",
+  "name": "brontolano/pesantren-online-design-system",
+  "description": "Komponen Blade dan token antarmuka responsif untuk platform Pesantren.online.",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": "^8.3",
+    "illuminate/support": "^13.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Brontolano\\PesantrenDesignSystem\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Brontolano\\PesantrenDesignSystem\\PesantrenDesignSystemServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
