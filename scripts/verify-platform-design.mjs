@@ -22,7 +22,7 @@ assert.match(appCss, /@media\s*\(max-width:\s*760px\)/);
 assert.doesNotMatch(appCss, /#[0-9a-f]{3,8}\s*;\s*\/\*\s*legacy/i);
 
 assert.match(controller, /Organization::query\(\)[\s\S]*?selectRaw\('COUNT\(\*\) as total'\)/);
-assert.match(controller, /AuditEvent::query\(\)[\s\S]*?groupByRaw\('DATE\(created_at\)'\)/);
+assert.match(controller, /AuditEvent::query\(\)[\s\S]*?groupByRaw\("DATE\(created_at AT TIME ZONE 'Asia\/Jakarta'\)"\)/);
 assert.match(controller, /ModuleCatalogItem::query\(\)->where\('available', true\)/);
 assert.match(controller, /whereHas\('moduleEntitlements'/);
 assert.match(controller, /'service_state' => \['nullable', 'in:inactive,active,suspended'\]/);

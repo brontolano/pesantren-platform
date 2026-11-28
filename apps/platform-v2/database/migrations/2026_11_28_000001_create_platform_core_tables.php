@@ -89,6 +89,7 @@ return new class extends Migration
             $table->timestampTz('created_at')->useCurrent();
             $table->index(['organization_id', 'created_at']);
             $table->index(['actor_type', 'actor_id', 'created_at']);
+            $table->index('created_at');
         });
 
         Schema::connection('central')->create('module_catalog_items', function (Blueprint $table): void {

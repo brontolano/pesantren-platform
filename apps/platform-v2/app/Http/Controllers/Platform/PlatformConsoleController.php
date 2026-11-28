@@ -32,9 +32,9 @@ class PlatformConsoleController extends Controller
             ->first();
 
         $activityByDay = AuditEvent::query()
-            ->selectRaw('DATE(created_at) as activity_day, COUNT(*) as total')
+            ->selectRaw("DATE(created_at AT TIME ZONE 'Asia/Jakarta') as activity_day, COUNT(*) as total")
             ->whereBetween('created_at', [$start, $end])
-            ->groupByRaw('DATE(created_at)')
+            ->groupByRaw("DATE(created_at AT TIME ZONE 'Asia/Jakarta')")
             ->pluck('total', 'activity_day');
 
         $trend = collect(range(0, 6))->map(function (int $offset) use ($start, $activityByDay): array {
