@@ -18,6 +18,7 @@ for (const token of ['#123c35', '#2f6b5b', '#dde9df', '#f7f5ef', '#b99a55', '#1f
 }
 assert.match(appCss, /@import "\.\.\/\.\.\/\.\.\/\.\.\/packages\/pesantren-design-system\/resources\/css\/pesantren-ui\.css"/);
 assert.match(appCss, /\.dashboard-grid\s*\{/);
+assert.match(appCss, /@media\s*\(max-width:\s*68rem\)[\s\S]*?\.pu-data-table__mobile\s*\{\s*display:\s*block;/);
 assert.match(appCss, /@media\s*\(max-width:\s*760px\)/);
 assert.doesNotMatch(appCss, /#[0-9a-f]{3,8}\s*;\s*\/\*\s*legacy/i);
 

@@ -95,6 +95,10 @@ button, input, select { font: inherit; }
 .pu-data-table__mobile-actions form { max-width: 100%; }
 .pu-data-table__mobile-actions .pu-input { width: auto; max-width: 100%; min-width: 9rem; }
 
+@media (max-width: 68rem) {
+  .pu-data-table__desktop { display: none; }
+  .pu-data-table__mobile { display: block; }
+}
 @media (max-width: 1050px) {
   .cards { gap: 12px; }
   .metric { padding: 15px; }
