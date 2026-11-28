@@ -4,7 +4,7 @@
 
 Shell utama, navigasi, ringkasan, wizard, dan tabel dibangun dengan Blade/Livewire serta komponen dan design tokens dari paket UI v2. Ini memberi tim kendali pada hierarki, jarak, interaksi, dan tampilan tenant/operator tanpa ketergantungan pada Filament.
 
-- Desktop: sidebar kiri yang dapat diciutkan; breadcrumb dan judul halaman; satu tombol utama di lokasi konsisten; konten ringkasan dan daftar mengikuti konteks/status.
+- Desktop: sidebar kiri berwarna forest, header ringkas, judul halaman jelas, dan satu tombol utama pada lokasi konsisten.
 - Ponsel: drawer navigasi, kolom tunggal, jarak tekan cukup, form bertahap.
 - Tabel desktop tetap responsif dan dapat dibaca. Pada ponsel setiap record menjadi kartu atau baris bertumpuk dengan label dan nilai. Jangan biarkan isi terpotong atau mewajibkan scroll horizontal untuk membaca satu record.
 - Komponen bersama mengikuti token v2. Gaya komponen tidak boleh bergantung pada hover; tema sekunder tidak boleh mengubah selector global tanpa sengaja.
@@ -13,16 +13,18 @@ Shell utama, navigasi, ringkasan, wizard, dan tabel dibangun dengan Blade/Livewi
 
 | Token | Nilai | Penggunaan |
 |---|---|---|
-| `brand-700` | `#1D4ED8` | tombol utama, tautan aktif |
-| `brand-50` | `#EFF6FF` | sorotan ringan |
-| `ink-900` | `#111827` | teks utama |
-| `ink-600` | `#4B5563` | teks sekunder |
-| `surface` | `#FFFFFF` | kartu/form |
-| `canvas` | `#F8FAFC` | latar kerja |
-| `border` | `#6B7280` | batas input dan tabel |
-| `success-800` | `#166534` | label keberhasilan |
-| `warning-900` | `#78350F` | label peringatan |
-| `danger-800` | `#991B1B` | label kesalahan |
+| `brand-700` | `#123C35` | sidebar dan identitas utama |
+| `brand-600` | `#2F6B5B` | tombol, tautan, dan fokus |
+| `brand-50` | `#DDE9DF` | sorotan ringan |
+| `accent` | `#B99A55` | aksen aktif |
+| `ink-900` | `#1F2D46` | teks utama |
+| `ink-600` | `#536274` | teks sekunder |
+| `surface` | `#FFFEFA` | kartu/form |
+| `canvas` | `#F7F5EF` | latar kerja |
+| `border` | `#D7DFD8` | batas input dan tabel |
+| `success-800` | `#176B47` | label keberhasilan |
+| `warning-900` | `#744B08` | label peringatan |
+| `danger-800` | `#9B2828` | label kesalahan |
 
 Warna status memakai latar dan teks dengan kontras yang cukup, ikon boleh membantu tetapi bukan pengganti label. Cek kombinasi aktual pada komponen yang dirender, bukan nilai token saja.
 
@@ -32,7 +34,7 @@ Paket Composer `brontolano/pesantren-online-design-system` tersedia di `packages
 
 ## Tipografi dan jarak
 
-Gunakan `Inter, ui-sans-serif, system-ui, sans-serif` dengan fallback sistem agar tetap cepat pada jaringan terbatas. Ukuran dasar 16 px, teks isi 14–16 px, label input minimal 14 px, judul halaman 24–32 px desktop dan 22–28 px ponsel. Ukuran besar tetap mengikuti skala heading semantik.
+Gunakan `Inter, ui-sans-serif, system-ui, sans-serif` dengan fallback sistem agar tetap cepat pada jaringan terbatas tanpa permintaan font eksternal. Tema light memakai kanvas ivory, kartu putih hangat, sidebar forest, dan aksen jade/gold. Ukuran dasar 16 px, teks isi 14–16 px, label input minimal 14 px, judul halaman 24–32 px desktop dan 22–28 px ponsel. Ukuran besar tetap mengikuti skala heading semantik.
 
 Skala jarak 4, 8, 12, 16, 20, 24, 32, dan 48 px. Pakai radius 8 px untuk input/tombol, 12 px untuk kartu. Batas konten desktop sekitar 1200 px; pada layar kecil gunakan padding 16 px.
 

@@ -13,6 +13,7 @@ use App\Services\Provisioning\TenantProvisioningService;
 use App\Support\PlatformAudit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -20,27 +21,63 @@ class PlatformConsoleController extends Controller
 {
     public function dashboard(): View
     {
+        $today = Carbon::today();
+        $start = $today->copy()->subDays(6)->startOfDay();
+        $end = $today->copy()->endOfDay();
+
+        // Dashboard aggregates stay on the central registry; tenant databases are never queried here.
+        $summary = Organization::query()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw("SUM(CASE WHEN setup_state = 'failed' THEN 1 ELSE 0 END) as failed")
+            ->first();
+
+        $activityByDay = AuditEvent::query()
+            ->selectRaw('DATE(created_at) as activity_day, COUNT(*) as total')
+            ->whereBetween('created_at', [$start, $end])
+            ->groupByRaw('DATE(created_at)')
+            ->pluck('total', 'activity_day');
+
+        $trend = collect(range(0, 6))->map(function (int $offset) use ($start, $activityByDay): array {
+            $day = $start->copy()->addDays($offset);
+            $key = $day->toDateString();
+
+            return ['date' => $key, 'label' => $day->translatedFormat('D'), 'count' => (int) ($activityByDay[$key] ?? 0)];
+        });
+
         return view('platform.dashboard', [
             'counts' => [
-                'total' => Organization::query()->count(),
-                'draft' => Organization::query()->where('setup_state', 'draft')->count(),
-                'setup' => Organization::query()->whereIn('setup_state', ['pending', 'running'])->count(),
-                'failed' => Organization::query()->where('setup_state', 'failed')->count(),
-                'active' => Organization::query()->where('service_state', 'active')->count(),
-                'suspended' => Organization::query()->where('service_state', 'suspended')->count(),
+                'total' => (int) ($summary->total ?? 0),
+                'failed' => (int) ($summary->failed ?? 0),
+                'modules' => ModuleCatalogItem::query()->where('available', true)->count(),
             ],
-            'recent' => AuditEvent::query()->latest('created_at')->limit(8)->get(),
+            'trend' => $trend,
+            'trendMax' => max(1, (int) $trend->max('count')),
+            'recent' => AuditEvent::query()->select(['id', 'event', 'actor_id', 'organization_id', 'created_at'])->latest('created_at')->limit(5)->get(),
         ]);
     }
 
     public function organizations(Request $request): View
     {
-        $query = Organization::query()->when($request->string('q')->trim()->isNotEmpty(), function ($builder) use ($request): void {
-            $term = '%'.$request->string('q')->trim().'%';
-            $builder->where(fn ($nested) => $nested->where('name', 'ilike', $term)->orWhere('canonical_domain', 'ilike', $term));
-        });
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:160'],
+            'service_state' => ['nullable', 'in:inactive,active,suspended'],
+            'module_id' => ['nullable', 'integer', 'min:1'],
+        ]);
+        $modules = ModuleCatalogItem::query()->where('available', true)->orderBy('name')->get(['id', 'name']);
 
-        return view('platform.organizations', ['organizations' => $query->latest('id')->paginate(15)->withQueryString()]);
+        $query = Organization::query()->when(trim((string) ($filters['q'] ?? '')) !== '', function ($builder) use ($filters): void {
+            $term = '%'.trim($filters['q']).'%';
+            $builder->where(fn ($nested) => $nested->where('name', 'ilike', $term)->orWhere('canonical_domain', 'ilike', $term));
+        })->when(! empty($filters['service_state']), fn ($builder) => $builder->where('service_state', $filters['service_state']))
+            ->when(! empty($filters['module_id']) && $modules->contains('id', (int) $filters['module_id']), function ($builder) use ($filters): void {
+                $builder->whereHas('moduleEntitlements', fn ($entitlements) => $entitlements->where('module_catalog_item_id', (int) $filters['module_id']));
+            });
+
+        return view('platform.organizations', [
+            'organizations' => $query->latest('id')->paginate(15)->withQueryString(),
+            'modules' => $modules,
+            'filters' => $filters,
+        ]);
     }
 
     public function storeDraft(Request $request, CreateTenantDraft $drafts): RedirectResponse

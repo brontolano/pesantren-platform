@@ -1,10 +1,56 @@
-document.addEventListener('click', (event) => {
-  const button = event.target.closest('[data-menu-toggle]');
-  const menu = document.querySelector('[data-mobile-menu]');
-  if (!button || !menu) return;
-  const expanded = button.getAttribute('aria-expanded') === 'true';
-  button.setAttribute('aria-expanded', String(!expanded));
-  menu.hidden = expanded;
+const mobileDrawer = document.querySelector('[data-mobile-drawer]');
+const drawerToggle = document.querySelector('[data-drawer-toggle]');
+const drawerPanel = mobileDrawer?.querySelector('[role="dialog"]');
+const drawerFocusables = () => [...(drawerPanel?.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])') ?? [])]
+  .filter((element) => !element.hidden && element.getAttribute('aria-hidden') !== 'true');
+
+const closeDrawer = (restoreFocus = true) => {
+  if (!mobileDrawer || mobileDrawer.hidden) return;
+  mobileDrawer.hidden = true;
+  drawerToggle?.setAttribute('aria-expanded', 'false');
+  document.documentElement.classList.remove('pu-drawer-open');
+  if (restoreFocus) drawerToggle?.focus({ preventScroll: true });
+};
+
+drawerToggle?.addEventListener('click', () => {
+  if (!mobileDrawer || !drawerPanel) return;
+  mobileDrawer.hidden = false;
+  drawerToggle.setAttribute('aria-expanded', 'true');
+  document.documentElement.classList.add('pu-drawer-open');
+  (drawerFocusables()[0] ?? drawerPanel).focus({ preventScroll: true });
+});
+
+mobileDrawer?.addEventListener('click', (event) => {
+  if (event.target.closest('[data-drawer-close]')) closeDrawer();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (!mobileDrawer || mobileDrawer.hidden) return;
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeDrawer();
+    return;
+  }
+  if (event.key !== 'Tab') return;
+  const focusables = drawerFocusables();
+  if (!focusables.length) {
+    event.preventDefault();
+    drawerPanel?.focus();
+    return;
+  }
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
+window.matchMedia('(min-width: 48.001rem)').addEventListener('change', (event) => {
+  if (event.matches) closeDrawer(false);
 });
 
 document.querySelectorAll('[data-onboarding-wizard]').forEach((form) => {

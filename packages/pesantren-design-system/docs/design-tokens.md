@@ -4,16 +4,18 @@ Semua token CSS memakai awalan --pu- agar tidak bertabrakan dengan gaya aplikasi
 
 | Token | Nilai awal | Pemakaian |
 |---|---|---|
-| --pu-color-brand-700 | #1d4ed8 | Tombol utama, fokus, tautan aktif |
-| --pu-color-brand-50 | #eff6ff | Latar informasi |
-| --pu-color-ink-900 | #111827 | Teks utama |
-| --pu-color-ink-600 | #4b5563 | Teks pendamping |
-| --pu-color-surface | #ffffff | Panel, formulir, kartu |
-| --pu-color-canvas | #f8fafc | Latar kerja |
-| --pu-color-border | #6b7280 | Garis kontrol |
-| --pu-color-success-800 | #166534 | Keberhasilan |
-| --pu-color-warning-900 | #78350f | Peringatan |
-| --pu-color-danger-800 | #991b1b | Kegagalan |
+| `--pu-primitive-forest-900` | `#123C35` | Sidebar dan identitas utama |
+| `--pu-primitive-jade-700` | `#2F6B5B` | Aksi, tautan, dan fokus |
+| `--pu-primitive-sage-100` | `#DDE9DF` | Sorotan lembut dan ikon |
+| `--pu-primitive-ivory-50` | `#F7F5EF` | Kanvas halaman |
+| `--pu-primitive-paper` | `#FFFEFA` | Kartu dan panel |
+| `--pu-primitive-gold-500` | `#B99A55` | Aksen navigasi aktif |
+| `--pu-primitive-navy-900` | `#1F2D46` | Teks utama |
+| `--pu-color-ink-600` | `#536274` | Teks pendamping |
+| `--pu-color-border` | `#D7DFD8` | Garis kontrol dan panel |
+| `--pu-color-success-800` | `#176B47` | Keberhasilan |
+| `--pu-color-warning-900` | `#744B08` | Peringatan |
+| `--pu-color-danger-800` | `#9B2828` | Kegagalan |
 
 Warna adalah nilai awal, bukan bukti kontras untuk semua kombinasi. Periksa kontras setelah tema/status diterapkan. Tampilkan status dalam teks, jangan mengandalkan warna saja.
 
@@ -21,13 +23,13 @@ Tipografi memakai Inter bila tersedia dan font sistem sebagai fallback; paket ti
 
 ## Kustomisasi
 
-Override token semantik di stylesheet host setelah stylesheet paket dimuat:
+Tema dasar v2 adalah light mode. Font Inter memakai fallback sistem tanpa unduhan font eksternal. Override token semantik di stylesheet host setelah stylesheet paket dimuat:
 
 ~~~css
 :root {
-    --pu-color-brand-700: #14532d;
-    --pu-color-brand-50: #f0fdf4;
-    --pu-color-focus: #14532d;
+    --pu-color-brand-700: #123c35;
+    --pu-color-brand-50: #dde9df;
+    --pu-color-focus: #2f6b5b;
 }
 ~~~
 

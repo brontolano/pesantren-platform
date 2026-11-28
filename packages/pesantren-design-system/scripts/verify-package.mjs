@@ -39,19 +39,28 @@ const components = [
   'resources/views/components/field.blade.php',
   'resources/views/components/status.blade.php',
   'resources/views/components/data-table.blade.php',
+  'resources/views/components/icon.blade.php',
+  'resources/views/components/metric-card.blade.php',
+  'resources/views/components/empty-state.blade.php',
 ];
 for (const file of components) assert.ok((await read(file)).length > 50, file + ' must be implemented');
 
 const css = await read('resources/css/pesantren-ui.css');
-assert.match(css, /--pu-primitive-blue-700:\s*#1d4ed8/i);
-assert.match(css, /--pu-color-brand-700:\s*var\(--pu-primitive-blue-700\)/i);
-assert.match(css, /--pu-primitive-gray-900:\s*#111827/i);
-assert.match(css, /--pu-color-ink-900:\s*var\(--pu-primitive-gray-900\)/i);
+assert.match(css, /--pu-primitive-forest-900:\s*#123c35/i);
+assert.match(css, /--pu-primitive-jade-700:\s*#2f6b5b/i);
+assert.match(css, /--pu-primitive-sage-100:\s*#dde9df/i);
+assert.match(css, /--pu-primitive-ivory-50:\s*#f7f5ef/i);
+assert.match(css, /--pu-primitive-gold-500:\s*#b99a55/i);
+assert.match(css, /--pu-primitive-navy-900:\s*#1f2d46/i);
+assert.match(css, /--pu-color-brand-700:\s*var\(--pu-primitive-forest-900\)/i);
 assert.match(css, /:focus-visible/);
 assert.match(css, /@media\s*\(max-width:\s*48rem\)/);
 assert.match(css, /\.pu-data-table__desktop\s*\{\s*display:\s*none;/);
 assert.match(css, /\.pu-data-table__mobile\s*\{\s*display:\s*block;/);
 assert.match(css, /overflow-wrap:\s*anywhere/);
+assert.match(css, /\.pu-shell__drawer-panel\s*\{/);
+assert.match(css, /\.pu-mobile-menu-button\s*\{/);
+assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
 assert.match(css, /\.pu-data-table__desktop th, \.pu-data-table__desktop td\s*\{[^}]*overflow-wrap:\s*anywhere;[^}]*word-break:\s*normal;/);
 assert.doesNotMatch(css, /https?:\/\/|@import\s+url|@font-face/i);
 

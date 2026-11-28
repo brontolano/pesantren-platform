@@ -29,7 +29,13 @@
 
 <x-pesantren-ui::card class="panel-space" aria-labelledby="list-title">
     <x-slot:header><div class="panel-head"><h2 id="list-title">Daftar organisasi</h2><span class="field-hint">{{ $organizations->total() }} organisasi</span></div></x-slot:header>
-    <form class="toolbar" method="get" action="{{ route('platform.organizations.index') }}"><div class="field" style="flex:1;min-width:220px"><label for="q">Cari organisasi atau domain</label><input class="pu-input" id="q" name="q" value="{{ request('q') }}" placeholder="Nama atau domain"></div><x-pesantren-ui::button type="submit" variant="secondary">Cari</x-pesantren-ui::button></form>
+    <form class="toolbar organization-filters" method="get" action="{{ route('platform.organizations.index') }}">
+        <div class="field organization-filters__search"><label for="q">Cari organisasi atau domain</label><input class="pu-input" id="q" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Nama atau domain" autocomplete="off"></div>
+        <div class="field organization-filters__state"><label for="service_state">Status layanan</label><select class="pu-input" id="service_state" name="service_state"><option value="">Semua status</option><option value="active" @selected(($filters['service_state'] ?? '') === 'active')>Aktif</option><option value="inactive" @selected(($filters['service_state'] ?? '') === 'inactive')>Nonaktif</option><option value="suspended" @selected(($filters['service_state'] ?? '') === 'suspended')>Ditangguhkan</option></select></div>
+        <div class="field organization-filters__module"><label for="module_id">Modul aktif</label><select class="pu-input" id="module_id" name="module_id"><option value="">Semua modul</option>@foreach($modules as $module)<option value="{{ $module->id }}" @selected((string) ($filters['module_id'] ?? '') === (string) $module->id)>{{ $module->name }}</option>@endforeach</select></div>
+        <x-pesantren-ui::button type="submit" variant="secondary"><x-pesantren-ui::icon name="search" size="sm" />Terapkan</x-pesantren-ui::button>
+        @if(!empty($filters))<a class="pu-button pu-button--quiet" href="{{ route('platform.organizations.index') }}">Atur ulang</a>@endif
+    </form>
     @if($organizations->isEmpty())
         <p class="empty">Belum ada organisasi. Buat draf pertama melalui formulir di atas.</p>
     @else

@@ -4,52 +4,46 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Ruang kerja') · Pesantren.online v2</title>
-    <link rel="stylesheet" href="{{ asset('vendor/pesantren-ui/pesantren-ui.css') }}">
+    <title>@yield('title', 'Ruang kerja') · Pesantren.online</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
-<x-pesantren-ui::app-shell title="Pesantren.online">
+<x-pesantren-ui::app-shell title="Pesantren.online" :context="($panelType ?? 'platform') === 'platform' ? 'Superadmin' : 'Admin pesantren'">
     <x-slot:sidebar>
         @if(($panelType ?? 'platform') === 'platform')
-            <a class="brand" href="{{ route('platform.dashboard') }}"><span class="brand-mark" aria-hidden="true">P</span><span>Pesantren.online</span></a>
-            <nav aria-label="Ruang platform">
-                <p class="nav-label">Ruang platform</p>
-                <ul class="nav-list">
-                    <li><a class="nav-link" aria-current="{{ request()->routeIs('platform.dashboard') ? 'page' : 'false' }}" href="{{ route('platform.dashboard') }}">Ringkasan</a></li>
-                    <li><a class="nav-link" aria-current="{{ request()->routeIs('platform.organizations.*') ? 'page' : 'false' }}" href="{{ route('platform.organizations.index') }}">Organisasi</a></li>
-                    <li><a class="nav-link" aria-current="{{ request()->routeIs('platform.modules') ? 'page' : 'false' }}" href="{{ route('platform.modules') }}">Modul</a></li>
-                    <li><a class="nav-link" aria-current="{{ request()->routeIs('platform.activity') ? 'page' : 'false' }}" href="{{ route('platform.activity') }}">Log Aktivitas</a></li>
+            <a class="pu-shell__brand" href="{{ route('platform.dashboard') }}">
+                <span class="pu-shell__brand-icon"><x-pesantren-ui::icon name="building" size="lg" /></span>
+                <span>Pesantren.online</span>
+            </a>
+            <span class="pu-shell__panel-label">Superadmin</span>
+            <nav class="pu-shell__nav" aria-label="Ruang platform">
+                <p class="pu-shell__nav-label">Ruang platform</p>
+                <ul class="pu-shell__nav-list">
+                    <li><a class="pu-shell__nav-link" @if(request()->routeIs('platform.dashboard')) aria-current="page" @endif href="{{ route('platform.dashboard') }}"><x-pesantren-ui::icon name="dashboard" />Ringkasan</a></li>
+                    <li><a class="pu-shell__nav-link" @if(request()->routeIs('platform.organizations.*')) aria-current="page" @endif href="{{ route('platform.organizations.index') }}"><x-pesantren-ui::icon name="building" />Organisasi</a></li>
+                    <li><a class="pu-shell__nav-link" @if(request()->routeIs('platform.modules')) aria-current="page" @endif href="{{ route('platform.modules') }}"><x-pesantren-ui::icon name="layers" />Modul</a></li>
+                    <li><a class="pu-shell__nav-link" @if(request()->routeIs('platform.activity')) aria-current="page" @endif href="{{ route('platform.activity') }}"><x-pesantren-ui::icon name="activity" />Log Aktivitas</a></li>
                 </ul>
             </nav>
-            <p class="sidebar-note">Panel operator pusat. Data santri tidak tersedia di ruang ini.</p>
+            <p class="pu-shell__sidebar-note">Panel operator pusat. Data santri tidak tersedia di ruang ini.</p>
         @else
-            <a class="brand" href="{{ route('tenant.dashboard') }}"><span class="brand-mark" aria-hidden="true">{{ mb_substr($organization->name, 0, 1) }}</span><span>{{ $organization->name }}</span></a>
-            <nav aria-label="Ruang organisasi">
-                <p class="nav-label">Ruang organisasi</p>
-                <ul class="nav-list">
-                    <li><a class="nav-link" aria-current="{{ request()->routeIs('tenant.dashboard') ? 'page' : 'false' }}" href="{{ route('tenant.dashboard') }}">Beranda</a></li>
-                    <li><a class="nav-link" aria-current="{{ request()->routeIs('tenant.modules') ? 'page' : 'false' }}" href="{{ route('tenant.modules') }}">Modul</a></li>
+            <a class="pu-shell__brand" href="{{ route('tenant.dashboard') }}">
+                <span class="pu-shell__brand-icon"><x-pesantren-ui::icon name="building" size="lg" /></span>
+                <span>{{ $organization->name }}</span>
+            </a>
+            <nav class="pu-shell__nav" aria-label="Ruang organisasi">
+                <p class="pu-shell__nav-label">Ruang organisasi</p>
+                <ul class="pu-shell__nav-list">
+                    <li><a class="pu-shell__nav-link" @if(request()->routeIs('tenant.dashboard')) aria-current="page" @endif href="{{ route('tenant.dashboard') }}"><x-pesantren-ui::icon name="dashboard" />Beranda</a></li>
+                    <li><a class="pu-shell__nav-link" @if(request()->routeIs('tenant.modules')) aria-current="page" @endif href="{{ route('tenant.modules') }}"><x-pesantren-ui::icon name="layers" />Modul</a></li>
                 </ul>
             </nav>
+            <p class="pu-shell__sidebar-note">Ruang kerja {{ $organization->name }}.</p>
         @endif
     </x-slot:sidebar>
-    <x-slot:mobileNav>
-        <nav class="pu-mobile-links" aria-label="Navigasi ponsel">
-            @if(($panelType ?? 'platform') === 'platform')
-                <a href="{{ route('platform.dashboard') }}">Ringkasan</a>
-                <a href="{{ route('platform.organizations.index') }}">Organisasi</a>
-                <a href="{{ route('platform.modules') }}">Modul</a>
-                <a href="{{ route('platform.activity') }}">Aktivitas</a>
-            @else
-                <a href="{{ route('tenant.dashboard') }}">Beranda</a>
-                <a href="{{ route('tenant.modules') }}">Modul</a>
-            @endif
-        </nav>
-    </x-slot:mobileNav>
     <x-slot:topbar>
         <div class="pu-shell__topbar-actions">
-            <div class="topbar-meta">{{ ($panelType ?? 'platform') === 'platform' ? auth('platform')->user()?->name : auth('tenant')->user()?->name }}</div>
+            <span class="pu-shell__user">Assalamu’alaikum, {{ ($panelType ?? 'platform') === 'platform' ? auth('platform')->user()?->name : auth('tenant')->user()?->name }}</span>
             <form method="post" action="{{ ($panelType ?? 'platform') === 'platform' ? route('platform.logout') : route('tenant.logout') }}">
                 @csrf
                 <x-pesantren-ui::button type="submit" variant="secondary" size="sm">Keluar</x-pesantren-ui::button>
